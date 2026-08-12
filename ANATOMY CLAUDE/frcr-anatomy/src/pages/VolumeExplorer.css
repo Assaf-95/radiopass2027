@@ -1,0 +1,198 @@
+/* The scout page. ScanVolume.css owns the inside of the volume and its DICOM
+   corner overlay; this file only positions the layer and lays out the copy
+   beside it. */
+
+.vx {
+  background: var(--bg);
+}
+
+.vx-track {
+  position: relative;
+}
+
+.vx-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* The volume fills the pin. ScanVolume itself is position:absolute inset:0,
+   so it needs a positioned ancestor of a known size and nothing else. */
+.vx-stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- Copy ---------------------------------------------------------------- */
+
+.vx-copy {
+  position: absolute;
+  left: clamp(24px, 6vw, 88px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 30rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vx-copy > * {
+  pointer-events: auto;
+}
+
+.vx-eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber-accent);
+}
+
+.vx-copy h1 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  line-height: 1.05;
+  color: var(--text);
+}
+
+.vx-desc {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+/* Names the preset in prose. The live numbers live in ScanVolume's corner
+   console — this is orientation, not a second readout. */
+.vx-preset {
+  margin: -8px 0 22px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.vx-preset strong {
+  color: var(--amber-accent);
+  font-weight: 500;
+}
+
+.vx-go {
+  display: inline-block;
+}
+
+/* --- Region rail --------------------------------------------------------- */
+
+.vx-rail {
+  position: absolute;
+  right: clamp(16px, 3vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vx-stop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.vx-stop:hover {
+  color: var(--text-dim);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.vx-stop.is-on {
+  color: var(--amber-accent);
+}
+
+.vx-stop-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  flex: none;
+}
+
+.vx-stop.is-on .vx-stop-dot {
+  background: currentColor;
+}
+
+/* --- Foot ---------------------------------------------------------------- */
+
+.vx-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: var(--sp-8, 64px) 24px var(--sp-9, 96px);
+  text-align: center;
+}
+
+.vx-foot p {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+/* --- Narrow -------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .vx-copy {
+    left: 20px;
+    right: 20px;
+    top: auto;
+    bottom: 76px;
+    transform: none;
+    max-width: none;
+  }
+
+  /* The volume reads badly behind text at this width, so the copy gets a
+     scrim rather than fighting the picture. */
+  .vx-copy::before {
+    content: '';
+    position: absolute;
+    inset: -20px -20px -40px;
+    background: linear-gradient(0deg, var(--bg) 22%, transparent);
+    z-index: -1;
+  }
+
+  .vx-preset {
+    margin-bottom: 16px;
+  }
+
+  .vx-rail {
+    right: 10px;
+  }
+
+  .vx-stop-label {
+    display: none;
+  }
+}
+
+/* Reduced motion: the scrub is off, so the track collapses to one screen and
+   the rail buttons become the only way to travel. */
+@media (prefers-reduced-motion: reduce) {
+  .vx-track {
+    height: 100vh !important;
+  }
+}

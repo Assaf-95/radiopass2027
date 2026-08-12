@@ -24,6 +24,12 @@ const AtlasHome = lazy(() => import('./pages/AtlasHome'));
 const AtlasChapter = lazy(() => import('./pages/AtlasChapter'));
 const AtlasStructure = lazy(() => import('./pages/AtlasStructure'));
 
+/* The scout. Lazy for the same reason as the Atlas — it is a browsing tool,
+   not a step towards answering a question — and emphatically so here: it pulls
+   in the 1,767-line procedural volume builder, which is the largest single
+   module in the app and must never sit on the first download. */
+const VolumeExplorer = lazy(() => import('./pages/VolumeExplorer'));
+
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Disputes = lazy(() => import('./pages/Disputes'));
 const MriViewer = lazy(() => import('./pages/MriViewer'));
@@ -94,6 +100,7 @@ export default function App() {
             <Route path="/disputes" element={<Disputes />} />
             <Route path="/mri/:studyId" element={<MriViewer />} />
             <Route path="/cxr" element={<ChestXrayAtlas />} />
+            <Route path="/volume" element={<VolumeExplorer />} />
             <Route path="/atlas" element={<AtlasHome />} />
             <Route path="/atlas/:chapterId" element={<AtlasChapter />} />
             <Route path="/atlas/:chapterId/:structureId" element={<AtlasStructure />} />

@@ -161,6 +161,9 @@ export default function Layout() {
               {/* The second way into the same material: structure first
                   rather than question first. */}
               <Link to="/atlas">Atlas</Link>
+              {/* The third way in: region first. A scout down the body that
+                  hands you into that region's questions. */}
+              <Link to="/volume">Scout</Link>
               <Link to="/cxr">X-ray</Link>
               <Link to="/mri/head-bone">CT</Link>
               <Link to="/mri/hip-axial-t1">MRI</Link>
