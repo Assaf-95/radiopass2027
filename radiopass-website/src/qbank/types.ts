@@ -132,9 +132,53 @@ const MRI_KEYWORDS: [RegExp, string, string][] = [
 ]
 
 /**
+ * Where each TOPIC sends a candidate when the wording identifies nothing more
+ * specific — an explicit registry rather than a guess.
+ *
+ * This used to be three `if`s and a fallback, and the fallback did most of the
+ * work: only ultrasound, MRI and CT were mapped at all, so questions on
+ * mammography, digital imaging, fluoroscopy, nuclear medicine, legislation and
+ * radiation biology — 189 of the 453 in the bank — were all offered "Fact
+ * Bank", while /xray-lab/mammography, /xray-lab/digital, /xray-lab/fluoroscopy
+ * and /nm-lab sat built and unmentioned. CT, meanwhile, pointed at an anchor on
+ * the lab index instead of the CT lab itself.
+ *
+ * Keyed by the topic string as it appears IN THE DATA, not by QbTopic: the
+ * bank carries two topics the union does not declare ("Other" and "Basic
+ * Physics"), and a registry that silently dropped them would reintroduce the
+ * same fallback-for-everything problem. labLinkFor.test.ts asserts that every
+ * topic present in the bank has an entry here and that every href resolves to
+ * a route App.tsx actually declares — so this cannot rot the way a regex can.
+ *
+ * The principle is borrowed from the physics lineages in the archive, each of
+ * which bound questions to teaching visuals through a registry guarded by an
+ * integrity test rather than by pattern-matching the question text.
+ */
+export const TOPIC_LABS: Record<string, LabLink> = {
+  'Radiography & X-ray Physics': { href: '/xray-lab', label: 'X-ray Laboratory' },
+  Mammography: { href: '/xray-lab/mammography', label: 'Mammography lab' },
+  'Digital Imaging': { href: '/xray-lab/digital', label: 'Digital Radiography lab' },
+  Fluoroscopy: { href: '/xray-lab/fluoroscopy', label: 'Fluoroscopy lab' },
+  CT: { href: '/ct-lab', label: 'CT Laboratory' },
+  MRI: { href: '/mri-lab', label: 'MRI Laboratory' },
+  'Nuclear Medicine': { href: '/nm-lab', label: 'Nuclear Medicine lab' },
+  Ultrasound: { href: '/ultrasound-lab', label: 'Ultrasound Physics Lab' },
+  /* No lab teaches the regulations or the risk coefficients — they are learnt
+     from the facts — so these two go to the protection topic rather than to
+     the fact bank's front page, which would leave the candidate to find it. */
+  'Legislation & Radiation Protection': { href: '/fact-bank/protection', label: 'Radiation Protection facts' },
+  'Radiation Biology & Dosimetry': { href: '/fact-bank/protection', label: 'Radiation Protection facts' },
+  'Basic Physics': { href: '/fact-bank', label: 'Fact Bank' },
+  Other: { href: '/fact-bank', label: 'Fact Bank' },
+}
+
+/** Used only if a topic reaches the UI before it reaches the registry. */
+export const LAB_FALLBACK: LabLink = { href: '/fact-bank', label: 'Fact Bank' }
+
+/**
  * The laboratory a question links out to. Ultrasound and MRI questions link to
  * the specific experiment when the wording identifies one; everything else
- * lands on the closest thing the site has for that modality.
+ * lands on the lab its topic belongs to.
  */
 export function labLinkFor(question: Pick<QbQuestion, 'topic' | 'title' | 'stems'>): LabLink {
   const haystack = `${question.title} ${question.stems.map((s) => s.text).join(' ')}`
@@ -142,14 +186,11 @@ export function labLinkFor(question: Pick<QbQuestion, 'topic' | 'title' | 'stems
     for (const [pattern, href, label] of US_KEYWORDS) {
       if (pattern.test(haystack)) return { href, label }
     }
-    return { href: '/ultrasound-lab', label: 'Ultrasound Physics Lab' }
   }
   if (question.topic === 'MRI') {
     for (const [pattern, href, label] of MRI_KEYWORDS) {
       if (pattern.test(haystack)) return { href, label }
     }
-    return { href: '/mri-lab', label: 'MRI Laboratory' }
   }
-  if (question.topic === 'CT') return { href: '/visual-lab#demo', label: 'CT dose & noise demo' }
-  return { href: '/fact-bank', label: 'Fact Bank' }
+  return TOPIC_LABS[question.topic] ?? LAB_FALLBACK
 }
