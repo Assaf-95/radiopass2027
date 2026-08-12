@@ -423,3 +423,55 @@
 
 .rie-meta-row select,
 .rie-meta-row input { width: 100%; }
+
+/* --- Adding a label to an existing question ------------------------------
+   The button arms placement; the next click on the film is where the label
+   lands. Only a label added in this sitting gets a wording field — everything
+   the question shipped with stays protected. */
+
+.rie-addrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+}
+
+.rie-addcancel {
+  padding-inline: 12px;
+}
+
+.rie-text.is-new {
+  color: var(--amber-accent);
+  font-style: italic;
+}
+
+.rie-newanswer {
+  display: block;
+  margin: 8px 0 4px;
+}
+
+.rie-newanswer span {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.rie-newanswer input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--amber-accent);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* While placing, the film is the target — say so with the cursor. */
+.rie-stage.is-placing {
+  cursor: crosshair;
+}

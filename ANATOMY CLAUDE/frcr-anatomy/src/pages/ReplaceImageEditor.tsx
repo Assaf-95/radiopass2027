@@ -141,6 +141,14 @@ function Editor() {
     saved?.answers ?? (original ? toEditableAnswers(original) : [])
   );
   const [selected, setSelected] = useState<string | null>(null);
+  /* "Add label" is armed rather than immediate: the next click on the film is
+     the placement, so the label lands where the author is looking instead of
+     appearing at a default spot to be dragged afterwards. */
+  const [placing, setPlacing] = useState(false);
+  /* Answers added during THIS sitting. Only these get an editable wording
+     field — every answer the question shipped with stays protected, which is
+     the promise this page makes at the top of the answers panel. */
+  const [addedIds, setAddedIds] = useState<Set<string>>(() => new Set());
   const [showOld, setShowOld] = useState(true);
   const [preview, setPreview] = useState(false);
   const [confirm, setConfirm] = useState<Confirm>(null);
@@ -366,7 +374,63 @@ function Editor() {
     );
   }
 
+  /* Adding a label to a question that already exists.
+   *
+   * CustomCaseEditor has been able to drop a new arrow anywhere on a film
+   * since it was written — click the image, get the next letter. This page
+   * could not: stageClick only ever MOVED the label already selected, so on
+   * any of the 501 shipped questions a label could be removed and never put
+   * back, and a replacement film that showed a sixth structure had no way to
+   * label it. That is the one gesture the two editors did not share.
+   *
+   * Nothing below the UI had to change to allow it. applyEdit() already
+   * rebuilds labels, answers, markers, badges, shapes, angles, lengths,
+   * colours and thicknesses from whatever array of stable-id records it is
+   * given, so an added record travels the whole save path unaided.
+   */
+  const MAX_LABELS = 'ABCDEFGH'.length;
+
+  function addLabelAt(e: { clientX: number; clientY: number }) {
+    const p = pctFromEvent(e);
+    if (!p) return;
+    setAnswers((prev) => {
+      if (prev.length >= MAX_LABELS) return prev;
+      /* A fresh id that cannot collide with the ans_1..ans_n the shipped
+         question was loaded with, nor with anything added earlier in this
+         sitting. Identity is the whole point of the model: this record must
+         never be mistaken for one that already carries an answer. */
+      const id = `ans_new_${Date.now().toString(36)}_${prev.length}`;
+      /* defaultLabelPos speaks the viewer's language (labelX/labelY); the
+         stored badge speaks the edit model's (x/y). Same numbers, different
+         field names — translate rather than store the wrong shape. */
+      const { labelX, labelY } = defaultLabelPos(p.x, p.y);
+      const next = reletter([
+        ...prev,
+        {
+          id,
+          letter: '',
+          officialAnswer: '',
+          acceptedVariants: [],
+          lateralityRequired: false,
+          marker: p,
+          badge: { x: labelX, y: labelY },
+          shape: 'arrow',
+          colour: 'white',
+          thicknessPct: DEFAULT_THICKNESS_PCT,
+        },
+      ]);
+      setAddedIds((s) => new Set(s).add(id));
+      setSelected(id);
+      return next;
+    });
+    setPlacing(false);
+  }
+
   function stageClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (placing) {
+      addLabelAt(e);
+      return;
+    }
     if (!selected) return;
     place(selected, e);
   }
@@ -538,6 +602,18 @@ function Editor() {
 
   function save() {
     if (!questionId) return;
+    /* A label with no answer text is a label the candidate can never answer
+       and the marker can never score — exactly what validateQuestions reports
+       as `missing-official-answer`. Refuse it here rather than write it and
+       find out from the validator later. */
+    const unnamed = answers.filter((a) => !a.officialAnswer.trim());
+    if (unnamed.length > 0) {
+      setSaveError(
+        `Label ${unnamed.map((a) => a.letter).join(', ')} has no answer yet. Name it before saving, or remove it.`
+      );
+      setSavedOnce(false);
+      return;
+    }
     if (live) {
       void publish();
       return;
@@ -751,13 +827,15 @@ function Editor() {
               </figure>
             )}
 
-            <figure className="rie-stage">
+            <figure className={placing ? 'rie-stage is-placing' : 'rie-stage'}>
               <figcaption>
-                {imageRemoved
-                  ? 'No image currently assigned'
-                  : newImage
-                    ? 'New image — drag a label onto its structure, or select one and click'
-                    : 'Current image'}
+                {placing
+                  ? 'Click where the new label should point'
+                  : imageRemoved
+                    ? 'No image currently assigned'
+                    : newImage
+                      ? 'New image — drag a label onto its structure, or select one and click'
+                      : 'Current image'}
               </figcaption>
               {shownSrc ? (
                 /* A plain image with an overlay of its own, rather than the
@@ -903,11 +981,31 @@ function Editor() {
 
           <div className="rie-answers">
             <h2>
-              Answers <span className="rie-lock">read-only — protected</span>
+              Answers <span className="rie-lock">existing wording protected</span>
             </h2>
             <p className="rie-hint">
-              Wording is never changed here. Select one to place its label; use arrow keys to nudge.
+              Wording that shipped with the question is never changed here. Select one to place its
+              label; use arrow keys to nudge.
             </p>
+            <div className="rie-addrow">
+              <button
+                type="button"
+                className={placing ? 'btn btn-primary' : 'btn'}
+                disabled={answers.length >= MAX_LABELS}
+                aria-pressed={placing}
+                onClick={() => setPlacing((v) => !v)}
+              >
+                {placing ? 'Click the film to place it' : '+ Add label'}
+              </button>
+              {placing && (
+                <button type="button" className="btn rie-addcancel" onClick={() => setPlacing(false)}>
+                  Cancel
+                </button>
+              )}
+              {answers.length >= MAX_LABELS && (
+                <span className="rie-hint">Eight labels is the maximum — remove one first.</span>
+              )}
+            </div>
             {answers.map((a) => (
               <div
                 key={a.id}
@@ -915,8 +1013,31 @@ function Editor() {
               >
                 <button type="button" className="rie-pick" onClick={() => setSelected(a.id)}>
                   <span className="rie-letter">{a.letter}</span>
-                  <span className="rie-text">{a.officialAnswer}</span>
+                  {addedIds.has(a.id) ? (
+                    <span className="rie-text is-new">{a.officialAnswer || 'New label — name it below'}</span>
+                  ) : (
+                    <span className="rie-text">{a.officialAnswer}</span>
+                  )}
                 </button>
+                {/* Only a label added in this sitting is nameable here. An
+                    answer the question shipped with stays untouchable, so
+                    adding a label can never become a way to quietly reword an
+                    existing one. */}
+                {addedIds.has(a.id) && (
+                  <label className="rie-newanswer">
+                    <span>Answer for {a.letter}</span>
+                    <input
+                      type="text"
+                      value={a.officialAnswer}
+                      placeholder="e.g. Spinous process of C4"
+                      onChange={(e) =>
+                        setAnswers((prev) =>
+                          prev.map((x) => (x.id === a.id ? { ...x, officialAnswer: e.target.value } : x))
+                        )
+                      }
+                    />
+                  </label>
+                )}
                 {a.needsReview && <span className="rie-flag" title="Inherited from the previous image">review</span>}
                 <button type="button" className="rie-remove" onClick={() => removeAnswer(a)}>Remove</button>
                 <div className="rie-shapes" role="group" aria-label={`Pointer style for ${a.letter}`}>
