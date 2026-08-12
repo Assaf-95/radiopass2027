@@ -277,13 +277,25 @@ export default function AtlasStructure() {
               </button>
 
               <div className="gallery-caption">
+                {/* WHAT THIS FILM ACTUALLY SHOWS, first and loudest, and
+                    carrying the letter it is labelled with.
+
+                    The heading already says which entity you chose; on a page
+                    that folds a dozen parts into one, what you cannot work out
+                    by looking is which part THIS film is labelling — and then
+                    which of the letters printed on it to look at. The badge
+                    here is the same amber disc drawn over the film, so the eye
+                    goes caption -> marker without reading the legend. */}
+                <p className="film-label">
+                  <span className="film-label-key" aria-hidden="true">
+                    {image.label === 'Answer' ? '•' : image.label}
+                  </span>
+                  {image.officialAnswer}
+                </p>
                 <p className={image.description ? 'film-desc' : 'film-desc is-blank'}>
                   {image.description || 'Description not yet added'}
                 </p>
                 <ImageFacts image={image} />
-                {image.officialAnswer.toLowerCase() !== structure.name.toLowerCase() && (
-                  <p className="film-answer">Labelled “{image.officialAnswer}”</p>
-                )}
 
                 {showLabels && image.companions.length > 0 && (
                   <FilmLegend

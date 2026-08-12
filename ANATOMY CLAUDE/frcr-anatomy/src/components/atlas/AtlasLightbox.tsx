@@ -126,11 +126,14 @@ export default function AtlasLightbox({
         <header className="lightbox-head">
           <div className="lightbox-title">
             <h2>{structureName}</h2>
+            <p className="lb-label">
+              <span className="film-label-key" aria-hidden="true">
+                {image.label === 'Answer' ? '•' : image.label}
+              </span>
+              {image.officialAnswer}
+            </p>
             <p className="mono">
               {index + 1} / {images.length}
-              {image.officialAnswer.toLowerCase() !== structureName.toLowerCase() && (
-                <> · labelled “{image.officialAnswer}”</>
-              )}
             </p>
           </div>
           <div className="lightbox-tools">

@@ -366,6 +366,40 @@
 .gallery-caption .lb-facts { margin: 0; font-size: 11px; color: var(--text-faint); }
 .fact-sep { margin: 0 7px; opacity: 0.55; }
 
+/* The part this film is labelling. On an entity page — Mandible, Aorta,
+   Humerus — this is the line that does the teaching, so it leads the caption
+   and takes the accent, matching the badge drawn on the film itself. */
+.film-label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-size: 19px;
+  line-height: 1.2;
+  color: var(--amber-accent);
+}
+
+/* The letter printed on the film, drawn as the same amber disc that marks it
+   there. Two copies of one fact, so the eye can jump between them without
+   going through the legend. */
+.film-label-key {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--amber-accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(2px);
+}
+
 .film-answer { margin: 0; font-size: 12px; color: var(--text-dim); }
 
 .film-source {

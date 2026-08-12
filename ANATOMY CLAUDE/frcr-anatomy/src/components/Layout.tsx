@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import SignIn from './SignIn';
 import { hasServerSession, isAdmin } from '../lib/admin';
 import { contentState, loadContent, subscribeContent } from '../lib/content/store';
@@ -64,10 +64,33 @@ function initials(name: string) {
     .join('');
 }
 
+/* A new page starts at the top.
+ *
+ * Nothing was resetting the scroll on navigation, so following a link from
+ * halfway down one page landed halfway down the next — most visibly in the
+ * Atlas, where clicking a related structure from the bottom of a long gallery
+ * dropped you straight into the bottom of the next one.
+ *
+ * Back and forward are left alone: returning to a page you have already
+ * scrolled should put you back where you were, which is what the browser's
+ * own restoration does. Only a NEW navigation resets.
+ *
+ * useLayoutEffect, not useEffect, so the jump happens before the browser
+ * paints — and so that a page with a deliberate scroll of its own (the home
+ * page honouring ?goto=modules) runs after this and wins. */
+function useScrollToTopOnNavigate(pathname: string) {
+  const navigationType = useNavigationType();
+  useLayoutEffect(() => {
+    if (navigationType === 'POP') return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+  }, [pathname, navigationType]);
+}
+
 export default function Layout() {
   const { theme, toggle } = useTheme();
   const location = useLocation();
   const isQuestionRoute = /\/q\//.test(location.pathname);
+  useScrollToTopOnNavigate(location.pathname);
 
   const [account, setAccount] = useState<Account | null>(() => getAccount());
   const [menuOpen, setMenuOpen] = useState(false);
