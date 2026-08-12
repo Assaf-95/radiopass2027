@@ -822,8 +822,8 @@
       {
         "label": "A",
         "text": "Erythema threshold is 5mGy.",
-        "answer": true,
-        "explanation": "The erythema threshold is in the Gy range; mGy values are too low."
+        "answer": false,
+        "explanation": "False, and by a factor of about 400. The threshold for transient skin erythema is roughly 2 Gy — that is 2000 mGy. 5 mGy is diagnostic territory: a chest radiograph delivers an entrance dose of about 0.15 mGy, so if 5 mGy really were the threshold, a routine fluoroscopy list would be burning patients. That is the sanity check to carry — deterministic thresholds live in grays, diagnostic doses live in milligrays, and the two are separated by three orders of magnitude. Note stem B in this same question: 2 Gy for lens opacity. Same scale, and it is the right one."
       },
       {
         "label": "B",
@@ -5302,8 +5302,8 @@
       {
         "label": "A",
         "text": "Only with K shell electron.",
-        "answer": true,
-        "explanation": "The recall key marks this true: characteristic x-ray energy is set by shell binding-energy differences, while the incident electron or photon energy used to create the vacancy is usually higher."
+        "answer": false,
+        "explanation": "The word doing the damage is \"only\". A photoelectric interaction can happen with an electron in any shell — K, L or M — provided the incoming photon carries at least that shell's binding energy. K-shell electrons are the most tightly bound, so they dominate once the photon is above the K-edge, and that is where the sharp jump in attenuation comes from. But below the K-edge the interaction does not stop; it simply moves out to the L and M shells. Compare iodine: above 33.2 keV, K-shell photoelectric absorption is what makes it opaque, yet iodine still absorbs below that energy."
       },
       {
         "label": "B",
@@ -9761,7 +9761,7 @@
       },
       {
         "label": "C",
-        "text": "For abdominal studies, the dose rate at the surface of a patient is typically 1020mGy/min",
+        "text": "For abdominal studies, the dose rate at the surface of a patient is typically 10-20 mGy/min",
         "answer": true,
         "explanation": "Because the beam is on continuously and relatively high KVp and mA are required to penetrate the abdomen"
       },
@@ -10750,8 +10750,8 @@
       {
         "label": "C",
         "text": "after 10 half-lives the activity of a radionuclide will have decreased by a little more than 1000fold",
-        "answer": false,
-        "explanation": "After 10 half-lives activity is 1/1024 of the original, a little less than 1000-fold reduction is wrong if worded as decreased by a little more than 1000-fold."
+        "answer": true,
+        "explanation": "Ten half-lives means halving ten times: 2^10 = 1024. The activity is left at 1/1024 of what it started as, which is a reduction of a little more than 1000-fold — so the statement is true as written. This is the practical rule behind decay storage: hold a Tc-99m source (6 hour half-life) for ten half-lives, about 60 hours, and you are down to a thousandth of the starting activity. The useful shorthand is that 10 half-lives is roughly a factor of 1000, and 20 half-lives roughly a factor of a million."
       },
       {
         "label": "D",
