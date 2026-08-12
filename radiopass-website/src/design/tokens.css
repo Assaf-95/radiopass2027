@@ -103,7 +103,13 @@
   --success: #7FC8A9;
   --warning: #D9A84E;
   --error: #C9776B;
-  --hue-xray: #6BA3D6;
+  /* The approved X-ray blue, and the only correct value: it is what the anatomy
+     app ships (index.css --mod-xray), what both plate canvases paint, and what
+     the pinned homepage scenes use. This token was introduced at #6BA3D6, which
+     matched none of them — so home.css and portal.css each opted out of the
+     token rather than adopt a colour that was visibly wrong, and qbank.css
+     adopted it and drifted. Fixed at source; the opt-outs can now come back. */
+  --hue-xray: #A8CBEA;
   --hue-ct: #8FB8D8;
   --hue-mri: #A99EDB;
   --hue-us: #7BCBC4;

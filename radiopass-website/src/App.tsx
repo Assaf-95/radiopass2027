@@ -1,7 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useState, type ChangeEvent, type ComponentType, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { MoreDetail } from './design/primitives'
-import { FactBankPage, FactTopicPage } from './factbank'
 import { useAuth } from './lib/auth'
 import Crossing from './portal/Crossing'
 import { supabase } from './lib/supabase'
@@ -40,6 +39,15 @@ function lazyImport<T extends { default: ComponentType<any> }>(importer: () => P
 
 // The MRI laboratory carries the simulation engine and four canvas surfaces, so
 // it is split into its own chunk and only fetched when a learner opens it.
+/* The fact bank was the one page module imported eagerly, so its 54 KB of
+   source — every fact of all eight topics — was parsed before the front door
+   could paint, by every visitor including the ones who only ever click through
+   to anatomy. Both pages are named exports rather than default ones, hence the
+   mapping; they resolve to the same chunk, so opening one costs the other
+   nothing. */
+const FactBankPage = lazyImport(() => import('./factbank').then((m) => ({ default: m.FactBankPage })))
+const FactTopicPage = lazyImport(() => import('./factbank').then((m) => ({ default: m.FactTopicPage })))
+
 const MriFoundations = lazyImport(() => import('./mri/pages/Foundations'))
 const MriT1SpinEcho = lazyImport(() => import('./mri/pages/T1SpinEcho'))
 const MriT2SpinEcho = lazyImport(() => import('./mri/pages/T2SpinEcho'))
@@ -492,17 +500,27 @@ function VisualLabPage() {
 }
 
 function StudyPlanPage() {
+  /* Week, subject and scope. The per-week "24 lessons · 180 questions" counts
+     that used to sit here were invented — they summed to 960 questions against
+     the 511 the bank actually holds — so they are gone rather than restated.
+     When the content registry can report real per-week totals, they come back
+     from it. */
   const weeks = [
-    ['Week 1','Foundations & radiography','Atomic structure, X-ray production, interactions and image quality.','24 lessons · 180 questions'],
-    ['Week 2','CT & dose','Reconstruction, artefacts, optimisation and practical dose metrics.','21 lessons · 210 questions'],
-    ['Week 3','MRI','Signal, weighting, sequences, artefacts, instrumentation and safety.','28 lessons · 240 questions'],
-    ['Week 4','Ultrasound & Doppler','Propagation, transducers, resolution, artefacts and flow.','20 lessons · 160 questions'],
-    ['Week 5','Nuclear medicine','Gamma camera, radionuclides, PET/SPECT and counting statistics.','22 lessons · 170 questions'],
-    ['Week 6','Protection & consolidation','UK legislation, dosimetry, mixed mocks and final weak-area repair.','18 lessons · 5 mocks'],
+    ['Week 1','Foundations & radiography','Atomic structure, X-ray production, interactions and image quality.'],
+    ['Week 2','CT & dose','Reconstruction, artefacts, optimisation and practical dose metrics.'],
+    ['Week 3','MRI','Signal, weighting, sequences, artefacts, instrumentation and safety.'],
+    ['Week 4','Ultrasound & Doppler','Propagation, transducers, resolution, artefacts and flow.'],
+    ['Week 5','Nuclear medicine','Gamma camera, radionuclides, PET/SPECT and counting statistics.'],
+    ['Week 6','Protection & consolidation','UK legislation, dosimetry, mixed mocks and final weak-area repair.'],
   ]
   return <main><PageHero eyebrow="Six-week study plan" title={<>A clear route from<br/><span>overwhelmed to exam-ready.</span></>} text="A structured syllabus, daily targets and built-in consolidation so your revision keeps moving without becoming chaotic."><Link to="/pricing" className="button button-primary">Start the plan <Icon name="arrow" size={18}/></Link></PageHero>
-  <section className="section"><div className="container"><SectionHeading centre eyebrow="The route" title={<>One focus each week.<br/><span>One system holding it together.</span></>} text="Each week combines visual learning, targeted questions and spaced review."/><div className="timeline">{weeks.map(([week,title,text,meta],i)=><article key={week}><div className="timeline-marker"><span>{i+1}</span></div><div className="timeline-card"><span>{week}</span><h3>{title}</h3><p>{text}</p><small><Icon name="clock" size={15}/>{meta}</small></div></article>)}</div></div></section>
-  <section className="section surface-section"><div className="container split-grid align-centre"><div className="plan-dashboard"><div className="plan-top"><span>YOUR PLAN</span><strong>Week 3 · MRI</strong><small>Monday 3 August</small></div>{[['Visual lesson','T1, T2 and proton density',true],['Question set','MRI signal & weighting · 25 questions',true],['Recall review','Seven due concepts',false],['Quick calculation','Larmor frequency',false]].map(([type,title,done],i)=><div className={`plan-task ${done?'done':''}`} key={title as string}><span>{done?<Icon name="check"/>:i+1}</span><div><small>{type as string}</small><strong>{title as string}</strong></div><Icon name="chevron"/></div>)}</div><div><SectionHeading eyebrow="Designed for real rotas" title={<>Know the priority, even when time is <span>tight.</span></>} text="Choose a standard session or a 20-minute compressed version. Your progress carries forward and the plan recalibrates around missed work."/><ul className="check-list dark-list"><li><Icon name="check"/>Daily sessions with a clear finish line</li><li><Icon name="check"/>Automatic catch-up without double workload</li><li><Icon name="check"/>Final-week mock and trap review</li></ul></div></div></section><CTA/></main>
+  <section className="section"><div className="container"><SectionHeading centre eyebrow="The route" title={<>One focus each week.<br/><span>One system holding it together.</span></>} text="Each week combines visual learning, targeted questions and spaced review."/><div className="timeline">{weeks.map(([week,title,text],i)=><article key={week}><div className="timeline-marker"><span>{i+1}</span></div><div className="timeline-card"><span>{week}</span><h3>{title}</h3><p>{text}</p></div></article>)}</div></div></section>
+  {/* This panel used to render a sample week — "Week 3 · MRI", "Monday 3 August"
+      and four tasks, two of them ticked — styled exactly as though it were the
+      reader's own record. RadioPass records none of that yet, so it was a
+      fabrication wearing the interface of a fact. It states the truth instead
+      until there is a progress store behind it. */}
+  <section className="section surface-section"><div className="container split-grid align-centre"><div className="plan-dashboard"><div className="plan-top"><span>YOUR PLAN</span><strong>Not started</strong><small>No activity yet</small></div><p className="plan-empty">RadioPass does not track your progress yet. When it does, this is where the week you are on and the sessions still due will appear — read from your own activity, never from a sample.</p><Link to="/visual-lab" className="button button-outline">Open the laboratories <Icon name="arrow" size={16}/></Link></div><div><SectionHeading eyebrow="Designed for real rotas" title={<>Know the priority, even when time is <span>tight.</span></>} text="Six weeks, one subject at a time, each ending where the next begins — so a week missed on a busy rota is a week to slot back in, not a plan to restart."/><ul className="check-list dark-list"><li><Icon name="check"/>One subject per week, in exam order</li><li><Icon name="check"/>Visual learning, then questions, then review</li><li><Icon name="check"/>Final week for mocks and weak-area repair</li></ul></div></div></section><CTA/></main>
 }
 
 function PricingContent() {

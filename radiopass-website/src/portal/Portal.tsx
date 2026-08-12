@@ -65,8 +65,6 @@ const COUNTS = {
   physicsQuestions: 511,
   physicsStems: 1715,
   physicsMocks: 3,
-  factTopics: 8,
-  facts: 48,
 }
 
 /* The published shape of the examination, as the RCR sets it. Kept in one
@@ -695,73 +693,12 @@ function useReveal<T extends HTMLElement>() {
 }
 
 /* ------------------------------------------------------------------ *
- * Contents
- * ------------------------------------------------------------------ */
-
-type Entry = { label: string; note: string; href: string; external?: boolean }
-
-/* Anatomy, by region, in the order the body is examined rather than the order
-   the files happen to sit in. Counts are playable cases. */
-const ANATOMY_INDEX: Entry[] = [
-  { label: 'Head and neck', note: '102 cases', href: anatomy('/section/head-neck'), external: true },
-  { label: 'Spine', note: '44 cases', href: anatomy('/section/spine'), external: true },
-  { label: 'Thorax', note: '31 cases', href: anatomy('/section/thorax'), external: true },
-  { label: 'Abdomen and pelvis', note: '33 cases', href: anatomy('/section/abdo-pelvis'), external: true },
-  { label: 'Upper limb', note: '156 cases', href: anatomy('/section/upper-limb'), external: true },
-  { label: 'Lower limb', note: '133 cases', href: anatomy('/section/lower-limb'), external: true },
-  { label: 'Chest radiograph atlas', note: '40 structures', href: anatomy('/cxr'), external: true },
-  { label: 'Cross-sectional viewers', note: 'CT · MRI', href: anatomy('/mri/head-bone'), external: true },
-]
-
-/* Physics, by laboratory, then the drilling tools. */
-const PHYSICS_INDEX: Entry[] = [
-  { label: 'X-ray techniques', note: '3 lessons', href: '/xray-lab' },
-  { label: 'CT physics', note: '16 concepts', href: '/ct-lab' },
-  { label: 'MRI laboratory', note: '10 stages', href: '/mri-lab' },
-  { label: 'Ultrasound laboratory', note: '21 experiments', href: '/ultrasound-lab/focus' },
-  { label: 'Nuclear medicine', note: '14 concepts', href: '/nm-lab' },
-  { label: 'Question bank', note: `${COUNTS.physicsQuestions} questions`, href: '/question-bank' },
-  { label: 'Mock papers', note: `${COUNTS.physicsMocks} papers`, href: '/question-bank/mock' },
-  { label: 'Fact bank', note: `${COUNTS.facts} facts`, href: '/fact-bank' },
-]
-
-function Index({ title, total, entries }: { title: string; total: string; entries: Entry[] }) {
-  return (
-    <div className="pt-index">
-      <h3>{title}</h3>
-      <ul>
-        {entries.map((e) => {
-          const inner = (
-            <>
-              <span className="pt-idx-label">{e.label}</span>
-              <span className="pt-idx-leader" aria-hidden="true" />
-              <span className="pt-idx-note">{e.note}</span>
-            </>
-          )
-          return (
-            <li key={e.label}>
-              {e.external ? (
-                <a href={e.href}>{inner}</a>
-              ) : (
-                <Link to={e.href}>{inner}</Link>
-              )}
-            </li>
-          )
-        })}
-      </ul>
-      <p className="pt-idx-total">{total}</p>
-    </div>
-  )
-}
-
-/* ------------------------------------------------------------------ *
  * Page
  * ------------------------------------------------------------------ */
 
 export default function Portal() {
   const [hover, setHover] = useState<'anatomy' | 'physics' | null>(null)
   const plates = useReveal<HTMLElement>()
-  const contents = useReveal<HTMLElement>()
   const method = useReveal<HTMLElement>()
   const close = useReveal<HTMLElement>()
 
@@ -790,7 +727,6 @@ export default function Portal() {
             <a href={anatomy()}>Anatomy</a>
             <Link to="/physics">Physics</Link>
             <Link to="/pricing">Pricing</Link>
-            <Link to="/admin" className="pt-admin-link">Admin</Link>
           </nav>
         </div>
       </header>
@@ -822,14 +758,6 @@ export default function Portal() {
             <HeroLine />
           </div>
 
-          <ul className="pt-colophon" aria-label="What is inside, in numbers">
-            <li><b>{COUNTS.anatomyCases}</b>labelled cases</li>
-            <li><b>{COUNTS.anatomyStructures.toLocaleString('en-GB')}</b>structures to name</li>
-            <li><b>{COUNTS.physicsLabs}</b>laboratories</li>
-            <li><b>{COUNTS.physicsQuestions}</b>questions</li>
-            <li><b>{COUNTS.physicsStems.toLocaleString('en-GB')}</b>true-or-false stems</li>
-            <li><b>{COUNTS.physicsMocks}</b>mock papers</li>
-          </ul>
         </section>
 
         {/* ---------------- the two plates ---------------- */}
@@ -935,33 +863,6 @@ export default function Portal() {
           </div>
         </section>
 
-        {/* ---------------- contents ---------------- */}
-        <section
-          ref={contents.ref}
-          className={`pt-section pt-contents pt-reveal${contents.vis ? ' in-view' : ''}`}
-          aria-labelledby="pt-contents-h"
-        >
-          <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">II</span>
-            <h2 id="pt-contents-h">What is in it, in full.</h2>
-            <p className="pt-section-lede">
-              No teaser modules and nothing held back behind a later tier — this is the
-              whole syllabus as it stands today, and every line below opens.
-            </p>
-          </div>
-          <div className="pt-index-grid">
-            <Index
-              title="Anatomy"
-              entries={ANATOMY_INDEX}
-              total={`${COUNTS.anatomyCases} cases · ${COUNTS.anatomyStructures.toLocaleString('en-GB')} structures to name`}
-            />
-            <Index
-              title="Physics"
-              entries={PHYSICS_INDEX}
-              total={`${COUNTS.physicsQuestions} questions · ${COUNTS.physicsStems.toLocaleString('en-GB')} stems · ${COUNTS.facts} facts`}
-            />
-          </div>
-        </section>
 
         {/* ---------------- method ---------------- */}
         <section
@@ -970,7 +871,7 @@ export default function Portal() {
           aria-labelledby="pt-method-h"
         >
           <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">III</span>
+            <span className="pt-numeral" aria-hidden="true">II</span>
             <h2 id="pt-method-h">How it is built.</h2>
           </div>
           <div className="pt-method-grid">
@@ -1045,20 +946,13 @@ export default function Portal() {
             <span className="pt-wordmark">RADIOPASS</span>
             <p>Anatomy and physics for the First FRCR Examination, in one place.</p>
           </div>
-          <nav aria-label="Anatomy">
-            <h4>Anatomy</h4>
-            <a href={anatomy()}>All regions</a>
-            <a href={anatomy('/cxr')}>Chest radiograph atlas</a>
-            <a href={anatomy('/mri/head-bone')}>Cross-sectional viewers</a>
-            <a href={anatomy('/dashboard')}>Progress</a>
-          </nav>
-          <nav aria-label="Physics">
-            <h4>Physics</h4>
-            <Link to="/visual-lab">Laboratories</Link>
-            <Link to="/question-bank">Question bank</Link>
-            <Link to="/question-bank/mock">Mock papers</Link>
-            <Link to="/fact-bank">Fact bank</Link>
-            <Link to="/study-plan">Study plan</Link>
+          {/* Two branches, not two feature lists. Everything that lives inside a
+              branch is reachable from that branch's own homepage — the front door
+              never links past the choice it exists to offer. */}
+          <nav aria-label="Branches">
+            <h4>Branches</h4>
+            <a href={anatomy()}>Anatomy</a>
+            <Link to="/physics">Physics</Link>
           </nav>
           <nav aria-label="RadioPass">
             <h4>RadioPass</h4>

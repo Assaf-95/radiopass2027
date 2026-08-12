@@ -316,3 +316,9 @@
    is a holding area rather than finished product. */
 .lab-archive-note{margin:var(--gap-section) 0 0;text-align:center;font-size:var(--fs-support);color:var(--text-secondary)}
 .lab-archive-note a{color:var(--lime);border-bottom:1px solid rgba(217,168,78,.35)}
+
+/* The study plan's truthful empty state. It replaces a sample "your plan" panel
+   that was styled as the reader's own record; the panel keeps its surface so the
+   page composition is unchanged, and states what is actually known instead. */
+.plan-empty{margin:0 0 var(--sp-4);padding:0 7px;color:var(--text-secondary);font-size:var(--fs-support);line-height:var(--lh-body)}
+.plan-dashboard .button{margin:0 7px}
