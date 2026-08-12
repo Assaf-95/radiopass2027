@@ -23,8 +23,14 @@ const DESIGNS: { href: string; name: string; blurb: string }[] = [
     blurb: 'kVp, HVL and filtration — what hardens the beam and what it costs.' },
   { href: '/visuals/radiographic-magnification.html', name: 'Magnification & geometry',
     blurb: 'Object–film distance, penumbra and the geometry of the projection.' },
+  /* Recovered. Diagrams 6-10 were part of the same step-diagram set as 1-5 and
+     16-24 but were never carried across from the original site, so this lab
+     shipped two thirds of a family and the entry below claimed to be "the
+     remaining" diagrams while five were missing. */
+  { href: '/visuals/diagrams-6-10.html', name: 'Collimation, dose & detector geometry',
+    blurb: 'Five step diagrams: the parallel-hole collimator, interaction probability against photon energy, the CT dose profile and CTDI, X-ray room shielding, and multi-detector geometry with a live pitch slider.' },
   { href: '/visuals/diagrams-16-24.html', name: 'More tube & image diagrams',
-    blurb: 'The remaining step diagrams from the original visual set.' },
+    blurb: 'The last of the step diagrams from the original visual set.' },
 ]
 
 /* Magnetisation is MRI physics, not X-ray. It is listed here because it was
