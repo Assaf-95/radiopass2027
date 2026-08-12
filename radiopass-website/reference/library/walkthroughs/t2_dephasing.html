@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T2 Dephasing & Spin Echo — Simple — Radiopass</title>
+<meta name="description" content="From no field to a spin echo, in the simplest possible steps." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/simple-slides.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="ss-header">
+  <div class="shell">
+    <div class="ss-header-top">
+      <div>
+        <span class="eyebrow">MRI · T2 Dephasing & Spin Echo · Simple version</span>
+        <h1 class="ss-title">From nothing to an echo.</h1>
+        <p class="lede ss-subtitle">The whole sequence, broken into the smallest pieces.</p>
+      </div>
+      <div class="ss-count-pill" id="ss-count">SLIDE 1 / 8</div>
+    </div>
+    <div class="ss-progress-track"><div class="ss-progress-fill" id="ss-progress-fill"></div></div>
+    <a href="t2_dephasing-detailed.html" class="btn btn-ghost ss-more-link">want more detail? open the full page</a>
+    <a href="mri-sequence-contrast-walkthrough.html" class="btn btn-ghost ss-more-link">see how this builds T1, T2, FLAIR & STIR contrast &rarr;</a>
+  </div>
+</header>
+
+<div class="shell ss-layout">
+  <div class="card glass ss-stage-card">
+    <svg id="ss-stage" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card glass ss-teach-card">
+    <div class="ss-slide-title" id="ss-slide-title"></div>
+    <ul class="ss-bullets" id="ss-bullets"></ul>
+    <div class="ss-caption" id="ss-caption"></div>
+    <div class="ss-control" id="ss-control">
+      <label id="ss-control-label"></label>
+      <input type="range" id="ss-control-input" />
+      <span class="ss-readout" id="ss-control-readout"></span>
+    </div>
+    <div class="ss-nav">
+      <button type="button" class="btn btn-ghost" id="ss-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="ss-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/simple-slides.js"></script>
+<script>
+(function () {
+  var cx = 350, cy = 210;
+
+  function dot(x, y, r, colour) { return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="' + colour + '"/>'; }
+  function txt(x, y, s, colour, size) { return '<text x="' + x + '" y="' + y + '" fill="' + colour + '" font-size="' + (size || 15) + '" font-family="Inter,sans-serif" font-weight="700" text-anchor="middle">' + s + '</text>'; }
+
+  function randomSpins(t) {
+    var out = '';
+    for (var i = 0; i < 10; i++) {
+      var seed = i * 137.5;
+      var angle = seed + t * (0.6 + (i % 3) * 0.4);
+      var r = 40 + (i % 4) * 22;
+      var bx = cx + Math.cos(seed * 0.7) * r, by = cy + Math.sin(seed * 0.7) * r;
+      var x = bx + Math.cos(angle) * 14, y = by + Math.sin(angle) * 14;
+      out += '<line x1="' + bx.toFixed(1) + '" y1="' + by.toFixed(1) + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#8FA3BB" stroke-width="2"/>';
+    }
+    return out;
+  }
+
+  function b0Arrow() {
+    return '<line x1="' + cx + '" y1="' + (cy + 150) + '" x2="' + cx + '" y2="' + (cy - 150) + '" stroke="#5FE3F2" stroke-width="4" marker-end="url(#ssArrow)"/>' + txt(cx + 30, cy - 140, 'B0', '#5FE3F2', 16);
+  }
+
+  function netVector(angle, colour, label) {
+    var x = cx + Math.cos(angle) * 100, y = cy + Math.sin(angle) * 100;
+    return '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="' + colour + '" stroke-width="4" marker-end="url(#ssArrow)"/>' + dot(cx, cy, 5, colour) + (label ? txt(x, y - 14, label, colour, 14) : '');
+  }
+
+  function spinFan(t, spread) {
+    var out = '<circle cx="' + cx + '" cy="' + cy + '" r="100" fill="none" stroke="rgba(148,197,224,0.18)" stroke-width="1.5"/>';
+    var n = 8;
+    for (var i = 0; i < n; i++) {
+      var speed = 1 + (i - n / 2) * 0.05 * spread;
+      var angle = (i / n) * Math.PI * 2 + t * 1.8 * speed;
+      var x = cx + Math.cos(angle) * 85, y = cy + Math.sin(angle) * 85;
+      out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#5FE3F2" stroke-width="2" opacity="0.85"/>' + dot(x, y, 4, '#5FE3F2');
+    }
+    return out;
+  }
+
+  function recoveryBar(t, frac) {
+    var h = 160 * frac;
+    return '<rect x="600" y="' + (360 - h) + '" width="30" height="' + h + '" rx="6" fill="#A78BFA"/>' + txt(615, 380, 'Mz', '#A78BFA', 13);
+  }
+
+  var SLIDES = [
+    {
+      title: 'No field, no net magnetisation',
+      bullets: ['Without B0, nuclear spins are randomly oriented in space.', 'Their individual magnetic moments cancel by symmetry.', 'Net magnetisation, M, is zero — there is nothing yet for a scanner to detect.'],
+      caption: '<strong>M = 0</strong> — no preferred axis, no measurable signal.',
+      draw: function (t) { return randomSpins(t * 0.5); }
+    },
+    {
+      title: 'B0 establishes Mz',
+      bullets: ['B0 is the scanner’s static main field, conventionally along Z.', 'A small population excess favours the parallel (low-energy) orientation.', 'That excess sums to a net longitudinal vector: Mz.'],
+      caption: '<strong>Mz</strong> — net magnetisation, aligned with B0.',
+      draw: function (t) { return b0Arrow() + netVector(-Math.PI / 2, '#5FE3F2', 'Mz'); }
+    },
+    {
+      title: '90° pulse creates Mxy',
+      bullets: ['An RF pulse at the Larmor frequency satisfies the resonance condition.', 'A 90° pulse rotates Mz fully into the transverse (XY) plane.', 'Mxy is the component the receiver coil can actually detect.'],
+      caption: '<strong>Mxy</strong> — the transverse magnetisation the coil measures.',
+      draw: function (t) { return b0Arrow() + netVector(0, '#F2B84B', 'Mxy'); }
+    },
+    {
+      title: 'T2 dephasing',
+      bullets: ['Each spin isochromat experiences a slightly different local field.', 'Precessional frequency depends on local field, so phase coherence is lost progressively.', 'As coherence falls, vector summation of Mxy — and the measured signal — decays.'],
+      caption: '<strong>Dephasing</strong> — loss of shared phase, the mechanism behind T2/T2* decay.',
+      draw: function (t) { return spinFan(t * 0.4, Math.min(1, t * 0.3)); }
+    },
+    {
+      title: 'T1 recovery runs concurrently',
+      bullets: ['Independently of transverse dephasing, Mz regrows toward M0.', 'This is spin-lattice relaxation — energy exchange with the surrounding lattice.', 'T1 recovery and T2 decay proceed on separate physical mechanisms, from the same instant of excitation.'],
+      caption: '<strong>T1 recovery and T2 decay</strong> are simultaneous, not sequential.',
+      draw: function (t) { return spinFan(t * 0.4, 2) + recoveryBar(t, Math.min(1, t * 0.15)); }
+    },
+    {
+      title: 'The 180° refocusing pulse',
+      bullets: ['Applied at TE/2, a 180° pulse inverts the spatial phase order of the isochromats.', 'Spins that were leading are now lagging, by the same magnitude.', 'This refocuses only static-field (T2′) dephasing — not true spin-spin (T2) relaxation.'],
+      caption: '<strong>180° refocusing</strong> reverses T2′, the reversible part of dephasing.',
+      draw: function (t) { return spinFan(t * 0.4, 2) + txt(350, 60, '180° pulse applied', '#F2B84B', 18); }
+    },
+    {
+      title: 'The spin echo forms',
+      bullets: ['Reversed spins rephase, and Mxy — and signal — rises again toward TE.', 'The echo peaks exactly at TE, measured from the 90° pulse.', 'True T2 decay was never paused: the echo peak sits on the T2 envelope, below the original FID.'],
+      caption: '<strong>Spin echo at TE</strong> — coherence transiently restored, on a true-T2 envelope.',
+      draw: function (t) { return spinFan(t * 0.4, Math.max(0, 2 - t * 0.6)); }
+    },
+    {
+      title: 'That was the short version',
+      bullets: ['This covered the full 90°–dephase–180°–echo sequence, at full technical depth.', 'The full page lets you play, pause and step through it live, with adjustable T2/T2′/T1.', 'Same physics, same terminology — this time with real sliders and spin trails.'],
+      caption: '<strong>Ready for more?</strong> The detailed page is one click away, above.',
+      draw: function () {
+        return '<rect x="120" y="140" width="460" height="180" rx="24" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+          txt(350, 220, 'Full teaching timeline available', '#5FE3F2', 20) +
+          txt(350, 255, 'play · pause · step · T2 vs T2* · spin trails', '#8FA3BB', 14);
+      }
+    }
+  ];
+
+  var stage = document.getElementById('ss-stage');
+  var defs = '<defs><marker id="ssArrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>';
+  var origSlides = SLIDES.map(function (s) {
+    var d = s.draw;
+    s.draw = function (t, v) { return defs + '<g color="#5FE3F2">' + d(t, v) + '</g>'; };
+    return s;
+  });
+
+  window.SimpleSlides.init({ slides: origSlides });
+})();
+</script>
+</body>
+</html>

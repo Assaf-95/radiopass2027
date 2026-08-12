@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"/Users/User1/Desktop/Claude/radiopass-main\")"
+    ]
+  }
+}

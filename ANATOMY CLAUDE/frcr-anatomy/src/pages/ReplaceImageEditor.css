@@ -1,0 +1,425 @@
+/* Replace-image editor. Two stages side by side when a replacement is in
+   play, so the old film stays readable while the labels are re-placed. */
+
+.rie { max-width: var(--container); margin: 0 auto; padding: 28px 0 80px; }
+.rie-head h1 { font-size: 30px; margin: 10px 0 6px; }
+.rie-sub { color: var(--text-dim); margin: 0 0 18px; max-width: 70ch; }
+
+.rie-banner, .rie-warn {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px;
+  font-size: 14px; line-height: 1.5;
+}
+.rie-banner { background: var(--teal-bg); border: 1px solid var(--teal); }
+.rie-warn { background: var(--amber-bg); border: 1px solid var(--amber); color: var(--text); }
+
+.rie-body { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+@media (max-width: 1100px) { .rie-body { grid-template-columns: 1fr; } }
+
+.rie-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.rie-toggle { display: inline-flex; gap: 7px; align-items: center; font-size: 13px; color: var(--text-dim); }
+
+.rie-stages { display: grid; gap: 16px; }
+/* Split columns are declared with the old-film reference pane further down,
+   where the reason for the narrow column is explained. */
+
+.rie-stage { margin: 0; background: var(--void); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.rie-stage figcaption {
+  padding: 8px 12px; font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+}
+.rie-stage-old { opacity: 0.85; }
+.rie-stage-click { cursor: crosshair; }
+.rie-noimage { padding: 60px 20px; text-align: center; color: var(--text-dim); }
+.rie-noimage p { font-family: var(--font-mono); letter-spacing: 0.1em; margin-bottom: 16px; }
+
+/* min-width:0 on both tracks. A grid item defaults to min-width:auto, so the
+   answer wording and the row of dials pushed this column past its 380px and
+   off the right of the page — the colour swatches and the size dial ended up
+   beyond the viewport edge, unreachable without a horizontal scroll. */
+.rie-side { display: grid; gap: 18px; min-width: 0; }
+.rie-stage-wrap { min-width: 0; }
+.rie-side > *, .rie-answers > * { min-width: 0; }
+.rie-field { display: grid; gap: 6px; font-size: 13px; }
+.rie-field span { color: var(--text-dim); }
+.rie-field em { color: var(--teal-bright); font-style: normal; }
+.rie-field textarea { width: 100%; resize: vertical; }
+
+.rie-answers h2 { font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.rie-lock {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--amber); border: 1px solid var(--amber);
+  border-radius: 4px; padding: 2px 6px; font-weight: 500;
+}
+.rie-hint { font-size: 12px; color: var(--text-faint); margin: 6px 0 10px; }
+
+/* Wording on the first line, controls on their own line beneath. Held on one
+   line the row's widest answer set the whole column's intrinsic width and
+   pushed the dials and colour swatches off the right of the page. */
+.rie-answer {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm); margin-bottom: 6px;
+  background: var(--panel);
+}
+.rie-answer.is-selected { border-color: var(--teal-bright); background: var(--teal-bg); }
+.rie-answer.needs-review { border-left: 3px solid var(--amber); }
+.rie-pick { flex: 1 1 60%; min-width: 0; display: flex; align-items: flex-start; gap: 10px; background: none; border: 0; text-align: left; cursor: pointer; color: var(--text); padding: 4px; }
+.rie-letter { font-family: var(--font-mono); font-weight: 700; color: var(--teal-bright); min-width: 16px; }
+.rie-text { font-size: 13px; }
+.rie-flag { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; color: var(--amber); }
+.rie-remove { background: none; border: 1px solid var(--line-strong); color: var(--text-dim); border-radius: 4px; font-size: 11px; padding: 4px 8px; cursor: pointer; }
+.rie-remove:hover { border-color: var(--red); color: var(--red); }
+
+.rie-preserved { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; }
+.rie-preserved h3 { font-size: 13px; margin: 0 0 8px; }
+.rie-preserved ul { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+
+.rie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.rie-unreviewed { font-size: 12px; color: var(--amber); }
+
+.rie-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: grid; place-items: center; z-index: 60; padding: 24px; }
+.rie-modal-inner { background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 22px; max-width: 720px; width: 100%; max-height: 88vh; overflow: auto; }
+.rie-confirm { max-width: 460px; }
+.rie-preview-stem { font-weight: 600; margin: 6px 0 12px; }
+.rie-preview-answers { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+/* The stage below declares a height for its viewer; the preview modal never
+   did, so .iv-root's height:100% resolved against an auto-height parent and
+   collapsed to zero. The film was invisible AND the viewer measured a 0-height
+   canvas, which suppressed the whole marker layer — so "Preview as student"
+   showed neither the image nor a single pointer. */
+.rie-modal-inner .iv-root { height: 58vh; min-height: 300px; margin-bottom: 14px; }
+
+/* ImageViewer fills its container, so the stage has to declare a height or
+   it collapses to the caption and the film never shows. */
+.rie-stage-click { min-height: var(--stage-h); display: flex; }
+.rie-stage .iv-root { flex: 1; min-height: var(--stage-h); display: flex; flex-direction: column; }
+/* The viewer's canvas is the element that actually sizes the film; giving
+   only the outer wrapper a height left it at zero and the image invisible. */
+.rie-stage .iv-canvas { flex: 1; min-height: 0; height: 100%; }
+
+/* The working area, and the single most important measurement on this page:
+   labels are placed by eye against it. It was 58vh, and 42vh once a
+   replacement put the old film alongside — which on a portrait crop left the
+   film 148px wide inside a 640px plate. At that size a 30% arrow is 45px and
+   the size dial looks broken, so the stage is now as tall as the window
+   sensibly allows and the reference film no longer takes half of it. */
+.rie-stage-wrap { --stage-h: min(74vh, 860px); }
+
+/* Placement plate: the image plus an overlay in the image's own coordinate
+   space, so a drop lands exactly where it was dropped. Scrolls once the
+   author zooms past the fitted size. */
+.rie-plate {
+  position: relative; display: grid; place-items: center;
+  height: var(--stage-h); max-height: var(--stage-h);
+  background: #000; flex: 1; min-width: 0;
+  overflow: auto; overscroll-behavior: contain;
+}
+.rie-plate img { max-width: 100%; max-height: var(--stage-h); object-fit: contain; display: block; }
+
+/* The cropped film, and the coordinate space every label is measured in. Its
+   aspect-ratio is set inline from the crop so the visible picture is framed
+   exactly as the candidate's viewer frames it; overflow hides the parts of the
+   file the crop cuts away. `.is-full` is the crop tool's view, where the whole
+   file shows and the frame is just the image's own box.
+
+   --zoom multiplies the fitted height. Because every pin is positioned as a
+   percentage OF THIS BOX and pctFromEvent measures this box, zooming needs no
+   other change anywhere: placement, dragging and the size dials all keep
+   working against the box's real on-screen rect. */
+.rie-frame {
+  position: relative; overflow: hidden; display: block;
+  max-width: calc(100% * var(--zoom, 1));
+  margin: 0 auto; justify-self: center;
+}
+.rie-frame:not(.is-full) { height: calc(var(--stage-h) * var(--zoom, 1)); }
+/* In crop mode the frame shrink-wraps the whole file, so the frame box and the
+   image box are the same rectangle. They have to be: the crop rectangle is
+   drawn in frame percentages but dragged in image percentages, and when the
+   frame was a little taller than the film the dashed outline sat off the
+   region it described. */
+.rie-frame.is-full {
+  display: inline-block; height: auto; max-height: none; line-height: 0;
+}
+.rie-frame.is-full img { max-height: calc(var(--stage-h) * var(--zoom, 1)); max-width: 100%; }
+.rie-frame:not(.is-full) img { max-width: 100%; max-height: 100%; }
+
+/* The previous film is reference only — it does not need half the working
+   area, which is what a 1fr 1fr split gave it. A fixed narrow column keeps it
+   glanceable and hands the rest back to the film being edited. */
+.rie-stages-split { grid-template-columns: 210px 1fr; align-items: start; }
+.rie-stages-split .rie-stage-old .rie-plate { min-height: 0; overflow: hidden; }
+.rie-stages-split .rie-stage-old .rie-plate img { max-height: 260px; }
+@media (max-width: 860px) {
+  .rie-stages-split { grid-template-columns: 1fr; }
+}
+
+/* Zoom control */
+.rie-zoom { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.rie-zoom .btn { min-width: 34px; padding: 6px 8px; }
+.rie-zoom output {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+  min-width: 44px; text-align: center;
+}
+
+.rie-overlay { position: absolute; inset: 0; pointer-events: none; }
+.rie-pin {
+  position: absolute; transform: translate(-50%, -50%);
+  min-width: 30px; height: 30px; padding: 0 6px;
+  border-radius: 999px; cursor: grab; pointer-events: auto;
+  background: rgba(10,10,10,0.9); color: var(--teal-bright);
+  border: 2px solid var(--teal-bright);
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+.rie-pin:active { cursor: grabbing; }
+.rie-pin.is-selected { background: var(--teal-bright); color: #04231f; transform: translate(-50%,-50%) scale(1.15); }
+.rie-pin.needs-review { border-color: var(--amber); color: var(--amber); }
+.rie-pin.needs-review.is-selected { background: var(--amber); color: #241a06; }
+
+/* Pointer-style picker, one row per answer. */
+.rie-shapes { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; flex: 1 0 100%; margin-top: 6px; }
+.rie-shape {
+  width: 26px; height: 24px; border-radius: 5px; cursor: pointer;
+  background: var(--panel-2); border: 1px solid var(--line);
+  color: var(--text-dim); font-size: 13px; line-height: 1;
+}
+.rie-shape:hover { border-color: var(--teal); color: var(--text); }
+.rie-shape.is-on { background: var(--teal-bright); border-color: var(--teal-bright); color: #04231f; }
+.rie-ring { width: 84px; margin-left: 4px; }
+
+/* Crop */
+.rie-stage-click.is-cropping { cursor: crosshair; }
+.rie-stage-click.is-cropping .rie-pin { pointer-events: none; opacity: 0.35; }
+.rie-croprect {
+  position: absolute; border: 2px dashed var(--teal-bright);
+  background: rgba(217, 168, 78, 0.12); pointer-events: none;
+}
+
+/* Saved banner */
+.rie-saved {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; margin-bottom: 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--green); background: var(--green-bg); font-size: 13.5px;
+}
+.rie-saved-actions { display: flex; gap: 8px; margin-left: auto; }
+
+/* The placement pin draws whichever pointer style is selected, so the picker
+   has a visible effect. The letter always shows — it is how you tell which
+   answer you are dragging. */
+.rie-pin { background: none; border: 0; padding: 0; width: 0; height: 0; }
+.rie-pin .rie-pin-letter {
+  position: absolute; transform: translate(-50%, -50%);
+  min-width: 26px; height: 26px; display: grid; place-items: center;
+  border-radius: 999px; background: rgba(10,10,10,.92);
+  color: var(--teal-bright); border: 2px solid currentColor;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+}
+/* Every pointer gets a contrasting halo. A 1px white hairline is invisible on
+   the bright mediastinum and a black one vanishes in a lung field, so the
+   shape picker looked like a dead control even though it was drawing exactly
+   what it was asked to: the mark was there, it just could not be seen against
+   a radiograph. The halo makes each ink readable over both. */
+.rie-pin .rie-pin-mark {
+  position: absolute; transform: translate(-50%, -50%); pointer-events: none;
+  filter:
+    drop-shadow(0 0 1px var(--halo))
+    drop-shadow(0 0 2px var(--halo));
+}
+
+/* arrow — a shaft with a head, pointing at the spot */
+.rie-pin-arrow .rie-pin-mark,
+.rie-pin-arrow-point .rie-pin-mark,
+.rie-pin-line .rie-pin-mark {
+  /* Length and angle come from the per-label dials. --len and --ring arrive as
+     PIXELS, computed from the rendered width of the film; as percentages they
+     resolved against this pin's own box — about 30px of letter badge — so a
+     "12%" arrow was 3.6px long and the size dial did nothing visible. */
+  width: var(--len, 60px); height: var(--thick, 3px); background: currentColor;
+  border-radius: 2px;
+  left: 0; transform-origin: 0 50%;
+  transform: rotate(var(--ang, 0deg)) translate(0, -50%);
+}
+/* The head grows with the shaft, the way the student viewer's does — there
+   markerUnits="strokeWidth" ties the two together automatically. */
+.rie-pin-arrow .rie-pin-mark::after,
+.rie-pin-arrow-point .rie-pin-mark::after {
+  content: ''; position: absolute; left: -1px; top: 50%;
+  transform: translateY(-50%);
+  border-right: var(--head, 13px) solid currentColor;
+  border-top: calc(var(--head, 13px) * 0.55) solid transparent;
+  border-bottom: calc(var(--head, 13px) * 0.55) solid transparent;
+}
+/* The letter rides the far end of the shaft, leaving the arrowhead alone on
+   the structure. Centred on the tip it sat directly over its own head and hid
+   the thing the pointer was aiming at — and it disagreed with the student
+   view, where the badge has always been offset with a leader line back to the
+   anatomy. The trailing counter-rotation keeps the letter upright at any
+   angle. */
+.rie-pin-arrow .rie-pin-letter,
+.rie-pin-arrow-point .rie-pin-letter,
+.rie-pin-line .rie-pin-letter {
+  transform-origin: 50% 50%;
+  transform:
+    rotate(var(--ang, 0deg))
+    translateX(var(--len, 60px))
+    rotate(calc(-1 * var(--ang, 0deg)))
+    translate(-50%, -50%);
+}
+
+/* point — a filled dot on the structure, sized by the same dial as the ring */
+.rie-pin-point .rie-pin-mark {
+  width: var(--ring, 13px); aspect-ratio: 1; height: auto;
+  min-width: 5px; border-radius: 999px; background: currentColor;
+}
+.rie-pin-point .rie-pin-letter { transform: translate(-50%, -165%); }
+
+/* arrow + point together */
+.rie-pin-arrow-point .rie-pin-mark::before {
+  content: ''; position: absolute; right: -3px; top: 50%;
+  width: 10px; height: 10px; border-radius: 999px; background: currentColor;
+  transform: translate(50%, -50%);
+}
+
+/* line — a plain rule, no head */
+
+/* circle — an empty ring around the region */
+.rie-pin-circle .rie-pin-mark {
+  width: var(--ring, 45px); aspect-ratio: 1; border-radius: 999px;
+  border: var(--thick, 3px) solid currentColor; background: none;
+}
+.rie-pin-circle .rie-pin-letter { transform: translate(-50%, -50%); background: rgba(10,10,10,.72); }
+
+/* The four pointer colours. Chosen to stay legible on any film: white and
+   yellow read on dark anatomy, black on bright bone, blue against both. */
+.rie-pin { color: #ffffff; --halo: rgba(0,0,0,0.9); }
+.rie-c-white  { color: #ffffff; --halo: rgba(0,0,0,0.9); }
+.rie-c-black  { color: #000000; --halo: rgba(255,255,255,0.95); }
+.rie-c-yellow { color: #ffd23f; --halo: rgba(0,0,0,0.9); }
+.rie-c-blue   { color: #4db2ff; --halo: rgba(0,0,0,0.9); }
+.rie-pin.needs-review .rie-pin-letter { border-style: dashed; }
+.rie-pin.is-selected { color: #fff; z-index: 3; }
+.rie-pin.is-selected .rie-pin-letter { background: var(--teal-bright); color: #04231f; }
+
+
+/* One control row per label: angle, size, colour — the same on every shape. */
+.rie-dials { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:4px 0 2px; }
+.rie-dial { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-faint); }
+.rie-dial span { font-size:13px; }
+.rie-dial input[type=range] { width:82px; }
+.rie-dial b { font-family:var(--font-mono); font-size:10.5px; min-width:34px; color:var(--text-dim); }
+.rie-colours { display:flex; gap:4px; }
+.rie-colour { width:16px; height:16px; border-radius:999px; border:1px solid rgba(242,238,230,.35); cursor:pointer; padding:0; }
+.rie-colour-white{background:#fff} .rie-colour-black{background:#000}
+.rie-colour-yellow{background:#ffd23f} .rie-colour-blue{background:#4db2ff}
+.rie-colour.is-on { outline:2px solid var(--teal-bright); outline-offset:2px; }
+
+
+/* The film is fixed while labels are placed.
+
+   A pointer aimed at a millimetre is worthless if the picture slides under
+   it, and three things were letting it move: the browser's native image drag
+   (which pulls a translucent ghost of the photo around), text selection
+   sweeping across the stage, and touch scrolling. All three are off inside
+   the plate. The image never pans or zooms here by design — the accuracy of
+   the placement depends on the frame being still. */
+.rie-plate img {
+  -webkit-user-drag: none; -khtml-user-drag: none; user-drag: none;
+  user-select: none; -webkit-user-select: none;
+  pointer-events: none;            /* clicks belong to the overlay, not the img */
+}
+.rie-stage-click {
+  user-select: none; -webkit-user-select: none;
+  touch-action: none;              /* a drag places a label; it never scrolls */
+}
+/* The plate keeps normal touch behaviour: once zoomed in it is the scroll
+   container, and disabling touch-action there would trap a finger on a
+   tablet with no way to reach the rest of the film. */
+.rie-plate { user-select: none; -webkit-user-select: none; }
+
+/* Orientation correction: rotate / flip a film that came out of the source
+   extraction the wrong way up. Mirrors the student viewer's construction —
+   the film sits un-rotated in this layer and the layer is turned inside the
+   frame, which is sized to the turned result. */
+.rie-frame > .rie-orient {
+  position: absolute; left: 50%; top: 50%; overflow: hidden;
+}
+.rie-frame.is-full > .rie-orient {
+  position: static; width: auto; height: auto; transform: none;
+}
+.rie-orient { line-height: 0; }
+
+.rie-orient img { display: block; }
+
+.rie-orient-group { display: inline-flex; gap: 6px; align-items: center; }
+.btn-icon {
+  min-width: 34px; padding: 6px 8px; font-size: 15px; line-height: 1;
+}
+.btn-icon.is-on { border-color: var(--amber); color: var(--amber); }
+
+
+/* --- Which letters are asked, and which reach the Atlas -------------------
+   Two switches per label rather than one, because hiding a letter from the
+   candidate and withdrawing its anatomy from the Atlas are different
+   decisions and conflating them would quietly delete teaching material. */
+
+.rie-visibility,
+.rie-atlasmeta {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.rie-visibility h3,
+.rie-atlasmeta h3 {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.rie-vis-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rie-vis-list li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.rie-vis-letter { color: var(--amber-accent); font-size: 12px; }
+
+.rie-vis-name {
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rie-vis-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-faint);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rie-vis-toggle input { accent-color: var(--amber-accent); }
+.rie-atlas-include { margin-bottom: 12px; font-size: 12.5px; color: var(--text-dim); }
+
+.rie-meta-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.rie-meta-row select,
+.rie-meta-row input { width: 100%; }

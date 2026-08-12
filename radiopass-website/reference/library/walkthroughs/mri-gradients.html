@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>B0, Precession and Gradients — Radiopass</title>
+<meta name="description" content="The Larmor equation and the three spatial-encoding gradients, one idea at a time — Radiopass visual lab." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/guided-steps.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="gs-header">
+  <div class="shell">
+    <div class="gs-header-top">
+      <div>
+        <span class="eyebrow">MRI · B0, Precession & Gradients</span>
+        <h1 class="gs-title">Three gradients, three separate jobs.</h1>
+        <p class="lede gs-subtitle">Everything starts from one equation. Everything else — slice, phase, frequency — is a controlled distortion of it.</p>
+      </div>
+      <div class="gs-progress-pill" id="gs-progress">STEP 1 / 8</div>
+    </div>
+    <a href="mri-gradients-full.html" class="btn btn-ghost gs-full-link">open the full simulator</a>
+  </div>
+</header>
+
+<div class="shell gs-layout">
+  <div class="card glass gs-stage-card">
+    <div class="gs-stage-head">
+      <span id="gs-chip"></span>
+      <div class="gs-timeline" id="gs-timeline"></div>
+    </div>
+    <div class="gs-stage-svg-wrap">
+      <svg id="gs-stage" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="card glass gs-teach-card">
+    <h2 class="gs-step-title" id="gs-step-title"></h2>
+    <p class="gs-step-text" id="gs-step-text"></p>
+    <ul class="gs-notes" id="gs-notes"></ul>
+    <div class="gs-nav">
+      <button type="button" class="btn btn-ghost" id="gs-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="gs-next">Next</button>
+    </div>
+    <div class="gs-reset-row"><button type="button" id="gs-reset">restart from step 1</button></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/mri-vector-kit.js"></script>
+<script src="../../assets/js/guided-steps.js"></script>
+<script>
+(function () {
+  var K = window.MriVectorKit;
+  var cx = 430, cy = 210;
+
+  var STEPS = [
+    {
+      title: "Two populations of spins",
+      chip: "Parallel vs anti-parallel",
+      text: "In B0, hydrogen spins settle into two groups: parallel to the field (lower energy) and anti-parallel (higher energy). Slightly more sit parallel — that small excess is where net magnetisation comes from.",
+      notes: ["Parallel = low energy, slightly favoured population.", "Anti-parallel = high energy, slightly smaller population.", "The tiny excess of parallel spins is the entire source of MR signal."]
+    },
+    {
+      title: "The Larmor equation",
+      chip: "F = γ × B0",
+      text: "Every spin precesses at a frequency set by one equation: F = γ × B0, where γ is the gyromagnetic ratio — a fixed constant for hydrogen.",
+      notes: ["γ (gyromagnetic ratio) is fixed for a given nucleus.", "F is the Larmor frequency — the only frequency that will excite these spins.", "This single equation underlies every RF pulse in MRI."]
+    },
+    {
+      title: "Change B0, change frequency",
+      chip: "1.5T vs 3T",
+      text: "Because F scales directly with B0, a 3T scanner's spins precess at exactly double the frequency of a 1.5T scanner's. Everything downstream — RF pulses, bandwidths — has to match.",
+      notes: ["1.5T → ≈63.87 MHz for hydrogen.", "3T → ≈127.7 MHz — double the field, double the frequency.", "RF pulses must be tuned to match whatever field strength is in use."]
+    },
+    {
+      title: "Precession around B0",
+      chip: "Precession",
+      text: "Spins don't just sit aligned with B0 — they precess around it, like a spinning top around gravity, tracing a cone at the Larmor frequency.",
+      notes: ["The precession axis is set by B0's direction (conventionally Z).", "This precession is what an RF pulse at the right frequency can tip and resonate with.", "No precession, no resonance, no signal."]
+    },
+    {
+      title: "Slice-select gradient — Gz",
+      chip: "Gz",
+      text: "Applying a gradient along Z means field strength — and so Larmor frequency — varies with position along that axis. An RF pulse at one specific frequency now only excites one slice.",
+      notes: ["Gz is on only during the RF pulse itself.", "It's what turns a 3D volume into one selectable 2D slice.", "Steeper gradient = thinner slice."]
+    },
+    {
+      title: "Phase-encode gradient — Gy",
+      chip: "Gy",
+      text: "A brief gradient along Y, switched on and off before readout, leaves each row at a slightly different phase — even after the gradient itself is gone.",
+      notes: ["Gy is applied once per repetition, then switched off.", "The phase difference it leaves behind encodes position along Y.", "This is why phase-encode steps take the most repetitions to complete."]
+    },
+    {
+      title: "Frequency-encode gradient — Gx",
+      chip: "Gx",
+      text: "During readout itself, a gradient along X means each column emits a slightly different frequency simultaneously — all captured in one readout window.",
+      notes: ["Gx is on throughout the readout, not before it.", "Different columns → different frequencies → position along X.", "Frequency-encoding is 'free' — one readout captures the whole axis at once."]
+    },
+    {
+      title: "Ready for the full simulator",
+      chip: "Full simulator available",
+      text: "The full version lets you adjust B0, animate precession live, and apply any combination of the three gradients with 90°/180° RF pulses together.",
+      notes: ["Try changing B0 and watching the Larmor frequency update live.", "Apply gradients one at a time before combining all three.", "This is the same physics behind every sequence in the question bank."]
+    }
+  ];
+
+  function renderScene(i, svg) {
+    var step = i + 1;
+    var scene = '';
+
+    if (step === 1) {
+      scene += K.pool(cx - 120, cy, '#5FE3F2', 'Parallel (low E)', 0, 0);
+      scene += K.pool(cx + 120, cy, '#F2B84B', 'Anti-parallel (high E)', 0.5, 0);
+      scene += K.label(cx - 120, cy - 130, 'more populated', '#5FE3F2', 'middle', 13);
+      scene += K.label(cx + 120, cy - 130, 'fewer spins', '#F2B84B', 'middle', 13);
+    } else if (step === 2) {
+      scene += K.label(cx, cy - 20, 'F = γ × B0', '#5FE3F2', 'middle', 42);
+      scene += K.label(cx, cy + 40, 'γ — gyromagnetic ratio (fixed for hydrogen)', '#8FA3BB', 'middle', 15);
+      scene += K.label(cx, cy + 70, 'B0 — main field strength', '#8FA3BB', 'middle', 15);
+    } else if (step === 3) {
+      scene += K.label(cx, cy - 60, '1.5 T  →  63.87 MHz', '#5FE3F2', 'middle', 26);
+      scene += K.label(cx, cy + 10, '3.0 T  →  127.7 MHz', '#F2B84B', 'middle', 26);
+      scene += K.label(cx, cy + 70, 'double the field, double the frequency', '#8FA3BB', 'middle', 14);
+    } else if (step === 4) {
+      scene += '<circle cx="' + cx + '" cy="' + cy + '" r="110" fill="none" stroke="rgba(148,197,224,0.25)" stroke-width="1.5"/>';
+      scene += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="110" ry="34" fill="none" stroke="rgba(95,227,242,0.4)" stroke-width="1.5"/>';
+      scene += '<line x1="' + cx + '" y1="' + (cy + 130) + '" x2="' + cx + '" y2="' + (cy - 130) + '" stroke="#5FE3F2" stroke-width="4" marker-end="url(#gs-arrow)"/>';
+      scene += K.label(cx + 20, cy - 118, 'B0 (Z)', '#5FE3F2', 'start', 16);
+      scene += K.phaseVector(cx, cy, 0.5, 100, '#EAF3FB', 'precessing spin');
+    } else if (step === 5 || step === 6 || step === 7) {
+      var colours = { 5: '#5FE3F2', 6: '#A78BFA', 7: '#F2B84B' };
+      var names = { 5: 'Gz — slice select', 6: 'Gy — phase encode', 7: 'Gx — frequency encode' };
+      var axisLabel = { 5: 'Z', 6: 'Y', 7: 'X' };
+      scene += '<rect x="140" y="120" width="580" height="180" rx="18" fill="' + colours[step] + '" opacity="0.08" stroke="' + colours[step] + '" stroke-width="1.6"/>';
+      scene += K.label(430, 165, names[step], colours[step], 'middle', 22);
+      scene += K.label(430, 210, 'gradient axis: ' + axisLabel[step], '#EAF3FB', 'middle', 16);
+      for (var s = 0; s < 5; s++) {
+        var gx = 190 + s * 105;
+        var h = 30 + s * 12;
+        scene += '<rect x="' + (gx - 14) + '" y="' + (270 - h) + '" width="28" height="' + h + '" fill="' + colours[step] + '" opacity="' + (0.3 + s * 0.12) + '"/>';
+      }
+      scene += K.label(430, 320, 'field strength varies smoothly across the axis', '#8FA3BB', 'middle', 13);
+    } else if (step === 8) {
+      scene +=
+        '<rect x="90" y="120" width="680" height="260" rx="28" fill="rgba(6,11,20,0.6)" stroke="rgba(95,227,242,0.35)"/>' +
+        K.label(430, 175, 'Full simulator preserved', '#5FE3F2', 'middle', 24) +
+        K.label(430, 215, 'Live B0 · animated precession · Gz / Gy / Gx · 90° / 180° RF', '#EAF3FB', 'middle', 15) +
+        '<rect x="148" y="260" width="120" height="70" rx="14" fill="rgba(95,227,242,0.14)" stroke="#5FE3F2"/>' +
+        '<rect x="306" y="260" width="120" height="70" rx="14" fill="rgba(167,139,250,0.14)" stroke="#A78BFA"/>' +
+        '<rect x="464" y="260" width="120" height="70" rx="14" fill="rgba(242,184,75,0.14)" stroke="#F2B84B"/>' +
+        '<rect x="622" y="260" width="120" height="70" rx="14" fill="rgba(22,191,166,0.14)" stroke="#16BFA6"/>' +
+        K.label(208, 300, 'B0', '#AFF3FF') + K.label(366, 300, 'gradients', '#D9CBFF') + K.label(524, 300, 'RF', '#FBE3B0') + K.label(682, 300, 'live formula', '#9DEAD9');
+    }
+
+    svg.innerHTML = K.frame(scene);
+  }
+
+  window.GuidedSteps.init({ steps: STEPS, renderScene: renderScene });
+})();
+</script>
+</body>
+</html>

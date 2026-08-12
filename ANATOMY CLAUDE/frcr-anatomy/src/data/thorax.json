@@ -1,0 +1,2431 @@
+[
+  {
+    "id": "thorax-p0004",
+    "section": "thorax",
+    "questionNumber": 1,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 4,
+    "sourcePageAnswer": 5,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Paratracheal stripe",
+        "acceptedVariants": [
+          "paratracheal line"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left coracoid process",
+        "acceptedVariants": [
+          "left coracoid"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right hilar point",
+        "acceptedVariants": [
+          "right hilum"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right costophrenic angle",
+        "acceptedVariants": [
+          "right costophrenic recess"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Descending thoracic aorta",
+        "acceptedVariants": [
+          "descending aorta",
+          "thoracic descending aorta"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The paratracheal stripe is normally less than 3–4 mm wide and formed by the pleura in contact with the right lateral wall of the trachea. The pleura is in contact with the trachea from the clavicles down to the azygous vein at the right tracheobronchial angle. The left lateral wall of the trachea is not normally distinguishable from the mediastinum.\n\nThe left coracoid process projects anteriorly from the upper border of the neck of the scapula.\n\nMost lung markings are due to vessels. The hilar point is where the superior pulmonary vein crosses the descending pulmonary artery. The right is 1 cm lower than the left, and is projected over the 6th posterior interspace. The angle between the vessels at the hilar point (hilar angle) is normally 120°.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 90.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 120.",
+      "Weber E, Netter FH, Vilensky JA, Carmichael SW. Netter's Concise Radiologic Anatomy. Philadelphia: Saunders/Elsevier, 2009: 183."
+    ],
+    "regionTags": [
+      "Trachea",
+      "Mediastinum",
+      "Hila",
+      "Pleura"
+    ],
+    "structureTags": [
+      "Paratracheal stripe",
+      "Coracoid process",
+      "Hilar point",
+      "Costophrenic angle",
+      "Thoracic aorta"
+    ],
+    "imagePath": "/images/thorax/p0004.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.12667,
+      "y": 0.00093,
+      "w": 0.74667,
+      "h": 0.99907
+    }
+  },
+  {
+    "id": "thorax-p0006",
+    "section": "thorax",
+    "questionNumber": 2,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 6,
+    "sourcePageAnswer": 7,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Shoulder radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right atrial border",
+        "acceptedVariants": [
+          "lateral border of the right atrium",
+          "right heart border"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Azygos fissure",
+        "acceptedVariants": [
+          "azygous fissure"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Anatomical neck of right humerus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Superior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Acromion of right scapula",
+        "acceptedVariants": [
+          "acromial process of right scapula",
+          "acromion process of right scapula"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The azygos fissure is a normal variant. The azygos vein travels through the apex of the right upper lobe, where it has four pleural layers: two parietal and two visceral.\n\nThe anatomical neck of the humerus separates the greater and lesser tuberosities. The surgical neck is the narrow area of shaft just inferior to the tuberosities and anatomical neck. The surgical neck is fractured more frequently than the anatomical neck, and the axillary nerve is at risk here.\n\nThe acromion articulates with the clavicle at the acromioclavicular joint to help provide stability to the shoulder joint.",
+    "references": [
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 125–126.",
+      "Moore KL, Dalley AF, Agur AMR. Clinically Oriented Anatomy, 6th edn. Philadelphia: Lippincott Williams & Wilkins, 2009: 114."
+    ],
+    "regionTags": [
+      "Heart",
+      "Pleura",
+      "Shoulder girdle"
+    ],
+    "structureTags": [
+      "Right atrium",
+      "Azygos fissure",
+      "Humerus",
+      "Superior vena cava",
+      "Acromion",
+      "Scapula"
+    ],
+    "imagePath": "/images/thorax/p0006.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.08467,
+      "y": 0.00843,
+      "w": 0.83067,
+      "h": 0.99157
+    }
+  },
+  {
+    "id": "thorax-p0008",
+    "section": "thorax",
+    "questionNumber": 3,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 8,
+    "sourcePageAnswer": 9,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Middle third of left clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Aortic arch",
+        "acceptedVariants": [
+          "aortic knob",
+          "aortic knuckle",
+          "arch of aorta",
+          "arch of the aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right posterior 6th rib/right blade of scapula",
+        "acceptedVariants": [
+          "right posterior 6th rib blade of scapula"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Stomach bubble/gas within the gastric fundus",
+        "acceptedVariants": [
+          "stomach bubble within the gastric fundus",
+          "stomach gas bubble within the gastric fundus",
+          "stomach gas within the gastric fundus"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right hemidiaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right dome of diaphragm",
+          "right dome of the diaphragm",
+          "right hemi-diaphragm"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The clavicle articulates with the acromion process of the scapula laterally, and the manubrium medially. It can be divided into the proximal, middle and distal thirds, to describe the location of pathology.\n\nThe aortic arch, or aortic knuckle, is seen forming the left upper mediastinal contour and continues as the descending thoracic aorta which can be seen behind the cardiac shadow. The descending aorta is found in the posterior mediastinum.\n\nA right-sided aortic arch, or double aortic arch, is sometimes seen as a normal variant. These particular anomalies can create complete vascular rings, and may cause compressive symptoms affecting the trachea and oesophagus.\n\nThe scapular blade is often seen overlying a chest radiograph, which can help to determine whether the image was acquired anteroposterior (AP) or posteroanterior (PA). If the scapula is overlying the lung, it means the arms have not been abducted and the radiograph is most likely to have been taken AP; the positioning for an erect PA chest radiograph involves lifting the arms over the cassette, with the backs of the hands placed on the hips and the shoulders rolled forwards. This moves the scapulae anteriorly and laterally, so they do not obscure the lungs. In this position, the X-rays travel from posterior to anterior, with the heart close to the film, thus reducing magnification of the heart.\n\nIn an erect chest radiograph gas is often seen in the gastric fundus. It is sometimes possible to identify gastric rugae outlined by air on a chest radiograph. Remember that if the film is taken supine, the gas will move anteriorly and so will be seen in a different position.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 90.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 120."
+    ],
+    "regionTags": [
+      "Clavicle",
+      "Aorta",
+      "Ribs",
+      "Diaphragm",
+      "Stomach"
+    ],
+    "structureTags": [
+      "Clavicle",
+      "Aortic arch",
+      "Rib",
+      "Scapula",
+      "Gastric fundus",
+      "Hemidiaphragm"
+    ],
+    "imagePath": "/images/thorax/p0008.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.128,
+      "y": 0.0,
+      "w": 0.744,
+      "h": 1.0
+    }
+  },
+  {
+    "id": "thorax-p0010",
+    "section": "thorax",
+    "questionNumber": 4,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 10,
+    "sourcePageAnswer": 11,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain lateral chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right main pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right hemidiaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right dome of diaphragm",
+          "right dome of the diaphragm",
+          "right hemi-diaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Stomach bubble",
+        "acceptedVariants": [
+          "gastric air bubble",
+          "gastric bubble",
+          "stomach gas bubble"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left hemidiaphragm",
+        "acceptedVariants": [
+          "left diaphragm",
+          "left dome of diaphragm",
+          "left dome of the diaphragm",
+          "left hemi-diaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right ventricle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The right diaphragm is usually higher than the left, and you can see the heart through it, i.e. the heart therefore cannot be in contact with it. The inferior vena cava may be seen to pass through the right diaphragm.\n\nAerated lung is adjacent to the right hemidiaphragm and therefore its contour is visible from its posterior to anterior aspects.\n\nThe left diaphragm is usually lower than the right and the heart is in contact with it, i.e. the heart is sitting on the left diaphragm and the gastric bubble can be seen to lie below it.\n\nThe right ventricle is the most anterior chamber of the heart. It is crescent shaped, and has a thinner wall than the larger, more muscular left ventricle. The left ventricle is so large that it bulges into the right ventricle, giving it its crescent shape. Inflow is from the right atrium via the tricuspid valve (three leaflets). Outflow is into the pulmonary artery via the pulmonary valve.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 91.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 121.",
+      "Weber E, Netter FH, Vilensky JA, Carmichael SW. Netter's Concise Radiologic Anatomy. Philadelphia: Saunders/Elsevier, 2009: 203."
+    ],
+    "regionTags": [
+      "Pulmonary arteries and veins",
+      "Diaphragm",
+      "Stomach",
+      "Heart"
+    ],
+    "structureTags": [
+      "Pulmonary artery",
+      "Hemidiaphragm",
+      "Gastric bubble",
+      "Right ventricle"
+    ],
+    "imagePath": "/images/thorax/p0010.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.21333,
+      "y": 0.06044,
+      "w": 0.57333,
+      "h": 0.93956
+    }
+  },
+  {
+    "id": "thorax-p0012",
+    "section": "thorax",
+    "questionNumber": 5,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 12,
+    "sourcePageAnswer": 13,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "AP chest radiograph, neonate/infant with central lines in situ.",
+    "questionText": "(a) Name the structure labelled A. (b) Name the anterior mediastinal structure labelled B. (c) Name the structure labelled C. (d) What does the line labelled D correspond to? (e) Name the structure labelled E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ossification centre of right humeral head",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Thymus",
+        "acceptedVariants": [
+          "thymic tissue",
+          "thymus gland"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right transverse process of T2",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Azygo-oesophageal recess",
+        "acceptedVariants": [
+          "azygo-esophageal line",
+          "azygo-esophageal recess",
+          "azygo-oesophageal line",
+          "azygos-oesophageal line"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Gastric fundus",
+        "acceptedVariants": [
+          "fundus of stomach",
+          "fundus of the stomach"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "A number of anatomical lines, stripes and other interfaces are evident on chest radiographs, deviation of which can be a subtle sign of pathology. The azygo-oesophageal recess is visualised as a result of the different densities of the mediastinum and the posteromedial aspect of the right lower lobe. The recess lies anterior to the vertebral column and posterior or lateral to the oesophagus. Its superior extent is the anterior turn of the azygos vein, with the inferior extent being the aortic hiatus. Pathologies which alter the normal contour of the recess include hiatus hernias, oesophageal tumours and lymph node enlargement.",
+    "references": [],
+    "regionTags": [
+      "Mediastinum",
+      "Thymus",
+      "Thoracic spine",
+      "Stomach"
+    ],
+    "structureTags": [
+      "Humeral head",
+      "Thymus",
+      "Transverse process",
+      "Azygo-oesophageal recess",
+      "Gastric fundus"
+    ],
+    "imagePath": "/images/thorax/p0012.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.25867,
+      "y": 0.00356,
+      "w": 0.48533,
+      "h": 0.61956
+    }
+  },
+  {
+    "id": "thorax-p0014",
+    "section": "thorax",
+    "questionNumber": 6,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 14,
+    "sourcePageAnswer": 15,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "AP X-ray of the neonatal chest.",
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Thymus",
+        "acceptedVariants": [
+          "thymic tissue",
+          "thymus gland"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left lower lobe bronchus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Stomach",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Posterior right third rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Thymus",
+        "acceptedVariants": [
+          "thymic tissue",
+          "thymus gland"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The neonatal chest X-ray (CXR) is performed as a supine antero-posterior radiograph that exaggerates the heart size and mediastinal width. The normal evolution of the CXR appearances from neonates to adults should be understood in order to recognize pathology when present. For instance, it is normal to see the thymus gland on neonatal CXR but in adults this should not be visualized.\n\nThe thymus is a specialized organ for the production of T-lymphocytes of the immune system. It is located in the anterior superior mediastinum and is most prominent in the neonatal period. As the child grows, it becomes much less prominent on CXR and after about eight years old it is not readily identifiable.\n\nAids to recognition of the thymus gland include:\n- Its characteristic 'sail' shape.\n- Location in the anterior mediastinum should not obscure the heart borders.\n- Scalloping of the border of the thymus by the anterior ribs.\n- A normal thymus will not displace the trachea: if this is identified, another pathology must be suspected.",
+    "references": [],
+    "regionTags": [
+      "Thymus",
+      "Mediastinum",
+      "Bronchopulmonary segments",
+      "Stomach",
+      "Ribs"
+    ],
+    "structureTags": [
+      "Thymus",
+      "Bronchus",
+      "Stomach",
+      "Rib"
+    ],
+    "imagePath": "/images/thorax/p0014.webp",
+    "flagForReview": "Source image shows two arrow instances each for labels A, B, C and D (paired thymic lobes / duplicate pointers); only one instance per letter is marked with the new overlay badge, the source's own duplicate arrow/letter for the second instance is left as-is.",
+    "imageCrop": {
+      "x": 0.23533,
+      "y": 0.11111,
+      "w": 0.52667,
+      "h": 0.78756
+    }
+  },
+  {
+    "id": "thorax-p0016",
+    "section": "thorax",
+    "questionNumber": 7,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 16,
+    "sourcePageAnswer": 17,
+    "caseLabel": "Question 2.6",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to D.\nE  Which cardiac chamber makes up this part of the cardiac silhouette?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left main bronchus",
+        "acceptedVariants": [
+          "left main stem bronchus",
+          "left mainstem bronchus",
+          "left principal bronchus"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left coracoid process",
+        "acceptedVariants": [
+          "left coracoid"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right hilum or hilar point",
+        "acceptedVariants": [
+          "right hilar point",
+          "right hilum"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right interlobar pulmonary artery",
+        "acceptedVariants": [
+          "right interlobar artery"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The pulmonary arteries, veins and bronchi make up the hila. The hilar point is formed by the descending upper lobe veins superiorly as they cross in front of (anterior to) the interlobar pulmonary artery inferiorly. The angle between the vessels is known as the hilar angle and normally measures 120°. The right hilar point is normally located 1 cm lower than the left hilar point and should never be located higher than the left. The left heart border consists of the left atrium superiorly and left ventricle inferiorly. The right heart border consists of the right atrium alone.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest"
+    ],
+    "structureTags": [
+      "Left main bronchus",
+      "Coracoid process",
+      "Hilum",
+      "Interlobar pulmonary artery",
+      "Right atrium"
+    ],
+    "imagePath": "/images/thorax/p0016.webp",
+    "flagForReview": "Answer page title reads '2.6 PA X-ray of the chest' (heading, not an italic projection line) so projection left null.",
+    "imageCrop": {
+      "x": 0.274,
+      "y": 0.12622,
+      "w": 0.49267,
+      "h": 0.70222
+    }
+  },
+  {
+    "id": "thorax-p0018",
+    "section": "thorax",
+    "questionNumber": 8,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 18,
+    "sourcePageAnswer": 19,
+    "caseLabel": "Question 3.8",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Parietal pleura",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Manubrium",
+        "acceptedVariants": [
+          "manubrium sterni"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Manubriosternal joint (angle of Louis)",
+        "acceptedVariants": [
+          "angle of louis",
+          "manubrio-sternal joint",
+          "manubriosternal angle",
+          "manubriosternal joint",
+          "sternal angle"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Body of sternum",
+        "acceptedVariants": [
+          "mesosternum",
+          "sternal body"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Xiphoid process",
+        "acceptedVariants": [
+          "xiphisternum",
+          "xiphoid"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The sternum is located in the centre of the thorax and is composed of three parts. The superior part is called the manubrium, the middle is called the body and the inferior part is the xiphoid process. The sternal angle (also called the angle of Louis or the manubriosternal joint) is the angle formed at the junction of the manubrium and the body of the sternum. The angle of Louis lies at the level of the T4/5 and is an important anatomical landmark of the thorax. The mediastinal structures that lie on a horizontal plane with the angle of Louis include:\n\n• The bifurcation of the trachea.\n• The start and end of the aortic arch.\n• The entry of the azygos vein as it arches over the right main bronchus to enter the superior vena cava.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Sternum"
+    ],
+    "structureTags": [
+      "Parietal pleura",
+      "Manubrium",
+      "Manubriosternal joint",
+      "Body of sternum",
+      "Xiphoid process"
+    ],
+    "imagePath": "/images/thorax/p0018.webp",
+    "flagForReview": "Answer page is a single PDF page containing two stacked slide panels (text continues across the visual break) - treated as one continuous answer. Final bullet as printed reads '...azygos vein as it arches over the right main bronchus to enter the trachea' which appears to be a source error (expected superior vena cava); transcribed verbatim.",
+    "imageCrop": {
+      "x": 0.35533,
+      "y": 0.06844,
+      "w": 0.38533,
+      "h": 0.86844
+    }
+  },
+  {
+    "id": "thorax-p0020",
+    "section": "thorax",
+    "questionNumber": 9,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 20,
+    "sourcePageAnswer": 21,
+    "caseLabel": "Question 7.10",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right acromioclavicular joint",
+        "acceptedVariants": [
+          "right acromio-clavicular joint"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Trachea",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right coracoid process",
+        "acceptedVariants": [
+          "right coracoid"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Superior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Stomach",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The acromioclavicular joint (AC joint) is a synovial joint connecting the scapula to the clavicle. It is stabilized by the superior and inferior acromioclavicular ligaments, and is a common site of sporting injuries. The normal acromioclavicular joint space is less than 5 mm. There is a further connection between the scapula and clavicle via the coracoclavicular ligament (which connects the coracoid process to the clavicle). The normal coracoclavicular distance is less than 12 mm. When assessing chest X-rays it is important also to inspect the shoulder joints, as it not uncommon to pick up unexpected pathology.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Shoulder"
+    ],
+    "structureTags": [
+      "Acromioclavicular joint",
+      "Trachea",
+      "Coracoid process",
+      "Superior vena cava",
+      "Stomach"
+    ],
+    "imagePath": "/images/thorax/p0020.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.21067,
+      "y": 0.12178,
+      "w": 0.57467,
+      "h": 0.68267
+    }
+  },
+  {
+    "id": "thorax-p0022",
+    "section": "thorax",
+    "questionNumber": 10,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 22,
+    "sourcePageAnswer": 23,
+    "caseLabel": "Question 8.9",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to D.\nE  What normal variant is present?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Superior angle of right scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right costophrenic angle",
+        "acceptedVariants": [
+          "right costophrenic recess"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left anterior first rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right posterior ninth rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right cervical rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "A cervical rib is an additional rib arising from the seventh cervical vertebra and is found in approximately 1 in 500 people. It is generally unilateral. Cervical ribs can be problematic and lead to thoracic outlet syndrome from compression of the brachial plexus or subclavian artery. These structures become trapped between the cervical rib and the scalene muscles. Symptoms include arm weakness and paraesthesia.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Ribs"
+    ],
+    "structureTags": [
+      "Scapula",
+      "Costophrenic angle",
+      "First rib",
+      "Ninth rib",
+      "Cervical rib"
+    ],
+    "imagePath": "/images/thorax/p0022.webp",
+    "flagForReview": "Label E is not marked on the image; E is a printed text sub-question ('What normal variant is present?') answered as 'Right cervical rib.' Retained as label E.",
+    "imageCrop": {
+      "x": 0.268,
+      "y": 0.07111,
+      "w": 0.52933,
+      "h": 0.84356
+    }
+  },
+  {
+    "id": "thorax-p0024",
+    "section": "thorax",
+    "questionNumber": 11,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 24,
+    "sourcePageAnswer": 25,
+    "caseLabel": "Question 8.12",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Azygos fissure",
+        "acceptedVariants": [
+          "azygous fissure"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Aortic knuckle or arch",
+        "acceptedVariants": [
+          "aortic arch",
+          "aortic knob",
+          "aortic knuckle",
+          "arch of aorta",
+          "arch of the aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spine of the left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Spinous process of T2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left ventricle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The azygos fissure is a normal variant seen in 1–2% of individuals. It is formed when the azygos vein fails to migrate over the apex of the lung during foetal development. The azygos vein instead courses through the lung, bringing a layer of parietal and visceral pleura with it. The azygos fissure therefore consists of four layers of pleura (two parietal layers and two visceral layers). These wrap around the vein and are said to give a 'tadpole' appearance on the plain chest radiograph.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest"
+    ],
+    "structureTags": [
+      "Azygos fissure",
+      "Aortic arch",
+      "Scapular spine",
+      "Spinous process",
+      "Left ventricle"
+    ],
+    "imagePath": "/images/thorax/p0024.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.26,
+      "y": 0.21422,
+      "w": 0.53267,
+      "h": 0.58044
+    }
+  },
+  {
+    "id": "thorax-p0026",
+    "section": "thorax",
+    "questionNumber": 12,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 26,
+    "sourcePageAnswer": 27,
+    "caseLabel": "Case 2.1",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "A  Name the structure labelled A.\nB  Name the vascular structure labelled B.\nC  Name the structure labelled C.\nD  Name the outlined structure labelled D.\nE  Which anatomical variant is present on this image?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Aorto-pulmonary angle or aorto-pulmonary window",
+        "acceptedVariants": [
+          "aorto-pulmonary angle",
+          "aorto-pulmonary window",
+          "aortopulmonary angle",
+          "aortopulmonary window",
+          "ap window"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left lower lobe pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right pedicle of T5",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Carina",
+        "acceptedVariants": [
+          "carina of the trachea",
+          "tracheal carina"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Azygos lobe/fissure",
+        "acceptedVariants": [
+          "azygos fissure",
+          "azygos lobe",
+          "azygous fissure",
+          "azygous lobe"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The aorto-pulmonary angle is an important anatomical landmark formed by the lateral edge of the aorta and the upper margin of the left pulmonary artery. This angle can be obliterated in cases of mediastinal lymph node enlargement. The ligamentum arteriosum and the left recurrent laryngeal nerve are two important structures located here.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "Aorto-pulmonary window",
+      "Pulmonary artery",
+      "Pedicle",
+      "Carina",
+      "Azygos lobe"
+    ],
+    "imagePath": "/images/thorax/p0026.webp",
+    "flagForReview": "Question page carries a blank 'QUESTION | WRITE YOUR ANSWER HERE' worksheet table (blank, no leaked answers). Label E is not marked on the image; it is a text sub-question about the anatomical variant.",
+    "imageCrop": {
+      "x": 0.29267,
+      "y": 0.00533,
+      "w": 0.412,
+      "h": 0.56533
+    }
+  },
+  {
+    "id": "thorax-p0028",
+    "section": "thorax",
+    "questionNumber": 13,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 28,
+    "sourcePageAnswer": 29,
+    "caseLabel": "Case 4.12",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "A  Name the structure labelled A.\nB  Name the structure labelled B.\nC  Name the structure labelled C.\nD  Name the structure labelled D.\nE  Which anatomical variant is present on this image?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right transverse process of C7",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Spinous process of T2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right pedicle of T7",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right hemidiaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right dome of diaphragm",
+          "right dome of the diaphragm",
+          "right hemi-diaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Azygos fissure",
+        "acceptedVariants": [
+          "azygous fissure"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The azygos fissure is the most common accessory fissure visible on chest radiography (seen in approximately 1–2%). The azygos vein runs in the most medial aspect of the fissure, surrounded by both parietal and visceral pleura.\n\nA vertebra seen on an anteroposterior radiograph can be thought of as an owl: the spinous process corresponding to the beak, the pedicles representing eyes. The 'winking owl' sign is an important indication of pedicular destruction.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Thoracic spine",
+      "Chest"
+    ],
+    "structureTags": [
+      "Transverse process",
+      "Spinous process",
+      "Pedicle",
+      "Hemidiaphragm",
+      "Azygos fissure"
+    ],
+    "imagePath": "/images/thorax/p0028.webp",
+    "flagForReview": "Question page carries a blank worksheet table (no leaked answers). Label E is not marked on the image; it is a text sub-question about the anatomical variant.",
+    "imageCrop": {
+      "x": 0.38067,
+      "y": 0.00089,
+      "w": 0.18267,
+      "h": 0.63911
+    }
+  },
+  {
+    "id": "thorax-p0030",
+    "section": "thorax",
+    "questionNumber": 14,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 30,
+    "sourcePageAnswer": 31,
+    "caseLabel": "Case 5.5",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Coracoid process of the right scapula",
+        "acceptedVariants": [
+          "coracoid of the right scapula"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Spinous process of T2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left atrial appendage",
+        "acceptedVariants": [
+          "left atrial appendix"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Lateral border of the right atrium",
+        "acceptedVariants": [
+          "right atrial border",
+          "right heart border"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right upper lobe segmental bronchus (end on)",
+        "acceptedVariants": [
+          "right upper lobe segmental bronchus"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "In the cardiac silhouette, it is important to know the borders of the heart and the chambers which form them. The lower right heart border is formed by the right atrium and the upper right silhouette created by the superior vena cava.\n\nThe bulge of the left atrial appendage contributes to the left heart border superiorly, with the inferior left heart border formed by the left ventricle.\n\nThe right ventricle forms most of the inferior border of the heart.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Heart"
+    ],
+    "structureTags": [
+      "Coracoid process",
+      "Spinous process",
+      "Left atrial appendage",
+      "Right atrium",
+      "Segmental bronchus"
+    ],
+    "imagePath": "/images/thorax/p0030.webp",
+    "flagForReview": "Question page has no printed instruction text (image only, gray 'Case 5.5' bar); generic questionText used. Answer page is one PDF page containing two stacked text panels - concatenated in printed order.",
+    "imageCrop": {
+      "x": 0.18467,
+      "y": 0.03733,
+      "w": 0.616,
+      "h": 0.94756
+    }
+  },
+  {
+    "id": "thorax-p0032",
+    "section": "thorax",
+    "questionNumber": 15,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 32,
+    "sourcePageAnswer": 33,
+    "caseLabel": "Case 6.1",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "A  Name the structure labelled A.\nB  Name the structure labelled B.\nC  Name the structure labelled C.\nD  Name the structure labelled D.\nE  Name the vascular structure labelled E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Spinous process of T2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left acromion process",
+        "acceptedVariants": [
+          "left acromial process",
+          "left acromion"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left coracoid process",
+        "acceptedVariants": [
+          "left coracoid"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Arch of aorta (aortic knuckle)",
+        "acceptedVariants": [
+          "aortic arch",
+          "aortic knob",
+          "aortic knuckle",
+          "arch of aorta",
+          "arch of the aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left lower lobe pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The three ligaments that attach to the coracoid process are:\n\n1. Coracoclavicular ligament\n2. Coracoacromial ligament\n3. Coracohumeral ligament.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Shoulder"
+    ],
+    "structureTags": [
+      "Spinous process",
+      "Acromion",
+      "Coracoid process",
+      "Aortic arch",
+      "Pulmonary artery"
+    ],
+    "imagePath": "/images/thorax/p0032.webp",
+    "flagForReview": "Question page carries a blank worksheet table (no leaked answers). Question image is a coned/cropped left-upper-chest and shoulder view.",
+    "imageCrop": {
+      "x": 0.258,
+      "y": 0.0,
+      "w": 0.484,
+      "h": 0.62578
+    }
+  },
+  {
+    "id": "thorax-p0034",
+    "section": "thorax",
+    "questionNumber": 16,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 34,
+    "sourcePageAnswer": 35,
+    "caseLabel": "Case 8.3",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "A  Name the structure labelled A.\nB  Name the structure labelled B.\nC  Name the structure labelled C.\nD  In which structure does the gas labelled D lie?\nE  Which anatomical variant is present on this image?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left first rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right lower lobe pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Gastric fundus",
+        "acceptedVariants": [
+          "fundus of stomach",
+          "fundus of the stomach"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right aortic arch",
+        "acceptedVariants": [
+          "right aortic knob",
+          "right aortic knuckle",
+          "right arch of aorta",
+          "right arch of the aorta"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The asymptomatic adult variant of a right aortic arch is usually associated with an aberrant left subclavian artery. This can cause a posterior indentation of the oesophagus on a barium swallow.\n\nThis can be identified on a chest radiograph using the following clues:\n\n1. Ensure the radiograph is appropriately orientated (side marker)\n2. Appreciate the lack of a left sided arch above the left pulmonary artery\n3. Ensure that the heart is normally sited, i.e. there is no dextrocardia.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "First rib",
+      "Clavicle",
+      "Pulmonary artery",
+      "Gastric fundus",
+      "Right aortic arch"
+    ],
+    "imagePath": "/images/thorax/p0034.webp",
+    "flagForReview": "Question page carries a blank worksheet table (no leaked answers). Label E is not marked on the image; it is a text sub-question about the anatomical variant.",
+    "imageCrop": {
+      "x": 0.34067,
+      "y": 0.0,
+      "w": 0.32467,
+      "h": 0.54578
+    }
+  },
+  {
+    "id": "thorax-p0036",
+    "section": "thorax",
+    "questionNumber": 17,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 36,
+    "sourcePageAnswer": 37,
+    "caseLabel": "Case 10.17",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "A  Name the radiolucent structure labelled A.\nB  Name the structure labelled B.\nC  Which chamber of the heart lies anteriorly (C)?\nD  Which chamber of the heart lies posteriorly (D)?\nE  At what level does the trachea usually divide?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Trachea",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Aortic arch",
+        "acceptedVariants": [
+          "aortic knob",
+          "aortic knuckle",
+          "arch of aorta",
+          "arch of the aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right ventricle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "T4",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "If not specified, most lateral radiographs will be performed in the left lateral position. There are three important 'retro' spaces:\n\n1. Retrosternal – the heart is usually in contact with the lower third of the sternum. In emphysema, this space may be widened. It may be obliterated in right ventricular hypertrophy.\n2. Retrotracheal – posterior to the trachea, anterior to the spine and superior to the aortic arch. Mediastinal adenopathy can opacify this space.\n3. Retrocardiac – usually lucent, although basal consolidation or a pleural effusion may obliterate this space.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest",
+      "Heart"
+    ],
+    "structureTags": [
+      "Trachea",
+      "Aortic arch",
+      "Right ventricle",
+      "Left atrium",
+      "Carina"
+    ],
+    "imagePath": "/images/thorax/p0036.webp",
+    "flagForReview": "Lateral chest radiograph. Question page carries a blank worksheet table (no leaked answers). Label E is not marked on the image; it is a text sub-question ('At what level does the trachea usually divide?').",
+    "imageCrop": {
+      "x": 0.33467,
+      "y": 0.0,
+      "w": 0.324,
+      "h": 0.54489
+    }
+  },
+  {
+    "id": "thorax-p0038",
+    "section": "thorax",
+    "questionNumber": 18,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 38,
+    "sourcePageAnswer": 39,
+    "caseLabel": "Case 11.14",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right acromioclavicular joint",
+        "acceptedVariants": [
+          "right acromio-clavicular joint"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left upper lobe pulmonary vein",
+        "acceptedVariants": [
+          "left superior pulmonary vein"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right lower lobe pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left coracoid process of scapula",
+        "acceptedVariants": [
+          "left coracoid of scapula"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Gastric fundus",
+        "acceptedVariants": [
+          "fundus of stomach",
+          "fundus of the stomach"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The hila are composed of major bronchi, blood vessels and lymphatics. The hila may be seen at the same level but commonly, the left is higher than the right because of the position of the left main bronchus, over which the left pulmonary artery courses.\n\nThe hilar points are the angles formed by the descending upper lobe veins and descending pulmonary arteries. Not every normal patient has a very clear hilar point on both sides, but if present, they can be useful indicators of disease processes.",
+    "references": [],
+    "regionTags": [
+      "Thorax",
+      "Chest"
+    ],
+    "structureTags": [
+      "Acromioclavicular joint",
+      "Pulmonary vein",
+      "Pulmonary artery",
+      "Coracoid process",
+      "Gastric fundus"
+    ],
+    "imagePath": "/images/thorax/p0038.webp",
+    "flagForReview": "Question page 38 is the last page of the assigned 16-38 range; its answer page (39) falls just outside the range and was read to complete the pair - possible duplicate with the agent covering pages 39+. Question page has no printed instruction text and no worksheet table; generic questionText used.",
+    "imageCrop": {
+      "x": 0.122,
+      "y": 0.01422,
+      "w": 0.768,
+      "h": 0.92267
+    }
+  },
+  {
+    "id": "thorax-p0040",
+    "section": "thorax",
+    "questionNumber": 19,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 40,
+    "sourcePageAnswer": 41,
+    "caseLabel": "Case 13.15",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Epiphysis of right humeral head",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Carina",
+        "acceptedVariants": [
+          "carina of the trachea",
+          "tracheal carina"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left main bronchus",
+        "acceptedVariants": [
+          "left main stem bronchus",
+          "left mainstem bronchus",
+          "left principal bronchus"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The carina is the point at which the trachea bifurcates into the left and right main bronchi. The left atrium lies below the carina, and as such, splaying of the carina is seen in the event of left atrial enlargement (e.g. in mitral valve disease). The right atrium forms the lower part of the right heart border and is typically obscured in cases of right middle lobe collapse or consolidation. The left ventricle forms the lower part of the left heart border. The right ventricle sits anteriorly and does not contribute to the heart borders as seen on a frontal radiograph.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Thorax",
+      "Paediatric"
+    ],
+    "structureTags": [
+      "Humeral head epiphysis",
+      "Carina",
+      "Left main bronchus",
+      "Left atrium",
+      "Right atrium"
+    ],
+    "imagePath": "/images/thorax/p0040.webp",
+    "flagForReview": "Question page has a blank worksheet table with descriptive sub-questions: A 'Name the structure labelled A.', B 'Name the part of the airways tract labelled B.', C 'Name the part of the airways tract labelled C.', D 'Name the most posterior cardiac chamber.', E 'Name the cardiac chamber that forms the right heart border.' Label D does not appear on the image (it is a knowledge question), and B and E each appear twice on the image.",
+    "imageCrop": {
+      "x": 0.3,
+      "y": 0.00178,
+      "w": 0.40467,
+      "h": 0.54756
+    }
+  },
+  {
+    "id": "thorax-p0042",
+    "section": "thorax",
+    "questionNumber": 20,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 42,
+    "sourcePageAnswer": 43,
+    "caseLabel": "Case 1.1",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "1.1 Postero-anterior (PA) chest radiograph",
+    "questionText": "Identify the structures labelled A–D.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left brachiocephalic vein",
+        "acceptedVariants": [
+          "left innominate vein"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Pulmonary trunk",
+        "acceptedVariants": [
+          "trunk of the pulmonary artery"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right atrium (right heart border)",
+        "acceptedVariants": [
+          "lateral border of the right atrium",
+          "right atrial border",
+          "right atrium",
+          "right heart border"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right cardiophrenic recess",
+        "acceptedVariants": [
+          "right cardiophrenic angle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "(a) The left brachiocephalic vein forms a silhouette with the adjacent lung. This interface 'fades' above the clavicles as it becomes more anteriorly placed and 'merges' with the anterior chest wall.\n\n(e) Azygos fissure. The azygos fissure is seen in 0.5% of chest radiographs. It is formed by the caudal invagination of the azygos vein through the apex of the right upper lobe. It begins as a line in the upper portion and extends in an arc caudally toward the 'teardrop' density that is the azygos vein. The azygos vein is outside the parietal pleura – the line is therefore composed of two visceral and two parietal pleural layers. The so-called azygos 'lobe' is the segment of lung between the fissure and the trachea. It is not a true separate 'lobe' as the total bronchial anatomy in the right upper lobe has not been altered even though there may be minor variations in the bronchial supply to this segment of upper lobe.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Thorax",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "Left brachiocephalic vein",
+      "Pulmonary trunk",
+      "Right atrium",
+      "Cardiophrenic recess",
+      "Azygos fissure"
+    ],
+    "imagePath": "/images/thorax/p0042.webp",
+    "flagForReview": "Answer page lists (a)–(e) but the question image on page 42 shows only labels A, B, C and D (checked at high magnification); there is no visible E marker. Answer (e) 'Azygos fissure' and its explanatory text have been placed in teachingText rather than assigned to a label. Answer page uses lowercase letters (a)–(d) mapped to image letters A–D in printed order.",
+    "imageCrop": {
+      "x": 0.21867,
+      "y": 0.14489,
+      "w": 0.668,
+      "h": 0.78844
+    }
+  },
+  {
+    "id": "thorax-p0044",
+    "section": "thorax",
+    "questionNumber": 21,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 44,
+    "sourcePageAnswer": 45,
+    "caseLabel": "Case 1.13",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "1.13 PA chest radiograph centred over mediastinum",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Anterior junction line",
+        "acceptedVariants": [
+          "anterior junctional line"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Azygo-oesophageal line",
+        "acceptedVariants": [
+          "azygo-esophageal line",
+          "azygo-esophageal recess",
+          "azygo-oesophageal recess",
+          "azygos-oesophageal line"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right interlobar pulmonary artery",
+        "acceptedVariants": [
+          "right interlobar artery"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Descending thoracic aorta",
+        "acceptedVariants": [
+          "descending aorta",
+          "thoracic descending aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right transverse process of the C7 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "(a) This is formed by the interface of the anterior lungs as they meet in the midline. This line will only be seen on the frontal projection if there is sufficient penetration of the beam, which should be tangential to the interface. The line runs below the aortic arch and to the left in a caudal direction.\n\n(b) This is formed by the interface between the right lung and the azygos vein and oesophagus. The cranial end of the line terminates at the point where the azygos vein drains into the superior vena cava. Any bulge of this line is indirect evidence of a possible oesophageal or posterior/middle mediastinal mass lesion and before the advent of cross-sectional imaging, this was sometimes the only plain radiograph sign of such pathology.\n\n(e) The transverse process of a cervical vertebra points downwards unlike that of a thoracic vertebra, which points upwards. This is a useful fact to remember when determining whether an atypical rib is a cervical or hypoplastic first rib. In the case of a cervical rib, the rib articulates with a transverse process that is pointing downwards.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Thorax",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "Anterior junction line",
+      "Azygo-oesophageal line",
+      "Interlobar pulmonary artery",
+      "Descending thoracic aorta",
+      "Transverse process C7"
+    ],
+    "imagePath": "/images/thorax/p0044.webp",
+    "flagForReview": "Answer page uses lowercase letters (a)–(e); mapped to image letters A–E in printed order.",
+    "imageCrop": {
+      "x": 0.41133,
+      "y": 0.06933,
+      "w": 0.34133,
+      "h": 0.93067
+    }
+  },
+  {
+    "id": "thorax-p0046",
+    "section": "thorax",
+    "questionNumber": 22,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 46,
+    "sourcePageAnswer": 47,
+    "caseLabel": "Case 1.15",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "1.15 Lateral radiograph of the sternum",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Manubrio-sternal joint (sternal angle)",
+        "acceptedVariants": [
+          "angle of louis",
+          "manubrio-sternal joint",
+          "manubriosternal angle",
+          "manubriosternal joint",
+          "sternal angle"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Medial clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Head of humerus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Body of sternum",
+        "acceptedVariants": [
+          "mesosternum",
+          "sternal body"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Manubrium",
+        "acceptedVariants": [
+          "manubrium sterni"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "(a) The manubrio-sternal joint is a secondary cartilaginous joint and may be involved with generalized seronegative arthropathies.\n\nAnatomically, it normally lies at the level of the T4–T5 intervertebral disc and the aortic arch.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Thorax",
+      "Sternum"
+    ],
+    "structureTags": [
+      "Manubriosternal joint",
+      "Clavicle",
+      "Humeral head",
+      "Body of sternum",
+      "Manubrium"
+    ],
+    "imagePath": "/images/thorax/p0046.webp",
+    "flagForReview": "Answer page uses lowercase (a)–(e), mapped to image letters A–E in printed order. Label C is printed four times on the image (four separate arrows) for the single answer 'Head of humerus.'",
+    "imageCrop": {
+      "x": 0.25533,
+      "y": 0.07467,
+      "w": 0.56733,
+      "h": 0.92089
+    }
+  },
+  {
+    "id": "thorax-p0056",
+    "section": "thorax",
+    "questionNumber": 23,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 56,
+    "sourcePageAnswer": 57,
+    "caseLabel": "Case 4.20",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "4.20 PA chest radiograph",
+    "questionText": "Identify the structures labelled A–D. (e) Which normal variant is present on this image?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left pericardial fat pad",
+        "acceptedVariants": [
+          "left epicardial fat pad"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left main bronchus",
+        "acceptedVariants": [
+          "left main stem bronchus",
+          "left mainstem bronchus",
+          "left principal bronchus"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right first rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right costophrenic angle",
+        "acceptedVariants": [
+          "right costophrenic recess"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Situs inversus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Please note the side marker!\n\n(a) Left pericardial fat pad. This is of no clinical bearing but can sometimes be confused for a mediastinal mass because of its shape. The density of a fat pad is less than that produced by soft tissue mass lesions.\n\n(e) Situs inversus. The radiograph has been presented the wrong way round but the side marker is present on the film.\n\nSitus inversus implies the position of the heart is mirrored as is that of the abdominal viscera. Normal position is referred to as situs solitus.\n\nIf solely the position of the heart is altered, with the apex towards the right, then this is referred to as dextrocardia.\n\nKartagener's syndrome is a not infrequent association with situs inversus, affecting 20% of patients. It is a disease affecting mucociliary function and therefore patients often present with sinusitis and bronchiectasis.\n\nSitus inversus also has bearing on patients presenting with trauma or abdominal pain and it needs to be considered, for instance, the spleen will be on the right and the appendix on the left.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "Pericardial fat pad",
+      "Left main bronchus",
+      "First rib",
+      "Costophrenic angle",
+      "Situs inversus"
+    ],
+    "imagePath": "/images/thorax/p0056.webp",
+    "flagForReview": "Image prints arrow labels A–D only; the answer page lists (a)–(e). Label E corresponds to the printed sub-question '(e) Which normal variant is present on this image?' shown in a small worksheet box on the question page, not to an arrow on the image.",
+    "imageCrop": {
+      "x": 0.22267,
+      "y": 0.08267,
+      "w": 0.64067,
+      "h": 0.91111
+    }
+  },
+  {
+    "id": "thorax-p0058",
+    "section": "thorax",
+    "questionNumber": 24,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 58,
+    "sourcePageAnswer": 59,
+    "caseLabel": "Case 7.12",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "7.12 PA chest radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Companion shadow of left clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Azygos vein",
+        "acceptedVariants": [
+          "azygous vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right hilar point",
+        "acceptedVariants": [
+          "right hilum"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right interlobar pulmonary artery",
+        "acceptedVariants": [
+          "right interlobar artery"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Bronchus intermedius",
+        "acceptedVariants": [
+          "intermediate bronchus"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "(e) Bronchus intermedius. The pulmonary arteries are always located alongside bronchi. In the case of bronchus intermedius, it lies adjacent to the interlobar artery.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Hilum"
+    ],
+    "structureTags": [
+      "Clavicle",
+      "Azygos vein",
+      "Hilar point",
+      "Interlobar pulmonary artery",
+      "Bronchus intermedius"
+    ],
+    "imagePath": "/images/thorax/p0058.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.184,
+      "y": 0.09067,
+      "w": 0.72933,
+      "h": 0.90933
+    }
+  },
+  {
+    "id": "thorax-p0060",
+    "section": "thorax",
+    "questionNumber": 25,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 60,
+    "sourcePageAnswer": 61,
+    "caseLabel": "Case 7.15",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "7.15 PA chest radiograph",
+    "questionText": "Identify the structures labelled A–D. (e) Which normal variant is present on this image?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Coracoid process of the right scapula",
+        "acceptedVariants": [
+          "coracoid of the right scapula"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right transverse process of T3",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Spine of left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Aorto-pulmonary window",
+        "acceptedVariants": [
+          "aorto-pulmonary angle",
+          "aortopulmonary angle",
+          "aortopulmonary window",
+          "ap window"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right cervical rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "(e) Right cervical rib. A cervical rib articulates with a transverse process which is orientated in a downwards direction unlike thoracic ribs, which articulate with an upwardly orientated transverse process. They may cause vascular and neural compression leading to symptoms in the upper limb.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Thoracic inlet"
+    ],
+    "structureTags": [
+      "Coracoid process",
+      "Transverse process",
+      "Scapula",
+      "Aorto-pulmonary window",
+      "Cervical rib"
+    ],
+    "imagePath": "/images/thorax/p0060-clean.png",
+    "flagForReview": "Image prints arrow labels A–D only; label E corresponds to the printed sub-question '(e) Which normal variant is present on this image?' in the worksheet box on the question page.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+    }
+  },
+  {
+    "id": "thorax-p0062",
+    "section": "thorax",
+    "questionNumber": 26,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 62,
+    "sourcePageAnswer": 63,
+    "caseLabel": "Case 8.5",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "8.5 PA chest radiograph centred over the upper mediastinum",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Posterior junction line",
+        "acceptedVariants": [
+          "posterior junctional line"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left main pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left axillary fold",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right lateral border of the sternum",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right sternoclavicular joint",
+        "acceptedVariants": [
+          "right sterno-clavicular joint"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "(a) Posterior junction line. The posterior junction line is seen in about 30% of PA chest radiographs and is formed when the x-ray beam is tangential to the apposition of the postero-medial portion of both upper lobes posteriorly. On the PA radiograph it runs from above the clavicles to the arch of the aorta and is projected through the trachea. The line comprises four layers – two parietal and two visceral pleural layers. The line may become a stripe if there is a significant amount of mediastinal fat in between the two lungs.\n\nAbnormal bulging of this line suggests mass lesions of the oesophagus, lymphadenopathy or neurogenic masses.\n\n(b) Left main pulmonary artery. The left main pulmonary artery is more cranial in position than the right main pulmonary artery since it is superior to the left main bronchus just prior to its bifurcation.\n\n(e) Right sternoclavicular joint. The sternoclavicular joint is a synovial joint separated by a flat articular disc. There are four strong ligaments (anterior and posterior sternoclavicular, interclavicular and costoclavicular) and a strong fibrous capsule. As a result trauma to the joint rarely causes disruption but instead is associated with clavicular fracture.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Upper mediastinum"
+    ],
+    "structureTags": [
+      "Posterior junction line",
+      "Pulmonary artery",
+      "Axillary fold",
+      "Sternum",
+      "Sternoclavicular joint"
+    ],
+    "imagePath": "/images/thorax/p0062.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.18,
+      "y": 0.28444,
+      "w": 0.734,
+      "h": 0.52889
+    }
+  },
+  {
+    "id": "thorax-p0064",
+    "section": "thorax",
+    "questionNumber": 27,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 64,
+    "sourcePageAnswer": 65,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right acromioclavicular joint",
+        "acceptedVariants": [
+          "right acromio-clavicular joint"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Spinous process T1 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left atrium (left atrial appendage)",
+        "acceptedVariants": [
+          "left atrial appendage",
+          "left atrial appendix",
+          "left atrium"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Gas in colon/splenic flexure",
+        "acceptedVariants": [
+          "gas in colon flexure",
+          "gas in splenic flexure"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This is gas in the colon; the gastric air bubble is seen superiorly.",
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Acromioclavicular joint",
+      "Spinous process",
+      "Left atrium",
+      "Right atrium",
+      "Splenic flexure"
+    ],
+    "imagePath": "/images/thorax/p0064.webp",
+    "flagForReview": "Format E continuous atlas numbering 86–90 relabelled to A–E in printed order (86->A ... 90->E).",
+    "imageCrop": {
+      "x": 0.236,
+      "y": 0.09333,
+      "w": 0.52533,
+      "h": 0.81156
+    }
+  },
+  {
+    "id": "thorax-p0066",
+    "section": "thorax",
+    "questionNumber": 28,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 66,
+    "sourcePageAnswer": 67,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left coracoid process",
+        "acceptedVariants": [
+          "left coracoid"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right 1st rib (anterior)",
+        "acceptedVariants": [
+          "right 1st rib"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Medial border of left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right hilar point",
+        "acceptedVariants": [
+          "right hilum"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Interlobar artery (right lower lobe artery)",
+        "acceptedVariants": [
+          "right interlobar artery",
+          "right interlobar pulmonary artery",
+          "right lower lobe artery"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The hilar points are the angles formed by the descending upper lobe veins, as they cross in front of the lower lobe arteries.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Hilum"
+    ],
+    "structureTags": [
+      "Coracoid process",
+      "First rib",
+      "Scapula",
+      "Hilar point",
+      "Interlobar artery"
+    ],
+    "imagePath": "/images/thorax/p0066.webp",
+    "flagForReview": "Format E continuous atlas numbering 46–50 relabelled to A–E in printed order (46->A ... 50->E).",
+    "imageCrop": {
+      "x": 0.16333,
+      "y": 0.06133,
+      "w": 0.674,
+      "h": 0.88889
+    }
+  },
+  {
+    "id": "thorax-p0068",
+    "section": "thorax",
+    "questionNumber": 29,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 68,
+    "sourcePageAnswer": 69,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Manubrium",
+        "acceptedVariants": [
+          "manubrium sterni"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Aortic knuckle",
+        "acceptedVariants": [
+          "aortic arch",
+          "aortic knob",
+          "arch of aorta",
+          "arch of the aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Aortopulmonary window",
+        "acceptedVariants": [
+          "aorto-pulmonary angle",
+          "aorto-pulmonary window",
+          "aortopulmonary angle",
+          "ap window"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Interlobar artery",
+        "acceptedVariants": [
+          "interlobar pulmonary artery"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Descending thoracic aorta",
+        "acceptedVariants": [
+          "descending aorta",
+          "thoracic descending aorta"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Mediastinum"
+    ],
+    "structureTags": [
+      "Manubrium",
+      "Aortic knuckle",
+      "Aortopulmonary window",
+      "Interlobar artery",
+      "Descending thoracic aorta"
+    ],
+    "imagePath": "/images/thorax/p0068.webp",
+    "flagForReview": "Format E continuous atlas numbering 91–95 relabelled to A–E in printed order (91->A ... 95->E). No teaching note printed on the answer page.",
+    "imageCrop": {
+      "x": 0.16467,
+      "y": 0.03111,
+      "w": 0.67067,
+      "h": 0.93511
+    }
+  },
+  {
+    "id": "thorax-p0070",
+    "section": "thorax",
+    "questionNumber": 30,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 70,
+    "sourcePageAnswer": 71,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Arch of aorta",
+        "acceptedVariants": [
+          "aortic arch",
+          "aortic knob",
+          "aortic knuckle"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left main bronchus",
+        "acceptedVariants": [
+          "left main stem bronchus",
+          "left mainstem bronchus",
+          "left principal bronchus"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right dome of diaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right hemi-diaphragm",
+          "right hemidiaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "Lateral chest x-ray demonstrating kyphosis. Remember that the left main bronchus, being more horizontal, is seen as a circular structure. The left pulmonary artery is comma-shaped as it arches over the left main bronchus.\n\nThe following points help identify the domes of the diaphragm:\n\n• Air within the gastric fundus lies under the left dome.\n• The heart shadow obscures part of the left dome.\n• The inferior vena cava may be seen traversing the right dome.",
+    "references": [],
+    "regionTags": [
+      "Chest",
+      "Mediastinum",
+      "Diaphragm"
+    ],
+    "structureTags": [
+      "Aortic arch",
+      "Left main bronchus",
+      "Clavicle",
+      "Diaphragm",
+      "Left atrium"
+    ],
+    "imagePath": "/images/thorax/p0070.webp",
+    "flagForReview": "Format E continuous atlas numbering 36–40 relabelled to A–E in printed order (36->A ... 40->E). Answer page 71 lies just outside the assigned 55–70 range and was consulted to complete this entry.",
+    "imageCrop": {
+      "x": 0.24067,
+      "y": 0.0,
+      "w": 0.51467,
+      "h": 0.99467
+    }
+  },
+  {
+    "id": "thorax-msk-p0066",
+    "section": "thorax",
+    "questionNumber": 31,
+    "sourceFile": "MY MSK NOTES Augest 2026.key",
+    "sourcePageQuestion": 66,
+    "sourcePageAnswer": 66,
+    "caseLabel": null,
+    "modalitySection": "My Revision Deck",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structure indicated.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right transverse process of T6",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "On AP chest radiographs, thoracic transverse processes project laterally from the vertebral column.\nCount down the thoracic levels using ribs or vertebral bodies to localise T6.\nThey are small, symmetric bony densities and should not be mistaken for mediastinal pathology.",
+    "references": [],
+    "regionTags": [
+      "Thoracic spine",
+      "Chest"
+    ],
+    "structureTags": [
+      "Transverse process",
+      "T6 vertebra"
+    ],
+    "imagePath": "/images/revision/msk-p0066.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.02865,
+      "y": 0.03061,
+      "w": 0.94531,
+      "h": 0.93878
+    }
+  }
+]

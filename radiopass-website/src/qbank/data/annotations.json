@@ -1,0 +1,1814 @@
+{
+  "b1": {
+    "keyPoint": "Compton scatter involves loosely bound outer-shell electrons, depends on electron density not atomic number, and dominates in soft tissue at diagnostic and CT energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b2": {
+    "keyPoint": "Characteristic X-rays arise from electron transitions filling an inner-shell vacancy (created by electrons, photoelectric absorption or electron capture), never from nuclear gamma emission.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b3": {
+    "keyPoint": "Isotopes share proton number and chemical properties but differ in neutron number, mass number, binding energy and half-life.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b4": {
+    "keyPoint": "Increasing kVp raises tube output roughly with kVp squared, so skin and receptor dose rise, and the beam becomes harder and more penetrating.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b5": {
+    "keyPoint": "Breast compression reduces thickness and scatter, improving contrast and lowering mean glandular dose; magnification factors are always greater than 1.",
+    "topic": "Mammography"
+  },
+  "b6": {
+    "keyPoint": "A smaller focal spot and reduced object-receptor distance both shrink penumbra, reducing geometric unsharpness and improving spatial resolution.",
+    "topic": "Digital Imaging"
+  },
+  "b7": {
+    "keyPoint": "In image-intensifier fluoroscopy the TV camera limits spatial resolution, electron lenses (not photomultipliers) do the focusing, and digital data undergo logarithmic conversion.",
+    "topic": "Fluoroscopy"
+  },
+  "b8": {
+    "keyPoint": "DSA subtraction improves vessel contrast but combines noise from both frames, and cannot improve detector spatial resolution.",
+    "topic": "Fluoroscopy"
+  },
+  "b9": {
+    "keyPoint": "CR plates use photostimulable barium fluorohalide (CsI is a DR material, NaI a gamma-camera material) and the latent image survives well beyond one hour.",
+    "topic": "Digital Imaging"
+  },
+  "b10": {
+    "keyPoint": "CT numbers express voxel attenuation relative to water in Hounsfield units; narrowing window width increases displayed contrast (lung window roughly WW 1500, WL -600 HU).",
+    "topic": "CT"
+  },
+  "b11": {
+    "keyPoint": "CT dose is inversely related to pitch, whereas reconstructed slice thickness alone does not change patient dose.",
+    "topic": "CT"
+  },
+  "b12": {
+    "keyPoint": "Increasing matrix size at fixed field of view makes pixels smaller, so fewer photons per pixel and lower CT SNR; larger pixels raise SNR.",
+    "topic": "CT"
+  },
+  "b13": {
+    "keyPoint": "Thicker CT slices improve SNR; fat measures about -50 to -100 HU, air -1000 HU, and lung windows use a negative window level.",
+    "topic": "CT"
+  },
+  "b14": {
+    "keyPoint": "The 0.5 mT static fringe field (not 0.5 T) defines the MRI controlled-access boundary, and many cochlear implants are MR conditional rather than contraindicated.",
+    "topic": "MRI"
+  },
+  "b15": {
+    "keyPoint": "In gamma cameras thallium activation boosts NaI light output, closer collimator-patient distance improves resolution, and thicker crystals raise sensitivity but degrade resolution.",
+    "topic": "Nuclear Medicine"
+  },
+  "b16": {
+    "keyPoint": "PET detects paired 511 keV annihilation photons in coincidence, achieving spatial resolution of roughly 4-8 mm.",
+    "topic": "Nuclear Medicine"
+  },
+  "b17": {
+    "keyPoint": "The ideal imaging radionuclide is a pure gamma emitter with a short physical half-life, since beta emission and long half-lives only add dose.",
+    "topic": "Nuclear Medicine"
+  },
+  "b18": {
+    "keyPoint": "SUV is a semi-quantitative FDG uptake index normalised to injected activity and body weight, varying with scanner and uptake time; the common malignancy threshold is about 2.5.",
+    "topic": "Nuclear Medicine"
+  },
+  "b19": {
+    "keyPoint": "SUV interpretation requires correction for the patient's blood glucose level before FDG injection.",
+    "topic": "Nuclear Medicine"
+  },
+  "b20": {
+    "keyPoint": "Internal radionuclide dose increases with longer physical (effective) half-life and slow organ clearance; scan duration does not change the committed dose.",
+    "topic": "Nuclear Medicine"
+  },
+  "b21": {
+    "keyPoint": "Mechanical index equals peak negative pressure divided by the square root of frequency, and indicates cavitation risk, significant above about 0.7 with microbubble contrast.",
+    "topic": "Ultrasound"
+  },
+  "b22": {
+    "keyPoint": "Chemical shift artefact appears along the frequency-encoding direction, worsens at higher field strength, and is reduced by increasing receiver bandwidth, not by gadolinium.",
+    "topic": "MRI"
+  },
+  "b23": {
+    "keyPoint": "A long TE (about 120 ms) with long TR gives T2 weighting, and T1 is always longer than T2 in biological tissues.",
+    "topic": "MRI"
+  },
+  "b24": {
+    "keyPoint": "In gradient echo, shortening TE reduces susceptibility and metal artefact, while reducing flip angle lowers transverse magnetisation and hence SNR.",
+    "topic": "MRI"
+  },
+  "b25": {
+    "keyPoint": "SPECT improves contrast by tomographically separating overlying activity, but the rotating camera adds centre-of-rotation, motion and attenuation artefacts.",
+    "topic": "Nuclear Medicine"
+  },
+  "b26": {
+    "keyPoint": "PET is more sensitive than SPECT because it needs no physical collimator, and its radionuclides (C-11, N-13, O-15, F-18) have low atomic numbers.",
+    "topic": "Nuclear Medicine"
+  },
+  "b27": {
+    "keyPoint": "Spin echo uses a 90 degree excitation then a 180 degree refocusing pulse, which removes reversible dephasing so true T2* images cannot be produced.",
+    "topic": "MRI"
+  },
+  "b28": {
+    "keyPoint": "Under IRMER the employer establishes DRLs, practitioners need only be entitled and adequately trained (not necessarily doctors), and operators help keep doses ALARP.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b29": {
+    "keyPoint": "The IRMER practitioner justifies each medical exposure (the referrer only supplies clinical information), and practitioner and operator share optimisation duties.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b30": {
+    "keyPoint": "Deterministic effects have dose thresholds in the Gy range (lens opacity about 2 Gy); cancer is stochastic, and the lens is more radiosensitive than the cornea.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b31": {
+    "keyPoint": "Acoustic impedance equals density times sound speed (not frequency or attenuation), and a soft tissue-air interface reflects over 99% of the beam.",
+    "topic": "Ultrasound"
+  },
+  "b32": {
+    "keyPoint": "Limit mechanical index to about 0.7 with microbubble contrast, and keep obstetric scanning below a thermal index of 3.0 with minimal exposure time.",
+    "topic": "Ultrasound"
+  },
+  "b33": {
+    "keyPoint": "Sound speed depends on tissue stiffness and density, not frequency; wavelength equals speed divided by frequency, so it is proportional to speed.",
+    "topic": "Ultrasound"
+  },
+  "b34": {
+    "keyPoint": "Doppler shift is proportional to transmitted frequency, blood velocity and the cosine of the angle - not to beam intensity or PRF.",
+    "topic": "Ultrasound"
+  },
+  "b35": {
+    "keyPoint": "Pulsed Doppler aliases when the shift exceeds half the PRF (possible at physiological velocities), and aerated lung attenuates ultrasound at over 30 dB/cm/MHz.",
+    "topic": "Nuclear Medicine"
+  },
+  "b36": {
+    "keyPoint": "Short gamma-camera dead time permits dynamic studies, and breastfeeding interruption after Tc-99m depends on the specific radiopharmaceutical, not a universal 24 hours.",
+    "topic": "Nuclear Medicine"
+  },
+  "b37": {
+    "keyPoint": "Increasing pitch reduces CT dose - dose is inversely proportional to pitch when other factors are fixed.",
+    "topic": "CT"
+  },
+  "b38": {
+    "keyPoint": "Chemical shift artefact is mapped along the frequency-encoding direction because fat and water resonate at slightly different frequencies.",
+    "topic": "MRI"
+  },
+  "b39": {
+    "keyPoint": "Classic chemical shift displacement occurs in the frequency-encoding direction, not the phase-encoding direction.",
+    "topic": "MRI"
+  },
+  "b40": {
+    "keyPoint": "Chemical shift artefact increases with field strength because the absolute fat-water frequency separation grows with B0.",
+    "topic": "MRI"
+  },
+  "b41": {
+    "keyPoint": "Increasing receiver bandwidth reduces chemical shift pixel displacement, at the cost of lower SNR.",
+    "topic": "MRI"
+  },
+  "b42": {
+    "keyPoint": "Gadolinium shortens T1 but has no effect on the fat-water frequency difference, so it does not alter chemical shift artefact.",
+    "topic": "MRI"
+  },
+  "b43": {
+    "keyPoint": "Titanium is non-ferromagnetic, so titanium implants do not align with or experience strong force from the static magnetic field.",
+    "topic": "MRI"
+  },
+  "b44": {
+    "keyPoint": "Ferromagnetic (ferrous) materials experience strong force and torque and align with the static magnetic field - the basis of MRI projectile risk.",
+    "topic": "MRI"
+  },
+  "b45": {
+    "keyPoint": "Decreasing window width increases displayed contrast by mapping a smaller HU range across the full greyscale.",
+    "topic": "CT"
+  },
+  "b46": {
+    "keyPoint": "The absolute probability of Compton interaction falls slowly with increasing photon energy, so it is less likely at 120 kVp than 80 kVp.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b47": {
+    "keyPoint": "Compton scatter is the predominant photon interaction in soft tissue at diagnostic X-ray energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b48": {
+    "keyPoint": "Compton scatter requires photon energy well above the electron binding energy - it involves loosely bound outer-shell electrons.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b49": {
+    "keyPoint": "Compton interaction probability is proportional to tissue electron density, not atomic number.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b50": {
+    "keyPoint": "The scattered photon's residual energy falls as scatter angle increases, so mean energy at 90 degrees is lower than at 45 degrees.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b51": {
+    "keyPoint": "Compton interactions contribute to absorbed dose because the recoil electrons deposit energy locally in tissue.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b52": {
+    "keyPoint": "Water is defined as 0 HU on the Hounsfield scale; air is about -1000 HU and dense bone strongly positive.",
+    "topic": "CT"
+  },
+  "b53": {
+    "keyPoint": "Beam hardening removes low-energy photons, lowering measured CT numbers and causing cupping artefact centrally.",
+    "topic": "CT"
+  },
+  "b54": {
+    "keyPoint": "Entrance surface dose at a CT entry point exceeds that of most plain radiographs, though CT dose is distributed circumferentially.",
+    "topic": "CT"
+  },
+  "b55": {
+    "keyPoint": "CT irradiates from many angles, giving a more uniform circumferential dose distribution than a single-projection radiograph.",
+    "topic": "CT"
+  },
+  "b56": {
+    "keyPoint": "Effective dose is calculated from organ equivalent doses and tissue weighting factors - it is never assigned to a gram of tissue.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b57": {
+    "keyPoint": "Controlled areas are designated from likely exposure conditions and special procedure requirements, not from an examination exceeding 1 mSv effective dose.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b58": {
+    "keyPoint": "A 3 mSv effective dose threshold does not define a controlled area - designation depends on exposure conditions and regulatory criteria.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b59": {
+    "keyPoint": "Classified worker dose records are kept until age 75 or at least 30 years after work ceases, not until death.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b60": {
+    "keyPoint": "A typical adult non-contrast CT head effective dose is of the order of 1-3 mSv.",
+    "topic": "CT"
+  },
+  "b61": {
+    "keyPoint": "Pre-patient collimation in CT primarily defines beam width and slice profile - it is not primarily a scatter-removal device.",
+    "topic": "CT"
+  },
+  "b62": {
+    "keyPoint": "The gamma camera collimator provides spatial localisation by accepting only near-parallel photons; scatter rejection is done by energy windowing.",
+    "topic": "Nuclear Medicine"
+  },
+  "b63": {
+    "keyPoint": "An abdominal CT effective dose is of the order of 5-10 mSv, with protocol and patient variation.",
+    "topic": "CT"
+  },
+  "b64": {
+    "keyPoint": "Effective dose in nuclear medicine depends on the radionuclide's biodistribution and residence time, which set the organ absorbed doses.",
+    "topic": "Nuclear Medicine"
+  },
+  "b65": {
+    "keyPoint": "BGO is used in PET for its high density and stopping power at 511 keV, not because its decay time beats NaI.",
+    "topic": "Nuclear Medicine"
+  },
+  "b66": {
+    "keyPoint": "Doppler shift is proportional to the cosine of the insonation angle, not to the raw angle itself.",
+    "topic": "Ultrasound"
+  },
+  "b67": {
+    "keyPoint": "Doppler shift is directly proportional to the transmitted ultrasound frequency.",
+    "topic": "Ultrasound"
+  },
+  "b68": {
+    "keyPoint": "Doppler shift is directly proportional to blood (reflector) velocity.",
+    "topic": "Ultrasound"
+  },
+  "b69": {
+    "keyPoint": "Doppler shift depends only on transmitted frequency, reflector velocity and cosine of the angle - not reflector size.",
+    "topic": "Ultrasound"
+  },
+  "b70": {
+    "keyPoint": "The Doppler equation contains only transmitted frequency, reflector velocity, cosine of angle and sound speed - nothing else changes the shift.",
+    "topic": "Ultrasound"
+  },
+  "b71": {
+    "keyPoint": "Compton scatter can occur through angles up to 180 degrees, including full backscatter.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b72": {
+    "keyPoint": "F-18 has a physical half-life of approximately 110 minutes.",
+    "topic": "Nuclear Medicine"
+  },
+  "b73": {
+    "keyPoint": "The MR Safety Expert providing technical MR safety advice is usually a medical physicist.",
+    "topic": "MRI"
+  },
+  "b74": {
+    "keyPoint": "The MRI controlled area relates to the 0.5 mT fringe field contour, not 50 mT.",
+    "topic": "MRI"
+  },
+  "b75": {
+    "keyPoint": "The Faraday cage blocks external RF interference from corrupting the MR signal; it does not reduce the MRI signal or fringe field.",
+    "topic": "MRI"
+  },
+  "b76": {
+    "keyPoint": "Mo-99 (not Mo-68) is the parent isotope of Tc-99m in the generator.",
+    "topic": "Nuclear Medicine"
+  },
+  "b77": {
+    "keyPoint": "Tc-99m is eluted from a Mo-99/Tc-99m generator, not produced in a cyclotron (F-18 and I-123 are cyclotron products).",
+    "topic": "Nuclear Medicine"
+  },
+  "b78": {
+    "keyPoint": "Tc-99m emits a 140 keV (0.14 MeV) gamma photon.",
+    "topic": "Nuclear Medicine"
+  },
+  "b79": {
+    "keyPoint": "Tc-99m decays to Tc-99, whose half-life is so long it behaves as effectively stable for the patient.",
+    "topic": "Nuclear Medicine"
+  },
+  "b80": {
+    "keyPoint": "Tc-99m decays by isomeric transition, releasing its excess nuclear energy as gamma emission.",
+    "topic": "Nuclear Medicine"
+  },
+  "b81": {
+    "keyPoint": "SAR rises approximately with the square of the flip angle, since larger RF pulses deposit more energy.",
+    "topic": "MRI"
+  },
+  "b82": {
+    "keyPoint": "Detector element size and sampling pitch limit spatial resolution, alongside focal spot, motion and reconstruction factors.",
+    "topic": "Digital Imaging"
+  },
+  "b83": {
+    "keyPoint": "Adjacent detector rows can be combined, so a reconstructed CT slice can be wider than a single detector row.",
+    "topic": "CT"
+  },
+  "b84": {
+    "keyPoint": "Soft-tissue ultrasound attenuation is roughly 0.5-1 dB/cm/MHz, far below 15 dB/cm/MHz.",
+    "topic": "Ultrasound"
+  },
+  "b85": {
+    "keyPoint": "A larger acoustic impedance mismatch between tissues reflects a larger fraction of the ultrasound beam.",
+    "topic": "Ultrasound"
+  },
+  "b86": {
+    "keyPoint": "Sound travels much faster in bone than in muscle or other soft tissue.",
+    "topic": "Ultrasound"
+  },
+  "b87": {
+    "keyPoint": "Sound travels faster in muscle than in fat because muscle is stiffer.",
+    "topic": "Ultrasound"
+  },
+  "b88": {
+    "keyPoint": "Sound speed in muscle is approximately 1540 m/s, the standard soft-tissue average used by scanners.",
+    "topic": "Ultrasound"
+  },
+  "b89": {
+    "keyPoint": "Mechanical index indicates the risk of cavitation, important above about 0.7 with microbubble contrast.",
+    "topic": "Ultrasound"
+  },
+  "b90": {
+    "keyPoint": "Thermal index estimates tissue temperature rise and is separate from mechanical index, which addresses cavitation.",
+    "topic": "Ultrasound"
+  },
+  "b91": {
+    "keyPoint": "Mechanical index guides the operator on non-thermal (cavitation) risk, supporting keeping output as low as reasonably achievable.",
+    "topic": "Ultrasound"
+  },
+  "b92": {
+    "keyPoint": "Mechanical index equals peak negative pressure divided by the square root of frequency, so it is inversely proportional to root frequency.",
+    "topic": "Ultrasound"
+  },
+  "b93": {
+    "keyPoint": "Added filtration removes low-energy photons, so overall beam intensity leaving the tube decreases.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b94": {
+    "keyPoint": "Filtration reduces entrance skin dose by removing low-energy photons that would be absorbed superficially without contributing to the image.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b95": {
+    "keyPoint": "Filtration hardens the beam and usually reduces subject contrast, even though it lowers skin dose.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b96": {
+    "keyPoint": "Minimum total filtration for a standard diagnostic tube is typically 2.5 mm aluminium equivalent - 0.5 mm is insufficient.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b97": {
+    "keyPoint": "Beryllium tube windows are used below about 50 kVp (mammography) because they barely absorb the low-energy photons needed for breast contrast.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b98": {
+    "keyPoint": "Filtration modifies beam quality and patient dose; it is not used to limit a digital detector's dynamic range.",
+    "topic": "Digital Imaging"
+  },
+  "b99": {
+    "keyPoint": "CR plates are photostimulable barium fluorohalide; caesium iodide is a DR detector material.",
+    "topic": "Digital Imaging"
+  },
+  "b100": {
+    "keyPoint": "Doubling matrix dimensions from 512x512 to 1024x1024 quadruples pixel count and storage, it does not merely double them.",
+    "topic": "Digital Imaging"
+  },
+  "b101": {
+    "keyPoint": "A CR plate is a continuous phosphor - pixels are only created by sampling during laser readout.",
+    "topic": "Digital Imaging"
+  },
+  "b102": {
+    "keyPoint": "Positron annihilation occurs outside the nucleus, when the emitted positron meets an electron after travelling a short range in tissue.",
+    "topic": "Nuclear Medicine"
+  },
+  "b103": {
+    "keyPoint": "PET uses electronic coincidence detection of paired 511 keV photons and needs no physical parallel-hole collimator.",
+    "topic": "Nuclear Medicine"
+  },
+  "b104": {
+    "keyPoint": "A nominal fatal cancer risk of about 1 in 20,000 per mSv effective dose is the standard adult figure in radiological protection.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b105": {
+    "keyPoint": "Hereditary risk per mSv is far lower than 1 in 10,000 - the standard nominal figure is the 1-in-20,000 fatal cancer risk.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b106": {
+    "keyPoint": "The nominal fatal cancer risk is about 1 in 20,000 per mSv, not 1 in 300.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b107": {
+    "keyPoint": "SAR is proportional to the square of the Larmor frequency (and hence B0) and the square of the flip angle.",
+    "topic": "MRI"
+  },
+  "b108": {
+    "keyPoint": "Susceptibility artefact worsens with increasing static field strength.",
+    "topic": "MRI"
+  },
+  "b109": {
+    "keyPoint": "Susceptibility artefact causes signal loss, blooming and distortion, not simple brightening of the image.",
+    "topic": "MRI"
+  },
+  "b110": {
+    "keyPoint": "CR still uses automatic exposure control despite its wide dynamic range, to keep patient dose and noise appropriate.",
+    "topic": "Digital Imaging"
+  },
+  "b111": {
+    "keyPoint": "Tissue perfusion affects heating and thermal index interpretation; mechanical index addresses cavitation, not perfusion.",
+    "topic": "Ultrasound"
+  },
+  "b112": {
+    "keyPoint": "Duplex ultrasound combines B-mode imaging with Doppler, not M-mode.",
+    "topic": "Ultrasound"
+  },
+  "b113": {
+    "keyPoint": "Conventional spin echo begins with a 90 degree RF excitation pulse.",
+    "topic": "MRI"
+  },
+  "b114": {
+    "keyPoint": "The 180 degree refocusing pulse in spin echo reverses static dephasing and forms the echo.",
+    "topic": "MRI"
+  },
+  "b115": {
+    "keyPoint": "Spin echo gives true T2 weighting because the 180 degree pulse refocuses field inhomogeneity; T2* effects belong to gradient echo.",
+    "topic": "MRI"
+  },
+  "b116": {
+    "keyPoint": "More phase-encoding steps lengthen scan time and enlarge the phase matrix, but they do not require a longer TE.",
+    "topic": "MRI"
+  },
+  "b117": {
+    "keyPoint": "Air couples ultrasound very poorly - over 99% is reflected at a probe-air interface, which is why coupling gel is essential.",
+    "topic": "Ultrasound"
+  },
+  "b118": {
+    "keyPoint": "A transducer heats more in air than on tissue because little acoustic energy is coupled away and internal losses stay in the probe.",
+    "topic": "Ultrasound"
+  },
+  "b119": {
+    "keyPoint": "The Nyquist limit equals half the PRF, so increasing PRF raises the maximum Doppler shift measurable without aliasing.",
+    "topic": "Ultrasound"
+  },
+  "b120": {
+    "keyPoint": "Diagnostic ultrasound wavelengths in soft tissue are approximately 0.1-1.5 mm across typical frequencies.",
+    "topic": "Ultrasound"
+  },
+  "b121": {
+    "keyPoint": "Gradient echo lacks a 180 degree refocusing pulse, so susceptibility and field inhomogeneity cause more artefact than in spin echo.",
+    "topic": "MRI"
+  },
+  "b122": {
+    "keyPoint": "A single gamma camera crystal is viewed by an array of photomultiplier tubes whose relative signals localise each scintillation event.",
+    "topic": "Nuclear Medicine"
+  },
+  "b123": {
+    "keyPoint": "TR, the interval between successive excitations, is normally longer than TE, the time from excitation to echo.",
+    "topic": "MRI"
+  },
+  "b124": {
+    "keyPoint": "Diagnostic ultrasound uses roughly 2-15 MHz, with higher frequencies reserved for superficial structures.",
+    "topic": "Ultrasound"
+  },
+  "b125": {
+    "keyPoint": "CR plates are read by laser stimulation, which releases the stored latent image as light for photomultiplier detection.",
+    "topic": "Digital Imaging"
+  },
+  "b126": {
+    "keyPoint": "SUV can help distinguish benign from malignant lesions (threshold about 2.5), though it is semi-quantitative and not definitive alone.",
+    "topic": "Nuclear Medicine"
+  },
+  "b127": {
+    "keyPoint": "A bow-tie filter shapes beam intensity to patient cross-section, reducing peripheral dose and equalising signal at the detector.",
+    "topic": "CT"
+  },
+  "b128": {
+    "keyPoint": "Beta emission adds patient dose without contributing to imaging, which is why pure gamma emitters are preferred.",
+    "topic": "Nuclear Medicine"
+  },
+  "b129": {
+    "keyPoint": "The linear attenuation coefficient depends on composition, density, atomic number and photon energy - not the total mass of the object.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b130": {
+    "keyPoint": "DSA subtraction reduces SNR because noise variance from the mask and live images combines.",
+    "topic": "Fluoroscopy"
+  },
+  "b131": {
+    "keyPoint": "A subtracted DSA image has better contrast conspicuity but no better spatial resolution than the unsubtracted images.",
+    "topic": "Fluoroscopy"
+  },
+  "b132": {
+    "keyPoint": "Quantum mottle increases in a subtracted image because noise from both the mask and live frames adds.",
+    "topic": "Fluoroscopy"
+  },
+  "b133": {
+    "keyPoint": "Iterative reconstruction permits lower-dose CT acquisition while maintaining diagnostic image quality.",
+    "topic": "CT"
+  },
+  "b134": {
+    "keyPoint": "DSA delivers higher dose than standard fluoroscopy because it adds multiple high-dose acquisition runs.",
+    "topic": "Fluoroscopy"
+  },
+  "b135": {
+    "keyPoint": "Aliasing occurs when the Doppler shift exceeds the Nyquist limit (half the PRF), which physiological blood velocities can exceed.",
+    "topic": "Ultrasound"
+  },
+  "b136": {
+    "keyPoint": "Reducing object-to-detector distance reduces magnification and penumbra, decreasing geometric unsharpness.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b137": {
+    "keyPoint": "A smaller focal spot reduces penumbra and improves geometric sharpness.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b138": {
+    "keyPoint": "Geometric unsharpness is blur caused by focal spot size and imaging geometry - it is not a tool for excluding peripheral anatomy.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b139": {
+    "keyPoint": "Tomosynthesis improves depth separation and reduces tissue overlap, but in-plane spatial resolution is not necessarily better than 2D radiography.",
+    "topic": "Mammography"
+  },
+  "b140": {
+    "keyPoint": "Tomosynthesis reconstructs multiple low-dose projections into a quasi-3D stack of slices.",
+    "topic": "Mammography"
+  },
+  "b141": {
+    "keyPoint": "Tomosynthesis separates structures by depth, distinguishing overlying from underlying anatomy.",
+    "topic": "Mammography"
+  },
+  "b142": {
+    "keyPoint": "Increasing a conductor's cross-sectional area lowers its resistance, so current rises for a fixed voltage.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b143": {
+    "keyPoint": "A longer effective half-life means more nuclear transformations occur in the patient, increasing absorbed dose.",
+    "topic": "Nuclear Medicine"
+  },
+  "b144": {
+    "keyPoint": "1 cGy cm2 equals 1 uGy m2, because 1 cGy is 10,000 uGy and 1 m2 is 10,000 cm2.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b145": {
+    "keyPoint": "Barium enema DAP is quoted in Gy cm2 (about 45-50 Gy cm2) - dose-area product is dose multiplied by irradiated area, never plain Gy.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b146": {
+    "keyPoint": "A gamma camera processes successive scintillation events, acquiring many events during an examination, limited at high rates by dead time.",
+    "topic": "Nuclear Medicine"
+  },
+  "b147": {
+    "keyPoint": "Pitch is table advance per rotation divided by total beam collimation; dose is inversely related to pitch.",
+    "topic": "CT"
+  },
+  "b148": {
+    "keyPoint": "Increasing pitch shortens scan time (and reduces dose) for a given coverage.",
+    "topic": "CT"
+  },
+  "b149": {
+    "keyPoint": "CT colonography commonly uses 120 kVp, though low-dose protocols may use lower tube potentials.",
+    "topic": "CT"
+  },
+  "b150": {
+    "keyPoint": "Extracellular gadolinium contrast has an elimination half-life of about 1.5 hours with normal renal function, not 2 minutes.",
+    "topic": "MRI"
+  },
+  "b151": {
+    "keyPoint": "Thermal index estimates tissue temperature rise and is affected by tissue attenuation, especially near bone.",
+    "topic": "Ultrasound"
+  },
+  "b152": {
+    "keyPoint": "Iodinated CT contrast saturates thyroid iodine handling and reduces subsequent I-123 uptake, so study timing matters.",
+    "topic": "Nuclear Medicine"
+  },
+  "b153": {
+    "keyPoint": "Thermal index assumes average tissue conditions, so in highly perfused tissue it does not reflect true heating because blood flow carries heat away.",
+    "topic": "Ultrasound"
+  },
+  "b154": {
+    "keyPoint": "Thermal index is high when scanning over superficial bone because bone strongly absorbs ultrasound and heats readily.",
+    "topic": "Ultrasound"
+  },
+  "b155": {
+    "keyPoint": "CT artefacts increase at bone edges because abrupt attenuation transitions cause beam hardening, partial volume and streak artefacts.",
+    "topic": "CT"
+  },
+  "b156": {
+    "keyPoint": "Ultrasound attenuation, and therefore heating and thermal index, increases with frequency - even over bone TI remains frequency dependent.",
+    "topic": "Ultrasound"
+  },
+  "b157": {
+    "keyPoint": "A bone-muscle interface has a much larger acoustic impedance mismatch than muscle-fluid, so it reflects far more of the beam.",
+    "topic": "Ultrasound"
+  },
+  "b158": {
+    "keyPoint": "SAR is reduced by lowering flip angle, using fewer RF pulses and lengthening TR - anything reducing deposited RF energy.",
+    "topic": "MRI"
+  },
+  "b159": {
+    "keyPoint": "Slice thickness is not a primary determinant of SAR, which depends on RF energy deposition.",
+    "topic": "MRI"
+  },
+  "b160": {
+    "keyPoint": "Field of view is not a primary determinant of SAR, which depends on RF energy deposition.",
+    "topic": "MRI"
+  },
+  "b161": {
+    "keyPoint": "Increasing TR allows more longitudinal magnetisation recovery, increasing signal and reducing SAR per unit time, at the cost of scan time.",
+    "topic": "MRI"
+  },
+  "b162": {
+    "keyPoint": "More phase-encoding (gradient) steps increase matrix size and scan time but do not by themselves improve SNR.",
+    "topic": "MRI"
+  },
+  "b163": {
+    "keyPoint": "Increasing B0 generally increases MR signal and SNR, though susceptibility artefact and SAR also increase.",
+    "topic": "MRI"
+  },
+  "b164": {
+    "keyPoint": "MRI SNR rises with the square root of the number of signal averages and with higher field strength.",
+    "topic": "MRI"
+  },
+  "b165": {
+    "keyPoint": "kVp changes beam energy and output but not focal spot size, which is set by filament, focusing cup and anode angle geometry.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b166": {
+    "keyPoint": "Bore width alone does not determine CT dose - protocol, filtration, tube current modulation and patient centring do.",
+    "topic": "CT"
+  },
+  "b167": {
+    "keyPoint": "Iodine and gadolinium are positive contrast via high atomic number; air is negative contrast via very low density, not high Z.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b168": {
+    "keyPoint": "I-123 beats I-125 for imaging because its 159 keV photon suits the gamma camera and its shorter half-life lowers dose - chemistry is identical.",
+    "topic": "Nuclear Medicine"
+  },
+  "b169": {
+    "keyPoint": "Lowering kV reduces beam output and penetration, increases subject contrast, and reduces scatter production.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b170": {
+    "keyPoint": "Lower kVp reduces entrance dose only if mAs is unchanged; compensating with higher mAs to maintain receptor exposure can raise dose.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b171": {
+    "keyPoint": "At fixed mAs, lower kVp reduces photon output and penetration, so receptor dose falls.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b172": {
+    "keyPoint": "Decreasing kVp reduces Compton scatter production; scatter fraction rises with increasing kVp.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b173": {
+    "keyPoint": "Lower kVp means less scatter reaching the receptor; higher kVp increases the scatter fraction.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b174": {
+    "keyPoint": "Lowering kVp increases subject contrast because photoelectric absorption contributes relatively more at lower photon energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b175": {
+    "keyPoint": "PET/CT acquires the CT and PET datasets sequentially in the same examination, then fuses them.",
+    "topic": "Nuclear Medicine"
+  },
+  "b176": {
+    "keyPoint": "CT spatial resolution is far below 15 lp/mm - that figure belongs to mammography; CT achieves roughly 1 lp/mm or slightly more.",
+    "topic": "CT"
+  },
+  "b177": {
+    "keyPoint": "Ultrasound contrast microbubbles are only a few micrometres across - far smaller than the wavelength and unrelated to probe dimensions.",
+    "topic": "Ultrasound"
+  },
+  "b178": {
+    "keyPoint": "ESD is the entrance surface dose at the skin; the quantity incorporating irradiated area is dose-area product.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b179": {
+    "keyPoint": "Filtration reduces intensity and skin dose while raising mean beam energy and HVL - it removes photons, it does not add them.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b180": {
+    "keyPoint": "The X-ray tube is evacuated, tube current (not filament area) sets X-ray quantity, and anode heat is dissipated mainly by radiation.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b181": {
+    "keyPoint": "High kV increases beam intensity roughly with kVp squared but lowers subject contrast as Compton interactions dominate.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b182": {
+    "keyPoint": "Compression reduces tissue thickness and therefore scatter, improving contrast.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b183": {
+    "keyPoint": "CR phosphor layer thickness and crystal properties determine X-ray absorption, sensitivity and spatial resolution.",
+    "topic": "Digital Imaging"
+  },
+  "b184": {
+    "keyPoint": "CT typically uses a 512x512 matrix, bow-tie filtration, and shows cupping (low central HU) from beam hardening; the FBP filter is mathematical.",
+    "topic": "CT"
+  },
+  "b185": {
+    "keyPoint": "Water is 0 HU, narrowing window width raises displayed contrast, metal causes photon starvation streaks, and multislice CT can still show ring artefact.",
+    "topic": "CT"
+  },
+  "b186": {
+    "keyPoint": "Air is about -1000 HU, and isotropic voxels allow oblique multiplanar reconstruction with little loss of quality.",
+    "topic": "CT"
+  },
+  "b187": {
+    "keyPoint": "Vignetting makes the image intensifier periphery dimmer than the centre, not brighter.",
+    "topic": "Fluoroscopy"
+  },
+  "b188": {
+    "keyPoint": "Barium enema DAP is around 45-50 Gy cm2 and CT head effective dose 1-3 mSv; DAP conversions need both dose prefix and area handled together.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b189": {
+    "keyPoint": "Under IRMER the practitioner (not the referrer) justifies the exposure, the operator optimises it, and practitioners need not be doctors or dentists.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b190": {
+    "keyPoint": "The employer establishes local rules (with RPA advice) and ensures staff compliance; entering a controlled area does not automatically classify a worker.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b191": {
+    "keyPoint": "Clinical gamma camera resolution is about 10 mm (3 mm objects are not resolved), and the collimator localises photons - energy windowing rejects scatter.",
+    "topic": "Nuclear Medicine"
+  },
+  "b192": {
+    "keyPoint": "SPECT gives higher contrast, dose and attenuation-correction capability than planar imaging, but not better spatial resolution.",
+    "topic": "Nuclear Medicine"
+  },
+  "b193": {
+    "keyPoint": "PET needs no collimator, annihilation occurs outside the nucleus, and the coincidence timing window relates to detector separation and the speed of light.",
+    "topic": "Nuclear Medicine"
+  },
+  "b194": {
+    "keyPoint": "The ideal radiopharmaceutical has high chemical purity, gamma emission around 100-250 keV, no beta particles, and a half-life just long enough for imaging.",
+    "topic": "Nuclear Medicine"
+  },
+  "b195": {
+    "keyPoint": "Acoustic impedance is proportional to density; an air-tissue interface reflects about 99% while soft tissue-fluid interfaces reflect far below 15%.",
+    "topic": "Ultrasound"
+  },
+  "b196": {
+    "keyPoint": "Doppler is a frequency (not velocity) change on reflection, maximal with the beam parallel to flow, and increased when blood moves towards the probe.",
+    "topic": "Ultrasound"
+  },
+  "b197": {
+    "keyPoint": "T2* imaging exploits susceptibility dephasing, GRE shows flow as bright, and chemical shift displacement occurs along the frequency-encoding direction.",
+    "topic": "MRI"
+  },
+  "b198": {
+    "keyPoint": "MRI SNR increases with voxel size and TR, but falls with larger matrix, wider receiver bandwidth and longer TE.",
+    "topic": "MRI"
+  },
+  "b199": {
+    "keyPoint": "STIR suppresses all short-T1 tissue including gadolinium enhancement, so frequency-selective fat suppression is preferred after contrast.",
+    "topic": "MRI"
+  },
+  "b200": {
+    "keyPoint": "In- and opposed-phase imaging exploits the cyclical fat-water phase difference and detects microscopic fat by signal drop on opposed-phase images.",
+    "topic": "MRI"
+  },
+  "b201": {
+    "keyPoint": "MR Safe means no known hazard in any MR environment; demonstrated safety within defined conditions defines MR Conditional.",
+    "topic": "MRI"
+  },
+  "b202": {
+    "keyPoint": "SAR rises approximately with the square of flip angle; slice thickness and field of view are not primary SAR determinants.",
+    "topic": "MRI"
+  },
+  "b203": {
+    "keyPoint": "Microbubbles are a few micrometres across (much smaller than the wavelength); lead shields via high atomic number; low-eGFR gadolinium use is cautioned, not absolutely banned.",
+    "topic": "Ultrasound"
+  },
+  "b204": {
+    "keyPoint": "For the same photon fluence, 1 g of bone absorbs more dose than 1 g of soft tissue because photoelectric absorption is greater in bone.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b205": {
+    "keyPoint": "Characteristic X-ray energy is fixed by shell binding-energy differences and is much lower than the initial electron energy creating the vacancy.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b206": {
+    "keyPoint": "Local ultrasound heating depends on the tissue absorption coefficient, blood perfusion and heat conduction away from the exposed region.",
+    "topic": "Ultrasound"
+  },
+  "b207": {
+    "keyPoint": "Helium cryogen is inert (hazards are cold, pressure and asphyxiation on quench); the always-on static magnet is the biggest hazard, with 0.5 mT bounding the controlled area.",
+    "topic": "MRI"
+  },
+  "b208": {
+    "keyPoint": "Spin echo uses 90 and 180 degree pulses, cannot show T2* effects, and more phase-encoding steps do not improve signal via longer TE.",
+    "topic": "MRI"
+  },
+  "b209": {
+    "keyPoint": "Scatter can reach around 10 times the transmitted primary beam in large-field examinations.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b210": {
+    "keyPoint": "Maximum PRF is limited by imaging depth, sampling must be at least twice the Doppler shift (Nyquist), and physiological velocities can alias.",
+    "topic": "Ultrasound"
+  },
+  "b211": {
+    "keyPoint": "Doppler shift depends on transmitted frequency, reflector velocity, insonation angle and sound speed - not tissue density or compressibility.",
+    "topic": "Ultrasound"
+  },
+  "b212": {
+    "keyPoint": "Sound speed varies with tissue temperature, and scanners assume an average soft-tissue speed of 1540 m/s, not 1240 m/s.",
+    "topic": "Ultrasound"
+  },
+  "b213": {
+    "keyPoint": "Justification authority depends on employer entitlement and adequate training - there is no 5 mSv threshold reserving justification to radiologists.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b214": {
+    "keyPoint": "Radioactive gases and patient excreta count as radioactive waste, regulated by the environmental regulator rather than local councils.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b215": {
+    "keyPoint": "Effective focal spot size depends on target (anode) angle, filament size and focusing, and increases with mA through blooming.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b216": {
+    "keyPoint": "Grids improve contrast by absorbing scatter - they do not improve spatial resolution.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b217": {
+    "keyPoint": "MRI SNR improves with larger FOV, thicker slices, bigger pixels and narrower receiver bandwidth; a bigger matrix at fixed FOV reduces SNR.",
+    "topic": "MRI"
+  },
+  "b218": {
+    "keyPoint": "DSA subtraction decreases SNR because mask and live image noise combine.",
+    "topic": "Fluoroscopy"
+  },
+  "b219": {
+    "keyPoint": "Higher frequency (shorter wavelength) improves ultrasound axial resolution; TGC and monitor brightness change display only, not intrinsic resolution.",
+    "topic": "Ultrasound"
+  },
+  "b220": {
+    "keyPoint": "Longer physical half-life raises patient dose, a Tc-99m bone scan gives roughly 3-4 mSv, and PET detects annihilation photons, not positrons directly.",
+    "topic": "Nuclear Medicine"
+  },
+  "b221": {
+    "keyPoint": "Gamma camera field of view is set by crystal/detector area, Mo-99 is the Tc-99m parent, and high-resolution collimators are often preferred for detail.",
+    "topic": "Nuclear Medicine"
+  },
+  "b222": {
+    "keyPoint": "A desirable radionuclide emits gamma photons around 100-250 keV (not beta, not over 500 keV), binds a suitable pharmaceutical, and accumulates in the target organ.",
+    "topic": "Nuclear Medicine"
+  },
+  "b223": {
+    "keyPoint": "Film badges measure beta, X and gamma radiation, TLD rings monitor finger dose, and electronic dosimeters are sensitive enough for real-time interventional monitoring.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b224": {
+    "keyPoint": "Effective dose requires tissue weighting factors and equals the uniform whole-body equivalent dose carrying the same stochastic risk.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b225": {
+    "keyPoint": "Compton probability tracks electron density, which differs between tissues, so the effect is not identical across all tissues at diagnostic energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b226": {
+    "keyPoint": "CR plates fade with time so should be read promptly, have lower limiting resolution than film, and their life is limited by handling not radiation heat.",
+    "topic": "Digital Imaging"
+  },
+  "b227": {
+    "keyPoint": "Flat panel detectors show far less geometric (pincushion, magnetic) distortion than image intensifiers.",
+    "topic": "Fluoroscopy"
+  },
+  "b228": {
+    "keyPoint": "Beam hardening lowers central CT numbers (cupping), water is 0 HU, and ring artefact from faulty detector elements still occurs in multislice CT.",
+    "topic": "CT"
+  },
+  "b229": {
+    "keyPoint": "Increasing pitch decreases CT dose, and cone beam artefact is worst away from the central plane where the beam is most oblique.",
+    "topic": "CT"
+  },
+  "b230": {
+    "keyPoint": "After written declaration of pregnancy the fetal dose must be unlikely to exceed 1 mSv for the remainder; the employer reviews the risk assessment, and fluoroscopy is not automatically barred.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b231": {
+    "keyPoint": "CT uses 0.5-1 mm focal spots, solid-state detectors with 80-90% detection efficiency and low afterglow, filtered backprojection, and about 400 kB per 512x512 12-bit image.",
+    "topic": "CT"
+  },
+  "b232": {
+    "keyPoint": "Quantum mottle worsens in obese patients, rib beam-hardening can mimic liver lesions, post-patient collimation reduces scatter, and pitch is dimensionless.",
+    "topic": "CT"
+  },
+  "b233": {
+    "keyPoint": "MRI SNR is proportional to proton density and slice width; field inhomogeneity and extra phase-encoding steps do not increase it.",
+    "topic": "MRI"
+  },
+  "b234": {
+    "keyPoint": "Chemical shift artefact grows with field strength and appears in the frequency-encoding direction; gadolinium does not cause or worsen it.",
+    "topic": "MRI"
+  },
+  "b235": {
+    "keyPoint": "Pulsed Doppler has the highest acoustic output of common modes, and a sustained 4 degree Celsius tissue temperature rise is potentially hazardous.",
+    "topic": "Ultrasound"
+  },
+  "b236": {
+    "keyPoint": "A 512x512 image at 12-bit depth needs about 400 kB (393,216 bytes) of storage.",
+    "topic": "Digital Imaging"
+  },
+  "b237": {
+    "keyPoint": "Photoelectric absorption involves bound electrons and yields characteristic radiation, but Compton scatter is the main soft-tissue interaction at diagnostic energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b238": {
+    "keyPoint": "Sound speed equals 1 over the square root of (compressibility times density); it is highest in bone, and higher frequency improves resolution but cuts penetration.",
+    "topic": "Ultrasound"
+  },
+  "b239": {
+    "keyPoint": "Reflection depends on acoustic impedance mismatch (not density alone), lung attenuates strongly, and lateral resolution is best on the central beam axis at focus.",
+    "topic": "Ultrasound"
+  },
+  "b240": {
+    "keyPoint": "Photoelectric absorption probability varies approximately with Z cubed and falls with the cube of photon energy, involving bound electrons and producing characteristic radiation.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b241": {
+    "keyPoint": "Apparent contrast rises with narrower window width, falls with higher kV and bright ambient lighting, and the eye distinguishes only about 256 grey levels.",
+    "topic": "CT"
+  },
+  "b242": {
+    "keyPoint": "Dynamic range is the range of exposures a detector can record - it has nothing to do with pixel size.",
+    "topic": "Digital Imaging"
+  },
+  "b243": {
+    "keyPoint": "Isotropic resolution requires equal voxel dimensions in all three axes; a rectangular voxel is anisotropic.",
+    "topic": "CT"
+  },
+  "b244": {
+    "keyPoint": "Fat has short T1 (bright on T1), cortical bone has very short T2 (no signal), and gradient echo uses small flip angles for fast scanning with flip-angle-dependent T1 contrast.",
+    "topic": "MRI"
+  },
+  "b245": {
+    "keyPoint": "Helical CT does not remove partial volume averaging, thicker slices reduce noise, and afterglow degrades rather than improves image quality.",
+    "topic": "CT"
+  },
+  "b246": {
+    "keyPoint": "Gadolinium mainly shortens T1, has a plasma half-life of about 1.5 hours, and at eGFR below 30 is used with caution rather than absolutely contraindicated.",
+    "topic": "MRI"
+  },
+  "b247": {
+    "keyPoint": "I-123 is cyclotron-produced with a 13-hour half-life; field inhomogeneity affects T2* more than true T2.",
+    "topic": "Nuclear Medicine"
+  },
+  "b248": {
+    "keyPoint": "Tc-99m's 140 keV photons suit a low-energy gamma camera collimator.",
+    "topic": "Nuclear Medicine"
+  },
+  "b249": {
+    "keyPoint": "Compton scatter dominates diagnostic imaging but its absolute probability is slightly lower at 120 keV than at 80 keV.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b250": {
+    "keyPoint": "At constant receptor dose, higher kVp lets mAs fall so entrance skin dose decreases, while contrast falls and relative scatter increases.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b251": {
+    "keyPoint": "Increasing kVp raises mean beam energy, so the half-value layer increases.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b252": {
+    "keyPoint": "Grid ratio is strip height over interspace width (typically about 10:1), and the Bucky factor is the exposure increase a grid demands.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b253": {
+    "keyPoint": "With mAs fixed, raising kVp increases output and ESD roughly with kVp squared, increases scatter reaching the receptor, but leaves geometric unsharpness unchanged.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b254": {
+    "keyPoint": "Raising kVp hardens the beam, so the half-value layer increases.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b255": {
+    "keyPoint": "Mammography uses Mo/Mo target-filter, sub-millimetre focal spots, compression to cut dose, and an air gap instead of a grid in magnification views.",
+    "topic": "Mammography"
+  },
+  "b256": {
+    "keyPoint": "MTF measures how contrast transfers across spatial frequencies - the standard resolution metric - and is degraded by scatter and motion blur.",
+    "topic": "Digital Imaging"
+  },
+  "b257": {
+    "keyPoint": "A typical image intensifier has a 25 cm CsI input phosphor, 2.5 cm output phosphor and 20-30 kV accelerating potential, giving minification gain.",
+    "topic": "Fluoroscopy"
+  },
+  "b258": {
+    "keyPoint": "Reportable accidental exposures scale with intent: below 0.3 mSv intended, 3 mSv or more; 0.3-2.5 mSv, 10 times intended; 2.5-10 mSv, 25 mSv; above 10 mSv, 2.5 times intended.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b259": {
+    "keyPoint": "DSA uses logarithmic subtraction at around 70 kVp to enhance iodine conspicuity, improving low-contrast vessel perception but increasing noise.",
+    "topic": "Fluoroscopy"
+  },
+  "b260": {
+    "keyPoint": "Nominal fatal cancer risk is about 1 in 20,000 per mSv for adults; excess childhood cancer risk is roughly 1 in 13,000 per mSv.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b261": {
+    "keyPoint": "Solid radioactive waste decays in shielded stores before disposal, and patient excreta are the main liquid waste source (about 40% for Tc-99m, 20% for FDG).",
+    "topic": "Nuclear Medicine"
+  },
+  "b262": {
+    "keyPoint": "Key half-lives: Tc-99m 6 hours, Mo-99 66 hours, F-18 110 minutes, I-123 13 hours.",
+    "topic": "Nuclear Medicine"
+  },
+  "b263": {
+    "keyPoint": "F-18 is cyclotron-produced, Tc-99m (not molybdenum) comes from the generator, and the gyromagnetic ratio is nucleus-specific, not tissue-specific.",
+    "topic": "Nuclear Medicine"
+  },
+  "b264": {
+    "keyPoint": "Susceptibility artefact worsens with increasing field strength and causes signal loss and blooming, not brightening.",
+    "topic": "MRI"
+  },
+  "b265": {
+    "keyPoint": "Compton scatter involves loosely bound electrons and depends on electron density; backscattered photons retain relatively low energy.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b266": {
+    "keyPoint": "Photoelectric absorption chiefly involves inner (K) shell electrons and scales with atomic number cubed, not with electron density.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b267": {
+    "keyPoint": "CR has wider dynamic range than film-screen; plate replacement follows wear and QA findings, not a fixed 3-year cycle.",
+    "topic": "Digital Imaging"
+  },
+  "b268": {
+    "keyPoint": "Mammography: Mo/Mo target-filter, useful spectrum near 20 keV, resolution about 15 lp/mm, mean glandular dose about 2 mGy, focal spot under 0.5 mm.",
+    "topic": "Mammography"
+  },
+  "b269": {
+    "keyPoint": "Full-field digital mammography uses flat-panel digital detectors, not single-sided film-screen emulsion.",
+    "topic": "Mammography"
+  },
+  "b270": {
+    "keyPoint": "Grids improve contrast at the cost of higher patient dose, so they are avoided for extremities and most paediatric patients.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b271": {
+    "keyPoint": "A grid controls scatter at the receptor - it does not reduce staff dose, which is managed by distance, shielding and collimation.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b272": {
+    "keyPoint": "Iterative reconstruction enables lower-dose CT; display FOV, reconstructed slice thickness and helical mode do not themselves cut dose, and higher pitch lowers it.",
+    "topic": "CT"
+  },
+  "b273": {
+    "keyPoint": "Larger matrices need more storage, and film-screen can exceed many digital detectors in intrinsic spatial resolution.",
+    "topic": "Digital Imaging"
+  },
+  "b274": {
+    "keyPoint": "Effective dose can be estimated from DAP, the AP chest conversion factor exceeds PA, and local DRLs are set for standard examinations, not all.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b275": {
+    "keyPoint": "Fluoroscopy entrance surface dose is a rate, typically of the order of 10-50 mGy per minute.",
+    "topic": "Fluoroscopy"
+  },
+  "b276": {
+    "keyPoint": "IRMER covers medico-legal exposures, stochastic effects are assumed to have no threshold, and childhood cancer risk is about 1 in 13,000 per mSv.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b277": {
+    "keyPoint": "The dose limit for the lens of the eye is expressed as an equivalent dose because the lens is a radiosensitive tissue prone to cataract.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b278": {
+    "keyPoint": "ARSAC authority is site- and practice-specific, paediatric activity is scaled by weight, and pregnancy is not an absolute contraindication to nuclear medicine.",
+    "topic": "Nuclear Medicine"
+  },
+  "b279": {
+    "keyPoint": "kVp is checked with a calibrated meter (a step wedge tests contrast response), and image intensifiers - not the whole unit - are distorted by magnetic fields.",
+    "topic": "Fluoroscopy"
+  },
+  "b280": {
+    "keyPoint": "X-ray tube output is QA-tested every one to two months with an ionisation chamber, not merely annually.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b281": {
+    "keyPoint": "An X-ray photon may pass through unaffected, be completely absorbed, or scatter with energy loss - it never gains energy, and backscatter loses the most.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b282": {
+    "keyPoint": "Effective focal spot size depends on the actual focal spot and target angle - not anode disc diameter, target material or anode-cathode distance.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b283": {
+    "keyPoint": "Increasing the target angle increases effective focal spot size; target material has no effect on it.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b284": {
+    "keyPoint": "Compton scatter predominates at CT energies, fat is about -100 HU, and subpixel objects can still be visible through partial volume averaging.",
+    "topic": "CT"
+  },
+  "b285": {
+    "keyPoint": "Ideal diagnostic radionuclides emit gamma photons of roughly 100-250 keV with a short practical half-life; several (F-18, I-123) are cyclotron-produced.",
+    "topic": "Nuclear Medicine"
+  },
+  "b286": {
+    "keyPoint": "The pulse height analyser rejects scattered events to cut noise, while crystal thickness and collimator hole geometry set the resolution-sensitivity trade-off.",
+    "topic": "Nuclear Medicine"
+  },
+  "b287": {
+    "keyPoint": "Tissue heating in ultrasound is mainly from absorption of acoustic energy; probe surface heating reflects internal transducer losses and poor coupling.",
+    "topic": "Ultrasound"
+  },
+  "b288": {
+    "keyPoint": "Posterior enhancement behind fluid is a propagation (low attenuation) effect, not TGC; pulse-echo systems spend about 99% of each cycle receiving.",
+    "topic": "Ultrasound"
+  },
+  "b289": {
+    "keyPoint": "The operator controls PRF, focal zone position and (indirectly through depth, sector width and line density) frame rate.",
+    "topic": "Ultrasound"
+  },
+  "b290": {
+    "keyPoint": "The MR controlled area begins at the 0.5 mT (5 gauss) contour, with an inner controlled area at 3 mT overseen by the MR Responsible Person.",
+    "topic": "MRI"
+  },
+  "b291": {
+    "keyPoint": "Normal-mode SAR limits keep whole-body temperature rise to about 1 degree Celsius, and first-trimester pregnancy is not an absolute MRI contraindication.",
+    "topic": "MRI"
+  },
+  "b292": {
+    "keyPoint": "Gradient echo uses a bipolar readout gradient, small flip angles and short TR, giving fast low-SAR imaging without a 180 degree pulse.",
+    "topic": "MRI"
+  },
+  "b293": {
+    "keyPoint": "Chemical shift artefact (from the 3.5 ppm fat-water difference) lies along the frequency-encoding axis, grows with B0, and shrinks with wider bandwidth.",
+    "topic": "MRI"
+  },
+  "b294": {
+    "keyPoint": "The K-shell holds only 2 electrons, K-shell binding energy rises with atomic (not mass) number, and outermost-shell electrons determine chemical properties.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b295": {
+    "keyPoint": "Photoelectric absorption occurs in K, L or M shells, produces characteristic radiation, and its strong Z-dependence creates subject contrast; mA does not change its probability.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b296": {
+    "keyPoint": "In Compton scatter the electron receives more energy at wider scatter angles, and Compton dominates soft tissue at nuclear medicine photon energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b297": {
+    "keyPoint": "The effective focal spot is the projected (smaller) version of the real focal spot, set by filament size and target angle - typically 0.6 mm fine and 1.2 mm broad.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b298": {
+    "keyPoint": "Raising kVp from 60 to 80 nearly doubles output (intensity proportional to kVp squared), cutting mAs and entrance dose but reducing photoelectric interactions and contrast.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b299": {
+    "keyPoint": "A CR plate is a continuous phosphor sensitive to any ionising radiation; phosphor thickness is limited by readout laser light spread, and underexposure raises noise.",
+    "topic": "Digital Imaging"
+  },
+  "b300": {
+    "keyPoint": "Brightness gain equals flux gain times minification gain (typically 5000-10000); minification gain uses screen areas, edge darkening is vignetting, and magnification mode improves resolution at higher dose.",
+    "topic": "Fluoroscopy"
+  },
+  "b301": {
+    "keyPoint": "Tc-99m decays by isomeric transition emitting a 140 keV gamma with no beta; the NaI crystal absorbs about 90%, and effective half-life depends on the radiopharmaceutical.",
+    "topic": "Nuclear Medicine"
+  },
+  "b302": {
+    "keyPoint": "Nuclear medicine image contrast depends on PHA window width, injection-to-scan delay and radiochemical purity - not on collimator type or patient-collimator distance.",
+    "topic": "Nuclear Medicine"
+  },
+  "b303": {
+    "keyPoint": "Bone scan resolution is about 10 mm FWHM worsening with collimator distance; 600 MBq is the DRL (not a legal limit) and effective dose about 3 mSv.",
+    "topic": "Nuclear Medicine"
+  },
+  "b304": {
+    "keyPoint": "SPECT needs higher administered activity and high-resolution collimators, and is degraded by attenuation, camera non-uniformity and poorer resolution than planar imaging.",
+    "topic": "Nuclear Medicine"
+  },
+  "b305": {
+    "keyPoint": "PET uses dense scintillators (BGO, LSO, GSO - not NaI), coincidence detection of two 511 keV photons, higher sensitivity than SPECT, and best resolution at ring centre.",
+    "topic": "Nuclear Medicine"
+  },
+  "b306": {
+    "keyPoint": "Cancer induction is stochastic, lens opacity is deterministic with a threshold near 0.5 Gy (2 Gy causes point opacities), and X- and gamma rays share a weighting factor of 1.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b307": {
+    "keyPoint": "A controlled area is designated where annual effective dose may exceed 6 mSv, needs warning signs, local rules and an RPS - pregnant staff may still enter.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b308": {
+    "keyPoint": "DRLs are typical doses for standard-sized patients in any convenient dose quantity, reviewable annually, achievable nationally, and exceedable in justified individual cases.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b309": {
+    "keyPoint": "Each administered activity must be measured beforehand under IRMER; ARSAC publishes national DRLs, routes include oral and inhaled, and about 40% of Tc-99m is excreted as liquid waste.",
+    "topic": "Nuclear Medicine"
+  },
+  "b310": {
+    "keyPoint": "The bow-tie filter controls peripheral dose, beam hardening occurs at bone-soft tissue junctions, and CT numbers vary with kVp but not with mA.",
+    "topic": "CT"
+  },
+  "b311": {
+    "keyPoint": "CT resolution improves with smaller focal spots, smaller detectors and shorter scan times; interpolation to a bigger matrix and thicker slices do not help.",
+    "topic": "CT"
+  },
+  "b312": {
+    "keyPoint": "CT noise rises with larger matrix (smaller pixels) and obese patients, and falls with higher mA or slower rotation; window width only changes noise visibility.",
+    "topic": "CT"
+  },
+  "b313": {
+    "keyPoint": "CTDI is measured in mGy in Perspex phantoms (16 cm head, 32 cm body - head values higher), is proportional to mA, and CTDIvol falls as pitch rises.",
+    "topic": "CT"
+  },
+  "b314": {
+    "keyPoint": "CT patient dose is proportional to mAs, falls with faster rotation and higher pitch, can be cut by iterative reconstruction, and abdomen-pelvis studies give about 8 mSv.",
+    "topic": "CT"
+  },
+  "b315": {
+    "keyPoint": "The Larmor precession frequency is proportional to field strength and the gyromagnetic ratio, and is unaffected by relaxation times.",
+    "topic": "MRI"
+  },
+  "b316": {
+    "keyPoint": "M0 is the net spin-population vector proportional to B0; a 90 degree pulse tips it fully transverse, a 180 degree pulse inverts it, and rotating transverse magnetisation induces the signal.",
+    "topic": "MRI"
+  },
+  "b317": {
+    "keyPoint": "In spin echo the 180 degree pulse refocuses dephasing so the echo appears at TE after the 90 degree pulse; TR and TE choices set T1 or T2 weighting.",
+    "topic": "MRI"
+  },
+  "b318": {
+    "keyPoint": "GRE uses sub-90 flip angles and a bipolar gradient (no 180 pulse), yields T2*-weighted images sensitive to field inhomogeneity, and suits MR angiography.",
+    "topic": "MRI"
+  },
+  "b319": {
+    "keyPoint": "Ultrasound travels at 1540 m/s in soft tissue and about 4000 m/s in bone, is non-ionising, deposits energy in collagen-rich tissue, and has 0.3-1 mm wavelengths.",
+    "topic": "Ultrasound"
+  },
+  "b320": {
+    "keyPoint": "Ultrasound attenuates exponentially (about 0.5-1 dB/cm/MHz in soft tissue), mostly ending as heat, with reflection and refraction at impedance boundaries and scattering by subwavelength structures.",
+    "topic": "Ultrasound"
+  },
+  "b321": {
+    "keyPoint": "Axial resolution equals half the spatial pulse length and is independent of depth; transducer diameter and focusing affect lateral resolution instead.",
+    "topic": "Ultrasound"
+  },
+  "b322": {
+    "keyPoint": "Reflected frequency rises for approaching targets, the shift is greatest parallel to flow, pulsed Doppler is limited to half the PRF, and continuous wave Doppler never aliases.",
+    "topic": "Ultrasound"
+  },
+  "b323": {
+    "keyPoint": "Ultrasound heating is greatest in bone, foetal scan time is restricted above TI 0.7, neonatal lung damage can occur above MI 0.3, and microbubbles promote cavitation.",
+    "topic": "Ultrasound"
+  },
+  "b324": {
+    "keyPoint": "Photon energy is proportional to frequency (expressed in eV), all photons travel at light speed, and X-rays and gamma rays of equal energy are identical apart from origin.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b325": {
+    "keyPoint": "Photoelectric absorption needs photon energy above the binding energy and dominates in iodine (Z=53, probability about Z cubed), while Compton dominates soft tissue at CT energies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b326": {
+    "keyPoint": "Bremsstrahlung (about 1% efficient at diagnostic energies) rises with kVp and target Z; K-characteristic X-ray energy sits just below the K-shell binding energy.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b327": {
+    "keyPoint": "Radiographic spatial resolution improves with a smaller focal spot and shorter patient-receptor distance; mA, grid ratio and filtration do not change it.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b328": {
+    "keyPoint": "Higher kVp raises HVL and ESD (with kVp squared), cuts quantum mottle, and lowers effective dose when receptor dose is held constant.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b329": {
+    "keyPoint": "Only pixel size (not bit depth) sets digital spatial resolution; subpixel objects remain visible via partial volume, and a 10,000:1 dynamic range cuts repeat exposures.",
+    "topic": "Digital Imaging"
+  },
+  "b330": {
+    "keyPoint": "In DSA the mask is subtracted from the live image using logarithmic subtraction, which removes overlying tissue but increases noise and leaves resolution unchanged.",
+    "topic": "Fluoroscopy"
+  },
+  "b331": {
+    "keyPoint": "Mammography uses 25-35 kVp, a 0.3 mm focal spot and about 65 cm SID; K-edge filtration keeps the useful characteristic X-rays in the beam.",
+    "topic": "Mammography"
+  },
+  "b332": {
+    "keyPoint": "Tc-99m is eluted daily from the Mo-99 generator; its 140 keV gammas have about 5 cm soft-tissue HVL and interact mainly by Compton scattering.",
+    "topic": "Nuclear Medicine"
+  },
+  "b333": {
+    "keyPoint": "Longer acquisitions cut noise, thyroid Tc-99m DRL is 80 MBq, and high-resolution collimators need longer (not shorter) acquisition times due to lower sensitivity.",
+    "topic": "Nuclear Medicine"
+  },
+  "b334": {
+    "keyPoint": "PET resolution (about 4 mm) beats SPECT (about 10 mm); finer angular sampling improves SPECT, and PET bed positions overlap about 33% for axial sensitivity.",
+    "topic": "Nuclear Medicine"
+  },
+  "b335": {
+    "keyPoint": "Adult FDG PET/CT injects 250-350 MBq (about 6 mSv, exceeding the CT component), uses a 60-minute uptake, and must correct random coincidences.",
+    "topic": "Nuclear Medicine"
+  },
+  "b336": {
+    "keyPoint": "IRR17 requires HSE registration, ALARP optimisation and employer-led protection (the RPA only advises); medical exposures have no dose limits.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b337": {
+    "keyPoint": "Under IRMER anyone performing QC on medical radiation equipment is an operator, each duty holder answers for their own role, and nuclear medicine needs both practitioner and employer licences.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b338": {
+    "keyPoint": "About 40% of administered Tc-99m enters the sewer via urine (discharged directly, not delayed), solid Tc-99m waste decays on-site for a week, and the RWA oversees permit compliance.",
+    "topic": "Nuclear Medicine"
+  },
+  "b339": {
+    "keyPoint": "UK average annual dose is about 2.7 mSv (15% medical); 10 mSv carries about 1 in 2000 cancer risk, and 25 mSv in utero roughly doubles childhood cancer risk.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b340": {
+    "keyPoint": "Effective dose (in mSv) is the sum of organ equivalent doses times tissue weighting factors, quantifying stochastic risk only - not foetal dose or deterministic risk.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b341": {
+    "keyPoint": "In MDCT, pre-patient collimation defines the irradiated volume (a detector grid removes scatter), the bow-tie filter modulates dose, and contrast largely reflects tissue density.",
+    "topic": "CT"
+  },
+  "b342": {
+    "keyPoint": "CT SNR scales with the square root of mAs, falls with higher pitch, is altered by the reconstruction filter, and is unaffected by display window width.",
+    "topic": "CT"
+  },
+  "b343": {
+    "keyPoint": "CT effective dose is unaffected by pixel size or reconstructed slice thickness, rises with scan length, and is about 1-2 mSv for a routine brain scan.",
+    "topic": "CT"
+  },
+  "b344": {
+    "keyPoint": "Adult thorax-abdomen-pelvis CT uses spiral acquisition at 120 kVp or more with about 0.7 lp/mm resolution; contrast injection precedes scanning by a timed delay.",
+    "topic": "CT"
+  },
+  "b345": {
+    "keyPoint": "The MR signal is a voltage induced by rotating transverse magnetisation of hydrogen nuclei, grows with B0, decays by T2 relaxation, and follows no signal after a lone 180 pulse.",
+    "topic": "MRI"
+  },
+  "b346": {
+    "keyPoint": "T1 (typically 200-2000 ms) always exceeds T2, lengthens with field strength, and governs TR choice; T2 measures how fast the signal decays.",
+    "topic": "MRI"
+  },
+  "b347": {
+    "keyPoint": "MR spatial resolution improves with thinner slices, larger matrix and smaller FOV - higher B0 or TE change SNR, not resolution.",
+    "topic": "MRI"
+  },
+  "b348": {
+    "keyPoint": "Chemical shift artefact stems from intrinsic fat-water Larmor frequency differences (not field inhomogeneity), lies along frequency encoding, worsens at high field, and is minimised by STIR.",
+    "topic": "MRI"
+  },
+  "b349": {
+    "keyPoint": "Only ferromagnetic objects are projectile hazards, rapid gradient switching causes peripheral nerve stimulation, and SAR quantifies RF tissue heating.",
+    "topic": "MRI"
+  },
+  "b350": {
+    "keyPoint": "Acoustic impedance (in Rayls) rises with tissue density and sound speed, is motion-independent, and is higher in muscle than fat.",
+    "topic": "Ultrasound"
+  },
+  "b351": {
+    "keyPoint": "B-mode sends one pulse per scan line in real time, PRF is limited by imaging depth, and brightness reflects impedance differences at interfaces, strongest at normal incidence.",
+    "topic": "Ultrasound"
+  },
+  "b352": {
+    "keyPoint": "Axial resolution equals half the spatial pulse length (typically 0.5-1 mm), improves with frequency, and is independent of depth and transducer diameter.",
+    "topic": "Ultrasound"
+  },
+  "b353": {
+    "keyPoint": "Doppler shift rises with operating frequency and blood velocity, falls as the angle approaches 90 degrees, and is inversely proportional to propagation velocity - PRF only sets the aliasing limit.",
+    "topic": "Ultrasound"
+  },
+  "b354": {
+    "keyPoint": "Binding energy is the energy to remove an electron from the atom, greatest for K-shell (typically 10-70 keV), rising with atomic number, and gating photoelectric events.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b355": {
+    "keyPoint": "Photoelectrons travel under 2 mm in tissue, Compton (incoherent) scatter dominates above 100 keV with increasingly forward-directed scatter, and elastic scatter deposits no dose.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b356": {
+    "keyPoint": "Added filtration removes low-energy bremsstrahlung without changing maximum energy; inherent filtration is about 0.5 mm Al, and more filtration raises HVL.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b357": {
+    "keyPoint": "A larger matrix improves sampling, more photons per pixel raise SNR, low-pass filtering suppresses noise, and subvoxel high-contrast structures remain detectable.",
+    "topic": "Digital Imaging"
+  },
+  "b358": {
+    "keyPoint": "In flat panels a photoconductor makes charge directly while a phosphor makes light (screen blur limits indirect FPD resolution); dynamic range is about 10,000:1 and FPDs serve fluoroscopy.",
+    "topic": "Fluoroscopy"
+  },
+  "b359": {
+    "keyPoint": "Fluoroscopy quantum noise falls with higher kVp or mA, grid removal, or an alternative ABC dose curve - anything that increases detected photons.",
+    "topic": "Fluoroscopy"
+  },
+  "b360": {
+    "keyPoint": "X-ray contrast improves by lowering kVp, collimating the beam and using a grid - all reduce scatter or boost photoelectric interactions; mA has no effect.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b361": {
+    "keyPoint": "Electron capture and positron emission both occur in proton-rich nuclei and lower Z by one; isomeric transition (Tc-99m) emits gamma without changing atomic number.",
+    "topic": "Nuclear Medicine"
+  },
+  "b362": {
+    "keyPoint": "The collimator forms the image (the PHA window rejects scatter by energy), NaI converts gammas to light, and faulty PM tubes cause circular uniformity defects.",
+    "topic": "Nuclear Medicine"
+  },
+  "b363": {
+    "keyPoint": "Higher administered activity raises SNR without changing scatter fraction, parallel-hole collimators keep 1:1 magnification, and impurities alter biodistribution and contrast.",
+    "topic": "Nuclear Medicine"
+  },
+  "b364": {
+    "keyPoint": "F-18 positrons span energies up to 635 keV with short range, PET rings are stationary, resolution peaks centrally, and random coincidences fog contrast.",
+    "topic": "Nuclear Medicine"
+  },
+  "b365": {
+    "keyPoint": "SUV equals tissue FDG concentration divided by injected activity per body mass, and varies with scanner, uptake time and reconstruction algorithm.",
+    "topic": "Nuclear Medicine"
+  },
+  "b366": {
+    "keyPoint": "IRR17 limits sit below tissue-reaction thresholds and none may be exceeded: 20 mSv for the lens, 150 mSv extremities (forcing classification), and 1 mSv to the foetus, not the mother.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b367": {
+    "keyPoint": "IRMER covers screening and research, any entitled trained registered professional can be a practitioner, optimisation means the lowest dose giving diagnostic information, and duty holders can be prosecuted individually.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b368": {
+    "keyPoint": "6 mSv, typical of a chest CT, carries about 1 in 3000 cancer risk and is the three-tenths threshold for classifying staff.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b369": {
+    "keyPoint": "Scatter at 1 m is about 0.1% of the incident dose rate, tube leakage must stay under 1 mGy/h at 1 m, and lead aprons stop only scatter.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b370": {
+    "keyPoint": "CT numbers vary with kVp, slice thickness (partial volume), surrounding anatomy (beam hardening) and reconstruction algorithm - but not with mA.",
+    "topic": "CT"
+  },
+  "b371": {
+    "keyPoint": "Raising pitch from 1.0 to 1.5 cuts dose, scan time and motion artefact, but increases noise and partial volume effects.",
+    "topic": "CT"
+  },
+  "b372": {
+    "keyPoint": "FBP is faster with sharper detail; iterative reconstruction suppresses noise and metal/beam-hardening artefacts better, and both suffer motion artefacts equally.",
+    "topic": "CT"
+  },
+  "b373": {
+    "keyPoint": "CT noise falls with slower gantry rotation and smaller matrix (larger pixels), but rises when slice thickness, kVp or mA are decreased.",
+    "topic": "CT"
+  },
+  "b374": {
+    "keyPoint": "Metal causes streaks, faulty detectors cause rings (not motion), beam hardening causes cupping, and zebra artefacts arise from helical interpolation.",
+    "topic": "CT"
+  },
+  "b375": {
+    "keyPoint": "Excitation frequency (Larmor) is proportional to B0, gradients define the imaged slice, fat and water precess at slightly different frequencies, and gadolinium shortens T1 more than T2.",
+    "topic": "MRI"
+  },
+  "b376": {
+    "keyPoint": "Slice thickness depends on RF pulse bandwidth and gradient slope, frequency encoding is applied during readout, and acquisition time is proportional to phase-encode matrix size.",
+    "topic": "MRI"
+  },
+  "b377": {
+    "keyPoint": "MRI SNR rises with thicker slices and larger FOV, and falls with longer TE and wider receiver bandwidth; extra phase-encoding steps add resolution, not SNR.",
+    "topic": "MRI"
+  },
+  "b378": {
+    "keyPoint": "MR scanners have three gradient coil sets, cryogen-cooled superconducting magnets (quenching destroys the field), a transmit-receive RF coil, and a fringe field extending metres.",
+    "topic": "MRI"
+  },
+  "b379": {
+    "keyPoint": "The transducer listens over 99% of the time, TGC amplifies deep echoes to offset attenuation, and refraction occurs at oblique boundaries with different sound speeds.",
+    "topic": "Ultrasound"
+  },
+  "b380": {
+    "keyPoint": "Lateral resolution (typically 2-3 mm, worse than axial) improves with frequency and line density, varies with depth, and trades off against frame rate.",
+    "topic": "Ultrasound"
+  },
+  "b381": {
+    "keyPoint": "TGC compensates for depth-dependent attenuation so similar boundaries give similar signals - it does not affect axial resolution and narrows the displayed dynamic range.",
+    "topic": "Ultrasound"
+  },
+  "b382": {
+    "keyPoint": "Speed errors displace structures axially, reverberation causes comet tails, side lobes misplace off-axis echoes, and cysts cause enhancement, not shadowing.",
+    "topic": "Ultrasound"
+  },
+  "b383": {
+    "keyPoint": "Ultrasound heating rises with PRF and frequency, peaks superficially and in bone, and is reduced in well-perfused tissue where blood carries heat away.",
+    "topic": "Ultrasound"
+  },
+  "b384": {
+    "keyPoint": "Photoelectric absorption dominates at mammographic energies (about 20 keV), completely absorbs the photon, and falls with 1/E cubed while rising with density and atomic number.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b385": {
+    "keyPoint": "Compton scatter involves outer-shell electrons, slowly decreases with kVp, always degrades contrast, and dominates in patients at CT energies - but not in high-Z CsI detectors.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b386": {
+    "keyPoint": "The linear attenuation coefficient is the fractional intensity loss per unit thickness, equals 0.693/HVL, is energy- (not mAs-) dependent, and is higher for bone than water.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b387": {
+    "keyPoint": "Scatter is reduced by collimation, compression, lower kVp and an air gap - increasing mA changes quantity but not the scatter fraction.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b388": {
+    "keyPoint": "Sharpness improves with longer focus-to-patient distance and smaller focal spot; grids, kVp and a larger patient-receptor gap do not help.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b389": {
+    "keyPoint": "CR resolution is typically 4 lp/mm, limited by laser spot size and plate size; fading is gradual (15-20 minute delays tolerable) and contrast is set by post-processing.",
+    "topic": "Digital Imaging"
+  },
+  "b390": {
+    "keyPoint": "Image intensifiers use a CsI input phosphor with output light driving automatic exposure control; abdominal surface dose rates run 10-20 mGy/min and brightness gain falls with age.",
+    "topic": "Fluoroscopy"
+  },
+  "b391": {
+    "keyPoint": "Mammography uses a 65 cm focus-receptor distance, K-edge filtration and long exposures; compression improves contrast and sharpness, while magnification increases quantum mottle.",
+    "topic": "Mammography"
+  },
+  "b392": {
+    "keyPoint": "The ideal gamma-camera radionuclide has a 4-6 hour half-life, 100-200 keV gamma emission, a stable daughter, and generator (not cyclotron) availability.",
+    "topic": "Nuclear Medicine"
+  },
+  "b393": {
+    "keyPoint": "NaI detects about 90% of 140 keV gammas, the collimator dominates resolution, dead time breaks count-rate linearity at high activity, and under 0.1% of emitted gammas form the image.",
+    "topic": "Nuclear Medicine"
+  },
+  "b394": {
+    "keyPoint": "SPECT acquires up to 120 projections at about 3 degree steps, uses patient-contoured orbits and iterative reconstruction, and corrects attenuation (not camera non-uniformity) with CT.",
+    "topic": "Nuclear Medicine"
+  },
+  "b395": {
+    "keyPoint": "PET axial FOV is 15-25 cm requiring bed positions, CT is acquired first, time-of-flight needs fast (non-BGO) scintillators, and generator-produced Rb-82 and Ga-68 have higher Z.",
+    "topic": "Nuclear Medicine"
+  },
+  "b396": {
+    "keyPoint": "IRR17 requires critical examination at installation, dose investigation levels in local rules, 30-year classified dose records, and limits the foetal (not maternal) dose to 1 mSv.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b397": {
+    "keyPoint": "The employer reports significant accidental exposures to the CQC within 2 weeks; reporting thresholds scale with intended dose, and equipment-fault overexposures are reportable.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b398": {
+    "keyPoint": "Absorbed dose is energy per unit mass; in diagnostic radiology equivalent dose equals absorbed dose (weighting factor 1), and effective dose compares stochastic risk across examinations.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b399": {
+    "keyPoint": "Radiopharmaceutical dose depends on both radionuclide and pharmaceutical, is delivered at a far lower dose rate than CT, and limits image quality via administered activity.",
+    "topic": "Nuclear Medicine"
+  },
+  "b400": {
+    "keyPoint": "All activities are measured in a dose calibrator first; paediatric doses scale by weight, operators can authorise under protocol, and breastfeeding interruption is radiopharmaceutical-specific.",
+    "topic": "Nuclear Medicine"
+  },
+  "b401": {
+    "keyPoint": "CT beams are heavily pre-hardened with copper or tin, detectors are gadolinium oxysulphide scintillators, the tube runs continuously, and pitch divides table travel by collimated beam width.",
+    "topic": "CT"
+  },
+  "b402": {
+    "keyPoint": "CT noise increases with thinner slices, lower kVp and sharp (bone) reconstruction filters; slower rotation and smaller matrices reduce it.",
+    "topic": "CT"
+  },
+  "b403": {
+    "keyPoint": "In MSCT detector element size sets slice thickness, quarter-detector offset boosts transaxial sampling, ring artefacts still occur helically, and CT numbers are relative to water.",
+    "topic": "CT"
+  },
+  "b404": {
+    "keyPoint": "Effective dose is proportional to DLP via conversion factors; chest-abdomen-pelvis CT gives 12-15 mSv, pelvic CT delivers 20-30 mGy to a foetus, and DRLs are guidance, not limits.",
+    "topic": "CT"
+  },
+  "b405": {
+    "keyPoint": "T1 (spin-lattice) is the 63% recovery time and lengthens with B0; T2 (30-100 ms) reflects random spin-spin interactions - inhomogeneity effects belong to T2*.",
+    "topic": "MRI"
+  },
+  "b406": {
+    "keyPoint": "Fat and water protons precess at different frequencies, STIR (short TI) nulls fat while CSF nulling needs long TI, and inflowing blood is dark on spin echo.",
+    "topic": "MRI"
+  },
+  "b407": {
+    "keyPoint": "MR SNR is proportional to proton density and higher in T1-weighted (short TE) images; wider receiver bandwidth admits more noise and quadrupling matrix size quarters voxel signal.",
+    "topic": "MRI"
+  },
+  "b408": {
+    "keyPoint": "Motion (not field inhomogeneity) causes phase-axis ghosting, GRE shows worse metal signal voids than SE, and wraparound is cured by enlarging the FOV.",
+    "topic": "MRI"
+  },
+  "b409": {
+    "keyPoint": "The Faraday cage blocks RF (not fringe field), public access is allowed below 0.5 mT, only ferromagnetic items are projectiles, and gadolinium in later pregnancy raises stillbirth risk.",
+    "topic": "MRI"
+  },
+  "b410": {
+    "keyPoint": "Soft-tissue attenuation is about 0.5-1 dB/cm/MHz, exponential with depth, mainly due to absorption, frequency-dependent, and unrelated to acoustic impedance.",
+    "topic": "Ultrasound"
+  },
+  "b411": {
+    "keyPoint": "Crystal thickness (not diameter) sets resonant frequency, spatial pulse length shrinks with frequency, reflections under 1% are detectable, and sound is faster in muscle than fat.",
+    "topic": "Ultrasound"
+  },
+  "b412": {
+    "keyPoint": "Phased arrays steer and focus scan lines, linear arrays give rectangular fields, harmonic imaging receives at twice the transmitted frequency, and speckle arises from subwavelength scattering interference.",
+    "topic": "Ultrasound"
+  },
+  "b413": {
+    "keyPoint": "Higher frequency improves resolution but increases attenuation, heating risk and Doppler aliasing, while wave speed stays fixed by the medium.",
+    "topic": "Ultrasound"
+  },
+  "b414": {
+    "keyPoint": "General X-ray equipment needs at least 2.5 mm Al equivalent total filtration (inherent about 0.5-1 mm); CT is filtered more heavily and 0.1-0.5 mm copper can be added.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b415": {
+    "keyPoint": "X-ray photon quantity rises with kVp (approximately kVp squared), target atomic number and reduced filtration - anode-cathode distance is irrelevant.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b416": {
+    "keyPoint": "1 MBq is one million disintegrations per second, half-life equals 0.693 divided by the decay constant, and physical half-life is independent of biological clearance.",
+    "topic": "Nuclear Medicine"
+  },
+  "b417": {
+    "keyPoint": "Beam quality depends on peak kV, voltage waveform, anode atomic number and angle, and tube window material.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b418": {
+    "keyPoint": "QA uses ionisation chambers for leakage and output, HVL measurement to estimate total filtration, and accepts about 2 lp/mm for fluoroscopy systems.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b419": {
+    "keyPoint": "MRI SNR increases with shorter TE, larger FOV, higher field strength and thicker slices; a larger matrix reduces it.",
+    "topic": "MRI"
+  },
+  "b420": {
+    "keyPoint": "Compton (energy shared between electron and scattered photon) dominates in CT, forward scatter grows with energy, and pair production yields 1.02 MeV of annihilation radiation.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b421": {
+    "keyPoint": "Useful dose benchmarks: barium enema about 7 mSv, chest X-ray ESD about 150 uGy, 100 MBq Tc-99m lung perfusion about 1 mSv, UK medical average about 400 uSv per year.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b422": {
+    "keyPoint": "The Nyquist limit (half the PRF) caps measurable velocity, power Doppler shows amplitude but not direction, and thicker crystals emit longer wavelengths.",
+    "topic": "Ultrasound"
+  },
+  "b423": {
+    "keyPoint": "Classification is required when a worker is likely to exceed 6 mSv effective dose or three-tenths of any dose limit - pregnancy or multiple sites do not trigger it.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b424": {
+    "keyPoint": "CR plates are read by a red laser and erased with bright white light; CR has wide dynamic range but is less dose-efficient than DR.",
+    "topic": "Digital Imaging"
+  },
+  "b425": {
+    "keyPoint": "CT is a high-dose modality with about 10 lp/cm resolution on a 512x512 matrix; narrow window widths display subtle density differences.",
+    "topic": "CT"
+  },
+  "b426": {
+    "keyPoint": "Gyromagnetic ratios differ between nuclei, Larmor frequency rises with B0, and water protons precess about 3.5 ppm faster than fat protons.",
+    "topic": "MRI"
+  },
+  "b427": {
+    "keyPoint": "Interventional skin dose falls with greater tube-to-patient distance, beam angulation and varied projections; increasing patient-to-detector distance raises it.",
+    "topic": "Fluoroscopy"
+  },
+  "b428": {
+    "keyPoint": "Annual limits: public 1 mSv, classified workers 20 mSv effective and 500 mSv skin; UK natural background averages about 2.7 mSv.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b429": {
+    "keyPoint": "Photoelectric absorption involves inner-shell electrons, totally absorbs the photon and ionises the atom, falling with energy and rising with Z cubed.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b430": {
+    "keyPoint": "Each CT pixel represents the voxel's average linear attenuation coefficient (dependent on density and composition); fat is about -100 HU and bone windows use high levels.",
+    "topic": "CT"
+  },
+  "b431": {
+    "keyPoint": "Iodinated contrast works by photoelectric absorption with a K-edge at about 33 keV, and positive plus negative agents can be combined for double-contrast studies.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b432": {
+    "keyPoint": "The ideal geometry minimises focal spot and object-detector distance while maximising focus-detector distance; mammographic magnification deliberately raises object-detector distance.",
+    "topic": "Mammography"
+  },
+  "b433": {
+    "keyPoint": "Most radiation damage is indirect via free radicals; LET is energy per unit path length, alpha particles have high LET, and RBE compares doses for equal biological effect.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b434": {
+    "keyPoint": "Any entitled professional can be an IRMER practitioner (one person may hold all three roles); the employer bears overall compliance responsibility and optimisation means ALARP, not best image.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b435": {
+    "keyPoint": "Gamma photons are nuclear emissions with wave-particle duality, can ionise atoms, may be emitted without changing atomic or mass number, and outpenetrate alpha and beta.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b436": {
+    "keyPoint": "Point-source intensity follows the inverse square law (doubling distance quarters intensity), which does not account for attenuation in materials such as lead.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b437": {
+    "keyPoint": "Patient scatter is the main staff exposure, entrance surface dose varies with kV squared, and in-utero childhood cancer risk is about 1 in 13,000 per mGy.",
+    "topic": "Legislation & Radiation Protection"
+  },
+  "b438": {
+    "keyPoint": "Fast flow gives spin echo flow voids but is bright on GRE; ghosts appear along phase encoding, and truncation ringing is reduced by increasing the matrix.",
+    "topic": "MRI"
+  },
+  "b439": {
+    "keyPoint": "Mammography dose is quoted as mean glandular dose in mGy - below about 2.5 mGy per image for a standard NHSBSP breast - because glandular tissue is the radiosensitive target.",
+    "topic": "Mammography"
+  },
+  "b440": {
+    "keyPoint": "Inversion recovery starts with a 180 degree pulse and long TR; STIR (short TI) suppresses fat while FLAIR (long TI) nulls CSF.",
+    "topic": "MRI"
+  },
+  "b441": {
+    "keyPoint": "PET detects 511 keV photons from short-lived positron emitters using ring detectors, with coincidence detection replacing lead collimators; it is not low dose.",
+    "topic": "Nuclear Medicine"
+  },
+  "b442": {
+    "keyPoint": "Thermionic emission happens at the cathode filament; bremsstrahlung and characteristic X-rays form at the anode, with only about 1% of electron energy becoming X-rays.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b443": {
+    "keyPoint": "National DRLs exist for common examinations (as administered activity in nuclear medicine) and employers must audit local DRLs; exceeding one triggers review, not automatic reporting.",
+    "topic": "Nuclear Medicine"
+  },
+  "b444": {
+    "keyPoint": "Scatter mainly degrades contrast, increases with kV, and is reduced by grids - which improve contrast but raise patient dose.",
+    "topic": "Radiography & X-ray Physics"
+  },
+  "b445": {
+    "keyPoint": "Quantum noise dominates CT and limits low-contrast detectability; SNR improves with higher mA, longer rotation or higher kV, and falls with thinner slices.",
+    "topic": "CT"
+  },
+  "b446": {
+    "keyPoint": "Element timing focuses and steers array beams (annular arrays cannot steer), curvilinear arrays give sector fields, narrower sectors raise frame rate, and matching layers aid coupling.",
+    "topic": "Ultrasound"
+  },
+  "b447": {
+    "keyPoint": "CT filtration exceeds 2.5 mm Al, bow-tie filters offset the patient's elliptical shape, and post-patient collimation rejects scatter; collimation width is millimetres to centimetres.",
+    "topic": "CT"
+  },
+  "b448": {
+    "keyPoint": "DSA patient dose is cut with 0.2 mm copper filtration and monitored by DAP meter; faster frame rates increase, not decrease, dose.",
+    "topic": "Fluoroscopy"
+  },
+  "b449": {
+    "keyPoint": "Pulse-echo imaging assumes similar soft-tissue sound speeds, uses pulsed emission and narrow beams for localisation, with TGC manually offsetting depth attenuation.",
+    "topic": "Ultrasound"
+  },
+  "b450": {
+    "keyPoint": "The 90 degree pulse creates transverse magnetisation, the 180 degree refocusing pulse fires at TE/2, and the echo forms at TE - TR is the interval between excitations.",
+    "topic": "MRI"
+  },
+  "b451": {
+    "keyPoint": "Tc-99m emits 140 keV, F-18 is cyclotron- (not generator-) produced, gamma cameras use NaI (BGO is PET), and wider collimator holes raise sensitivity, not lower dose.",
+    "topic": "Nuclear Medicine"
+  },
+  "b452": {
+    "keyPoint": "Under AEC, patient dose falls with faster detectors and smaller field sizes; grids raise it, and lowering mA just lengthens exposure time.",
+    "topic": "Radiation Biology & Dosimetry"
+  },
+  "b453": {
+    "keyPoint": "Magnification rises with shorter focus-receptor or longer object-receptor distance and is independent of focal spot size, which instead governs unsharpness.",
+    "topic": "Radiography & X-ray Physics"
+  }
+}

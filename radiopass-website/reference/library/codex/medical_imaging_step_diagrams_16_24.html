@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Physics Diagrams 16-24</title>
+  <style>
+    :root {
+      --bg: #e9f2f6;
+      --card: rgba(255, 255, 255, 0.94);
+      --ink: #173649;
+      --muted: #506f82;
+      --line: #5f839a;
+      --edge: rgba(100, 145, 171, 0.34);
+      --accent: #0b85ab;
+      --accent2: #13936f;
+      --warn: #c97b31;
+      --danger: #c55252;
+      --radius: 18px;
+      --shadow: 0 20px 42px rgba(8, 44, 66, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Avenir Next", "IBM Plex Sans", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 7%, rgba(72, 174, 202, 0.15), transparent 40%),
+        radial-gradient(circle at 92% 9%, rgba(29, 178, 140, 0.12), transparent 38%),
+        linear-gradient(160deg, #edf4f8 0%, #e7f1f6 55%, #ecf5f4 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(11, 67, 97, 0.04) 0px,
+        rgba(11, 67, 97, 0.04) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    }
+
+    .page {
+      width: min(1440px, calc(100% - 2rem));
+      margin: 1rem auto 2rem;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .hero {
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.94), rgba(244, 250, 253, 0.95));
+      padding: 0.92rem 1.06rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Avenir Next Condensed", "Franklin Gothic Medium", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: clamp(1.08rem, 2.4vw, 1.78rem);
+      color: #0f4a66;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .diagram-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .diagram-card {
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: var(--card);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+    }
+
+    .card-head {
+      padding: 0.8rem 0.95rem 0.66rem;
+      border-bottom: 1px solid rgba(118, 160, 182, 0.24);
+      background: linear-gradient(180deg, rgba(245, 252, 255, 0.94), rgba(242, 249, 253, 0.9));
+      display: grid;
+      gap: 0.28rem;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.66rem;
+      flex-wrap: wrap;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: #10445f;
+      letter-spacing: 0.02em;
+    }
+
+    .card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.35;
+    }
+
+    .step-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(88, 145, 174, 0.38);
+      background: rgba(220, 241, 249, 0.84);
+      color: #0f6686;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 0.24rem 0.55rem;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scene-wrap {
+      padding: 0.74rem;
+    }
+
+    .scene {
+      width: 100%;
+      aspect-ratio: 18 / 8;
+      border-radius: 14px;
+      border: 1px solid rgba(102, 152, 179, 0.35);
+      background:
+        linear-gradient(180deg, rgba(247, 253, 255, 0.95), rgba(240, 249, 252, 0.92)),
+        radial-gradient(circle at 14% 16%, rgba(73, 172, 202, 0.11), transparent 32%),
+        radial-gradient(circle at 84% 82%, rgba(58, 175, 137, 0.1), transparent 32%);
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .caption {
+      margin: 0;
+      min-height: 72px;
+      padding: 0.67rem 0.95rem;
+      border-top: 1px solid rgba(121, 161, 182, 0.22);
+      border-bottom: 1px solid rgba(121, 161, 182, 0.22);
+      background: linear-gradient(180deg, rgba(244, 251, 254, 0.93), rgba(243, 249, 253, 0.85));
+      color: #1f4d66;
+      font-size: 0.9rem;
+      line-height: 1.37;
+    }
+
+    .info-panel {
+      margin: 0;
+      padding: 0.72rem 0.95rem 0.76rem;
+      background: linear-gradient(180deg, rgba(20, 34, 47, 0.9), rgba(15, 28, 40, 0.95));
+      border-top: 1px solid rgba(104, 145, 171, 0.28);
+      border-bottom: 1px solid rgba(104, 145, 171, 0.28);
+      color: #d4e8f7;
+    }
+
+    .info-title {
+      margin: 0 0 0.42rem;
+      color: #e8f5ff;
+      font-size: 0.84rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .info-list {
+      margin: 0;
+      padding-left: 1.05rem;
+      display: grid;
+      gap: 0.33rem;
+      font-size: 0.8rem;
+      line-height: 1.34;
+    }
+
+    .info-list li::marker {
+      color: #77d9f8;
+    }
+
+    .info-ref {
+      margin: 0.5rem 0 0;
+      color: #99b7cc;
+      font-size: 0.74rem;
+    }
+
+    .controls {
+      padding: 0.72rem 0.82rem 0.92rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid rgba(92, 145, 171, 0.44);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(248, 253, 255, 0.97), rgba(232, 245, 250, 0.94));
+      color: #0f4d6b;
+      font-size: 0.79rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      padding: 0.48rem 0.8rem;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(14, 124, 165, 0.67);
+      box-shadow: 0 10px 20px rgba(11, 62, 90, 0.14);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .layer {
+      opacity: 0;
+      transition: opacity 420ms ease, transform 760ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .layer.show {
+      opacity: 1;
+    }
+
+    .ray {
+      opacity: 0;
+      stroke: #1b7ea3;
+      stroke-width: 2.5;
+      stroke-dasharray: 8 6;
+      transition: opacity 360ms ease;
+    }
+
+    .ray.show {
+      opacity: 0.92;
+    }
+
+    .curve {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transition: opacity 420ms ease;
+    }
+
+    .curve.show {
+      opacity: 1;
+    }
+
+    .label {
+      fill: #295971;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .small {
+      fill: #3f6c82;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .quiet-note {
+      padding: 0.7rem 0.9rem;
+      border: 1px dashed rgba(121, 160, 180, 0.5);
+      border-radius: 12px;
+      background: rgba(245, 251, 254, 0.72);
+      color: #3d6277;
+      font-size: 0.83rem;
+    }
+
+    body {
+      color: #e2eef7;
+      background:
+        radial-gradient(circle at 9% 6%, rgba(54, 144, 183, 0.24), transparent 38%),
+        radial-gradient(circle at 92% 10%, rgba(24, 167, 126, 0.2), transparent 40%),
+        linear-gradient(165deg, #050c16 0%, #0b1624 56%, #08131e 100%);
+    }
+
+    body::before {
+      opacity: 0.16;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(160, 206, 236, 0.09) 0px,
+        rgba(160, 206, 236, 0.09) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    }
+
+    .hero,
+    .diagram-card {
+      background: linear-gradient(160deg, rgba(12, 24, 37, 0.93), rgba(13, 28, 42, 0.94));
+      border-color: rgba(107, 166, 204, 0.24);
+      box-shadow: 0 26px 48px rgba(0, 8, 16, 0.52);
+    }
+
+    .hero h1 {
+      color: #c7e9ff;
+    }
+
+    .hero p,
+    .card-head p {
+      color: #96b8cf;
+    }
+
+    .card-head {
+      background: linear-gradient(180deg, rgba(14, 30, 45, 0.93), rgba(12, 27, 40, 0.94));
+      border-bottom-color: rgba(96, 149, 181, 0.24);
+    }
+
+    .card-head h2 {
+      color: #d7f0ff;
+    }
+
+    .step-pill {
+      color: #8fdcff;
+      background: rgba(20, 50, 72, 0.86);
+      border-color: rgba(89, 152, 188, 0.45);
+    }
+
+    .scene {
+      border-color: rgba(113, 165, 193, 0.28);
+      background:
+        linear-gradient(180deg, rgba(229, 237, 243, 0.96), rgba(214, 225, 233, 0.96)),
+        radial-gradient(circle at 12% 15%, rgba(119, 175, 202, 0.2), transparent 36%),
+        radial-gradient(circle at 88% 82%, rgba(92, 177, 147, 0.16), transparent 34%);
+    }
+
+    .caption {
+      color: #d9ecfb;
+      background: linear-gradient(180deg, rgba(14, 30, 44, 0.95), rgba(13, 26, 39, 0.95));
+      border-top-color: rgba(97, 146, 175, 0.24);
+      border-bottom-color: rgba(97, 146, 175, 0.24);
+    }
+
+    button {
+      background: linear-gradient(180deg, rgba(16, 40, 58, 0.98), rgba(12, 31, 46, 0.97));
+      border-color: rgba(88, 145, 177, 0.45);
+      color: #d9f1ff;
+    }
+
+    button:hover {
+      border-color: rgba(118, 216, 255, 0.74);
+      box-shadow: 0 10px 22px rgba(0, 14, 26, 0.52);
+    }
+
+    .quiet-note {
+      background: linear-gradient(180deg, rgba(14, 30, 44, 0.92), rgba(13, 27, 40, 0.93));
+      border-color: rgba(96, 149, 182, 0.34);
+      color: #b7d5e8;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        width: calc(100% - 1rem);
+        margin: 0.6rem auto 1rem;
+      }
+
+      .scene {
+        aspect-ratio: 16 / 10;
+      }
+
+      .caption {
+        min-height: 90px;
+      }
+
+      .controls button {
+        flex: 1 1 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1>Interactive Physics Diagrams 16-24</h1>
+      <p>Manual step navigation, smooth transitions, and relationship-focused physics trends.</p>
+    </header>
+
+    <section class="diagram-list">
+      <article class="diagram-card" id="d16" data-diagram="d16">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 16: MRI Signal Contribution and Tissue Differences</h2>
+            <span class="step-pill">Step 1 / 5</span>
+          </div>
+          <p>Relative tissue behavior (fat, water, haemorrhage) with transverse decay and final voxel summation.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="MRI signal contribution and tissue differences">
+              <defs>
+                <marker id="d16Arrow" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <polygon points="0,0 10,5 0,10" fill="#1c7fa4" />
+                </marker>
+              </defs>
+
+              <line x1="70" y1="430" x2="70" y2="90" stroke="#5d8097" stroke-width="4" marker-end="url(#d16Arrow)" />
+              <text x="46" y="80" class="small">B0</text>
+
+              <g>
+                <circle cx="180" cy="320" r="48" fill="#f3d7b0" stroke="#b08658" stroke-width="3" />
+                <text x="164" y="389" class="small">Fat</text>
+                <line id="d16-v-fat" x1="180" y1="320" x2="180" y2="220" stroke="#1c7fa4" stroke-width="5" marker-end="url(#d16Arrow)" />
+              </g>
+
+              <g>
+                <circle cx="300" cy="320" r="48" fill="#b7daef" stroke="#6790a8" stroke-width="3" />
+                <text x="275" y="389" class="small">Water</text>
+                <line id="d16-v-water" x1="300" y1="320" x2="300" y2="220" stroke="#1c7fa4" stroke-width="5" marker-end="url(#d16Arrow)" />
+              </g>
+
+              <g>
+                <circle cx="420" cy="320" r="48" fill="#efb9b8" stroke="#a97372" stroke-width="3" />
+                <text x="376" y="389" class="small">Haemorrhage</text>
+                <line id="d16-v-hemo" x1="420" y1="320" x2="420" y2="220" stroke="#1c7fa4" stroke-width="5" marker-end="url(#d16Arrow)" />
+              </g>
+
+              <g id="d16-rf" class="layer">
+                <path d="M110 230 Q300 140 490 230" fill="none" stroke="#c67a2f" stroke-width="4" stroke-dasharray="10 8" />
+                <text x="248" y="132" class="small">RF pulse tips vectors into transverse plane</text>
+              </g>
+
+              <rect x="560" y="70" width="500" height="360" fill="rgba(249, 254, 255, 0.85)" stroke="#adc2d0" stroke-width="2" />
+              <line x1="590" y1="392" x2="1030" y2="392" stroke="#4f7084" stroke-width="4" />
+              <line x1="590" y1="392" x2="590" y2="96" stroke="#4f7084" stroke-width="3" />
+              <text x="774" y="430" class="label">Time</text>
+              <text x="548" y="266" transform="rotate(-90 548 266)" class="label">Transverse Signal</text>
+
+              <path id="d16-fat-curve" class="curve" stroke="#c97b31"
+                d="M590 132 C640 170 690 210 740 260 C790 304 840 340 900 368 C940 382 980 390 1030 392" />
+              <path id="d16-water-curve" class="curve" stroke="#0b85ab"
+                d="M590 132 C650 170 710 214 770 260 C830 302 900 334 960 360 C995 374 1014 384 1030 390" />
+              <path id="d16-hemo-curve" class="curve" stroke="#c55252"
+                d="M590 132 C640 165 690 204 740 246 C790 286 850 322 910 350 C958 372 998 384 1030 390" />
+
+              <g id="d16-legend" class="layer">
+                <line x1="608" y1="116" x2="650" y2="116" stroke="#c97b31" stroke-width="4" />
+                <text x="658" y="121" class="small">Fat (faster relative decay)</text>
+                <line x1="608" y1="142" x2="650" y2="142" stroke="#0b85ab" stroke-width="4" />
+                <text x="658" y="147" class="small">Water (slower relative decay)</text>
+                <line x1="608" y1="168" x2="650" y2="168" stroke="#c55252" stroke-width="4" />
+                <text x="658" y="173" class="small">Haemorrhage (intermediate)</text>
+              </g>
+
+              <g id="d16-voxel" class="layer">
+                <rect x="640" y="266" width="330" height="104" rx="10" fill="rgba(227, 244, 250, 0.82)" stroke="#8fb0c1" stroke-width="2" />
+                <text x="658" y="292" class="small">Voxel signal contribution (relative)</text>
+                <rect x="660" y="307" width="64" height="20" fill="#c97b31" />
+                <text x="732" y="323" class="small">Fat</text>
+                <rect x="660" y="333" width="116" height="20" fill="#0b85ab" />
+                <text x="784" y="349" class="small">Water</text>
+                <rect x="660" y="359" width="92" height="20" fill="#c55252" />
+                <text x="760" y="375" class="small">Haemorrhage</text>
+                <text x="854" y="350" class="small">Final voxel intensity = sum</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d17" data-diagram="d17">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 17: Exponential Attenuation Through Materials</h2>
+            <span class="step-pill">Step 1 / 5</span>
+          </div>
+          <p>Transmission decreases with thickness; material-dependent attenuation is shown by relative curve separation.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Exponential attenuation through materials">
+              <defs>
+                <linearGradient id="d17BeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="rgba(14, 138, 174, 0.36)" />
+                  <stop offset="100%" stop-color="rgba(14, 138, 174, 0.08)" />
+                </linearGradient>
+              </defs>
+
+              <g>
+                <circle cx="96" cy="170" r="22" fill="#1f627f" stroke="#0f455b" stroke-width="4" />
+                <text x="40" y="130" class="small">X-ray source</text>
+              </g>
+
+              <rect x="130" y="154" width="170" height="32" rx="16" fill="url(#d17BeamGrad)" stroke="#0b85ab" stroke-width="2.5" />
+              <text x="148" y="145" class="small">Initial intensity I0</text>
+
+              <rect id="d17-thin" class="layer" x="330" y="102" width="72" height="136" fill="#b8c9d3" stroke="#6f8a98" stroke-width="3" />
+              <text id="d17-thin-label" class="layer small" x="332" y="92">Thin material</text>
+              <rect id="d17-beam-thin" class="layer" x="402" y="158" width="130" height="24" rx="12" fill="rgba(11,133,171,0.35)" />
+
+              <rect id="d17-thick" class="layer" x="560" y="86" width="180" height="170" fill="#aebfc9" stroke="#6f8a98" stroke-width="3" />
+              <text id="d17-thick-label" class="layer small" x="564" y="76">Thicker material</text>
+              <rect id="d17-beam-thick" class="layer" x="740" y="162" width="70" height="16" rx="8" fill="rgba(11,133,171,0.35)" />
+              <text id="d17-thick-note" class="layer small" x="736" y="205">Lower transmitted intensity</text>
+
+              <rect x="90" y="290" width="980" height="180" fill="rgba(249, 254, 255, 0.9)" stroke="#aec3d0" stroke-width="2" />
+              <line x1="120" y1="446" x2="1030" y2="446" stroke="#4f7084" stroke-width="4" />
+              <line x1="120" y1="446" x2="120" y2="314" stroke="#4f7084" stroke-width="3" />
+              <text x="506" y="486" class="label">Thickness</text>
+              <text x="80" y="390" transform="rotate(-90 80 390)" class="label">Transmission</text>
+
+              <path id="d17-exp" class="curve" stroke="#0b85ab"
+                d="M120 324 C220 342 320 362 420 384 C520 404 620 420 720 432 C820 439 920 444 1030 446" />
+
+              <path id="d17-matA" class="curve" stroke="#13936f"
+                d="M120 336 C220 350 320 370 420 390 C520 408 620 422 720 432 C820 438 920 443 1030 446" />
+              <path id="d17-matB" class="curve" stroke="#c55252"
+                d="M120 314 C220 332 320 354 420 382 C520 410 620 425 720 436 C820 442 920 445 1030 447" />
+
+              <text id="d17-mat-note" class="layer small" x="694" y="334">Material with higher attenuation drops faster</text>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d18" data-diagram="d18">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 18: Sinusoidal Wave and Period-Frequency Relationship</h2>
+            <span class="step-pill">Step 1 / 5</span>
+          </div>
+          <p>Shows inverse relationship between period and frequency while preserving amplitude independence.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Sinusoidal wave period and frequency relationship">
+              <defs>
+                <marker id="d18Arrow" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <polygon points="0,0 10,5 0,10" fill="#2a5f77" />
+                </marker>
+              </defs>
+
+              <rect x="80" y="70" width="980" height="360" fill="rgba(250, 254, 255, 0.9)" stroke="#adc2d0" stroke-width="2" />
+              <line x1="100" y1="250" x2="1030" y2="250" stroke="#4f7084" stroke-width="3.5" />
+              <line x1="100" y1="406" x2="1030" y2="406" stroke="#4f7084" stroke-width="3.5" />
+              <line x1="100" y1="406" x2="100" y2="92" stroke="#4f7084" stroke-width="3" />
+              <text x="523" y="444" class="label">Time</text>
+              <text x="58" y="256" transform="rotate(-90 58 256)" class="label">Amplitude</text>
+
+              <line id="d18-amp-arrow" x1="150" y1="250" x2="150" y2="166" stroke="#2a5f77" stroke-width="3" marker-end="url(#d18Arrow)" />
+              <line id="d18-amp-arrow2" x1="150" y1="250" x2="150" y2="334" stroke="#2a5f77" stroke-width="3" marker-end="url(#d18Arrow)" />
+              <text x="120" y="156" class="small">Amplitude</text>
+
+              <path id="d18-wave-low" class="curve" stroke="#0b85ab"
+                d="M100 250 C140 170 180 170 220 250 C260 330 300 330 340 250 C380 170 420 170 460 250 C500 330 540 330 580 250 C620 170 660 170 700 250 C740 330 780 330 820 250 C860 170 900 170 940 250 C980 330 1010 330 1030 250" />
+
+              <path id="d18-wave-high" class="curve" stroke="#13936f"
+                d="M100 250 C120 170 140 170 160 250 C180 330 200 330 220 250 C240 170 260 170 280 250 C300 330 320 330 340 250 C360 170 380 170 400 250 C420 330 440 330 460 250 C480 170 500 170 520 250 C540 330 560 330 580 250 C600 170 620 170 640 250 C660 330 680 330 700 250 C720 170 740 170 760 250 C780 330 800 330 820 250 C840 170 860 170 880 250 C900 330 920 330 940 250 C960 170 980 170 1000 250 C1014 300 1022 315 1030 250" />
+
+              <g id="d18-cycle" class="layer">
+                <rect x="220" y="118" width="240" height="264" fill="rgba(17, 144, 111, 0.14)" />
+                <line x1="220" y1="108" x2="460" y2="108" stroke="#13936f" stroke-width="3" marker-start="url(#d18Arrow)" marker-end="url(#d18Arrow)" />
+                <text x="324" y="96" class="small">One full cycle = T</text>
+              </g>
+
+              <text id="d18-formula" class="layer small" x="740" y="116">f = 1 / T (inverse relation)</text>
+
+              <g id="d18-independence" class="layer">
+                <text x="718" y="144" class="small">Amplitude unchanged while frequency changes</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d19" data-diagram="d19">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 19: PET Detection and Signal Processing</h2>
+            <span class="step-pill">Step 1 / 5</span>
+          </div>
+          <p>Opposite photons, coincidence timing, energy window filtering, and multi-LOR reconstruction concept.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="PET detection and signal processing">
+              <defs>
+                <linearGradient id="d19Ring" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#8daabd" />
+                  <stop offset="100%" stop-color="#6f8ea1" />
+                </linearGradient>
+              </defs>
+
+              <circle cx="270" cy="250" r="170" fill="none" stroke="url(#d19Ring)" stroke-width="26" />
+              <circle cx="270" cy="250" r="96" fill="#f3f8fa" stroke="#acc2cf" stroke-width="2" />
+              <text x="214" y="446" class="small">Detector ring</text>
+
+              <g id="d19-hitA" class="layer">
+                <circle cx="270" cy="80" r="16" fill="#13936f" />
+              </g>
+              <g id="d19-hitB" class="layer">
+                <circle cx="270" cy="420" r="16" fill="#13936f" />
+              </g>
+
+              <g id="d19-event" class="layer show">
+                <circle cx="270" cy="250" r="10" fill="#c55252" />
+                <line x1="252" y1="250" x2="288" y2="250" stroke="#c55252" stroke-width="3" />
+                <line x1="270" y1="232" x2="270" y2="268" stroke="#c55252" stroke-width="3" />
+                <text x="150" y="222" class="small">Annihilation event</text>
+              </g>
+
+              <line id="d19-photon1" class="ray" x1="270" y1="250" x2="270" y2="80" />
+              <line id="d19-photon2" class="ray" x1="270" y1="250" x2="270" y2="420" />
+
+              <line id="d19-lor" class="layer" x1="270" y1="80" x2="270" y2="420" stroke="#0b85ab" stroke-width="4" stroke-dasharray="9 7" />
+              <text id="d19-lor-label" class="layer small" x="292" y="258">Line of response (coincidence timing)</text>
+
+              <g id="d19-energy-window" class="layer">
+                <rect x="540" y="90" width="500" height="152" rx="12" fill="rgba(243, 250, 253, 0.96)" stroke="#8eafc0" stroke-width="2" />
+                <text x="560" y="118" class="small">Energy window discrimination</text>
+                <rect x="560" y="152" width="160" height="20" fill="#c55252" opacity="0.45" />
+                <text x="728" y="167" class="small">Rejected scatter event</text>
+                <rect x="560" y="186" width="250" height="20" fill="#13936f" opacity="0.6" />
+                <text x="818" y="201" class="small">Accepted coincidence energy</text>
+              </g>
+
+              <g id="d19-multi-lor" class="layer">
+                <line x1="135" y1="126" x2="405" y2="374" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+                <line x1="120" y1="250" x2="420" y2="250" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+                <line x1="144" y1="366" x2="392" y2="134" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+                <line x1="192" y1="406" x2="360" y2="98" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+                <circle cx="270" cy="250" r="38" fill="rgba(19, 147, 111, 0.24)" />
+                <text x="562" y="294" class="small">Multiple lines of response reconstruct tracer distribution</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d20" data-diagram="d20">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 20: Line Focus Principle Geometry</h2>
+            <span class="step-pill">Step 1 / 5</span>
+          </div>
+          <p>Actual focal spot on an angled anode projects to a smaller effective focal spot for better resolution.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Line focus principle geometry">
+              <defs>
+                <marker id="d20Arrow" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <polygon points="0,0 10,5 0,10" fill="#2d5f77" />
+                </marker>
+              </defs>
+
+              <rect x="90" y="90" width="920" height="330" fill="rgba(249, 254, 255, 0.9)" stroke="#acc2cf" stroke-width="2" />
+
+              <circle cx="170" cy="250" r="22" fill="#1f627f" stroke="#0f455b" stroke-width="4" />
+              <text x="108" y="214" class="small">Electron beam</text>
+              <line x1="194" y1="250" x2="498" y2="250" stroke="#0b85ab" stroke-width="4" marker-end="url(#d20Arrow)" />
+
+              <line id="d20-anode" x1="500" y1="330" x2="700" y2="170" stroke="#6b808d" stroke-width="22" stroke-linecap="round" />
+              <text x="710" y="176" class="small">Angled anode</text>
+
+              <line id="d20-actual" x1="562" y1="280" x2="626" y2="228" stroke="#c55252" stroke-width="8" stroke-linecap="round" />
+              <text id="d20-actual-label" class="small" x="500" y="310">Actual focal spot</text>
+
+              <line x1="750" y1="120" x2="750" y2="390" stroke="#8aa5b3" stroke-width="2" stroke-dasharray="8 6" />
+              <rect x="770" y="120" width="170" height="270" rx="10" fill="#deebf1" stroke="#8aa5b3" stroke-width="3" />
+              <text x="782" y="110" class="small">Projected detector plane</text>
+
+              <line id="d20-effective" class="layer" x1="785" y1="250" x2="832" y2="250" stroke="#13936f" stroke-width="8" stroke-linecap="round" />
+              <text id="d20-effective-label" class="layer small" x="844" y="255">Effective focal spot</text>
+
+              <g id="d20-projection-lines" class="layer">
+                <line x1="562" y1="280" x2="785" y2="250" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+                <line x1="626" y1="228" x2="832" y2="250" stroke="#0b85ab" stroke-width="2.5" stroke-dasharray="8 6" />
+              </g>
+
+              <g id="d20-angle-change" class="layer">
+                <line x1="500" y1="312" x2="705" y2="210" stroke="#6b808d" stroke-width="22" stroke-linecap="round" />
+                <line x1="562" y1="280" x2="618" y2="252" stroke="#c55252" stroke-width="8" stroke-linecap="round" />
+                <line x1="785" y1="250" x2="820" y2="250" stroke="#13936f" stroke-width="8" stroke-linecap="round" />
+                <text x="498" y="348" class="small">Smaller anode angle -> smaller effective focal spot</text>
+              </g>
+
+              <g id="d20-tradeoff" class="layer">
+                <rect x="120" y="334" width="540" height="62" rx="10" fill="rgba(231, 245, 250, 0.92)" stroke="#8bb0c2" stroke-width="2" />
+                <text x="136" y="358" class="small">Line focus principle:</text>
+                <text x="136" y="378" class="small">Large actual focal area spreads heat load, smaller effective spot improves spatial resolution.</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="quiet-note">
+      Diagrams 21-24 were not included in the message content that arrived (the order truncated at Diagram 20 Step 1). This file is ready to extend with the same step-state architecture as soon as you send the remaining diagram definitions.
+    </section>
+  </main>
+
+  <script>
+    const toggle = (root, selector, on) => {
+      root.querySelectorAll(selector).forEach((el) => el.classList.toggle("show", Boolean(on)));
+    };
+
+    const config = {
+      d16: {
+        steps: [
+          "Different tissues align in the main magnetic field.",
+          "RF excitation produces transverse magnetisation.",
+          "Different tissues have different relaxation times.",
+          "Signal intensity depends on T1 and T2 properties.",
+          "Final image signal is the sum of tissue contributions."
+        ],
+        notes: [
+          "Different tissues produce different transverse signal decay and recovery behavior.",
+          "RF excitation rotates net magnetization away from B0, creating measurable transverse signal.",
+          "Relative relaxation differences drive contrast weighting in MRI sequences.",
+          "Voxel intensity represents combined contribution of tissues within the voxel volume.",
+          "The diagram emphasizes qualitative contrast behavior, not exact sequence timing numbers."
+        ],
+        render(state, root) {
+          const step = state.step;
+          const fat = root.querySelector("#d16-v-fat");
+          const water = root.querySelector("#d16-v-water");
+          const hemo = root.querySelector("#d16-v-hemo");
+
+          if (step === 1) {
+            fat.setAttribute("x2", "180");
+            fat.setAttribute("y2", "220");
+            water.setAttribute("x2", "300");
+            water.setAttribute("y2", "220");
+            hemo.setAttribute("x2", "420");
+            hemo.setAttribute("y2", "220");
+          } else if (step === 2) {
+            fat.setAttribute("x2", "270");
+            fat.setAttribute("y2", "320");
+            water.setAttribute("x2", "390");
+            water.setAttribute("y2", "320");
+            hemo.setAttribute("x2", "510");
+            hemo.setAttribute("y2", "320");
+          } else {
+            fat.setAttribute("x2", "225");
+            fat.setAttribute("y2", "320");
+            water.setAttribute("x2", "405");
+            water.setAttribute("y2", "320");
+            hemo.setAttribute("x2", "490");
+            hemo.setAttribute("y2", "320");
+          }
+
+          toggle(root, "#d16-rf", step >= 2);
+          toggle(root, "#d16-fat-curve", step >= 4);
+          toggle(root, "#d16-water-curve", step >= 4);
+          toggle(root, "#d16-hemo-curve", step >= 4);
+          toggle(root, "#d16-legend", step >= 4);
+          toggle(root, "#d16-voxel", step >= 5);
+        }
+      },
+      d17: {
+        steps: [
+          "Initial intensity before entering material.",
+          "Some photons are attenuated.",
+          "Greater thickness causes greater attenuation.",
+          "Attenuation follows exponential decay.",
+          "Different materials attenuate differently."
+        ],
+        notes: [
+          "Transmission falls with thickness in an exponential manner for monoenergetic assumptions.",
+          "Larger thickness reduces transmitted intensity more strongly than small thickness changes.",
+          "Different materials have different attenuation coefficients, changing curve steepness.",
+          "Relative trends are key for imaging contrast and beam hardening understanding.",
+          "The model demonstrates relationship behavior rather than exact mu values."
+        ],
+        render(state, root) {
+          const step = state.step;
+          toggle(root, "#d17-thin", step >= 2);
+          toggle(root, "#d17-thin-label", step >= 2);
+          toggle(root, "#d17-beam-thin", step >= 2);
+          toggle(root, "#d17-thick", step >= 3);
+          toggle(root, "#d17-thick-label", step >= 3);
+          toggle(root, "#d17-beam-thick", step >= 3);
+          toggle(root, "#d17-thick-note", step >= 3);
+          toggle(root, "#d17-exp", step >= 4);
+          toggle(root, "#d17-matA", step >= 5);
+          toggle(root, "#d17-matB", step >= 5);
+          toggle(root, "#d17-mat-note", step >= 5);
+        }
+      },
+      d18: {
+        steps: [
+          "A wave repeats periodically.",
+          "One complete cycle defines the period.",
+          "Frequency is the inverse of period.",
+          "Higher frequency means shorter period.",
+          "Amplitude and frequency are independent."
+        ],
+        notes: [
+          "A periodic waveform repeats after one period T.",
+          "Frequency and period are inversely related, f = 1 / T.",
+          "Increasing frequency shortens cycle spacing while amplitude can remain fixed.",
+          "Amplitude controls signal magnitude; frequency controls oscillation rate.",
+          "Separating these concepts is essential in ultrasound and MR signal interpretation."
+        ],
+        render(state, root) {
+          const step = state.step;
+          toggle(root, "#d18-wave-low", step >= 1 && step < 4);
+          toggle(root, "#d18-cycle", step >= 2 && step < 4);
+          toggle(root, "#d18-formula", step >= 3);
+          toggle(root, "#d18-wave-high", step >= 4);
+          toggle(root, "#d18-independence", step >= 5);
+
+          // Amplitude markers stay fixed to show independence.
+          root.querySelector("#d18-amp-arrow").setAttribute("y2", "166");
+          root.querySelector("#d18-amp-arrow2").setAttribute("y2", "334");
+        }
+      },
+      d19: {
+        steps: [
+          "Positron annihilation produces two photons.",
+          "Photons travel approximately 180 degrees apart.",
+          "Coincidence detection defines line of response.",
+          "Energy discrimination removes scattered photons.",
+          "Image is reconstructed from many detected events."
+        ],
+        notes: [
+          "PET annihilation generates two gamma photons emitted nearly back-to-back.",
+          "Coincidence timing between opposite detectors defines each line of response.",
+          "Energy windowing reduces acceptance of scattered, mispositioning photons.",
+          "Many valid lines of response are required for stable activity reconstruction.",
+          "The figure captures detector-physics relationships rather than scanner timing constants."
+        ],
+        render(state, root) {
+          const step = state.step;
+          toggle(root, "#d19-event", step >= 1);
+          toggle(root, "#d19-photon1", step >= 2);
+          toggle(root, "#d19-photon2", step >= 2);
+          toggle(root, "#d19-hitA", step >= 3);
+          toggle(root, "#d19-hitB", step >= 3);
+          toggle(root, "#d19-lor", step >= 3);
+          toggle(root, "#d19-lor-label", step >= 3);
+          toggle(root, "#d19-energy-window", step >= 4);
+          toggle(root, "#d19-multi-lor", step >= 5);
+        }
+      },
+      d20: {
+        steps: [
+          "Actual focal spot exists on the anode surface.",
+          "Anode angulation creates a projected focal spot.",
+          "Effective focal spot is smaller than the actual focal spot.",
+          "Reducing anode angle further reduces effective focal spot.",
+          "Line focus principle balances heat loading and spatial resolution."
+        ],
+        notes: [
+          "Line-focus principle uses an angled anode to reduce apparent focal spot size.",
+          "Actual focal track area remains larger for heat loading while effective spot appears smaller.",
+          "Smaller effective focal spot improves geometric sharpness in the image plane.",
+          "Anode angle changes alter effective focal dimensions and intensity distribution.",
+          "This trade-off underpins practical tube design between resolution and tube loading."
+        ],
+        render(state, root) {
+          const step = state.step;
+          toggle(root, "#d20-actual", step >= 1);
+          toggle(root, "#d20-actual-label", step >= 1);
+          toggle(root, "#d20-projection-lines", step >= 2);
+          toggle(root, "#d20-effective", step >= 3);
+          toggle(root, "#d20-effective-label", step >= 3);
+          toggle(root, "#d20-angle-change", step >= 4);
+          toggle(root, "#d20-tradeoff", step >= 5);
+        }
+      }
+    };
+
+    class StepStateMachine {
+      constructor(root, model) {
+        this.root = root;
+        this.model = model;
+        this.state = { step: 1 };
+
+        this.caption = root.querySelector(".caption");
+        this.pill = root.querySelector(".step-pill");
+        this.prev = root.querySelector('[data-action="prev"]');
+        this.next = root.querySelector('[data-action="next"]');
+        this.reset = root.querySelector('[data-action="reset"]');
+        this.info = document.createElement("div");
+        this.info.className = "info-panel";
+        root.querySelector(".controls").before(this.info);
+        const notesList = (this.model.notes || []).map((item) => `<li>${item}</li>`).join("");
+        this.info.innerHTML = `
+          <h3 class="info-title">Physics Notes</h3>
+          <ul class="info-list">${notesList}</ul>
+          <p class="info-ref">Reference alignment: Farr's Physics for Medical Imaging (3rd ed., 2024), with emphasis on relative trends and geometric logic.</p>
+        `;
+
+        this.bind();
+        this.render();
+      }
+
+      bind() {
+        this.prev.addEventListener("click", () => {
+          if (this.state.step > 1) {
+            this.state.step -= 1;
+            this.render();
+          }
+        });
+
+        this.next.addEventListener("click", () => {
+          if (this.state.step < this.model.steps.length) {
+            this.state.step += 1;
+            this.render();
+          }
+        });
+
+        this.reset.addEventListener("click", () => {
+          this.state.step = 1;
+          this.render();
+        });
+      }
+
+      render() {
+        const total = this.model.steps.length;
+        this.caption.textContent = this.model.steps[this.state.step - 1];
+        this.pill.textContent = `Step ${this.state.step} / ${total}`;
+        this.prev.disabled = this.state.step === 1;
+        this.next.disabled = this.state.step === total;
+        this.model.render(this.state, this.root);
+      }
+    }
+
+    document.querySelectorAll(".diagram-card").forEach((card) => {
+      const key = card.dataset.diagram;
+      new StepStateMachine(card, config[key]);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Physics Exam Step Guide</title>
+  <style>
+    :root {
+      --bg: #f6f9ff;
+      --panel: #ffffff;
+      --line: #dbe6f8;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #0b5ed7;
+      --warn: #b45309;
+      --ok: #0f766e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 12% 8%, #ffffff, var(--bg));
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      padding: 14px;
+    }
+
+    .layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(11, 94, 215, 0.08);
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: sticky;
+      top: 10px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+    }
+
+    h1 { margin: 0; font-size: 1.06rem; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.35; }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid #cbd8ee;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 0.9rem;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .btn2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-weight: 650;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+      font-size: 0.85rem;
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #475569, #334155);
+    }
+
+    button.warn {
+      background: linear-gradient(120deg, #b45309, #d97706);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .main {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .fact-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .fact-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e1ecff;
+      color: #1d4ed8;
+      border: 1px solid #c9dbff;
+    }
+
+    .fact-text {
+      font-size: 1rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .explain {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: #334155;
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+    }
+
+    .formula {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #0b3a7c;
+      background: #eef4ff;
+      border: 1px solid #d7e5ff;
+      border-radius: 8px;
+      padding: 8px;
+      white-space: pre-wrap;
+    }
+
+    .diagram-box {
+      border: 1px solid #d6e4fb;
+      border-radius: 8px;
+      padding: 8px;
+      background: #f4f8ff;
+      display: grid;
+      gap: 6px;
+    }
+
+    .diagram-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+
+    .diagram-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .diagram-link {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #bfd5ff;
+      background: #eaf2ff;
+      color: #0b4ac8;
+      text-decoration: none;
+    }
+
+    .diagram-link:hover {
+      background: #dceaff;
+      border-color: #99bcff;
+    }
+
+    .list-wrap {
+      display: grid;
+      gap: 8px;
+      max-height: calc(100vh - 220px);
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbff;
+      padding: 8px;
+      font-size: 0.84rem;
+      line-height: 1.35;
+      color: #334155;
+    }
+
+    .mini b { color: #0f172a; }
+    .ok { color: var(--ok); font-weight: 700; }
+    .warn-txt { color: var(--warn); font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+      .list-wrap { max-height: none; }
+      .quick-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>MRI Physics Exam Step Guide</h1>
+      <p class="subtitle">New version built from your full topic list. Review one item at a time, or switch to all cards.</p>
+
+      <section class="section">
+        <div class="row"><span>Study Mode</span><strong id="modeLabel">Step-by-step</strong></div>
+        <select id="modeSelect">
+          <option value="step">Step-by-step (one fact at a time)</option>
+          <option value="all">All facts (filtered list)</option>
+        </select>
+        <div class="btn2">
+          <button id="prevBtn" class="secondary">Previous</button>
+          <button id="nextBtn">Next</button>
+        </div>
+        <div class="row"><span>Progress</span><strong id="progressLabel">1 / 1</strong></div>
+      </section>
+
+      <section class="section">
+        <div class="subtitle">Topic filter</div>
+        <select id="categorySelect"></select>
+        <input id="searchInput" type="text" placeholder="Search keyword (e.g., TR, k-space, STIR, SAR)" />
+      </section>
+
+      <section class="section">
+        <div class="subtitle">Exam formulas</div>
+        <div class="formula" id="formulaBox">Select a fact to show linked formula.</div>
+      </section>
+
+      <section class="section">
+        <div class="subtitle">High-yield reminders</div>
+        <div class="mini"><b>T1w:</b> short TR + short TE. Fat tends to be bright, water darker.</div>
+        <div class="mini"><b>T2w:</b> long TR + long TE. Water/CSF bright, fat relatively darker.</div>
+        <div class="mini"><b>Scan time:</b> TR x phase steps x NEX (<span class="warn-txt">phase matrix drives time</span>).</div>
+        <div class="mini"><b>Chemical shift:</b> along frequency-encoding axis. Shift (pixels) = Δf / BW per pixel.</div>
+      </section>
+    </aside>
+
+    <section class="card main">
+      <div id="stepContainer" class="fact-card"></div>
+      <div id="allContainer" class="list-wrap"></div>
+
+      <section class="quick-grid">
+        <div class="mini">
+          <b>Contrast control:</b><br />
+          TR and TE control weighting. Inversion recovery adds TI for nulling.<br />
+          <span class="ok">FLAIR:</span> nulls CSF. <span class="ok">STIR:</span> nulls fat (avoid post-gadolinium).
+        </div>
+        <div class="mini">
+          <b>Artifact triad:</b><br />
+          Chemical shift (fat-water frequency difference), susceptibility (field distortion), aliasing (FOV too small).
+        </div>
+        <div class="mini">
+          <b>Spatial resolution:</b><br />
+          matrix, FOV, slice thickness define voxel dimensions and partial-volume behavior.
+        </div>
+        <div class="mini">
+          <b>Safety:</b><br />
+          MR-safe / conditional / unsafe, SAR limits, projectile risk, RF burns, quench preparedness.
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const FACTS = [
+      {
+        c: "Core Signal",
+        f: "MRI uses the magnetic behavior of hydrogen protons to align spins and detect emitted RF signal.",
+        e: "Abundant hydrogen in water/fat makes tissue signal practical at clinical field strengths.",
+        q: "Larmor: omega = gamma * B0"
+      },
+      {
+        c: "Core Signal",
+        f: "MRI signal intensity depends on proton density, T1, and T2 properties.",
+        e: "Contrast is a combined tissue-property and sequence-timing effect.",
+        q: "Signal ~ f(PD, T1, T2, TR, TE, flip)"
+      },
+      {
+        c: "Relaxation",
+        f: "T1 (spin-lattice) reflects longitudinal recovery; fat has shorter T1 than water.",
+        e: "Short T1 tissues recover faster toward +Mz and can appear brighter on T1-weighted scans.",
+        q: "Mz(t) = M0 * (1 - exp(-t/T1))"
+      },
+      {
+        c: "Relaxation",
+        f: "T2 (spin-spin) reflects loss of phase coherence; water-rich tissues usually have longer T2 than fat.",
+        e: "Long T2 supports prolonged transverse signal and higher T2-weighted brightness.",
+        q: "Mxy(t) = Mxy0 * exp(-t/T2)"
+      },
+      {
+        c: "Relaxation",
+        f: "T2* includes intrinsic T2 decay plus dephasing from B0 inhomogeneity and susceptibility.",
+        e: "Gradient echo is T2*-sensitive because it lacks a 180° refocusing pulse.",
+        q: "1/T2* = 1/T2 + 1/T2_prime"
+      },
+      {
+        c: "Weighting",
+        f: "Proton-density weighting is obtained when T1 and T2 influence are minimized.",
+        e: "Typically long TR and short TE are used so PD dominates image contrast.",
+        q: "PDw: long TR, short TE"
+      },
+      {
+        c: "Weighting",
+        f: "TR and TE are the primary timing knobs controlling T1 vs T2 contrast behavior.",
+        e: "Short TR biases T1; long TE emphasizes T2 decay differences.",
+        q: "T1w: short TR/TE, T2w: long TR/TE"
+      },
+      {
+        c: "Sequence Basics",
+        f: "Spin echo uses 90° excitation followed by 180° refocusing to reduce static dephasing effects.",
+        e: "This improves robustness against susceptibility compared with gradient echo.",
+        q: "TE (spin echo) measured from 90° center to echo center"
+      },
+      {
+        c: "Sequence Basics",
+        f: "Gradient echo is faster than spin echo but more sensitive to susceptibility and flow artifacts.",
+        e: "No 180° pulse means dephasing is not fully refocused.",
+        q: "GRE contrast depends on flip, TR, TE, T2*"
+      },
+      {
+        c: "Tissue Appearance",
+        f: "Fat is usually bright on T1-weighted images and relatively darker on T2-weighted images unless fat suppression is off/variable.",
+        e: "Sequence implementation can modify this baseline pattern.",
+        q: ""
+      },
+      {
+        c: "Tissue Appearance",
+        f: "Water-containing tissues are usually darker on T1 and bright on T2-weighted images.",
+        e: "Long T1 and long T2 behavior drives this classic appearance.",
+        q: ""
+      },
+      {
+        c: "Inversion Recovery",
+        f: "Inversion recovery starts with 180° inversion and uses TI to null selected tissue.",
+        e: "Nulling occurs where longitudinal magnetization crosses zero before readout.",
+        q: "TI_null = T1 * ln(2)"
+      },
+      {
+        c: "Inversion Recovery",
+        f: "FLAIR is an IR sequence designed to suppress CSF signal and improve lesion conspicuity near ventricles.",
+        e: "Useful for periventricular and cortical/subcortical pathology assessment.",
+        q: ""
+      },
+      {
+        c: "Inversion Recovery",
+        f: "STIR suppresses fat and is commonly used in musculoskeletal imaging; it is not used for post-gadolinium T1 enhancement evaluation.",
+        e: "STIR nulls by T1, so gadolinium-shortened T1 tissue can also be attenuated.",
+        q: ""
+      },
+      {
+        c: "Resolution & Geometry",
+        f: "Spatial resolution is governed by matrix size, FOV, and slice thickness.",
+        e: "These terms define voxel dimensions and partial-volume effects.",
+        q: "Voxel = (FOVfreq/matrixfreq) * (FOVphase/matrixphase) * slice thickness"
+      },
+      {
+        c: "Resolution & Geometry",
+        f: "A pixel is a 2D in-plane unit; a voxel is that pixel extended through slice thickness.",
+        e: "Voxel volume is what affects SNR and partial-volume averaging.",
+        q: ""
+      },
+      {
+        c: "Resolution & Geometry",
+        f: "Partial-volume effects increase when voxel size exceeds small-structure size.",
+        e: "Smaller voxels improve detail but usually reduce SNR.",
+        q: ""
+      },
+      {
+        c: "Resolution & Geometry",
+        f: "Halving FOV (same matrix and slice thickness) improves in-plane resolution by 2 but reduces voxel volume by 4 and lowers SNR substantially.",
+        e: "Resolution-SNR tradeoff must be balanced clinically.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "Chemical shift artifact occurs at fat-water interfaces due to resonance frequency difference.",
+        e: "It appears along the frequency-encoding axis, often as dark/bright boundary misregistration rather than true enhancement.",
+        q: "Shift (pixels) = Delta f / (receiver BW per pixel)"
+      },
+      {
+        c: "Artifacts",
+        f: "Narrow receiver bandwidth increases chemical-shift displacement; wide bandwidth reduces it.",
+        e: "Tradeoff: wide bandwidth usually lowers SNR.",
+        q: "BW up => chem shift down, SNR down"
+      },
+      {
+        c: "Artifacts",
+        f: "Reducing FOV can reduce apparent chemical-shift displacement in mm because pixel size shrinks, but the pixel-shift formula still depends on BW per pixel.",
+        e: "Know pixel-shift vs physical-distance distinction for exams.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "Susceptibility artifact comes from local field distortion near air-bone boundaries or metal and worsens at higher field strength.",
+        e: "More pronounced in GRE/EPI than in spin echo.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "Aliasing (wrap-around) happens when FOV is too small and anatomy outside FOV is mapped into the image.",
+        e: "Fixes include larger FOV, oversampling, or anti-alias methods.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "Gradient nonlinearity can create geometric distortion, especially at image edges.",
+        e: "Distortion correction is often vendor/system dependent.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "Motion artifacts (respiration, cardiac pulsation, patient movement) degrade image quality.",
+        e: "Gating, navigators, and faster acquisition methods reduce motion burden.",
+        q: ""
+      },
+      {
+        c: "Artifacts",
+        f: "B0 inhomogeneity causes signal loss and distortion, notably in GRE and EPI.",
+        e: "Shimming improves homogeneity and reduces these artifacts.",
+        q: ""
+      },
+      {
+        c: "Bandwidth",
+        f: "Bandwidth affects SNR and chemical shift, but not voxel size directly.",
+        e: "Spatial resolution comes from matrix/FOV/slice thickness, not receiver bandwidth alone.",
+        q: ""
+      },
+      {
+        c: "Bandwidth",
+        f: "Narrow receiver bandwidth increases SNR but worsens chemical shift and lengthens minimum TE.",
+        e: "Sampling more slowly across a narrower frequency window requires longer readout timing.",
+        q: ""
+      },
+      {
+        c: "Bandwidth",
+        f: "Wide receiver bandwidth reduces chemical shift and allows shorter minimum TE but decreases SNR.",
+        e: "Used when artifact reduction or shorter TE is prioritized.",
+        q: ""
+      },
+      {
+        c: "Bandwidth",
+        f: "Transmit RF bandwidth is used in slice selection and does affect slice thickness; receiver bandwidth does not set slice thickness.",
+        e: "This distinction is commonly tested.",
+        q: "Slice thickness ~ RF transmit BW / Gslice"
+      },
+      {
+        c: "Spatial Encoding",
+        f: "Slice selection uses a gradient plus frequency-selective RF pulse to excite one plane.",
+        e: "Only spins in matching frequency band are tipped.",
+        q: "Slice thickness = RF BW / Gss"
+      },
+      {
+        c: "Spatial Encoding",
+        f: "Phase encoding sets spatial location along one axis by applying multiple gradient steps.",
+        e: "Each phase step fills one line of k-space.",
+        q: "Scan time = TR * Nphase * NEX"
+      },
+      {
+        c: "Spatial Encoding",
+        f: "Frequency encoding is applied during readout and defines spatial localization along the orthogonal axis.",
+        e: "Chemical shift artifact appears along this encoding direction.",
+        q: ""
+      },
+      {
+        c: "k-Space",
+        f: "k-space stores raw spatial-frequency data, not a direct anatomical image.",
+        e: "Image appears after Fourier reconstruction of full sampled data.",
+        q: ""
+      },
+      {
+        c: "k-Space",
+        f: "Spatial information in phase direction is complete only after all phase-encoding steps are acquired.",
+        e: "Typical phase matrices are 128, 256, 512 (system/protocol dependent).",
+        q: ""
+      },
+      {
+        c: "k-Space",
+        f: "Only increases in the phase matrix increase scan time directly (with other terms fixed).",
+        e: "Frequency matrix changes readout sampling load but not TR x phase steps structure.",
+        q: "Scan time = TR * phase steps * NEX"
+      },
+      {
+        c: "Fast Imaging",
+        f: "EPI rapidly acquires many/all k-space lines and is common in diffusion and fMRI.",
+        e: "Speed is high but distortion/susceptibility sensitivity is also high.",
+        q: ""
+      },
+      {
+        c: "Fast Imaging",
+        f: "Parallel imaging (SENSE/GRAPPA) accelerates MRI by under-sampling k-space with multi-channel coils.",
+        e: "Acceleration trades with SNR and possible reconstruction artifacts.",
+        q: ""
+      },
+      {
+        c: "Fast Imaging",
+        f: "Compressed sensing reconstructs from sparse sampling to reduce scan time.",
+        e: "Relies on sparsity constraints and iterative reconstruction.",
+        q: ""
+      },
+      {
+        c: "Diffusion & Functional",
+        f: "DWI measures Brownian motion of water and is highly sensitive to acute infarction.",
+        e: "Restricted diffusion often appears bright on high-b DWI.",
+        q: ""
+      },
+      {
+        c: "Diffusion & Functional",
+        f: "ADC maps derived from DWI help confirm true restriction versus T2 shine-through.",
+        e: "True restriction: high DWI with low ADC.",
+        q: ""
+      },
+      {
+        c: "Diffusion & Functional",
+        f: "T2 shine-through is high T2 signal that can mimic restricted diffusion on DWI.",
+        e: "ADC map interpretation resolves this pitfall.",
+        q: ""
+      },
+      {
+        c: "Diffusion & Functional",
+        f: "fMRI/BOLD detects deoxyhemoglobin-related signal changes linked to neural activity.",
+        e: "It is a hemodynamic surrogate, not direct neuronal current measurement.",
+        q: ""
+      },
+      {
+        c: "Diffusion & Functional",
+        f: "DTI evaluates diffusion anisotropy and enables tractography of white-matter pathways.",
+        e: "Used in presurgical mapping and connectivity studies.",
+        q: ""
+      },
+      {
+        c: "Angio & Perfusion",
+        f: "MRA can be contrast-enhanced or non-contrast flow sensitive.",
+        e: "TOF highlights inflow; phase-contrast encodes velocity/direction.",
+        q: ""
+      },
+      {
+        c: "Angio & Perfusion",
+        f: "ASL is a non-contrast perfusion technique using magnetically labeled blood.",
+        e: "Useful when gadolinium is contraindicated.",
+        q: ""
+      },
+      {
+        c: "Cardiac MRI",
+        f: "Cardiac MRI uses ECG gating and cine imaging for function and wall-motion assessment.",
+        e: "Additional techniques evaluate perfusion, viability, and tissue characterization.",
+        q: ""
+      },
+      {
+        c: "Cardiac MRI",
+        f: "Late gadolinium enhancement identifies fibrosis/infarction patterns.",
+        e: "Inversion timing is set to null normal myocardium for contrast.",
+        q: ""
+      },
+      {
+        c: "Advanced Contrast",
+        f: "Magnetization transfer suppresses background tissue by exchange between bound and free proton pools.",
+        e: "Useful in neuro and vessel wall applications.",
+        q: ""
+      },
+      {
+        c: "Advanced Contrast",
+        f: "Saturation recovery with short TR suppresses long-T1 components and increases T1 weighting.",
+        e: "Common principle in fast T1-prepared methods.",
+        q: ""
+      },
+      {
+        c: "Advanced Contrast",
+        f: "T1/T2 mapping provides quantitative tissue values rather than only qualitative weighting.",
+        e: "Important in myocarditis, fibrosis, edema, and diffuse disease workups.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "Clinical MRI uses superconducting magnets cooled by liquid helium for high field strength (e.g., 1.5T, 3T).",
+        e: "Higher B0 increases SNR but can increase susceptibility and SAR concerns.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "RF shielding (Faraday cage) reduces external electromagnetic interference.",
+        e: "Prevents corruption of low-level MR receive signals.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "SAR measures RF energy deposition and is regulated to limit tissue heating.",
+        e: "High-duty-cycle sequences require careful SAR management.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "MR-safe, MR-conditional, and MR-unsafe are standardized compatibility labels.",
+        e: "Always verify device-specific conditions before scanning.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "Ferromagnetic objects are dangerous due to projectile risk and device malfunction in strong fields.",
+        e: "Strict zone control and screening are essential.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "Magnet quench is loss of superconductivity with cryogen boil-off and major field collapse.",
+        e: "Quench pipes and emergency protocols are critical for safety.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "Acoustic noise comes from rapid gradient switching and requires hearing protection.",
+        e: "Particularly relevant for long or high-gradient scans.",
+        q: ""
+      },
+      {
+        c: "Hardware & Safety",
+        f: "RF burns can occur from conductive loops, cable contact, or skin-to-skin contact points.",
+        e: "Padding and cable management are key preventive measures.",
+        q: ""
+      },
+      {
+        c: "Contrast Agents",
+        f: "Gadolinium shortens T1 and increases enhancement of vascular/tumor structures on T1-weighted imaging.",
+        e: "Timing and sequence choice determine conspicuity of enhancement.",
+        q: ""
+      },
+      {
+        c: "Contrast Agents",
+        f: "Nephrogenic systemic fibrosis is a rare risk in severe renal failure after certain gadolinium exposures.",
+        e: "Risk stratification and agent selection are essential.",
+        q: ""
+      },
+      {
+        c: "SNR & Field Strength",
+        f: "SNR generally increases with field strength, voxel size, and NEX.",
+        e: "Higher SNR can be traded for speed or resolution depending on protocol goals.",
+        q: ""
+      },
+      {
+        c: "SNR & Field Strength",
+        f: "Field strength increases detail potential but can increase susceptibility and some artifacts at 3T vs 1.5T.",
+        e: "Protocol optimization is field-specific.",
+        q: ""
+      },
+      {
+        c: "Sequence Extensions",
+        f: "SWI is highly sensitive to blood products, calcium/iron, and susceptibility effects.",
+        e: "Useful in microbleed and venous/iron-deposition evaluation.",
+        q: ""
+      },
+      {
+        c: "Sequence Extensions",
+        f: "UTE/ZTE sequences allow imaging of very short-T2 tissues such as cortical bone and lung.",
+        e: "These tissues are poorly seen on conventional longer-TE methods.",
+        q: ""
+      },
+      {
+        c: "Sequence Extensions",
+        f: "MR spectroscopy reports metabolites such as NAA, choline, and creatine.",
+        e: "Supports tumor characterization and metabolic assessment.",
+        q: ""
+      },
+      {
+        c: "Workflow Limits",
+        f: "MRI limitations include longer scan times, motion sensitivity, implant/device constraints, and cost.",
+        e: "Protocol design balances diagnostic yield with patient tolerance and safety.",
+        q: ""
+      }
+    ];
+
+    const DIAGRAMS = {
+      xyz_step: {
+        label: "Auto Sequence (Step)",
+        file: "./mri-xyz-auto-simple-step-by-step.html"
+      },
+      xyz_full: {
+        label: "Auto Sequence (Full)",
+        file: "./mri-xyz-auto-simple.html"
+      },
+      seq_dyn: {
+        label: "Sequence Dynamics",
+        file: "./mri-xyz-sequence-dynamics.html"
+      },
+      rf_dyn: {
+        label: "RF Dynamics",
+        file: "./mri-rf-dynamics.html"
+      },
+      rf_180: {
+        label: "RF 180 Pulse",
+        file: "./mri-rf-180-pulse.html"
+      },
+      inv: {
+        label: "Inversion Recovery",
+        file: "./mri-inversion-recovery.html"
+      },
+      fat_relax: {
+        label: "Fat/Water Relaxation",
+        file: "./mri-fat-water-relaxation.html"
+      },
+      fat_xz: {
+        label: "Fat/Water XZ Dynamics",
+        file: "./mri-fat-water-xz-dynamics.html"
+      },
+      artifacts: {
+        label: "Artifacts Guide",
+        file: "./mri-artifacts-step-guide.html"
+      },
+      precession: {
+        label: "Precession Physics",
+        file: "./gyroscope-mri-precession-physics.html"
+      },
+      sim_v8: {
+        label: "Advanced Simulator",
+        file: "./mri-interactive-simulator-v8.html"
+      }
+    };
+
+    const CATEGORY_DIAGRAMS = {
+      "Core Signal": ["precession", "xyz_step"],
+      "Relaxation": ["fat_relax", "fat_xz", "xyz_step"],
+      "Weighting": ["xyz_step", "fat_relax"],
+      "Sequence Basics": ["rf_dyn", "rf_180", "xyz_step"],
+      "Tissue Appearance": ["fat_relax", "fat_xz"],
+      "Inversion Recovery": ["inv", "rf_180"],
+      "Resolution & Geometry": ["seq_dyn", "xyz_step"],
+      "Artifacts": ["artifacts", "xyz_step", "seq_dyn"],
+      "Bandwidth": ["artifacts", "seq_dyn"],
+      "Spatial Encoding": ["xyz_step", "seq_dyn"],
+      "k-Space": ["seq_dyn", "xyz_step"],
+      "Fast Imaging": ["seq_dyn", "sim_v8"],
+      "Diffusion & Functional": ["sim_v8", "seq_dyn"],
+      "Angio & Perfusion": ["sim_v8", "seq_dyn"],
+      "Cardiac MRI": ["sim_v8"],
+      "Advanced Contrast": ["sim_v8", "xyz_step"],
+      "Hardware & Safety": ["sim_v8", "artifacts"],
+      "Contrast Agents": ["inv", "sim_v8"],
+      "SNR & Field Strength": ["seq_dyn", "precession"],
+      "Sequence Extensions": ["sim_v8", "seq_dyn"],
+      "Workflow Limits": ["sim_v8", "xyz_step"]
+    };
+
+    const ui = {
+      modeSelect: document.getElementById("modeSelect"),
+      modeLabel: document.getElementById("modeLabel"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      progressLabel: document.getElementById("progressLabel"),
+      categorySelect: document.getElementById("categorySelect"),
+      searchInput: document.getElementById("searchInput"),
+      formulaBox: document.getElementById("formulaBox"),
+      stepContainer: document.getElementById("stepContainer"),
+      allContainer: document.getElementById("allContainer")
+    };
+
+    const state = {
+      mode: "step",
+      category: "All",
+      query: "",
+      index: 0
+    };
+
+    function norm(s) {
+      return String(s || "").toLowerCase().trim();
+    }
+
+    function buildCategoryOptions() {
+      const categories = ["All", ...Array.from(new Set(FACTS.map((x) => x.c))).sort()];
+      ui.categorySelect.innerHTML = categories.map((c) => `<option value="${c}">${c}</option>`).join("");
+    }
+
+    function getFiltered() {
+      const q = norm(state.query);
+      return FACTS.filter((x) => {
+        const byCat = state.category === "All" || x.c === state.category;
+        const byQ = !q || norm(`${x.f} ${x.e} ${x.q} ${x.c}`).includes(q);
+        return byCat && byQ;
+      });
+    }
+
+    function uniq(arr) {
+      return Array.from(new Set(arr));
+    }
+
+    function getRelevantDiagramIds(fact) {
+      const txt = norm(`${fact.c} ${fact.f} ${fact.e} ${fact.q}`);
+      let ids = [...(CATEGORY_DIAGRAMS[fact.c] || [])];
+
+      if (/inversion|flair|stir|ti null|ln\(2\)/.test(txt)) ids.push("inv");
+      if (/artifact|susceptibility|alias|wrap|distortion|inhomogeneity|chemical shift|bandwidth/.test(txt)) ids.push("artifacts");
+      if (/rf|90|180|spin echo|gradient echo|flip|larmor|precession/.test(txt)) ids.push("rf_dyn", "precession");
+      if (/phase encoding|frequency encoding|slice selection|k-space|gradient/.test(txt)) ids.push("xyz_step", "seq_dyn");
+      if (/fat|water|t1|t2|t2\*/.test(txt)) ids.push("fat_relax", "fat_xz");
+      if (/dwi|diffusion|adc|fmr|bold|dti|tract/.test(txt)) ids.push("sim_v8");
+      if (/sar|safety|quench|mr-safe|mr-conditional|mr-unsafe|projectile|burn/.test(txt)) ids.push("sim_v8");
+
+      ids = uniq(ids).filter((id) => DIAGRAMS[id]);
+      if (!ids.length) ids = ["xyz_step"];
+      return ids.slice(0, 3);
+    }
+
+    function diagramsHtml(fact) {
+      const ids = getRelevantDiagramIds(fact);
+      const links = ids.map((id) => {
+        const d = DIAGRAMS[id];
+        return `<a class="diagram-link" href="${d.file}" target="_blank" rel="noopener noreferrer">${d.label}</a>`;
+      }).join("");
+
+      return `
+        <div class="diagram-box">
+          <div class="diagram-title">Relevant diagrams</div>
+          <div class="diagram-links">${links}</div>
+        </div>
+      `;
+    }
+
+    function factCardHtml(x, i, n) {
+      return `
+        <div class="fact-head">
+          <span class="chip">${x.c}</span>
+          <span class="chip">${i + 1} / ${n}</span>
+        </div>
+        <div class="fact-text">${x.f}</div>
+        <div class="explain"><b>Why this matters:</b> ${x.e}</div>
+        ${diagramsHtml(x)}
+      `;
+    }
+
+    function renderStep(list) {
+      if (!list.length) {
+        ui.stepContainer.innerHTML = `<div class="fact-text">No matching facts. Adjust filter/search.</div>`;
+        ui.progressLabel.textContent = "0 / 0";
+        ui.formulaBox.textContent = "No formula for current filter.";
+        ui.prevBtn.disabled = true;
+        ui.nextBtn.disabled = true;
+        return;
+      }
+
+      state.index = Math.max(0, Math.min(state.index, list.length - 1));
+      const x = list[state.index];
+      ui.stepContainer.innerHTML = factCardHtml(x, state.index, list.length);
+      ui.progressLabel.textContent = `${state.index + 1} / ${list.length}`;
+      ui.formulaBox.textContent = x.q ? x.q : "No single formula tied to this fact.";
+      ui.prevBtn.disabled = state.index <= 0;
+      ui.nextBtn.disabled = state.index >= list.length - 1;
+    }
+
+    function renderAll(list) {
+      ui.allContainer.innerHTML = list.map((x, i) => {
+        return `
+          <article class="fact-card">
+            ${factCardHtml(x, i, list.length)}
+            ${x.q ? `<div class="formula">${x.q}</div>` : ""}
+          </article>
+        `;
+      }).join("");
+      ui.progressLabel.textContent = `${list.length} facts`;
+      ui.formulaBox.textContent = "All-facts mode: formulas are shown within each card when available.";
+      ui.prevBtn.disabled = true;
+      ui.nextBtn.disabled = true;
+    }
+
+    function render() {
+      const list = getFiltered();
+      const stepMode = state.mode === "step";
+      ui.modeLabel.textContent = stepMode ? "Step-by-step" : "All facts";
+      ui.stepContainer.style.display = stepMode ? "grid" : "none";
+      ui.allContainer.style.display = stepMode ? "none" : "grid";
+
+      if (stepMode) renderStep(list);
+      else renderAll(list);
+    }
+
+    function bind() {
+      ui.modeSelect.addEventListener("change", () => {
+        state.mode = ui.modeSelect.value;
+        render();
+      });
+      ui.categorySelect.addEventListener("change", () => {
+        state.category = ui.categorySelect.value;
+        state.index = 0;
+        render();
+      });
+      ui.searchInput.addEventListener("input", () => {
+        state.query = ui.searchInput.value;
+        state.index = 0;
+        render();
+      });
+      ui.prevBtn.addEventListener("click", () => {
+        state.index -= 1;
+        render();
+      });
+      ui.nextBtn.addEventListener("click", () => {
+        state.index += 1;
+        render();
+      });
+    }
+
+    buildCategoryOptions();
+    bind();
+    render();
+  </script>
+</body>
+</html>

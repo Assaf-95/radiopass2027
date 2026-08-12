@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MRI Fat-Water and Spin Echo Step-by-Step</title>
+  <style>
+    :root {
+      --bg: #040814;
+      --bg2: #0a1324;
+      --panel: rgba(8, 18, 34, 0.82);
+      --panel2: rgba(12, 28, 52, 0.72);
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #e5eefc;
+      --muted: #9fb0c8;
+      --cyan: #22d3ee;
+      --water: #60a5fa;
+      --fat: #f97316;
+      --rf: #f43f5e;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --violet: #a78bfa;
+      --shadow: 0 22px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(34, 211, 238, 0.22), transparent 30%),
+        radial-gradient(circle at 82% 14%, rgba(249, 115, 22, 0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+    }
+
+    .shell {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.7vw, 1.16rem);
+      line-height: 1.65;
+    }
+
+    .progress-pill {
+      min-width: 132px;
+      border: 1px solid rgba(34, 211, 238, 0.32);
+      border-radius: 999px;
+      padding: 12px 18px;
+      text-align: center;
+      color: #cffafe;
+      background: rgba(8, 18, 34, 0.68);
+      box-shadow: var(--shadow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.42fr) minmax(330px, 0.58fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .canvas-card,
+    .teaching-card,
+    .strip {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), rgba(7, 15, 28, 0.86));
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .canvas-card {
+      min-height: 640px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .canvas-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .legend span,
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(15, 23, 42, 0.5);
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: 1px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    #diagram {
+      min-height: 570px;
+    }
+
+    .teaching-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      min-height: 640px;
+    }
+
+    .step-kicker {
+      color: var(--cyan);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 12px 0 8px;
+      font-size: clamp(1.45rem, 2.5vw, 2.35rem);
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .explain {
+      color: #cbd5e1;
+      line-height: 1.62;
+      font-size: 1rem;
+      margin: 0 0 16px;
+    }
+
+    .notes {
+      display: grid;
+      gap: 10px;
+      margin: 10px 0 18px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .notes li {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.45);
+      border-radius: 16px;
+      padding: 12px 13px;
+      color: #dbeafe;
+      line-height: 1.42;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    button,
+    .advanced-link {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      color: #f8fafc;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(120deg, #155e75, #0f766e);
+      box-shadow: 0 12px 34px rgba(14, 116, 144, 0.22);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #334155, #1f2937);
+      box-shadow: none;
+    }
+
+    button.reset {
+      grid-column: 1 / -1;
+      background: rgba(15, 23, 42, 0.76);
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(11, 1fr);
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .timeline button {
+      min-height: 8px;
+      padding: 0;
+      border-radius: 99px;
+      background: rgba(148, 163, 184, 0.2);
+      box-shadow: none;
+      border: 0;
+    }
+
+    .timeline button.active {
+      background: linear-gradient(90deg, var(--cyan), var(--fat));
+    }
+
+    .strip {
+      margin-top: 18px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .strip strong {
+      color: #f8fafc;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .strip p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .advanced-panel {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      background: rgba(8, 47, 73, 0.34);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .advanced-panel.show {
+      display: grid;
+      gap: 10px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    @media (max-width: 930px) {
+      .hero,
+      .layout,
+      .strip {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-card,
+      .teaching-card {
+        min-height: auto;
+      }
+
+      #diagram {
+        min-height: 420px;
+      }
+
+      .progress-pill {
+        width: fit-content;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 18px, 1220px);
+        padding-top: 16px;
+      }
+
+      .canvas-card,
+      .teaching-card,
+      .strip {
+        border-radius: 20px;
+      }
+
+      .canvas-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .control-row {
+        grid-template-columns: 1fr;
+      }
+
+      button.reset {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">FRCR Physics Visual Lab</div>
+        <h1 id="page-title">MRI Fat-Water and Spin Echo Step-by-Step</h1>
+        <p class="subtitle">A guided version of the advanced MRI simulator. Each click adds one idea: hydrogen pools, B0 alignment, RF excitation, dephasing, chemical shift, refocusing, and spin echo formation.</p>
+      </div>
+      <div class="progress-pill" id="progress">Step 1 of 11</div>
+    </section>
+
+    <section class="layout">
+      <article class="canvas-card" aria-label="MRI diagram canvas">
+        <div class="canvas-head">
+          <span id="statusChip" class="chip">Hydrogen pools visible</span>
+          <div class="legend" aria-label="Legend">
+            <span><i class="dot" style="background:var(--water)"></i>Water hydrogen</span>
+            <span><i class="dot" style="background:var(--fat)"></i>Fat hydrogen</span>
+            <span><i class="dot" style="background:var(--cyan)"></i>Echo signal</span>
+          </div>
+        </div>
+        <svg id="diagram" viewBox="0 0 860 570" role="img" aria-labelledby="svgTitle svgDesc">
+          <title id="svgTitle">MRI fat-water spin echo step diagram</title>
+          <desc id="svgDesc">Interactive SVG diagram changes with each step.</desc>
+        </svg>
+      </article>
+
+      <aside class="teaching-card">
+        <div class="step-kicker" id="stepKicker">Step 1</div>
+        <h2 id="stepTitle">Hydrogen pools</h2>
+        <p class="explain" id="stepText"></p>
+        <ul class="notes" id="notes"></ul>
+
+        <div class="advanced-panel" id="advancedPanel">
+          <p class="small">The full simulator remains intact. Use it after the guided pathway, when the learner is ready for gradients, Bloch sphere controls, signal, and k-space.</p>
+          <a class="advanced-link" href="mri-interactive-simulator-v7.html">Open advanced simulator</a>
+          <a class="advanced-link" href="landing-fat-water.html">Open original fat-water simulator</a>
+        </div>
+
+        <div class="control-row" aria-label="Step controls">
+          <button id="prevBtn" class="secondary" type="button">Previous</button>
+          <button id="nextBtn" type="button">Next</button>
+          <button id="resetBtn" class="reset" type="button">Reset</button>
+        </div>
+        <div class="timeline" id="timeline" aria-label="Step timeline"></div>
+      </aside>
+    </section>
+
+    <section class="strip" aria-label="Exam focus">
+      <div>
+        <strong>Core exam idea</strong>
+        <p>Spin echo refocuses static field dephasing, so the echo follows true T2 rather than T2*.</p>
+      </div>
+      <div>
+        <strong>Fat-water idea</strong>
+        <p>Water and fat both contain hydrogen, but chemical environment changes their precession frequency slightly.</p>
+      </div>
+      <div>
+        <strong>Do not overcomplicate first</strong>
+        <p>Gradients and k-space are kept for the full simulator after the spin echo concept is secure.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const steps = [
+      {
+        title: "Hydrogen pools",
+        chip: "Hydrogen pools visible",
+        text: "MRI signal mainly comes from hydrogen nuclei. Water and fat both contain hydrogen, but the surrounding chemical environment is different, so their MR behaviour is not identical.",
+        notes: ["Water pool and fat pool are shown separately.", "This is the starting point before any RF pulse.", "FRCR trap: do not treat all hydrogen as having identical signal behaviour."]
+      },
+      {
+        title: "B0 alignment",
+        chip: "Net magnetisation aligns with B0",
+        text: "In the main magnetic field, slightly more spins align with B0 than against it. This produces net longitudinal magnetisation.",
+        notes: ["Mz is longitudinal magnetisation.", "Before excitation, transverse magnetisation is not the useful signal.", "The diagram keeps this as a single net vector rather than many random spins."]
+      },
+      {
+        title: "90 degree RF pulse",
+        chip: "RF excitation tips magnetisation",
+        text: "A 90 degree RF pulse tips net magnetisation away from the longitudinal axis into the transverse plane.",
+        notes: ["Mz decreases as the vector tips down.", "Mxy increases and becomes detectable.", "The RF pulse must be at the Larmor frequency for resonance."]
+      },
+      {
+        title: "In-phase transverse magnetisation",
+        chip: "Water and fat begin in phase",
+        text: "Immediately after excitation, water and fat transverse components are shown together. Their vectors initially point in the same direction.",
+        notes: ["Coherent transverse magnetisation gives a strong signal.", "This is the simple starting point for fat-water phase behaviour.", "No gradients or k-space are needed yet."]
+      },
+      {
+        title: "T2 star dephasing",
+        chip: "T2* dephasing reduces coherence",
+        text: "After the RF pulse, spins lose phase coherence. T2* includes true tissue T2 decay plus extra dephasing from static field inhomogeneity.",
+        notes: ["The free induction signal falls quickly.", "T2* is shorter than true T2.", "A 180 degree pulse can refocus static field dephasing, but not true T2 decay."]
+      },
+      {
+        title: "Chemical shift separation",
+        chip: "Water and fat phase separate",
+        text: "Water and fat precess at slightly different frequencies. Over time, their transverse vectors separate in phase.",
+        notes: ["This is a relative phase difference, not a physical separation of tissue.", "The visual shows water and fat vectors opening apart.", "Chemical shift is central to in-phase and opposed-phase imaging."]
+      },
+      {
+        title: "180 degree RF pulse",
+        chip: "Refocusing pulse reverses phase order",
+        text: "The 180 degree RF pulse flips the transverse magnetisation. Spins that were ahead become behind, and spins that were behind become ahead.",
+        notes: ["This reverses phase dispersion caused by static field variation.", "It does not stop true spin-spin relaxation.", "This is why spin echo is different from simple FID decay."]
+      },
+      {
+        title: "Rephasing",
+        chip: "Spins rephase toward echo",
+        text: "After the 180 degree pulse, static dephasing unwinds. The transverse components move back towards phase alignment.",
+        notes: ["The signal rises again as coherence improves.", "True T2 loss continues in the background.", "The echo does not return to the original full signal height."]
+      },
+      {
+        title: "Spin echo at TE",
+        chip: "Echo peak forms at TE",
+        text: "At echo time, TE, the refocused transverse magnetisation reaches its peak. The peak lies on the true T2 envelope.",
+        notes: ["TE is measured from the 90 degree pulse to the echo peak.", "Longer TE increases T2 weighting.", "The echo height is lower because true T2 decay still occurs."]
+      },
+      {
+        title: "Weighting summary",
+        chip: "Exam weighting summary",
+        text: "Spin echo image weighting depends mainly on TR and TE. Keep the control logic simple for FRCR: TR controls T1 weighting; TE controls T2 weighting.",
+        notes: ["Short TR and short TE: T1 weighted.", "Long TR and long TE: T2 weighted.", "Long TR and short TE: proton density weighted."]
+      },
+      {
+        title: "Advanced full simulator",
+        chip: "Advanced view available",
+        text: "The guided module deliberately hides advanced controls. The original simulator is preserved as the full view for sequence building, gradients, Bloch dynamics, signal, and k-space.",
+        notes: ["Use the full simulator after the learner understands the sequence.", "Advanced controls are powerful but too busy for the first pass.", "This guided page acts as the bridge into the complex simulator."]
+      }
+    ];
+
+    const svg = document.getElementById("diagram");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepText = document.getElementById("stepText");
+    const stepKicker = document.getElementById("stepKicker");
+    const notes = document.getElementById("notes");
+    const progress = document.getElementById("progress");
+    const statusChip = document.getElementById("statusChip");
+    const advancedPanel = document.getElementById("advancedPanel");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const timeline = document.getElementById("timeline");
+
+    let index = 0;
+
+    function point(cx, cy, angle, radius) {
+      return {
+        x: cx + Math.cos(angle) * radius,
+        y: cy + Math.sin(angle) * radius
+      };
+    }
+
+    function arrow(x1, y1, x2, y2, colour, width = 4, dash = "") {
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colour}" stroke-width="${width}" stroke-linecap="round" ${dash ? `stroke-dasharray="${dash}"` : ""} marker-end="url(#arrow)"/>`;
+    }
+
+    function label(x, y, text, colour = "#e5eefc", anchor = "middle", size = 16) {
+      return `<text x="${x}" y="${y}" fill="${colour}" text-anchor="${anchor}" font-size="${size}" font-weight="800">${text}</text>`;
+    }
+
+    function pool(x, y, colour, title, phase = 0, spread = 0) {
+      const dots = Array.from({ length: 10 }, (_, i) => {
+        const a = phase + i * 0.72 + spread * (i - 5) * 0.18;
+        const r = 28 + (i % 3) * 14;
+        const p = point(x, y, a, r);
+        return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="7" fill="${colour}" opacity="0.88"/>`;
+      }).join("");
+      return `
+        <g>
+          <circle cx="${x}" cy="${y}" r="92" fill="${colour}" opacity="0.08" stroke="${colour}" stroke-width="1.5"/>
+          ${dots}
+          ${label(x, y + 126, title, colour)}
+        </g>`;
+    }
+
+    function phaseVector(cx, cy, angle, length, colour, text) {
+      const p = point(cx, cy, angle, length);
+      return `
+        ${arrow(cx, cy, p.x.toFixed(1), p.y.toFixed(1), colour, 5)}
+        <circle cx="${cx}" cy="${cy}" r="6" fill="${colour}"/>
+        ${label(p.x + 8, p.y - 8, text, colour, "start", 14)}
+      `;
+    }
+
+    function signalCurve(step) {
+      const showEcho = step >= 7;
+      const fidFast = step >= 4;
+      const echoOpacity = step >= 8 ? 1 : 0.35;
+      const t2LabelOpacity = step >= 8 ? 1 : 0.2;
+      const t2StarPath = fidFast
+        ? "M100 468 C150 420, 205 430, 250 458 C300 492, 346 498, 390 502"
+        : "M100 468 C160 430, 230 420, 300 432 C360 444, 405 462, 450 486";
+
+      return `
+        <g transform="translate(0 0)">
+          <line x1="80" y1="510" x2="780" y2="510" stroke="rgba(226,232,240,0.28)" stroke-width="2"/>
+          <line x1="80" y1="380" x2="80" y2="510" stroke="rgba(226,232,240,0.28)" stroke-width="2"/>
+          <path d="${t2StarPath}" fill="none" stroke="#ffffff" stroke-width="4" opacity="${step >= 4 ? 0.95 : 0.35}"/>
+          <path d="M100 468 C245 405, 430 415, 640 492" fill="none" stroke="rgba(167,139,250,${t2LabelOpacity})" stroke-width="3" stroke-dasharray="8 8"/>
+          ${showEcho ? `<path d="M390 502 C440 438, 490 438, 540 502" fill="none" stroke="#22d3ee" stroke-width="5" opacity="${echoOpacity}"/>` : ""}
+          ${showEcho ? `<circle cx="465" cy="438" r="9" fill="#22d3ee" opacity="${echoOpacity}"/>` : ""}
+          ${showEcho ? label(465, 420, "TE", "#22d3ee", "middle", 15) : ""}
+          ${step >= 4 ? label(247, 415, "T2*", "#ffffff", "middle", 14) : ""}
+          ${step >= 8 ? label(620, 478, "T2", "#a78bfa", "middle", 14) : ""}
+          ${label(102, 535, "time", "rgba(203,213,225,0.78)", "start", 13)}
+          ${label(54, 386, "signal", "rgba(203,213,225,0.78)", "middle", 13)}
+        </g>`;
+    }
+
+    function renderDiagram(stepIndex) {
+      const step = stepIndex + 1;
+      const showB0 = step >= 2;
+      const showRf = step >= 3 && step <= 4;
+      const showPhase = step >= 4 && step <= 9;
+      const showWeight = step === 10;
+      const showAdvanced = step === 11;
+      const spread = step >= 5 ? (step === 5 ? 2.4 : 1.2) : 0;
+      const waterAngle = step >= 6 ? -0.55 : -0.2;
+      const fatAngle = step >= 6 ? (step === 7 ? -1.7 : step === 8 ? -0.75 : step === 9 ? -0.55 : 0.78) : -0.2;
+
+      const phasePanel = showPhase ? `
+        <g>
+          <circle cx="430" cy="210" r="118" fill="rgba(15,23,42,0.48)" stroke="rgba(226,232,240,0.16)" stroke-width="2"/>
+          <circle cx="430" cy="210" r="78" fill="none" stroke="rgba(226,232,240,0.12)" stroke-width="1.5"/>
+          <line x1="312" y1="210" x2="548" y2="210" stroke="rgba(226,232,240,0.18)"/>
+          <line x1="430" y1="92" x2="430" y2="328" stroke="rgba(226,232,240,0.18)"/>
+          ${phaseVector(430, 210, waterAngle, 95, "#60a5fa", "water")}
+          ${phaseVector(430, 210, fatAngle, 83, "#f97316", "fat")}
+          ${step >= 5 ? pool(215, 220, "#60a5fa", "", -0.2, spread) : ""}
+          ${step >= 5 ? pool(645, 220, "#f97316", "", 0.3, spread) : ""}
+          ${step === 7 ? label(430, 62, "180 degree RF pulse", "#f43f5e") : ""}
+          ${step === 8 ? label(430, 62, "rephasing", "#34d399") : ""}
+          ${step === 9 ? label(430, 62, "spin echo peak", "#22d3ee") : ""}
+        </g>` : "";
+
+      const poolPanel = step <= 3 ? `
+        <g>
+          ${pool(255, 235, "#60a5fa", "Water hydrogen", 0, 0)}
+          ${pool(605, 235, "#f97316", "Fat hydrogen", 0.4, 0)}
+          ${showB0 ? arrow(430, 355, 430, 126, "#22d3ee", 6) : ""}
+          ${showB0 ? label(448, 138, "B0", "#22d3ee", "start", 18) : ""}
+          ${showB0 ? arrow(255, 265, 255, 165, "#60a5fa", 5) : ""}
+          ${showB0 ? arrow(605, 265, 605, 165, "#f97316", 5) : ""}
+          ${showB0 ? label(255, 150, "Mz", "#60a5fa") : ""}
+          ${showB0 ? label(605, 150, "Mz", "#f97316") : ""}
+          ${showRf ? `<path d="M355 170 C390 135, 472 135, 505 170" fill="none" stroke="#f43f5e" stroke-width="4" stroke-dasharray="8 8" marker-end="url(#arrow)"/>` : ""}
+          ${showRf ? label(430, 118, "90 degree RF pulse", "#f43f5e") : ""}
+          ${showRf ? arrow(430, 320, 520, 320, "#34d399", 5) : ""}
+          ${showRf ? label(540, 326, "Mxy increasing", "#34d399", "start", 15) : ""}
+          ${showRf ? label(365, 248, "Mz decreasing", "#a78bfa", "end", 15) : ""}
+        </g>` : "";
+
+      const weightingPanel = showWeight ? `
+        <g>
+          <rect x="90" y="88" width="210" height="180" rx="28" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.55)"/>
+          <rect x="325" y="88" width="210" height="180" rx="28" fill="rgba(34,211,238,0.12)" stroke="rgba(34,211,238,0.55)"/>
+          <rect x="560" y="88" width="210" height="180" rx="28" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.55)"/>
+          ${label(195, 135, "T1 weighted", "#bfdbfe")}
+          ${label(430, 135, "T2 weighted", "#a5f3fc")}
+          ${label(665, 135, "Proton density", "#fed7aa")}
+          ${label(195, 180, "Short TR", "#e5eefc")}
+          ${label(195, 214, "Short TE", "#e5eefc")}
+          ${label(430, 180, "Long TR", "#e5eefc")}
+          ${label(430, 214, "Long TE", "#e5eefc")}
+          ${label(665, 180, "Long TR", "#e5eefc")}
+          ${label(665, 214, "Short TE", "#e5eefc")}
+          ${label(430, 324, "TR controls T1 weighting. TE controls T2 weighting.", "#cbd5e1", "middle", 18)}
+        </g>` : "";
+
+      const advanced = showAdvanced ? `
+        <g>
+          <rect x="90" y="92" width="680" height="295" rx="34" fill="rgba(8,18,34,0.72)" stroke="rgba(34,211,238,0.35)"/>
+          ${label(430, 148, "Advanced simulator preserved", "#22d3ee", "middle", 26)}
+          ${label(430, 202, "Sequence builder  |  gradients  |  Bloch sphere  |  signal  |  k-space", "#e5eefc", "middle", 18)}
+          <rect x="148" y="250" width="120" height="80" rx="18" fill="rgba(244,63,94,0.22)" stroke="#f43f5e"/>
+          <rect x="306" y="250" width="120" height="80" rx="18" fill="rgba(34,211,238,0.18)" stroke="#22d3ee"/>
+          <rect x="464" y="250" width="120" height="80" rx="18" fill="rgba(167,139,250,0.18)" stroke="#a78bfa"/>
+          <rect x="622" y="250" width="120" height="80" rx="18" fill="rgba(249,115,22,0.18)" stroke="#f97316"/>
+          ${label(208, 295, "RF", "#fda4af")}
+          ${label(366, 295, "Mxy", "#67e8f9")}
+          ${label(524, 295, "k-space", "#c4b5fd")}
+          ${label(682, 295, "fat/water", "#fed7aa")}
+        </g>` : "";
+
+      svg.innerHTML = `
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect x="22" y="32" width="816" height="492" rx="34" fill="rgba(2,6,23,0.32)" stroke="rgba(148,163,184,0.14)"/>
+        <g color="#22d3ee" filter="url(#glow)">
+          ${poolPanel}
+          ${phasePanel}
+          ${weightingPanel}
+          ${advanced}
+          ${step >= 4 && step <= 9 ? signalCurve(step) : ""}
+        </g>
+      `;
+    }
+
+    function render() {
+      const current = steps[index];
+      stepTitle.textContent = current.title;
+      stepText.textContent = current.text;
+      stepKicker.textContent = `Step ${index + 1}`;
+      progress.textContent = `Step ${index + 1} of ${steps.length}`;
+      statusChip.textContent = current.chip;
+      notes.innerHTML = current.notes.map((item) => `<li>${item}</li>`).join("");
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === steps.length - 1;
+      nextBtn.textContent = index === steps.length - 2 ? "Final view" : "Next";
+      advancedPanel.classList.toggle("show", index === steps.length - 1);
+      [...timeline.children].forEach((node, i) => node.classList.toggle("active", i <= index));
+      renderDiagram(index);
+    }
+
+    steps.forEach((_, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", `Go to step ${i + 1}`);
+      b.addEventListener("click", () => {
+        index = i;
+        render();
+      });
+      timeline.appendChild(b);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      index = Math.max(0, index - 1);
+      render();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      index = Math.min(steps.length - 1, index + 1);
+      render();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      index = 0;
+      render();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") nextBtn.click();
+      if (event.key === "ArrowLeft") prevBtn.click();
+      if (event.key.toLowerCase() === "r") resetBtn.click();
+    });
+
+    render();
+  </script>
+</body>
+</html>

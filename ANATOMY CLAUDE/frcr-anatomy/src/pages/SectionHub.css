@@ -1,0 +1,218 @@
+.hub {
+  max-width: 1180px;
+  margin: 0 auto;
+  /* .app-header is fixed and goes opaque the instant scrollY passes 24px
+     (see Layout.tsx) — with only 24px of top padding here, the heading and
+     back-link render right under the header: see-through-overlapping at
+     rest, fully covered the moment the page scrolls. */
+  padding: calc(var(--header-h) + 24px) 24px 80px;
+  width: 100%;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--text-dim);
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+.hub-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.hub-sub { color: var(--text-dim); margin-top: 4px; }
+
+.hub-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* A readout strip, like the metrics band on a workstation: fixed columns so
+   the eight figures stay on one line and can be scanned across, with hairline
+   dividers instead of boxes. */
+.hub-stats {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0;
+  padding: 0;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 18px;
+  border-right: 1px solid var(--line);
+}
+
+.stat:last-child { border-right: none; }
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .hub-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stat:nth-child(4n) { border-right: none; }
+  .stat:nth-child(-n + 4) { border-bottom: 1px solid var(--line); }
+}
+
+@media (max-width: 520px) {
+  .hub-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(2n) { border-right: none; }
+  .stat:nth-child(-n + 6) { border-bottom: 1px solid var(--line); }
+}
+.tone-green { color: var(--green); }
+.tone-amber { color: var(--amber); }
+.tone-red { color: var(--red); }
+.tone-purple { color: var(--purple); }
+
+.review-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.review-chip {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.review-chip:hover { background: var(--panel-2); }
+.review-chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.review-chip.danger { color: var(--red); border-color: var(--red-bg); }
+
+.confirm-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.confirm-actions { display: flex; gap: 8px; }
+
+.browse-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.toggle-btn {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-dim);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.browse-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.browse-card h3 { font-size: 14.5px; }
+.browse-count { color: var(--text-faint); font-size: 12.5px; }
+
+.question-index h3 { margin-bottom: 12px; font-size: 15px; }
+
+.index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+  gap: 6px;
+}
+
+.idx-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.idx-cell.grey { background: var(--grey-bg); }
+.idx-cell.blue { background: var(--blue-bg); }
+.idx-cell.green { background: var(--green-bg); color: var(--green); }
+.idx-cell.amber { background: var(--amber-bg); color: var(--amber); }
+.idx-cell.red { background: var(--red-bg); color: var(--red); }
+.idx-cell.purple { background: var(--purple-bg); color: var(--purple); }
+
+.idx-fav {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 9px;
+  color: var(--red);
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Section backdrop. The image is atmosphere, not content: it is held behind
+   everything, dimmed, and faded out toward the left and bottom so the title
+   and the case list keep full contrast over it. */
+.hub-has-hero { position: relative; isolation: isolate; }
+.hub-hero {
+  position: absolute; inset: -20px -20px auto -20px; height: 340px; z-index: -1;
+  background-size: cover; background-position: center right;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.55) 55%, transparent 100%),
+                      linear-gradient(to right, transparent 0%, #000 42%);
+          mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.55) 55%, transparent 100%),
+                      linear-gradient(to right, transparent 0%, #000 42%);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+@media (max-width: 800px) { .hub-hero { height: 220px; opacity: 0.34; } }

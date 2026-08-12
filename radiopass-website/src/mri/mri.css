@@ -1,0 +1,3628 @@
+/**
+ * MRI laboratory styles.
+ *
+ * Extends the site's existing dark surface and violet MRI accent rather than
+ * introducing a second visual language. Canvas colours are mirrored in
+ * components/theme.ts, since a canvas cannot read custom properties.
+ *
+ * The module is dressed as a piece of laboratory instrumentation. Three rules
+ * carry that, and everything else follows from them:
+ *
+ *   Surfaces are machined, not floating. Every panel gets a lit top edge and a
+ *   shadow beneath, so the page reads as milled plates on a dark chassis rather
+ *   than translucent cards.
+ *
+ *   Every number is monospaced and tabular. Readouts update many times a second
+ *   and proportional digits make them twitch; IBM Plex Mono holds each digit in
+ *   the same cell, which is exactly why real instrument panels use one.
+ *
+ *   Colour is rationed. Violet is the only interface accent. Every other hue on
+ *   screen belongs to a tissue and therefore means something.
+ *
+ * TYPE — the rule this file most needed and least had.
+ *
+ * It once carried 140 independent px font-sizes across twenty-four distinct
+ * values, from 8.5px to 46px. Because a laboratory is dense, every new panel
+ * had quietly justified being one step smaller than the last, until the thing
+ * the learner was supposed to read — why the null point moved, what TR does,
+ * what the classification means — was set smaller than the label naming it.
+ *
+ * There are now no px font-sizes in this file. Every size comes from
+ * design/tokens.css, and which token is a decision about what the text IS:
+ *
+ *   --fs-concept  the one question a guided step or challenge card asks
+ *   --fs-card     a panel, zone, tissue or stage title
+ *   --fs-teach    the claim, the caption, the takeaway — prose that teaches
+ *   --fs-body     generated explanations, disclosure bodies, answers
+ *   --fs-support  everything you read to operate the instrument: control
+ *                 labels, hints, warnings, and every live numeric readout
+ *   --fs-meta     ONLY orientation: breadcrumb, module strip, stage index,
+ *                 "03 / 06", timestamps, units, and the engraved plate labels
+ *                 that name an adjacent readout
+ *
+ * The instrument may be dense. It may not be unreadable: nothing instructional
+ * goes below 16px, and --fs-meta's floor of 14px is the whole file's floor.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/**
+ * The instrument's colour system.
+ *
+ * Kept separate from `.mri-module` — which is a whole laboratory *page*, with a
+ * background, a min-height and its own overlays — because the same components
+ * are now embedded outside those pages: inside lesson steps and on the module's
+ * front door. Scoping the variables to the page class meant an embedded
+ * component silently lost every colour it owned, and `background: var(--mri-accent)`
+ * resolved to transparent, leaving dark text on a dark pill.
+ *
+ * Any container that hosts MRI components must carry `.mri-vars` (or be a
+ * `.mri-module`, which includes it).
+ */
+.mri-vars,
+.mri-module {
+  /* Chassis: neutral graphite. The violet accent is a state colour, never a wash. */
+  --mri-bg: #08090b;
+  --mri-panel: #101216;
+  --mri-panel-2: #171a20;
+  --mri-line: rgba(255, 255, 255, 0.055);
+  --mri-line-strong: rgba(255, 255, 255, 0.12);
+  --mri-bevel: rgba(255, 255, 255, 0.05);
+  --mri-text: #eef1f4;
+  --mri-muted: #98a1ad;
+  --mri-dim: rgba(255, 255, 255, 0.4);
+  /* Scientific palette: white leads, cyan is transverse/signal, violet is RF. */
+  --mri-cyan: #63d3f5;
+  --mri-blue: #8fb7ff;
+  --mri-violet: #b49cff;
+  --mri-amber: #f0b56a;
+  --mri-pink: #ff8fc4;
+  /* RadioPass accent — reserved for current stage, selection and progress. */
+  --mri-accent: #A99EDB;
+  --mri-teal: #75d9c0;
+  --mri-radius: 12px;
+  --mri-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mri-shadow: 0 1px 0 var(--mri-bevel) inset, 0 18px 40px -26px rgba(0, 0, 0, 0.95);
+  /* How much of the top of the window the site header owns. The laboratory
+     stages keep the site header, and `.mri-shell` is `position: relative;
+     z-index: 1`, which makes it a stacking context — so a `position: fixed`
+     panel inside it can never out-stack a header painted outside it, whatever
+     z-index it claims. Anything the module pins to the top of the window has to
+     start below this line rather than try to win above it. */
+  --mri-chrome-top: 78px;
+}
+
+@media (max-width: 900px) {
+  .mri-vars,
+  .mri-module { --mri-chrome-top: 68px; }
+}
+
+/* The laboratory page chassis. Embedded instruments take the variables above
+   without taking the full-page background and spacing with them. */
+.mri-module {
+  background: var(--mri-bg);
+  color: var(--mri-text);
+  padding: var(--sp-9) 0 var(--sp-8);
+  min-height: 100vh;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mri-module::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 520px;
+  background: radial-gradient(ellipse 70% 100% at 20% 0%, rgba(99, 211, 245, 0.05), transparent 62%),
+    radial-gradient(ellipse 55% 85% at 86% 2%, rgba(180, 156, 255, 0.035), transparent 60%);
+  pointer-events: none;
+}
+
+/* A hairline of light along the very top of the chassis. */
+.mri-module::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 211, 245, 0.22) 24%,
+    rgba(169, 158, 219, 0.16) 66%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+.mri-shell {
+  width: min(var(--container-wide), calc(100% - 2 * var(--gutter)));
+  margin-inline: auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- headings ---------- */
+
+.mri-page-head {
+  margin-bottom: var(--gap-header-content);
+}
+
+.mri-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-meta);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--mri-muted);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mri-eyebrow a:hover {
+  color: var(--mri-accent);
+}
+
+.mri-eyebrow em {
+  font-style: normal;
+  color: var(--mri-accent);
+}
+
+.mri-page-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.mri-page-head h1 {
+  font-family: var(--display);
+  font-size: var(--fs-page);
+  line-height: 1.08;
+  letter-spacing: -1.6px;
+  margin: 0 0 12px;
+  max-width: 18ch;
+}
+
+.mri-page-head h1 span {
+  color: var(--mri-accent);
+}
+
+.mri-page-head > .mri-page-head-row p {
+  margin: 0;
+  color: var(--mri-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  max-width: var(--measure);
+}
+
+/* ---------- stage navigation ---------- */
+
+.mri-stage-nav {
+  margin-top: 26px;
+  border-top: 1px solid var(--mri-line);
+  border-bottom: 1px solid var(--mri-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.mri-stage-nav ol {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+  min-width: max-content;
+}
+
+.mri-stage-nav a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 14px;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--mri-muted);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.mri-stage-nav a span {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.mri-stage-nav a:hover {
+  color: var(--mri-text);
+}
+
+.mri-stage-nav a.is-current,
+.mri-stage-nav a.active {
+  color: var(--mri-accent);
+  border-bottom-color: var(--mri-accent);
+}
+
+.mri-stage-nav a.is-current span,
+.mri-stage-nav a.active span {
+  color: rgba(169, 158, 219, 0.6);
+}
+
+/* ---------- mode switch ---------- */
+
+.mri-mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mri-segmented {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  gap: 2px;
+}
+
+.mri-segmented button {
+  border: 0;
+  background: transparent;
+  color: var(--mri-muted);
+  padding: 8px 13px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.mri-segmented button.is-on {
+  background: var(--mri-accent);
+  color: #12101c;
+}
+
+.mri-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--mri-line);
+  background: var(--mri-panel);
+  color: var(--mri-muted);
+  border-radius: 20px;
+  padding: 7px 12px;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.mri-chip:hover {
+  color: var(--mri-text);
+  border-color: var(--mri-line-strong);
+}
+
+.mri-chip.is-on {
+  border-color: rgba(169, 158, 219, 0.45);
+  color: var(--mri-accent);
+  background: rgba(169, 158, 219, 0.09);
+}
+
+.mri-chip-small {
+  padding: 5px 9px;
+  font-size: var(--fs-support);
+  gap: 5px;
+}
+
+.mri-chip-small span {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- workbench layout ---------- */
+
+.mri-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 16px;
+  align-items: start;
+}
+
+.mri-workbench-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+
+.mri-zone {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+  min-width: 0;
+}
+
+.mri-zone-chamber,
+.mri-zone-timeline {
+  grid-column: 1 / -1;
+}
+
+.mri-zone-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  margin: 0 0 12px;
+  color: var(--mri-text);
+}
+
+.mri-zone-title span {
+  font-size: var(--fs-meta);
+  letter-spacing: 1.3px;
+  font-weight: 800;
+  color: var(--mri-accent);
+  background: rgba(169, 158, 219, 0.1);
+  border: 1px solid rgba(169, 158, 219, 0.22);
+  padding: 3px 6px;
+  border-radius: 5px;
+}
+
+.mri-zone-loading {
+  height: 420px;
+  display: grid;
+  place-items: center;
+  color: var(--mri-muted);
+  font-size: var(--fs-support);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.mri-workbench-side {
+  display: grid;
+  gap: 16px;
+  position: sticky;
+  top: 96px;
+  min-width: 0;
+}
+
+.mri-panel {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+}
+
+.mri-panel h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin: 0 0 13px;
+  letter-spacing: -0.2px;
+}
+
+/* ---------- canvases ---------- */
+
+.mri-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  touch-action: none;
+}
+
+.mri-canvas:focus-visible,
+.mri-chip:focus-visible,
+.mri-segmented button:focus-visible,
+.mri-tile:focus-visible,
+.mri-tissue-chip:focus-visible,
+.mri-icon-button:focus-visible,
+.mri-preset:focus-visible,
+.mri-stage-nav a:focus-visible,
+.mri-steps button:focus-visible,
+.mri-legend button:focus-visible,
+.mri-matrix button:focus-visible,
+.mri-answer:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--mri-accent);
+  outline-offset: 2px;
+}
+
+.mri-canvas-interactive {
+  cursor: ew-resize;
+}
+
+.mri-chamber-stage {
+  height: clamp(300px, 42vh, 460px);
+  background: #050d0a;
+  border: 1px solid var(--mri-line);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mri-chamber-tools,
+.mri-graph-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.mri-graph-head {
+  justify-content: space-between;
+  margin: 0 0 12px;
+}
+
+.mri-timeline-stage,
+.mri-graph-stage,
+.mri-image-stage {
+  background: #050d0a;
+  border: 1px solid var(--mri-line);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mri-image-stage {
+  aspect-ratio: 4 / 3;
+}
+
+.mri-event-jump {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 11px 0 0;
+  padding: 0;
+}
+
+/* ---------- transport ---------- */
+
+.mri-transport {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+  padding-top: 13px;
+  border-top: 1px solid var(--mri-line);
+}
+
+.mri-transport-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.mri-icon-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid var(--mri-line);
+  background: var(--mri-panel-2);
+  color: var(--mri-text);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.mri-icon-button:hover {
+  border-color: var(--mri-line-strong);
+}
+
+.mri-icon-button.is-primary {
+  background: var(--mri-accent);
+  color: #12101c;
+  border-color: var(--mri-accent);
+}
+
+.mri-scrub {
+  flex: 1 1 200px;
+  min-width: 140px;
+  display: block;
+}
+
+.mri-scrub input {
+  width: 100%;
+}
+
+.mri-transport-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mri-time {
+  font-family: var(--display);
+  font-size: var(--fs-meta);
+  color: var(--mri-muted);
+  min-width: 62px;
+}
+
+.mri-time b {
+  font-size: var(--fs-body);
+  color: var(--mri-text);
+}
+
+.mri-speed select,
+.mri-select select {
+  background: var(--mri-panel-2);
+  color: var(--mri-text);
+  border: 1px solid var(--mri-line);
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: var(--fs-support);
+}
+
+.mri-next-event {
+  flex: 1 0 100%;
+  margin: 0;
+  font-size: var(--fs-support);
+  color: var(--mri-muted);
+}
+
+.mri-next-event strong {
+  color: var(--mri-text);
+}
+
+.mri-stage-caption {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--mri-text);
+  background: rgba(169, 158, 219, 0.06);
+  border-left: 2px solid rgba(169, 158, 219, 0.45);
+  padding: 11px 13px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* ---------- range inputs ---------- */
+
+.mri-vars input[type='range'],
+.mri-module input[type='range'] {
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  outline-offset: 6px;
+}
+
+.mri-vars input[type='range']::-webkit-slider-thumb,
+.mri-module input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--mri-accent);
+  border: 3px solid #0c1d17;
+  box-shadow: 0 0 0 1px rgba(169, 158, 219, 0.5);
+  cursor: pointer;
+}
+
+.mri-vars input[type='range']::-moz-range-thumb,
+.mri-module input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--mri-accent);
+  border: 3px solid #0c1d17;
+  cursor: pointer;
+}
+
+/* ---------- sliders ---------- */
+
+.mri-controls {
+  display: grid;
+  gap: 15px;
+}
+
+.mri-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.mri-slider-head label {
+  font-size: var(--fs-support);
+  font-weight: 700;
+}
+
+.mri-slider-head output {
+  font-family: var(--display);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--mri-accent);
+}
+
+.mri-slider-head output span {
+  font-size: var(--fs-meta);
+  color: var(--mri-muted);
+  font-weight: 600;
+}
+
+.mri-slider-hint {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-slider-markers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.mri-inline-slider {
+  display: block;
+  margin-bottom: 11px;
+}
+
+.mri-inline-slider span {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-support);
+  margin-bottom: 5px;
+  color: var(--mri-muted);
+}
+
+.mri-inline-slider b {
+  color: var(--mri-text);
+}
+
+.mri-issues {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: grid;
+  gap: 6px;
+}
+
+.mri-issues li {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  padding: 8px 10px;
+  border-radius: 7px;
+  border-left: 2px solid;
+}
+
+.mri-issues .is-error {
+  background: rgba(255, 122, 122, 0.1);
+  border-color: #ff8f8f;
+  color: #ffc4c4;
+}
+
+.mri-issues .is-warning {
+  background: rgba(255, 177, 90, 0.1);
+  border-color: var(--mri-amber);
+  color: #ffdcb0;
+}
+
+.mri-issues .is-info {
+  background: rgba(117, 217, 192, 0.09);
+  border-color: var(--mri-teal);
+  color: #b8ece0;
+}
+
+/* ---------- presets ---------- */
+
+.mri-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mri-preset {
+  border: 1px solid var(--mri-line);
+  background: var(--mri-panel-2);
+  color: var(--mri-muted);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+.mri-preset:hover:not(:disabled) {
+  color: var(--mri-text);
+  border-color: var(--mri-line-strong);
+}
+
+.mri-preset.is-on {
+  background: var(--mri-accent);
+  border-color: var(--mri-accent);
+  color: #12101c;
+}
+
+.mri-preset:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---------- tissue chips, legend, tiles ---------- */
+
+.mri-tissue-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mri-tissue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--mri-line);
+  background: var(--mri-panel-2);
+  color: var(--mri-muted);
+  border-radius: 20px;
+  padding: 6px 11px 6px 7px;
+  font-size: var(--fs-support);
+  font-weight: 600;
+}
+
+.mri-tissue-chip.is-on {
+  color: var(--mri-text);
+  border-color: var(--mri-line-strong);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mri-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.mri-swatch.is-large {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.mri-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0;
+  margin: 11px 0 0;
+}
+
+.mri-legend button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--mri-muted);
+  border-radius: 7px;
+  padding: 6px 9px;
+  font-size: var(--fs-support);
+  font-weight: 600;
+}
+
+.mri-legend button.is-on {
+  border-color: var(--mri-line-strong);
+  color: var(--mri-text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.mri-legend b {
+  font-family: var(--display);
+  color: var(--mri-text);
+  font-size: var(--fs-support);
+}
+
+.mri-caption {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-tiles {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 7px;
+}
+
+.mri-tile {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 11px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid var(--mri-line);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 9px;
+  padding: 9px;
+  color: var(--mri-text);
+}
+
+.mri-tile.is-on {
+  border-color: var(--mri-line-strong);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mri-tile-swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.mri-tile-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mri-tile-body strong {
+  font-size: var(--fs-support);
+}
+
+/* The band word — "very bright", "suppressed" — is not a plate label naming a
+   readout, it is the readout: the answer to the only question the panel asks.
+   At --fs-meta it sat below the raw signal figures underneath it, which put the
+   number above the meaning. It carries the panel, so it is sized like it. */
+.mri-tile-band {
+  font-size: var(--fs-support);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+}
+
+.mri-tile-values {
+  font-size: var(--fs-support);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mri-tile-values em {
+  font-style: normal;
+  color: var(--mri-pink);
+}
+
+/* ---------- steps ---------- */
+
+.mri-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  counter-reset: step;
+}
+
+.mri-steps button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--mri-muted);
+}
+
+.mri-steps li.is-active button {
+  border-color: rgba(169, 158, 219, 0.3);
+  background: rgba(169, 158, 219, 0.07);
+  color: var(--mri-text);
+}
+
+.mri-step-index {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.mri-steps li.is-active .mri-step-index {
+  background: var(--mri-accent);
+  color: #12101c;
+}
+
+.mri-step-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mri-step-body strong {
+  font-size: var(--fs-support);
+}
+
+.mri-step-body small {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-step-time {
+  font-size: var(--fs-meta);
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+}
+
+/* ---------- classification ---------- */
+
+.mri-classification {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-left: 3px solid var(--mri-teal);
+  border-radius: var(--mri-radius);
+  padding: 15px;
+}
+
+.mri-classification.is-t1 {
+  border-left-color: var(--mri-accent);
+}
+.mri-classification.is-t2 {
+  border-left-color: var(--mri-blue);
+}
+.mri-classification.is-pd {
+  border-left-color: var(--mri-amber);
+}
+.mri-classification.is-weak {
+  border-left-color: #ff8f8f;
+}
+
+.mri-classification-head span {
+  display: block;
+  font-size: var(--fs-meta);
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+  margin-bottom: 5px;
+}
+
+.mri-classification-head strong {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  line-height: 1.3;
+  display: block;
+}
+
+.mri-classification p {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  margin: 9px 0 12px;
+}
+
+.mri-contribution-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mri-contribution-bar .is-t1 {
+  background: var(--mri-accent);
+}
+.mri-contribution-bar .is-t2 {
+  background: var(--mri-blue);
+}
+.mri-contribution-bar .is-pd {
+  background: var(--mri-amber);
+}
+
+.mri-contribution-key {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 11px;
+  padding: 0;
+  margin: 9px 0 0;
+  font-size: var(--fs-support);
+  color: var(--mri-muted);
+}
+
+.mri-contribution-key li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mri-contribution-key i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: block;
+}
+
+.mri-contribution-key .is-t1 {
+  background: var(--mri-accent);
+}
+.mri-contribution-key .is-t2 {
+  background: var(--mri-blue);
+}
+.mri-contribution-key .is-pd {
+  background: var(--mri-amber);
+}
+
+/* ---------- inspector ---------- */
+
+.mri-inspector {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+}
+
+.mri-inspector header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.mri-inspector h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin: 0;
+}
+
+.mri-inspector header p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-inspector-brightness {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mri-inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--mri-line);
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.mri-inspector-grid > div {
+  background: var(--mri-panel);
+  padding: 9px 11px;
+}
+
+.mri-inspector-grid dt {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+}
+
+.mri-inspector-grid dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--display);
+  font-size: var(--fs-support);
+  font-weight: 700;
+}
+
+.mri-inspector-reason {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--mri-text);
+  background: rgba(90, 214, 255, 0.07);
+  border-left: 2px solid rgba(90, 214, 255, 0.4);
+  padding: 11px 13px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* ---------- advanced disclosure ---------- */
+
+.mri-advanced {
+  border: 1px solid var(--mri-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  margin-top: 13px;
+}
+
+.mri-advanced summary {
+  cursor: pointer;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-support);
+  font-weight: 700;
+  color: var(--mri-accent);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mri-advanced summary::before {
+  content: '+';
+  font-size: var(--fs-support);
+  line-height: 1;
+}
+
+.mri-advanced[open] summary::before {
+  content: '−';
+}
+
+.mri-advanced-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--mri-muted);
+}
+
+.mri-advanced-body p {
+  margin: 0 0 11px;
+}
+
+.mri-advanced-body strong {
+  color: var(--mri-text);
+}
+
+/* ---------- teaching prose ---------- */
+
+.mri-lesson {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.mri-lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.mri-lesson-card {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+}
+
+.mri-lesson-card h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin: 0 0 var(--sp-2);
+}
+
+.mri-lesson-card p {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--mri-muted);
+}
+
+.mri-teaching-statement {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  background: linear-gradient(90deg, rgba(169, 158, 219, 0.12), rgba(169, 158, 219, 0.02));
+  border: 1px solid rgba(169, 158, 219, 0.24);
+  border-radius: var(--mri-radius);
+  padding: 16px 18px;
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  line-height: 1.5;
+  color: var(--mri-text);
+  margin: 0;
+}
+
+.mri-teaching-statement span {
+  color: var(--mri-accent);
+}
+
+/* The model caveat is real and must stay readable, but it is level-4 detail:
+   it belongs folded, at reading size, not spread across the page bottom in
+   footnote type. */
+.mri-model-note {
+  border: 1px dashed var(--mri-line-strong);
+  border-radius: var(--radius);
+  margin: var(--gap-section) 0 0;
+}
+
+.mri-model-note > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--mri-muted);
+}
+
+.mri-model-note > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mri-model-note > summary::before {
+  content: '+';
+  margin-right: var(--sp-2);
+}
+
+.mri-model-note[open] > summary::before {
+  content: '−';
+}
+
+.mri-model-note > summary:hover {
+  color: var(--mri-text);
+}
+
+.mri-model-note p {
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-4);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  max-width: var(--measure);
+}
+
+.mri-model-note strong {
+  color: var(--mri-text);
+}
+
+.mri-note {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-formula {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--fs-support);
+  line-height: 1.9;
+  background: #050d0a;
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  padding: 13px 15px;
+  color: var(--mri-teal);
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0 0 11px;
+}
+
+/* ---------- pager ---------- */
+
+.mri-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--gap-section);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--mri-line);
+}
+
+.mri-pager-link {
+  display: grid;
+  gap: 3px;
+  padding: 13px 17px;
+  border: 1px solid var(--mri-line);
+  border-radius: 10px;
+  background: var(--mri-panel);
+  transition: border-color var(--dur) var(--ease);
+  max-width: 48%;
+}
+
+.mri-pager-link:hover {
+  border-color: rgba(169, 158, 219, 0.4);
+}
+
+.mri-pager-link small {
+  font-size: var(--fs-meta);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+}
+
+.mri-pager-link strong {
+  font-family: var(--display);
+  font-size: var(--fs-body);
+}
+
+.mri-pager-link.is-next {
+  text-align: right;
+  margin-left: auto;
+}
+
+/* ---------- accessibility ---------- */
+
+.mri-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mri-module * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1180px) {
+  .mri-workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-workbench-side {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 860px) {
+  .mri-module {
+    padding-top: 100px;
+  }
+
+  .mri-shell {
+    width: calc(100% - 2 * var(--gutter));
+  }
+
+  .mri-workbench-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-chamber-stage {
+    height: clamp(280px, 56vw, 380px);
+  }
+
+  .mri-inspector-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-page-head-row {
+    align-items: flex-start;
+  }
+
+  .mri-pager-link {
+    max-width: none;
+    flex: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .mri-module {
+    padding-top: 90px;
+    padding-bottom: 60px;
+  }
+
+  .mri-zone,
+  .mri-panel,
+  .mri-inspector,
+  .mri-classification {
+    padding: 13px;
+  }
+
+  .mri-transport {
+    gap: 9px;
+  }
+
+  .mri-scrub {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  /* Touch targets stay comfortable on a phone. */
+  .mri-icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mri-chip,
+  .mri-tissue-chip {
+    padding: 9px 12px;
+  }
+
+  .mri-module input[type='range']::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mri-tile {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .mri-tile-swatch {
+    width: 38px;
+    height: 38px;
+  }
+
+  .mri-teaching-statement {
+    padding: 14px;
+  }
+}
+
+/* ---------- boot fallback ---------- */
+
+.mri-boot {
+  padding: var(--sp-8) 0;
+  color: var(--mri-muted, #8fa79c);
+  font-size: var(--fs-body);
+}
+
+/* ---------- foundations ---------- */
+
+.mri-foundations {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 16px;
+  align-items: start;
+}
+
+.mri-foundations-stage {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+  min-width: 0;
+}
+
+.mri-foundations-side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.mri-foundations .mri-icon-button {
+  font-size: var(--fs-body);
+  line-height: 1;
+}
+
+.mri-foundations .mri-icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---------- null point readout ---------- */
+
+.mri-null-readout {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+}
+
+.mri-null-readout header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 13px;
+}
+
+.mri-null-readout h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin: 0;
+}
+
+.mri-null-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  background: var(--mri-line);
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.mri-null-grid > div {
+  background: var(--mri-panel);
+  padding: 9px 11px;
+}
+
+.mri-null-grid dt {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+}
+
+.mri-null-grid dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--display);
+  font-size: var(--fs-support);
+  font-weight: 700;
+}
+
+.mri-null-grid dd.is-good {
+  color: var(--mri-accent);
+}
+
+.mri-null-grid dd.is-warn {
+  color: var(--mri-amber);
+}
+
+.mri-suppression {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 12px;
+  padding: 11px;
+  border-radius: 9px;
+  border-left: 3px solid;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mri-suppression.is-good {
+  border-color: var(--mri-accent);
+}
+.mri-suppression.is-ok {
+  border-color: var(--mri-teal);
+}
+.mri-suppression.is-warn {
+  border-color: var(--mri-amber);
+}
+.mri-suppression.is-bad {
+  border-color: #ff8f8f;
+}
+
+.mri-suppression-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex: none;
+}
+
+.mri-suppression strong {
+  display: block;
+  font-size: var(--fs-body);
+}
+
+.mri-suppression small {
+  display: block;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  margin-top: 3px;
+}
+
+.mri-null-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+/* ---------- laboratory extras ---------- */
+
+.mri-segmented.is-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+}
+
+.mri-segmented.is-block button {
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+}
+
+.mri-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.mri-ernst-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 5px;
+}
+
+.mri-ernst-list li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-support);
+  color: var(--mri-muted);
+}
+
+/* ---------- comparison matrix ---------- */
+
+.mri-matrix-tools {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.mri-matrix-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  background: var(--mri-panel);
+}
+
+.mri-matrix {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 720px;
+}
+
+.mri-matrix th,
+.mri-matrix td {
+  border-bottom: 1px solid var(--mri-line);
+  padding: 8px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.mri-matrix thead th {
+  position: sticky;
+  top: 0;
+  background: var(--mri-panel-2);
+  z-index: 1;
+  padding: 11px 8px;
+}
+
+.mri-matrix thead th strong {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-support);
+}
+
+.mri-matrix thead th small {
+  display: block;
+  font-size: var(--fs-meta);
+  color: var(--mri-muted);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.mri-matrix tbody th {
+  font-size: var(--fs-support);
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 62px;
+}
+
+.mri-matrix-cell {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px;
+  color: var(--mri-text);
+}
+
+.mri-matrix-cell:hover {
+  border-color: var(--mri-line-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mri-matrix-cell.is-on {
+  border-color: var(--mri-accent);
+  background: rgba(169, 158, 219, 0.09);
+}
+
+.mri-matrix-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.mri-matrix-band {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+  line-height: 1.3;
+}
+
+.mri-matrix-value {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-support);
+  color: var(--mri-text);
+}
+
+.mri-matrix-detail {
+  margin-top: 16px;
+}
+
+.mri-matrix-detail header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.mri-matrix-detail h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin: 6px 0 0;
+}
+
+.mri-matrix-detail h3 strong {
+  color: var(--mri-accent);
+}
+
+/* ---------- challenge ---------- */
+
+.mri-challenge-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.mri-challenge-progress {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1 1 220px;
+}
+
+.mri-challenge-progress span {
+  font-family: var(--display);
+  font-size: var(--fs-meta);
+  color: var(--mri-muted);
+  white-space: nowrap;
+}
+
+.mri-progress-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.mri-progress-track i {
+  display: block;
+  height: 100%;
+  background: var(--mri-accent);
+  transition: width var(--dur-reveal) var(--ease);
+}
+
+.mri-challenge-score {
+  text-align: right;
+}
+
+.mri-challenge-score strong {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-card);
+}
+
+.mri-challenge-score small {
+  font-size: var(--fs-meta);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--mri-muted);
+}
+
+.mri-challenge-card {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 22px;
+}
+
+.mri-challenge-card h2 {
+  font-family: var(--display);
+  font-size: var(--fs-concept);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.4px;
+  margin: 0 0 8px;
+  max-width: 60ch;
+}
+
+.mri-challenge-detail {
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  margin: 0 0 18px;
+  max-width: 70ch;
+}
+
+.mri-challenge-tiles {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 9px;
+}
+
+.mri-challenge-tiles li {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  padding: 9px;
+  text-align: center;
+}
+
+.mri-challenge-swatch {
+  display: block;
+  height: 54px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  margin-bottom: 8px;
+}
+
+.mri-challenge-tiles strong {
+  display: block;
+  font-size: var(--fs-support);
+}
+
+.mri-challenge-tiles small {
+  display: block;
+  font-size: var(--fs-meta);
+  color: var(--mri-muted);
+  margin-top: 2px;
+}
+
+.mri-answers {
+  display: grid;
+  gap: 8px;
+}
+
+.mri-answer {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid var(--mri-line);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 9px;
+  padding: 13px 15px;
+  color: var(--mri-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.mri-answer:hover:not(:disabled) {
+  border-color: var(--mri-line-strong);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mri-answer > span {
+  font-weight: 800;
+  font-size: var(--fs-body);
+}
+
+.mri-answer.is-correct {
+  border-color: rgba(169, 158, 219, 0.6);
+  background: rgba(169, 158, 219, 0.1);
+  color: #eafbd4;
+}
+
+.mri-answer.is-wrong {
+  border-color: rgba(255, 143, 143, 0.55);
+  background: rgba(255, 143, 143, 0.09);
+  color: #ffd8d8;
+}
+
+.mri-answer:disabled {
+  cursor: default;
+}
+
+.mri-feedback {
+  margin-top: 16px;
+  padding: 15px 17px;
+  border-radius: 10px;
+  border-left: 3px solid;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mri-feedback.is-correct {
+  border-color: var(--mri-accent);
+}
+
+.mri-feedback.is-wrong {
+  border-color: var(--mri-amber);
+}
+
+.mri-feedback strong {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  margin-bottom: 7px;
+}
+
+.mri-feedback.is-correct strong {
+  color: var(--mri-accent);
+}
+
+.mri-feedback.is-wrong strong {
+  color: var(--mri-amber);
+}
+
+.mri-feedback p {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-loose);
+  color: var(--mri-text);
+  max-width: 78ch;
+}
+
+.mri-challenge-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 4px;
+}
+
+.mri-challenge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.mri-challenge-next {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+/* ---------- responsive additions ---------- */
+
+@media (max-width: 1180px) {
+  .mri-foundations,
+  .mri-challenge-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-foundations-side {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .mri-matrix tbody th {
+    min-height: 54px;
+  }
+
+  .mri-challenge-card {
+    padding: 16px;
+  }
+
+  .mri-matrix-detail header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .mri-null-grid,
+  .mri-segmented.is-block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-challenge-head {
+    gap: 10px;
+  }
+
+  .mri-answer {
+    padding: 12px;
+  }
+}
+
+/* ===== Live notes — "what did that change do?" ===== */
+.mri-live-note {
+  background: linear-gradient(150deg, rgba(169, 158, 219, 0.09), rgba(169, 158, 219, 0.02) 60%);
+  border: 1px solid rgba(169, 158, 219, 0.32);
+  border-radius: var(--mri-radius);
+  padding: 14px 16px 13px;
+  margin-bottom: 4px;
+  animation: mri-live-note-in 0.45s ease;
+}
+.mri-live-note.is-idle {
+  background: var(--mri-panel-2);
+  border: 1px dashed var(--mri-line-strong);
+  animation: none;
+}
+@keyframes mri-live-note-in {
+  0% { border-color: rgba(169, 158, 219, 0.9); box-shadow: 0 0 0 3px rgba(169, 158, 219, 0.18); }
+  100% { border-color: rgba(169, 158, 219, 0.32); box-shadow: 0 0 0 0 rgba(169, 158, 219, 0); }
+}
+.mri-live-note-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.mri-live-note-label {
+  font-size: var(--fs-meta);
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--mri-accent);
+}
+.mri-live-note.is-idle .mri-live-note-label { color: var(--mri-muted); }
+.mri-live-note-chip {
+  font-size: var(--fs-meta);
+  font-weight: 800;
+  font-family: var(--display, inherit);
+  color: #0d211c;
+  background: var(--mri-accent);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.mri-live-note-title {
+  display: block;
+  font-size: var(--fs-body);
+  line-height: 1.35;
+  color: var(--mri-text);
+  margin-bottom: 6px;
+}
+.mri-live-note-body {
+  margin: 0 0 10px;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+.mri-live-note.is-idle .mri-live-note-body { margin-bottom: 0; }
+.mri-live-note-fact {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: rgba(255, 177, 90, 0.08);
+  border: 1px solid rgba(255, 177, 90, 0.25);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: #e8d5bb;
+}
+.mri-live-note-fact svg { flex: none; margin-top: 2px; color: var(--mri-amber); }
+.mri-live-note-fact b { color: var(--mri-amber); font-weight: 700; }
+
+/* =====================================================================
+   Instrument finish
+   ---------------------------------------------------------------------
+   Everything below refines surfaces, typography and readouts across the
+   module. It is deliberately a single layer at the end of the file so the
+   treatment can be read — and adjusted — in one place.
+   ===================================================================== */
+
+/* ---------- machined surfaces ---------- */
+
+.mri-zone,
+.mri-panel,
+.mri-inspector,
+.mri-classification,
+.mri-null-readout,
+.mri-lesson-card,
+.mri-challenge-card,
+.mri-matrix-scroll,
+.mri-pager-link,
+.mri-advanced {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0));
+  box-shadow: var(--mri-shadow);
+}
+
+/* Canvases sit *in* their housing: a recess, not a sticker. */
+.mri-chamber-stage,
+.mri-timeline-stage,
+.mri-graph-stage,
+.mri-image-stage {
+  background: #040a07;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.5) inset;
+}
+
+/* The vector chamber is the signature instrument: it gets the deepest well
+   and a faint bore glow along its floor. */
+.mri-chamber-stage {
+  background:
+    radial-gradient(ellipse 120% 60% at 50% 108%, rgba(169, 158, 219, 0.07), transparent 70%),
+    #040a07;
+}
+
+/* ---------- typography ---------- */
+
+.mri-page-head h1 {
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.mri-page-head > .mri-page-head-row p {
+  text-wrap: pretty;
+}
+
+/* Eyebrows and lane labels are engraved plate text: small, wide, quiet. */
+.mri-eyebrow,
+.mri-tile-band,
+.mri-inspector-grid dt,
+.mri-null-grid dt,
+.mri-matrix-band,
+.mri-classification-head span,
+.mri-challenge-score small,
+.mri-pager-link small {
+  font-family: var(--mri-mono);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.mri-inspector-grid dt,
+.mri-null-grid dt {
+  color: var(--mri-dim);
+}
+
+/* Zone titles: a machined index plate, then the name. */
+.mri-zone-title span {
+  font-family: var(--mri-mono);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  padding: 4px 7px;
+}
+
+/* ---------- readouts ---------- */
+
+/* Anything that is a live number is monospaced, so nothing shifts as it ticks. */
+.mri-slider-head output,
+.mri-time,
+.mri-time b,
+.mri-inspector-grid dd,
+.mri-null-grid dd,
+.mri-tile-values,
+.mri-matrix-value,
+.mri-step-time,
+.mri-legend b,
+.mri-challenge-score strong,
+.mri-chip-small span,
+.mri-speed select,
+.mri-ernst-list button {
+  font-family: var(--mri-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1;
+}
+
+.mri-slider-head output {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mri-slider-head output span {
+  font-family: var(--mri-mono);
+  font-weight: 400;
+  color: var(--mri-dim);
+}
+
+.mri-inspector-grid dd,
+.mri-null-grid dd {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.mri-time b {
+  font-weight: 600;
+}
+
+.mri-formula {
+  font-family: var(--mri-mono);
+  line-height: 1.85;
+  background: #040a07;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55) inset;
+}
+
+/* ---------- controls ---------- */
+
+.mri-icon-button,
+.mri-chip,
+.mri-preset,
+.mri-tissue-chip {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+}
+
+.mri-icon-button.is-primary,
+.mri-segmented button.is-on,
+.mri-preset.is-on {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+  box-shadow: 0 4px 14px -6px rgba(169, 158, 219, 0.55);
+}
+
+.mri-icon-button:active {
+  transform: translateY(1px);
+}
+
+/* The scrub track reads as a machined slot with a lit fill behind the thumb. */
+.mri-vars input[type='range'],
+.mri-module input[type='range'] {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) inset;
+}
+
+.mri-vars input[type='range']::-webkit-slider-thumb,
+.mri-module input[type='range']::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 1px rgba(169, 158, 219, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.6),
+    0 0 10px -2px rgba(169, 158, 219, 0.7);
+}
+
+/* ---------- tiles and matrix ---------- */
+
+/* Grey-level swatches are image data: square-ish, recessed, no soft edges. */
+.mri-tile-swatch,
+.mri-matrix-swatch,
+.mri-inspector-brightness,
+.mri-suppression-swatch,
+.mri-challenge-swatch {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55) inset;
+}
+
+.mri-tile.is-on,
+.mri-matrix-cell.is-on {
+  box-shadow: 0 0 0 1px rgba(169, 158, 219, 0.28);
+}
+
+/* ---------- stage navigation ---------- */
+
+.mri-stage-nav a span {
+  font-family: var(--mri-mono);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.mri-stage-nav a.is-current,
+.mri-stage-nav a.active {
+  /* A lit indicator under the active stage rather than a plain border. */
+  box-shadow: 0 -1px 12px -2px rgba(169, 158, 219, 0.4) inset;
+}
+
+/* ---------- teaching emphasis ---------- */
+
+.mri-teaching-statement {
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  box-shadow: var(--mri-shadow);
+}
+
+.mri-stage-caption,
+.mri-inspector-reason {
+  text-wrap: pretty;
+}
+
+/* ---------- motion ---------- */
+
+/* One coordinated entrance, not scattered effects: the workbench zones settle
+   into place in sequence when a stage opens. */
+@keyframes mri-zone-settle {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mri-workbench-main > .mri-zone {
+  animation: mri-zone-settle 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+}
+
+.mri-workbench-main > .mri-zone:nth-child(1) { animation-delay: 0.02s; }
+.mri-workbench-main > .mri-zone:nth-child(2) { animation-delay: 0.08s; }
+.mri-workbench-main > .mri-zone:nth-child(3) { animation-delay: 0.14s; }
+.mri-workbench-main > .mri-zone:nth-child(4) { animation-delay: 0.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mri-workbench-main > .mri-zone {
+    animation: none;
+  }
+}
+
+/* =====================================================================
+   Comparison walkthrough
+   ---------------------------------------------------------------------
+   One subject per screen, built up to the full matrix. The rail is a
+   progress track, not a menu: the chapters are meant to be read in order.
+   ===================================================================== */
+
+.mri-chapter-rail {
+  border-top: 1px solid var(--mri-line);
+  border-bottom: 1px solid var(--mri-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  margin-bottom: 24px;
+}
+
+.mri-chapter-rail ol {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+  min-width: max-content;
+}
+
+.mri-chapter-rail a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 14px;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--mri-muted);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.mri-chapter-rail a span {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--mri-dim);
+}
+
+.mri-chapter-rail a:hover {
+  color: var(--mri-text);
+}
+
+.mri-chapter-rail a.is-current {
+  color: var(--mri-accent);
+  border-bottom-color: var(--mri-accent);
+}
+
+.mri-chapter-rail a.is-current span {
+  background: var(--mri-accent);
+  color: #12101c;
+}
+
+/* ---------- chapter ---------- */
+
+.mri-chapter {
+  display: grid;
+  gap: 20px;
+}
+
+.mri-chapter-head {
+  max-width: 66ch;
+}
+
+.mri-chapter-count {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+}
+
+.mri-chapter-head h2 {
+  font-family: var(--display);
+  font-size: var(--fs-concept);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.03em;
+  margin: 9px 0 12px;
+  text-wrap: balance;
+}
+
+.mri-chapter-claim {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--mri-accent);
+  text-wrap: pretty;
+}
+
+.mri-chapter-body {
+  max-width: var(--measure);
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--mri-muted);
+}
+
+.mri-chapter-body p {
+  margin: 0 0 15px;
+  text-wrap: pretty;
+}
+
+.mri-chapter-body p:last-child {
+  margin-bottom: 0;
+}
+
+.mri-chapter-body strong {
+  color: var(--mri-text);
+}
+
+.mri-chapter-body em {
+  color: var(--mri-text);
+  font-style: italic;
+}
+
+.mri-chapter-fact {
+  max-width: 68ch;
+}
+
+/* ---------- one tissue across every sequence ---------- */
+
+.mri-row-strip {
+  background: var(--mri-panel);
+  border: 1px solid var(--mri-line);
+  border-radius: var(--mri-radius);
+  padding: 16px;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0));
+  box-shadow: var(--mri-shadow);
+}
+
+.mri-row-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--mri-line);
+}
+
+.mri-row-head h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.mri-row-head p {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  max-width: 58ch;
+}
+
+.mri-row-params {
+  display: flex;
+  gap: 1px;
+  margin: 0;
+  background: var(--mri-line);
+  border: 1px solid var(--mri-line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.mri-row-params > div {
+  background: var(--mri-panel-2);
+  padding: 8px 13px;
+  text-align: center;
+}
+
+.mri-row-params dt {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+}
+
+.mri-row-params dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--mri-text);
+}
+
+.mri-row-cells {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+}
+
+.mri-row-cell {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 11px;
+  align-items: start;
+  height: 100%;
+  padding: 11px;
+  border: 1px solid var(--mri-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.mri-row-cell:hover {
+  border-color: rgba(169, 158, 219, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.mri-row-cell:focus-visible {
+  outline: 2px solid var(--mri-accent);
+  outline-offset: 2px;
+}
+
+.mri-row-swatch {
+  width: 52px;
+  height: 52px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55) inset;
+}
+
+.mri-row-cell-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mri-row-cell-body strong {
+  font-size: var(--fs-support);
+  color: var(--mri-text);
+}
+
+.mri-row-recipe,
+.mri-row-signal {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--mri-dim);
+}
+
+.mri-row-signal em {
+  font-style: normal;
+  color: var(--mri-pink);
+}
+
+/* Same rule as .mri-tile-band. This word is what the learner is meant to leave
+   the comparison table holding — it must not be set smaller than .mri-row-reason
+   directly beneath it, which merely explains it. */
+.mri-row-band {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mri-accent);
+}
+
+.mri-row-reason {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+/* ---------- chapter pager ---------- */
+
+.mri-chapter-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--gap-section);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--mri-line);
+}
+
+@media (max-width: 860px) {
+  .mri-row-head {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .mri-row-params {
+    grid-column: 1 / -1;
+    justify-content: start;
+  }
+
+  .mri-row-cells {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-chapter-pager {
+    flex-direction: column;
+  }
+
+  .mri-chapter-pager .mri-pager-link {
+    max-width: none;
+  }
+}
+
+/* =====================================================================
+   The instrument
+   ---------------------------------------------------------------------
+   One workspace: the magnetisation scene as hero, a contextual inspector
+   beside it, a slim transport beneath, and the sequence and analysis
+   bands below that. Hierarchy comes from space and luminance; borders are
+   used only where two surfaces genuinely need separating.
+   ===================================================================== */
+
+.mri-lab {
+  display: grid;
+  /* Without an explicit track, this is an implicit auto-sized column, which
+     grows to the max-content of its widest item rather than clamping to the
+     container — the actual root of the .mri-workspace runaway-width loop:
+     min-width:0 on the item alone constrains its minimum, but an auto track
+     still lets max-content (the canvas's own JS-resized pixel width) push
+     it wider every cycle. minmax(0, 1fr) is a definite, container-relative
+     track that can't grow past the available width no matter what its
+     content asks for. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.mri-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 70fr) minmax(320px, 30fr);
+  gap: 18px;
+  align-items: stretch;
+  /* As a grid item of .mri-lab, this defaults to min-width:auto, meaning it
+     won't shrink below its own content's preferred width — and its content
+     includes a <canvas> whose pixel width SimCanvas.tsx sets in JS from a
+     ResizeObserver measurement of an ancestor inside this very box. Without
+     min-width:0 forcing it to respect .mri-lab's actual track width instead
+     of its own content, that becomes a real feedback loop: the canvas's
+     rendered width nudges this box's max-content size up, the next
+     ResizeObserver tick measures the now-larger box, resizes the canvas
+     larger again, and it never settles — confirmed live, growing by
+     hundreds of px per second with no user interaction. */
+  min-width: 0;
+  /* A bounded row: the instrument fills what is left of the viewport, and the
+     inspector scrolls inside it rather than stretching the canvas to fit its
+     own content. */
+  height: clamp(460px, calc(100vh - 268px), 700px);
+}
+
+/* ---------- the hero canvas ---------- */
+
+.mri-stage-canvas {
+  position: relative;
+  min-width: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 120% 70% at 50% 112%, rgba(99, 211, 245, 0.06), transparent 68%),
+    #07080B;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 30px 70px -40px rgba(0, 0, 0, 1);
+}
+
+/* The chamber fills its housing rather than sitting in a bordered card. */
+.mri-stage-canvas .mri-chamber,
+.mri-stage-canvas .mri-chamber-stage {
+  height: 100%;
+}
+
+.mri-stage-canvas .mri-chamber {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.mri-stage-canvas .mri-chamber-stage {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  min-height: 0;
+}
+
+.mri-stage-canvas .mri-chamber-tools {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 10px 14px 12px;
+  gap: 6px;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
+}
+
+/* ---------- canvas overlays ---------- */
+
+.mri-canvas-overlay {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mri-canvas-overlay-stage {
+  top: 16px;
+  left: 18px;
+  max-width: 44%;
+}
+
+.mri-overlay-category {
+  display: block;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+}
+
+.mri-overlay-title {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.025em;
+  margin: 6px 0 0;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.mri-overlay-hint {
+  margin: 6px 0 0;
+  font-size: var(--fs-support);
+  color: var(--mri-dim);
+}
+
+.mri-chips {
+  top: 16px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  align-items: flex-end;
+}
+
+.mri-chip-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: rgba(8, 10, 14, 0.62);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.mri-chip-value dt {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+}
+
+.mri-chip-value dd {
+  margin: 0;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--mri-text);
+  min-width: 4.5ch;
+  text-align: right;
+}
+
+.mri-chip-value.is-z dd { color: var(--mri-accent); }
+.mri-chip-value.is-xy dd { color: var(--mri-cyan); }
+.mri-chip-value.is-rf dd { color: var(--mri-violet); }
+
+/* ---------- contextual inspector ---------- */
+
+.mri-inspector-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 18px;
+  border-radius: 16px;
+  background: linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) , var(--mri-panel);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  overflow-y: auto;
+  /* This column is a scroller inside a fixed-height row, and at reading size
+     more of it is below its own fold than before. A track the learner can
+     actually see is the difference between "there is more" and "the sentence
+     got cut off". */
+  scrollbar-width: thin;
+  scrollbar-color: var(--mri-line-strong) transparent;
+}
+
+/* ---------- stage rail ---------- */
+
+.mri-rail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mri-rail ol {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+
+.mri-rail li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.mri-rail li + li::before {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mri-rail li.is-done + li::before,
+.mri-rail li.is-current + li::before {
+  background: rgba(169, 158, 219, 0.35);
+}
+
+.mri-rail button {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+}
+
+.mri-rail-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease), width var(--dur) var(--ease), height var(--dur) var(--ease);
+}
+
+.mri-rail li.is-done .mri-rail-dot {
+  background: rgba(169, 158, 219, 0.55);
+}
+
+.mri-rail li.is-current .mri-rail-dot {
+  width: 11px;
+  height: 11px;
+  background: var(--mri-accent);
+  box-shadow: 0 0 0 3px rgba(169, 158, 219, 0.16), 0 0 12px rgba(169, 158, 219, 0.5);
+}
+
+.mri-rail button:focus-visible {
+  outline: 2px solid var(--mri-accent);
+  outline-offset: 2px;
+}
+
+.mri-rail-position {
+  margin: 0;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--mri-dim);
+  white-space: nowrap;
+}
+
+/* ---------- stage summary ---------- */
+
+.mri-stage-summary h3 {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.025em;
+  margin: 0 0 9px;
+  text-wrap: balance;
+}
+
+.mri-stage-summary p {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-loose);
+  color: var(--mri-muted);
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+
+.mri-inspector-controls {
+  display: grid;
+  gap: 14px;
+}
+
+/* ---------- bands below the workspace ---------- */
+
+.mri-band-title {
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+  margin: 0 0 10px;
+}
+
+.mri-sequence-band {
+  padding: 16px 18px 18px;
+  border-radius: 16px;
+  background: var(--mri-panel);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+.mri-analysis-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 14px;
+}
+
+.mri-analysis-band > section {
+  padding: 16px 18px 18px;
+  border-radius: 16px;
+  background: var(--mri-panel);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  min-width: 0;
+}
+
+/* ---------- module bar ---------- */
+
+.mri-module-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  border-top: 1px solid var(--mri-line);
+  border-bottom: 1px solid var(--mri-line);
+}
+
+.mri-module-bar .mri-stage-nav {
+  margin-top: 0;
+  border: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.mri-module-bar .mri-stage-nav a {
+  padding: 11px 13px;
+}
+
+/* "You are here", and nothing else. At reading-floor size the longest stage
+   name is wider than the space the module strip leaves it, and a nowrap line
+   with nowhere to go simply ran off the shell and got clipped by the page's
+   overflow guard. It is the least important text in the bar, so it is the one
+   that yields: it shrinks, then truncates. */
+.mri-location {
+  margin: 0;
+  padding-right: 4px;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.06em;
+  color: var(--mri-dim);
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mri-location span {
+  color: var(--mri-text);
+}
+
+.mri-location i {
+  font-style: normal;
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+/* ---------- transport, slimmed ---------- */
+
+.mri-lab > .mri-transport {
+  margin-top: 0;
+  padding: 10px 16px;
+  border-top: 0;
+  border-radius: 12px;
+  background: var(--mri-panel);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+/* ---------- transient live note ---------- */
+
+.mri-live-slot {
+  min-height: 0;
+}
+
+.mri-live-note {
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: rgba(99, 211, 245, 0.055);
+  box-shadow: 0 0 0 1px rgba(99, 211, 245, 0.18) inset;
+  animation: mri-note-in 0.28s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes mri-note-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.mri-live-note-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.mri-live-note-chip {
+  font-family: var(--mri-mono);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--mri-cyan);
+  white-space: nowrap;
+}
+
+.mri-live-note-title {
+  line-height: 1.35;
+  color: var(--mri-text);
+}
+
+.mri-live-note-body {
+  margin: 0;
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+.mri-live-note-more summary {
+  cursor: pointer;
+  margin-top: 7px;
+  font-family: var(--mri-mono);
+  font-size: var(--fs-support);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+  list-style: none;
+}
+
+.mri-live-note-more summary:hover { color: var(--mri-text); }
+
+.mri-live-note-more p {
+  margin: 7px 0 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mri-live-note { animation: none; }
+}
+
+/* ---------- fewer borders ---------- */
+
+/* Surfaces now separate by luminance and space. Borders survive only where
+   two controls genuinely need a boundary. */
+.mri-zone,
+.mri-panel,
+.mri-inspector,
+.mri-classification,
+.mri-null-readout,
+.mri-lesson-card,
+.mri-challenge-card,
+.mri-row-strip,
+.mri-advanced,
+.mri-timeline-stage,
+.mri-graph-stage,
+.mri-image-stage,
+.mri-chamber-stage {
+  border-color: transparent;
+}
+
+.mri-zone,
+.mri-panel,
+.mri-inspector,
+.mri-null-readout,
+.mri-lesson-card,
+.mri-challenge-card,
+.mri-row-strip {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+.mri-advanced {
+  background: transparent;
+  box-shadow: none;
+  border-top: 1px solid var(--mri-line);
+  border-radius: 0;
+}
+
+/* Green is a state colour. Neutral chrome unless something is selected. */
+.mri-classification { border-left-color: rgba(255, 255, 255, 0.16); }
+.mri-classification.is-t1 { border-left-color: var(--mri-accent); }
+.mri-classification.is-t2 { border-left-color: var(--mri-cyan); }
+.mri-classification.is-pd { border-left-color: var(--mri-amber); }
+
+.mri-contribution-bar .is-t2,
+.mri-contribution-key .is-t2 { background: var(--mri-cyan); }
+
+.mri-stage-caption {
+  background: transparent;
+  border-left: 2px solid rgba(255, 255, 255, 0.14);
+  color: var(--mri-muted);
+  padding: 2px 0 2px 13px;
+  border-radius: 0;
+  margin: 0;
+}
+
+.mri-inspector-reason {
+  background: rgba(99, 211, 245, 0.05);
+  border-left-color: rgba(99, 211, 245, 0.35);
+}
+
+.mri-advanced summary { color: var(--mri-cyan); }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1180px) {
+  .mri-workspace {
+    grid-template-columns: minmax(0, 62fr) minmax(300px, 38fr);
+  }
+}
+
+@media (max-width: 960px) {
+  .mri-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    /* The base rule's height:clamp(...,700px) sizes the desktop two-column
+       row to the viewport — correct there, since the inspector scrolls
+       inside it. Stacked into one column here, the canvas and inspector's
+       real combined content is well over 1000px; min-height:0 alone doesn't
+       cancel the explicit height, so the fixed ~700px box stayed and the
+       overflow painted straight through into the transport controls below
+       it instead of the container actually growing to fit. */
+    height: auto;
+    min-height: 0;
+  }
+
+  .mri-stage-canvas {
+    height: clamp(320px, 58vw, 460px);
+  }
+
+  .mri-analysis-band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mri-module-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .mri-location {
+    padding: 0 0 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mri-shell {
+    width: calc(100% - 2 * var(--gutter));
+  }
+
+  .mri-stage-canvas {
+    height: clamp(280px, 74vw, 380px);
+    border-radius: 13px;
+  }
+
+  .mri-canvas-overlay-stage {
+    top: 12px;
+    left: 13px;
+    max-width: 52%;
+  }
+
+  .mri-chips {
+    top: 12px;
+    right: 13px;
+  }
+
+  .mri-inspector-column {
+    padding: 15px;
+    border-radius: 13px;
+  }
+
+  .mri-sequence-band,
+  .mri-analysis-band > section {
+    padding: 14px;
+    border-radius: 13px;
+  }
+}
+
+/* ---------- primer, below the instrument ---------- */
+
+/* The four orientation cards are still here, but after the instrument: the
+   canvas has to be the first thing the eye lands on. */
+.mri-primer {
+  margin-top: 4px;
+}
+
+.mri-primer .mri-lesson-grid {
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 1px;
+  background: var(--mri-line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--mri-line);
+}
+
+/* One continuous strip divided by hairlines, rather than four bordered cards. */
+.mri-primer .mri-lesson-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--mri-panel);
+  padding: 17px 18px;
+}
+
+.mri-primer .mri-lesson-card h3 {
+  margin-bottom: var(--sp-2);
+}
+
+/* ===== Horizontal stability guard ===== */
+/* The laboratory page must never pan sideways. The stage-navigation strip is
+   far wider than a phone viewport; if any transient state renders it (or any
+   other child) without its own scroller, the page gains x-overflow and a
+   diagonal trackpad / touch gesture visibly drags the whole page to the left
+   and leaves it there. `clip` forbids that overflow from ever becoming
+   scrollable without creating a new scroll container (so sticky elements are
+   unaffected). */
+.mri-module { overflow-x: clip; }
+@supports not (overflow: clip) {
+  .mri-module { overflow-x: hidden; }
+}
+/* The stage strip scrolls internally — its horizontal gesture must stop at
+   its own edges rather than chaining up and shoving the page. */
+.mri-stage-nav { overscroll-behavior-x: contain; }
+
+/* The course index sits at the head of the stage strip: the lesson modules
+   are not laboratory stages, so they need their own way in from inside.
+   Written with the parent so it outranks `.mri-stage-nav a` (0,1,1) — as a
+   bare class this rule was dead and the link rendered muted grey. */
+.mri-stage-nav a.mri-stage-course { color: var(--mri-accent); font-weight: 700; }
+
+/* An instrument page saying so, and pointing at the concept that teaches it. */
+.mri-lesson-first {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--mri-muted);
+  border-left: 2px solid var(--mri-accent);
+  padding-left: 12px;
+}
+.mri-lesson-first a { color: var(--mri-accent); text-decoration: none; font-weight: 600; }
+.mri-lesson-first a:hover { text-decoration: underline; }
+
+/* Second-tissue picker under the chamber. Its own row rather than more chips
+   in the layer row: those switch what is drawn about one tissue, this chooses
+   a different tissue, and mixing the two made the row unreadable. */
+.mri-chamber-compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.mri-compare-label {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mri-dim);
+  margin-right: 2px;
+}
+.mri-chamber-compare .mri-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mri-chamber-compare .mri-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* Inside a lesson stage the compare row sits in the tools strip, which is
+   overlaid on the instrument — keep it on one scrollable line there so it
+   never grows tall enough to cover the vectors. */
+.mri-stage-canvas .mri-chamber-compare {
+  margin: 0;
+  padding: 0 14px 12px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mri-stage-canvas .mri-chamber-compare::-webkit-scrollbar { display: none; }
+
+/* ---------- learning diagrams: controls beside, not beneath ----------
+   Same rule as the chapter-5 simulations. A row of switches under a tall
+   instrument pushed the concept text most of a screen down; a narrow column
+   beside it costs nothing vertically. Applies wherever the chamber is being
+   learned on — it is left alone in the full laboratory, which is a workbench
+   and is meant to be dense. */
+@media (min-width: 1040px) {
+  .mrx-panelled .mri-chamber {
+    display: grid;
+    grid-template-columns: 196px minmax(0, 1fr);
+    grid-template-areas: 'tools stage';
+    align-items: start;
+    gap: 12px;
+  }
+  .mrx-panelled .mri-chamber-stage { grid-area: stage; }
+  .mrx-panelled .mri-chamber-tools {
+    grid-area: tools;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    align-content: start;
+    margin: 0;
+    padding: 12px 0 0 14px;
+    background: none;
+  }
+  /* The compare menu belongs with the switches, under them in the column. */
+  .mrx-panelled .mri-chamber-compare {
+    grid-area: tools;
+    align-self: end;
+    padding: 0 0 12px 14px;
+    margin: 0;
+  }
+}
+
+/* The second-tissue picker is a menu now, not a row of chips. */
+.mri-chamber-compare {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+.mri-chamber-compare select {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--mri-text);
+  border: 1px solid var(--mri-line-strong);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: var(--fs-support);
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+.mri-chamber-compare select:hover { border-color: rgba(255, 255, 255, 0.3); }
+
+/* The speed button doubles as the disclosure for scrubbing and speed. */
+.mri-timing-toggle {
+  width: auto;
+  min-width: 42px;
+  padding: 0 9px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: var(--fs-support);
+}
+.mri-timing-toggle.is-on {
+  background: rgba(169, 158, 219, 0.16);
+  border-color: var(--mri-accent);
+  color: var(--mri-text);
+}
+
+/* ==================================================================
+   Guided Mode — a chrome layer and stylesheet over the SAME laboratory.
+   Explore mode is the untouched page; these rules apply only under
+   .mri-guided, and they hide or re-dress, never remove.
+   ================================================================== */
+
+.mri-guide-modebar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+.mri-guide-modenote { font-size: var(--fs-support); color: var(--mri-muted); }
+
+.mri-guide-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin: 0 0 14px;
+}
+.mri-guide-count {
+  display: flex; align-items: center; gap: 12px;
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--mri-muted);
+}
+.mri-guide-dots { display: inline-flex; gap: 6px; }
+.mri-guide-dots i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+.mri-guide-dots i.seen { background: rgba(255, 255, 255, 0.42); }
+.mri-guide-dots i.on { background: var(--mri-accent); transform: scale(1.35); }
+
+.mri-guide-title {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-weight: 360; font-size: var(--fs-concept);
+  line-height: var(--lh-heading); margin: 0 0 var(--sp-3);
+}
+.mri-guide-claim {
+  font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-secondary);
+  max-width: var(--measure); margin: 0 0 var(--sp-4);
+}
+.mri-guide-try, .mri-guide-key {
+  display: flex; gap: 12px; align-items: baseline;
+  font-size: var(--fs-teach); line-height: var(--lh-body); margin: var(--sp-4) 0 0;
+  padding-left: var(--sp-4);
+}
+.mri-guide-try { border-left: 2px solid var(--mri-cyan); color: var(--mri-muted); }
+.mri-guide-key { border-left: 2px solid var(--mri-accent); color: var(--mri-text); }
+.mri-guide-try > span, .mri-guide-key > span {
+  flex: none; font-size: var(--fs-meta); font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.mri-guide-try > span { color: var(--mri-cyan); }
+.mri-guide-key > span { color: var(--mri-accent); }
+
+.mri-guide-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-top: 18px;
+}
+.mri-guide-drawer-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.mri-guide-next { background: var(--mri-accent); border-color: var(--mri-accent); color: #12101c; font-weight: 600; }
+.mri-guide-next:hover { background: #c0b6ee; border-color: #c0b6ee; color: #12101c; }
+
+/* ---- what Guided hides by default (nothing is unmounted) ---- */
+.mri-guided .mri-primer,
+.mri-guided .mri-teaching-statement,
+.mri-guided .mri-lesson-card,
+.mri-guided .mri-advanced,
+.mri-guided .mri-model-note,
+.mri-guided .mri-pager,
+.mri-guided .mri-live-slot,
+.mri-guided .mri-stage-summary,
+.mri-guided .mri-sequence-band,
+.mri-guided .mri-analysis-band > section { display: none; }
+
+.mri-guided.show-timeline .mri-sequence-band { display: block; }
+.mri-guided.show-graphs .mri-analysis-band > section:first-child { display: block; }
+.mri-guided.show-contrast .mri-analysis-band > section:last-child { display: block; }
+
+/* One-viewport ambition: the chamber compacts a little under guidance. */
+.mri-guided .mri-stage-canvas { height: clamp(260px, 38vh, 380px); }
+
+/* ---- the spotlight: dim every slider the step is not about ---- */
+.mri-guided[data-guide-focus='tr'] .mri-slider[data-param]:not([data-param='tr']),
+.mri-guided[data-guide-focus='te'] .mri-slider[data-param]:not([data-param='te']),
+.mri-guided[data-guide-focus='ti'] .mri-slider[data-param]:not([data-param='ti']),
+.mri-guided[data-guide-focus='flip'] .mri-slider[data-param]:not([data-param='flip']),
+.mri-guided[data-guide-focus='field'] .mri-slider[data-param]:not([data-param='field']),
+.mri-guided[data-guide-focus='homogeneity'] .mri-slider[data-param]:not([data-param='homogeneity']) {
+  opacity: 0.32;
+  filter: saturate(0.4);
+  transition: opacity var(--dur) var(--ease);
+}
+.mri-guided[data-guide-focus='tr'] .mri-slider[data-param='tr'],
+.mri-guided[data-guide-focus='te'] .mri-slider[data-param='te'],
+.mri-guided[data-guide-focus='ti'] .mri-slider[data-param='ti'],
+.mri-guided[data-guide-focus='flip'] .mri-slider[data-param='flip'],
+.mri-guided[data-guide-focus='field'] .mri-slider[data-param='field'],
+.mri-guided[data-guide-focus='homogeneity'] .mri-slider[data-param='homogeneity'] {
+  outline: 1px solid rgba(169, 158, 219, 0.55);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+/* ---- drawers: the page's own hidden blocks, re-dressed ---- */
+.mri-guided.mri-drawer-why .mri-primer,
+.mri-guided.mri-drawer-why .mri-teaching-statement,
+.mri-guided.mri-drawer-exam .mri-advanced,
+.mri-guided.mri-drawer-measure .mri-stage-summary,
+.mri-guided.mri-drawer-measure .mri-live-slot { display: block; }
+
+.mri-guided.mri-drawer-why .mri-primer,
+.mri-guided.mri-drawer-why .mri-teaching-statement,
+.mri-guided.mri-drawer-exam .mri-advanced,
+.mri-guided.mri-drawer-measure .mri-stage-summary {
+  position: fixed;
+  /* Not `top: 0`. These drawers sit inside `.mri-shell`'s stacking context, so
+     the site header paints over their first 78px however high their z-index is
+     — which meant every drawer opened with its own first line invisible: the
+     summary of the Exam-detail disclosure, the first sentence of Why?, the
+     first measurement. Starting below the header costs 78px of drawer and
+     returns the sentence the drawer was opened to read. */
+  top: var(--mri-chrome-top); right: 0; bottom: 0;
+  width: min(480px, 92vw);
+  overflow-y: auto;
+  z-index: 60;
+  background: var(--mri-panel);
+  border-left: 1px solid var(--mri-line-strong);
+  box-shadow: -30px 0 80px rgba(0, 0, 0, 0.6);
+  padding: 26px 24px 40px;
+  animation: mri-drawer-in 0.22s ease;
+}
+/* Stack the why-drawer's two blocks rather than overlap them. */
+.mri-guided.mri-drawer-why .mri-teaching-statement { top: auto; height: auto; bottom: 0; padding-top: 14px; }
+.mri-guided.mri-drawer-why .mri-primer { bottom: 96px; }
+
+/* Guided hides .mri-lesson-card globally; the why-drawer must re-show the
+   primer's own cards or the drawer opens empty. One column at drawer width. */
+.mri-guided.mri-drawer-why .mri-primer .mri-lesson-card { display: block; }
+.mri-guided.mri-drawer-why .mri-primer .mri-lesson-grid { grid-template-columns: 1fr; }
+
+@keyframes mri-drawer-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.mri-guide-scrim {
+  position: fixed; inset: 0; z-index: 55;
+  background: rgba(4, 5, 8, 0.55);
+  border: 0; cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mri-guided.mri-drawer-why .mri-primer,
+  .mri-guided.mri-drawer-exam .mri-advanced,
+  .mri-guided.mri-drawer-measure .mri-stage-summary { animation: none; }
+}
+
+/* Foundations' chamber sets an inline height, which only !important can
+   override — one of the two places it is used in this file, and only under
+   guidance, where the one-viewport rule outranks the inline tuning. */
+.mri-guided .mri-chamber-stage { height: clamp(260px, 38vh, 380px) !important; }
+
+/* The other. Foundations also sets its "What is happening" paragraph's size in
+   a style attribute, and no stylesheet outranks that. That paragraph is the
+   page's explanation of what the chamber is doing — the most-read sentence on
+   the stage — and the module's floor for anything instructional is 16px, so it
+   is dragged back onto the scale here. Delete this rule the moment the inline
+   style goes. */
+.mri-foundations-side .mri-panel > p[style] {
+  font-size: var(--fs-body) !important;
+  line-height: var(--lh-body);
+}

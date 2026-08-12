@@ -1,0 +1,186 @@
+/**
+ * Touch ergonomics.
+ *
+ * The mobile and tablet builds are not cut-down versions — every module, every
+ * question and every control that changes something is present. What changes on
+ * a touch screen is not *what* is there but whether a finger can hit it, and an
+ * audit across 84 routes found three ways it could not:
+ *
+ *   1. Every range slider was a 4px-tall element. The thumb was 15px and looked
+ *      grabbable; the element you actually have to hit was four pixels of
+ *      screen. Sliders are the single most important control in this product —
+ *      they are how a learner changes TR, TE, gradient strength, b-value — so a
+ *      4px target made the physics unusable on a phone.
+ *   2. Nav chips and transport buttons sat at 26–28px, under any reasonable
+ *      touch minimum.
+ *   3. A handful of labels sat at 9.5–10.5px, which is fine on a monitor at
+ *      arm's length and not on a phone.
+ *
+ * Everything here is inside `pointer: coarse`, so the desktop layout — which
+ * these sizes were tuned for — is untouched. Nothing is hidden, moved or
+ * removed; targets only grow.
+ */
+
+@media (pointer: coarse) {
+  /* ---------- sliders ----------
+     Two different constructions exist in this codebase and they need different
+     treatment, so this is deliberately explicit rather than a blanket rule.
+
+     (a) The MRI, chapter-5 and homepage sliders paint the track on the INPUT
+         ITSELF (`background` on a 4px-tall element). Padding plus
+         `background-clip: content-box` keeps that colour painting in a 4px
+         strip while the element's box — the thing a finger has to hit — grows
+         to 34px. The selector is doubled because each module scopes its own
+         rule under a root class, which outranks a bare element selector; the
+         repetition is the cheapest way to win without `!important`.
+
+     (b) The ultrasound sliders already do it properly: a transparent 22px
+         element with the visual track on `::-webkit-slider-runnable-track`.
+         Those only need to be taller, and must NOT get the padding treatment —
+         it would shift the thumb off its track. */
+  .m5-root input[type='range'][type='range'],
+  .mri-vars input[type='range'][type='range'],
+  .mri-module input[type='range'][type='range'],
+  .qb-root input[type='range'][type='range'],
+  .home input[type='range'][type='range'] {
+    box-sizing: border-box;
+    height: 34px;
+    padding-block: 15px;
+    background-clip: content-box;
+  }
+
+  .us-slider input[type='range'][type='range'],
+  .us-vertical-slider input[type='range'][type='range'] {
+    height: 34px;
+  }
+  /* The thumb's negative margin was tuned to centre it in a 22px box; the box
+     is now 34px, so it needs the extra six pixels back. */
+  .us-slider input[type='range']::-webkit-slider-thumb {
+    margin-top: -11.5px;
+  }
+
+  /* ---------- tap targets ----------
+     40px, not 44: these are dense instrument controls sitting in rows, and 44
+     forces the rows to wrap in a way that pushes the diagram off screen. 40 is
+     comfortably hittable and keeps the instrument readable. */
+  /* Every selector below is deliberately written with its class repeated.
+
+     Module stylesheets are imported by lazily-loaded route chunks, so their
+     <style> elements are injected into the document AFTER this file no matter
+     where it sits in main.tsx. Import order therefore cannot win a tie, and at
+     equal specificity the later rule takes it. Doubling the class raises this
+     file to (0,2,0) and settles it without `!important`, which would then have
+     to be fought with more `!important` at the next change. */
+  .m5-chip.m5-chip,
+  .m5-tbtn.m5-tbtn,
+  .m5-nav-toggle.m5-nav-toggle,
+  .m5-nav-group.m5-nav-group,
+  .m5-nav-home.m5-nav-home,
+  .mri-chip.mri-chip,
+  .mri-chip-small.mri-chip-small,
+  .mri-icon-button.mri-icon-button,
+  .us-btn.us-btn,
+  .us-btn-small.us-btn-small,
+  .us-segmented button,
+  .mri-segmented button,
+  .lx-btn.lx-btn,
+  .m5-foot a,
+  .qb-nav a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Swatches are square by definition, so they grow in both axes. */
+  .cce-swatch.cce-swatch { min-width: 40px; min-height: 40px; }
+
+  /* Native selects get the platform picker, but the closed control still has
+     to be hittable. */
+  select { min-height: 40px; }
+
+  /* ---------- legibility ----------
+     A floor, not a redesign: these are eyebrows, counters and index numbers
+     whose desktop sizes are deliberately small. Same doubling, same reason. */
+  .m5-nav-group.m5-nav-group,
+  .m5-nav-kicker.m5-nav-kicker,
+  .m5-nav-count.m5-nav-count,
+  .m5-contents-n.m5-contents-n,
+  .m5-readouts .m5-readout dt,
+  .us-live.us-live,
+  .lx-numbers > span,
+  .lx-trap > span,
+  .mri-compare-label.mri-compare-label {
+    font-size: 11.5px;
+  }
+
+  /* Step and section numbers inside a badge. */
+  .m5-stage-step span,
+  .mrp-n.mrp-n,
+  .m5-contents-card .m5-contents-n,
+  .module-index.module-index,
+  .lx-contents span {
+    font-size: var(--fs-meta);
+  }
+
+  /* The uppercase eyebrow labels — "Taken as read", "Change a variable",
+     "FRCR high-yield", "Test yourself". Letterspaced small caps read acceptably
+     at 9.5px on a monitor and not at arm's length on a phone. */
+  .m5-inherits.m5-inherits > span:first-child,
+  .m5-change.m5-change > span:first-child,
+  .m5-why.m5-why h4,
+  .m5-hy.m5-hy h4,
+  .m5-quiz.m5-quiz h4,
+  .m5-readouts.m5-readouts .m5-readout dt {
+    font-size: var(--fs-meta);
+  }
+
+  /* Footer and contents link *lists* get real touch rows. Links inside a
+     running sentence are left alone on purpose — padding those to 40px would
+     break the line they belong to. */
+  .footer.footer a,
+  .qb-footer a,
+  .m5-nav-col.m5-nav-col a,
+  .m5-contents-card.m5-contents-card,
+  .mrp-entry.mrp-entry {
+    min-height: 40px;
+  }
+  .footer.footer a,
+  .qb-footer a {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* A phone in landscape is short, not narrow: a stage sized as a fraction of
+   viewport height leaves no room for the explanation underneath. Cap them so
+   the diagram and its text are on screen together. */
+@media (pointer: coarse) and (max-height: 520px) and (orientation: landscape) {
+  .m5-stage-normal { height: 62vh; }
+  .m5-stage-tall { height: 68vh; }
+  .m5-stage-short { height: 52vh; }
+  .lx-stage { height: 62vh; }
+  .mrx-instrument { height: 62vh; }
+}
+
+/* Targets found by a second audit pass, after the paged reading mode and the
+   left-hand control column landed. Same doubling rule as above. */
+@media (pointer: coarse) {
+  .m5-readmode.m5-readmode,
+  .m5-plan button,
+  .m5-why > summary,
+  .brand.brand,
+  .footer a,
+  .m5-foot a,
+  .mrp-foot a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Contents rows are full-width list items, not inline chips. */
+  .m5-plan button { display: flex; }
+
+  /* Index numerals in the section contents, the knowledge map and the dots. */
+  .m5-plan button span,
+  .m5-map-chain a span { font-size: var(--fs-meta); }
+}

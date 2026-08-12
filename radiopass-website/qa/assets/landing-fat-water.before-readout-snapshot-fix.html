@@ -1,0 +1,3555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Fat-Water Hydrogen Spin Grid and Pulse Encoding</title>
+  <style>
+    :root {
+      --bg0: #f4f8ff;
+      --bg1: #dce8f8;
+      --panel: #ffffff;
+      --ink: #10233a;
+      --muted: #4d647f;
+      --line: #c8d9eb;
+      --accent: #1d5f9f;
+      --b0: #2f6fb1;
+      --rf: #b55f22;
+      --gz: #2e8c63;
+      --gy: #7a4db6;
+      --gx: #2f78a7;
+      --coil: #624ca0;
+      --signal: #be3f54;
+      --spin: #6e879f;
+      --arm: #254f7a;
+      --shadow: 0 14px 34px rgba(14, 34, 61, 0.13);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 1rem;
+      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.9), transparent 46%),
+        radial-gradient(circle at 90% 92%, rgba(170, 200, 235, 0.34), transparent 42%),
+        linear-gradient(150deg, var(--bg0), var(--bg1));
+    }
+
+    .app {
+      width: min(1320px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.78rem;
+      animation: rise 340ms ease-out;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel {
+      border: 1px solid rgba(153, 182, 212, 0.45);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 251, 255, 0.93));
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 0.84rem 1rem;
+      display: grid;
+      gap: 0.33rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.06rem, 2vw, 1.5rem);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.34;
+    }
+
+    .controls {
+      padding: 0.68rem 0.9rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.45rem;
+    }
+
+    .control-group {
+      border: 1px solid rgba(134, 163, 191, 0.36);
+      border-radius: 12px;
+      padding: 0.42rem;
+      display: grid;
+      gap: 0.34rem;
+      align-content: start;
+      background: rgba(245, 251, 255, 0.88);
+      min-height: 116px;
+    }
+
+    .group-title {
+      margin: 0;
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2e567d;
+      font-weight: 700;
+    }
+
+    .group-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.34rem;
+      align-items: flex-start;
+    }
+
+    .weighting-wrap {
+      display: grid;
+      gap: 0.26rem;
+      margin-top: 0.08rem;
+    }
+
+    .weighting-wrap label {
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #3f3578;
+      font-weight: 700;
+    }
+
+    .weighting-wrap select {
+      border: 1px solid rgba(90, 73, 156, 0.42);
+      border-radius: 10px;
+      padding: 0.36rem 0.5rem;
+      background: linear-gradient(180deg, #f7f2ff, #ebe2ff);
+      color: #2f2563;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    button {
+      border: 1px solid rgba(43, 81, 125, 0.4);
+      border-radius: 999px;
+      padding: 0.43rem 0.82rem;
+      background: linear-gradient(180deg, #fbfdff, #eaf3ff);
+      color: #173551;
+      font: inherit;
+      font-size: 0.81rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      box-shadow: 0 6px 14px rgba(22, 51, 84, 0.16);
+    }
+
+    button.active {
+      border-color: rgba(31, 94, 157, 0.56);
+      background: linear-gradient(180deg, #e7f3ff, #d4e8ff);
+      color: #12395f;
+    }
+
+    button.mode-b0 { border-color: rgba(41, 99, 164, 0.5); }
+    button.mode-rf { border-color: rgba(171, 98, 40, 0.5); }
+    button.mode-gz { border-color: rgba(42, 118, 83, 0.5); }
+    button.mode-gy { border-color: rgba(97, 63, 150, 0.5); }
+    button.mode-gx { border-color: rgba(48, 116, 161, 0.5); }
+
+    .chip {
+      border: 1px solid rgba(108, 137, 167, 0.36);
+      border-radius: 999px;
+      padding: 0.3rem 0.65rem;
+      background: rgba(232, 243, 255, 0.74);
+      color: #24486b;
+      font-size: 0.78rem;
+      white-space: normal;
+      line-height: 1.25;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .big-notice {
+      position: fixed;
+      left: 50%;
+      top: 18%;
+      transform: translate(-50%, -18px) scale(0.92);
+      border-radius: 16px;
+      padding: 1rem 1.3rem;
+      border: 1px solid rgba(58, 106, 151, 0.35);
+      background: linear-gradient(180deg, rgba(242, 250, 255, 0.97), rgba(228, 241, 255, 0.95));
+      color: #173f66;
+      font-weight: 800;
+      font-size: clamp(1rem, 2.3vw, 1.38rem);
+      letter-spacing: 0.01em;
+      box-shadow: 0 20px 44px rgba(14, 34, 61, 0.26);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      transition: opacity 220ms ease, transform 220ms ease;
+      max-width: min(92vw, 860px);
+      text-align: center;
+    }
+
+    .big-notice.show {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .big-notice.t2 {
+      border-color: rgba(49, 111, 177, 0.45);
+      background: linear-gradient(180deg, rgba(232, 245, 255, 0.98), rgba(214, 234, 255, 0.95));
+      color: #174975;
+    }
+
+    .big-notice.t1 {
+      border-color: rgba(166, 100, 45, 0.42);
+      background: linear-gradient(180deg, rgba(255, 244, 229, 0.98), rgba(255, 233, 203, 0.95));
+      color: #6a3a0f;
+    }
+
+    .step-note {
+      position: fixed;
+      left: 50%;
+      bottom: 2rem;
+      transform: translateX(-50%);
+      width: min(92vw, 980px);
+      border: 1px solid rgba(75, 112, 149, 0.42);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(246, 252, 255, 0.98), rgba(231, 244, 255, 0.96));
+      box-shadow: 0 18px 38px rgba(12, 31, 55, 0.24);
+      padding: 0.72rem 0.8rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.64rem;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 32;
+      transition: opacity 200ms ease, transform 200ms ease;
+    }
+
+    .step-note.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .step-note-copy {
+      display: grid;
+      gap: 0.24rem;
+    }
+
+    .step-note-copy h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #214b73;
+      letter-spacing: 0.01em;
+    }
+
+    .step-note-copy p {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: #2b4f73;
+    }
+
+    #stepNextBtn {
+      border-color: rgba(40, 92, 145, 0.46);
+      background: linear-gradient(180deg, #e9f4ff, #dcecff);
+      color: #18466f;
+      min-width: 98px;
+      font-weight: 700;
+    }
+
+    .group-seq {
+      background: linear-gradient(180deg, rgba(243, 239, 255, 0.88), rgba(236, 248, 255, 0.86));
+    }
+
+    .group-seq .group-title {
+      color: #4b3a86;
+    }
+
+    .group-seq button {
+      border-color: rgba(87, 70, 155, 0.42);
+      background: linear-gradient(180deg, #f5f0ff, #e7ddff);
+      color: #35276c;
+    }
+
+    .group-pulse {
+      background: linear-gradient(180deg, rgba(255, 244, 235, 0.9), rgba(255, 249, 239, 0.88));
+    }
+
+    .group-pulse .group-title {
+      color: #7a4722;
+    }
+
+    .group-pulse button {
+      border-color: rgba(168, 107, 54, 0.45);
+      background: linear-gradient(180deg, #fff2e2, #ffe5c6);
+      color: #714112;
+    }
+
+    .group-grad {
+      background: linear-gradient(180deg, rgba(238, 252, 244, 0.9), rgba(236, 248, 255, 0.88));
+    }
+
+    .group-grad .group-title {
+      color: #246548;
+    }
+
+    .group-grad button {
+      border-color: rgba(57, 131, 95, 0.46);
+      background: linear-gradient(180deg, #e9f9ef, #d8f2e1);
+      color: #1e5b3f;
+    }
+
+    .group-view {
+      background: linear-gradient(180deg, rgba(241, 248, 255, 0.92), rgba(235, 245, 255, 0.9));
+    }
+
+    .group-view button {
+      border-color: rgba(69, 114, 154, 0.42);
+      background: linear-gradient(180deg, #f1f7ff, #dfeeff);
+      color: #214f77;
+    }
+
+    .group-snap {
+      background: linear-gradient(180deg, rgba(255, 241, 247, 0.9), rgba(246, 243, 255, 0.9));
+    }
+
+    .group-snap .group-title {
+      color: #7a2f52;
+    }
+
+    .group-snap button {
+      border-color: rgba(162, 69, 114, 0.38);
+      background: linear-gradient(180deg, #fff0f6, #f0e6ff);
+      color: #6f1f48;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.36fr 0.64fr;
+      gap: 0.78rem;
+      align-items: stretch;
+    }
+
+    .canvas-wrap {
+      padding: 0.7rem;
+      min-height: 590px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid rgba(142, 172, 203, 0.42);
+      background:
+        radial-gradient(circle at 16% 16%, rgba(204, 224, 246, 0.42), transparent 44%),
+        radial-gradient(circle at 84% 86%, rgba(182, 209, 240, 0.34), transparent 40%),
+        linear-gradient(160deg, #f8fcff, #edf5ff);
+    }
+
+    .side {
+      padding: 0.72rem;
+      display: grid;
+      gap: 0.52rem;
+      align-content: start;
+      max-height: 590px;
+      overflow: auto;
+    }
+
+    .card {
+      border: 1px solid rgba(145, 174, 204, 0.38);
+      border-radius: 11px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(237, 246, 255, 0.9));
+      box-shadow: 0 7px 18px rgba(25, 50, 82, 0.08);
+      padding: 0.54rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.36rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2f557b;
+    }
+
+    .card p {
+      margin: 0;
+      color: #264567;
+      font-size: 0.83rem;
+      line-height: 1.32;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.42rem;
+      margin-top: 0.46rem;
+    }
+
+    .metric {
+      border: 1px solid rgba(130, 160, 190, 0.36);
+      border-radius: 10px;
+      padding: 0.36rem;
+      background: rgba(248, 252, 255, 0.88);
+      color: #2a4d73;
+      font-size: 0.76rem;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 0.18rem;
+      font-size: 0.93rem;
+    }
+
+    .row-phase-list {
+      display: grid;
+      gap: 0.3rem;
+      margin-top: 0.4rem;
+    }
+
+    .row-phase-item {
+      border: 1px solid rgba(136, 164, 193, 0.34);
+      border-radius: 9px;
+      padding: 0.28rem 0.34rem;
+      background: rgba(246, 251, 255, 0.88);
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .row-phase-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.74rem;
+      color: #2a4d73;
+    }
+
+    .bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(164, 189, 215, 0.35);
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #496f9e, #4f87c5);
+      transition: width 120ms linear;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+      color: #254567;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      border: 1px solid rgba(133, 162, 191, 0.35);
+      padding: 0.26rem 0.3rem;
+      vertical-align: top;
+      line-height: 1.26;
+    }
+
+    .summary-table th {
+      background: rgba(227, 240, 255, 0.8);
+      color: #183f67;
+      font-weight: 700;
+    }
+
+    .snap-grid {
+      display: grid;
+      gap: 0.36rem;
+      margin-top: 0.35rem;
+    }
+
+    .snap-item {
+      border: 1px solid rgba(134, 163, 191, 0.34);
+      border-radius: 9px;
+      padding: 0.28rem;
+      background: rgba(246, 251, 255, 0.88);
+      display: grid;
+      gap: 0.24rem;
+    }
+
+    .snap-item img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 7px;
+      border: 1px solid rgba(136, 164, 193, 0.34);
+      background: linear-gradient(160deg, #eef4fd, #dbe8f8);
+      display: block;
+    }
+
+    .snap-meta {
+      font-size: 0.71rem;
+      color: #305173;
+      line-height: 1.25;
+      min-height: 1.1rem;
+    }
+
+    .mri-result {
+      display: grid;
+      gap: 0.34rem;
+      margin-top: 0.35rem;
+    }
+
+    .mri-result img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid rgba(136, 164, 193, 0.34);
+      background: linear-gradient(160deg, #eef4fd, #dbe8f8);
+      display: block;
+    }
+
+    .mri-caption {
+      font-size: 0.72rem;
+      color: #2f5173;
+      line-height: 1.25;
+    }
+
+    .mri-caption a {
+      color: #295a8a;
+      text-decoration: underline;
+    }
+
+    .seq-wrap {
+      border: 1px solid rgba(136, 164, 193, 0.34);
+      border-radius: 8px;
+      background: rgba(246, 251, 255, 0.9);
+      padding: 0.2rem;
+      margin-top: 0.32rem;
+    }
+
+    #seqCanvas {
+      width: 100%;
+      height: 180px;
+      display: block;
+      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(241, 248, 255, 0.9), rgba(231, 242, 255, 0.84));
+    }
+
+    .dynamics-panel {
+      padding: 0.68rem;
+      display: grid;
+      gap: 0.52rem;
+    }
+
+    .dynamics-head {
+      display: grid;
+      gap: 0.22rem;
+    }
+
+    .dynamics-head h2 {
+      margin: 0;
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2f557b;
+    }
+
+    .dynamics-head p {
+      margin: 0;
+      color: #2a4d73;
+      font-size: 0.82rem;
+      line-height: 1.32;
+    }
+
+    .dyn-grid {
+      display: grid;
+      grid-template-columns: 1.28fr 0.72fr;
+      gap: 0.58rem;
+    }
+
+    .dyn-card {
+      border: 1px solid rgba(136, 164, 193, 0.34);
+      border-radius: 10px;
+      background: rgba(246, 251, 255, 0.9);
+      padding: 0.28rem;
+    }
+
+    #relaxCanvas {
+      width: 100%;
+      height: 255px;
+      display: block;
+      border-radius: 7px;
+      background: linear-gradient(180deg, rgba(241, 248, 255, 0.9), rgba(231, 242, 255, 0.84));
+    }
+
+    #phaseCanvas {
+      width: 100%;
+      height: 255px;
+      display: block;
+      border-radius: 7px;
+      background: linear-gradient(180deg, rgba(241, 248, 255, 0.9), rgba(231, 242, 255, 0.84));
+    }
+
+    /* Dark fancy theme override */
+    :root {
+      --bg0: #050914;
+      --bg1: #12233f;
+      --panel: #111b2f;
+      --ink: #e6f0ff;
+      --muted: #b8c8de;
+      --line: #2e4667;
+      --accent: #65b6ff;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+    }
+
+    body {
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(84, 147, 232, 0.24), transparent 42%),
+        radial-gradient(circle at 85% 86%, rgba(128, 83, 217, 0.2), transparent 44%),
+        linear-gradient(150deg, #04080f, #0b162b 48%, #101f3a);
+    }
+
+    .panel {
+      border-color: rgba(102, 149, 202, 0.32);
+      background: linear-gradient(180deg, rgba(16, 28, 49, 0.96), rgba(11, 21, 39, 0.95));
+      box-shadow: var(--shadow);
+    }
+
+    .header p,
+    .card p,
+    .dynamics-head p,
+    .mri-caption,
+    .snap-meta,
+    .row-phase-line,
+    .metric,
+    .summary-table {
+      color: #c8d6ea !important;
+    }
+
+    .group-title,
+    .card h2,
+    .dynamics-head h2 {
+      color: #9fc7f3 !important;
+    }
+
+    .control-group,
+    .group-seq,
+    .group-pulse,
+    .group-grad,
+    .group-view,
+    .group-snap,
+    .card,
+    .row-phase-item,
+    .snap-item,
+    .seq-wrap,
+    .dyn-card {
+      background: linear-gradient(180deg, rgba(19, 34, 57, 0.94), rgba(13, 25, 44, 0.92)) !important;
+      border-color: rgba(106, 146, 191, 0.32) !important;
+      box-shadow: inset 0 1px 0 rgba(180, 215, 255, 0.06), 0 9px 22px rgba(0, 0, 0, 0.28);
+    }
+
+    button {
+      border-color: rgba(108, 155, 212, 0.4);
+      background: linear-gradient(180deg, #1a3354, #122742);
+      color: #e7f1ff;
+    }
+
+    button:hover {
+      box-shadow: 0 8px 20px rgba(35, 92, 161, 0.35);
+    }
+
+    button.active {
+      border-color: rgba(120, 187, 255, 0.68);
+      background: linear-gradient(180deg, #295187, #1a3d67);
+      color: #f4f9ff;
+    }
+
+    .chip {
+      border-color: rgba(109, 153, 203, 0.34);
+      background: rgba(27, 46, 72, 0.74);
+      color: #d8e7fb;
+    }
+
+    .weighting-wrap select {
+      border-color: rgba(120, 165, 220, 0.45);
+      background: linear-gradient(180deg, #192f4f, #122742);
+      color: #dfeeff;
+    }
+
+    canvas,
+    #seqCanvas,
+    #relaxCanvas,
+    #phaseCanvas,
+    .snap-item img,
+    .mri-result img {
+      border-color: rgba(102, 144, 190, 0.36) !important;
+      background:
+        radial-gradient(circle at 16% 16%, rgba(88, 135, 201, 0.22), transparent 44%),
+        radial-gradient(circle at 82% 84%, rgba(119, 79, 196, 0.2), transparent 44%),
+        linear-gradient(160deg, #0e1c33, #081425) !important;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      border-color: rgba(104, 146, 191, 0.34);
+    }
+
+    .summary-table th {
+      background: rgba(39, 67, 104, 0.7);
+      color: #e0eeff;
+    }
+
+    .bar {
+      background: rgba(120, 156, 199, 0.23);
+    }
+
+    .bar > span {
+      background: linear-gradient(90deg, #4f87c5, #74d0ff);
+    }
+
+    .big-notice {
+      border-color: rgba(122, 170, 222, 0.38);
+      background: linear-gradient(180deg, rgba(22, 39, 63, 0.96), rgba(13, 26, 46, 0.94));
+      color: #dff0ff;
+    }
+
+    .step-note {
+      border-color: rgba(96, 140, 189, 0.4);
+      background: linear-gradient(180deg, rgba(20, 36, 60, 0.97), rgba(12, 24, 43, 0.95));
+    }
+
+    .step-note-copy h3 {
+      color: #bcd9fb;
+    }
+
+    .step-note-copy p {
+      color: #d4e5fb;
+    }
+
+    @media (max-width: 1080px) {
+      .controls-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 440px;
+      }
+
+      .side {
+        max-height: none;
+      }
+
+      .dyn-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #relaxCanvas,
+      #phaseCanvas {
+        height: 220px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .control-group {
+        min-height: 0;
+      }
+    }
+  </style>
+  <script src="../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <div class="app">
+    <section class="panel header">
+      <h1>MRI Hydrogen in Water and Fat</h1>
+      <p>Same simulator layout with mixed hydrogen pools: water spins and fat spins, each with different precession and relaxation behavior.</p>
+      <p>Apply RF/gradients to see phasing, dephasing, rephasing, and chemical-shift separation during frequency encoding.</p>
+    </section>
+
+    <section class="panel controls">
+      <div class="controls-grid">
+        <div class="control-group group-seq">
+          <p class="group-title">Sequence</p>
+          <div class="group-buttons">
+            <button id="penEchoBtn" class="active">Pen Echo</button>
+            <button id="greBtn">Gradient Echo</button>
+            <button id="applySeqBtn">Guided Sequence</button>
+            <button id="autoBtn">Guided Auto</button>
+          </div>
+          <div class="weighting-wrap">
+            <label for="weightingSel">Image Weighting</label>
+            <select id="weightingSel" aria-label="MRI image weighting selection">
+              <option value="t2" selected>T2-weighted</option>
+              <option value="t1">T1-weighted</option>
+              <option value="pd">Proton Density (PD)</option>
+              <option value="flair">FLAIR</option>
+              <option value="stir">STIR</option>
+              <option value="dwi">DWI</option>
+              <option value="adc">ADC</option>
+              <option value="t2star">T2* (STAR / GRE)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group group-pulse">
+          <p class="group-title">Field / RF Pulses</p>
+          <div class="group-buttons">
+            <button id="b0Btn" class="mode-b0">Apply B0</button>
+            <button id="rf90Btn" class="mode-rf">Apply 90° RF</button>
+            <button id="rfOffBtn" class="mode-rf">RF Off (T2*)</button>
+            <button id="rf180Btn" class="mode-rf">Apply 180° RF</button>
+          </div>
+        </div>
+
+        <div class="control-group group-grad">
+          <p class="group-title">Gradients</p>
+          <div class="group-buttons">
+            <button id="sliceBtn" class="mode-gz">Slice Select Gz</button>
+            <button id="phaseBtn" class="mode-gy">Phase Encode Gy</button>
+            <button id="freqBtn" class="mode-gx">Frequency Encode Gx</button>
+          </div>
+        </div>
+
+        <div class="control-group group-view">
+          <p class="group-title">Scene / Playback</p>
+          <div class="group-buttons">
+            <button id="singleBtn" class="active">Single Hydrogen</button>
+            <button id="groupBtn">Add Hydrogen Group</button>
+            <button id="suscBtn">Susceptibility ON</button>
+            <button id="playBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="control-group group-snap">
+          <p class="group-title">Snapshots</p>
+          <div class="group-buttons">
+            <button id="snapT2Btn">Snapshot T2</button>
+            <button id="snapTEBtn">Snapshot TE</button>
+            <button id="snapTRBtn">Snapshot TR</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <span id="statusChip" class="chip">Before B0: random spins, no net magnetization.</span>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel canvas-wrap">
+        <canvas id="scene" aria-label="MRI hydrogen spin and encoding simulation"></canvas>
+      </div>
+
+      <aside class="panel side">
+        <article class="card">
+          <h2>Current Phase</h2>
+          <p id="phaseTitle">Before B0</p>
+          <p id="phaseText">No strong external magnetic field exists. Spins precess randomly at different frequencies and phases. Net magnetization is near zero.</p>
+        </article>
+
+        <article class="card">
+          <h2>Readout (Water + Fat)</h2>
+          <div class="metrics">
+            <div class="metric">Mz<strong id="mzVal">0.00</strong></div>
+            <div class="metric">Mxy<strong id="mxyVal">0.00</strong></div>
+            <div class="metric">Water Mxy<strong id="waterMxyVal">0.00</strong></div>
+            <div class="metric">Fat Mxy<strong id="fatMxyVal">0.00</strong></div>
+            <div class="metric">Water-Fat Phase Gap<strong id="phaseGapVal">0°</strong></div>
+            <div class="metric">Chemical Shift (readout)<strong id="chemShiftVal">Δf active only on Gx</strong></div>
+            <div class="metric">T1 recovery<strong id="t1Val">-</strong></div>
+            <div class="metric">T2/T2*<strong id="t2Val">-</strong></div>
+            <div class="metric">Echo marker<strong id="echoVal">-</strong></div>
+            <div class="metric">Coherence<strong id="cohVal">0%</strong></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Snapshots (T2 / TE / TR)</h2>
+          <p>Capture current view at key timing points.</p>
+          <div class="snap-grid">
+            <div class="snap-item">
+              <img id="snapT2Img" alt="T2 snapshot" />
+              <div id="snapT2Meta" class="snap-meta"></div>
+            </div>
+            <div class="snap-item">
+              <img id="snapTEImg" alt="TE snapshot" />
+              <div id="snapTEMeta" class="snap-meta"></div>
+            </div>
+            <div class="snap-item">
+              <img id="snapTRImg" alt="TR snapshot" />
+              <div id="snapTRMeta" class="snap-meta"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Real MRI Result</h2>
+          <p>When echo/result is formed, show a real example image for selected weighting.</p>
+          <div class="mri-result">
+            <img id="resultMriImg" alt="Real MRI example image for selected weighting" />
+            <div id="resultMriMeta" class="mri-caption"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Sequence Graph</h2>
+          <p id="seqLabel">Pen Echo selected: connected RF + Gz + Gy + Gx waveforms with RF 180° refocusing.</p>
+          <div class="seq-wrap">
+            <canvas id="seqCanvas" aria-label="Connected RF and gradient timeline"></canvas>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Row Phase (Gy Effect)</h2>
+          <p>Phase changes are shown for each row (combined water + fat), with species dephasing overlaid in main diagrams.</p>
+          <div id="rowPhaseList" class="row-phase-list"></div>
+        </article>
+
+        <article class="card">
+          <h2>FRCR Summary Table</h2>
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>Field Homogeneity</th>
+                <th>Precession</th>
+                <th>Magnetization</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Before B0</td>
+                <td>Random local fields</td>
+                <td>Random frequency and phase</td>
+                <td>Net ~ 0</td>
+              </tr>
+              <tr>
+                <td>After B0</td>
+                <td>Mostly homogeneous with small imperfections</td>
+                <td>Approx. Larmor with slight dephasing</td>
+                <td>Mz forms</td>
+              </tr>
+              <tr>
+                <td>After 90°</td>
+                <td>B0 same, B1 uniformity matters</td>
+                <td>Spins in phase in transverse plane</td>
+                <td>Mxy present, Mz reduced</td>
+              </tr>
+              <tr>
+                <td>RF Off</td>
+                <td>Inhomogeneity drives T2*</td>
+                <td>Phase coherence lost</td>
+                <td>Mxy decays, Mz recovers</td>
+              </tr>
+              <tr>
+                <td>After 180° (SE)</td>
+                <td>Static inhomogeneity refocused</td>
+                <td>Rephasing toward echo</td>
+                <td>T2 persists, true SE behavior</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      </aside>
+    </section>
+
+    <section class="panel dynamics-panel">
+      <div class="dynamics-head">
+        <h2>Spin, Dephase, Rephase View</h2>
+        <p>Left: X/Y/Z component decay and recovery with TE echo marker and T1/T2 timing. Right: spinning phase lock, de-spinning dephasing, and rephasing.</p>
+      </div>
+      <div class="dyn-grid">
+        <div class="dyn-card">
+          <canvas id="relaxCanvas" aria-label="XYZ recovery and decay timeline"></canvas>
+        </div>
+        <div class="dyn-card">
+          <canvas id="phaseCanvas" aria-label="Spin phase coherence map"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="bigNotice" class="big-notice" aria-live="polite"></div>
+  <div id="stepNote" class="step-note" aria-live="polite">
+    <div class="step-note-copy">
+      <h3 id="stepNoteTitle">Step Explanation</h3>
+      <p id="stepNoteBody">Each step pauses here. Click Next to continue.</p>
+    </div>
+    <button id="stepNextBtn">Next</button>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("scene");
+      const ctx = canvas.getContext("2d");
+      const relaxCanvas = document.getElementById("relaxCanvas");
+      const phaseCanvas = document.getElementById("phaseCanvas");
+
+      const ROWS = 6;
+      const COLS = 8;
+      const LARMOR = 2.2;
+      const FAT_RATIO = 0.38;
+
+      const SPECIES = {
+        water: {
+          name: "Water",
+          t1: 4.9,
+          t2: 2.9,
+          t2starBase: 1.7,
+          chemShift: 0.0,
+          sphereHi: "#e9f5ff",
+          sphereLo: "#5f8fbc",
+          arm: "#2c6b9f",
+          ring: "rgba(47, 120, 167, 0.46)"
+        },
+        fat: {
+          name: "Fat",
+          t1: 2.7,
+          t2: 1.9,
+          t2starBase: 1.2,
+          chemShift: -0.28,
+          sphereHi: "#fff2da",
+          sphereLo: "#c69758",
+          arm: "#9f6a2f",
+          ring: "rgba(181, 113, 46, 0.44)"
+        }
+      };
+
+      const MRI_SAMPLE_LIBRARY = {
+        t1: {
+          name: "T1-weighted",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/T1-weighted-MRI.png",
+          src: "https://commons.wikimedia.org/wiki/File:T1-weighted-MRI.png",
+          teach: "T1 weighting depends mainly on longitudinal recovery (Mz). T1 contrast is controlled primarily by TR; short TR increases T1 contrast. A short TE is used to minimize T2 contribution."
+        },
+        t2: {
+          name: "T2-weighted",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/MRI%20Brain%20T2%20Axial%20%282%29.jpg",
+          src: "https://commons.wikimedia.org/wiki/File:MRI_Brain_T2_Axial_(2).jpg",
+          teach: "T2 weighting depends on transverse decay (Mxy). TE controls T2 contrast; long TE increases T2 contrast. In Spin Echo, 90° excitation is followed by 180° refocusing at TE/2."
+        },
+        pd: {
+          name: "Proton Density (PD)",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/T1t2PD.jpg",
+          src: "https://commons.wikimedia.org/wiki/File:T1t2PD.jpg",
+          teach: "Proton-density weighting minimizes T1 and T2 effects: long TR minimizes T1 contribution and short TE minimizes T2 contribution."
+        },
+        flair: {
+          name: "FLAIR",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/FLAIR%20MRI%20of%20cerebral%20infarction.png",
+          src: "https://commons.wikimedia.org/wiki/File:FLAIR_MRI_of_cerebral_infarction.png",
+          teach: "FLAIR is inversion recovery (Spin Echo variant): first a 180° inversion pulse, then long TI (~2500 ms) to null fluid/CSF, then 90° excitation and SE refocusing."
+        },
+        stir: {
+          name: "STIR",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/Shinsplint-mri.jpg",
+          src: "https://commons.wikimedia.org/wiki/File:Shinsplint-mri.jpg",
+          teach: "STIR is inversion recovery (Spin Echo variant): first a 180° inversion pulse, then short TI (~130 ms) to null fat, then 90° excitation and SE refocusing."
+        },
+        t2star: {
+          name: "T2* (STAR / GRE)",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/T2-star%20MRI%20of%20cerebral%20infarction.png",
+          src: "https://commons.wikimedia.org/wiki/File:T2-star_MRI_of_cerebral_infarction.png",
+          teach: "T2* weighting is gradient-echo based: no RF 180° refocusing pulse, so static inhomogeneity and susceptibility effects remain."
+        },
+        dwi: {
+          name: "DWI",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/MRI%20Brain%20T2%20Axial%20%282%29.jpg",
+          src: "https://commons.wikimedia.org/wiki/File:MRI_Brain_T2_Axial_(2).jpg",
+          teach: "DWI uses paired diffusion gradients around 180° refocusing. Stationary spins rephase and moving spins lose signal. Restricted diffusion appears bright."
+        },
+        adc: {
+          name: "ADC",
+          img: "https://commons.wikimedia.org/wiki/Special:FilePath/MRI%20Brain%20T2%20Axial%20%282%29.jpg",
+          src: "https://commons.wikimedia.org/wiki/File:MRI_Brain_T2_Axial_(2).jpg",
+          teach: "ADC is a quantitative diffusion map computed from multiple b values. True restriction is bright on DWI and dark on ADC."
+        }
+      };
+
+      const els = {
+        singleBtn: document.getElementById("singleBtn"),
+        groupBtn: document.getElementById("groupBtn"),
+        penEchoBtn: document.getElementById("penEchoBtn"),
+        greBtn: document.getElementById("greBtn"),
+        applySeqBtn: document.getElementById("applySeqBtn"),
+        weightingSel: document.getElementById("weightingSel"),
+        b0Btn: document.getElementById("b0Btn"),
+        rf90Btn: document.getElementById("rf90Btn"),
+        rfOffBtn: document.getElementById("rfOffBtn"),
+        rf180Btn: document.getElementById("rf180Btn"),
+        sliceBtn: document.getElementById("sliceBtn"),
+        phaseBtn: document.getElementById("phaseBtn"),
+        freqBtn: document.getElementById("freqBtn"),
+        suscBtn: document.getElementById("suscBtn"),
+        autoBtn: document.getElementById("autoBtn"),
+        snapT2Btn: document.getElementById("snapT2Btn"),
+        snapTEBtn: document.getElementById("snapTEBtn"),
+        snapTRBtn: document.getElementById("snapTRBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        playBtn: document.getElementById("playBtn"),
+        statusChip: document.getElementById("statusChip"),
+        phaseTitle: document.getElementById("phaseTitle"),
+        phaseText: document.getElementById("phaseText"),
+        mzVal: document.getElementById("mzVal"),
+        mxyVal: document.getElementById("mxyVal"),
+        waterMxyVal: document.getElementById("waterMxyVal"),
+        fatMxyVal: document.getElementById("fatMxyVal"),
+        phaseGapVal: document.getElementById("phaseGapVal"),
+        chemShiftVal: document.getElementById("chemShiftVal"),
+        t1Val: document.getElementById("t1Val"),
+        t2Val: document.getElementById("t2Val"),
+        echoVal: document.getElementById("echoVal"),
+        cohVal: document.getElementById("cohVal"),
+        rowPhaseList: document.getElementById("rowPhaseList"),
+        snapT2Img: document.getElementById("snapT2Img"),
+        snapTEMeta: document.getElementById("snapTEMeta"),
+        snapTEImg: document.getElementById("snapTEImg"),
+        snapT2Meta: document.getElementById("snapT2Meta"),
+        snapTRImg: document.getElementById("snapTRImg"),
+        snapTRMeta: document.getElementById("snapTRMeta"),
+        resultMriImg: document.getElementById("resultMriImg"),
+        resultMriMeta: document.getElementById("resultMriMeta"),
+        seqCanvas: document.getElementById("seqCanvas"),
+        seqLabel: document.getElementById("seqLabel"),
+        bigNotice: document.getElementById("bigNotice"),
+        stepNote: document.getElementById("stepNote"),
+        stepNoteTitle: document.getElementById("stepNoteTitle"),
+        stepNoteBody: document.getElementById("stepNoteBody"),
+        stepNextBtn: document.getElementById("stepNextBtn")
+      };
+
+      const state = {
+        running: true,
+        time: 0,
+        lastFrameMs: performance.now(),
+        phase: "before_b0",
+        phaseStart: 0,
+        showGroup: false,
+        b0Applied: false,
+        sliceOn: false,
+        freqOn: false,
+        susceptOn: true,
+        rfTimer: 0,
+        kyIndex: 0,
+        phasePulseTimer: 0,
+        freqPulseTimer: 0,
+        sequenceMode: "pen",
+        weightingMode: "t2",
+        autoOn: false,
+        autoStart: 0,
+        slicePulseStart: -1,
+        autoIdx: 0,
+        autoEvents: [],
+        pendingTimers: [],
+        trace: [],
+        traceLastT: -1,
+        echoInfo: { type: "None", at: -1, teMs: 0, t1: 0, t2: 0 },
+        manualActions: [],
+        seqDetect: { t1Done: false, t2Done: false, noticeTimer: null },
+        guide: {
+          active: false,
+          queue: [],
+          idx: 0,
+          nextCb: null
+        },
+        actionOrigin: "auto",
+        visualTime: 0,
+        tagOverlay: { text: "", color: "#1d5f9f", timer: 0 },
+        spins: []
+      };
+
+      const KY_VALUES = [-1, -0.6, -0.25, 0.25, 0.6, 1];
+      const rowUi = [];
+
+      const GUIDE_NAMES = {
+        t1: "T1 weighted Spin Echo",
+        t2: "T2 weighted Spin Echo",
+        stir: "STIR",
+        flair: "FLAIR",
+        dwi: "DWI",
+        adc: "ADC"
+      };
+
+      const FRCR_STEPS = {
+        t1: [
+          { title: "Step 1", body: "Show B0 field on. All protons aligned. Net M along plus Z." },
+          { title: "Step 2", body: "Apply 90 degree RF pulse. Animate M flipping from Z into transverse plane. Label Mz to Mxy." },
+          { title: "Step 3", body: "Show transverse precession. Fat and water start in phase." },
+          { title: "Step 4", body: "Show natural dephasing beginning. Label T2 decay starts." },
+          { title: "Step 5", body: "Apply 180 degree pulse at TE divided by 2. Flip transverse spins and show rephasing." },
+          { title: "Step 6", body: "At TE show echo formation and signal detection." },
+          { title: "Step 7", body: "Set TR short and show incomplete longitudinal recovery." },
+          { title: "Step 8", body: "Animate fat recovery faster than water before next pulse. Fat arrow longer than water." },
+          { title: "Step 9", body: "Display result panel. Fat bright. Water dark. Label T1 contrast." }
+        ],
+        t2: [
+          { title: "Step 1", body: "Show full recovery before pulse. Label TR long." },
+          { title: "Step 2", body: "Apply 90 degree RF pulse and flip M into transverse plane." },
+          { title: "Step 3", body: "Apply 180 pulse at TE divided by 2." },
+          { title: "Step 4", body: "Show echo at long TE." },
+          { title: "Step 5", body: "Animate fat transverse signal decaying faster." },
+          { title: "Step 6", body: "Animate water transverse signal persisting longer." },
+          { title: "Step 7", body: "Display amplitude comparison at TE." },
+          { title: "Step 8", body: "Show water arrow longer than fat." },
+          { title: "Step 9", body: "Display result panel. Water bright. Fat intermediate. Label T2 contrast." }
+        ],
+        stir: [
+          { title: "Step 1", body: "Apply 180 inversion pulse first. Flip magnetization to negative Z." },
+          { title: "Step 2", body: "Show longitudinal recovery upward." },
+          { title: "Step 3", body: "Pause at TI where fat crosses zero and highlight fat arrow equals zero." },
+          { title: "Step 4", body: "Apply 90 pulse at that exact TI." },
+          { title: "Step 5", body: "Fat produces no transverse signal while water produces signal." },
+          { title: "Step 6", body: "Apply 180 refocusing pulse." },
+          { title: "Step 7", body: "Use long TR and long TE and keep that label visible." },
+          { title: "Step 8", body: "Show echo formation." },
+          { title: "Step 9", body: "Display result. Fat black. Fluid bright. Label fat suppressed via inversion recovery." }
+        ],
+        flair: [
+          { title: "Step 1", body: "Apply 180 inversion pulse." },
+          { title: "Step 2", body: "Show CSF recovering slowly." },
+          { title: "Step 3", body: "Pause at TI where CSF crosses zero." },
+          { title: "Step 4", body: "Apply 90 pulse." },
+          { title: "Step 5", body: "CSF gives no signal." },
+          { title: "Step 6", body: "Apply 180 refocusing pulse." },
+          { title: "Step 7", body: "Use long TR and long TE." },
+          { title: "Step 8", body: "Show echo." },
+          { title: "Step 9", body: "Display result. CSF dark. Oedema bright. Label CSF suppressed T2." }
+        ],
+        dwi: [
+          { title: "Step 1", body: "Apply 90 pulse." },
+          { title: "Step 2", body: "Apply first diffusion gradient G1 and show spins acquiring phase." },
+          { title: "Step 3", body: "Apply 180 pulse." },
+          { title: "Step 4", body: "Apply second diffusion gradient G2 equal to G1." },
+          { title: "Step 5", body: "If spins did not move they rephase completely." },
+          { title: "Step 6", body: "If spins moved they rephase incompletely." },
+          { title: "Step 7", body: "Show moving water losing signal." },
+          { title: "Step 8", body: "Display b value and compare low b versus high b." },
+          { title: "Step 9", body: "Display result. Restricted diffusion bright on DWI." }
+        ],
+        adc: [
+          { title: "Step 1", body: "Show two DWI images with low b and high b." },
+          { title: "Step 2", body: "Show signal difference calculation between b values." },
+          { title: "Step 3", body: "Display logarithmic signal formula." },
+          { title: "Step 4", body: "Compute diffusion coefficient per voxel." },
+          { title: "Step 5", body: "Generate quantitative ADC map." },
+          { title: "Step 6", body: "Restricted diffusion appears dark on ADC." },
+          { title: "Step 7", body: "Free diffusion appears bright on ADC." },
+          { title: "Step 8", body: "Show DWI and ADC side by side for comparison." },
+          { title: "Step 9", body: "Label true restriction as bright DWI with dark ADC." }
+        ]
+      };
+
+      const GUIDE_ACTIONS = {
+        t1: ["group", "b0", "rf90", "rfOff", "rf180", "echoSE", "guide_note_7", "guide_note_8", "guide_note_9"],
+        t2: ["b0", "rf90", "rf180", "echoSE", "guide_note_5", "guide_note_6", "guide_note_7", "guide_note_8", "guide_note_9"],
+        stir: ["guide_inv", "guide_rec", "guide_ti", "rf90", "guide_zero", "rf180", "guide_long", "echoSE", "guide_result"],
+        flair: ["guide_inv", "guide_csf", "guide_ti", "rf90", "guide_zero", "rf180", "guide_long", "echoSE", "guide_result"],
+        dwi: ["rf90", "guide_g1", "rf180", "guide_g2", "guide_nomove", "guide_move", "guide_loss", "guide_b", "guide_result"],
+        adc: ["guide_bpair", "guide_diff", "guide_log", "guide_voxel", "guide_map", "guide_dark", "guide_bright", "guide_compare", "guide_result"]
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function lerpAngle(a, b, t) {
+        const d = Math.atan2(Math.sin(b - a), Math.cos(b - a));
+        return a + d * t;
+      }
+
+      function wrapAngle(a) {
+        while (a > Math.PI) a -= Math.PI * 2;
+        while (a < -Math.PI) a += Math.PI * 2;
+        return a;
+      }
+
+      function showBigNotice(message, type) {
+        const el = els.bigNotice;
+        if (!el) return;
+        el.textContent = message;
+        el.classList.remove("t1", "t2");
+        if (type) el.classList.add(type);
+        el.classList.add("show");
+
+        if (state.seqDetect.noticeTimer) {
+          window.clearTimeout(state.seqDetect.noticeTimer);
+        }
+        state.seqDetect.noticeTimer = window.setTimeout(() => {
+          el.classList.remove("show");
+        }, 2400);
+      }
+
+      function hasOrderedPattern(actions, pattern) {
+        let idx = 0;
+        for (let i = 0; i < actions.length; i += 1) {
+          if (actions[i] === pattern[idx]) idx += 1;
+          if (idx >= pattern.length) return true;
+        }
+        return false;
+      }
+
+      function checkSequenceAchievements() {
+        const names = state.manualActions.map((a) => a.name);
+
+        const isT2 = state.sequenceMode === "pen"
+          && hasOrderedPattern(names, ["b0", "sliceOn", "rf90", "phase", "rf180"]);
+
+        const isT1 = state.sequenceMode === "gre"
+          && hasOrderedPattern(names, ["b0", "sliceOn", "rf90", "phase", "freqOn"]);
+
+        if (isT2 && !state.seqDetect.t2Done) {
+          state.seqDetect.t2Done = true;
+          const irSelected = isInversionRecoveryWeighting();
+          showBigNotice(
+            irSelected
+              ? "Well done, you built the Spin Echo core. STIR/FLAIR still need inversion 180° + TI."
+              : "Well done, you just did a T2 sequence.",
+            "t2"
+          );
+          updateResultMri(irSelected ? "Spin Echo core achieved" : "T2 sequence achieved");
+          playClick(0.09, 1400, 0.06);
+        }
+
+        if (isT1 && !state.seqDetect.t1Done) {
+          state.seqDetect.t1Done = true;
+          showBigNotice("Well done, you built a GRE-style T1-weighted setup.", "t1");
+          updateResultMri("GRE-style T1 setup achieved");
+          playClick(0.09, 1480, 0.06);
+        }
+      }
+
+      function recordManualAction(name) {
+        state.manualActions.push({ name, t: state.time });
+        while (state.manualActions.length > 24) state.manualActions.shift();
+        const cutoff = state.time - 28;
+        while (state.manualActions.length && state.manualActions[0].t < cutoff) {
+          state.manualActions.shift();
+        }
+        checkSequenceAchievements();
+      }
+
+      function openStepNote(title, body, nextCb) {
+        if (!els.stepNote) return;
+        els.stepNoteTitle.textContent = title;
+        els.stepNoteBody.textContent = body;
+        state.guide.nextCb = nextCb || null;
+        els.stepNote.classList.add("show");
+        state.running = false;
+      }
+
+      function closeStepNote(resume = true) {
+        if (!els.stepNote) return;
+        els.stepNote.classList.remove("show");
+        state.guide.nextCb = null;
+        if (resume) state.running = true;
+      }
+
+      function currentGuideKey() {
+        if (FRCR_STEPS[state.weightingMode]) return state.weightingMode;
+        if (state.weightingMode === "t2star") return "t2";
+        if (state.weightingMode === "pd") return "t2";
+        return "t2";
+      }
+
+      function stepInfoFor(actionName, guideIndex = null, guideKey = null) {
+        const key = guideKey || currentGuideKey();
+        if (typeof guideIndex === "number" && FRCR_STEPS[key] && FRCR_STEPS[key][guideIndex]) {
+          return FRCR_STEPS[key][guideIndex];
+        }
+
+        const map = {
+          group: { title: "Hydrogen Group", body: "Multiple spins shown so phase behavior can be seen clearly." },
+          b0: { title: "Apply B0", body: "B0 aligns protons and forms net longitudinal magnetization Mz." },
+          sliceOn: { title: "Slice Select", body: "Gz with RF excites a selected slice." },
+          rf90: { title: "RF 90", body: "90 degree RF pulse tips magnetization into transverse plane." },
+          phase: { title: "Gy Phase Encode", body: "Gy changes phase and selects ky position." },
+          freqOn: { title: "Gx Readout", body: "Gx readout traverses kx and samples signal." },
+          rfOff: { title: "RF Off", body: "Transverse dephasing starts and longitudinal recovery continues." },
+          rf180: { title: "RF 180", body: "180 degree pulse refocuses dephasing for spin echo." },
+          echoSE: { title: "Echo", body: "Echo forms at TE and signal is recorded." },
+          echoGRE: { title: "GRE Echo", body: "Gradient echo forms by gradient rephasing." },
+          sliceOff: { title: "Slice Off", body: "Slice select gradient is turned off." },
+          freqOff: { title: "Readout Off", body: "Frequency encoding is turned off." }
+        };
+        return map[actionName] || { title: "Step", body: "Sequence step applied." };
+      }
+
+      function shouldExplainAction(actionName) {
+        return ["b0", "sliceOn", "sliceOff", "rf90", "phase", "freqOn", "freqOff", "rfOff", "rf180", "echoSE", "echoGRE", "group"].includes(actionName);
+      }
+
+      function guidedSteps() {
+        const key = currentGuideKey();
+        return GUIDE_ACTIONS[key] ? GUIDE_ACTIONS[key].slice() : GUIDE_ACTIONS.t2.slice();
+      }
+
+      function stopGuidedMode() {
+        state.guide.active = false;
+        state.guide.queue = [];
+        state.guide.idx = 0;
+        state.guide.nextCb = null;
+        els.autoBtn.classList.remove("active");
+        els.autoBtn.textContent = "Guided Auto";
+      }
+
+      function guidedAdvance() {
+        if (!state.guide.active) return;
+        const key = currentGuideKey();
+        const seqName = GUIDE_NAMES[key] || "MRI Sequence";
+        if (state.guide.idx >= state.guide.queue.length) {
+          openStepNote(
+            "Guided Sequence Complete",
+            `${seqName} nine steps completed. Click Next to continue free simulation.`,
+            () => {
+              closeStepNote(true);
+              stopGuidedMode();
+            }
+          );
+          return;
+        }
+
+        const action = state.guide.queue[state.guide.idx];
+        state.guide.idx += 1;
+        runAction(action, "guided");
+        const info = stepInfoFor(action, state.guide.idx - 1, key);
+        openStepNote(
+          `${seqName} ${info.title} of ${state.guide.queue.length}`,
+          info.body,
+          guidedAdvance
+        );
+      }
+
+      function startGuidedMode() {
+        stopAuto();
+        clearPendingTimers();
+        resetAll();
+        const key = currentGuideKey();
+        if (key === "t1" || key === "t2" || key === "stir" || key === "flair") {
+          setSequenceMode("pen");
+        }
+        state.guide.active = true;
+        state.guide.queue = guidedSteps();
+        state.guide.idx = 0;
+        els.autoBtn.classList.add("active");
+        els.autoBtn.textContent = "Guided ON";
+        guidedAdvance();
+      }
+
+      function onStepNext() {
+        const cb = state.guide.nextCb;
+        if (typeof cb === "function") {
+          cb();
+          return;
+        }
+        closeStepNote(true);
+      }
+
+      function weightingData() {
+        return MRI_SAMPLE_LIBRARY[state.weightingMode] || MRI_SAMPLE_LIBRARY.t2;
+      }
+
+      function isInversionRecoveryWeighting(mode = state.weightingMode) {
+        return mode === "stir" || mode === "flair";
+      }
+
+      function sequenceLabelText() {
+        const isPen = state.sequenceMode === "pen";
+        if (state.weightingMode === "dwi") {
+          return "DWI selected: 90 pulse then diffusion gradient G1, 180 pulse, and diffusion gradient G2. Signal depends on motion and b value.";
+        }
+        if (state.weightingMode === "adc") {
+          return "ADC selected: compare low b and high b diffusion images, then compute voxel diffusion coefficient map.";
+        }
+        if (isInversionRecoveryWeighting()) {
+          if (state.weightingMode === "stir") {
+            return isPen
+              ? "STIR selected: inversion recovery Spin Echo (Pen Echo view) requires initial 180° inversion, short TI (~130 ms), then 90° and refocusing 180°."
+              : "STIR selected with Gradient Echo: mismatch. STIR is inversion recovery Spin Echo (initial 180° inversion + short TI + 90°), not GRE.";
+          }
+          return isPen
+            ? "FLAIR selected: inversion recovery Spin Echo (Pen Echo view) requires initial 180° inversion, long TI (~2500 ms), then 90° and refocusing 180°."
+            : "FLAIR selected with Gradient Echo: mismatch. FLAIR is inversion recovery Spin Echo (initial 180° inversion + long TI + 90°), not GRE.";
+        }
+        return isPen
+          ? "Pen Echo selected: connected RF + Gz + Gy + Gx waveforms with RF 180° refocusing."
+          : "Gradient Echo selected: connected RF + Gz + Gy + Gx waveforms with gradient rephasing and no RF 180°.";
+      }
+
+      function updateResultMri(triggerLabel) {
+        const info = weightingData();
+        if (!els.resultMriImg || !els.resultMriMeta) return;
+        els.resultMriImg.src = info.img;
+        const sourceLabel = "Wikimedia Commons";
+        const action = triggerLabel ? `${triggerLabel}. ` : "";
+        const teaching = info.teach ? `${info.teach} ` : "";
+        const mismatch = isInversionRecoveryWeighting() && state.sequenceMode === "gre"
+          ? "<strong>Correction:</strong> STIR/FLAIR are inversion-recovery Spin Echo techniques and start with a 180° inversion pulse before the 90° excitation."
+          : "";
+        els.resultMriMeta.innerHTML = `${action}<strong>${info.name}</strong> example loaded. ${teaching}${mismatch} Source: <a href="${info.src}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>.`;
+      }
+
+      function setWeightingMode(mode) {
+        if (!MRI_SAMPLE_LIBRARY[mode]) return;
+        state.weightingMode = mode;
+        if (els.weightingSel && els.weightingSel.value !== mode) {
+          els.weightingSel.value = mode;
+        }
+        if (els.seqLabel) {
+          els.seqLabel.textContent = sequenceLabelText();
+        }
+        if (mode === "t1") {
+          els.statusChip.textContent = "T1 sequence selected. Short TR emphasizes T1 recovery. Fat tends bright and water tends dark.";
+        } else if (mode === "t2") {
+          els.statusChip.textContent = "T2 sequence selected. Long TR and long TE emphasize T2 decay. Water tends bright.";
+        } else if (mode === "pd") {
+          els.statusChip.textContent = "PD sequence selected. Contrast mainly reflects proton density.";
+        } else if (mode === "t2star") {
+          els.statusChip.textContent = "T2 star selected. Gradient echo keeps susceptibility and inhomogeneity effects.";
+        } else if (mode === "stir") {
+          els.statusChip.textContent = "STIR selected. Inversion recovery with TI chosen to null fat before 90 pulse.";
+        } else if (mode === "flair") {
+          els.statusChip.textContent = "FLAIR selected. Inversion recovery with TI chosen to null CSF before 90 pulse.";
+        } else if (mode === "dwi") {
+          els.statusChip.textContent = "DWI selected. Diffusion gradients encode motion. Restricted diffusion appears bright on DWI.";
+        } else if (mode === "adc") {
+          els.statusChip.textContent = "ADC selected. Quantitative diffusion map from multiple b values. True restriction is dark on ADC.";
+        }
+        updateResultMri("Weighting selected");
+      }
+
+      function playGradientTone(kind) {
+        const ctx = ensureAudio();
+        if (!ctx || !audio.master) return;
+        const now = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sawtooth";
+        const f0 = kind === "gx" ? 540 : 760;
+        const f1 = kind === "gx" ? 320 : 480;
+        osc.frequency.setValueAtTime(f0, now);
+        osc.frequency.exponentialRampToValueAtTime(f1, now + 0.12);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.075, now + 0.018);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+        osc.connect(gain);
+        gain.connect(audio.master);
+        osc.start(now);
+        osc.stop(now + 0.17);
+      }
+
+      function showLargeTag(text, color, dur = 1.45) {
+        state.tagOverlay.text = text;
+        state.tagOverlay.color = color || "#1d5f9f";
+        state.tagOverlay.timer = dur;
+      }
+
+      function scheduleTRSnapshot() {
+        const trDelayMs = 1500;
+        const id = window.setTimeout(() => {
+          captureSnapshot("tr", "TR auto snapshot");
+          showLargeTag("TR", "#2f6fb1", 1.55);
+        }, trDelayMs);
+        state.pendingTimers.push(id);
+      }
+
+      function tickVisualTimers(dt) {
+        state.phasePulseTimer = Math.max(0, state.phasePulseTimer - dt);
+        state.freqPulseTimer = Math.max(0, state.freqPulseTimer - dt);
+        state.tagOverlay.timer = Math.max(0, state.tagOverlay.timer - dt);
+      }
+
+      function spinModel(kind) {
+        return SPECIES[kind] || SPECIES.water;
+      }
+
+      function estimateRelaxTimes() {
+        const spins = activeSpins();
+        const acc = {
+          all: { t1: 0, t2: 0, t2star: 0, n: 0 },
+          water: { t1: 0, t2: 0, t2star: 0, n: 0 },
+          fat: { t1: 0, t2: 0, t2star: 0, n: 0 }
+        };
+
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          const model = spinModel(s.kind);
+          const bucket = acc[s.kind] || acc.water;
+          const t2s = model.t2starBase / (1 + Math.abs(s.suscDetune) * 1.35 + Math.abs(s.baseDetune));
+
+          bucket.t1 += model.t1;
+          bucket.t2 += model.t2;
+          bucket.t2star += t2s;
+          bucket.n += 1;
+
+          acc.all.t1 += model.t1;
+          acc.all.t2 += model.t2;
+          acc.all.t2star += t2s;
+          acc.all.n += 1;
+        }
+
+        const avg = (obj, key, fallback) => obj.n > 0 ? (obj[key] / obj.n) : fallback;
+        return {
+          t1: avg(acc.all, "t1", 4.1),
+          t2: avg(acc.all, "t2", 2.4),
+          t2star: avg(acc.all, "t2star", 1.45),
+          water: {
+            t1: avg(acc.water, "t1", SPECIES.water.t1),
+            t2: avg(acc.water, "t2", SPECIES.water.t2),
+            t2star: avg(acc.water, "t2star", SPECIES.water.t2starBase)
+          },
+          fat: {
+            t1: avg(acc.fat, "t1", SPECIES.fat.t1),
+            t2: avg(acc.fat, "t2", SPECIES.fat.t2),
+            t2star: avg(acc.fat, "t2star", SPECIES.fat.t2starBase)
+          }
+        };
+      }
+
+      function markEcho(type) {
+        const relax = estimateRelaxTimes();
+        const isSE = type === "SE";
+        const teMs = isSE ? 74 : 69;
+        const t2 = isSE ? relax.t2 : relax.t2star;
+
+        state.echoInfo = {
+          type,
+          at: state.time,
+          teMs,
+          t1: relax.t1,
+          t2
+        };
+
+        els.statusChip.textContent = isSE
+          ? `SE echo at TE ~${teMs} ms | Water T1/T2 ${relax.water.t1.toFixed(1)}/${relax.water.t2.toFixed(1)} s | Fat T1/T2 ${relax.fat.t1.toFixed(1)}/${relax.fat.t2.toFixed(1)} s`
+          : `GRE echo at TE ~${teMs} ms | Water T2* ${relax.water.t2star.toFixed(2)} s | Fat T2* ${relax.fat.t2star.toFixed(2)} s`;
+        updateResultMri("Echo result");
+        captureSnapshot("te", "TE auto snapshot");
+        showLargeTag("TE", "#8f3043", 1.55);
+        scheduleTRSnapshot();
+        playClick(0.06, 1320, 0.05);
+      }
+
+      const audio = {
+        ctx: null,
+        master: null
+      };
+
+      function ensureAudio() {
+        if (!audio.ctx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          audio.ctx = new Ctx();
+          audio.master = audio.ctx.createGain();
+          audio.master.gain.value = 0.12;
+          audio.master.connect(audio.ctx.destination);
+        }
+        if (audio.ctx.state === "suspended") {
+          audio.ctx.resume();
+        }
+        return audio.ctx;
+      }
+
+      function playClick(volume = 0.06, freq = 1200, dur = 0.035) {
+        const ctx = ensureAudio();
+        if (!ctx || !audio.master) return;
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(120, freq * 0.5), now + dur);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume), now + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        osc.connect(gain);
+        gain.connect(audio.master);
+        osc.start(now);
+        osc.stop(now + dur + 0.01);
+      }
+
+      function playRfTone(is180 = false) {
+        const ctx = ensureAudio();
+        if (!ctx || !audio.master) return;
+
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+
+        const f0 = is180 ? 520 : 700;
+        const f1 = is180 ? 320 : 460;
+        osc.frequency.setValueAtTime(f0, now);
+        osc.frequency.exponentialRampToValueAtTime(f1, now + 0.15);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.09, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+        osc.connect(gain);
+        gain.connect(audio.master);
+        osc.start(now);
+        osc.stop(now + 0.24);
+      }
+
+      function playWhoosh() {
+        const ctx = ensureAudio();
+        if (!ctx || !audio.master) return;
+
+        const now = ctx.currentTime;
+        const dur = 0.28;
+        const n = Math.max(1, Math.floor(ctx.sampleRate * dur));
+        const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < n; i += 1) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / n);
+        }
+
+        const srcN = ctx.createBufferSource();
+        srcN.buffer = buf;
+
+        const hp = ctx.createBiquadFilter();
+        hp.type = "highpass";
+        hp.frequency.setValueAtTime(280, now);
+
+        const lp = ctx.createBiquadFilter();
+        lp.type = "lowpass";
+        lp.frequency.setValueAtTime(2400, now);
+        lp.frequency.linearRampToValueAtTime(700, now + dur);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        srcN.connect(hp);
+        hp.connect(lp);
+        lp.connect(gain);
+        gain.connect(audio.master);
+        srcN.start(now);
+        srcN.stop(now + dur + 0.01);
+      }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(280, Math.floor(rect.width));
+        const h = Math.max(280, Math.floor(rect.height));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function project3D(x, y, z, camera, focal) {
+        const denom = camera.z - z;
+        const k = focal / Math.max(0.25, denom);
+        return {
+          x: camera.cx + x * k,
+          y: camera.cy - y * k,
+          k,
+          depth: z
+        };
+      }
+
+      function initRowUi() {
+        els.rowPhaseList.innerHTML = "";
+        rowUi.length = 0;
+        for (let r = 0; r < ROWS; r += 1) {
+          const item = document.createElement("div");
+          item.className = "row-phase-item";
+
+          const line = document.createElement("div");
+          line.className = "row-phase-line";
+
+          const left = document.createElement("span");
+          left.textContent = `Row ${r + 1}`;
+
+          const right = document.createElement("span");
+          right.textContent = "0°";
+
+          line.append(left, right);
+
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          const fill = document.createElement("span");
+          bar.append(fill);
+
+          item.append(line, bar);
+          els.rowPhaseList.append(item);
+          rowUi.push({ right, fill });
+        }
+      }
+
+      function makeSpin(row, col) {
+        const cR = (ROWS - 1) / 2;
+        const cC = (COLS - 1) / 2;
+        const x = (col - cC) * 0.72;
+        const y = (row - cR) * 0.72;
+        const z = 0;
+        const kind = Math.random() < FAT_RATIO ? "fat" : "water";
+        const model = spinModel(kind);
+
+        const edgeFactor = Math.max(
+          Math.abs(row - cR) / cR,
+          Math.abs(col - cC) / cC
+        );
+
+        return {
+          row,
+          col,
+          kind,
+          x,
+          y,
+          z,
+          phase: Math.random() * Math.PI * 2,
+          mLong: (Math.random() * 2) - 1,
+          mTrans: 0.4 + Math.random() * 0.6,
+          baseDetune: (Math.random() * 2 - 1) * (kind === "fat" ? 0.25 : 0.35),
+          chemShift: model.chemShift,
+          suscDetune: edgeFactor * (0.12 + Math.random() * 0.5),
+          staticSign: 1,
+          excited: false,
+          eqLong: Math.random() < (kind === "fat" ? 0.68 : 0.62) ? 1 : -0.8
+        };
+      }
+
+      function buildSpins() {
+        state.spins = [];
+        for (let r = 0; r < ROWS; r += 1) {
+          for (let c = 0; c < COLS; c += 1) {
+            state.spins.push(makeSpin(r, c));
+          }
+        }
+      }
+
+      function centerSpin() {
+        const r = Math.floor((ROWS - 1) / 2);
+        const c = Math.floor((COLS - 1) / 2);
+        return state.spins.find((s) => s.row === r && s.col === c) || state.spins[0];
+      }
+
+      function spinInSlice(spin) {
+        if (!state.sliceOn) return true;
+        const cR = (ROWS - 1) / 2;
+        return Math.abs(spin.row - cR) <= 1;
+      }
+
+      function activeSpins() {
+        if (!state.showGroup) {
+          return [centerSpin()];
+        }
+        return state.spins;
+      }
+
+      function setPhase(phaseKey) {
+        state.phase = phaseKey;
+        state.phaseStart = state.time;
+
+        if (phaseKey === "before_b0") {
+          els.phaseTitle.textContent = "Before B0";
+          els.phaseText.textContent = "No strong external magnetic field exists. Spins precess randomly with different frequencies and phases, so net magnetization is near zero.";
+          els.statusChip.textContent = "Before B0: random spins, no net magnetization.";
+        }
+
+        if (phaseKey === "after_b0") {
+          els.phaseTitle.textContent = "After B0";
+          els.phaseText.textContent = "Water and fat spins align to B0. Both precess near Larmor frequency, but fat is chemically shifted relative to water, so they can separate in phase.";
+          els.statusChip.textContent = "After B0: Mz forms; water-fat chemical shift present.";
+        }
+
+        if (phaseKey === "during_rf") {
+          els.phaseTitle.textContent = "During RF 90°";
+          els.phaseText.textContent = "RF at Larmor frequency drives phase coherence and tips magnetization toward transverse plane. B1 uniformity controls flip-angle consistency.";
+          els.statusChip.textContent = "During RF: coherent tipping and Mxy creation.";
+        }
+
+        if (phaseKey === "after_90") {
+          els.phaseTitle.textContent = "Immediately After 90°";
+          els.phaseText.textContent = "Transverse magnetization is high and coherent. Water and fat start together, then phase diverges due to chemical shift and field imperfections.";
+          els.statusChip.textContent = "After 90°: Mxy rotates; water-fat phase gap begins.";
+        }
+
+        if (phaseKey === "after_rf_off") {
+          els.phaseTitle.textContent = "After RF Stops (T2*)";
+          els.phaseText.textContent = "Inhomogeneities drive phase dispersion immediately. Mxy decays with T2* behavior while Mz slowly recovers (T1).";
+          els.statusChip.textContent = "RF off: dephasing and T2* decay.";
+        }
+
+        if (phaseKey === "after_180") {
+          els.phaseTitle.textContent = "After 180° Spin Echo Pulse";
+          els.phaseText.textContent = "Static field inhomogeneity is refocused and spins rephase toward echo. Intrinsic T2 decay still continues, so echo amplitude remains limited.";
+          els.statusChip.textContent = "After 180°: rephasing toward spin echo.";
+        }
+      }
+
+      function alignSpinsForB0() {
+        const spins = activeSpins();
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          s.eqLong = Math.random() < (s.kind === "fat" ? 0.68 : 0.62) ? 1 : -0.8;
+          s.mLong = s.eqLong;
+          s.mTrans = 0.07 + Math.random() * 0.03;
+          s.phase = Math.random() * Math.PI * 2;
+          s.excited = false;
+          s.staticSign = 1;
+        }
+      }
+
+      function applySingle() {
+        state.showGroup = false;
+        els.singleBtn.classList.add("active");
+        els.groupBtn.classList.remove("active");
+      }
+
+      function applyGroup() {
+        state.showGroup = true;
+        els.groupBtn.classList.add("active");
+        els.singleBtn.classList.remove("active");
+
+        if (state.b0Applied) {
+          alignSpinsForB0();
+          setPhase("after_b0");
+        }
+      }
+
+      function applyB0() {
+        state.b0Applied = true;
+        alignSpinsForB0();
+        setPhase("after_b0");
+        playClick(0.06, 980, 0.05);
+      }
+
+      function apply90() {
+        if (!state.b0Applied) {
+          els.statusChip.textContent = "Apply B0 first.";
+          return;
+        }
+
+        const spins = activeSpins();
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          if (spinInSlice(s)) {
+            s.excited = true;
+            s.mLong = 0;
+            s.mTrans = 1;
+            s.phase = 0;
+            s.staticSign = 1;
+          } else {
+            s.excited = false;
+          }
+        }
+
+        state.rfTimer = 1.1;
+        setPhase("during_rf");
+        if (isInversionRecoveryWeighting()) {
+          els.statusChip.textContent = "90° RF applied. For true STIR/FLAIR, this 90° should follow an initial 180° inversion pulse plus TI (fat nulling in STIR, fluid nulling in FLAIR).";
+        } else {
+          els.statusChip.textContent = "90° RF applied: water and fat start in-phase in the transverse plane, then chemical shift separates their phase.";
+        }
+        playRfTone(false);
+      }
+
+      function applyRfOff() {
+        if (state.phase === "during_rf" || state.phase === "after_90") {
+          setPhase("after_rf_off");
+        }
+      }
+
+      function apply180() {
+        if (!state.b0Applied) {
+          els.statusChip.textContent = "Apply B0 first.";
+          return;
+        }
+        if (state.sequenceMode !== "pen") {
+          els.statusChip.textContent = "Gradient Echo selected: RF 180° is not used in GRE.";
+          playClick(0.045, 620, 0.04);
+          return;
+        }
+
+        const spins = activeSpins();
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          if (!s.excited) continue;
+          s.phase = wrapAngle(s.phase + Math.PI);
+          s.staticSign *= -1;
+        }
+
+        setPhase("after_180");
+        playRfTone(true);
+
+        if (state.actionOrigin === "auto") {
+          const id = window.setTimeout(() => {
+            markEcho("SE");
+          }, 680);
+          state.pendingTimers.push(id);
+        }
+      }
+
+      function setSlice(on) {
+        if (state.sliceOn === on) return;
+        state.sliceOn = on;
+        els.sliceBtn.classList.toggle("active", state.sliceOn);
+
+        if (on) {
+          state.slicePulseStart = state.time;
+          els.statusChip.textContent = "Slice selection Gz applied: gradient amplitude ramps with time (Gz(t) increases), selecting center rows.";
+          playWhoosh();
+          playClick(0.05, 850, 0.04);
+        } else {
+          els.statusChip.textContent = "Slice selection Gz off.";
+          playClick(0.045, 620, 0.03);
+        }
+      }
+
+      function toggleSlice() {
+        setSlice(!state.sliceOn);
+      }
+
+      function applyPhaseEncode() {
+        const ky = KY_VALUES[state.kyIndex % KY_VALUES.length];
+        state.kyIndex += 1;
+
+        const cR = (ROWS - 1) / 2;
+        const spins = activeSpins();
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          if (!s.excited) continue;
+          const rowNorm = cR === 0 ? 0 : (s.row - cR) / cR;
+          s.phase = wrapAngle(s.phase + ky * rowNorm * 1.35);
+        }
+
+        state.phasePulseTimer = 0.45;
+        playWhoosh();
+        playGradientTone("gy");
+        els.statusChip.textContent = `Phase encoding Gy applied (ky ${ky.toFixed(2)}): each row gets phase offset for both water and fat spins.`;
+        playClick(0.05, 1100, 0.035);
+      }
+
+      function setFreq(on) {
+        if (state.freqOn === on) return;
+        state.freqOn = on;
+        els.freqBtn.classList.toggle("active", state.freqOn);
+
+        if (on) {
+          state.freqPulseTimer = 0.6;
+          playWhoosh();
+          playGradientTone("gx");
+          els.statusChip.textContent = state.sequenceMode === "pen"
+            ? "Spin Echo readout gradient ON: Gx prephaser + readout path. Water and fat separate along X by chemical shift."
+            : "Gradient Echo readout gradient ON: Gx dephase/rephase readout path with chemical-shift water/fat separation along X.";
+
+          if (state.sequenceMode === "gre" && state.actionOrigin === "auto") {
+            const id = window.setTimeout(() => {
+              markEcho("GRE");
+            }, 520);
+            state.pendingTimers.push(id);
+          }
+        } else {
+          els.statusChip.textContent = "Frequency encoding OFF.";
+        }
+        playClick(0.055, state.freqOn ? 990 : 700, 0.04);
+      }
+
+      function toggleFreqEncode() {
+        setFreq(!state.freqOn);
+      }
+
+      function toggleSusceptibility() {
+        state.susceptOn = !state.susceptOn;
+        els.suscBtn.textContent = state.susceptOn ? "Susceptibility ON" : "Susceptibility OFF";
+        els.suscBtn.classList.toggle("active", state.susceptOn);
+      }
+
+      function setSequenceMode(mode) {
+        state.sequenceMode = mode;
+        state.manualActions = [];
+        const isPen = mode === "pen";
+
+        els.penEchoBtn.classList.toggle("active", isPen);
+        els.greBtn.classList.toggle("active", !isPen);
+
+        els.rf180Btn.disabled = !isPen;
+        els.rf180Btn.style.opacity = isPen ? "1" : "0.5";
+
+        els.seqLabel.textContent = sequenceLabelText();
+        if (!isPen && state.phase === "after_180") {
+          setPhase("after_rf_off");
+        }
+        if (!isPen && isInversionRecoveryWeighting()) {
+          els.statusChip.textContent = "Correction: STIR/FLAIR are inversion recovery Spin Echo techniques and require initial 180° inversion + TI before 90° excitation.";
+        }
+      }
+
+      function sequenceProfile(mode) {
+        if (mode === "pen") {
+          return {
+            te: 0.74,
+            signalStart: 0.58,
+            chain: [
+              { t: 0.15, tr: "RF" },
+              { t: 0.15, tr: "Gz" },
+              { t: 0.35, tr: "Gy" },
+              { t: 0.47, tr: "Gx" },
+              { t: 0.55, tr: "RF" },
+              { t: 0.74, tr: "Signal" }
+            ],
+            markers: [
+              { t: 0.15, tr: "RF", label: "90°" },
+              { t: 0.20, tr: "Gz", label: "Gz refocus" },
+              { t: 0.35, tr: "Gy", label: "Gy ky" },
+              { t: 0.48, tr: "Gx", label: "Gx pre" },
+              { t: 0.55, tr: "RF", label: "180°" },
+              { t: 0.74, tr: "Signal", label: "TE" }
+            ],
+            waves: {
+              RF: [
+                [0.00, 0.00], [0.12, 0.00], [0.135, 0.28], [0.15, 1.00], [0.165, 0.28], [0.18, 0.00],
+                [0.52, 0.00], [0.535, 0.30], [0.55, 1.00], [0.565, 0.30], [0.58, 0.00], [1.00, 0.00]
+              ],
+              Gz: [
+                [0.00, 0.00], [0.12, 0.00], [0.12, 0.86], [0.18, 0.86], [0.19, -0.42], [0.22, -0.42], [0.22, 0.00],
+                [0.52, 0.00], [0.52, 0.86], [0.58, 0.86], [0.59, -0.42], [0.62, -0.42], [0.62, 0.00], [1.00, 0.00]
+              ],
+              Gy: [
+                [0.00, 0.00], [0.32, 0.00], [0.32, 0.76], [0.38, 0.76], [0.38, 0.00], [1.00, 0.00]
+              ],
+              Gx: [
+                [0.00, 0.00], [0.45, 0.00], [0.45, -0.84], [0.50, -0.84], [0.50, 0.00],
+                [0.62, 0.00], [0.62, 0.82], [0.86, 0.82], [0.86, 0.00], [1.00, 0.00]
+              ]
+            }
+          };
+        }
+
+        return {
+          te: 0.69,
+          signalStart: 0.54,
+          chain: [
+            { t: 0.15, tr: "RF" },
+            { t: 0.15, tr: "Gz" },
+            { t: 0.35, tr: "Gy" },
+            { t: 0.47, tr: "Gx" },
+            { t: 0.69, tr: "Signal" }
+          ],
+          markers: [
+            { t: 0.15, tr: "RF", label: "90°" },
+            { t: 0.20, tr: "Gz", label: "Gz refocus" },
+            { t: 0.35, tr: "Gy", label: "Gy ky" },
+            { t: 0.47, tr: "Gx", label: "Gx dephase" },
+            { t: 0.69, tr: "Signal", label: "TE" }
+          ],
+          waves: {
+            RF: [
+              [0.00, 0.00], [0.12, 0.00], [0.135, 0.28], [0.15, 1.00], [0.165, 0.28], [0.18, 0.00], [1.00, 0.00]
+            ],
+            Gz: [
+              [0.00, 0.00], [0.12, 0.00], [0.12, 0.86], [0.18, 0.86], [0.19, -0.42], [0.22, -0.42], [0.22, 0.00], [1.00, 0.00]
+            ],
+            Gy: [
+              [0.00, 0.00], [0.32, 0.00], [0.32, 0.76], [0.38, 0.76], [0.38, 0.00], [1.00, 0.00]
+            ],
+            Gx: [
+              [0.00, 0.00], [0.45, 0.00], [0.45, -0.84], [0.50, -0.84], [0.50, 0.00],
+              [0.58, 0.00], [0.58, 0.82], [0.82, 0.82], [0.82, 0.00], [1.00, 0.00]
+            ]
+          }
+        };
+      }
+
+      function drawSequenceGraph(netMxy) {
+        const c = els.seqCanvas;
+        if (!c) return;
+        const g = c.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const w = Math.max(220, Math.floor(c.clientWidth));
+        const h = Math.max(140, Math.floor(c.clientHeight));
+        if (c.width !== Math.floor(w * dpr) || c.height !== Math.floor(h * dpr)) {
+          c.width = Math.floor(w * dpr);
+          c.height = Math.floor(h * dpr);
+        }
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, w, h);
+
+        const padL = 52;
+        const padR = 10;
+        const padT = 12;
+        const padB = 14;
+
+        const tracks = ["RF", "Gz", "Gy", "Gx", "Signal"];
+        const yStep = (h - padT - padB) / (tracks.length - 1);
+
+        const yOf = {};
+        tracks.forEach((t, i) => {
+          yOf[t] = padT + i * yStep;
+          g.strokeStyle = "rgba(101, 136, 173, 0.35)";
+          g.lineWidth = 1;
+          g.beginPath();
+          g.moveTo(padL, yOf[t]);
+          g.lineTo(w - padR, yOf[t]);
+          g.stroke();
+
+          g.fillStyle = "#315273";
+          g.font = "600 10px Avenir Next";
+          g.fillText(t, 10, yOf[t] + 3);
+        });
+
+        const profile = sequenceProfile(state.sequenceMode);
+        const x0 = (t) => padL + t * (w - padL - padR);
+        const color = {
+          RF: "#b55f22",
+          Gz: "#2f8c63",
+          Gy: "#7a4db6",
+          Gx: "#2f78a7"
+        };
+        const ampPx = 11;
+
+        g.strokeStyle = "rgba(58, 92, 127, 0.35)";
+        g.lineWidth = 1;
+        g.beginPath();
+        profile.chain.forEach((n, i) => {
+          const xx = x0(n.t);
+          const yy = yOf[n.tr];
+          if (i === 0) g.moveTo(xx, yy);
+          else g.lineTo(xx, yy);
+        });
+        g.stroke();
+
+        ["RF", "Gz", "Gy", "Gx"].forEach((track) => {
+          const pts = profile.waves[track];
+          g.strokeStyle = color[track];
+          g.lineWidth = 2;
+          g.beginPath();
+          for (let i = 0; i < pts.length; i += 1) {
+            const p = pts[i];
+            const xx = x0(p[0]);
+            const yy = yOf[track] - p[1] * ampPx;
+            if (i === 0) g.moveTo(xx, yy);
+            else g.lineTo(xx, yy);
+          }
+          g.stroke();
+        });
+
+        profile.markers.forEach((m) => {
+          const xx = x0(m.t);
+          const yy = yOf[m.tr];
+          g.fillStyle = "#254f7a";
+          g.beginPath();
+          g.arc(xx, yy, 2.3, 0, Math.PI * 2);
+          g.fill();
+
+          g.fillStyle = "#1f446a";
+          g.font = "600 8.5px Avenir Next";
+          g.fillText(m.label, xx + 3, yy - 4);
+        });
+
+        let progress = 0;
+        if (state.autoOn && state.autoEvents.length) {
+          const lastT = state.autoEvents[state.autoEvents.length - 1].t + 1.2;
+          progress = clamp((state.time - state.autoStart) / Math.max(0.1, lastT), 0, 1);
+        } else {
+          const phasePos = {
+            before_b0: 0.04,
+            after_b0: 0.18,
+            during_rf: 0.16,
+            after_90: 0.62,
+            after_rf_off: 0.72,
+            after_180: 0.80
+          };
+          progress = phasePos[state.phase] ?? 0.04;
+        }
+
+        const xNow = x0(progress);
+        g.strokeStyle = "rgba(28, 95, 159, 0.8)";
+        g.lineWidth = 1.8;
+        g.beginPath();
+        g.moveTo(xNow, padT - 4);
+        g.lineTo(xNow, h - padB + 4);
+        g.stroke();
+
+        g.fillStyle = "#204a73";
+        g.font = "700 9px Avenir Next";
+        g.fillText(state.sequenceMode === "pen" ? "Pen Echo" : "Gradient Echo", w - 86, 10);
+
+        const teX = x0(profile.te);
+        g.strokeStyle = "rgba(190,63,84,0.75)";
+        g.lineWidth = 1.2;
+        g.beginPath();
+        g.moveTo(teX, yOf.Signal - 14);
+        g.lineTo(teX, yOf.Signal + 14);
+        g.stroke();
+        g.fillStyle = "#8f3043";
+        g.font = "700 8.5px Avenir Next";
+        g.fillText("TE", teX + 3, yOf.Signal - 16);
+
+        const sigY = yOf.Signal;
+        g.strokeStyle = "rgba(190,63,84,0.6)";
+        g.lineWidth = 1.5;
+        g.beginPath();
+        for (let i = 0; i <= 90; i += 1) {
+          const t = i / 90;
+          const x = x0(profile.signalStart + 0.3 * t);
+          const y = sigY + Math.sin(t * 26 + state.time * 4) * (5 * clamp(netMxy, 0, 1)) * Math.exp(-t * 2.2);
+          if (i === 0) g.moveTo(x, y);
+          else g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+
+      function scheduleAuto() {
+        state.autoOn = true;
+        state.autoStart = state.time;
+        state.autoIdx = 0;
+
+        if (state.sequenceMode === "pen") {
+          state.autoEvents = [
+            { t: 0.8, a: "single" },
+            { t: 1.6, a: "b0" },
+            { t: 2.3, a: "group" },
+            { t: 2.9, a: "sliceOn" },
+            { t: 3.5, a: "rf90" },
+            { t: 4.15, a: "phase" },
+            { t: 4.75, a: "rfOff" },
+            { t: 5.35, a: "freqOn" },
+            { t: 6.35, a: "rf180" }
+          ];
+        } else {
+          state.autoEvents = [
+            { t: 0.8, a: "single" },
+            { t: 1.6, a: "b0" },
+            { t: 2.3, a: "group" },
+            { t: 2.9, a: "sliceOn" },
+            { t: 3.5, a: "rf90" },
+            { t: 4.15, a: "phase" },
+            { t: 4.75, a: "freqOn" },
+            { t: 5.45, a: "rfOff" }
+          ];
+        }
+
+        els.autoBtn.classList.add("active");
+        els.autoBtn.textContent = "Auto Pulses ON";
+      }
+
+      function stopAuto() {
+        state.autoOn = false;
+        state.autoEvents = [];
+        state.autoIdx = 0;
+        els.autoBtn.classList.remove("active");
+        els.autoBtn.textContent = "Auto Pulses";
+      }
+
+      function clearPendingTimers() {
+        for (let i = 0; i < state.pendingTimers.length; i += 1) {
+          window.clearTimeout(state.pendingTimers[i]);
+        }
+        state.pendingTimers.length = 0;
+      }
+
+      function scheduleSelectedEcho() {
+        stopAuto();
+        clearPendingTimers();
+
+        if (!state.showGroup) {
+          applyGroup();
+        }
+        if (!state.b0Applied) {
+          applyB0();
+        }
+        setSlice(false);
+        setFreq(false);
+
+        const events = state.sequenceMode === "pen"
+          ? [
+              { t: 0.00, a: "sliceOn" },
+              { t: 0.28, a: "rf90" },
+              { t: 0.95, a: "phase" },
+              { t: 1.35, a: "rfOff" },
+              { t: 1.72, a: "freqOn" },
+              { t: 2.38, a: "rf180" }
+            ]
+          : [
+              { t: 0.00, a: "sliceOn" },
+              { t: 0.28, a: "rf90" },
+              { t: 0.95, a: "phase" },
+              { t: 1.35, a: "freqOn" },
+              { t: 1.88, a: "rfOff" }
+            ];
+
+        for (let i = 0; i < events.length; i += 1) {
+          const e = events[i];
+          const id = window.setTimeout(() => {
+            runAction(e.a);
+          }, Math.round(e.t * 1000));
+          state.pendingTimers.push(id);
+        }
+
+        els.statusChip.textContent = state.sequenceMode === "pen"
+          ? (isInversionRecoveryWeighting()
+            ? "Applying Spin Echo core chain. For true STIR/FLAIR add initial inversion 180° and TI before the 90° pulse."
+            : "Applying Pen Echo chain: Gz slice, RF 90°, Gy, Gx readout, RF 180° refocus.")
+          : "Applying Gradient Echo chain: Gz slice, RF 90°, Gy, Gx gradient echo readout.";
+      }
+
+      function runAction(name, origin = "auto") {
+        const prevOrigin = state.actionOrigin;
+        state.actionOrigin = origin;
+
+        if (name === "single") applySingle();
+        if (name === "group") applyGroup();
+        if (name === "b0") applyB0();
+        if (name === "slice") toggleSlice();
+        if (name === "sliceOn") setSlice(true);
+        if (name === "sliceOff") setSlice(false);
+        if (name === "rf90") apply90();
+        if (name === "phase") applyPhaseEncode();
+        if (name === "rfOff") applyRfOff();
+        if (name === "freq") toggleFreqEncode();
+        if (name === "freqOn") setFreq(true);
+        if (name === "freqOff") setFreq(false);
+        if (name === "rf180") apply180();
+        if (name === "echoSE") markEcho("SE");
+        if (name === "echoGRE") markEcho("GRE");
+
+        if (origin === "manual") {
+          let token = name;
+          if (name === "slice") token = state.sliceOn ? "sliceOn" : "sliceOff";
+          if (name === "freq") token = state.freqOn ? "freqOn" : "freqOff";
+          recordManualAction(token);
+          if (shouldExplainAction(token)) {
+            const info = stepInfoFor(token);
+            openStepNote(info.title, info.body, null);
+          }
+        }
+
+        state.actionOrigin = prevOrigin;
+      }
+
+      function resetAll() {
+        stopGuidedMode();
+        state.time = 0;
+        state.phaseStart = 0;
+        state.phase = "before_b0";
+        state.b0Applied = false;
+        state.sliceOn = false;
+        state.freqOn = false;
+        state.susceptOn = true;
+        state.rfTimer = 0;
+        state.kyIndex = 0;
+        state.phasePulseTimer = 0;
+        state.freqPulseTimer = 0;
+        state.slicePulseStart = -1;
+        state.visualTime = 0;
+        state.tagOverlay = { text: "", color: "#1d5f9f", timer: 0 };
+        state.trace = [];
+        state.traceLastT = -1;
+        state.echoInfo = { type: "None", at: -1, teMs: 0, t1: 0, t2: 0 };
+        state.manualActions = [];
+        state.seqDetect.t1Done = false;
+        state.seqDetect.t2Done = false;
+        if (state.seqDetect.noticeTimer) {
+          window.clearTimeout(state.seqDetect.noticeTimer);
+          state.seqDetect.noticeTimer = null;
+        }
+        if (els.bigNotice) {
+          els.bigNotice.classList.remove("show");
+        }
+        closeStepNote(false);
+        stopAuto();
+        clearPendingTimers();
+
+        buildSpins();
+        state.showGroup = false;
+
+        els.suscBtn.textContent = "Susceptibility ON";
+        els.suscBtn.classList.remove("active");
+        els.sliceBtn.classList.remove("active");
+        els.freqBtn.classList.remove("active");
+        els.singleBtn.classList.add("active");
+        els.groupBtn.classList.remove("active");
+
+        setPhase("before_b0");
+        setSequenceMode(state.sequenceMode || "pen");
+        setWeightingMode((els.weightingSel && els.weightingSel.value) ? els.weightingSel.value : state.weightingMode);
+      }
+
+      function updateSpins(dt) {
+        const spins = activeSpins();
+
+        if (state.phase === "during_rf") {
+          state.rfTimer = Math.max(0, state.rfTimer - dt);
+          if (state.rfTimer <= 0) {
+            setPhase("after_90");
+          }
+        }
+
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          const model = spinModel(s.kind);
+          const cR = (ROWS - 1) / 2;
+          const cC = (COLS - 1) / 2;
+          const rowNorm = cR === 0 ? 0 : (s.row - cR) / cR;
+          const colNorm = cC === 0 ? 0 : (s.col - cC) / cC;
+
+          const staticTerm = s.staticSign * (
+            s.baseDetune * 0.45 + (state.susceptOn ? s.suscDetune * 0.75 : 0)
+          );
+          const freqTerm = state.freqOn ? colNorm * 0.75 : 0;
+          const chemTerm = model.chemShift;
+          const t2s = model.t2starBase / (1 + Math.abs(s.suscDetune) * 1.35 + Math.abs(s.baseDetune));
+
+          if (state.phase === "before_b0") {
+            const omega = 0.75 + s.baseDetune * 2.0 + Math.sin(state.time + i * 0.7) * 0.35;
+            s.phase += omega * dt;
+            s.mTrans = clamp(s.mTrans + (Math.random() - 0.5) * dt * 0.7, 0.35, 1.0);
+            s.mLong = clamp(s.mLong + (Math.random() - 0.5) * dt * 1.3, -1.0, 1.0);
+            continue;
+          }
+
+          if (state.phase === "after_b0") {
+            s.phase += (LARMOR + chemTerm * 0.8 + staticTerm * 0.3 + freqTerm) * dt;
+            s.mTrans += (0.04 - s.mTrans) * dt * 1.7;
+            s.mLong += (s.eqLong - s.mLong) * dt * (s.kind === "fat" ? 1.7 : 1.2);
+            continue;
+          }
+
+          if (state.phase === "during_rf") {
+            if (s.excited) {
+              const target = (LARMOR + chemTerm * 0.5) * state.time;
+              s.phase = lerpAngle(s.phase, target, dt * 7.5);
+              s.mTrans += (1 - s.mTrans) * dt * 5.2;
+              s.mLong += (0 - s.mLong) * dt * 5.2;
+            } else {
+              s.phase += (LARMOR + chemTerm * 0.6 + staticTerm * 0.3 + freqTerm) * dt;
+              s.mTrans += (0.05 - s.mTrans) * dt * 1.2;
+              s.mLong += (s.eqLong - s.mLong) * dt * (s.kind === "fat" ? 1.5 : 1.0);
+            }
+            continue;
+          }
+
+          if (state.phase === "after_90") {
+            if (s.excited) {
+              s.phase += (LARMOR + chemTerm + staticTerm * 0.55 + freqTerm) * dt;
+              s.mTrans *= Math.exp(-dt / model.t2);
+              s.mLong += (0.05 - s.mLong) * dt * (s.kind === "fat" ? 0.55 : 0.4);
+            } else {
+              s.phase += (LARMOR + chemTerm * 0.6 + staticTerm * 0.3 + freqTerm) * dt;
+              s.mTrans += (0.05 - s.mTrans) * dt * 1.2;
+              s.mLong += (s.eqLong - s.mLong) * dt * (s.kind === "fat" ? 1.4 : 1.0);
+            }
+            continue;
+          }
+
+          if (state.phase === "after_rf_off") {
+            if (s.excited) {
+              s.phase += (LARMOR + chemTerm + staticTerm + freqTerm + rowNorm * 0.05) * dt;
+              s.mTrans *= Math.exp(-dt / t2s);
+              s.mLong += (1 - s.mLong) * dt / model.t1;
+            } else {
+              s.phase += (LARMOR + chemTerm * 0.6 + staticTerm * 0.35 + freqTerm) * dt;
+              s.mTrans += (0.05 - s.mTrans) * dt * 1.0;
+              s.mLong += (s.eqLong - s.mLong) * dt * (s.kind === "fat" ? 1.3 : 1.0);
+            }
+            continue;
+          }
+
+          if (state.phase === "after_180") {
+            if (s.excited) {
+              s.phase += (LARMOR + chemTerm + staticTerm + freqTerm) * dt;
+              s.mTrans *= Math.exp(-dt / model.t2);
+              s.mLong += (1 - s.mLong) * dt / model.t1;
+            } else {
+              s.phase += (LARMOR + chemTerm * 0.6 + staticTerm * 0.35 + freqTerm) * dt;
+              s.mTrans += (0.05 - s.mTrans) * dt * 1.0;
+              s.mLong += (s.eqLong - s.mLong) * dt * (s.kind === "fat" ? 1.3 : 1.0);
+            }
+          }
+        }
+      }
+
+      function computeNetAndRows() {
+        const spins = activeSpins();
+
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        let sumTrans = 0;
+        const species = {
+          water: { sx: 0, sy: 0, sz: 0, sumTrans: 0, n: 0 },
+          fat: { sx: 0, sy: 0, sz: 0, sumTrans: 0, n: 0 }
+        };
+
+        const rows = Array.from({ length: ROWS }, () => ({ c: 0, s: 0, w: 0 }));
+
+        for (let i = 0; i < spins.length; i += 1) {
+          const sp = spins[i];
+          const mx = sp.mLong;
+          const my = sp.mTrans * Math.cos(sp.phase);
+          const mzp = sp.mTrans * Math.sin(sp.phase);
+
+          sx += mx;
+          sy += my;
+          sz += mzp;
+          sumTrans += sp.mTrans;
+
+          const bucket = species[sp.kind] || species.water;
+          bucket.sx += mx;
+          bucket.sy += my;
+          bucket.sz += mzp;
+          bucket.sumTrans += sp.mTrans;
+          bucket.n += 1;
+
+          const rObj = rows[sp.row];
+          rObj.c += Math.cos(sp.phase) * sp.mTrans;
+          rObj.s += Math.sin(sp.phase) * sp.mTrans;
+          rObj.w += sp.mTrans;
+        }
+
+        const n = Math.max(1, spins.length);
+        const net = {
+          x: sx / n,
+          y: sy / n,
+          z: sz / n
+        };
+
+        const coherence = sumTrans > 0.001
+          ? clamp(Math.sqrt(sy * sy + sz * sz) / sumTrans, 0, 1)
+          : 0;
+
+        const speciesOut = {};
+        ["water", "fat"].forEach((key) => {
+          const b = species[key];
+          const nSp = Math.max(1, b.n);
+          const mxy = Math.sqrt(b.sy * b.sy + b.sz * b.sz) / nSp;
+          speciesOut[key] = {
+            mz: b.sx / nSp,
+            mxy,
+            phase: Math.atan2(b.sz, b.sy),
+            coherence: b.sumTrans > 0.001 ? clamp(Math.sqrt(b.sy * b.sy + b.sz * b.sz) / b.sumTrans, 0, 1) : 0,
+            count: b.n
+          };
+        });
+
+        const phaseGap = wrapAngle(speciesOut.water.phase - speciesOut.fat.phase);
+
+        return { net, rows, coherence, species: speciesOut, phaseGap };
+      }
+
+      function drawArrowHead2D(from, to, color, width) {
+        const ang = Math.atan2(to.y - from.y, to.x - from.x);
+        const h = 8 + width * 0.7;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(to.x, to.y);
+        ctx.lineTo(to.x - h * Math.cos(ang - 0.34), to.y - h * Math.sin(ang - 0.34));
+        ctx.lineTo(to.x - h * Math.cos(ang + 0.34), to.y - h * Math.sin(ang + 0.34));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawLine3D(a, b, camera, focal, stroke, width, dash) {
+        const pa = project3D(a.x, a.y, a.z, camera, focal);
+        const pb = project3D(b.x, b.y, b.z, camera, focal);
+        ctx.save();
+        if (dash) ctx.setLineDash(dash);
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawSphere(center, worldRadius, camera, focal, speciesKind) {
+        const p = project3D(center.x, center.y, center.z, camera, focal);
+        const pr = Math.max(5, worldRadius * p.k);
+        const model = spinModel(speciesKind);
+
+        const g = ctx.createRadialGradient(p.x - pr * 0.35, p.y - pr * 0.4, pr * 0.12, p.x, p.y, pr);
+        g.addColorStop(0, model.sphereHi);
+        g.addColorStop(1, model.sphereLo);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(58, 89, 122, 0.36)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        return { p, pr };
+      }
+
+      function drawSpinArm(spin, camera, focal, phaseOffset = 0) {
+        const model = spinModel(spin.kind);
+        const armLen = 0.35;
+        const vx = spin.mLong;
+        const ang = spin.phase + phaseOffset;
+        const vy = spin.mTrans * Math.cos(ang);
+        const vz = spin.mTrans * Math.sin(ang);
+        const mag = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1;
+
+        const ux = vx / mag;
+        const uy = vy / mag;
+        const uz = vz / mag;
+
+        const a = {
+          x: spin.x - ux * armLen,
+          y: spin.y - uy * armLen,
+          z: spin.z - uz * armLen
+        };
+        const b = {
+          x: spin.x + ux * armLen,
+          y: spin.y + uy * armLen,
+          z: spin.z + uz * armLen
+        };
+
+        const pa = project3D(a.x, a.y, a.z, camera, focal);
+        const pb = project3D(b.x, b.y, b.z, camera, focal);
+
+        ctx.strokeStyle = model.arm;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+
+        drawArrowHead2D(pa, pb, model.arm, 2.2);
+      }
+
+      function drawRing(spin, camera, focal, flip, visualTime = 0) {
+        const model = spinModel(spin.kind);
+        const c = project3D(spin.x, spin.y, spin.z, camera, focal);
+        const ringW = Math.max(13, 0.25 * c.k);
+        const ringH = Math.max(5, 0.08 * c.k);
+        const angle = flip ? Math.sin(visualTime * 2.1) * (Math.PI * 0.38) : 0;
+
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(angle);
+        ctx.strokeStyle = model.ring;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ringW, ringH, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawB0Axis(camera, focal) {
+        drawLine3D(
+          { x: -2.55, y: 0, z: 0 },
+          { x: 2.55, y: 0, z: 0 },
+          camera,
+          focal,
+          "#2f6fb1",
+          2.4
+        );
+
+        const p0 = project3D(0, 0, 0, camera, focal);
+        const p1 = project3D(2.55, 0, 0, camera, focal);
+        drawArrowHead2D(p0, p1, "#2f6fb1", 2.4);
+
+        ctx.fillStyle = "#275079";
+        ctx.font = "700 13px Avenir Next";
+        ctx.fillText("B0 / Z", p1.x + 8, p1.y - 6);
+
+        ctx.fillStyle = "#1b3f62";
+        ctx.beginPath();
+        ctx.arc(p0.x, p0.y, 3.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Origin", p0.x + 8, p0.y + 14);
+      }
+
+      function drawSliceBand(camera, focal) {
+        if (!state.sliceOn || !state.showGroup) return;
+
+        const t = Math.max(0, state.time - Math.max(0, state.slicePulseStart));
+        const level = clamp(t / 2.0, 0, 1);
+        const extra = 0.24 * level;
+
+        const cR = (ROWS - 1) / 2;
+        const yTop = (cR - 1 - cR) * 0.72 - (0.36 + extra);
+        const yBottom = (cR + 1 - cR) * 0.72 + (0.36 + extra);
+
+        const corners = [
+          project3D(-2.9, yTop, 0, camera, focal),
+          project3D(2.9, yTop, 0, camera, focal),
+          project3D(2.9, yBottom, 0, camera, focal),
+          project3D(-2.9, yBottom, 0, camera, focal)
+        ];
+
+        const alpha = 0.13 + 0.22 * level;
+        ctx.fillStyle = `rgba(46, 140, 99, ${alpha})`;
+        ctx.strokeStyle = "rgba(40, 111, 81, 0.42)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x, corners[0].y);
+        ctx.lineTo(corners[1].x, corners[1].y);
+        ctx.lineTo(corners[2].x, corners[2].y);
+        ctx.lineTo(corners[3].x, corners[3].y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#24674a";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText(`Gz(t) slice select: ${Math.round(level * 100)}%`, corners[0].x + 8, corners[0].y - 8);
+      }
+
+      function drawGridPlane(camera, focal) {
+        if (!state.showGroup) return;
+
+        ctx.strokeStyle = "rgba(103, 141, 182, 0.24)";
+        ctx.lineWidth = 1;
+
+        for (let r = 0; r < ROWS; r += 1) {
+          const cR = (ROWS - 1) / 2;
+          const y = (r - cR) * 0.72;
+          const a = project3D(-2.9, y, 0, camera, focal);
+          const b = project3D(2.9, y, 0, camera, focal);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+
+        for (let c = 0; c < COLS; c += 1) {
+          const cC = (COLS - 1) / 2;
+          const x = (c - cC) * 0.72;
+          const a = project3D(x, -2.1, 0, camera, focal);
+          const b = project3D(x, 2.1, 0, camera, focal);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+
+      function drawNetVector(net, camera, focal) {
+        const p0 = project3D(0, 0, 0, camera, focal);
+        const p1 = project3D(net.x * 1.75, net.y * 1.75, net.z * 1.75, camera, focal);
+
+        ctx.strokeStyle = "#1d5f9f";
+        ctx.lineWidth = 4.2;
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
+        drawArrowHead2D(p0, p1, "#1d5f9f", 4.2);
+
+        ctx.fillStyle = "#164874";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText("M", p1.x + 7, p1.y - 6);
+      }
+
+      function drawCoilAndSignal(netMxy, speciesStats, phaseGap, camera, focal) {
+        const coilWorld = { x: 3.15, y: 0.9, z: -0.1 };
+        const cp = project3D(coilWorld.x, coilWorld.y, coilWorld.z, camera, focal);
+
+        const r = 30;
+        ctx.strokeStyle = "#624ca0";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cp.x, cp.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "#513f8d";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText("Receiver coil", cp.x - 30, cp.y + 50);
+
+        const amp = clamp(netMxy, 0, 1);
+        const ampW = clamp(speciesStats.water.mxy, 0, 1);
+        const ampF = clamp(speciesStats.fat.mxy, 0, 1);
+        if (amp > 0.03) {
+          ctx.strokeStyle = `rgba(190, 63, 84, ${0.35 + 0.55 * amp})`;
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          for (let i = 0; i <= 170; i += 1) {
+            const x = cp.x - 85 + i;
+            const tw = i * 0.22 + state.time * 6.2 + speciesStats.water.phase;
+            const tf = i * 0.20 + state.time * (6.2 + Math.abs(SPECIES.fat.chemShift) * 2.6) + speciesStats.fat.phase;
+            const y = cp.y + 58
+              + Math.sin(tw) * (7.2 * ampW)
+              + Math.sin(tf) * (7.2 * ampF);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.fillStyle = "#8f3043";
+          ctx.fillText("MR signal", cp.x - 18, cp.y + 82);
+
+          ctx.fillStyle = "#2d4d72";
+          ctx.font = "600 10px Avenir Next";
+          ctx.fillText(`Water-Fat phase gap: ${Math.round(Math.abs(phaseGap) * 180 / Math.PI)}°`, cp.x - 56, cp.y + 96);
+        }
+      }
+
+      function drawSpeciesLegend() {
+        const x = 166;
+        const y = 20;
+        const w = 210;
+        const h = 48;
+        ctx.fillStyle = "rgba(241, 248, 255, 0.9)";
+        ctx.strokeStyle = "rgba(132, 163, 194, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.fill();
+        ctx.stroke();
+
+        const items = [
+          { k: "water", label: "Water hydrogen" },
+          { k: "fat", label: "Fat hydrogen" }
+        ];
+        for (let i = 0; i < items.length; i += 1) {
+          const it = items[i];
+          const model = spinModel(it.k);
+          const yy = y + 14 + i * 18;
+          ctx.fillStyle = model.sphereLo;
+          ctx.beginPath();
+          ctx.arc(x + 14, yy, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#23476d";
+          ctx.font = "600 10px Avenir Next";
+          ctx.fillText(it.label, x + 24, yy + 3);
+        }
+      }
+
+      function updateRowUi(rows) {
+        for (let r = 0; r < ROWS; r += 1) {
+          const item = rowUi[r];
+          const data = rows[r];
+          if (!item) continue;
+
+          if (data.w <= 0.01) {
+            item.right.textContent = "-";
+            item.fill.style.width = "0%";
+            item.fill.style.background = "linear-gradient(90deg,#6f86a0,#6f86a0)";
+            continue;
+          }
+
+          const phase = Math.atan2(data.s, data.c);
+          const deg = Math.round((phase * 180) / Math.PI);
+          const coh = clamp(Math.sqrt(data.c * data.c + data.s * data.s) / data.w, 0, 1);
+
+          item.right.textContent = `${deg}°`;
+          item.fill.style.width = `${Math.round(coh * 100)}%`;
+
+          const hue = ((deg + 180) / 360) * 240 + 120;
+          item.fill.style.background = `linear-gradient(90deg, hsl(${hue},55%,48%), hsl(${hue + 32},62%,56%))`;
+        }
+      }
+
+      function drawMiniAxis(net) {
+        const ox = 64;
+        const oy = 72;
+        const L = 26;
+
+        ctx.fillStyle = "rgba(241, 248, 255, 0.9)";
+        ctx.strokeStyle = "rgba(132, 163, 194, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(16, 18, 136, 88);
+        ctx.fill();
+        ctx.stroke();
+
+        // Z / longitudinal axis (horizontal)
+        const zEnd = { x: ox + L, y: oy };
+        ctx.strokeStyle = "#2f6fb1";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(zEnd.x, zEnd.y);
+        ctx.stroke();
+        drawArrowHead2D({ x: ox, y: oy }, zEnd, "#2f6fb1", 2);
+
+        // X axis (up)
+        const xEnd = { x: ox, y: oy - L };
+        ctx.strokeStyle = "#2f8c63";
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(xEnd.x, xEnd.y);
+        ctx.stroke();
+        drawArrowHead2D({ x: ox, y: oy }, xEnd, "#2f8c63", 2);
+
+        // Y axis (depth cue)
+        const yEnd = { x: ox + 18, y: oy + 14 };
+        ctx.save();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = "#7a4db6";
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(yEnd.x, yEnd.y);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = "#1d456d";
+        ctx.font = "700 11px Avenir Next";
+        ctx.fillText("Z", zEnd.x + 5, zEnd.y + 4);
+        ctx.fillText("X", xEnd.x + 6, xEnd.y - 2);
+        ctx.fillText("Y", yEnd.x + 4, yEnd.y + 2);
+
+        const longLevel = clamp(Math.abs(net.x), 0, 1);
+        const longEnd = { x: ox + (net.x >= 0 ? 1 : -1) * (8 + longLevel * 18), y: oy + 20 };
+        ctx.strokeStyle = "#1d5f9f";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy + 20);
+        ctx.lineTo(longEnd.x, longEnd.y);
+        ctx.stroke();
+        drawArrowHead2D({ x: ox, y: oy + 20 }, longEnd, "#1d5f9f", 2);
+
+        ctx.fillStyle = "#2b4f73";
+        ctx.font = "600 10px Avenir Next";
+        ctx.fillText("Longitudinal (Mz)", 20, 100);
+      }
+
+      function captureSnapshot(kind, sourceLabel = "") {
+        const { net, species, phaseGap } = computeNetAndRows();
+        const mxy = Math.sqrt(net.y * net.y + net.z * net.z);
+        const stamp = `t=${state.time.toFixed(2)}s | Mz=${net.x.toFixed(2)} | Mxy=${mxy.toFixed(2)} | W=${species.water.mxy.toFixed(2)} F=${species.fat.mxy.toFixed(2)} | Δφ=${Math.round(Math.abs(phaseGap) * 180 / Math.PI)}°`;
+        const data = canvas.toDataURL("image/png");
+        const srcPrefix = sourceLabel ? `${sourceLabel}: ` : "";
+
+        if (kind === "t2") {
+          els.snapT2Img.src = data;
+          els.snapT2Meta.textContent = `${srcPrefix}T2 snapshot: ${stamp}`;
+        }
+        if (kind === "te") {
+          els.snapTEImg.src = data;
+          els.snapTEMeta.textContent = `${srcPrefix}TE snapshot: ${stamp}`;
+        }
+        if (kind === "tr") {
+          els.snapTRImg.src = data;
+          els.snapTRMeta.textContent = `${srcPrefix}TR snapshot: ${stamp}`;
+        }
+        playClick(0.06, 1250, 0.05);
+      }
+
+      function recordTrace(net, coherence, mxy, species, phaseGap) {
+        if (state.traceLastT >= 0 && state.time - state.traceLastT < 0.04) return;
+        state.traceLastT = state.time;
+
+        state.trace.push({
+          t: state.time,
+          z: net.x,
+          x: net.y,
+          y: net.z,
+          mxy,
+          coh: coherence,
+          waterMxy: species.water.mxy,
+          fatMxy: species.fat.mxy,
+          phaseGap
+        });
+
+        const cutoff = state.time - 18;
+        while (state.trace.length > 2 && state.trace[0].t < cutoff) {
+          state.trace.shift();
+        }
+      }
+
+      function drawRelaxationChart() {
+        if (!relaxCanvas) return;
+        const g = relaxCanvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const w = Math.max(260, Math.floor(relaxCanvas.clientWidth));
+        const h = Math.max(200, Math.floor(relaxCanvas.clientHeight));
+        if (relaxCanvas.width !== Math.floor(w * dpr) || relaxCanvas.height !== Math.floor(h * dpr)) {
+          relaxCanvas.width = Math.floor(w * dpr);
+          relaxCanvas.height = Math.floor(h * dpr);
+        }
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, w, h);
+
+        const padL = 38;
+        const padR = 12;
+        const padT = 12;
+        const padB = 24;
+        const xMin = Math.max(0, state.time - 18);
+        const xMax = Math.max(xMin + 0.5, state.time);
+        const xRange = xMax - xMin;
+        const yTop = padT;
+        const yBot = h - padB;
+
+        const xMap = (t) => padL + ((t - xMin) / xRange) * (w - padL - padR);
+        const yMap = (v) => yBot - ((v + 1) * 0.5) * (yBot - yTop);
+
+        g.strokeStyle = "rgba(100, 132, 164, 0.28)";
+        g.lineWidth = 1;
+        [-1, -0.5, 0, 0.5, 1].forEach((yv) => {
+          const y = yMap(yv);
+          g.beginPath();
+          g.moveTo(padL, y);
+          g.lineTo(w - padR, y);
+          g.stroke();
+        });
+
+        g.strokeStyle = "rgba(71, 104, 138, 0.6)";
+        g.beginPath();
+        g.moveTo(padL, yTop);
+        g.lineTo(padL, yBot);
+        g.lineTo(w - padR, yBot);
+        g.stroke();
+
+        const drawLine = (getter, color, width) => {
+          if (!state.trace.length) return;
+          g.strokeStyle = color;
+          g.lineWidth = width;
+          g.beginPath();
+          for (let i = 0; i < state.trace.length; i += 1) {
+            const p = state.trace[i];
+            const xx = xMap(p.t);
+            const yy = yMap(getter(p));
+            if (i === 0) g.moveTo(xx, yy);
+            else g.lineTo(xx, yy);
+          }
+          g.stroke();
+        };
+
+        drawLine((p) => p.z, "#2f6fb1", 2.2); // longitudinal Z
+        drawLine((p) => p.x, "#2f8c63", 1.9); // X
+        drawLine((p) => p.y, "#7a4db6", 1.9); // Y
+        drawLine((p) => p.waterMxy * 2 - 1, "rgba(47,120,167,0.55)", 1.2);
+        drawLine((p) => p.fatMxy * 2 - 1, "rgba(181,113,46,0.55)", 1.2);
+
+        if (state.echoInfo.at >= xMin && state.echoInfo.at <= xMax) {
+          const ex = xMap(state.echoInfo.at);
+          g.strokeStyle = "rgba(190, 63, 84, 0.82)";
+          g.lineWidth = 1.3;
+          g.beginPath();
+          g.moveTo(ex, yTop);
+          g.lineTo(ex, yBot);
+          g.stroke();
+
+          g.fillStyle = "#8f3043";
+          g.font = "700 10px Avenir Next";
+          g.fillText(`TE ${state.echoInfo.teMs} ms`, ex + 4, yTop + 11);
+        }
+
+        if (state.echoInfo.type !== "None") {
+          g.fillStyle = "#8f3043";
+          g.font = "600 10px Avenir Next";
+          const t2Label = state.echoInfo.type === "SE" ? "T2" : "T2*";
+          g.fillText(`Echo ${state.echoInfo.type} | T1 ${state.echoInfo.t1.toFixed(2)} s | ${t2Label} ${state.echoInfo.t2.toFixed(2)} s`, padL + 6, yBot - 8);
+        }
+
+        g.fillStyle = "#2a4e73";
+        g.font = "600 10px Avenir Next";
+        g.fillText("Z(longitudinal)", padL + 6, yTop + 12);
+        g.fillStyle = "#2d6f54";
+        g.fillText("X", padL + 108, yTop + 12);
+        g.fillStyle = "#6944a0";
+        g.fillText("Y", padL + 122, yTop + 12);
+        g.fillStyle = "#2f78a7";
+        g.fillText("Water Mxy", padL + 136, yTop + 12);
+        g.fillStyle = "#9f6a2f";
+        g.fillText("Fat Mxy", padL + 197, yTop + 12);
+
+        g.fillStyle = "#2a4d72";
+        g.font = "600 9px Avenir Next";
+        g.fillText("-1", 14, yMap(-1) + 3);
+        g.fillText("0", 18, yMap(0) + 3);
+        g.fillText("+1", 13, yMap(1) + 3);
+        g.fillText(`${xRange.toFixed(1)} s window`, w - 88, h - 8);
+        if (state.trace.length) {
+          const last = state.trace[state.trace.length - 1];
+          g.fillText(`Δphase ${Math.round(Math.abs(last.phaseGap) * 180 / Math.PI)}°`, w - 160, yTop + 12);
+        }
+      }
+
+      function drawPhaseCoherencePanel(net, coherence, netMxy, phaseOffset = 0) {
+        if (!phaseCanvas) return;
+        const g = phaseCanvas.getContext("2d");
+        const dpr = window.devicePixelRatio || 1;
+        const w = Math.max(200, Math.floor(phaseCanvas.clientWidth));
+        const h = Math.max(200, Math.floor(phaseCanvas.clientHeight));
+        if (phaseCanvas.width !== Math.floor(w * dpr) || phaseCanvas.height !== Math.floor(h * dpr)) {
+          phaseCanvas.width = Math.floor(w * dpr);
+          phaseCanvas.height = Math.floor(h * dpr);
+        }
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, w, h);
+
+        const cx = w * 0.5;
+        const cy = h * 0.5 - 6;
+        const r = Math.min(w, h) * 0.3;
+
+        g.strokeStyle = "rgba(88, 121, 156, 0.42)";
+        g.lineWidth = 1.5;
+        g.beginPath();
+        g.arc(cx, cy, r, 0, Math.PI * 2);
+        g.stroke();
+
+        const spins = activeSpins();
+        for (let i = 0; i < spins.length; i += 1) {
+          const s = spins[i];
+          if (!s.excited) continue;
+          const ang = s.phase + phaseOffset;
+          const px = cx + Math.cos(ang) * r;
+          const py = cy - Math.sin(ang) * r;
+          const alpha = 0.25 + 0.75 * s.mTrans;
+          if (s.kind === "fat") {
+            g.fillStyle = `rgba(181, 113, 46, ${alpha})`;
+          } else {
+            g.fillStyle = `rgba(47, 120, 167, ${alpha})`;
+          }
+          g.beginPath();
+          g.arc(px, py, 2.6, 0, Math.PI * 2);
+          g.fill();
+        }
+
+        const ang = Math.atan2(net.z, net.y);
+        const nr = r * clamp(netMxy, 0, 1);
+        const nx = cx + Math.cos(ang) * nr;
+        const ny = cy - Math.sin(ang) * nr;
+        g.strokeStyle = "#1d5f9f";
+        g.lineWidth = 2.6;
+        g.beginPath();
+        g.moveTo(cx, cy);
+        g.lineTo(nx, ny);
+        g.stroke();
+
+        g.fillStyle = "#214a73";
+        g.font = "600 11px Avenir Next";
+        g.fillText(`Coherence: ${Math.round(coherence * 100)}%`, 12, h - 44);
+        g.fillStyle = "#2b5f8d";
+        g.font = "600 10px Avenir Next";
+        g.fillText("Blue=water, brown=fat", 12, h - 58);
+
+        let phaseState = "Spinning in phase (glazing)";
+        if (coherence < 0.3) phaseState = "Strong de-spinning / dephasing";
+        else if (coherence < 0.7) phaseState = "Partial dephasing";
+        const n = state.trace.length;
+        if (state.phase === "after_180" && n > 6) {
+          const d = state.trace[n - 1].coh - state.trace[Math.max(0, n - 6)].coh;
+          if (d > 0.03) phaseState = "Rephasing (de-glazing to echo)";
+        }
+
+        g.fillStyle = "#2a4d73";
+        g.font = "600 10px Avenir Next";
+        g.fillText(phaseState, 12, h - 26);
+      }
+
+      function drawGradientShadows(w, h) {
+        if (state.phasePulseTimer > 0) {
+          const a = clamp(state.phasePulseTimer / 0.45, 0, 1);
+          const bandH = Math.max(90, h * 0.22);
+          const y0 = (h * 0.54) - (bandH / 2);
+          ctx.fillStyle = `rgba(122, 77, 182, ${0.10 + 0.18 * a})`;
+          ctx.fillRect(0, y0, w, bandH);
+          ctx.fillStyle = "rgba(83, 52, 132, 0.82)";
+          ctx.font = "700 18px Avenir Next";
+          ctx.fillText("Gy PHASE ENCODE", 24, y0 + 28);
+        }
+
+        if (state.freqPulseTimer > 0) {
+          const a = clamp(state.freqPulseTimer / 0.6, 0, 1);
+          const bandW = Math.max(120, w * 0.18);
+          const x0 = (w * 0.52) - (bandW / 2);
+          ctx.fillStyle = `rgba(47, 120, 167, ${0.10 + 0.22 * a})`;
+          ctx.fillRect(x0, 0, bandW, h);
+          ctx.fillStyle = "rgba(25, 84, 125, 0.86)";
+          ctx.font = "700 18px Avenir Next";
+          ctx.fillText("Gx READOUT", x0 + 10, 34);
+        }
+      }
+
+      function drawTagOverlay(w, h) {
+        if (state.tagOverlay.timer <= 0 || !state.tagOverlay.text) return;
+        const a = clamp(state.tagOverlay.timer / 1.55, 0, 1);
+        const boxW = Math.min(w * 0.54, 440);
+        const boxH = 108;
+        const x = (w - boxW) / 2;
+        const y = h * 0.12;
+
+        ctx.fillStyle = `rgba(240, 248, 255, ${0.72 + 0.18 * a})`;
+        ctx.strokeStyle = `rgba(90, 127, 163, ${0.45 + 0.25 * a})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.rect(x, y, boxW, boxH);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = state.tagOverlay.color;
+        ctx.font = "800 66px Avenir Next";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(state.tagOverlay.text, x + boxW / 2, y + boxH / 2 + 4);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+      }
+
+      function drawScene() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+        const stepPaused = !!(els.stepNote && els.stepNote.classList.contains("show"));
+        const phaseOffset = stepPaused ? state.visualTime * LARMOR : 0;
+
+        const camera = { cx: w * 0.5, cy: h * 0.64, z: 6.3 };
+        const focal = Math.min(w, h) * 1.08;
+
+        const active = activeSpins();
+        const { net, rows, coherence, species, phaseGap } = computeNetAndRows();
+
+        drawGridPlane(camera, focal);
+
+        if (state.b0Applied) {
+          drawB0Axis(camera, focal);
+          drawSliceBand(camera, focal);
+        }
+
+        drawGradientShadows(w, h);
+
+        const drawItems = [];
+        let cx = 0;
+        let cy = 0;
+        let cz = 0;
+        if (state.showGroup && active.length > 0) {
+          for (let i = 0; i < active.length; i += 1) {
+            cx += active[i].x;
+            cy += active[i].y;
+            cz += active[i].z;
+          }
+          cx /= active.length;
+          cy /= active.length;
+          cz /= active.length;
+        }
+
+        for (let i = 0; i < active.length; i += 1) {
+          const s = active[i];
+          const chemShiftX = state.freqOn && s.excited
+            ? (s.kind === "fat" ? 0.34 : -0.12)
+            : 0;
+          const viewSpin = state.showGroup
+            ? {
+                ...s,
+                x: s.x - cx + chemShiftX,
+                y: s.y - cy,
+                z: s.z - cz
+              }
+            : {
+                ...s,
+                x: chemShiftX,
+                y: 0,
+                z: 0
+              };
+          const p = project3D(viewSpin.x, viewSpin.y, viewSpin.z, camera, focal);
+          drawItems.push({ s: viewSpin, p });
+        }
+
+        drawItems.sort((a, b) => a.p.depth - b.p.depth);
+
+        for (let i = 0; i < drawItems.length; i += 1) {
+          const it = drawItems[i];
+          drawLine3D({ x: it.s.x, y: it.s.y, z: it.s.z }, { x: it.s.x, y: it.s.y + 0.001, z: it.s.z }, camera, focal, "rgba(53,95,143,0.25)", 1);
+          drawSphere({ x: it.s.x, y: it.s.y, z: it.s.z }, state.showGroup ? 0.22 : 0.36, camera, focal, it.s.kind);
+          drawRing(it.s, camera, focal, state.phase === "before_b0" && !state.showGroup, stepPaused ? state.visualTime : state.time);
+          drawSpinArm(it.s, camera, focal, phaseOffset);
+        }
+
+        const netMxy = Math.sqrt(net.y * net.y + net.z * net.z);
+        drawNetVector(net, camera, focal);
+        drawCoilAndSignal(netMxy, species, phaseGap, camera, focal);
+        drawMiniAxis(net);
+        drawSpeciesLegend();
+        drawSequenceGraph(netMxy);
+        recordTrace(net, coherence, netMxy, species, phaseGap);
+        drawRelaxationChart();
+        drawPhaseCoherencePanel(net, coherence, netMxy, phaseOffset);
+
+        if (state.phase === "during_rf") {
+          ctx.strokeStyle = "#b55f22";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i <= 140; i += 1) {
+            const x = 24 + i;
+            const y = 56 + Math.sin(i * 0.24 + state.time * 3) * 6;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.fillStyle = "#764216";
+          ctx.font = "700 12px Avenir Next";
+          ctx.fillText("B1 RF pulse", 24, 46);
+        }
+
+        if (state.phase === "after_rf_off" && state.susceptOn) {
+          ctx.fillStyle = "rgba(149, 71, 51, 0.12)";
+          ctx.fillRect(w * 0.62, h * 0.18, w * 0.28, h * 0.3);
+          ctx.strokeStyle = "rgba(143, 64, 44, 0.36)";
+          ctx.strokeRect(w * 0.62, h * 0.18, w * 0.28, h * 0.3);
+          ctx.fillStyle = "#7c402f";
+          ctx.font = "600 12px Avenir Next";
+          ctx.fillText("Susceptibility region (air-bone)", w * 0.63, h * 0.2);
+        }
+
+        ctx.fillStyle = "#4a627f";
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Water (blue) and fat (brown) spins: apply Gy for row phase, apply Gx for readout + chemical shift along X, then view dephasing/rephasing.", 14, h - 16);
+        drawTagOverlay(w, h);
+
+        const mz = net.x;
+        const mxy = Math.sqrt(net.y * net.y + net.z * net.z);
+        const relax = estimateRelaxTimes();
+        const t2View = state.sequenceMode === "pen" ? relax.t2 : relax.t2star;
+        const echoT1 = state.echoInfo.type === "None" ? relax.t1 : state.echoInfo.t1;
+        const echoT2 = state.echoInfo.type === "None" ? t2View : state.echoInfo.t2;
+        const t2Name = state.echoInfo.type === "GRE"
+          ? "T2*"
+          : (state.sequenceMode === "pen" || state.echoInfo.type === "SE" ? "T2" : "T2*");
+        els.mzVal.textContent = mz.toFixed(2);
+        els.mxyVal.textContent = mxy.toFixed(2);
+        els.waterMxyVal.textContent = species.water.mxy.toFixed(2);
+        els.fatMxyVal.textContent = species.fat.mxy.toFixed(2);
+        els.phaseGapVal.textContent = `${Math.round(Math.abs(phaseGap) * 180 / Math.PI)}°`;
+        els.chemShiftVal.textContent = state.freqOn ? "ON (Gx): fat-water shifted" : "OFF (enable Gx)";
+        els.t1Val.textContent = `${echoT1.toFixed(2)} s`;
+        els.t2Val.textContent = `${t2Name} ${echoT2.toFixed(2)} s`;
+        els.echoVal.textContent = state.echoInfo.type === "None"
+          ? "-"
+          : `${state.echoInfo.type} | TE ${state.echoInfo.teMs} ms`;
+        els.cohVal.textContent = `${Math.round(coherence * 100)}%`;
+
+        updateRowUi(rows);
+      }
+
+      function tickAuto() {
+        if (!state.autoOn) return;
+        const elapsed = state.time - state.autoStart;
+
+        while (state.autoIdx < state.autoEvents.length && elapsed >= state.autoEvents[state.autoIdx].t) {
+          runAction(state.autoEvents[state.autoIdx].a);
+          state.autoIdx += 1;
+        }
+
+        if (state.autoIdx >= state.autoEvents.length && elapsed > state.autoEvents[state.autoEvents.length - 1].t + 2.2) {
+          stopAuto();
+        }
+      }
+
+      function frame(nowMs) {
+        const dt = clamp((nowMs - state.lastFrameMs) / 1000, 0, 0.05);
+        state.lastFrameMs = nowMs;
+        const stepPaused = !!(els.stepNote && els.stepNote.classList.contains("show"));
+        tickVisualTimers(dt);
+
+        if (state.running) {
+          state.time += dt;
+          state.visualTime = state.time;
+          updateSpins(dt);
+          tickAuto();
+        } else if (stepPaused) {
+          // Keep visual spin motion alive while physics state remains frozen.
+          state.visualTime += dt;
+        }
+
+        drawScene();
+        requestAnimationFrame(frame);
+      }
+
+      els.singleBtn.addEventListener("click", () => runAction("single", "manual"));
+      els.groupBtn.addEventListener("click", () => runAction("group", "manual"));
+      els.b0Btn.addEventListener("click", () => runAction("b0", "manual"));
+      els.rf90Btn.addEventListener("click", () => runAction("rf90", "manual"));
+      els.rfOffBtn.addEventListener("click", () => runAction("rfOff", "manual"));
+      els.rf180Btn.addEventListener("click", () => runAction("rf180", "manual"));
+      els.sliceBtn.addEventListener("click", () => runAction("slice", "manual"));
+      els.phaseBtn.addEventListener("click", () => runAction("phase", "manual"));
+      els.freqBtn.addEventListener("click", () => runAction("freq", "manual"));
+      els.suscBtn.addEventListener("click", toggleSusceptibility);
+
+      els.penEchoBtn.addEventListener("click", () => setSequenceMode("pen"));
+      els.greBtn.addEventListener("click", () => setSequenceMode("gre"));
+      els.applySeqBtn.addEventListener("click", startGuidedMode);
+      els.weightingSel.addEventListener("change", () => {
+        setWeightingMode(els.weightingSel.value);
+      });
+
+      els.snapT2Btn.addEventListener("click", () => captureSnapshot("t2"));
+      els.snapTEBtn.addEventListener("click", () => captureSnapshot("te"));
+      els.snapTRBtn.addEventListener("click", () => captureSnapshot("tr"));
+
+      els.autoBtn.addEventListener("click", () => {
+        if (state.guide.active) {
+          stopGuidedMode();
+          closeStepNote(true);
+          return;
+        }
+        startGuidedMode();
+      });
+
+      els.resetBtn.addEventListener("click", resetAll);
+
+      els.playBtn.addEventListener("click", () => {
+        state.running = !state.running;
+        els.playBtn.textContent = state.running ? "Pause" : "Play";
+      });
+
+      els.stepNextBtn.addEventListener("click", onStepNext);
+
+      document.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          ensureAudio();
+        }, { passive: true });
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      initRowUi();
+      resetAll();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

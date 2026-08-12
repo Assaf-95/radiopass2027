@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T2 and T2* — Simple — Radiopass</title>
+<meta name="description" content="T2 and T2* signal decay, explained in the simplest possible terms." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/simple-slides.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="ss-header">
+  <div class="shell">
+    <div class="ss-header-top">
+      <div>
+        <span class="eyebrow">MRI · T2 and T2* · Simple version</span>
+        <h1 class="ss-title">Why the signal fades.</h1>
+        <p class="lede ss-subtitle">The short version — just the idea, one small piece at a time.</p>
+      </div>
+      <div class="ss-count-pill" id="ss-count">SLIDE 1 / 7</div>
+    </div>
+    <div class="ss-progress-track"><div class="ss-progress-fill" id="ss-progress-fill"></div></div>
+    <a href="mri-t2-t2star-signal-steps-detailed.html" class="btn btn-ghost ss-more-link">want more detail? open the full page</a>
+  </div>
+</header>
+
+<div class="shell ss-layout">
+  <div class="card glass ss-stage-card">
+    <svg id="ss-stage" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card glass ss-teach-card">
+    <div class="ss-slide-title" id="ss-slide-title"></div>
+    <ul class="ss-bullets" id="ss-bullets"></ul>
+    <div class="ss-caption" id="ss-caption"></div>
+    <div class="ss-control" id="ss-control">
+      <label id="ss-control-label"></label>
+      <input type="range" id="ss-control-input" />
+      <span class="ss-readout" id="ss-control-readout"></span>
+    </div>
+    <div class="ss-nav">
+      <button type="button" class="btn btn-ghost" id="ss-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="ss-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/simple-slides.js"></script>
+<script>
+(function () {
+  var cx = 350, cy = 200;
+
+  function dot(x, y, r, colour) { return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="' + colour + '"/>'; }
+  function txt(x, y, s, colour, size) { return '<text x="' + x + '" y="' + y + '" fill="' + colour + '" font-size="' + (size || 15) + '" font-family="Inter,sans-serif" font-weight="700" text-anchor="middle">' + s + '</text>'; }
+
+  function spinRing(t, spread) {
+    var out = '<circle cx="' + cx + '" cy="' + cy + '" r="110" fill="none" stroke="rgba(148,197,224,0.18)" stroke-width="1.5"/>';
+    var n = 8;
+    for (var i = 0; i < n; i++) {
+      var baseAngle = (i / n) * Math.PI * 2;
+      var speedVariance = 1 + (i - n / 2) * 0.06 * spread;
+      var angle = baseAngle + t * 2.2 * speedVariance;
+      var x = cx + Math.cos(angle) * 90, y = cy + Math.sin(angle) * 90;
+      out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#5FE3F2" stroke-width="2" opacity="' + (0.85 - spread * 0.05) + '"/>';
+      out += dot(x, y, 5, '#5FE3F2');
+    }
+    return out;
+  }
+
+  function decayCurve(t, rate, colour, label) {
+    var pts = '';
+    for (var x = 0; x <= 560; x += 8) {
+      var tt = x / 560 * 6;
+      var y = 380 - 140 * Math.exp(-rate * tt);
+      pts += (x + 90) + ',' + y.toFixed(1) + ' ';
+    }
+    var markerX = Math.min(560, t * 90) + 90;
+    var markerTT = (markerX - 90) / 560 * 6;
+    var markerY = 380 - 140 * Math.exp(-rate * markerTT);
+    return '<polyline points="' + pts + '" fill="none" stroke="' + colour + '" stroke-width="3"/>' +
+      dot(markerX, markerY, 6, colour) +
+      (label ? txt(650, markerY, label, colour, 13) : '');
+  }
+
+  var SLIDES = [
+    {
+      title: 'Maximum coherent Mxy',
+      bullets: ['Immediately post-90°, every spin isochromat shares the same phase.', 'Transverse components summate constructively — maximum signal amplitude.', 'This instant is the reference point every subsequent decay is measured against.'],
+      caption: '<strong>Perfect phase coherence</strong> = maximum measurable Mxy.',
+      draw: function (t) {
+        return spinRing(t * 0.3, 0);
+      }
+    },
+    {
+      title: 'Dephasing begins',
+      bullets: ['Each spin experiences a slightly different local magnetic field.', 'Precessional frequency depends on local field strength — so each spin drifts at a different rate.', 'Phase coherence is lost progressively across the isochromat population.'],
+      caption: '<strong>Dephasing</strong> — loss of the shared phase, not loss of magnetisation itself.',
+      draw: function (t) {
+        return spinRing(t * 0.3, Math.min(1, t * 0.3));
+      }
+    },
+    {
+      title: 'Free Induction Decay',
+      bullets: ['As coherence is lost, vector summation of the transverse components falls.', 'Net Mxy decays exponentially toward zero.', 'This exponential decay, immediately after excitation with no refocusing pulse, is the FID.'],
+      caption: '<strong>FID</strong> — the raw, unrefocused exponential decay of Mxy.',
+      draw: function (t) {
+        return spinRing(t * 0.3, 2.4) + decayCurve(t, 0.9, '#EAF3FB', 'FID');
+      }
+    },
+    {
+      title: 'T2 — spin-spin relaxation',
+      bullets: ['T2 arises from spin-spin interaction — energy exchange between neighbouring nuclei, not with the lattice.', 'It is intrinsic to the tissue, independent of scanner field homogeneity.', 'T2 is defined as the time for Mxy to fall to 37% of its initial value (a loss of 63%).'],
+      caption: '<strong>T2</strong> — the 37% time constant, set by tissue microstructure alone.',
+      draw: function (t) { return decayCurve(t, 0.55, '#16BFA6', 'T2'); }
+    },
+    {
+      title: 'T2* — T2 plus field inhomogeneity',
+      bullets: ['Real magnets are never perfectly homogeneous — static field variation adds extra dephasing.', '1/T2* = 1/T2 + 1/T2′, where T2′ is the inhomogeneity contribution.', 'T2* is therefore always shorter than true T2, and is what you actually observe as an unrefocused FID.'],
+      caption: '<strong>1/T2* = 1/T2 + 1/T2′</strong> — T2* is never longer than T2.',
+      draw: function (t) { return decayCurve(t, 0.55, '#16BFA6', 'T2') + decayCurve(t, 1.1, '#F2B84B', 'T2*'); }
+    },
+    {
+      title: 'T2 by tissue type',
+      bullets: ['Bone, calcium and metal: very short T2 — rigid lattices produce large local field gradients.', 'Fat: relatively short T2.', 'Water and simple fluids: long T2 — rapid molecular motion averages out local field variation.'],
+      caption: '<strong>T2</strong> reflects how much local field variation a tissue’s structure produces.',
+      draw: function (t) {
+        return decayCurve(t, 1.6, '#FB6C6C', 'bone') + decayCurve(t, 0.9, '#F2B84B', 'fat') + decayCurve(t, 0.35, '#5FE3F2', 'water');
+      }
+    },
+    {
+      title: 'That was the short version',
+      bullets: ['This covered FID, T2, and T2* at full technical depth, one idea per slide.', 'The full page has the exact decay curves, definitions and the T2/T2′ factors table.', 'Open it any time — identical physics, presented with more density.'],
+      caption: '<strong>Ready for more?</strong> The detailed page is one click away, above.',
+      draw: function () {
+        return '<rect x="120" y="130" width="460" height="200" rx="24" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+          txt(350, 220, 'Full T2 / T2* page available', '#5FE3F2', 20) +
+          txt(350, 255, 'exact curves · full definitions · factors table', '#8FA3BB', 14);
+      }
+    }
+  ];
+
+  window.SimpleSlides.init({ slides: SLIDES });
+})();
+</script>
+</body>
+</html>

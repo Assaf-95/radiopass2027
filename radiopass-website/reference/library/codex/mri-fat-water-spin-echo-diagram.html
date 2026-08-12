@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Spin Echo Fat Water Diagram</title>
+  <style>
+    :root {
+      --bg: #f3f7fc;
+      --panel: #ffffff;
+      --panel-soft: #edf4fb;
+      --ink: #12263e;
+      --muted: #506580;
+      --line: #c7d8ea;
+      --fat: #da7f2f;
+      --water: #2f7fd0;
+      --z: #314e78;
+      --x: #3f9d68;
+      --y: #8e57b8;
+      --accent: #1f6fb8;
+      --good: #278f6a;
+      --warn: #b56a1f;
+      --shadow: 0 14px 34px rgba(16, 37, 64, 0.12);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 5%, rgba(255, 255, 255, 0.88), transparent 44%),
+        radial-gradient(circle at 88% 92%, rgba(163, 198, 235, 0.28), transparent 38%),
+        linear-gradient(145deg, #edf3fb, #dfeaf8);
+      padding: 1rem;
+    }
+
+    .app {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.9rem;
+      animation: rise 420ms ease-out;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.94));
+      border: 1px solid rgba(156, 182, 212, 0.42);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 0.9rem 1rem;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.35;
+      font-size: 0.93rem;
+    }
+
+    .controls {
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid rgba(40, 82, 131, 0.35);
+      border-radius: 999px;
+      padding: 0.5rem 0.95rem;
+      background: linear-gradient(180deg, #fbfdff, #e9f2fd);
+      color: #173354;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 7px 16px rgba(22, 54, 92, 0.14);
+    }
+
+    button.primary {
+      background: linear-gradient(180deg, #eaf5ff, #d4e9ff);
+      border-color: rgba(31, 93, 157, 0.4);
+    }
+
+    button.warn {
+      background: linear-gradient(180deg, #fff4e9, #ffe4ca);
+      border-color: rgba(178, 104, 37, 0.4);
+    }
+
+    .chip {
+      border: 1px solid rgba(100, 131, 165, 0.34);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      color: #214669;
+      background: rgba(232, 242, 254, 0.65);
+      white-space: nowrap;
+    }
+
+    .chip strong {
+      font-size: 0.85rem;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 0.9rem;
+      align-items: stretch;
+    }
+
+    .canvas-wrap {
+      padding: 0.75rem;
+      min-height: 420px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(143, 173, 206, 0.38);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(209, 226, 246, 0.44), transparent 45%),
+        radial-gradient(circle at 82% 82%, rgba(190, 214, 242, 0.42), transparent 40%),
+        linear-gradient(160deg, #f7fbff, #edf5ff);
+      display: block;
+    }
+
+    .sidebar {
+      padding: 0.8rem;
+      display: grid;
+      gap: 0.65rem;
+      align-content: start;
+    }
+
+    .card {
+      border: 1px solid rgba(150, 179, 210, 0.38);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(237, 246, 255, 0.88));
+      padding: 0.65rem;
+      box-shadow: 0 7px 20px rgba(30, 57, 90, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 0.45rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #315679;
+    }
+
+    .card p {
+      margin: 0;
+      color: #274569;
+      font-size: 0.86rem;
+      line-height: 1.38;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+    }
+
+    .stat {
+      border: 1px solid rgba(133, 161, 190, 0.34);
+      border-radius: 10px;
+      padding: 0.45rem;
+      font-size: 0.79rem;
+      background: rgba(248, 252, 255, 0.88);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-top: 0.2rem;
+    }
+
+    .stat.fat {
+      color: #8c4b14;
+    }
+
+    .stat.water {
+      color: #1f5187;
+    }
+
+    .timeline {
+      padding: 0.85rem;
+    }
+
+    .timeline h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #2f5279;
+    }
+
+    .sequence {
+      border: 1px solid rgba(139, 170, 202, 0.37);
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f7fbff, #ebf4ff);
+    }
+
+    .track {
+      position: relative;
+      height: 52px;
+      border-bottom: 1px solid rgba(160, 188, 217, 0.33);
+      padding-left: 90px;
+    }
+
+    .track:last-child {
+      border-bottom: 0;
+    }
+
+    .track-label {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 90px;
+      border-right: 1px solid rgba(154, 184, 214, 0.33);
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      color: #325579;
+      text-transform: uppercase;
+      background: rgba(236, 245, 255, 0.92);
+    }
+
+    .event {
+      position: absolute;
+      top: 11px;
+      height: 30px;
+      border-radius: 8px;
+      font-size: 0.71rem;
+      line-height: 1.08;
+      padding: 0.32rem 0.35rem;
+      display: grid;
+      align-content: center;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .rf {
+      background: rgba(255, 202, 125, 0.55);
+      border-color: rgba(182, 118, 42, 0.42);
+      color: #6d3e0b;
+    }
+
+    .gz {
+      background: rgba(118, 172, 230, 0.35);
+      border-color: rgba(54, 109, 170, 0.4);
+      color: #134776;
+    }
+
+    .gy {
+      background: rgba(163, 130, 221, 0.3);
+      border-color: rgba(104, 73, 163, 0.38);
+      color: #4c2d84;
+    }
+
+    .gx {
+      background: rgba(117, 203, 167, 0.34);
+      border-color: rgba(52, 127, 96, 0.4);
+      color: #1d5c44;
+    }
+
+    .signal {
+      background: rgba(250, 241, 154, 0.45);
+      border-color: rgba(171, 147, 40, 0.4);
+      color: #6b5a0e;
+    }
+
+    .event small {
+      font-size: 0.64rem;
+    }
+
+    .te-marker,
+    .now-marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+    }
+
+    .te-marker {
+      left: 72%;
+      background: rgba(193, 75, 58, 0.8);
+    }
+
+    .now-marker {
+      left: 14%;
+      background: rgba(38, 101, 168, 0.72);
+      transition: left 120ms linear;
+    }
+
+    .te-label,
+    .now-label {
+      position: absolute;
+      top: 3px;
+      transform: translateX(-50%);
+      font-size: 0.66rem;
+      padding: 0.1rem 0.32rem;
+      border-radius: 999px;
+      border: 1px solid rgba(143, 167, 193, 0.4);
+      background: rgba(251, 253, 255, 0.88);
+      color: #294669;
+      white-space: nowrap;
+    }
+
+    .te-label {
+      left: 72%;
+      color: #7a2c1f;
+      border-color: rgba(193, 75, 58, 0.32);
+    }
+
+    .now-label {
+      left: 14%;
+    }
+
+    .notes {
+      margin-top: 0.6rem;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .note {
+      border: 1px solid rgba(146, 175, 206, 0.36);
+      border-radius: 10px;
+      padding: 0.46rem 0.55rem;
+      font-size: 0.8rem;
+      color: #264465;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(237, 246, 255, 0.82));
+      line-height: 1.3;
+    }
+
+    .note strong {
+      color: #1d3d5f;
+    }
+
+    .footer-note {
+      margin-top: 0.5rem;
+      font-size: 0.78rem;
+      color: #4e6682;
+    }
+
+    @media (max-width: 980px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="panel header">
+      <h1>MRI Spin Echo: Fat and Water Magnetization</h1>
+      <p>Z-axis is horizontal, X-axis is vertical, and Y-axis is depth into screen. Two vectors only: fat and water. Shadows show <strong>Mz</strong> on Z and <strong>Mxy</strong> in the transverse plane.</p>
+      <p>Animation speed is slowed for visualization.</p>
+    </section>
+
+    <section class="panel controls">
+      <button id="btn90" class="primary">Apply 90°</button>
+      <button id="btn180" class="warn">Apply 180°</button>
+      <button id="btnReset">Reset</button>
+      <button id="btnPlay">Pause</button>
+      <span id="statusChip" class="chip"><strong>Equilibrium:</strong> fat and water aligned along +Z.</span>
+      <span id="clockChip" class="chip">t after 90°: 0.00 s</span>
+    </section>
+
+    <section class="main">
+      <div class="panel canvas-wrap">
+        <canvas id="scene" aria-label="3-axis spin echo magnetization diagram"></canvas>
+      </div>
+
+      <aside class="panel sidebar">
+        <article class="card">
+          <h2>Teaching Text</h2>
+          <p id="teachingLine">Start state: both vectors are longitudinal on +Z. Press 90° to create transverse signal.</p>
+        </article>
+
+        <article class="card">
+          <h2>Axis Mapping</h2>
+          <p><strong>Slice selection:</strong> Gz (horizontal Z axis)</p>
+          <p><strong>Phase encoding:</strong> Gy (depth Y axis)</p>
+          <p><strong>Frequency/readout:</strong> Gx (vertical X axis)</p>
+        </article>
+
+        <article class="card">
+          <h2>Vector Readout</h2>
+          <div class="row">
+            <div class="stat fat">Fat Mz<strong id="fatMz">1.00</strong></div>
+            <div class="stat fat">Fat Mxy<strong id="fatMxy">0.00</strong></div>
+            <div class="stat water">Water Mz<strong id="waterMz">1.00</strong></div>
+            <div class="stat water">Water Mxy<strong id="waterMxy">0.00</strong></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Spin Echo Clarity</h2>
+          <p>180° reverses phase dispersion and forms an echo later, but intrinsic T2 decay continues, so echo amplitude is still lower.</p>
+        </article>
+      </aside>
+    </section>
+
+    <section class="panel timeline">
+      <h2>Spin Echo Gradient Timeline</h2>
+      <div class="sequence" id="sequence">
+        <div class="te-marker" aria-hidden="true"></div>
+        <div class="now-marker" id="nowMarker" aria-hidden="true"></div>
+        <div class="te-label">TE, echo peak</div>
+        <div class="now-label" id="nowLabel">Now</div>
+
+        <div class="track">
+          <div class="track-label">RF</div>
+          <div class="event rf" style="left: 7%; width: 9%;">90° RF</div>
+          <div class="event rf" style="left: 47%; width: 9%;">180° RF</div>
+        </div>
+
+        <div class="track">
+          <div class="track-label">Gz</div>
+          <div class="event gz" style="left: 7%; width: 9%;">Slice select</div>
+          <div class="event gz" style="left: 16.8%; width: 3.4%;">Slice refocus</div>
+          <div class="event gz" style="left: 47%; width: 9%;">Slice select</div>
+          <div class="event gz" style="left: 56.8%; width: 3.4%;">Slice refocus</div>
+        </div>
+
+        <div class="track">
+          <div class="track-label">Gy</div>
+          <div class="event gy" style="left: 26%; width: 10%;">Phase encode<br><small>varies each TR</small></div>
+          <div class="event gy" style="left: 37%; width: 4.2%;">Rewind</div>
+        </div>
+
+        <div class="track">
+          <div class="track-label">Gx</div>
+          <div class="event gx" style="left: 40%; width: 7%;">Readout<br>prephaser</div>
+          <div class="event gx" style="left: 60%; width: 23%;">Readout</div>
+        </div>
+
+        <div class="track">
+          <div class="track-label">Signal</div>
+          <div class="event signal" style="left: 62%; width: 20%;">Echo sampled during readout</div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <div class="note"><strong>Gz slice selection:</strong> Gz during RF excites one slice; a small opposite lobe refocuses phase from the slice gradient.</div>
+        <div class="note"><strong>Gy phase encoding:</strong> Gy amplitude changes each TR to fill different ky lines. More phase steps increase scan time: total time is approximately TR multiplied by number of phase lines.</div>
+        <div class="note"><strong>Gx readout:</strong> Frequency encoding is along X during sampling. Chemical shift creates a fat-water frequency difference, producing displacement along the frequency encode direction.</div>
+      </div>
+
+      <div class="footer-note">90° pulse tips longitudinal magnetization into the transverse plane, creating transverse signal. 180° pulse reverses phase dispersion so spins rephase and an echo forms.</div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("scene");
+      const ctx = canvas.getContext("2d");
+
+      const els = {
+        btn90: document.getElementById("btn90"),
+        btn180: document.getElementById("btn180"),
+        btnReset: document.getElementById("btnReset"),
+        btnPlay: document.getElementById("btnPlay"),
+        statusChip: document.getElementById("statusChip"),
+        clockChip: document.getElementById("clockChip"),
+        teachingLine: document.getElementById("teachingLine"),
+        fatMz: document.getElementById("fatMz"),
+        fatMxy: document.getElementById("fatMxy"),
+        waterMz: document.getElementById("waterMz"),
+        waterMxy: document.getElementById("waterMxy"),
+        nowMarker: document.getElementById("nowMarker"),
+        nowLabel: document.getElementById("nowLabel")
+      };
+
+      const state = {
+        simTime: 0,
+        running: true,
+        pulse90Time: null,
+        pulse180Time: null,
+        lastFrameMs: performance.now()
+      };
+
+      const species = {
+        fat: {
+          color: getComputedStyle(document.documentElement).getPropertyValue("--fat").trim() || "#da7f2f",
+          omega: 5.4,
+          t2: 2.7,
+          t1: 2.2,
+          width: 5.2
+        },
+        water: {
+          color: getComputedStyle(document.documentElement).getPropertyValue("--water").trim() || "#2f7fd0",
+          omega: 3.8,
+          t2: 1.9,
+          t1: 4.3,
+          width: 4.2
+        }
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(280, Math.floor(rect.width));
+        const h = Math.max(260, Math.floor(rect.height));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function calculateVector(cfg) {
+        if (state.pulse90Time === null) {
+          return { x: 0, y: 0, z: 1, mxy: 0, mz: 1 };
+        }
+
+        const t = Math.max(0, state.simTime - state.pulse90Time);
+        const mxy = Math.exp(-t / cfg.t2);
+        const mz = 1 - Math.exp(-t / cfg.t1);
+
+        let phase;
+        if (state.pulse180Time === null || state.simTime <= state.pulse180Time) {
+          phase = cfg.omega * t;
+        } else {
+          const t180 = Math.max(0, state.pulse180Time - state.pulse90Time);
+          phase = cfg.omega * (2 * t180 - t);
+        }
+
+        return {
+          x: mxy * Math.cos(phase),
+          y: mxy * Math.sin(phase),
+          z: mz,
+          mxy,
+          mz
+        };
+      }
+
+      function drawArrow(from, to, color, width) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+
+        const ang = Math.atan2(to.y - from.y, to.x - from.x);
+        const head = 12 + width * 0.55;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(to.x, to.y);
+        ctx.lineTo(to.x - head * Math.cos(ang - 0.34), to.y - head * Math.sin(ang - 0.34));
+        ctx.lineTo(to.x - head * Math.cos(ang + 0.34), to.y - head * Math.sin(ang + 0.34));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function render() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        const origin = { x: w * 0.34, y: h * 0.64 };
+        const scale = Math.min(w, h) * 0.23;
+        const depthX = -0.55 * scale;
+        const depthY = -0.34 * scale;
+
+        function project(v) {
+          return {
+            x: origin.x + v.z * scale + v.y * depthX,
+            y: origin.y - v.x * scale + v.y * depthY
+          };
+        }
+
+        function point(x, y, z) {
+          return project({ x, y, z });
+        }
+
+        // Transverse (XY) plane
+        ctx.beginPath();
+        for (let i = 0; i <= 90; i += 1) {
+          const a = (i / 90) * Math.PI * 2;
+          const p = point(Math.cos(a), Math.sin(a), 0);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = "rgba(157, 200, 241, 0.16)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(72, 120, 172, 0.34)";
+        ctx.lineWidth = 1.15;
+        ctx.stroke();
+
+        // Axes
+        const axis = {
+          zPos: point(0, 0, 1.32),
+          zNeg: point(0, 0, -0.32),
+          xPos: point(1.15, 0, 0),
+          xNeg: point(-0.3, 0, 0),
+          yPos: point(0, 1.12, 0),
+          yNeg: point(0, -0.26, 0)
+        };
+
+        drawArrow(origin, axis.zPos, getComputedStyle(document.documentElement).getPropertyValue("--z").trim() || "#314e78", 3);
+        ctx.strokeStyle = "rgba(49, 78, 120, 0.45)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(axis.zNeg.x, axis.zNeg.y);
+        ctx.stroke();
+
+        drawArrow(origin, axis.xPos, getComputedStyle(document.documentElement).getPropertyValue("--x").trim() || "#3f9d68", 3);
+        ctx.strokeStyle = "rgba(63, 157, 104, 0.35)";
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(axis.xNeg.x, axis.xNeg.y);
+        ctx.stroke();
+
+        drawArrow(origin, axis.yPos, getComputedStyle(document.documentElement).getPropertyValue("--y").trim() || "#8e57b8", 3);
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = "rgba(142, 87, 184, 0.35)";
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(axis.yNeg.x, axis.yNeg.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#28496f";
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("+Z (longitudinal)", axis.zPos.x + 7, axis.zPos.y - 6);
+        ctx.fillText("+X", axis.xPos.x + 7, axis.xPos.y - 6);
+        ctx.fillText("+Y depth", axis.yPos.x - 12, axis.yPos.y - 10);
+
+        const fat = calculateVector(species.fat);
+        const water = calculateVector(species.water);
+        const fatVec = point(fat.x, fat.y, fat.z);
+        const waterVec = point(water.x, water.y, water.z);
+
+        function drawShadowAndVector(vec, cfg, name, labelOffset) {
+          const zShadow = point(0, 0, vec.z);
+          const xyShadow = point(vec.x, vec.y, 0);
+          const tip = point(vec.x, vec.y, vec.z);
+
+          ctx.setLineDash([6, 5]);
+          ctx.strokeStyle = cfg.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(origin.x, origin.y);
+          ctx.lineTo(zShadow.x, zShadow.y);
+          ctx.stroke();
+
+          ctx.setLineDash([2, 5]);
+          ctx.beginPath();
+          ctx.moveTo(origin.x, origin.y);
+          ctx.lineTo(xyShadow.x, xyShadow.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          drawArrow(origin, tip, cfg.color, cfg.width);
+
+          ctx.fillStyle = cfg.color;
+          ctx.font = "700 12px Avenir Next";
+          ctx.fillText(name, tip.x + labelOffset.x, tip.y + labelOffset.y);
+        }
+
+        drawShadowAndVector(fat, species.fat, "Fat", { x: 7, y: -4 });
+        drawShadowAndVector(water, species.water, "Water", { x: 7, y: 13 });
+
+        ctx.fillStyle = "#355a81";
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Mz shadows on Z", origin.x + scale * 0.55, origin.y + 18);
+        ctx.fillText("Mxy shadows in XY plane", origin.x - scale * 0.65, origin.y - scale * 0.55);
+
+        // A subtle echo marker in vector panel after 180
+        if (state.pulse90Time !== null && state.pulse180Time !== null) {
+          const echoT = state.pulse90Time + 2 * (state.pulse180Time - state.pulse90Time);
+          const dtEcho = state.simTime - echoT;
+          const alpha = clamp(1 - Math.abs(dtEcho) / 0.5, 0, 1);
+          if (alpha > 0) {
+            const ringR = scale * (0.93 + 0.05 * Math.sin(state.simTime * 8));
+            ctx.strokeStyle = `rgba(196, 84, 47, ${0.35 * alpha})`;
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.arc(origin.x, origin.y, ringR, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+
+        updateReadouts(fat, water);
+      }
+
+      function updateReadouts(fat, water) {
+        els.fatMz.textContent = fat.mz.toFixed(2);
+        els.fatMxy.textContent = fat.mxy.toFixed(2);
+        els.waterMz.textContent = water.mz.toFixed(2);
+        els.waterMxy.textContent = water.mxy.toFixed(2);
+
+        let tAfter90 = 0;
+        if (state.pulse90Time !== null) {
+          tAfter90 = Math.max(0, state.simTime - state.pulse90Time);
+        }
+        els.clockChip.textContent = `t after 90°: ${tAfter90.toFixed(2)} s`;
+
+        // Move timeline "Now" marker from 14% to 83% over 4 seconds
+        const seqStart = 14;
+        const seqEnd = 83;
+        const seqT = clamp(tAfter90 / 4, 0, 1);
+        const left = seqStart + (seqEnd - seqStart) * seqT;
+        els.nowMarker.style.left = `${left}%`;
+        els.nowLabel.style.left = `${left}%`;
+
+        if (state.pulse90Time === null) {
+          els.statusChip.innerHTML = "<strong>Equilibrium:</strong> fat and water aligned along +Z.";
+          els.teachingLine.textContent = "Start state: both vectors are longitudinal on +Z. Press 90° to create transverse signal.";
+          return;
+        }
+
+        if (state.pulse180Time === null) {
+          els.statusChip.innerHTML = "<strong>After 90°:</strong> Mz is near zero, Mxy is maximal, then dephasing and decay begin.";
+          els.teachingLine.textContent = "90° pulse tips longitudinal magnetization into the transverse plane, creating transverse signal.";
+          return;
+        }
+
+        const echoT = state.pulse90Time + 2 * (state.pulse180Time - state.pulse90Time);
+        if (state.simTime < echoT) {
+          els.statusChip.innerHTML = "<strong>After 180°:</strong> phase dispersion reversed, spins are rephasing toward echo.";
+        } else {
+          els.statusChip.innerHTML = "<strong>Echo passed:</strong> spins briefly lined up at TE, then dephase again with ongoing T2 loss.";
+        }
+        els.teachingLine.textContent = "180° pulse reverses phase dispersion so spins rephase and an echo forms. T1 recovery on Z continues, faster for fat than water.";
+      }
+
+      function resetState() {
+        state.simTime = 0;
+        state.pulse90Time = null;
+        state.pulse180Time = null;
+        els.nowMarker.style.left = "14%";
+        els.nowLabel.style.left = "14%";
+      }
+
+      els.btn90.addEventListener("click", () => {
+        state.pulse90Time = state.simTime;
+        state.pulse180Time = null;
+      });
+
+      els.btn180.addEventListener("click", () => {
+        if (state.pulse90Time === null) {
+          els.statusChip.innerHTML = "<strong>Apply 90° first:</strong> start in transverse plane before using 180° refocusing.";
+          return;
+        }
+        state.pulse180Time = state.simTime;
+      });
+
+      els.btnReset.addEventListener("click", resetState);
+
+      els.btnPlay.addEventListener("click", () => {
+        state.running = !state.running;
+        els.btnPlay.textContent = state.running ? "Pause" : "Play";
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      resetState();
+
+      function frame(nowMs) {
+        const dt = clamp((nowMs - state.lastFrameMs) / 1000, 0, 0.05);
+        state.lastFrameMs = nowMs;
+        if (state.running) {
+          state.simTime += dt;
+        }
+
+        render();
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

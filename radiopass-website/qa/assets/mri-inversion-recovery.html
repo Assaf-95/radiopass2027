@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Inversion Recovery Simulator</title>
+  <style>
+    :root {
+      --bg: #f3f8ff;
+      --panel: #ffffff;
+      --line: #d7e3f3;
+      --ink: #0f172a;
+      --muted: #334155;
+      --fat: #f59e0b;
+      --water: #0ea5e9;
+      --accent: #2563eb;
+      --ok: #16a34a;
+      --warn: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 10% 10%, #ffffff, var(--bg));
+    }
+
+    .layout {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 10px 26px rgba(51, 65, 85, 0.12);
+    }
+
+    .controls {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: sticky;
+      top: 14px;
+      max-height: calc(100vh - 30px);
+      overflow: auto;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #f8fbff;
+      display: grid;
+      gap: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 9px 10px;
+      font-weight: 650;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0369a1);
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #475569, #334155);
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.82rem;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .stage {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      display: block;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px;
+      background: #f8fbff;
+    }
+
+    .fat { color: #b45309; }
+    .water { color: #0369a1; }
+    .nulled {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .signal-bars {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 72px 1fr 46px;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      transition: width 180ms linear;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>MRI Inversion Recovery Simulator</h1>
+      <p class="subtitle">Physics model: Mz(t)=M0(1-2e<sup>-t/T1</sup>), with 180° inversion at t=0.</p>
+
+      <section class="section">
+        <div class="btn-row">
+          <button id="apply180">Apply 180° Pulse</button>
+          <button id="apply90" class="secondary">Apply 90° At TI</button>
+        </div>
+        <div class="row">
+          <span>Scanner preset</span>
+          <div>
+            <button id="preset15" class="secondary">1.5T</button>
+            <button id="preset3" class="secondary">3T</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="showFat" type="checkbox" checked /> Show Fat</label>
+        <label class="check"><input id="showWater" type="checkbox" checked /> Show Water</label>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>T1 Fat</span><strong id="fatT1Val">250 ms</strong></div>
+        <input id="fatT1" type="range" min="80" max="900" step="10" value="250" />
+        <div class="row"><span>T1 Water</span><strong id="waterT1Val">2000 ms</strong></div>
+        <input id="waterT1" type="range" min="400" max="4000" step="20" value="2000" />
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Inversion Time TI</span><strong id="tiVal">0 ms</strong></div>
+        <input id="tiSlider" type="range" min="0" max="5000" step="10" value="0" />
+        <div class="btn-row">
+          <button id="stirBtn" class="secondary">STIR Preset</button>
+          <button id="flairBtn" class="secondary">FLAIR Preset</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Fat null TI (T1 ln2)</span><span class="pill" id="fatNull">173 ms</span></div>
+        <div class="row"><span>Water null TI (T1 ln2)</span><span class="pill" id="waterNull">1386 ms</span></div>
+        <div class="row fat" id="fatNulledStatus">Fat: not nulled</div>
+        <div class="row water" id="waterNulledStatus">Water: not nulled</div>
+      </section>
+
+      <section class="section signal-bars">
+        <div class="row"><span>Transverse signal after 90° at TI</span><strong id="signalWinner">-</strong></div>
+        <div class="bar">
+          <span>Fat |Mz|</span>
+          <div class="track"><div id="fatSignalFill" class="fill" style="background: var(--fat);"></div></div>
+          <span id="fatSignalNum">0.00</span>
+        </div>
+        <div class="bar">
+          <span>Water |Mz|</span>
+          <div class="track"><div id="waterSignalFill" class="fill" style="background: var(--water);"></div></div>
+          <span id="waterSignalNum">0.00</span>
+        </div>
+      </section>
+    </aside>
+
+    <section class="card stage">
+      <canvas id="graph" width="960" height="600"></canvas>
+      <div class="legend">
+        <span><span class="dot" style="background: var(--fat);"></span>Fat recovery curve</span>
+        <span><span class="dot" style="background: var(--water);"></span>Water recovery curve</span>
+        <span><span class="dot" style="background: #64748b;"></span>TI marker</span>
+        <span><span class="dot" style="background: #0f172a;"></span>Zero magnetisation line</span>
+      </div>
+      <div class="stats">
+        <div class="stat" id="fatMzReadout">Fat Mz(TI): -1.000 M0</div>
+        <div class="stat" id="waterMzReadout">Water Mz(TI): -1.000 M0</div>
+        <div class="stat" id="elapsedReadout">Elapsed after 180° pulse: 0 ms</div>
+        <div class="stat" id="equationReadout">Equation: Mz(t)=M0(1-2e^(-t/T1))</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    class InversionRecoveryPhysics {
+      static mz(tMs, t1Ms, m0 = 1) {
+        return m0 * (1 - 2 * Math.exp(-tMs / t1Ms));
+      }
+
+      static nullTime(t1Ms) {
+        return t1Ms * Math.log(2);
+      }
+
+      static signalAfter90(tiMs, t1Ms, m0 = 1) {
+        return Math.abs(this.mz(tiMs, t1Ms, m0));
+      }
+
+      static isNulled(tiMs, t1Ms) {
+        const tolMs = 12;
+        return Math.abs(tiMs - this.nullTime(t1Ms)) <= tolMs;
+      }
+    }
+
+    class GraphRenderer {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+        this.pad = { left: 72, right: 22, top: 30, bottom: 58 };
+      }
+
+      xForTime(t, maxT) {
+        const w = this.canvas.width - this.pad.left - this.pad.right;
+        return this.pad.left + (t / maxT) * w;
+      }
+
+      yForMz(mz) {
+        const h = this.canvas.height - this.pad.top - this.pad.bottom;
+        return this.pad.top + ((1 - mz) / 2) * h;
+      }
+
+      drawFrame(model) {
+        const ctx = this.ctx;
+        const { width, height } = this.canvas;
+        const maxT = model.maxTimeMs;
+        this.currentMaxT = maxT;
+
+        ctx.clearRect(0, 0, width, height);
+
+        const yZero = this.yForMz(0);
+        const yTop = this.yForMz(1);
+        const yBottom = this.yForMz(-1);
+
+        ctx.fillStyle = "#eff6ff";
+        ctx.fillRect(this.pad.left, this.pad.top, width - this.pad.left - this.pad.right, yZero - this.pad.top);
+        ctx.fillStyle = "#fff7ed";
+        ctx.fillRect(this.pad.left, yZero, width - this.pad.left - this.pad.right, yBottom - yZero);
+
+        this.drawAxes(maxT);
+
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.pad.left, yZero);
+        ctx.lineTo(width - this.pad.right, yZero);
+        ctx.stroke();
+
+        if (model.showFat) {
+          this.drawCurve(model.fatT1Ms, maxT, "#f59e0b", model.elapsedMs);
+          this.drawNullMarker(model.fatNullMs, "#b45309", "fat null");
+          this.drawTIMarkerPoint(model.tiMs, model.fatT1Ms, "#f59e0b", model.fatNulled);
+        }
+
+        if (model.showWater) {
+          this.drawCurve(model.waterT1Ms, maxT, "#0ea5e9", model.elapsedMs);
+          this.drawNullMarker(model.waterNullMs, "#0369a1", "water null");
+          this.drawTIMarkerPoint(model.tiMs, model.waterT1Ms, "#0ea5e9", model.waterNulled);
+        }
+
+        this.drawVerticalTI(model.tiMs, maxT);
+        this.drawPulseAnnotation(model);
+      }
+
+      drawAxes(maxT) {
+        const ctx = this.ctx;
+        const { width, height } = this.canvas;
+
+        ctx.strokeStyle = "#cbd5e1";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 10; i += 1) {
+          const t = (maxT * i) / 10;
+          const x = this.xForTime(t, maxT);
+          ctx.beginPath();
+          ctx.moveTo(x, this.pad.top);
+          ctx.lineTo(x, height - this.pad.bottom);
+          ctx.stroke();
+
+          ctx.fillStyle = "#475569";
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(`${Math.round(t)} ms`, x - 16, height - this.pad.bottom + 18);
+        }
+
+        [-1, -0.5, 0, 0.5, 1].forEach((mz) => {
+          const y = this.yForMz(mz);
+          ctx.beginPath();
+          ctx.moveTo(this.pad.left, y);
+          ctx.lineTo(width - this.pad.right, y);
+          ctx.stroke();
+
+          ctx.fillStyle = "#475569";
+          ctx.fillText(`${mz.toFixed(1)} M0`, 14, y + 4);
+        });
+
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(this.pad.left, this.pad.top);
+        ctx.lineTo(this.pad.left, height - this.pad.bottom);
+        ctx.lineTo(width - this.pad.right, height - this.pad.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Longitudinal magnetization Mz", 16, 18);
+        ctx.fillText("Time after 180° pulse (ms)", width / 2 - 70, height - 14);
+      }
+
+      drawCurve(t1Ms, maxT, color, elapsedMs) {
+        const ctx = this.ctx;
+        const n = 360;
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        for (let i = 0; i <= n; i += 1) {
+          const t = (maxT * i) / n;
+          const mz = InversionRecoveryPhysics.mz(t, t1Ms);
+          const x = this.xForTime(t, maxT);
+          const y = this.yForMz(mz);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.globalAlpha = 0.28;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        const visibleTime = Math.max(0, Math.min(elapsedMs, maxT));
+        ctx.beginPath();
+        for (let i = 0; i <= n; i += 1) {
+          const t = (visibleTime * i) / n;
+          const mz = InversionRecoveryPhysics.mz(t, t1Ms);
+          const x = this.xForTime(t, maxT);
+          const y = this.yForMz(mz);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      drawNullMarker(tNull, color, label) {
+        const ctx = this.ctx;
+        const x = this.xForTime(tNull, this.currentMaxT);
+        const y = this.yForMz(0);
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillStyle = color;
+        ctx.fillText(label, x + 8, y - 8);
+      }
+
+      drawTIMarkerPoint(tiMs, t1Ms, color, nulled) {
+        const ctx = this.ctx;
+        const x = this.xForTime(tiMs, this.currentMaxT);
+        const y = this.yForMz(InversionRecoveryPhysics.mz(tiMs, t1Ms));
+
+        if (nulled) {
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = "#16a34a";
+        }
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      drawVerticalTI(tiMs, maxT) {
+        const ctx = this.ctx;
+        const x = this.xForTime(tiMs, maxT);
+
+        ctx.strokeStyle = "#475569";
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([7, 5]);
+        ctx.beginPath();
+        ctx.moveTo(x, this.pad.top);
+        ctx.lineTo(x, this.canvas.height - this.pad.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#334155";
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText(`TI = ${Math.round(tiMs)} ms`, x + 8, this.pad.top + 14);
+      }
+
+      drawPulseAnnotation(model) {
+        const ctx = this.ctx;
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("At t=0 right after 180° pulse: Mz = -M0", this.pad.left + 6, this.pad.top + 16);
+
+        const x0 = this.xForTime(0, model.maxTimeMs);
+        const y0 = this.yForMz(-1);
+        ctx.fillStyle = "#dc2626";
+        ctx.beginPath();
+        ctx.arc(x0, y0, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class InversionRecoverySimulator {
+      constructor() {
+        this.renderer = new GraphRenderer(document.getElementById("graph"));
+
+        this.ui = {
+          apply180: document.getElementById("apply180"),
+          apply90: document.getElementById("apply90"),
+          preset15: document.getElementById("preset15"),
+          preset3: document.getElementById("preset3"),
+          showFat: document.getElementById("showFat"),
+          showWater: document.getElementById("showWater"),
+          fatT1: document.getElementById("fatT1"),
+          waterT1: document.getElementById("waterT1"),
+          tiSlider: document.getElementById("tiSlider"),
+          stirBtn: document.getElementById("stirBtn"),
+          flairBtn: document.getElementById("flairBtn"),
+          fatT1Val: document.getElementById("fatT1Val"),
+          waterT1Val: document.getElementById("waterT1Val"),
+          tiVal: document.getElementById("tiVal"),
+          fatNull: document.getElementById("fatNull"),
+          waterNull: document.getElementById("waterNull"),
+          fatNulledStatus: document.getElementById("fatNulledStatus"),
+          waterNulledStatus: document.getElementById("waterNulledStatus"),
+          fatMzReadout: document.getElementById("fatMzReadout"),
+          waterMzReadout: document.getElementById("waterMzReadout"),
+          elapsedReadout: document.getElementById("elapsedReadout"),
+          fatSignalFill: document.getElementById("fatSignalFill"),
+          waterSignalFill: document.getElementById("waterSignalFill"),
+          fatSignalNum: document.getElementById("fatSignalNum"),
+          waterSignalNum: document.getElementById("waterSignalNum"),
+          signalWinner: document.getElementById("signalWinner")
+        };
+
+        this.state = {
+          field: 1.5,
+          fatT1Ms: 250,
+          waterT1Ms: 2000,
+          showFat: true,
+          showWater: true,
+          tiMs: 0,
+          maxTimeMs: 5000,
+          elapsedMs: 0,
+          isAnimating: false,
+          lastTs: performance.now(),
+          simSpeed: 1.15,
+          signalCaptured: false,
+          fatSignal: 0,
+          waterSignal: 0
+        };
+
+        this.bindEvents();
+        this.recompute();
+        requestAnimationFrame((ts) => this.tick(ts));
+      }
+
+      bindEvents() {
+        this.ui.apply180.addEventListener("click", () => {
+          this.state.isAnimating = true;
+          this.state.elapsedMs = 0;
+          this.setTI(0);
+        });
+
+        this.ui.apply90.addEventListener("click", () => {
+          this.state.signalCaptured = true;
+          this.computeSignalsAtTI();
+          this.updateReadouts();
+        });
+
+        this.ui.showFat.addEventListener("change", () => {
+          this.state.showFat = this.ui.showFat.checked;
+          this.updateReadouts();
+        });
+
+        this.ui.showWater.addEventListener("change", () => {
+          this.state.showWater = this.ui.showWater.checked;
+          this.updateReadouts();
+        });
+
+        this.ui.fatT1.addEventListener("input", () => {
+          this.state.fatT1Ms = Number(this.ui.fatT1.value);
+          this.recompute();
+        });
+
+        this.ui.waterT1.addEventListener("input", () => {
+          this.state.waterT1Ms = Number(this.ui.waterT1.value);
+          this.recompute();
+        });
+
+        this.ui.tiSlider.addEventListener("input", () => {
+          this.state.isAnimating = false;
+          this.setTI(Number(this.ui.tiSlider.value));
+        });
+
+        this.ui.preset15.addEventListener("click", () => {
+          this.state.field = 1.5;
+          this.state.fatT1Ms = 250;
+          this.state.waterT1Ms = 2000;
+          this.syncSliders();
+          this.recompute();
+        });
+
+        this.ui.preset3.addEventListener("click", () => {
+          this.state.field = 3.0;
+          this.state.fatT1Ms = 360;
+          this.state.waterT1Ms = 2800;
+          this.syncSliders();
+          this.recompute();
+        });
+
+        this.ui.stirBtn.addEventListener("click", () => {
+          this.setTI(this.fatNullMs);
+        });
+
+        this.ui.flairBtn.addEventListener("click", () => {
+          this.setTI(this.waterNullMs);
+        });
+      }
+
+      syncSliders() {
+        this.ui.fatT1.value = String(this.state.fatT1Ms);
+        this.ui.waterT1.value = String(this.state.waterT1Ms);
+      }
+
+      setTI(valueMs) {
+        const v = Math.max(0, Math.min(this.state.maxTimeMs, valueMs));
+        this.state.tiMs = v;
+        this.ui.tiSlider.value = String(Math.round(v));
+        this.state.signalCaptured = false;
+        this.state.fatSignal = 0;
+        this.state.waterSignal = 0;
+        this.updateReadouts();
+      }
+
+      recompute() {
+        this.fatNullMs = InversionRecoveryPhysics.nullTime(this.state.fatT1Ms);
+        this.waterNullMs = InversionRecoveryPhysics.nullTime(this.state.waterT1Ms);
+
+        this.state.maxTimeMs = Math.ceil(Math.max(this.state.fatT1Ms, this.state.waterT1Ms) * 2.4 / 100) * 100;
+        this.ui.tiSlider.max = String(this.state.maxTimeMs);
+
+        if (this.state.tiMs > this.state.maxTimeMs) {
+          this.state.tiMs = this.state.maxTimeMs;
+        }
+
+        if (this.state.signalCaptured) {
+          this.computeSignalsAtTI();
+        } else {
+          this.state.fatSignal = 0;
+          this.state.waterSignal = 0;
+        }
+        this.updateReadouts();
+      }
+
+      computeSignalsAtTI() {
+        this.state.fatSignal = InversionRecoveryPhysics.signalAfter90(this.state.tiMs, this.state.fatT1Ms);
+        this.state.waterSignal = InversionRecoveryPhysics.signalAfter90(this.state.tiMs, this.state.waterT1Ms);
+      }
+
+      get fatNulled() {
+        return InversionRecoveryPhysics.isNulled(this.state.tiMs, this.state.fatT1Ms);
+      }
+
+      get waterNulled() {
+        return InversionRecoveryPhysics.isNulled(this.state.tiMs, this.state.waterT1Ms);
+      }
+
+      updateReadouts() {
+        const fatMz = InversionRecoveryPhysics.mz(this.state.tiMs, this.state.fatT1Ms);
+        const waterMz = InversionRecoveryPhysics.mz(this.state.tiMs, this.state.waterT1Ms);
+
+        this.ui.fatT1Val.textContent = `${this.state.fatT1Ms} ms`;
+        this.ui.waterT1Val.textContent = `${this.state.waterT1Ms} ms`;
+        this.ui.tiVal.textContent = `${Math.round(this.state.tiMs)} ms`;
+
+        this.ui.fatNull.textContent = `${Math.round(this.fatNullMs)} ms`;
+        this.ui.waterNull.textContent = `${Math.round(this.waterNullMs)} ms`;
+
+        this.ui.fatNulledStatus.textContent = this.fatNulled ? "Fat: nulled" : "Fat: not nulled";
+        this.ui.waterNulledStatus.textContent = this.waterNulled ? "Water: nulled" : "Water: not nulled";
+        this.ui.fatNulledStatus.className = `row fat${this.fatNulled ? " nulled" : ""}`;
+        this.ui.waterNulledStatus.className = `row water${this.waterNulled ? " nulled" : ""}`;
+
+        this.ui.fatMzReadout.textContent = `Fat Mz(TI): ${fatMz.toFixed(3)} M0`;
+        this.ui.waterMzReadout.textContent = `Water Mz(TI): ${waterMz.toFixed(3)} M0`;
+        this.ui.elapsedReadout.textContent = `Elapsed after 180° pulse: ${Math.round(this.state.elapsedMs)} ms`;
+
+        const fatPct = Math.max(0, Math.min(100, this.state.fatSignal * 100));
+        const waterPct = Math.max(0, Math.min(100, this.state.waterSignal * 100));
+        this.ui.fatSignalFill.style.width = `${fatPct}%`;
+        this.ui.waterSignalFill.style.width = `${waterPct}%`;
+        this.ui.fatSignalNum.textContent = this.state.fatSignal.toFixed(2);
+        this.ui.waterSignalNum.textContent = this.state.waterSignal.toFixed(2);
+
+        if (!this.state.signalCaptured) {
+          this.ui.signalWinner.textContent = "press 90°";
+        } else if (Math.abs(this.state.fatSignal - this.state.waterSignal) < 0.02) {
+          this.ui.signalWinner.textContent = "similar";
+        } else if (this.state.fatSignal > this.state.waterSignal) {
+          this.ui.signalWinner.textContent = "Fat brighter";
+        } else {
+          this.ui.signalWinner.textContent = "Water brighter";
+        }
+      }
+
+      tick(ts) {
+        const dt = Math.min(50, ts - this.state.lastTs);
+        this.state.lastTs = ts;
+
+        if (this.state.isAnimating) {
+          this.state.elapsedMs += dt * this.state.simSpeed;
+          if (this.state.elapsedMs >= this.state.maxTimeMs) {
+            this.state.elapsedMs = this.state.maxTimeMs;
+            this.state.isAnimating = false;
+          }
+          this.setTI(this.state.elapsedMs);
+        }
+
+        this.renderer.drawFrame({
+          fatT1Ms: this.state.fatT1Ms,
+          waterT1Ms: this.state.waterT1Ms,
+          showFat: this.state.showFat,
+          showWater: this.state.showWater,
+          tiMs: this.state.tiMs,
+          maxTimeMs: this.state.maxTimeMs,
+          elapsedMs: this.state.elapsedMs,
+          fatNullMs: this.fatNullMs,
+          waterNullMs: this.waterNullMs,
+          fatNulled: this.fatNulled,
+          waterNulled: this.waterNulled
+        });
+
+        requestAnimationFrame((t) => this.tick(t));
+      }
+    }
+
+    new InversionRecoverySimulator();
+  </script>
+</body>
+</html>

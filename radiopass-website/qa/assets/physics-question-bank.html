@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FRCR1 PHYSICS QBank</title>
+  <style>
+    :root {
+      --bg: #050a12;
+      --panel: rgba(13, 24, 39, 0.88);
+      --panel-2: #101d2e;
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #edf6ff;
+      --muted: #9fb0c7;
+      --cyan: #40d9f5;
+      --cyan-dark: #0e7490;
+      --amber: #ffb454;
+      --green: #42d392;
+      --red: #fb7185;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(34, 211, 238, 0.18), transparent 28%),
+        radial-gradient(circle at 96% 18%, rgba(255, 180, 84, 0.12), transparent 26%),
+        linear-gradient(145deg, #081321, var(--bg) 58%);
+    }
+
+    button, input, select { font: inherit; }
+
+    .shell {
+      width: min(1480px, calc(100% - 30px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.8rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin: 8px 0 0;
+      font-size: 0.92rem;
+    }
+
+    .overall {
+      min-width: 150px;
+      padding: 9px 13px;
+      border: 1px solid rgba(64, 217, 245, 0.3);
+      border-radius: 14px;
+      background: rgba(8, 22, 38, 0.74);
+      box-shadow: var(--shadow);
+    }
+
+    .overall strong { display: block; font-size: 1rem; }
+    .overall span { color: var(--muted); font-size: 0.72rem; }
+
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+
+    .lessons-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 13px;
+      border-radius: 12px;
+      color: #f8fafc;
+      background: linear-gradient(120deg, #0e7490, #0f766e);
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: block;
+    }
+
+    .study-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .filter-summary {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filter-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      background: rgba(2, 6, 12, 0.62);
+      backdrop-filter: blur(8px);
+    }
+
+    .sidebar,
+    .question-card {
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: linear-gradient(180deg, var(--panel), rgba(7, 15, 27, 0.9));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      width: min(420px, calc(100vw - 28px));
+      padding: 16px;
+      margin: 0;
+      border-radius: 16px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(calc(100% + 30px));
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .sidebar.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .filter-drawer-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .filter-drawer-head span {
+      display: block;
+      color: var(--cyan);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .filter-drawer-head strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .field { margin: 0; min-width: 0; }
+    .field label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0a1626;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    input:focus, select:focus { border-color: var(--cyan); }
+
+    .source-note {
+      color: var(--muted);
+      font-size: 0.81rem;
+      line-height: 1.5;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    .question-card { padding: clamp(18px, 3vw, 34px); }
+
+    .question-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(15, 39, 60, 0.8);
+      border: 1px solid var(--line);
+      color: #cbd5e1;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .pill.cyan { color: #a5f3fc; border-color: rgba(64, 217, 245, 0.32); }
+    .pill.warn { color: #fed7aa; border-color: rgba(255, 180, 84, 0.34); }
+
+    h2 {
+      margin: 0 0 22px;
+      font-size: clamp(1.45rem, 2.5vw, 2.35rem);
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+    }
+
+    .lesson-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+      margin: -8px 0 20px;
+      padding: 11px 13px;
+      border: 1px solid rgba(64, 217, 245, 0.26);
+      border-radius: 12px;
+      background: rgba(10, 43, 63, 0.55);
+      color: #c7f5ff;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .lesson-preview span { color: var(--muted); }
+
+    .stems { display: grid; gap: 12px; }
+
+    .stem {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(14, 28, 46, 0.65);
+      overflow: hidden;
+      transition: border-color 180ms ease, background 180ms ease;
+    }
+
+    .stem.correct { border-color: rgba(66, 211, 146, 0.65); background: rgba(13, 70, 53, 0.3); }
+    .stem.incorrect { border-color: rgba(251, 113, 133, 0.65); background: rgba(89, 24, 41, 0.3); }
+
+    .stem-main {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 178px;
+      gap: 12px;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .letter {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #082f49;
+      background: linear-gradient(135deg, #a5f3fc, var(--cyan));
+      font-weight: 900;
+    }
+
+    .stem-text {
+      min-width: 0;
+      color: #e2e8f0;
+      line-height: 1.48;
+      overflow-wrap: anywhere;
+    }
+
+    .tf-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 13px;
+      color: #f8fafc;
+      font-weight: 850;
+      cursor: pointer;
+      background: #26364a;
+      transition: transform 140ms ease, background 140ms ease, opacity 140ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .choice.selected { background: var(--cyan-dark); }
+    .choice.correct-choice { background: #087f5b; }
+    .choice.incorrect-choice { background: #be123c; }
+
+    .feedback {
+      display: none;
+      padding: 0 16px 16px 70px;
+      color: #dbeafe;
+      line-height: 1.52;
+      overflow-wrap: anywhere;
+    }
+
+    .feedback.show { display: block; }
+    .feedback strong { color: var(--green); }
+    .stem.incorrect .feedback strong { color: #fda4af; }
+
+    .feedback-summary {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .feedback-result,
+    .feedback-answer {
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .feedback-answer { color: #d8e7e4; }
+
+    .feedback-kicker {
+      color: var(--cyan);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .feedback-body p { margin: 0; }
+
+    .choice:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    .message {
+      min-height: 25px;
+      color: var(--amber);
+      margin: 16px 0 0;
+      font-weight: 700;
+    }
+
+    .score-panel {
+      display: none;
+      margin-top: 18px;
+      padding: 17px 18px;
+      border: 1px solid rgba(64, 217, 245, 0.34);
+      border-radius: 18px;
+      background: linear-gradient(120deg, rgba(14, 116, 144, 0.24), rgba(13, 148, 136, 0.14));
+    }
+
+    .score-panel.show { display: block; }
+    .score-panel strong { display: block; font-size: 1.5rem; }
+    .score-panel span { color: var(--muted); }
+
+    .related-module {
+      display: none;
+      margin-top: 20px;
+      border: 1px solid rgba(64, 217, 245, 0.3);
+      border-radius: 22px;
+      overflow: hidden;
+      background: #071322;
+    }
+
+    .related-module.show { display: block; }
+
+    .further-reading-intro {
+      border-bottom: 1px solid var(--line);
+      padding: 20px 18px;
+    }
+
+    .further-reading-intro span {
+      color: var(--amber);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+
+    .further-reading-intro h3 {
+      font-size: 1.2rem;
+      margin: 0 0 6px;
+    }
+
+    .further-reading-intro p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .visual-card + .visual-card {
+      border-top: 1px solid var(--line);
+    }
+
+    .related-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .related-head strong { color: #a5f3fc; }
+
+    .related-head span { color: var(--muted); line-height: 1.45; }
+
+    .lesson-preview,
+    .related-head,
+    .score-panel { overflow-wrap: anywhere; }
+
+    .related-head a {
+      color: var(--cyan);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .related-module iframe {
+      display: block;
+      width: 100%;
+      height: min(1050px, 82vh);
+      min-height: 720px;
+      border: 0;
+      background: #071322;
+    }
+
+    @media (max-width: 650px) {
+      .related-head { align-items: flex-start; flex-direction: column; }
+      .related-module iframe { height: 68vh; min-height: 520px; }
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      gap: 9px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .primary { background: linear-gradient(120deg, #0e7490, #0f766e); }
+    .submit { background: linear-gradient(120deg, #0891b2, #14b8a6); padding-inline: 24px; }
+    .quiet { background: #26364a; }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 70px 20px;
+    }
+
+    @media (max-width: 1100px) {
+      .sidebar-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .topbar { display: grid; grid-template-columns: 1fr auto; }
+      .overall { width: fit-content; }
+    }
+
+    @media (max-width: 650px) {
+      .shell { width: min(100% - 18px, 1480px); padding-top: 16px; }
+      .topbar { grid-template-columns: 1fr; }
+      .subtitle { display: none; }
+      .overall { display: flex; gap: 8px; align-items: baseline; }
+      .sidebar-grid { grid-template-columns: 1fr 1fr; }
+      .sidebar-grid .field:first-child,
+      .sidebar-grid .field:last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 650px) {
+      .shell { width: min(100% - 16px, 1280px); padding-top: 16px; }
+      .sidebar, .question-card { border-radius: 20px; }
+      .sidebar-grid, .stem-main, .actions { grid-template-columns: 1fr; }
+      .stem-main { align-items: start; }
+      .tf-controls { width: 100%; }
+      .feedback { padding: 0 15px 15px; }
+      .actions .submit { order: -1; }
+    }
+    /* 2026 visual system: clinical dossier */
+    :root {
+      --bg: #070b0c;
+      --panel: #0d1416;
+      --panel-2: #111b1d;
+      --line: rgba(164, 205, 204, 0.16);
+      --text: #eef5f2;
+      --muted: #8fa4a2;
+      --cyan: #69e4dd;
+      --cyan-dark: #157c78;
+      --amber: #e9b86e;
+      --green: #6bddad;
+      --red: #ff7f87;
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.3);
+    }
+
+    body { position: relative; background: #070b0c; isolation: isolate; }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(105, 228, 221, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 228, 221, 0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, #000 0, transparent 78%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 38vw;
+      height: 2px;
+      top: 0;
+      right: 6vw;
+      z-index: -1;
+      background: var(--cyan);
+      box-shadow: 0 0 32px rgba(105, 228, 221, 0.55);
+    }
+
+    .shell { padding-top: 34px; }
+
+    .topbar {
+      min-height: 108px;
+      padding: 8px 0 22px 22px;
+      border-left: 2px solid var(--cyan);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-family: "Avenir Next Condensed", "Avenir Next", sans-serif;
+      letter-spacing: 0.22em;
+    }
+
+    h1 {
+      font-family: "Avenir Next Condensed", "Avenir Next", sans-serif;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    .lessons-link,
+    button.primary,
+    button.submit {
+      color: #071211;
+      background: var(--cyan);
+      box-shadow: none;
+    }
+
+    .lessons-link {
+      border: 1px solid rgba(105, 228, 221, 0.45);
+      border-radius: 8px;
+    }
+
+    .overall {
+      min-width: 140px;
+      border-radius: 8px;
+      border-color: var(--line);
+      background: #0d1517;
+      box-shadow: none;
+    }
+
+    .overall strong { font-family: "Avenir Next Condensed", "Avenir Next", sans-serif; font-weight: 500; }
+    .overall span { letter-spacing: 0.04em; }
+
+    .sidebar,
+    .question-card {
+      border-color: var(--line);
+      background: #0d1416;
+      box-shadow: var(--shadow);
+      backdrop-filter: none;
+    }
+
+    .sidebar {
+      padding: 10px;
+      border-radius: 10px;
+      background: #0a1113;
+    }
+
+    .field label {
+      color: #8fa4a2;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.61rem;
+    }
+
+    input,
+    select {
+      border-radius: 7px;
+      border-color: rgba(164, 205, 204, 0.18);
+      background: #070d0f;
+    }
+
+    .question-card {
+      border-radius: 14px;
+      padding-top: 26px;
+    }
+
+    .pill {
+      min-height: 27px;
+      border-radius: 5px;
+      border-color: rgba(164, 205, 204, 0.18);
+      background: #101a1c;
+      color: #aabbb8;
+      letter-spacing: 0.035em;
+      font-size: 0.69rem;
+    }
+
+    .pill.cyan { color: var(--cyan); border-color: rgba(105, 228, 221, 0.32); }
+    .pill.warn { color: var(--amber); border-color: rgba(233, 184, 110, 0.35); }
+
+    .lesson-preview {
+      border-radius: 8px;
+      border-color: rgba(105, 228, 221, 0.25);
+      background: #0a1819;
+    }
+
+    .stem {
+      position: relative;
+      border-radius: 10px;
+      border-color: rgba(164, 205, 204, 0.14);
+      background: #0a1214;
+      box-shadow: inset 3px 0 #182628;
+    }
+
+    .stem:hover { border-color: rgba(105, 228, 221, 0.28); }
+    .stem.correct { border-color: rgba(107, 221, 173, 0.42); background: #0c1b18; box-shadow: inset 3px 0 var(--green); }
+    .stem.incorrect { border-color: rgba(255, 127, 135, 0.42); background: #201114; box-shadow: inset 3px 0 var(--red); }
+
+    .letter {
+      width: 35px;
+      height: 35px;
+      border-radius: 6px;
+      color: #071211;
+      background: var(--cyan);
+    }
+
+    button {
+      border-radius: 7px;
+      background: #182527;
+      transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
+    }
+
+    button:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22); }
+    .choice.selected { color: #071211; background: var(--cyan-dark); }
+    .choice.correct-choice { color: #06140f; background: var(--green); }
+    .choice.incorrect-choice { color: #1a0709; background: var(--red); }
+    .quiet { background: #172326; }
+
+    .feedback { color: #c8d8d5; }
+
+    .score-panel {
+      border-radius: 10px;
+      border-color: rgba(105, 228, 221, 0.3);
+      background: #0a191a;
+    }
+
+    .related-module {
+      border-radius: 10px;
+      border-color: rgba(105, 228, 221, 0.28);
+      background: #081012;
+    }
+
+    .related-head { background: #0b1517; }
+    .related-head strong,
+    .related-head a { color: var(--cyan); }
+
+    @media (max-width: 650px) {
+      .topbar { min-height: 0; padding-left: 14px; }
+      .question-card { border-radius: 10px; }
+      .top-actions { width: 100%; justify-content: space-between; }
+    }
+
+    .filter-drawer .sidebar-grid { grid-template-columns: 1fr; }
+
+    .filter-drawer .field:first-child,
+    .filter-drawer .field:last-child { grid-column: auto; }
+
+    .filter-toggle,
+    .filter-close,
+    .open-visual,
+    .modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .filter-toggle {
+      min-height: 40px;
+      padding-inline: 16px;
+      color: #071211;
+      background: var(--cyan);
+    }
+
+    .filter-close,
+    .modal-close { background: #172326; }
+
+    .feedback {
+      padding: 0 16px 16px 70px;
+    }
+
+    .feedback-body {
+      padding: 13px 14px;
+      border: 1px solid rgba(164, 205, 204, 0.14);
+      border-radius: 8px;
+      color: #c8d8d5;
+      background: #081012;
+    }
+
+    .stem.correct .feedback-result { color: var(--green); }
+    .stem.incorrect .feedback-result { color: var(--red); }
+
+    .related-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .open-visual {
+      color: #071211;
+      background: var(--cyan);
+    }
+
+    .related-actions a {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    .visual-modal[hidden] { display: none; }
+
+    .visual-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(2, 6, 12, 0.78);
+      backdrop-filter: blur(10px);
+    }
+
+    .visual-modal-shell {
+      width: min(1180px, 100%);
+      max-height: min(900px, 92vh);
+      display: grid;
+      grid-template-rows: auto minmax(360px, 1fr);
+      border: 1px solid rgba(105, 228, 221, 0.32);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #071012;
+      box-shadow: var(--shadow);
+    }
+
+    .visual-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #0a1517;
+    }
+
+    .visual-modal-head span {
+      display: block;
+      color: var(--cyan);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 850;
+    }
+
+    .visual-modal-head h2 {
+      margin: 2px 0 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .visual-modal iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: min(720px, 74vh);
+      border: 0;
+      background: #071322;
+    }
+
+    @media (max-width: 650px) {
+      .study-toolbar { align-items: stretch; flex-direction: column; }
+      .filter-summary { white-space: normal; }
+      .feedback { padding: 0 15px 15px; }
+      .feedback-toggle { align-items: flex-start; flex-direction: column; }
+      .visual-modal { padding: 8px; }
+      .visual-modal-shell { max-height: 96vh; }
+      .visual-modal-head { align-items: flex-start; flex-direction: column; }
+      .visual-modal iframe { min-height: 70vh; }
+    }
+  </style>
+  <script src="../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">FRCR Physics Visual Lab</div>
+        <h1>FRCR1 PHYSICS QBank</h1>
+        <p class="subtitle">Choose True or False for every available stem, then submit for immediate scoring and stem-specific explanations.</p>
+      </div>
+      <div class="top-actions">
+        <a class="lessons-link" href="../index.html">Home</a>
+        <a class="lessons-link" href="lessons.html">Visual Lab</a>
+        <a class="lessons-link" href="../favorites.html">Favorites</a>
+        <div class="overall">
+          <strong id="overallProgress">0 attempted</strong>
+          <span id="overallDetail">Progress is saved on this device</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="study-toolbar" aria-label="Question bank tools">
+        <button id="filterToggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filterDrawer">Filters</button>
+        <div id="filterSummary" class="filter-summary">All questions</div>
+      </div>
+      <div id="filterBackdrop" class="filter-backdrop" hidden></div>
+      <aside class="sidebar filter-drawer" id="filterDrawer" aria-label="Advanced search filters" aria-hidden="true" inert>
+        <div class="filter-drawer-head">
+          <div>
+            <span>Filters</span>
+            <strong>Advanced Search</strong>
+          </div>
+          <button id="filterClose" class="filter-close" type="button">Close</button>
+        </div>
+        <div class="sidebar-grid">
+          <div class="field">
+            <label for="search">Search questions</label>
+            <input id="search" type="search" placeholder="MRI, CT, dose..." />
+          </div>
+          <div class="field">
+            <label for="yearFilter">Recall year</label>
+            <select id="yearFilter"><option value="all">All years</option></select>
+          </div>
+          <div class="field">
+            <label for="topicFilter">Physics topic</label>
+            <select id="topicFilter"><option value="all">All topics</option></select>
+          </div>
+          <div class="field">
+            <label for="stemFilter">Question type</label>
+            <select id="stemFilter">
+              <option value="all">All recalled blocks</option>
+              <option value="five">Complete five-stem only</option>
+              <option value="incomplete">Other recalled stem counts</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="lessonFilter">Attached lesson / animation</label>
+            <select id="lessonFilter">
+              <option value="all">All questions</option>
+              <option value="attached">Questions with a lesson</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="questionSelect">Jump to question</label>
+            <select id="questionSelect"></select>
+          </div>
+        </div>
+      </aside>
+
+      <article class="question-card" id="questionCard">
+        <div id="questionContent"></div>
+      </article>
+    </section>
+  </main>
+
+  <div class="visual-modal" id="visualModal" role="dialog" aria-modal="true" aria-labelledby="visualModalTitle" hidden>
+    <div class="visual-modal-shell">
+      <div class="visual-modal-head">
+        <div>
+          <span>Related visual</span>
+          <h2 id="visualModalTitle">Animation</h2>
+        </div>
+        <button id="visualModalClose" class="modal-close" type="button">Close</button>
+      </div>
+      <iframe id="visualModalFrame" title="Related visual animation"></iframe>
+    </div>
+  </div>
+
+  <script src="physics-question-bank-data.js"></script>
+  <script src="visual-concept-registry.js"></script>
+  <script>
+    const bank = window.QUESTION_BANK || [];
+    const visualRegistry = window.visualConceptRegistry || {};
+    const storageKey = "frcr-physics-question-bank-v1";
+    const marksKey = "radiopass:qbank-marks:v1";
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    const questionMarks = JSON.parse(localStorage.getItem(marksKey) || "{}");
+
+    const search = document.getElementById("search");
+    const yearFilter = document.getElementById("yearFilter");
+    const topicFilter = document.getElementById("topicFilter");
+    const stemFilter = document.getElementById("stemFilter");
+    const lessonFilter = document.getElementById("lessonFilter");
+    const questionSelect = document.getElementById("questionSelect");
+    const questionContent = document.getElementById("questionContent");
+    const overallProgress = document.getElementById("overallProgress");
+    const overallDetail = document.getElementById("overallDetail");
+    const filterToggle = document.getElementById("filterToggle");
+    const filterClose = document.getElementById("filterClose");
+    const filterDrawer = document.getElementById("filterDrawer");
+    const filterBackdrop = document.getElementById("filterBackdrop");
+    const filterSummary = document.getElementById("filterSummary");
+    const visualModal = document.getElementById("visualModal");
+    const visualModalTitle = document.getElementById("visualModalTitle");
+    const visualModalFrame = document.getElementById("visualModalFrame");
+    const visualModalClose = document.getElementById("visualModalClose");
+
+    let filtered = [...bank];
+    let currentPosition = 0;
+    let selections = {};
+    let submitted = false;
+    let lastVisualTrigger = null;
+
+    [...new Set(bank.map(q => q.year))].sort((a, b) => b.localeCompare(a)).forEach(year => {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      yearFilter.appendChild(option);
+    });
+
+    const topicOrder = [
+      "MRI", "CT", "Radiography & X-ray Physics", "Fluoroscopy", "Mammography",
+      "Legislation & Radiation Protection", "Nuclear Medicine", "Ultrasound",
+      "Digital Imaging", "Radiation Biology & Dosimetry", "Basic Physics", "Other"
+    ];
+    topicOrder.filter(topic => bank.some(question => question.topic === topic)).forEach(topic => {
+      const option = document.createElement("option");
+      option.value = topic;
+      option.textContent = topic;
+      topicFilter.appendChild(option);
+    });
+    const requestedTopic = new URLSearchParams(window.location.search).get("topic");
+    if (requestedTopic && [...topicFilter.options].some(option => option.value === requestedTopic)) topicFilter.value = requestedTopic;
+
+    const usedVisualTags = [...new Set(bank.flatMap(question => question.visualTags || []))]
+      .filter(tag => visualRegistry[tag]?.filePath)
+      .sort((a, b) => visualRegistry[a].title.localeCompare(visualRegistry[b].title));
+    usedVisualTags.forEach(tag => {
+      const count = bank.filter(question => (question.visualTags || []).includes(tag)).length;
+      const option = document.createElement("option");
+      option.value = tag;
+      option.textContent = `${visualRegistry[tag].title} (${count})`;
+      lessonFilter.appendChild(option);
+    });
+
+    function saveProgress(question, score) {
+      saved[question.id] = { score, total: question.stems.length, completed: true };
+      localStorage.setItem(storageKey, JSON.stringify(saved));
+      renderOverall();
+    }
+
+    function renderOverall() {
+      const completed = Object.values(saved).filter(item => item.completed);
+      const correct = completed.reduce((sum, item) => sum + Number(item.score || 0), 0);
+      const total = completed.reduce((sum, item) => sum + Number(item.total || 0), 0);
+      overallProgress.textContent = `${completed.length} attempted`;
+      overallDetail.textContent = total ? `${correct}/${total} stems correct overall` : "Progress is saved on this device";
+    }
+
+    function setFilterDrawer(open) {
+      filterDrawer.classList.toggle("open", open);
+      filterDrawer.setAttribute("aria-hidden", String(!open));
+      filterDrawer.inert = !open;
+      filterToggle.setAttribute("aria-expanded", String(open));
+      filterBackdrop.hidden = !open;
+      if (open) filterClose.focus();
+      if (!open && filterDrawer.contains(document.activeElement)) filterToggle.focus();
+    }
+
+    function updateFilterSummary() {
+      const parts = [];
+      if (search.value.trim()) parts.push(`Search: "${search.value.trim()}"`);
+      if (yearFilter.value !== "all") parts.push(yearFilter.value);
+      if (topicFilter.value !== "all") parts.push(topicFilter.value);
+      if (stemFilter.value !== "all") parts.push(stemFilter.options[stemFilter.selectedIndex].textContent);
+      if (lessonFilter.value !== "all") parts.push(lessonFilter.options[lessonFilter.selectedIndex].textContent.replace(/\s*\(\d+\)$/, ""));
+      const count = `${filtered.length} ${filtered.length === 1 ? "question" : "questions"}`;
+      filterSummary.textContent = parts.length ? `${count} - ${parts.join(" - ")}` : `${count} - all filters off`;
+    }
+
+    function applyFilters() {
+      const term = search.value.trim().toLowerCase();
+      const year = yearFilter.value;
+      const topic = topicFilter.value;
+      const type = stemFilter.value;
+      const lesson = lessonFilter.value;
+      filtered = bank.filter(question => {
+        const searchable = `${question.title} ${question.stems.map(stem => stem.text).join(" ")}`.toLowerCase();
+        const termMatch = !term || searchable.includes(term);
+        const yearMatch = year === "all" || question.year === year;
+        const topicMatch = topic === "all" || question.topic === topic;
+        const typeMatch = type === "all" || (type === "five" ? question.stems.length === 5 : question.stems.length !== 5);
+        const availableTags = (question.visualTags || []).filter(tag => visualRegistry[tag]?.filePath);
+        const lessonMatch = lesson === "all" || (lesson === "attached" ? availableTags.length > 0 : availableTags.includes(lesson));
+        return termMatch && yearMatch && topicMatch && typeMatch && lessonMatch;
+      });
+      currentPosition = 0;
+      rebuildQuestionSelect();
+      updateFilterSummary();
+      loadQuestion();
+    }
+
+    function rebuildQuestionSelect() {
+      questionSelect.innerHTML = filtered.map((question, i) =>
+        `<option value="${i}">${i + 1}. ${question.year} - ${escapeHtml(question.title)}${(question.visualTags || []).some(tag => visualRegistry[tag]?.filePath) ? " [Lesson]" : ""}</option>`
+      ).join("");
+      questionSelect.value = String(currentPosition);
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
+    }
+
+    function loadQuestion() {
+      selections = {};
+      submitted = false;
+      if (!filtered.length) {
+        questionContent.innerHTML = `<div class="empty"><h2>No questions found</h2><p>Change the search or filters.</p></div>`;
+        return;
+      }
+
+      currentPosition = Math.max(0, Math.min(currentPosition, filtered.length - 1));
+      questionSelect.value = String(currentPosition);
+      const question = filtered[currentPosition];
+      const stemLabel = question.stems.length === 5 ? "Five-stem question" : `${question.stems.length}-stem recalled block`;
+      const incompleteClass = question.stems.length === 5 ? "cyan" : "warn";
+      const attachedLessons = (question.visualTags || [])
+        .map(tag => visualRegistry[tag])
+        .filter(item => item?.filePath)
+        .slice(0, 2);
+
+      questionContent.innerHTML = `
+        <div class="question-meta">
+          <span class="pill cyan">${escapeHtml(question.year)}</span>
+          <span class="pill cyan">${escapeHtml(question.topic || "Other")}</span>
+          <span class="pill">Question ${currentPosition + 1} of ${filtered.length}</span>
+          <span class="pill ${incompleteClass}">${stemLabel}</span>
+          ${saved[question.id]?.completed ? '<span class="pill">Previously attempted</span>' : ''}
+        </div>
+        <div class="question-tools" aria-label="Question study controls">
+          <button type="button" id="flagQuestion" aria-pressed="${Boolean(questionMarks[question.id]?.flag)}">${questionMarks[question.id]?.flag ? "Flagged" : "Flag"}</button>
+          <button type="button" id="bookmarkQuestion" aria-pressed="${Boolean(questionMarks[question.id]?.bookmark)}">${questionMarks[question.id]?.bookmark ? "Bookmarked" : "Bookmark"}</button>
+          <button type="button" id="reviewQuestion" aria-pressed="${Boolean(questionMarks[question.id]?.review)}">${questionMarks[question.id]?.review ? "In review queue" : "Review later"}</button>
+        </div>
+        <h2>${escapeHtml(question.title)}</h2>
+        ${attachedLessons.length ? `
+          <div class="lesson-preview">
+            <strong>${attachedLessons.length === 1 ? "Lesson attached" : "Lessons attached"}:</strong>
+            ${attachedLessons.map(item => escapeHtml(item.title)).join(" | ")}
+            <span>Optional further reading becomes available after you review the submitted answers.</span>
+          </div>
+        ` : ""}
+        <div class="stems">
+          ${question.stems.map(stem => `
+            <section class="stem" id="stem-${stem.label}">
+              <div class="stem-main">
+                <div class="letter">${stem.label}</div>
+                <div class="stem-text">${escapeHtml(stem.text)}</div>
+                <div class="tf-controls" role="group" aria-label="Answer for stem ${stem.label}">
+                  <button class="choice true" data-label="${stem.label}" data-value="true" type="button">True</button>
+                  <button class="choice false" data-label="${stem.label}" data-value="false" type="button">False</button>
+                </div>
+              </div>
+              <div class="feedback" id="feedback-${stem.label}"></div>
+            </section>
+          `).join("")}
+        </div>
+        <div class="message" id="message"></div>
+        <div class="score-panel" id="scorePanel"></div>
+        <div class="related-module" id="relatedModule"></div>
+        <div class="actions">
+          <button class="quiet" id="previousQuestion" type="button">Previous question</button>
+          <button class="submit" id="submitQuestion" type="button">Submit answers</button>
+          <span></span>
+          <button class="primary" id="nextQuestion" type="button">Next question</button>
+        </div>
+      `;
+
+      document.querySelectorAll(".choice").forEach(button => button.addEventListener("click", chooseAnswer));
+      document.getElementById("submitQuestion").addEventListener("click", submitQuestion);
+      document.getElementById("previousQuestion").addEventListener("click", () => moveQuestion(-1));
+      document.getElementById("nextQuestion").addEventListener("click", () => moveQuestion(1));
+      document.getElementById("flagQuestion").addEventListener("click", () => toggleQuestionMark(question.id, "flag", "Flag", "Flagged"));
+      document.getElementById("bookmarkQuestion").addEventListener("click", () => toggleQuestionMark(question.id, "bookmark", "Bookmark", "Bookmarked"));
+      document.getElementById("reviewQuestion").addEventListener("click", () => toggleQuestionMark(question.id, "review", "Review later", "In review queue"));
+      document.getElementById("previousQuestion").disabled = filtered.length === 0;
+      document.getElementById("nextQuestion").disabled = filtered.length === 0;
+    }
+
+    function toggleQuestionMark(questionId, key, inactiveLabel, activeLabel) {
+      const current = questionMarks[questionId] || {};
+      current[key] = !current[key];
+      questionMarks[questionId] = current;
+      localStorage.setItem(marksKey, JSON.stringify(questionMarks));
+      const button = document.getElementById(`${key}Question`);
+      if (!button) return;
+      button.setAttribute("aria-pressed", String(current[key]));
+      button.textContent = current[key] ? activeLabel : inactiveLabel;
+    }
+
+    function chooseAnswer(event) {
+      if (submitted) return;
+      const button = event.currentTarget;
+      const label = button.dataset.label;
+      selections[label] = button.dataset.value === "true";
+      submitted = false;
+      document.querySelectorAll(`.choice[data-label="${label}"]`).forEach(item => item.classList.remove("selected"));
+      button.classList.add("selected");
+      const stem = document.getElementById(`stem-${label}`);
+      stem.classList.remove("correct", "incorrect");
+      document.querySelectorAll(`.choice[data-label="${label}"]`).forEach(item => item.classList.remove("correct-choice", "incorrect-choice"));
+      document.getElementById(`feedback-${label}`).classList.remove("show");
+      document.getElementById(`feedback-${label}`).innerHTML = "";
+      document.getElementById("scorePanel").classList.remove("show");
+      document.getElementById("relatedModule").classList.remove("show");
+      document.getElementById("relatedModule").innerHTML = "";
+      document.getElementById("message").textContent = "";
+    }
+
+    function submitQuestion() {
+      if (submitted) {
+        loadQuestion();
+        return;
+      }
+      const question = filtered[currentPosition];
+      const unanswered = question.stems.filter(stem => !(stem.label in selections));
+      const message = document.getElementById("message");
+      if (unanswered.length) {
+        message.textContent = `Answer every available stem first: ${unanswered.map(stem => stem.label).join(", ")}.`;
+        return;
+      }
+
+      submitted = true;
+      let score = 0;
+      question.stems.forEach(stem => {
+        const correct = selections[stem.label] === stem.answer;
+        if (correct) score += 1;
+        const card = document.getElementById(`stem-${stem.label}`);
+        const feedback = document.getElementById(`feedback-${stem.label}`);
+        const trueButton = document.querySelector(`.choice[data-label="${stem.label}"][data-value="true"]`);
+        const falseButton = document.querySelector(`.choice[data-label="${stem.label}"][data-value="false"]`);
+        const correctButton = stem.answer ? trueButton : falseButton;
+        const selectedButton = selections[stem.label] ? trueButton : falseButton;
+        const selectedAnswer = selections[stem.label] ? "True" : "False";
+        const correctAnswer = stem.answer ? "True" : "False";
+        trueButton.classList.remove("correct-choice", "incorrect-choice");
+        falseButton.classList.remove("correct-choice", "incorrect-choice");
+        correctButton.classList.add("correct-choice");
+        if (!correct) selectedButton.classList.add("incorrect-choice");
+        trueButton.disabled = true;
+        falseButton.disabled = true;
+        card.classList.add(correct ? "correct" : "incorrect");
+        feedback.innerHTML = `
+          <div class="feedback-summary">
+            <span class="feedback-result">Your answer: ${selectedAnswer} - ${correct ? "Correct" : "Incorrect"}</span>
+            <span class="feedback-answer">Correct answer: ${correctAnswer}</span>
+          </div>
+          <div class="feedback-body" id="feedback-body-${stem.label}">
+            <span class="feedback-kicker">Why this statement is ${correctAnswer.toLowerCase()}</span>
+            <p>${escapeHtml(stem.explanation)}</p>
+          </div>
+        `;
+        feedback.classList.add("show");
+      });
+
+      const scorePanel = document.getElementById("scorePanel");
+      scorePanel.innerHTML = `<strong>Score: ${score}/${question.stems.length}</strong><span>${question.stems.length === 5 ? "Five-stem FRCR recall set." : "Scored using every stem available in this recalled block."}</span>`;
+      scorePanel.classList.add("show");
+      QuestionVisualExplanation(question);
+      message.textContent = "";
+      saveProgress(question, score);
+      const submitButton = document.getElementById("submitQuestion");
+      submitButton.textContent = "Try this question again";
+      submitButton.classList.remove("submit");
+      submitButton.classList.add("quiet");
+      const resultTarget = document.getElementById(`feedback-${question.stems[0].label}`) || scorePanel;
+      requestAnimationFrame(() => resultTarget.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+
+    function QuestionVisualExplanation(question) {
+      const relatedModule = document.getElementById("relatedModule");
+      const matches = (question.visualTags || [])
+        .map(tag => ({ tag, ...visualRegistry[tag] }))
+        .filter(item => item.filePath)
+        .slice(0, 2);
+
+      if (!matches.length) {
+        relatedModule.classList.remove("show");
+        relatedModule.innerHTML = "";
+        return false;
+      }
+
+      relatedModule.innerHTML = `
+        <div class="further-reading-intro">
+          <span>Optional further reading</span>
+          <h3>Explore the concept after reviewing every stem.</h3>
+          <p>These visual modules extend the explanations above. They do not replace the answer review.</p>
+        </div>
+      ` + matches.map(item => `
+        <section class="visual-card" data-visual-tag="${escapeHtml(item.tag)}">
+          <div class="related-head">
+            <div>
+              <strong>Further reading: ${escapeHtml(item.title)}</strong><br>
+              <span>${escapeHtml(item.description)}</span>
+            </div>
+            <div class="related-actions">
+              <button class="open-visual" type="button" data-open-visual data-src="${escapeHtml(item.filePath)}" data-title="${escapeHtml(item.title)}">Open ${escapeHtml(item.title)} animation</button>
+              <a href="${escapeHtml(item.fullPath || item.filePath)}" target="_blank" rel="noopener">New tab</a>
+            </div>
+          </div>
+        </section>
+      `).join("");
+      relatedModule.querySelectorAll("[data-open-visual]").forEach(button => {
+        button.addEventListener("click", openVisualModal);
+      });
+      relatedModule.classList.add("show");
+      return true;
+    }
+
+    function openVisualModal(event) {
+      const button = event.currentTarget;
+      lastVisualTrigger = button;
+      visualModalTitle.textContent = button.dataset.title || "Related visual";
+      visualModalFrame.src = button.dataset.src;
+      visualModalFrame.title = button.dataset.title || "Related visual animation";
+      visualModal.hidden = false;
+      document.body.classList.add("modal-open");
+      visualModalClose.focus();
+    }
+
+    function closeVisualModal() {
+      visualModal.hidden = true;
+      visualModalFrame.src = "about:blank";
+      document.body.classList.remove("modal-open");
+      if (lastVisualTrigger) lastVisualTrigger.focus();
+    }
+
+    function moveQuestion(change) {
+      if (!filtered.length) return;
+      currentPosition = (currentPosition + change + filtered.length) % filtered.length;
+      questionSelect.value = String(currentPosition);
+      loadQuestion();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    search.addEventListener("input", applyFilters);
+    yearFilter.addEventListener("change", applyFilters);
+    topicFilter.addEventListener("change", applyFilters);
+    stemFilter.addEventListener("change", applyFilters);
+    lessonFilter.addEventListener("change", applyFilters);
+    questionSelect.addEventListener("change", () => {
+      currentPosition = Number(questionSelect.value);
+      loadQuestion();
+      setFilterDrawer(false);
+    });
+
+    filterToggle.addEventListener("click", () => setFilterDrawer(true));
+    filterClose.addEventListener("click", () => setFilterDrawer(false));
+    filterBackdrop.addEventListener("click", () => setFilterDrawer(false));
+    visualModalClose.addEventListener("click", closeVisualModal);
+    visualModal.addEventListener("click", event => {
+      if (event.target === visualModal) closeVisualModal();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        if (!visualModal.hidden) closeVisualModal();
+        if (filterDrawer.classList.contains("open")) setFilterDrawer(false);
+      }
+      if (event.target.closest("input, select, textarea, button")) return;
+      if (event.key === "ArrowRight") moveQuestion(1);
+      if (event.key === "ArrowLeft") moveQuestion(-1);
+    });
+
+    rebuildQuestionSelect();
+    renderOverall();
+    updateFilterSummary();
+    loadQuestion();
+  </script>
+</body>
+</html>

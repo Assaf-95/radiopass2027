@@ -1,0 +1,128 @@
+/* The full-size viewer. A layer, not a page: closing it puts you back in the
+   gallery exactly where you were. */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.lightbox-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 5, 7, 0.92);
+  backdrop-filter: blur(3px);
+}
+
+.lightbox-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(1400px, 100%);
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  overflow: hidden;
+  outline: none;
+}
+
+.lightbox-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lightbox-title h2 { font-size: 22px; }
+.lightbox-title p { margin: 6px 0 0; font-size: 11.5px; color: var(--text-faint); }
+
+.lightbox-tools { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.lb-btn {
+  min-width: 38px;
+  height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.lb-btn:hover { background: var(--panel-2); color: var(--text); }
+.lb-btn.is-on { border-color: var(--amber-accent); color: var(--amber-accent); background: var(--teal-bg); }
+.lb-close { font-size: 15px; }
+.lb-zoom { font-size: 11px; color: var(--text-faint); min-width: 44px; text-align: center; }
+
+.lightbox-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: var(--void);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.lightbox-film {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  transition: transform 0.12s ease-out;
+}
+
+.lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 46px;
+  height: 74px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(11, 13, 16, 0.72);
+  color: var(--text);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lb-nav:hover { background: rgba(11, 13, 16, 0.95); }
+.lb-prev { left: 12px; }
+.lb-next { right: 12px; }
+
+.lightbox-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 26px;
+  padding: 15px 18px 18px;
+  border-top: 1px solid var(--line);
+  max-height: 34vh;
+  overflow-y: auto;
+}
+
+.lightbox-caption { display: flex; flex-direction: column; gap: 7px; }
+.lb-desc { margin: 0; font-size: 15px; color: var(--text); }
+.lb-desc.is-blank { color: var(--text-faint); font-style: italic; }
+.lb-source { align-self: flex-start; margin-top: 4px; font-size: 12px; }
+
+.lightbox-foot .film-legend { margin-top: 0; padding-top: 0; border-top: 0; }
+
+@media (max-width: 860px) {
+  .lightbox { padding: 0; }
+  .lightbox-panel { border-radius: 0; border: 0; }
+  .lightbox-foot { grid-template-columns: 1fr; gap: 14px; max-height: 40vh; }
+  .lb-nav { width: 38px; height: 62px; font-size: 24px; }
+}

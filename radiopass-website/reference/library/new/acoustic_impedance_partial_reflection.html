@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acoustic Impedance and Partial Reflection</title>
+  <style>
+    :root {
+      --bg: #f7fbff;
+      --panel: #ffffff;
+      --ink: #172635;
+      --muted: #526a7d;
+      --line: #cad9e6;
+      --line-strong: #8aa9bf;
+      --surface: #eef6fb;
+      --accent: #0f76a8;
+      --accent-strong: #064d78;
+      --amber: #b76a20;
+      --green: #217756;
+      --shadow: 0 20px 50px rgba(29, 57, 78, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(247, 251, 255, 0.95), rgba(231, 242, 249, 0.92)),
+        linear-gradient(135deg, rgba(15, 118, 168, 0.1), rgba(183, 106, 32, 0.08));
+    }
+
+    #app {
+      width: min(1440px, 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.85fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .panel {
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    #leftPanel {
+      overflow: hidden;
+      position: relative;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .stageHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid rgba(202, 217, 230, 0.72);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .stageTitle {
+      display: grid;
+      gap: 3px;
+    }
+
+    .stageTitle span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stageTitle strong {
+      color: var(--ink);
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      line-height: 1.2;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #42586b;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .swatch.reflected {
+      background: var(--amber);
+    }
+
+    .swatch.transmitted {
+      background: var(--green);
+    }
+
+    #scene {
+      width: 100%;
+      height: 100%;
+      min-height: 540px;
+      display: block;
+      background: linear-gradient(180deg, rgba(246, 251, 255, 0.9), rgba(231, 241, 247, 0.9));
+    }
+
+    #rightPanel {
+      padding: 22px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: #10283a;
+      font-size: clamp(1.45rem, 2.3vw, 2rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      color: #1f4259;
+      font-size: 0.86rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .intro {
+      color: #465f73;
+      font-size: 1rem;
+    }
+
+    .infoBlock {
+      display: grid;
+      gap: 8px;
+      padding-top: 2px;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 7px;
+    }
+
+    li {
+      position: relative;
+      padding-left: 18px;
+      color: #30495e;
+      font-size: 0.92rem;
+      line-height: 1.42;
+    }
+
+    li::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 0.55em;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .concept {
+      border-left: 4px solid var(--amber);
+      border-radius: 8px;
+      background: #fff7ed;
+      color: #5f3515;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .controlBox {
+      margin-top: auto;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .controlLabel {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      color: #17384f;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .controlLabel strong {
+      color: var(--accent-strong);
+      font-size: 1.15rem;
+    }
+
+    .small {
+      color: #557083;
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .coeff {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      color: #314e62;
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .coeff div {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+      border: 1px solid rgba(138, 169, 191, 0.62);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    .coeff strong {
+      color: #10283a;
+      font-size: 1.12rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    @media (max-width: 1050px) {
+      body {
+        overflow: auto;
+      }
+
+      #app {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      #scene {
+        height: min(68vh, 620px);
+        min-height: 430px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      #app {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .stageHeader {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+      }
+
+      .legend {
+        justify-content: flex-start;
+      }
+
+      #rightPanel {
+        padding: 16px;
+      }
+
+      .coeff {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app">
+    <section id="leftPanel" class="panel">
+      <div class="stageHeader">
+        <div class="stageTitle">
+          <span>Live pulse model</span>
+          <strong>Incident, reflected, and transmitted ultrasound energy</strong>
+        </div>
+        <div class="legend" aria-label="Wave legend">
+          <span><i class="swatch"></i>Incident</span>
+          <span><i class="swatch reflected"></i>Reflected</span>
+          <span><i class="swatch transmitted"></i>Transmitted</span>
+        </div>
+      </div>
+      <svg id="scene" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" aria-label="Acoustic impedance and partial reflection animation"></svg>
+    </section>
+
+    <aside id="rightPanel" class="panel">
+      <header>
+        <p class="eyebrow">Ultrasound physics</p>
+        <h1>Acoustic Impedance and Partial Reflection</h1>
+      </header>
+
+      <p class="intro">Follow an ultrasound pulse as it reaches a tissue boundary. Drag the mismatch control to see how much energy returns to the probe versus continuing deeper.</p>
+
+      <section class="infoBlock">
+        <h2>Acoustic Impedance</h2>
+        <p>Acoustic impedance is the resistance a medium provides to sound propagation.</p>
+        <ul>
+          <li>It depends on tissue density and sound velocity</li>
+          <li>It is denoted by Z</li>
+          <li>Adjacent tissues with different Z values create echoes</li>
+        </ul>
+      </section>
+
+      <section class="infoBlock">
+        <h2>Reflection at an Interface</h2>
+        <p>When a pulse meets a boundary, part of its energy reflects and part transmits.</p>
+        <ul>
+          <li>Larger impedance mismatch means a brighter echo</li>
+          <li>Smaller mismatch means most energy keeps travelling</li>
+          <li>Soft-tissue boundaries usually produce partial reflection</li>
+        </ul>
+      </section>
+
+      <section class="infoBlock">
+        <h2>Through-Transmission</h2>
+        <ul>
+          <li>The unreflected portion continues deeper</li>
+          <li>Transmission allows imaging beyond the first boundary</li>
+        </ul>
+      </section>
+
+      <div class="concept">
+        Image brightness rises with reflection strength. Reflection strength rises with impedance difference.
+      </div>
+
+      <div class="controlBox">
+        <div class="controlLabel">
+          <span>Impedance Difference</span>
+          <strong id="mismatchValue">35%</strong>
+        </div>
+        <input id="mismatchSlider" type="range" min="0" max="100" value="35" step="1" />
+        <div class="small">Low mismatch gives a small echo. High mismatch gives a stronger echo and lower through-transmission.</div>
+        <div class="coeff">
+          <div><span>Reflection</span> <strong id="reflectValue">0%</strong></div>
+          <div><span>Transmission</span> <strong id="transmitValue">0%</strong></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const NS = "http://www.w3.org/2000/svg";
+
+    const svg = document.getElementById("scene");
+    const mismatchSlider = document.getElementById("mismatchSlider");
+    const mismatchValue = document.getElementById("mismatchValue");
+    const reflectValue = document.getElementById("reflectValue");
+    const transmitValue = document.getElementById("transmitValue");
+
+    const cfg = {
+      sourceY: 150,
+      interfaceY: 376,
+      maxY: 650,
+      beamX: 500,
+      beamWidth: 300,
+      speed: 166,
+      cycle: 4.9,
+      slots: 7,
+      slotDelay: 0.13,
+      alpha: 0.0026
+    };
+
+    const state = {
+      t: 0,
+      last: performance.now(),
+      mismatch: Number(mismatchSlider.value) / 100,
+      incident: [],
+      reflected: [],
+      transmitted: []
+    };
+
+    function el(tag, attrs = {}) {
+      const node = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+      return node;
+    }
+
+    function clamp(v, a, b) {
+      return Math.max(a, Math.min(b, v));
+    }
+
+    function coefficients() {
+      const reflection = 0.03 + 0.72 * Math.pow(state.mismatch, 1.6);
+      const transmission = 1 - reflection;
+      return { reflection, transmission };
+    }
+
+    function setBand(node, y, amp) {
+      if (amp <= 0.002) {
+        node.setAttribute("opacity", "0");
+        return;
+      }
+
+      const a = clamp(amp, 0, 1);
+      const width = cfg.beamWidth * (0.52 + 0.24 * a);
+      const height = 6 + 8 * a;
+      node.setAttribute("x", (cfg.beamX - width * 0.5).toFixed(2));
+      node.setAttribute("y", (y - height * 0.5).toFixed(2));
+      node.setAttribute("width", width.toFixed(2));
+      node.setAttribute("height", height.toFixed(2));
+      node.setAttribute("rx", (height * 0.5).toFixed(2));
+      node.setAttribute("opacity", clamp(0.05 + a * 0.95, 0, 0.96).toFixed(3));
+      node.setAttribute("filter", a > 0.11 ? "url(#glow)" : "");
+    }
+
+    const defs = el("defs");
+    const glow = el("filter", { id: "glow", x: "-80%", y: "-80%", width: "260%", height: "260%" });
+    glow.appendChild(el("feGaussianBlur", { stdDeviation: "2.4", result: "b" }));
+    const merge = el("feMerge");
+    merge.appendChild(el("feMergeNode", { in: "b" }));
+    merge.appendChild(el("feMergeNode", { in: "SourceGraphic" }));
+    glow.appendChild(merge);
+    defs.appendChild(glow);
+    svg.appendChild(defs);
+
+    const layerBack = el("g");
+    const layerProbe = el("g");
+    const layerBeam = el("g");
+    const layerInterface = el("g");
+    const layerWaves = el("g");
+    svg.append(layerBack, layerProbe, layerBeam, layerInterface, layerWaves);
+
+    layerBack.appendChild(el("rect", {
+      x: "240",
+      y: "120",
+      width: "520",
+      height: (cfg.interfaceY - 120).toFixed(2),
+      fill: "#d9eef8",
+      "fill-opacity": "0.82"
+    }));
+    layerBack.appendChild(el("rect", {
+      x: "240",
+      y: cfg.interfaceY.toFixed(2),
+      width: "520",
+      height: (cfg.maxY - cfg.interfaceY).toFixed(2),
+      fill: "#f4eadf",
+      "fill-opacity": "0.9"
+    }));
+
+    layerBack.appendChild(el("text", {
+      x: "266",
+      y: "154",
+      fill: "#2e6684",
+      "font-size": "24",
+      "font-weight": "800"
+    })).textContent = "Tissue A: lower Z";
+    layerBack.appendChild(el("text", {
+      x: "266",
+      y: "418",
+      fill: "#7a4f25",
+      "font-size": "24",
+      "font-weight": "800"
+    })).textContent = "Tissue B: higher Z";
+
+    for (let y = 132; y <= cfg.maxY; y += 44) {
+      layerBack.appendChild(el("line", {
+        x1: "240",
+        y1: y.toFixed(2),
+        x2: "760",
+        y2: y.toFixed(2),
+        stroke: "#98b6c7",
+        "stroke-width": "1",
+        "stroke-opacity": "0.32"
+      }));
+    }
+
+    layerBeam.appendChild(el("rect", {
+      x: (cfg.beamX - cfg.beamWidth * 0.5).toFixed(2),
+      y: cfg.sourceY.toFixed(2),
+      width: cfg.beamWidth.toFixed(2),
+      height: (cfg.maxY - cfg.sourceY).toFixed(2),
+      rx: "10",
+      fill: "#0f76a8",
+      "fill-opacity": "0.07",
+      stroke: "#0f76a8",
+      "stroke-opacity": "0.24",
+      "stroke-width": "1"
+    }));
+
+    const interfaceLine = el("line", {
+      x1: "240",
+      y1: cfg.interfaceY.toFixed(2),
+      x2: "760",
+      y2: cfg.interfaceY.toFixed(2),
+      stroke: "#8f5d2b",
+      "stroke-width": "3",
+      "stroke-opacity": "0.74"
+    });
+    layerInterface.appendChild(interfaceLine);
+
+    layerInterface.appendChild(el("text", {
+      x: "770",
+      y: (cfg.interfaceY + 8).toFixed(2),
+      fill: "#704818",
+      "font-size": "22",
+      "font-weight": "800"
+    })).textContent = "interface";
+
+    layerProbe.appendChild(el("rect", {
+      x: "320",
+      y: "36",
+      width: "360",
+      height: "96",
+      rx: "30",
+      fill: "#e6edf3",
+      stroke: "#8ba3b4",
+      "stroke-width": "1"
+    }));
+    layerProbe.appendChild(el("rect", {
+      x: "360",
+      y: "58",
+      width: "280",
+      height: "55",
+      rx: "18",
+      fill: "#b7c9d6"
+    }));
+    layerProbe.appendChild(el("rect", {
+      x: "380",
+      y: "120",
+      width: "240",
+      height: "34",
+      rx: "8",
+      fill: "#405f72",
+      stroke: "#6f899a",
+      "stroke-width": "1"
+    }));
+
+    layerProbe.appendChild(el("text", {
+      x: "500",
+      y: "93",
+      fill: "#233746",
+      "font-size": "24",
+      "font-weight": "800",
+      "text-anchor": "middle"
+    })).textContent = "Transducer";
+
+    const incidentLayer = el("g");
+    const reflectedLayer = el("g");
+    const transmittedLayer = el("g");
+    layerWaves.append(incidentLayer, reflectedLayer, transmittedLayer);
+
+    for (let i = 0; i < cfg.slots; i++) {
+      const incidentNode = el("rect", {
+        x: "0", y: "0", width: "0", height: "0", rx: "4",
+        fill: "#0f76a8", "fill-opacity": "0.78", opacity: "0"
+      });
+      const reflectedNode = el("rect", {
+        x: "0", y: "0", width: "0", height: "0", rx: "4",
+        fill: "#b76a20", "fill-opacity": "0.82", opacity: "0"
+      });
+      const transmittedNode = el("rect", {
+        x: "0", y: "0", width: "0", height: "0", rx: "4",
+        fill: "#217756", "fill-opacity": "0.72", opacity: "0"
+      });
+      incidentLayer.appendChild(incidentNode);
+      reflectedLayer.appendChild(reflectedNode);
+      transmittedLayer.appendChild(transmittedNode);
+      state.incident.push(incidentNode);
+      state.reflected.push(reflectedNode);
+      state.transmitted.push(transmittedNode);
+    }
+
+    function updateReadout() {
+      const { reflection, transmission } = coefficients();
+      mismatchValue.textContent = `${Math.round(state.mismatch * 100)}%`;
+      reflectValue.textContent = `${Math.round(reflection * 100)}%`;
+      transmitValue.textContent = `${Math.round(transmission * 100)}%`;
+    }
+
+    mismatchSlider.addEventListener("input", () => {
+      state.mismatch = Number(mismatchSlider.value) / 100;
+      updateReadout();
+    });
+
+    function render(now) {
+      const dt = Math.min(0.04, (now - state.last) / 1000);
+      state.last = now;
+      state.t += dt;
+
+      const phase = state.t % cfg.cycle;
+      const distanceToInterface = cfg.interfaceY - cfg.sourceY;
+      const timeToInterface = distanceToInterface / cfg.speed;
+      const attenToInterface = Math.exp(-cfg.alpha * distanceToInterface);
+      const { reflection, transmission } = coefficients();
+
+      let interfaceActivity = 0;
+
+      for (let i = 0; i < cfg.slots; i++) {
+        const nodeIncident = state.incident[i];
+        const nodeReflected = state.reflected[i];
+        const nodeTransmitted = state.transmitted[i];
+
+        nodeIncident.setAttribute("opacity", "0");
+        nodeReflected.setAttribute("opacity", "0");
+        nodeTransmitted.setAttribute("opacity", "0");
+
+        const slotScale = 1 - i * 0.05;
+        const delay = i * cfg.slotDelay;
+        const age = phase - delay;
+        if (age <= 0) continue;
+
+        const z = cfg.speed * age;
+        if (z < distanceToInterface) {
+          const y = cfg.sourceY + z;
+          const ampIncident = Math.exp(-cfg.alpha * z) * slotScale;
+          setBand(nodeIncident, y, ampIncident);
+          continue;
+        }
+
+        const afterHit = age - timeToInterface;
+        if (afterHit < 0) continue;
+
+        const dHit = afterHit;
+        interfaceActivity += Math.exp(-(dHit * dHit) / (2 * 0.022 * 0.022));
+
+        const yRef = cfg.interfaceY - cfg.speed * afterHit;
+        if (yRef > cfg.sourceY - 8) {
+          const upDistance = cfg.interfaceY - yRef;
+          const ampRef = attenToInterface * reflection * Math.exp(-cfg.alpha * upDistance) * slotScale;
+          setBand(nodeReflected, yRef, ampRef);
+        }
+
+        const yTr = cfg.interfaceY + cfg.speed * afterHit;
+        if (yTr < cfg.maxY + 8) {
+          const downDistance = yTr - cfg.interfaceY;
+          const ampTr = attenToInterface * transmission * Math.exp(-cfg.alpha * downDistance) * slotScale;
+          setBand(nodeTransmitted, yTr, ampTr);
+        }
+      }
+
+      const lineOpacity = clamp(0.34 + interfaceActivity * (0.16 + reflection * 0.3), 0.34, 0.95);
+      interfaceLine.setAttribute("stroke-opacity", lineOpacity.toFixed(3));
+
+      requestAnimationFrame(render);
+    }
+
+    updateReadout();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

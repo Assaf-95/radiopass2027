@@ -1,0 +1,622 @@
+[
+  {
+    "name": "K-space & spatial encoding",
+    "items": [
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_05_slice_select_gz.html",
+        "file": "dephasing_step_05_slice_select_gz.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_07_phase_encode_gy.html",
+        "file": "dephasing_step_07_phase_encode_gy.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_09_frequency_encode_gx.html",
+        "file": "dephasing_step_09_frequency_encode_gx.html",
+        "kb": 27
+      },
+      {
+        "path": "codex/how-k-space-is-formed-explicit-phase-encoding-xyz.html",
+        "file": "how-k-space-is-formed-explicit-phase-encoding-xyz.html",
+        "kb": 51
+      },
+      {
+        "path": "codex/how-k-space-is-formed.html",
+        "file": "how-k-space-is-formed.html",
+        "kb": 23
+      },
+      {
+        "path": "walkthroughs/mri-gradients-full.html",
+        "file": "mri-gradients-full.html",
+        "kb": 22
+      },
+      {
+        "path": "visual-lab/visuals/mri-gradients.html",
+        "file": "mri-gradients.html",
+        "kb": 22
+      },
+      {
+        "path": "codex/mri-xyz-auto-simple-step-by-step.html",
+        "file": "mri-xyz-auto-simple-step-by-step.html",
+        "kb": 51
+      },
+      {
+        "path": "codex/mri-xyz-sequence-dynamics.html",
+        "file": "mri-xyz-sequence-dynamics.html",
+        "kb": 47
+      },
+      {
+        "path": "codex/section3-b0-precession-with-all-gradients.html",
+        "file": "section3-b0-precession-with-all-gradients.html",
+        "kb": 22
+      }
+    ]
+  },
+  {
+    "name": "Spin echo, refocusing & dephasing",
+    "items": [
+      {
+        "path": "codex/DEPHASING .html",
+        "file": "DEPHASING .html",
+        "kb": 74
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_04_apply_b0.html",
+        "file": "dephasing_step_04_apply_b0.html",
+        "kb": 28
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_06_apply_90_rf.html",
+        "file": "dephasing_step_06_apply_90_rf.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_08_rf_off_t2star.html",
+        "file": "dephasing_step_08_rf_off_t2star.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/mri-html-export/dephasing_step_10_apply_180_rf.html",
+        "file": "dephasing_step_10_apply_180_rf.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/legacy-mri/fid_spin_echo_masterclass.html",
+        "file": "fid_spin_echo_masterclass.html",
+        "kb": 11
+      },
+      {
+        "path": "walkthroughs/fid_spin_echo_masterclass.html",
+        "file": "fid_spin_echo_masterclass.html",
+        "kb": 11
+      },
+      {
+        "path": "visual-lab/legacy-mri/fid_step_page_1.html",
+        "file": "fid_step_page_1.html",
+        "kb": 24
+      },
+      {
+        "path": "walkthroughs/fid_step_page_1.html",
+        "file": "fid_step_page_1.html",
+        "kb": 24
+      },
+      {
+        "path": "walkthroughs/free-induction-decay-full.html",
+        "file": "free-induction-decay-full.html",
+        "kb": 26
+      },
+      {
+        "path": "visual-lab/legacy-mri/free-induction-decay.html",
+        "file": "free-induction-decay.html",
+        "kb": 26
+      },
+      {
+        "path": "walkthroughs/mri-dephasing-full.html",
+        "file": "mri-dephasing-full.html",
+        "kb": 75
+      },
+      {
+        "path": "visual-lab/visuals/mri-dephasing.html",
+        "file": "mri-dephasing.html",
+        "kb": 75
+      },
+      {
+        "path": "codex/mri-fat-water-spin-echo-diagram.html",
+        "file": "mri-fat-water-spin-echo-diagram.html",
+        "kb": 25
+      },
+      {
+        "path": "visual-lab/mri-fat-water-spin-echo-stepwise.html",
+        "file": "mri-fat-water-spin-echo-stepwise.html",
+        "kb": 26
+      },
+      {
+        "path": "visual-lab/visuals/mri-refocusing-pulse.html",
+        "file": "mri-refocusing-pulse.html",
+        "kb": 23
+      },
+      {
+        "path": "walkthroughs/mri-refocusing-pulse.html",
+        "file": "mri-refocusing-pulse.html",
+        "kb": 87
+      },
+      {
+        "path": "codex/mri-rf-180-pulse.html",
+        "file": "mri-rf-180-pulse.html",
+        "kb": 23
+      },
+      {
+        "path": "visual-lab/visuals/mri-spin-echo-fat-water.html",
+        "file": "mri-spin-echo-fat-water.html",
+        "kb": 122
+      },
+      {
+        "path": "visual-lab/visuals/mri-t2-dephasing-spin-echo.html",
+        "file": "mri-t2-dephasing-spin-echo.html",
+        "kb": 38
+      },
+      {
+        "path": "walkthroughs/t2_dephasing-detailed.html",
+        "file": "t2_dephasing-detailed.html",
+        "kb": 38
+      },
+      {
+        "path": "visual-lab/legacy-mri/t2_dephasing.html",
+        "file": "t2_dephasing.html",
+        "kb": 38
+      }
+    ]
+  },
+  {
+    "name": "T1 / T2 relaxation & recovery",
+    "items": [
+      {
+        "path": "walkthroughs/mri-b0-precession-rf-recovery-overview-detailed.html",
+        "file": "mri-b0-precession-rf-recovery-overview-detailed.html",
+        "kb": 44
+      },
+      {
+        "path": "visual-lab/visuals/mri-b0-precession-rf-recovery-overview.html",
+        "file": "mri-b0-precession-rf-recovery-overview.html",
+        "kb": 44
+      },
+      {
+        "path": "codex/mri-fat-water-relaxation.html",
+        "file": "mri-fat-water-relaxation.html",
+        "kb": 17
+      },
+      {
+        "path": "codex/mri-hydrogen-signal-production-diagram.html",
+        "file": "mri-hydrogen-signal-production-diagram.html",
+        "kb": 21
+      },
+      {
+        "path": "codex/mri-inversion-recovery.html",
+        "file": "mri-inversion-recovery.html",
+        "kb": 23
+      },
+      {
+        "path": "walkthroughs/mri-magnetisation-recovery-detailed.html",
+        "file": "mri-magnetisation-recovery-detailed.html",
+        "kb": 23
+      },
+      {
+        "path": "visual-lab/visuals/mri-magnetisation-recovery.html",
+        "file": "mri-magnetisation-recovery.html",
+        "kb": 23
+      },
+      {
+        "path": "walkthroughs/mri-signal-production-detailed.html",
+        "file": "mri-signal-production-detailed.html",
+        "kb": 22
+      },
+      {
+        "path": "visual-lab/visuals/mri-signal-production.html",
+        "file": "mri-signal-production.html",
+        "kb": 22
+      },
+      {
+        "path": "walkthroughs/mri-t2-t2star-signal-steps-detailed.html",
+        "file": "mri-t2-t2star-signal-steps-detailed.html",
+        "kb": 11
+      },
+      {
+        "path": "visual-lab/visuals/mri-t2-t2star-signal-steps.html",
+        "file": "mri-t2-t2star-signal-steps.html",
+        "kb": 11
+      },
+      {
+        "path": "visual-lab/legacy-mri/t1-steps.html",
+        "file": "t1-steps.html",
+        "kb": 10
+      },
+      {
+        "path": "new/t1-steps.html",
+        "file": "t1-steps.html",
+        "kb": 10
+      },
+      {
+        "path": "walkthroughs/t1-steps.html",
+        "file": "t1-steps.html",
+        "kb": 10
+      },
+      {
+        "path": "visual-lab/legacy-mri/t2-steps.html",
+        "file": "t2-steps.html",
+        "kb": 10
+      },
+      {
+        "path": "new/t2-steps.html",
+        "file": "t2-steps.html",
+        "kb": 10
+      }
+    ]
+  },
+  {
+    "name": "Chemical shift & bandwidth",
+    "items": [
+      {
+        "path": "codex/chemical-shift-receiver-bandwidth.html",
+        "file": "chemical-shift-receiver-bandwidth.html",
+        "kb": 44
+      },
+      {
+        "path": "visual-lab/visuals/mri-chemical-shift.html",
+        "file": "mri-chemical-shift.html",
+        "kb": 44
+      },
+      {
+        "path": "walkthroughs/mri-chemical-shift.html",
+        "file": "mri-chemical-shift.html",
+        "kb": 44
+      }
+    ]
+  },
+  {
+    "name": "Precession, Larmor & B0",
+    "items": [
+      {
+        "path": "codex/gyroscope-mri-precession-physics.html",
+        "file": "gyroscope-mri-precession-physics.html",
+        "kb": 44
+      },
+      {
+        "path": "codex/mri-hydrogen-precession-3d.html",
+        "file": "mri-hydrogen-precession-3d.html",
+        "kb": 21
+      },
+      {
+        "path": "visual-lab/visuals/mri-larmor-precession.html",
+        "file": "mri-larmor-precession.html",
+        "kb": 44
+      },
+      {
+        "path": "codex/mri-rf-dynamics.html",
+        "file": "mri-rf-dynamics.html",
+        "kb": 23
+      }
+    ]
+  },
+  {
+    "name": "Fat vs water",
+    "items": [
+      {
+        "path": "visual-lab/landing-fat-water-related.html",
+        "file": "landing-fat-water-related.html",
+        "kb": 122
+      },
+      {
+        "path": "visual-lab/landing-fat-water.before-readout-snapshot-fix.html",
+        "file": "landing-fat-water.before-readout-snapshot-fix.html",
+        "kb": 121
+      },
+      {
+        "path": "visual-lab/landing-fat-water.html",
+        "file": "landing-fat-water.html",
+        "kb": 122
+      },
+      {
+        "path": "codex/landing-fat-water.html",
+        "file": "landing-fat-water.html",
+        "kb": 122
+      },
+      {
+        "path": "new/landing-fat-water.html",
+        "file": "landing-fat-water.html",
+        "kb": 154
+      },
+      {
+        "path": "codex/mri-fat-water-xz-dynamics.html",
+        "file": "mri-fat-water-xz-dynamics.html",
+        "kb": 18
+      }
+    ]
+  },
+  {
+    "name": "MRI artefacts",
+    "items": [
+      {
+        "path": "codex/mri-artifacts-step-guide.html",
+        "file": "mri-artifacts-step-guide.html",
+        "kb": 24
+      },
+      {
+        "path": "visual-lab/visuals/mri-artifacts.html",
+        "file": "mri-artifacts.html",
+        "kb": 24
+      },
+      {
+        "path": "walkthroughs/mri-artifacts.html",
+        "file": "mri-artifacts.html",
+        "kb": 24
+      }
+    ]
+  },
+  {
+    "name": "MRI simulators & step decks",
+    "items": [
+      {
+        "path": "codex/legacy-simulator.html",
+        "file": "legacy-simulator.html",
+        "kb": 27
+      },
+      {
+        "path": "codex/medical_imaging_step_diagrams.html",
+        "file": "medical_imaging_step_diagrams.html",
+        "kb": 46
+      },
+      {
+        "path": "codex/medical_imaging_step_diagrams_16_24.html",
+        "file": "medical_imaging_step_diagrams_16_24.html",
+        "kb": 40
+      },
+      {
+        "path": "codex/medical_imaging_step_diagrams_6_10.html",
+        "file": "medical_imaging_step_diagrams_6_10.html",
+        "kb": 47
+      },
+      {
+        "path": "codex/medical_imaging_step_diagrams_modern_dark_1_5.html",
+        "file": "medical_imaging_step_diagrams_modern_dark_1_5.html",
+        "kb": 46
+      },
+      {
+        "path": "codex/medical_imaging_step_diagrams_modern_dark_6_10.html",
+        "file": "medical_imaging_step_diagrams_modern_dark_6_10.html",
+        "kb": 47
+      },
+      {
+        "path": "visual-lab/mri-interactive-simulator-v7.html",
+        "file": "mri-interactive-simulator-v7.html",
+        "kb": 54
+      },
+      {
+        "path": "codex/mri-interactive-simulator-v7.html",
+        "file": "mri-interactive-simulator-v7.html",
+        "kb": 54
+      },
+      {
+        "path": "codex/mri-interactive-simulator-v8.html",
+        "file": "mri-interactive-simulator-v8.html",
+        "kb": 64
+      },
+      {
+        "path": "codex/mri-minimal-step-by-step-v2.html",
+        "file": "mri-minimal-step-by-step-v2.html",
+        "kb": 28
+      },
+      {
+        "path": "codex/mri-minimal-step-by-step-v3.html",
+        "file": "mri-minimal-step-by-step-v3.html",
+        "kb": 21
+      },
+      {
+        "path": "new/mri-minimal-step-by-step-v4.html",
+        "file": "mri-minimal-step-by-step-v4.html",
+        "kb": 27
+      },
+      {
+        "path": "codex/mri-minimal-step-by-step-v5.html",
+        "file": "mri-minimal-step-by-step-v5.html",
+        "kb": 29
+      },
+      {
+        "path": "codex/mri-minimal-step-by-step.html",
+        "file": "mri-minimal-step-by-step.html",
+        "kb": 22
+      },
+      {
+        "path": "codex/mri-physics-exam-step-guide.html",
+        "file": "mri-physics-exam-step-guide.html",
+        "kb": 32
+      },
+      {
+        "path": "visual-lab/mri-physics-visual-deck.html",
+        "file": "mri-physics-visual-deck.html",
+        "kb": 42
+      },
+      {
+        "path": "walkthroughs/mri-sequence-contrast-walkthrough.html",
+        "file": "mri-sequence-contrast-walkthrough.html",
+        "kb": 77
+      },
+      {
+        "path": "visual-lab/mri-visual-2.html",
+        "file": "mri-visual-2.html",
+        "kb": 41
+      },
+      {
+        "path": "visual-lab/mri-visual-learning.html",
+        "file": "mri-visual-learning.html",
+        "kb": 68
+      },
+      {
+        "path": "visual-lab/legacy-mri/xray-beam-quality-simulator.html",
+        "file": "xray-beam-quality-simulator.html",
+        "kb": 35
+      },
+      {
+        "path": "codex/xray-beam-quality-simulator.html",
+        "file": "xray-beam-quality-simulator.html",
+        "kb": 35
+      }
+    ]
+  },
+  {
+    "name": "X-ray tube, anode & beam quality",
+    "items": [
+      {
+        "path": "codex/XRAY CODING copy.html",
+        "file": "XRAY CODING copy.html",
+        "kb": 40
+      },
+      {
+        "path": "codex/XRAY CODING.html",
+        "file": "XRAY CODING.html",
+        "kb": 30
+      },
+      {
+        "path": "visual-lab/visuals/radiographic-magnification.html",
+        "file": "radiographic-magnification.html",
+        "kb": 31
+      },
+      {
+        "path": "walkthroughs/radiographic-magnification.html",
+        "file": "radiographic-magnification.html",
+        "kb": 31
+      },
+      {
+        "path": "visual-lab/visuals/xray-beam-quality.html",
+        "file": "xray-beam-quality.html",
+        "kb": 35
+      },
+      {
+        "path": "walkthroughs/xray-beam-quality.html",
+        "file": "xray-beam-quality.html",
+        "kb": 35
+      },
+      {
+        "path": "walkthroughs/xray-focal-spot-unsharpness-full.html",
+        "file": "xray-focal-spot-unsharpness-full.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/visuals/xray-focal-spot-unsharpness.html",
+        "file": "xray-focal-spot-unsharpness.html",
+        "kb": 27
+      },
+      {
+        "path": "visual-lab/visuals/xray-guided-interactions.html",
+        "file": "xray-guided-interactions.html",
+        "kb": 19
+      },
+      {
+        "path": "walkthroughs/xray-guided-interactions.html",
+        "file": "xray-guided-interactions.html",
+        "kb": 19
+      },
+      {
+        "path": "visual-lab/xray-tube-physics-canvas.html",
+        "file": "xray-tube-physics-canvas.html",
+        "kb": 15
+      },
+      {
+        "path": "new/xray-tube-unsharpness.html",
+        "file": "xray-tube-unsharpness.html",
+        "kb": 25
+      },
+      {
+        "path": "visual-lab/xray_guided_lesson.before-fix.html",
+        "file": "xray_guided_lesson.before-fix.html",
+        "kb": 31
+      },
+      {
+        "path": "visual-lab/xray_guided_lesson.work.html",
+        "file": "xray_guided_lesson.work.html",
+        "kb": 32
+      }
+    ]
+  },
+  {
+    "name": "Ultrasound",
+    "items": [
+      {
+        "path": "new/acoustic_impedance_partial_reflection.html",
+        "file": "acoustic_impedance_partial_reflection.html",
+        "kb": 18
+      },
+      {
+        "path": "visual-lab/visuals/ultrasound-core-visuals.html",
+        "file": "ultrasound-core-visuals.html",
+        "kb": 8
+      },
+      {
+        "path": "walkthroughs/ultrasound-core-visuals.html",
+        "file": "ultrasound-core-visuals.html",
+        "kb": 8
+      },
+      {
+        "path": "new/ultrasound-longitudinal-wave-v1.html",
+        "file": "ultrasound-longitudinal-wave-v1.html",
+        "kb": 21
+      },
+      {
+        "path": "codex/ultrasound-wave-v2-impedance.html",
+        "file": "ultrasound-wave-v2-impedance.html",
+        "kb": 30
+      }
+    ]
+  },
+  {
+    "name": "Diagram decks",
+    "items": [
+      {
+        "path": "visual-lab/visuals/diagrams-1-5.html",
+        "file": "diagrams-1-5.html",
+        "kb": 47
+      },
+      {
+        "path": "walkthroughs/diagrams-1-5.html",
+        "file": "diagrams-1-5.html",
+        "kb": 47
+      },
+      {
+        "path": "visual-lab/visuals/diagrams-16-24.html",
+        "file": "diagrams-16-24.html",
+        "kb": 40
+      },
+      {
+        "path": "walkthroughs/diagrams-16-24.html",
+        "file": "diagrams-16-24.html",
+        "kb": 40
+      },
+      {
+        "path": "visual-lab/visuals/diagrams-6-10.html",
+        "file": "diagrams-6-10.html",
+        "kb": 47
+      },
+      {
+        "path": "walkthroughs/diagrams-6-10.html",
+        "file": "diagrams-6-10.html",
+        "kb": 47
+      }
+    ]
+  },
+  {
+    "name": "Everything else",
+    "items": [
+      {
+        "path": "visual-lab/originals/lessons-original.html",
+        "file": "lessons-original.html",
+        "kb": 19
+      },
+      {
+        "path": "codex/mri-proton-phase-magnetization-animator.html",
+        "file": "mri-proton-phase-magnetization-animator.html",
+        "kb": 38
+      }
+    ]
+  }
+]

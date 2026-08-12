@@ -1,0 +1,233 @@
+/**
+ * House style for the standalone visual pages under /visuals/.
+ *
+ * Exactly one page links this file — the X-ray tube simulation the X-ray hub
+ * opens — and for its whole life the file it asked for did not exist beside
+ * it, so the page rendered with browser defaults: serif text, blue links, and
+ * a 1600px canvas that forced the whole page sideways. This is that missing
+ * file, written to the RadioPass system rather than resurrected from the old
+ * archive look.
+ *
+ * The rules mirror the shipped instruments: chassis #0B0D10, Fraunces display,
+ * X-ray blue as this modality's colour, amber only for brand chrome, controls
+ * in a column beside the diagram on a desktop and after it on a phone, and
+ * the same touch targets as everywhere else.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0b0d10;
+  --panel: #101318;
+  --line: rgba(242, 238, 230, 0.1);
+  --ink: #f2eee6;
+  --mut: #8b929b;
+  --dim: #6f757e;
+  --amber: #d9a84e;
+  --xray: #a8cbea;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: radial-gradient(120% 70% at 50% -8%, rgba(168, 203, 234, 0.07), transparent 60%), var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.canvas-page {
+  min-height: 100vh;
+  width: min(1240px, calc(100% - 40px));
+  margin: 0 auto;
+  padding-bottom: 48px;
+  overflow-x: clip;
+}
+
+/* ---------- header: the way home, always visible ---------- */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 62px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(18px, 4vh, 34px);
+}
+
+.brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand em { font-style: normal; color: var(--xray); }
+
+.nav-links { display: flex; gap: 8px; }
+.nav-links a {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  text-decoration: none;
+  border: 1px solid rgba(242, 238, 230, 0.16);
+  border-radius: 18px;
+  padding: 7px 14px;
+  white-space: nowrap;
+  transition: color 0.16s, border-color 0.16s;
+}
+.nav-links a:hover { color: var(--ink); border-color: rgba(242, 238, 230, 0.4); }
+
+/* ---------- the instrument ---------- */
+
+/* Diagram beside its controls: controls in a left column on a desktop, and
+   after the diagram on a phone — the animation earns the first screenful. */
+.sim-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+@media (min-width: 980px) {
+  .sim-layout { grid-template-columns: minmax(260px, 330px) minmax(0, 1fr); }
+}
+@media (max-width: 979px) {
+  .control-panel { order: 2; }
+  .sim-panel { order: 1; }
+}
+
+.control-panel {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.015);
+  padding: 20px 20px 22px;
+}
+
+.kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--xray);
+  margin: 0 0 10px;
+}
+
+.control-panel h2 {
+  /* The page sets an inline clamp() size; family and weight come from here. */
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 340;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0 0 12px;
+}
+
+.control-panel > p { font-size: 13.5px; line-height: 1.65; color: var(--mut); margin: 0 0 12px; }
+
+.note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--dim);
+  border-left: 2px solid rgba(217, 168, 78, 0.5);
+  padding-left: 12px;
+  margin: 0 0 18px;
+}
+
+/* ---------- the generated controls ---------- */
+
+.control { margin-bottom: 2px; }
+.control label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--mut);
+}
+.control output {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--xray);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.control input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  outline-offset: 5px;
+  cursor: pointer;
+  margin: 8px 0 12px;
+}
+.control input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--xray);
+  border: 3px solid #10151b;
+  box-shadow: 0 0 0 1px rgba(168, 203, 234, 0.5);
+}
+.control input[type='range']::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--xray);
+  border: 3px solid #10151b;
+}
+:focus-visible { outline: 2px solid var(--xray); outline-offset: 2px; }
+
+/* The same touch rule as the shipped instruments: on a coarse pointer the
+   4px track grows a 34px hit area without changing how it looks. */
+@media (pointer: coarse) {
+  .control input[type='range'] {
+    height: 34px;
+    padding-block: 15px;
+    background-clip: content-box;
+  }
+  .nav-links a, .action { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; }
+}
+
+.action {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 18px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: var(--ink);
+  color: #0b0d10;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.action:hover { background: #ffffff; }
+
+/* ---------- the canvas ----------
+   The bitmap is 1600×900; the ELEMENT must never be. Width follows the
+   column, the aspect ratio keeps the drawing honest, and nothing can force
+   the page to scroll sideways again. */
+.sim-panel {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+  background: radial-gradient(90% 85% at 50% 40%, #10141a, #080a0d);
+}
+.sim-panel canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}

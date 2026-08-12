@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RADIOPASS — Computed Tomography, Made Visible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Space+Grotesk:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:        #070C17;   /* deep navy-charcoal */
+  --bg-deep:   #05080F;
+  --surface:   #0D1526;
+  --line:      rgba(155,184,255,.12);
+  --ivory:     #F1ECE1;
+  --grey:      #97A0B4;
+  --grey-dim:  #5D6578;
+  --gold:      #E3B45C;
+  --beam:      #9BB8FF;   /* blue-white X-ray energy */
+  --beam-hot:  #DFEAFF;
+  --violet:    #A78BFA;
+  --serif: "Fraunces", Georgia, serif;
+  --sans:  "Instrument Sans", system-ui, sans-serif;
+  --mono:  "Space Grotesk", monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ivory);
+  font-family:var(--sans);
+  font-size:17px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:rgba(227,180,92,.25)}
+
+/* ---------- nav ---------- */
+nav{
+  position:fixed; inset:0 0 auto 0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.1rem clamp(1.2rem,4vw,3rem);
+  transition:background .4s, backdrop-filter .4s, border-color .4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{
+  background:rgba(7,12,23,.72);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-color:var(--line);
+}
+.wordmark{font-family:var(--mono); font-weight:500; letter-spacing:.32em; font-size:.85rem; color:var(--ivory); text-decoration:none}
+.wordmark em{font-style:normal; color:var(--gold)}
+.nav-tag{font-family:var(--mono); font-size:.68rem; letter-spacing:.24em; color:var(--grey); text-transform:uppercase}
+
+/* ---------- shared type ---------- */
+.eyebrow{
+  font-family:var(--mono); font-size:.7rem; font-weight:500;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--gold);
+  display:flex; align-items:center; gap:.9rem; margin-bottom:1.4rem;
+}
+.eyebrow::before{content:""; width:2.2rem; height:1px; background:var(--gold); opacity:.6}
+h1,h2{font-family:var(--serif); font-weight:300; letter-spacing:-.015em; line-height:1.08}
+h1{font-size:clamp(2.7rem,7vw,5.6rem)}
+h2{font-size:clamp(2rem,4.4vw,3.4rem); margin-bottom:1.1rem}
+h2 i{font-style:italic; color:var(--beam)}
+.lede{color:var(--grey); max-width:36ch; font-size:clamp(1rem,1.25vw,1.12rem)}
+.k{color:var(--ivory); font-weight:500}
+
+/* ---------- hero ---------- */
+#hero{position:relative; height:210vh}
+#hero .stage{position:sticky; top:0; height:100vh; overflow:hidden}
+#hero canvas{position:absolute; inset:0; width:100%; height:100%}
+.hero-copy{
+  position:absolute; left:clamp(1.2rem,5vw,4.5rem); bottom:clamp(3.2rem,9vh,6rem);
+  z-index:5; max-width:34rem;
+}
+.hero-copy .eyebrow{margin-bottom:1rem}
+.hero-sub{color:var(--grey); margin-top:1.3rem; max-width:30rem}
+.scroll-cue{
+  position:absolute; right:clamp(1.2rem,5vw,4rem); bottom:2.6rem; z-index:5;
+  font-family:var(--mono); font-size:.65rem; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--grey); display:flex; align-items:center; gap:.8rem;
+}
+.scroll-cue::after{content:""; width:1px; height:2.6rem; background:linear-gradient(var(--grey),transparent); animation:cue 2.2s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* fade-up reveals */
+.rv{opacity:0; transform:translateY(26px); transition:opacity .9s cubic-bezier(.2,.6,.2,1), transform .9s cubic-bezier(.2,.6,.2,1)}
+.rv.in{opacity:1; transform:none}
+.rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
+
+/* ---------- pinned scrub sections ---------- */
+.pin-sec{position:relative}
+.pin-sec .stage{position:sticky; top:0; height:100vh; overflow:hidden; display:block}
+.pin-sec canvas{position:absolute; inset:0; width:100%; height:100%}
+.chapters{
+  position:absolute; z-index:5; top:50%; transform:translateY(-50%);
+  right:clamp(1.2rem,5vw,4.5rem); width:min(21rem,40vw);
+  display:flex; flex-direction:column; gap:1.5rem;
+}
+.chapters .head{margin-bottom:.4rem}
+.chap{
+  border-left:1px solid var(--line); padding-left:1.1rem;
+  opacity:.32; transition:opacity .45s, border-color .45s;
+}
+.chap.on{opacity:1; border-color:var(--gold)}
+.chap .n{font-family:var(--mono); font-size:.65rem; letter-spacing:.26em; color:var(--gold); display:block; margin-bottom:.25rem}
+.chap h3{font-family:var(--serif); font-weight:400; font-size:1.22rem; line-height:1.2; letter-spacing:-.01em; margin-bottom:.3rem}
+.chap p{font-size:.86rem; color:var(--grey); line-height:1.55}
+
+/* ---------- split (text + live canvas) sections ---------- */
+.split{
+  position:relative; min-height:100vh;
+  display:grid; grid-template-columns:minmax(20rem,30rem) 1fr;
+  gap:clamp(2rem,5vw,5rem); align-items:center;
+  padding:clamp(5rem,12vh,8rem) clamp(1.2rem,5vw,4.5rem);
+  border-top:1px solid var(--line);
+}
+.split.flip{grid-template-columns:1fr minmax(20rem,30rem)}
+.split.flip .txt{order:2}
+.split.flip .viz{order:1}
+.viz{position:relative; height:min(72vh,46rem); min-height:24rem}
+.viz canvas{position:absolute; inset:0; width:100%; height:100%}
+.legend{display:flex; flex-wrap:wrap; gap:1.2rem; margin-top:1.6rem}
+.legend span{font-family:var(--mono); font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; color:var(--grey); display:flex; align-items:center; gap:.5rem}
+.legend b{width:.65rem; height:.65rem; border-radius:50%; display:inline-block}
+.facts{margin-top:1.8rem; display:flex; flex-direction:column; gap:.9rem}
+.fact{display:flex; gap:.9rem; font-size:.92rem; color:var(--grey)}
+.fact::before{content:""; flex:0 0 auto; width:.45rem; height:.45rem; border-radius:50%; background:var(--gold); margin-top:.55rem}
+.formula{
+  margin-top:1.6rem; padding:1rem 1.2rem; border:1px solid var(--line);
+  border-radius:.4rem; background:rgba(13,21,38,.6);
+  font-family:var(--mono); font-size:.95rem; color:var(--beam); letter-spacing:.04em;
+}
+.formula small{display:block; font-family:var(--sans); color:var(--grey); font-size:.78rem; letter-spacing:0; margin-top:.4rem}
+
+/* ---------- outro ---------- */
+#outro{
+  min-height:88vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; padding:6rem 1.5rem; border-top:1px solid var(--line);
+  background:radial-gradient(60% 50% at 50% 60%, rgba(155,184,255,.06), transparent 70%), var(--bg-deep);
+}
+#outro h2{font-size:clamp(2.2rem,5vw,4rem)}
+#outro .lede{max-width:40ch; margin:1.2rem auto 2.4rem}
+.cta-row{display:flex; gap:1rem; flex-wrap:wrap; justify-content:center}
+.btn{
+  font-family:var(--mono); font-size:.75rem; letter-spacing:.22em; text-transform:uppercase;
+  padding:.95rem 1.8rem; border-radius:2rem; text-decoration:none; transition:.3s;
+}
+.btn.primary{background:var(--gold); color:#141005}
+.btn.primary:hover{background:#f0c97e; transform:translateY(-2px)}
+.btn.ghost{color:var(--ivory); border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--gold); color:var(--gold)}
+footer{padding:2.2rem; text-align:center; font-family:var(--mono); font-size:.65rem; letter-spacing:.24em; text-transform:uppercase; color:var(--grey-dim, #5d6578); border-top:1px solid var(--line)}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .split,.split.flip{grid-template-columns:1fr; gap:1.8rem; padding-top:4.5rem; padding-bottom:4.5rem}
+  .split.flip .txt{order:1}.split.flip .viz{order:2}
+  .viz{height:58vh; min-height:20rem}
+  .chapters{right:1rem; left:1rem; width:auto; top:auto; bottom:1.2rem; transform:none;
+    flex-direction:row; overflow-x:auto; gap:1rem; padding-bottom:.3rem}
+  .chapters .head{display:none}
+  .chap{flex:0 0 68vw; border-left-width:2px; background:rgba(7,12,23,.7); backdrop-filter:blur(8px); padding:.7rem .9rem; border-radius:.3rem}
+  #hero{height:170vh}
+  .nav-tag{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1; transform:none; transition:none}
+  .scroll-cue::after{animation:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a class="wordmark" href="/">RADIO<em>PASS</em></a>
+  <span class="nav-tag"><a href="/ct-lab" style="color:inherit;text-decoration:none">← CT Lesson</a> · CT Physics</span>
+</nav>
+
+<!-- ============ HERO — the rotating gantry ============ -->
+<section id="hero">
+  <div class="stage">
+    <canvas id="cv-hero"></canvas>
+    <div class="hero-copy">
+      <div class="eyebrow rv in">FRCR Part 1 · Physics</div>
+      <h1 class="rv in">Computed<br>Tomography,<br><i style="color:var(--beam)">made visible.</i></h1>
+      <p class="hero-sub rv in d1">One rotating fan of X-rays. Hundreds of detectors. A map of attenuation, rebuilt slice by slice.</p>
+    </div>
+    <div class="scroll-cue">Scroll to rotate</div>
+  </div>
+</section>
+
+<!-- ============ 01 GENERATIONS — pinned scrub ============ -->
+<section id="generations" class="pin-sec" style="height:420vh">
+  <div class="stage">
+    <canvas id="cv-gen"></canvas>
+    <div class="chapters">
+      <div class="head">
+        <div class="eyebrow">01 — Scanner generations</div>
+        <h2 style="font-size:clamp(1.5rem,2.6vw,2.1rem)">Forty years,<br>four geometries.</h2>
+      </div>
+      <div class="chap" data-ch="0">
+        <span class="n">A · First generation</span>
+        <h3>Translate–rotate, pencil beam</h3>
+        <p>A single pencil beam and one detector step sideways across the patient, then rotate. Minutes per slice.</p>
+      </div>
+      <div class="chap" data-ch="1">
+        <span class="n">B · Second generation</span>
+        <h3>Translate–rotate, narrow fan</h3>
+        <p>A small fan and a short detector row cover more tissue per translation. Fewer rotation steps, faster scans.</p>
+      </div>
+      <div class="chap" data-ch="2">
+        <span class="n">C · Third generation</span>
+        <h3>Rotate–rotate</h3>
+        <p>A wide fan covers the whole patient. Tube and detector arc rotate together — the geometry used by modern scanners.</p>
+      </div>
+      <div class="chap" data-ch="3">
+        <span class="n">D · Fourth generation</span>
+        <h3>Rotate–stationary ring</h3>
+        <p>A complete stationary ring of detectors; only the tube rotates inside it. Costly, and largely abandoned.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 BEAM SHAPING ============ -->
+<section id="beam" class="split">
+  <div class="txt">
+    <div class="eyebrow rv">02 — Shaping the beam</div>
+    <h2 class="rv d1">Filter first,<br>then <i>collimate.</i></h2>
+    <p class="lede rv d2">The patient is thinner at the edges than the middle. A <span class="k">bow-tie filter</span> — thick at its edges, thin at its centre — pre-attenuates the periphery of the fan, so the detectors see a flatter, more uniform signal and skin dose falls.</p>
+    <div class="facts rv d3">
+      <div class="fact">The <span class="k">collimator</span> then trims the beam along z, defining beam width and limiting dose.</div>
+      <div class="fact">Watch the profile: strong attenuation across the filter’s wings, gentle at its centre — the mirror image of the patient’s own attenuation.</div>
+    </div>
+    <div class="legend rv d3">
+      <span><b style="background:var(--beam)"></b>X-ray fan</span>
+      <span><b style="background:var(--gold)"></b>Bow-tie filter</span>
+      <span><b style="background:var(--violet)"></b>Attenuation profile</span>
+    </div>
+  </div>
+  <div class="viz"><canvas id="cv-beam"></canvas></div>
+</section>
+
+<!-- ============ 03 DETECTOR ARRAYS ============ -->
+<section id="arrays" class="split flip">
+  <div class="txt">
+    <div class="eyebrow rv">03 — Multi-slice detector arrays</div>
+    <h2 class="rv d1">Rows decide<br>the <i>slices.</i></h2>
+    <p class="lede rv d2">In multi-slice CT the detector is a 2-D mosaic. How its rows are sized along z defines the array type — and, with the collimation, the slice thickness.</p>
+    <div class="facts rv d3">
+      <div class="fact"><span class="k">Matrix</span> — every row the same width.</div>
+      <div class="fact"><span class="k">Adaptive</span> — fine rows at the centre, progressively wider towards the edges.</div>
+      <div class="fact"><span class="k">Hybrid</span> — a fine central set inside uniform outer rows.</div>
+      <div class="fact">In-plane, the fan spans the patient in x–y; side-on, collimation sets <span class="k">beam thickness</span>, detector configuration sets <span class="k">slice thickness</span>.</div>
+    </div>
+  </div>
+  <div class="viz"><canvas id="cv-arr"></canvas></div>
+</section>
+
+<!-- ============ 04 HELICAL — pinned scrub ============ -->
+<section id="helical" class="pin-sec" style="height:380vh">
+  <div class="stage">
+    <canvas id="cv-hel"></canvas>
+    <div class="chapters">
+      <div class="head">
+        <div class="eyebrow">04 — Helical acquisition</div>
+        <h2 style="font-size:clamp(1.5rem,2.6vw,2.1rem)">The beam<br>draws a helix.</h2>
+      </div>
+      <div class="chap" data-ch="0">
+        <span class="n">Continuous rotation</span>
+        <h3>Table moves, tube spins</h3>
+        <p>Slip-ring technology lets the tube rotate continuously while the table feeds the patient through — the beam traces a helix along z.</p>
+      </div>
+      <div class="chap" data-ch="1">
+        <span class="n">Pitch</span>
+        <h3>Feed per rotation ÷ beam width</h3>
+        <p>Pitch 1: turns touch. Pitch &gt; 1: gaps — faster, lower dose, interpolation fills in. Pitch &lt; 1: overlap — more dose, more data.</p>
+      </div>
+      <div class="chap" data-ch="2">
+        <span class="n">Reconstruction</span>
+        <h3>Interpolated planar slices</h3>
+        <p>No single rotation lies in one plane, so axial images are interpolated from the helical dataset at any chosen position.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 CONE BEAM ============ -->
+<section id="cone" class="split">
+  <div class="txt">
+    <div class="eyebrow rv">05 — The cone-beam effect</div>
+    <h2 class="rv d1">Only the centre<br>stays <i>in plane.</i></h2>
+    <p class="lede rv d2">With many detector rows the beam is no longer a flat fan but a cone. Central rows are hit almost perpendicular to z — but outer rows collect data from <span class="k">tilted, diverging planes</span>.</p>
+    <div class="facts rv d3">
+      <div class="fact">As the gantry rotates, an outer row sweeps a double-cone through the patient rather than a flat slice.</div>
+      <div class="fact">The mismatch grows with wider arrays and shows as <span class="k">cone-beam artefact</span> — corrected by dedicated reconstruction algorithms.</div>
+    </div>
+    <div class="legend rv d3">
+      <span><b style="background:var(--beam)"></b>Ray paths</span>
+      <span><b style="background:var(--gold)"></b>Outer-row plane</span>
+      <span><b style="background:var(--violet)"></b>True axial plane</span>
+    </div>
+  </div>
+  <div class="viz"><canvas id="cv-cone"></canvas></div>
+</section>
+
+<!-- ============ 06 RING ARTEFACT ============ -->
+<section id="ring" class="split flip">
+  <div class="txt">
+    <div class="eyebrow rv">06 — Ring artefact</div>
+    <h2 class="rv d1">One bad detector,<br>one perfect <i>circle.</i></h2>
+    <p class="lede rv d2">In third-generation geometry each detector keeps a fixed distance from the isocentre as the gantry turns. A miscalibrated detector therefore writes its error along a <span class="k">circle</span> — a ring in every image.</p>
+    <div class="facts rv d3">
+      <div class="fact">Watch the faulty channel sweep: every projection it contributes lies tangent to the same radius.</div>
+      <div class="fact">The fix is recalibration or interpolation across the faulty channel — and it distinguishes 3rd-gen from 4th-gen scanners in exams.</div>
+    </div>
+  </div>
+  <div class="viz"><canvas id="cv-ring"></canvas></div>
+</section>
+
+<!-- ============ OUTRO ============ -->
+<section id="outro">
+  <div class="eyebrow rv" style="justify-content:center">Radiopass · CT Physics</div>
+  <h2 class="rv d1">Physics is easier<br>when you can <i>see it.</i></h2>
+  <p class="lede rv d2">Build understanding. Recognise patterns. Pass FRCR Part 1.</p>
+  <div class="cta-row rv d3">
+    <a class="btn primary" href="/question-bank/ct">Practise CT questions</a>
+    <a class="btn ghost" href="/ct-lab">The focused lesson</a>
+    <a class="btn ghost" href="#generations">Replay the journey</a>
+  </div>
+</section>
+
+<footer>RADIOPASS — Radiology Physics, Made Visible</footer>
+
+<script>
+/* ================================================================
+   RADIOPASS · CT PHYSICS — cinematic canvas engine
+   ================================================================ */
+(() => {
+"use strict";
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DPR = Math.min(devicePixelRatio || 1, 2);
+const C = {
+  bg:"#070C17", ivory:"#F1ECE1", grey:"#97A0B4", greyDim:"#5D6578",
+  gold:"#E3B45C", beam:"#9BB8FF", beamHot:"#DFEAFF", violet:"#A78BFA",
+  line:"rgba(155,184,255,.14)", body:"rgba(151,160,180,.16)"
+};
+const TAU = Math.PI*2;
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp = (a,b,u)=>a+(b-a)*u;
+const ease = u=>u*u*(3-2*u);
+const sub = (p,a,b)=>clamp((p-a)/(b-a),0,1);           // sub-range progress
+
+/* ---------- scene plumbing ---------- */
+const scenes = [];
+function scene(id, draw){
+  const cv = document.getElementById(id);
+  if(!cv) return;
+  const s = { cv, ctx: cv.getContext("2d"), w:0, h:0, draw, visible:false, dirty:true };
+  const fit = () => {
+    const r = cv.getBoundingClientRect();
+    if(!r.width || !r.height) return;
+    s.w = r.width; s.h = r.height;
+    cv.width  = Math.round(r.width  * DPR);
+    cv.height = Math.round(r.height * DPR);
+    s.ctx.setTransform(DPR,0,0,DPR,0,0);
+    s.dirty = true;
+  };
+  fit(); addEventListener("resize", fit);
+  new IntersectionObserver(([e])=>{ s.visible = e.isIntersecting; s.dirty = true; },
+    {rootMargin:"120px"}).observe(cv);
+  scenes.push(s);
+  return s;
+}
+function pinProgress(el){
+  const r = el.getBoundingClientRect();
+  const total = r.height - innerHeight;
+  return total > 0 ? clamp(-r.top/total, 0, 1) : 0;
+}
+function setChapters(sec, p, n){
+  const idx = Math.min(n-1, Math.floor(p*n));
+  sec.querySelectorAll(".chap").forEach((c,i)=>c.classList.toggle("on", i===idx));
+  return idx;
+}
+
+/* ---------- shared drawing helpers ---------- */
+function vignette(ctx,w,h){
+  const g = ctx.createRadialGradient(w/2,h*.45,0, w/2,h*.45, Math.max(w,h)*.75);
+  g.addColorStop(0,"rgba(21,32,58,.55)"); g.addColorStop(1,"rgba(5,8,15,0)");
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+}
+function mono(ctx, px, color){
+  ctx.font = `500 ${px}px "Space Grotesk", monospace`;
+  ctx.fillStyle = color;
+  try{ ctx.letterSpacing = "0.14em"; }catch(e){}
+}
+function label(ctx, x, y, text, color=C.grey, align="left"){
+  mono(ctx, 11, color); ctx.textAlign = align; ctx.textBaseline = "middle";
+  ctx.fillText(text.toUpperCase(), x, y);
+  try{ ctx.letterSpacing = "0em"; }catch(e){}
+}
+function leader(ctx, x1,y1, x2,y2, color=C.line){
+  ctx.strokeStyle = color; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x1,y1,2,0,TAU); ctx.fill();
+}
+function glossSphere(ctx, x, y, r, color, alpha=1){
+  const g = ctx.createRadialGradient(x-r*.35, y-r*.4, r*.1, x, y, r);
+  g.addColorStop(0, "rgba(255,255,255,.95)");
+  g.addColorStop(.25, color);
+  g.addColorStop(1, "rgba(0,0,0,.55)");
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+  ctx.globalAlpha = 1;
+}
+/* patient cross-section (axial) */
+function axialPatient(ctx, x, y, rx, ry){
+  const g = ctx.createRadialGradient(x-rx*.3,y-ry*.35,rx*.1, x,y,rx);
+  g.addColorStop(0,"rgba(190,200,220,.20)");
+  g.addColorStop(.7,"rgba(151,160,180,.10)");
+  g.addColorStop(1,"rgba(151,160,180,.03)");
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,TAU); ctx.fill();
+  ctx.strokeStyle="rgba(190,200,220,.28)"; ctx.lineWidth=1;
+  ctx.stroke();
+  ctx.strokeStyle="rgba(190,200,220,.12)";
+  ctx.beginPath(); ctx.ellipse(x,y,rx*.55,ry*.5,0,0,TAU); ctx.stroke();
+}
+/* X-ray tube housing at angle a on radius R around (cx,cy) */
+function tubeAt(ctx,cx,cy,R,a,size=16){
+  const x = cx+Math.cos(a)*R, y = cy+Math.sin(a)*R;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(a+Math.PI/2);
+  ctx.shadowColor = C.beam; ctx.shadowBlur = 18;
+  ctx.fillStyle = "#1A2440";
+  ctx.strokeStyle = C.beam; ctx.lineWidth = 1.2;
+  const s = size;
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(-s, -s*.7, s*2, s*1.4, 4); else ctx.rect(-s,-s*.7,s*2,s*1.4);
+  ctx.fill(); ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = C.beamHot;
+  ctx.beginPath(); ctx.arc(0, s*.7, 2.6, 0, TAU); ctx.fill();
+  ctx.restore();
+  return {x,y};
+}
+/* fan wedge from tube towards centre */
+function fanBeam(ctx,cx,cy,R,a,half,alpha=.9){
+  const tx = cx+Math.cos(a)*R, ty = cy+Math.sin(a)*R;
+  const opp = a+Math.PI;
+  const p1 = [cx+Math.cos(opp-half)*R, cy+Math.sin(opp-half)*R];
+  const p2 = [cx+Math.cos(opp+half)*R, cy+Math.sin(opp+half)*R];
+  const g = ctx.createLinearGradient(tx,ty,(p1[0]+p2[0])/2,(p1[1]+p2[1])/2);
+  g.addColorStop(0,`rgba(223,234,255,${.34*alpha})`);
+  g.addColorStop(.5,`rgba(155,184,255,${.13*alpha})`);
+  g.addColorStop(1,`rgba(155,184,255,${.03*alpha})`);
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(p1[0],p1[1]);
+  ctx.arc(cx,cy,R,opp-half,opp+half); ctx.lineTo(tx,ty); ctx.fill();
+  ctx.strokeStyle=`rgba(223,234,255,${.35*alpha})`; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(p1[0],p1[1]); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(p2[0],p2[1]); ctx.stroke();
+}
+/* detector ticks along arc centred opposite angle a */
+function detectorArc(ctx,cx,cy,R,centreA,span,n,litHalf=null,alpha=1){
+  for(let i=0;i<n;i++){
+    const t = n===1 ? .5 : i/(n-1);
+    const ang = centreA - span/2 + span*t;
+    const lit = litHalf!==null && Math.abs(((ang-centreA+Math.PI*3)%TAU)-Math.PI) < 0 ? false : true;
+    const inBeam = litHalf!==null && Math.abs(angDiff(ang, centreA)) <= litHalf+.001;
+    const x1 = cx+Math.cos(ang)*(R-6), y1 = cy+Math.sin(ang)*(R-6);
+    const x2 = cx+Math.cos(ang)*(R+7), y2 = cy+Math.sin(ang)*(R+7);
+    ctx.strokeStyle = inBeam ? C.gold : `rgba(151,160,180,${.45*alpha})`;
+    ctx.lineWidth = inBeam ? 2.2 : 1.2;
+    if(inBeam){ ctx.shadowColor = C.gold; ctx.shadowBlur = 8; }
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+}
+function angDiff(a,b){ let d=(a-b)%TAU; if(d>Math.PI)d-=TAU; if(d<-Math.PI)d+=TAU; return d; }
+
+/* ================================================================
+   HERO — rotating third-generation gantry, scroll-scrubbed
+   ================================================================ */
+const heroSec = document.getElementById("hero");
+const dust = Array.from({length:70},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.6+.4,s:Math.random()*.02+.005,ph:Math.random()*TAU}));
+scene("cv-hero",(ctx,w,h,t)=>{
+  const p = pinProgress(heroSec);
+  ctx.clearRect(0,0,w,h);
+  vignette(ctx,w,h);
+  /* dust */
+  for(const d of dust){
+    const y = (d.y + t*d.s*.06)%1;
+    ctx.globalAlpha = .25 + .2*Math.sin(t+d.ph);
+    ctx.fillStyle = C.beam;
+    ctx.beginPath(); ctx.arc(d.x*w, y*h, d.r, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  const cx = w*(innerWidth>900 ? .58 : .5), cy = h*.46;
+  const R  = Math.min(w,h)*lerp(.30,.345,ease(p));
+  const a  = -Math.PI/2 + p*TAU*1.25 + (RM?0:t*.12);
+
+  /* gantry rings */
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx,cy,R+26,0,TAU); ctx.stroke();
+  ctx.strokeStyle = "rgba(155,184,255,.25)";
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,TAU); ctx.stroke();
+
+  fanBeam(ctx,cx,cy,R,a,.46);
+  axialPatient(ctx,cx,cy,R*.42,R*.34);
+  detectorArc(ctx,cx,cy,R, a+Math.PI, 1.35, 33, .46);
+  tubeAt(ctx,cx,cy,R,a);
+
+  /* isocentre */
+  glossSphere(ctx,cx,cy,3.2,C.gold);
+
+  /* labels appear with scroll */
+  const la = ease(sub(p,.12,.4));
+  if(la>0.02){
+    ctx.globalAlpha = la;
+    const tx = cx+Math.cos(a)*R, ty = cy+Math.sin(a)*R;
+    leader(ctx,tx,ty, tx+34, ty-30); label(ctx, tx+40, ty-30, "X-ray tube", C.ivory);
+    const da = a+Math.PI;
+    const dx = cx+Math.cos(da)*(R+8), dy = cy+Math.sin(da)*(R+8);
+    leader(ctx,dx,dy, dx+30, dy+34); label(ctx, dx+36, dy+34, "Detector arc", C.ivory);
+    leader(ctx,cx+R*.2,cy-6, cx+R*.2+46, cy-52); label(ctx, cx+R*.2+52, cy-52, "Fan beam", C.beam);
+    ctx.globalAlpha = 1;
+  }
+});
+
+/* ================================================================
+   01 · GENERATIONS — four geometries, scroll-scrubbed crossfade
+   ================================================================ */
+const genSec = document.getElementById("generations");
+scene("cv-gen",(ctx,w,h,t)=>{
+  const p = pinProgress(genSec);
+  setChapters(genSec, p, 4);
+  ctx.clearRect(0,0,w,h);
+  vignette(ctx,w,h);
+  const cx = w*(innerWidth>900 ? .38 : .5), cy = h*(innerWidth>900 ? .5 : .40);
+  const R = Math.min(w,h)*.30;
+
+  /* base: dashed rotation path + patient */
+  ctx.setLineDash([3,7]); ctx.strokeStyle=C.line; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,TAU); ctx.stroke();
+  ctx.setLineDash([]);
+  axialPatient(ctx,cx,cy,R*.4,R*.32);
+
+  const seg = clamp(p*4,0,3.9999);
+  const i = Math.floor(seg), u = seg - i;         // chapter + local progress
+  const fade = i<3 ? 1 - ease(sub(u,.88,1)) : 1;  // fade out at chapter end
+  ctx.globalAlpha = fade;
+  const spin = RM ? .6 : u;
+
+  if(i===0){ /* 1st gen — pencil, translate-rotate */
+    const rot = -Math.PI/2 + Math.floor(spin*4)*(Math.PI/10);
+    const off = Math.sin(spin*4*Math.PI)*R*.55;         // lateral translation
+    const nx = Math.cos(rot+Math.PI/2), ny = Math.sin(rot+Math.PI/2);
+    /* ghost trails */
+    for(let k=4;k>0;k--){
+      const o = off - k*10*Math.sign(Math.cos(spin*4*Math.PI)||1);
+      
+      ray(rot,o,.12);
+    }
+    ray(rot,off,.9,true);
+    tubeAt(ctx,cx + Math.cos(rot)*R + nx*off, cy + Math.sin(rot)*R + ny*off, 0, rot, 13);
+    label(ctx, cx, cy+R+34, "Pencil beam · translate, then rotate", C.grey, "center");
+    function ray(rotA, o, alpha, det){
+      const sx = cx+Math.cos(rotA)*R + Math.cos(rotA+Math.PI/2)*o;
+      const sy = cy+Math.sin(rotA)*R + Math.sin(rotA+Math.PI/2)*o;
+      const exx = cx+Math.cos(rotA+Math.PI)*R + Math.cos(rotA+Math.PI/2)*o;
+      const exy = cy+Math.sin(rotA+Math.PI)*R + Math.sin(rotA+Math.PI/2)*o;
+      ctx.strokeStyle=`rgba(223,234,255,${alpha*.8})`; ctx.lineWidth=1.4;
+      if(det){ctx.shadowColor=C.beam; ctx.shadowBlur=6}
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(exx,exy); ctx.stroke();
+      ctx.shadowBlur=0;
+      if(det){ ctx.fillStyle=C.gold; ctx.beginPath(); ctx.arc(exx,exy,3.4,0,TAU); ctx.fill(); }
+    }
+  }
+  else if(i===1){ /* 2nd gen — narrow fan, translate-rotate */
+    const rot = -Math.PI/2 + Math.floor(spin*3)*(Math.PI/6);
+    const off = Math.sin(spin*3*Math.PI)*R*.4;
+    const ox = Math.cos(rot+Math.PI/2)*off, oy = Math.sin(rot+Math.PI/2)*off;
+    ctx.save(); ctx.translate(ox,oy);
+    fanBeam(ctx,cx,cy,R,rot,.12);
+    detectorArc(ctx,cx,cy,R,rot+Math.PI,.28,5,.12);
+    tubeAt(ctx,cx,cy,R,rot,13);
+    ctx.restore();
+    label(ctx, cx, cy+R+34, "Narrow fan · fewer rotation steps", C.grey, "center");
+  }
+  else if(i===2){ /* 3rd gen — rotate-rotate */
+    const rot = -Math.PI/2 + spin*TAU;
+    fanBeam(ctx,cx,cy,R,rot,.46);
+    detectorArc(ctx,cx,cy,R,rot+Math.PI,1.25,25,.46);
+    tubeAt(ctx,cx,cy,R,rot,15);
+    label(ctx, cx, cy+R+34, "Wide fan · tube + detectors rotate together", C.grey, "center");
+  }
+  else { /* 4th gen — stationary ring */
+    const rot = -Math.PI/2 + spin*TAU;
+    detectorArc(ctx,cx,cy,R+18, rot+Math.PI, TAU-.0001, 64, .5);
+    fanBeam(ctx,cx,cy,R+10,rot,.5);
+    tubeAt(ctx,cx,cy,R-4,rot,15);
+    label(ctx, cx, cy+R+42, "Stationary detector ring · only the tube rotates", C.grey, "center");
+  }
+  ctx.globalAlpha = 1;
+});
+
+/* ================================================================
+   02 · BEAM SHAPING — bow-tie filter + collimator + profiles
+   ================================================================ */
+const photons = Array.from({length:26},(_,i)=>({u:Math.random(), sp:.14+Math.random()*.08, x:(Math.random()*2-1)}));
+scene("cv-beam",(ctx,w,h,t)=>{
+  ctx.clearRect(0,0,w,h);
+  const cx=w*.42, top=h*.06;
+  const yFilt=h*.30, yPat=h*.60, yDet=h*.88;
+  const spread=(y)=> (y-top)/(yDet-top) * w*.30;   // half-width of cone at depth y
+
+  /* focal spot + housing */
+  ctx.fillStyle="#1A2440"; ctx.strokeStyle=C.beam; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.arc(cx,top+10,16,Math.PI,0); ctx.closePath(); ctx.fill(); ctx.stroke();
+  glossSphere(ctx,cx,top+12,3.5,C.beamHot);
+  label(ctx,cx,top-8,"Focal spot",C.grey,"center");
+
+  /* cone */
+  const g=ctx.createLinearGradient(0,top,0,yDet);
+  g.addColorStop(0,"rgba(223,234,255,.20)");g.addColorStop(1,"rgba(155,184,255,.03)");
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(cx,top+12);
+  ctx.lineTo(cx-spread(yDet),yDet);ctx.lineTo(cx+spread(yDet),yDet);ctx.closePath();ctx.fill();
+
+  /* bow-tie filter (thick edges, thin centre) */
+  const fw=spread(yFilt)+14;
+  ctx.fillStyle="rgba(227,180,92,.30)"; ctx.strokeStyle=C.gold; ctx.lineWidth=1.2;
+  ctx.beginPath();
+  ctx.moveTo(cx-fw,yFilt-13); ctx.quadraticCurveTo(cx,yFilt+6,cx+fw,yFilt-13);
+  ctx.lineTo(cx+fw,yFilt+13); ctx.quadraticCurveTo(cx,yFilt-6,cx-fw,yFilt+13);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  label(ctx,cx-fw-12,yFilt,"Bow-tie filter",C.gold,"right");
+
+  /* collimator blades */
+  ctx.fillStyle="#2A3350";
+  const cwd=spread(yFilt+34);
+  ctx.fillRect(cx-cwd-46,yFilt+30,46,9); ctx.fillRect(cx+cwd,yFilt+30,46,9);
+  label(ctx,cx+cwd+52,yFilt+34,"Collimator",C.grey,"left");
+
+  /* patient */
+  axialPatient(ctx,cx,yPat,spread(yPat)*.92,h*.085);
+  label(ctx,cx,yPat,"Patient",C.grey,"center");
+
+  /* detector */
+  ctx.fillStyle="#141D33"; ctx.strokeStyle=C.line;
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(cx-spread(yDet)-6,yDet,spread(yDet)*2+12,12,3);
+  else ctx.rect(cx-spread(yDet)-6,yDet,spread(yDet)*2+12,12);
+  ctx.fill();ctx.stroke();
+  label(ctx,cx,yDet+26,"Detector",C.grey,"center");
+
+  /* travelling photons — edge rays attenuated by filter, central by patient */
+  if(!RM) for(const ph of photons){
+    ph.u += ph.sp*.016; if(ph.u>1){ph.u=0; ph.x=Math.random()*2-1;}
+    const y=lerp(top+14,yDet,ph.u);
+    const x=cx+ph.x*spread(y);
+    const filtAtt = y>yFilt ? 1-.62*ph.x*ph.x : 1;                 // edges lose more in filter
+    const patAtt  = y>yPat  ? 1-.55*(1-ph.x*ph.x) : 1;             // centre loses more in patient
+    const a = .95*filtAtt*patAtt;
+    ctx.shadowColor=C.beamHot; ctx.shadowBlur=6;
+    glossSphere(ctx,x,y,2.4,C.beam,a);
+    ctx.shadowBlur=0;
+  }
+
+  /* attenuation profiles, right column */
+  const px=w*.78, pw=w*.17;
+  profile(px,yFilt,"Across filter", u=>1-Math.pow(Math.abs(u),1.6), C.gold);
+  profile(px,yPat, "Across body",   u=>Math.pow(Math.abs(u),1.4),   C.violet);
+  profile(px,yDet-h*.05,"At detector · flattened", u=>.42+.06*Math.sin(u*9+t), C.beam);
+  function profile(x,y,name,f,col){
+    const hh=h*.055;
+    ctx.strokeStyle=C.line;ctx.beginPath();ctx.moveTo(x,y+hh);ctx.lineTo(x+pw,y+hh);ctx.stroke();
+    ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.beginPath();
+    for(let i=0;i<=40;i++){const u=i/40*2-1;const yy=y+hh - f(u)*hh;
+      i?ctx.lineTo(x+ (u+1)/2*pw,yy):ctx.moveTo(x+(u+1)/2*pw,yy);}
+    ctx.stroke();
+    label(ctx,x,y-8,name,C.grey);
+  }
+});
+
+/* ================================================================
+   03 · DETECTOR ARRAYS — matrix / adaptive / hybrid + side view
+   ================================================================ */
+scene("cv-arr",(ctx,w,h,t)=>{
+  ctx.clearRect(0,0,w,h);
+  const active = RM ? 1 : Math.floor(t/3.2)%3;
+  const gw=Math.min(w*.26,150), gh=gw, gy=h*.06, gap=(w-3*gw)/4;
+  const names=["Matrix","Adaptive","Hybrid"];
+  const rowSets=[
+    Array(12).fill(1),
+    [3,2.4,1.9,1.5,1.1,.8,.6,.6,.8,1.1,1.5,1.9,2.4,3],
+    [2,2,2,.7,.7,.7,.7,.7,.7,.7,.7,2,2,2].map(v=>v*1.15)
+  ];
+  for(let k=0;k<3;k++){
+    const gx=gap+(gw+gap)*k;
+    const rows=rowSets[k], sum=rows.reduce((a,b)=>a+b,0);
+    const on=k===active;
+    ctx.globalAlpha=on?1:.4;
+    if(on){ctx.shadowColor=C.gold;ctx.shadowBlur=16}
+    ctx.strokeStyle=on?C.gold:C.line;ctx.lineWidth=on?1.4:1;
+    ctx.strokeRect(gx,gy,gw,gh);
+    ctx.shadowBlur=0;
+    ctx.strokeStyle=on?"rgba(227,180,92,.55)":"rgba(155,184,255,.20)";
+    /* variable cell width along z (horizontal) */
+    let xx=gx;
+    for(const r of rows){const cw=r/sum*gw;
+      ctx.beginPath();ctx.moveTo(xx,gy);ctx.lineTo(xx,gy+gh);ctx.stroke(); xx+=cw;}
+    for(let c=1;c<10;c++){const yy=gy+c/10*gh;
+      ctx.beginPath();ctx.moveTo(gx,yy);ctx.lineTo(gx+gw,yy);ctx.stroke();}
+    label(ctx,gx+gw/2,gy+gh+18,names[k],on?C.gold:C.grey,"center");
+    ctx.globalAlpha=1;
+  }
+  mono(ctx,11,C.grey);ctx.textAlign="center";
+  ctx.fillText("Z →", w/2, gy+gh+40);
+
+  /* side view: beam + slice/beam thickness */
+  const sy=h*.52, sh=h*.42, scx=w*.5;
+  const src=sy+6;
+  const open=RM? .55 : .40+.28*Math.sin(t*.6);            // animated collimation
+  const half=w*.10*(.5+open);
+  /* source */
+  ctx.fillStyle="#1A2440";ctx.strokeStyle=C.beam;
+  ctx.fillRect(scx-26,sy-4,52,12);ctx.strokeRect(scx-26,sy-4,52,12);
+  label(ctx,scx,sy-16,"X-ray source",C.grey,"center");
+  /* wedge */
+  const dety=sy+sh, paty=sy+sh*.55;
+  const gg=ctx.createLinearGradient(0,src,0,dety);
+  gg.addColorStop(0,"rgba(223,234,255,.22)");gg.addColorStop(1,"rgba(155,184,255,.04)");
+  ctx.fillStyle=gg;
+  ctx.beginPath();ctx.moveTo(scx,src+8);ctx.lineTo(scx-half,dety);ctx.lineTo(scx+half,dety);ctx.closePath();ctx.fill();
+  /* patient slab */
+  ctx.fillStyle=C.body;ctx.strokeStyle="rgba(190,200,220,.25)";
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(scx-w*.28,paty-22,w*.56,44,22);else ctx.rect(scx-w*.28,paty-22,w*.56,44);
+  ctx.fill();ctx.stroke();
+  /* detector */
+  ctx.fillStyle="#141D33";ctx.strokeStyle=C.line;
+  ctx.fillRect(scx-w*.2,dety,w*.4,10);ctx.strokeRect(scx-w*.2,dety,w*.4,10);
+  /* thickness arrows */
+  const sHalf=half*( (paty-src)/(dety-src) );
+  arrowSpan(scx-sHalf,scx+sHalf,paty-34,"Slice thickness",C.gold);
+  arrowSpan(scx-half,scx+half,dety+26,"Beam thickness",C.beam);
+  label(ctx, scx+w*.30, paty, `${(open*10+2).toFixed(1)} mm`, C.gold, "left");
+  function arrowSpan(x1,x2,y,name,col){
+    ctx.strokeStyle=col;ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+    for(const [x,d] of [[x1,1],[x2,-1]]){
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+6*d,y-4);ctx.moveTo(x,y);ctx.lineTo(x+6*d,y+4);ctx.stroke();
+    }
+    label(ctx,(x1+x2)/2,y-12,name,col,"center");
+  }
+});
+
+/* ================================================================
+   04 · HELICAL — table feed + helix trace + pitch, scroll-scrubbed
+   ================================================================ */
+const helSec=document.getElementById("helical");
+scene("cv-hel",(ctx,w,h,t)=>{
+  const p=pinProgress(helSec);
+  const ch=setChapters(helSec,p,3);
+  ctx.clearRect(0,0,w,h);
+  vignette(ctx,w,h);
+  const cy=h*(innerWidth>900?.5:.38), gx=w*(innerWidth>900?.40:.5);
+  const bodyR=Math.min(w,h)*.11, ringR=bodyR*1.9;
+
+  /* pitch morphs during chapter 1 */
+  const pitch = ch===0 ? 1 : ch===1 ? lerp(.7,1.6,ease(sub(p,1/3,2/3))) : 1.6;
+  const feed  = ringR*.48*pitch;               // px of z per rotation
+  const turns = lerp(.3,4.2,ease(sub(p,0,.85)));
+  const zShift= turns*feed;                     // table travel so far
+
+  /* patient (side view): head enters first, table feeds them through to the right */
+  ctx.save(); ctx.translate(zShift,0);
+  const px0=gx+bodyR*.5;                        // head just entering the gantry
+  patientSide(px0,cy);
+  /* helix painted head→feet on the patient; its live end stays locked at the gantry */
+  helix(gx, cy, turns, feed);
+  ctx.restore();
+
+  /* gantry ring (fixed) */
+  ctx.strokeStyle="rgba(155,184,255,.5)";ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(gx,cy,ringR*.16,ringR,0,0,TAU);ctx.stroke();
+  ctx.strokeStyle=C.line;
+  ctx.beginPath();ctx.ellipse(gx,cy,ringR*.22,ringR*1.12,0,0,TAU);ctx.stroke();
+  /* rotating tube dot on the ring */
+  const ta=turns*TAU - Math.PI/2;
+  glossSphere(ctx, gx+Math.cos(ta)*ringR*.16, cy+Math.sin(ta)*ringR, 5, C.beamHot);
+  label(ctx,gx,cy-ringR-18,"Gantry · continuous rotation",C.grey,"center");
+
+  /* z-axis */
+  ctx.strokeStyle=C.line;ctx.setLineDash([2,6]);
+  ctx.beginPath();ctx.moveTo(w*.06,cy);ctx.lineTo(w*.94,cy);ctx.stroke();ctx.setLineDash([]);
+  mono(ctx,11,C.grey);ctx.textAlign="left";ctx.fillText("Z →",w*.9,cy-12);
+
+  /* table + arrow */
+  ctx.fillStyle="#141D33";
+  ctx.fillRect(w*.1-zShift*0, cy+bodyR+16, w*.8, 6);
+  label(ctx,w*.5,cy+bodyR+40,"Table feed →",C.grey,"center");
+
+  /* pitch readout */
+  mono(ctx,13,C.gold);ctx.textAlign="left";
+  ctx.fillText(`PITCH = ${pitch.toFixed(2)}`, w*.07, h*.12);
+  mono(ctx,11,C.grey);
+  ctx.fillText("table feed per rotation ÷ beam collimation", w*.07, h*.12+20);
+
+  /* chapter 3: interpolated slices */
+  const sa=ease(sub(p,.72,.9));
+  if(sa>0.02){
+    ctx.globalAlpha=sa;
+    for(let k=0;k<5;k++){
+      const sx=gx + ringR*.35 + k*feed*.8 ;
+      ctx.strokeStyle=C.violet;ctx.lineWidth=1.4;ctx.setLineDash([5,5]);
+      ctx.beginPath();ctx.moveTo(sx,cy-bodyR*1.5);ctx.lineTo(sx,cy+bodyR*1.5);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    label(ctx,gx+ringR*.35+feed*1.6,cy-bodyR*1.7,"Interpolated axial slices",C.violet,"center");
+    ctx.globalAlpha=1;
+  }
+
+  function patientSide(hx,cyy){
+    ctx.fillStyle=C.body;ctx.strokeStyle="rgba(190,200,220,.3)";ctx.lineWidth=1;
+    /* torso + legs */
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(hx-w*.52,cyy-bodyR*.85,w*.52,bodyR*1.7,bodyR*.85);
+    else ctx.rect(hx-w*.52,cyy-bodyR*.85,w*.52,bodyR*1.7);
+    ctx.fill();ctx.stroke();
+    /* head */
+    ctx.beginPath();ctx.arc(hx+bodyR*.55,cyy-bodyR*.1,bodyR*.55,0,TAU);ctx.fill();ctx.stroke();
+  }
+  function helix(startX,cyy,nTurns,fd){
+    const steps=Math.max(8,Math.floor(nTurns*60));
+    ctx.lineWidth=1.8;
+    let prev=null;
+    for(let s=0;s<=steps;s++){
+      const ph=s/steps*nTurns*TAU;
+      const x=startX - ph/TAU*fd;
+      const y=cyy + Math.sin(ph-Math.PI/2)*bodyR*1.18;
+      const depth=Math.cos(ph-Math.PI/2);          // >0 front
+      const col= depth>0? `rgba(227,180,92,.95)` : `rgba(227,180,92,.28)`;
+      if(prev){
+        ctx.strokeStyle=col;
+        if(depth>0){ctx.shadowColor=C.gold;ctx.shadowBlur=8}
+        ctx.beginPath();ctx.moveTo(prev[0],prev[1]);ctx.lineTo(x,y);ctx.stroke();
+        ctx.shadowBlur=0;
+      }
+      prev=[x,y];
+    }
+    /* beam spot at helix head */
+    if(nTurns>0){
+      const ph=nTurns*TAU;
+      glossSphere(ctx,startX-ph/TAU*fd, cyy+Math.sin(ph-Math.PI/2)*bodyR*1.18, 4.5, C.gold);
+    }
+  }
+});
+
+/* ================================================================
+   05 · CONE-BEAM — divergence across an 8-row array
+   ================================================================ */
+scene("cv-cone",(ctx,w,h,t)=>{
+  ctx.clearRect(0,0,w,h);
+  const cx=w*.5, topY=h*.10, botY=h*.90, midY=h*.5;
+  const aw=w*.72, cell=aw/8, ax=cx-aw/2;
+
+  /* focal spots: gantry at 0° (focus below) and 180° (focus above) */
+  const fB={x:cx,y:botY+8}, fT={x:cx,y:topY-8};
+
+  /* z-axis */
+  ctx.strokeStyle=C.line;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(w*.05,midY);ctx.lineTo(w*.95,midY);ctx.stroke();
+  mono(ctx,11,C.grey);ctx.textAlign="left";ctx.fillText("Z →",w*.9,midY-12);
+
+  /* detector rows, top + bottom */
+  for(const [y,dir] of [[topY,-1],[botY,1]]){
+    ctx.strokeStyle=C.line;
+    for(let i=0;i<=8;i++){
+      const x=ax+i*cell;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+14*dir);ctx.stroke();
+    }
+    ctx.beginPath();ctx.moveTo(ax,y);ctx.lineTo(ax+aw,y);ctx.moveTo(ax,y+14*dir);ctx.lineTo(ax+aw,y+14*dir);ctx.stroke();
+    mono(ctx,10,C.grey);ctx.textAlign="center";
+    for(let i=0;i<8;i++) ctx.fillText(String(i+1), ax+cell*(i+.5), y+24*dir);
+  }
+  label(ctx,fB.x,fB.y+20,"X-ray focus · gantry 0°",C.grey,"center");
+  label(ctx,fT.x,fT.y-20,"X-ray focus · gantry 180°",C.grey,"center");
+
+  /* all ray boundaries (thin) */
+  ctx.strokeStyle="rgba(155,184,255,.16)";
+  for(let i=0;i<=8;i++){
+    const x=ax+i*cell;
+    ctx.beginPath();ctx.moveTo(fB.x,fB.y);ctx.lineTo(x,topY+14);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fT.x,fT.y);ctx.lineTo(x,botY-14);ctx.stroke();
+  }
+
+  /* highlighted row sweeps outward: 3 → 1 → 3 → ... */
+  const seq=[2,1,0,1,2,3];                       // row index 0-based from left
+  const k=RM?0:Math.floor(t/2.4)%seq.length;
+  const row=seq[k];
+  const x1=ax+row*cell, x2=x1+cell;
+  shadeBeam(fB,x1,x2,topY+14);
+  shadeBeam(fT,ax+aw-(row+1)*cell, ax+aw-row*cell, botY-14);
+  function shadeBeam(f,xa,xb,ty){
+    ctx.fillStyle="rgba(227,180,92,.16)";
+    ctx.strokeStyle="rgba(227,180,92,.7)";ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(xa,ty);ctx.lineTo(xb,ty);ctx.closePath();
+    ctx.fill();ctx.stroke();
+  }
+
+  /* the plane this row actually samples (tilted, gold) vs true axial (violet, dashed) */
+  const rcx=ax+cell*(row+.5);                    // row centre x
+  const zc=(rcx+ (ax+aw - cell*(row+.5)) )/2;    // intersection ~ centre
+  const tilt=(rcx-cx)/(midY-topY-14)* (midY-topY)*.9;
+  ctx.strokeStyle=C.gold;ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(cx+tilt*.9,topY+30);ctx.lineTo(cx-tilt*.9,botY-30);ctx.stroke();
+  ctx.setLineDash([5,5]);ctx.strokeStyle=C.violet;
+  ctx.beginPath();ctx.moveTo(cx,topY+30);ctx.lineTo(cx,botY-30);ctx.stroke();
+  ctx.setLineDash([]);
+  const off=Math.abs(row-3.5)-.0;
+  label(ctx,w*.06,h*.94,`Row ${row+1} of 8 · tilt grows towards the edge`,C.gold);
+  glossSphere(ctx,cx,midY,3.4,C.gold);
+});
+
+/* ================================================================
+   06 · RING ARTEFACT — the envelope of a faulty channel
+   ================================================================ */
+scene("cv-ring",(ctx,w,h,t)=>{
+  ctx.clearRect(0,0,w,h);
+  const wide=w>640;
+  const gxc=wide? w*.28 : w*.5,  gyc=wide? h*.5 : h*.28;
+  const ixc=wide? w*.74 : w*.5,  iyc=wide? h*.5 : h*.75;
+  const R=Math.min(w,h)*(wide?.30:.20);
+  const faultFrac=.85;                              // faulty channel offset in fan
+  const half=.5;                                    // fan half-angle
+  const prog = RM ? .8 : (t*.14)%1.15;              // rotation progress (with pause)
+  const rot = -Math.PI/2 + clamp(prog,0,1)*TAU;
+
+  /* --- left: geometry --- */
+  ctx.setLineDash([3,7]);ctx.strokeStyle=C.line;
+  ctx.beginPath();ctx.arc(gxc,gyc,R,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  axialPatient(ctx,gxc,gyc,R*.5,R*.42);
+
+  /* accumulated faulty-channel rays — tangent envelope = the ring */
+  const N=Math.floor(clamp(prog,0,1)*60);
+  for(let i=0;i<=N;i++){
+    const a=-Math.PI/2+i/60*TAU;
+    faultRay(a, i===N?1:.10);
+  }
+  fanBeam(ctx,gxc,gyc,R,rot,half,.55);
+  detectorArc(ctx,gxc,gyc,R,rot+Math.PI,1.3,21,half,.9);
+  /* faulty channel marker */
+  const fa=rot+Math.PI + faultFrac*half*2 - half;   // fixed position within the arc
+  ctx.shadowColor=C.gold;ctx.shadowBlur=12;
+  glossSphere(ctx,gxc+Math.cos(fa)*R,gyc+Math.sin(fa)*R,4.5,C.gold);
+  ctx.shadowBlur=0;
+  tubeAt(ctx,gxc,gyc,R,rot,13);
+  label(ctx,gxc,gyc+R+30,"Faulty detector · fixed radius from isocentre",C.grey,"center");
+
+  function faultRay(a,alpha){
+    const tx=gxc+Math.cos(a)*R, ty=gyc+Math.sin(a)*R;
+    const da=a+Math.PI + faultFrac*half*2 - half;
+    const dx=gxc+Math.cos(da)*R, dy=gyc+Math.sin(da)*R;
+    ctx.strokeStyle=`rgba(227,180,92,${alpha*.8})`;
+    ctx.lineWidth=alpha>.5?1.5:1;
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(dx,dy);ctx.stroke();
+  }
+
+  /* --- right: reconstructed image --- */
+  ctx.save();
+  ctx.beginPath();ctx.arc(ixc,iyc,R*.9,0,TAU);ctx.clip();
+  const ig=ctx.createRadialGradient(ixc-R*.2,iyc-R*.25,R*.1,ixc,iyc,R*.9);
+  ig.addColorStop(0,"#232B3E");ig.addColorStop(1,"#10182B");
+  ctx.fillStyle=ig;ctx.fillRect(ixc-R,iyc-R,R*2,R*2);
+  /* faint anatomy */
+  ctx.strokeStyle="rgba(151,160,180,.18)";
+  ctx.beginPath();ctx.ellipse(ixc,iyc,R*.55,R*.45,0,0,TAU);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(ixc-R*.18,iyc+R*.05,R*.16,R*.2,0,0,TAU);ctx.stroke();
+  ctx.beginPath();ctx.ellipse(ixc+R*.18,iyc+R*.05,R*.16,R*.2,0,0,TAU);ctx.stroke();
+  /* the ring, completing with rotation — radius = chord distance of the faulty ray,
+     scaled patient-radius → image-radius */
+  const delta = faultFrac*half*2 - half;
+  const ringR2 = (R*.9/(R*.5)) * R*Math.abs(Math.sin(delta/2));
+  const sweep = clamp(prog,0,1)*TAU;
+  ctx.strokeStyle=C.gold;ctx.lineWidth=2;
+  ctx.shadowColor=C.gold;ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(ixc,iyc,ringR2,-Math.PI/2,-Math.PI/2+sweep);ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.restore();
+  ctx.strokeStyle=C.line;
+  ctx.beginPath();ctx.arc(ixc,iyc,R*.9,0,TAU);ctx.stroke();
+  label(ctx,ixc,iyc+R*.9+22,"Reconstructed image · ring artefact",C.grey,"center");
+});
+
+/* ================================================================
+   render loop · nav · reveals
+   ================================================================ */
+let t0=performance.now();
+function frame(now){
+  const t=(now-t0)/1000;
+  for(const s of scenes){
+    if(!s.visible) continue;
+    if(!s.w) { const r=s.cv.getBoundingClientRect(); if(r.width){s.w=r.width;s.h=r.height;
+      s.cv.width=r.width*DPR;s.cv.height=r.height*DPR;s.ctx.setTransform(DPR,0,0,DPR,0,0);} else continue; }
+    s.draw(s.ctx, s.w, s.h, RM? 2.6 : t);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+const nav=document.getElementById("nav");
+addEventListener("scroll",()=>nav.classList.toggle("scrolled",scrollY>40),{passive:true});
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}
+}),{threshold:.2});
+document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>

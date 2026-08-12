@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic X-ray emission spectrum · RadioPass</title>
+
+  <!--
+    Chart.js is served from this folder, not from a CDN. Every page under
+    /visuals is self-contained on purpose: the site ships as a folder you copy
+    onto a host, and a page that fetches its plotting library at run time is a
+    blank chart the first time the host sits behind a firewall, the CDN is
+    blocked, or the machine is offline.
+  -->
+  <script src="assets/chart.umd.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --surface: #12161d;
+      --surface-2: #161b24;
+      --line: #252c36;
+      --ink: #f0f4f8;
+      --muted: #a0abb8;
+      --primary: #2f5f93;
+      --tungsten: #6ba3d6;
+      --moly: #c9776b;
+      --warn: #d9a84e;
+      --sans: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 18px 16px;
+      background:
+        radial-gradient(1200px 560px at 96% -180px, rgba(47, 95, 147, 0.22) 0%, rgba(47, 95, 147, 0) 72%),
+        linear-gradient(180deg, #080a0d 0%, #0d1117 56%, #0b0e13 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1 { margin: 0; font-size: clamp(17px, 1.5vw, 21px); font-weight: 600; letter-spacing: -0.01em; }
+    h1 span { color: var(--muted); font-weight: 400; }
+
+    /* The instrument and what it is telling you, side by side and both on
+       screen. A reader watching the curve move must never have to scroll to
+       find the sentence explaining what just moved. */
+    .dashboard {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 330px;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 0;
+    }
+
+    .controls { display: flex; flex-direction: column; gap: 14px; overflow: auto; }
+    .control-group { display: flex; flex-direction: column; }
+    .control-group label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+    .control-group label b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--tungsten); }
+    select {
+      padding: 8px 9px; border-radius: 7px; border: 1px solid var(--line);
+      background: var(--surface-2); color: var(--ink); font: inherit; font-size: 13px;
+    }
+
+    .chart-card { display: flex; flex-direction: column; }
+    .chart-holder { flex: 1; min-height: 0; position: relative; }
+
+    /* Live notes. The heading stays put and only the list scrolls, so the
+       column never resizes as the wording changes under the reader. */
+    .notes { display: flex; flex-direction: column; min-height: 0; }
+    .notes h2 {
+      margin: 0 0 10px; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+    }
+    #liveNotesList { margin: 0; padding: 0 0 0 2px; list-style: none; overflow: auto; min-height: 0; }
+    #liveNotesList li {
+      font-size: 13.5px; line-height: 1.55; color: var(--muted);
+      padding: 9px 0; border-top: 1px solid var(--line);
+    }
+    #liveNotesList li:first-child { border-top: 0; padding-top: 0; }
+    #liveNotesList strong { color: var(--ink); font-weight: 600; }
+
+    .highlight-action {
+      background: rgba(107, 163, 214, 0.09);
+      border: 1px solid rgba(107, 163, 214, 0.28) !important;
+      border-radius: 9px;
+      padding: 11px 12px !important;
+      color: var(--ink) !important;
+      margin-bottom: 4px;
+    }
+
+    /* Both warnings occupy one reserved row, so nothing on the page jumps when
+       one of them appears. */
+    .warnings { min-height: 44px; }
+    .banner {
+      display: none; align-items: center; gap: 10px;
+      padding: 11px 14px; border-radius: 9px; font-size: 13.5px; line-height: 1.45;
+    }
+    .banner.show { display: flex; }
+    .banner b { flex: 0 0 auto; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+    #filtration-warning { background: rgba(217, 168, 78, 0.1); border: 1px solid rgba(217, 168, 78, 0.34); color: #e8d3a6; }
+    #filtration-warning b { color: var(--warn); }
+    #inherent-warning { background: rgba(201, 119, 107, 0.12); border: 1px solid rgba(201, 119, 107, 0.4); color: #f0c8c1; }
+    #inherent-warning b { color: var(--moly); }
+
+    /* The key is reference, not commentary on the live curve, so it is the one
+       thing allowed to sit below the fold. */
+    .glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .glossary article { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--primary); border-radius: 10px; padding: 14px; }
+    .glossary h4 { margin: 0 0 7px; font-size: 13.5px; }
+    .glossary p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+    .glossary .brems { border-left-color: #7fc8a9; }
+    .glossary .char { border-left-color: var(--moly); }
+    .glossary .axes { border-left-color: var(--tungsten); }
+
+    .below { padding: 0 18px 24px; }
+    .below h3 { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+
+    @media (max-width: 1080px) {
+      body { height: auto; }
+      .dashboard { grid-template-columns: minmax(0, 1fr); }
+      .chart-holder { height: 46vh; }
+      #liveNotesList { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dynamic X-ray emission spectrum <span>· quantity, quality, and what changes each</span></h1>
+
+  <div class="warnings">
+    <div id="inherent-warning" class="banner">
+      <b>Nice try</b>
+      <span>You cannot take total filtration below 0.5 mm Al — that is the <strong>inherent</strong> filtration of the tube itself: the glass envelope, the oil and the window. It is there whether you want it or not.</span>
+    </div>
+    <div id="filtration-warning" class="banner">
+      <b>Added filtration</b>
+      <span>Filtration cuts the <strong>quantity</strong>, raises the <strong>mean energy</strong> and raises the <strong>HVL</strong> — but it does <strong>not</strong> move the maximum energy.</span>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <section class="card controls">
+      <div class="control-group">
+        <label for="targetMaterial">Target material</label>
+        <select id="targetMaterial">
+          <option value="Both">Compare both — tungsten vs molybdenum</option>
+          <option value="W">Tungsten only (Z = 74)</option>
+          <option value="Mo">Molybdenum only (Z = 42)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="kvpSlider">Tube voltage <b><span id="kvpValue">100</span> kVp</b></label>
+        <input type="range" id="kvpSlider" min="20" max="150" value="100">
+      </div>
+
+      <div class="control-group">
+        <label for="maSlider">Tube current <b><span id="maValue">100</span> mA</b></label>
+        <input type="range" id="maSlider" min="10" max="500" value="100" step="10">
+      </div>
+
+      <div class="control-group">
+        <label for="filtrationSlider">Total filtration <b><span id="filtrationValue">0.5</span> mm Al</b></label>
+        <input type="range" id="filtrationSlider" min="0" max="5" value="0.5" step="0.5">
+      </div>
+
+      <div class="control-group">
+        <label for="generatorType">Generator (ripple)</label>
+        <select id="generatorType">
+          <option value="high">High frequency — low ripple</option>
+          <option value="single">Single phase — high ripple</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card chart-card">
+      <div class="chart-holder"><canvas id="spectrumChart"></canvas></div>
+    </section>
+
+    <section class="card notes">
+      <h2>Live physics notes</h2>
+      <ul id="liveNotesList"></ul>
+    </section>
+  </div>
+
+  <div class="below">
+    <h3>Diagram key — what are we seeing?</h3>
+    <div class="glossary">
+      <article class="brems">
+        <h4>Bremsstrahlung — the continuous curve</h4>
+        <p>The smooth hump. Incident electrons are decelerated by the pull of the target nucleus, and the energy they lose leaves as an X-ray. Any fraction of an electron's energy can be lost this way, so the result is a continuum running all the way up to the set kVp.</p>
+      </article>
+      <article class="char">
+        <h4>Characteristic radiation — the spikes</h4>
+        <p>Sharp lines at fixed energies. An incident electron ejects an inner K-shell electron; an outer electron drops into the vacancy and the difference in binding energies leaves as one photon. The energies belong to the target element, never to the kVp — the kVp only decides whether they appear at all.</p>
+      </article>
+      <article class="axes">
+        <h4>The axes — quantity against quality</h4>
+        <p><strong>Vertical, quantity:</strong> how many photons. The area under the curve is the total output. <strong>Horizontal, quality:</strong> photon energy. Where the curve meets the axis on the right is the maximum energy, and that point is set by the kVp and nothing else.</p>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict'
+
+      const targetSelect = document.getElementById('targetMaterial')
+      const kvpInput = document.getElementById('kvpSlider')
+      const maInput = document.getElementById('maSlider')
+      const filtrationInput = document.getElementById('filtrationSlider')
+      const generatorSelect = document.getElementById('generatorType')
+
+      const kvpDisplay = document.getElementById('kvpValue')
+      const maDisplay = document.getElementById('maValue')
+      const filtrationDisplay = document.getElementById('filtrationValue')
+
+      const filtrationWarning = document.getElementById('filtration-warning')
+      const inherentWarning = document.getElementById('inherent-warning')
+      const liveNotesList = document.getElementById('liveNotesList')
+
+      /* Characteristic line energies, in keV, from the X-Ray Data Booklet.
+         K-beta for tungsten is 67.2 — NOT 69.5. Those two get confused
+         constantly because they are close, and the exam trades on the
+         difference: 69.5 is the K-EDGE, the energy an incident electron must
+         exceed before any K line can be produced at all. Placing the line at
+         69 would teach the confusion rather than cure it. */
+      const TARGETS = {
+        W:  { Z: 74, name: 'Tungsten', kAlpha: 59.3, kBeta: 67.2, kEdge: 69.5, colour: '#6ba3d6', fill: 'rgba(107, 163, 214, 0.14)' },
+        Mo: { Z: 42, name: 'Molybdenum', kAlpha: 17.5, kBeta: 19.6, kEdge: 20.0, colour: '#c9776b', fill: 'rgba(201, 119, 107, 0.14)' },
+      }
+
+      /* Half-keV bins: on whole-keV bins the molybdenum K-beta at 19.6 keV
+         lands on 20, which is its K-edge — the exact collision the comment
+         above is trying to prevent. */
+      const STEP = 0.5
+      const E_MAX = 150
+      const BINS = Math.round(E_MAX / STEP) + 1
+      const ENERGIES = Array.from({ length: BINS }, (_, i) => +(i * STEP).toFixed(1))
+      const binOf = (keV) => Math.round(keV / STEP)
+
+      /** Inherent filtration: the glass, the oil and the window are always there. */
+      const INHERENT_MM_AL = 0.5
+
+      let lastAction = 'start'
+      let inherentTimer = null
+
+      const ctx = document.getElementById('spectrumChart').getContext('2d')
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: ENERGIES, datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 0 },
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          scales: {
+            x: {
+              type: 'linear', min: 0, max: E_MAX,
+              title: { display: true, text: 'Photon energy (keV)', color: '#a0abb8', font: { size: 12, weight: '600' } },
+              ticks: { color: '#8791a0', maxTicksLimit: 11 },
+              grid: { color: 'rgba(255,255,255,0.05)' },
+            },
+            y: {
+              min: 0,
+              title: { display: true, text: 'Relative number of photons', color: '#a0abb8', font: { size: 12, weight: '600' } },
+              ticks: { display: false },
+              grid: { color: 'rgba(255,255,255,0.05)' },
+            },
+          },
+          plugins: {
+            legend: { labels: { color: '#f0f4f8', boxWidth: 12, font: { size: 12 } } },
+            tooltip: {
+              callbacks: {
+                title: (items) => items[0].parsed.x.toFixed(1) + ' keV',
+                label: (item) => item.dataset.label,
+              },
+            },
+          },
+        },
+      })
+
+      /**
+       * One spectrum.
+       *
+       * Kramers' law for the continuum — intensity proportional to Z(E_max − E)
+       * — then an attenuation term standing in for aluminium, which bites hard
+       * at the soft end and barely at all at the hard end. The characteristic
+       * lines are added on top of the continuum they ride on, and only when the
+       * tube voltage clears that element's K-edge.
+       */
+      function spectrumFor(target, kvp, ma, filtration, generator) {
+        const ripple = generator === 'single' ? 0.6 : 1
+        const data = new Array(BINS).fill(0)
+
+        for (let i = 0; i < BINS; i++) {
+          const E = ENERGIES[i]
+          if (E <= 0 || E > kvp) continue
+          let intensity = ma * target.Z * (kvp - E) * 5
+          const attenuation = Math.exp(-filtration * (10000 / Math.pow(E, 3)))
+          data[i] = intensity * attenuation * ripple
+        }
+
+        if (kvp >= target.kEdge) {
+          const line = (keV, height) => {
+            const i = binOf(keV)
+            if (i >= 0 && i < BINS && keV < kvp) data[i] += ma * height
+          }
+          line(target.kAlpha, 6000)
+          line(target.kBeta, 1500)
+        }
+        return data
+      }
+
+      function update() {
+        const mode = targetSelect.value
+        const kvp = +kvpInput.value
+        const ma = +maInput.value
+        const generator = generatorSelect.value
+
+        let filtration = +filtrationInput.value
+        if (filtration < INHERENT_MM_AL) {
+          filtration = INHERENT_MM_AL
+          filtrationInput.value = String(INHERENT_MM_AL)
+          inherentWarning.classList.add('show')
+          clearTimeout(inherentTimer)
+          inherentTimer = setTimeout(() => inherentWarning.classList.remove('show'), 4200)
+        } else {
+          inherentWarning.classList.remove('show')
+        }
+
+        kvpDisplay.textContent = kvp
+        maDisplay.textContent = ma
+        filtrationDisplay.textContent = filtration.toFixed(1)
+        filtrationWarning.classList.toggle('show', filtration > INHERENT_MM_AL)
+
+        const shown = mode === 'Both' ? ['W', 'Mo'] : [mode]
+        chart.data.datasets = shown.map((key) => {
+          const t = TARGETS[key]
+          return {
+            label: t.name + ' (Z = ' + t.Z + ')',
+            data: spectrumFor(t, kvp, ma, filtration, generator).map((y, i) => ({ x: ENERGIES[i], y })),
+            borderColor: t.colour,
+            backgroundColor: t.fill,
+            borderWidth: 2, pointRadius: 0, fill: true, tension: 0.1,
+          }
+        })
+        chart.update()
+
+        renderNotes(mode, kvp, ma, filtration, generator)
+      }
+
+      function renderNotes(mode, kvp, ma, filtration, generator) {
+        const out = []
+
+        if (lastAction === 'ma') {
+          out.push(['highlight-action', '<strong>You changed the mA.</strong> More current means more electrons per second, so more photons: the whole curve rises. The maximum energy and the mean energy do not move at all — mA is quantity, and only quantity.'])
+        } else if (lastAction === 'kvp') {
+          if (kvp < TARGETS.W.kEdge && kvp >= TARGETS.Mo.kEdge) {
+            out.push(['highlight-action', '<strong>You are in the mammographic range.</strong> Molybdenum still shows its lines, because its K-edge is only 20 keV — which is exactly why it is used for soft-tissue contrast. Tungsten shows none at all: below 69.5 keV an electron cannot eject a tungsten K-shell electron, so there is nothing to fill and nothing to emit.'])
+          } else {
+            out.push(['highlight-action', '<strong>You changed the kVp.</strong> The endpoint moves with it — no photon can carry more energy than the electron that made it. The mean energy rises, and the total output rises faster still, roughly with kVp².'])
+          }
+        } else if (lastAction === 'filtration') {
+          out.push(['highlight-action', '<strong>You changed the filtration.</strong> Aluminium eats the soft end of the beam, so the left of the curve collapses and the peak shifts right. Watch the far right: the endpoint has not moved a single keV.'])
+        } else if (lastAction === 'material') {
+          out.push(['highlight-action', '<strong>You changed the target.</strong> Output rises with Z, so tungsten sits well above molybdenum. The lines move too: a higher-Z nucleus holds its inner electrons more tightly, so its characteristic energies are higher.'])
+        } else if (lastAction === 'generator') {
+          out.push(['highlight-action', '<strong>You changed the generator.</strong> A single-phase supply spends much of each cycle below peak voltage, so it makes fewer photons and a slightly softer beam than a high-frequency generator at the same nominal kVp.'])
+        }
+
+        out.push(['', '<strong>Maximum energy:</strong> ' + kvp + ' keV, set by the kVp and by nothing else on this panel.'])
+
+        if (mode === 'Both') {
+          out.push(['', '<strong>Comparing the two:</strong> tungsten’s curve is far taller, because output goes roughly with Z. Its lines sit at 59.3 and 67.2 keV against molybdenum’s 17.5 and 19.6.'])
+        } else if (mode === 'W') {
+          out.push(kvp >= TARGETS.W.kEdge
+            ? ['', '<strong>Characteristic lines:</strong> present at 59.3 and 67.2 keV, because ' + kvp + ' kVp clears tungsten’s K-edge of 69.5 keV.']
+            : ['', '<strong>Characteristic lines: gone.</strong> At ' + kvp + ' kVp you are below tungsten’s K-edge of 69.5 keV, so no incident electron has the energy to eject a K-shell electron in the first place.'])
+        } else {
+          out.push(['', '<strong>Molybdenum:</strong> lines at 17.5 and 19.6 keV, just under its 20 keV K-edge — the energies that give soft tissue its contrast in mammography.'])
+        }
+
+        if (filtration > INHERENT_MM_AL) {
+          out.push(['', '<strong>Filtration now ' + filtration.toFixed(1) + ' mm Al:</strong> ' + (filtration - INHERENT_MM_AL).toFixed(1) + ' mm added on top of the tube’s own 0.5 mm.'])
+        }
+
+        liveNotesList.innerHTML = out
+          .map(([cls, html]) => '<li' + (cls ? ' class="' + cls + '"' : '') + '>' + html + '</li>')
+          .join('')
+      }
+
+      const on = (el, event, action) => el.addEventListener(event, () => { lastAction = action; update() })
+      on(targetSelect, 'change', 'material')
+      on(kvpInput, 'input', 'kvp')
+      on(maInput, 'input', 'ma')
+      on(filtrationInput, 'input', 'filtration')
+      on(generatorSelect, 'change', 'generator')
+
+      update()
+    })()
+  </script>
+</body>
+</html>

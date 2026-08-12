@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canvas X-ray Tube Physics | FRCR Physics Visual Lab</title>
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <main class="canvas-page">
+    <header class="nav">
+      <a class="brand" href="index.html">FRCR Physics Visual Lab</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="lessons.html">Lessons</a>
+        <a href="physics-question-bank.html">QBank</a>
+      </nav>
+    </header>
+
+    <section class="sim-layout">
+      <aside class="control-panel">
+        <p class="kicker">Canvas physics engine</p>
+        <h2 style="font-size:clamp(2rem,4vw,3.2rem)">X-ray tube physics</h2>
+        <p>Procedural particles only: electrons, field lines, stochastic photons, heat map, spectrum and heel effect are redrawn from simulation state every frame.</p>
+        <div class="note">This is a teaching simulation, not a dosimetry model. Relationships are represented for FRCR revision.</div>
+        <div id="controls"></div>
+        <button class="action" id="resetBtn" type="button">Reset simulation</button>
+      </aside>
+
+      <section class="sim-panel">
+        <canvas id="tubeCanvas" width="1600" height="900" aria-label="Canvas simulation of an X-ray tube"></canvas>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('tubeCanvas');
+    const ctx = canvas.getContext('2d');
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const controls = {
+      temperature: { label: 'Filament temperature', min: 900, max: 2400, value: 2200, unit: 'C' },
+      kvp: { label: 'Tube potential', min: 50, max: 130, value: 90, unit: 'kVp' },
+      ma: { label: 'Tube current', min: 20, max: 500, value: 180, unit: 'mA' },
+      focus: { label: 'Focusing cup strength', min: 0, max: 100, value: 70, unit: '%' },
+      rpm: { label: 'Anode rotation', min: 0, max: 10000, value: 5200, unit: 'rpm' },
+      angle: { label: 'Target angle', min: 7, max: 20, value: 12, unit: 'deg' },
+      filter: { label: 'Filtration', min: 0, max: 5, value: 2.5, unit: 'mm Al' }
+    };
+    const values = Object.fromEntries(Object.entries(controls).map(([k, v]) => [k, v.value]));
+    const controlRoot = document.getElementById('controls');
+    Object.entries(controls).forEach(([key, cfg]) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'control';
+      wrap.innerHTML = `<label><span>${cfg.label}</span><output id="out-${key}">${cfg.value} ${cfg.unit}</output></label><input id="${key}" type="range" min="${cfg.min}" max="${cfg.max}" value="${cfg.value}" step="${key === 'filter' ? '0.1' : '1'}">`;
+      controlRoot.appendChild(wrap);
+      const input = wrap.querySelector('input');
+      const output = wrap.querySelector('output');
+      input.addEventListener('input', () => {
+        values[key] = Number(input.value);
+        output.textContent = `${input.value} ${cfg.unit}`;
+      });
+    });
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(900, Math.floor(rect.width * DPR));
+      canvas.height = Math.floor((canvas.width / 16) * 9);
+    }
+    addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const electrons = [];
+    const photons = [];
+    const spectrum = new Array(80).fill(0);
+    const heat = Array.from({ length: 80 }, () => new Array(42).fill(0));
+    let time = 0;
+    let anodePhase = 0;
+
+    function reset() {
+      electrons.length = 0;
+      photons.length = 0;
+      spectrum.fill(0);
+      heat.forEach(row => row.fill(0));
+      time = 0;
+      anodePhase = 0;
+    }
+    document.getElementById('resetBtn').addEventListener('click', reset);
+
+    function emitElectrons(dt) {
+      const tempFactor = clamp((values.temperature - 1000) / 1300, 0, 1);
+      const rate = tempFactor * (values.ma / 500) * 900;
+      let count = Math.floor(rate * dt + Math.random());
+      count = Math.min(count, 38);
+      for (let i = 0; i < count; i++) {
+        electrons.push({
+          x: 0.16 + rand(-0.006, 0.006),
+          y: 0.5 + rand(-0.055, 0.055),
+          vx: rand(0.05, 0.12),
+          vy: rand(-0.16, 0.16) * (1 - values.focus / 140),
+          life: 0,
+          energy: 0
+        });
+      }
+    }
+
+    function depositHeat(nx, ny, amount) {
+      const ix = clamp(Math.floor(nx * heat.length), 0, heat.length - 1);
+      const iy = clamp(Math.floor(ny * heat[0].length), 0, heat[0].length - 1);
+      heat[ix][iy] += amount;
+    }
+
+    function addSpectrum(energy) {
+      const filtered = energy * (0.72 + values.filter * 0.045);
+      const bin = clamp(Math.floor((filtered / 130) * spectrum.length), 0, spectrum.length - 1);
+      spectrum[bin] += 1;
+    }
+
+    function impactElectron(e) {
+      const thermal = 0.99 - values.kvp / 16000;
+      const xrayFraction = 1 - thermal;
+      depositHeat(0.72 + rand(-0.05, 0.05), e.y + rand(-0.06, 0.06), values.kvp * thermal * 0.014);
+      const photonCount = Math.random() < xrayFraction * 80 ? 1 : 0;
+      for (let i = 0; i < photonCount; i++) {
+        const energy = Math.pow(Math.random(), 1.9) * values.kvp;
+        const heel = rand(-0.55, 0.55);
+        photons.push({
+          x: 0.72,
+          y: e.y,
+          vx: 0.2 + Math.abs(heel) * 0.18,
+          vy: heel * 0.32,
+          energy,
+          life: 0,
+          alpha: clamp(energy / values.kvp, 0.25, 1)
+        });
+        addSpectrum(energy);
+      }
+    }
+
+    function update(dt) {
+      time += dt;
+      anodePhase += (values.rpm / 60000) * Math.PI * 2 * dt;
+      emitElectrons(dt);
+      const accel = values.kvp / 60;
+      const focus = values.focus / 100;
+      for (let i = electrons.length - 1; i >= 0; i--) {
+        const e = electrons[i];
+        const targetY = 0.5 + Math.sin(anodePhase + e.x * 24) * 0.028;
+        e.vx += accel * dt * 0.34;
+        e.vy += (targetY - e.y) * focus * dt * 5.4;
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.energy = clamp((e.x - 0.16) / 0.55, 0, 1) * values.kvp;
+        e.life += dt;
+        if (e.x > 0.705 || e.y < 0.04 || e.y > 0.96 || e.life > 4) {
+          if (e.x > 0.66) impactElectron(e);
+          electrons.splice(i, 1);
+        }
+      }
+      for (let i = photons.length - 1; i >= 0; i--) {
+        const p = photons[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life += dt;
+        if (p.x > 1.05 || p.y < -0.2 || p.y > 1.2 || p.life > 2.2) photons.splice(i, 1);
+      }
+      const cooling = 1 - dt * (0.35 + values.rpm / 25000);
+      for (const row of heat) for (let i = 0; i < row.length; i++) row[i] *= cooling;
+      for (let i = 0; i < spectrum.length; i++) spectrum[i] *= 0.997;
+    }
+
+    function clear() {
+      const w = canvas.width, h = canvas.height;
+      const g = ctx.createRadialGradient(w * 0.5, h * 0.38, 10, w * 0.5, h * 0.4, w * 0.75);
+      g.addColorStop(0, '#09213a');
+      g.addColorStop(1, '#02070d');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+    const X = nx => nx * canvas.width;
+    const Y = ny => ny * canvas.height;
+
+    function line(x1, y1, x2, y2, color, width = 2, alpha = 1) {
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width * DPR;
+      ctx.beginPath(); ctx.moveTo(X(x1), Y(y1)); ctx.lineTo(X(x2), Y(y2)); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    function drawTube() {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(180,220,255,.34)';
+      ctx.lineWidth = 3 * DPR;
+      ctx.fillStyle = 'rgba(120,190,255,.035)';
+      roundRect(X(0.06), Y(0.12), X(0.84), Y(0.62), 36 * DPR, true, true);
+      ctx.fillStyle = '#d8ecff';
+      ctx.font = `${15 * DPR}px Inter, sans-serif`;
+      ctx.fillText('vacuum envelope', X(0.08), Y(0.17));
+      ctx.restore();
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawCathode() {
+      const hot = clamp((values.temperature - 900) / 1500, 0, 1);
+      const glow = ctx.createRadialGradient(X(0.16), Y(0.5), 0, X(0.16), Y(0.5), X(0.11));
+      glow.addColorStop(0, `rgba(255,${120 + hot*100},40,${0.32 + hot*.35})`);
+      glow.addColorStop(1, 'rgba(255,80,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(X(0.03), Y(0.28), X(0.25), Y(0.44));
+      ctx.strokeStyle = `rgb(255,${90 + hot*145},${20 + hot*120})`;
+      ctx.lineWidth = 5 * DPR;
+      ctx.beginPath();
+      for (let i = 0; i < 42; i++) {
+        const t = i / 41;
+        const x = X(0.12 + t * 0.08);
+        const y = Y(0.5 + Math.sin(t * Math.PI * 8 + time * 10) * 0.028);
+        if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      line(0.095, 0.38, 0.205, 0.34, '#8fb4d4', 2, .72);
+      line(0.095, 0.62, 0.205, 0.66, '#8fb4d4', 2, .72);
+      ctx.fillStyle = '#cdefff';
+      ctx.font = `${16 * DPR}px Inter, sans-serif`;
+      ctx.fillText('heated tungsten filament', X(0.08), Y(0.31));
+    }
+
+    function drawFields() {
+      const f = values.focus / 100;
+      for (let i = -5; i <= 5; i++) {
+        const y0 = 0.5 + i * 0.055;
+        ctx.strokeStyle = `rgba(103,232,249,${0.06 + f * 0.16})`;
+        ctx.lineWidth = 1 * DPR;
+        ctx.beginPath();
+        ctx.moveTo(X(0.21), Y(y0));
+        ctx.bezierCurveTo(X(0.38), Y(y0 + i * 0.018 * (1-f)), X(0.52), Y(0.5 + i * 0.018), X(0.7), Y(0.5));
+        ctx.stroke();
+      }
+    }
+
+    function drawAnode() {
+      ctx.save();
+      ctx.translate(X(0.72), Y(0.5));
+      ctx.rotate((-values.angle / 180) * Math.PI);
+      const grd = ctx.createLinearGradient(-X(0.035), -Y(0.2), X(0.035), Y(0.2));
+      grd.addColorStop(0, '#596171'); grd.addColorStop(.5, '#b5bdc8'); grd.addColorStop(1, '#424a56');
+      ctx.fillStyle = grd;
+      ctx.strokeStyle = '#eef7ff';
+      ctx.lineWidth = 2 * DPR;
+      roundRect(-X(0.025), -Y(0.19), X(0.05), Y(0.38), 10 * DPR, true, true);
+      ctx.restore();
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${16 * DPR}px Inter, sans-serif`;
+      ctx.fillText('rotating tungsten-rhenium anode', X(0.61), Y(0.25));
+      ctx.fillText(`target angle ${Math.round(values.angle)} deg`, X(0.66), Y(0.77));
+    }
+
+    function drawHeat() {
+      const baseX = 0.66, baseY = 0.77, width = 0.27, height = 0.17;
+      ctx.fillStyle = 'rgba(255,255,255,.03)';
+      ctx.fillRect(X(baseX), Y(baseY), X(width), Y(height));
+      let max = 1;
+      for (const row of heat) for (const v of row) max = Math.max(max, v);
+      const cellW = X(width / heat.length), cellH = Y(height / heat[0].length);
+      for (let i = 0; i < heat.length; i++) for (let j = 0; j < heat[i].length; j++) {
+        const v = clamp(heat[i][j] / max, 0, 1);
+        if (v < .02) continue;
+        ctx.fillStyle = `rgba(${80 + v*175},${80 + v*110},${190 - v*130},${0.22 + v*.72})`;
+        ctx.fillRect(X(baseX + i * width / heat.length), Y(baseY + j * height / heat[i].length), cellW + 1, cellH + 1);
+      }
+      ctx.strokeStyle = 'rgba(125,211,252,.35)'; ctx.strokeRect(X(baseX), Y(baseY), X(width), Y(height));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+      ctx.fillText('live anode heat map', X(baseX), Y(baseY - 0.015));
+    }
+
+    function drawParticles() {
+      electrons.forEach(e => {
+        const r = 1.8 + e.energy / values.kvp * 2.8;
+        ctx.fillStyle = `rgba(103,232,249,${0.38 + e.energy / values.kvp * .55})`;
+        ctx.beginPath(); ctx.arc(X(e.x), Y(e.y), r * DPR, 0, Math.PI * 2); ctx.fill();
+      });
+      photons.forEach(p => {
+        ctx.strokeStyle = `rgba(255,232,135,${p.alpha})`;
+        ctx.lineWidth = (1.2 + p.alpha * 2) * DPR;
+        ctx.beginPath();
+        ctx.moveTo(X(p.x), Y(p.y));
+        ctx.lineTo(X(p.x - p.vx * 0.08), Y(p.y - p.vy * 0.08));
+        ctx.stroke();
+      });
+    }
+
+    function drawSpectrum() {
+      const x = 0.08, y = 0.78, w = 0.48, h = 0.15;
+      ctx.strokeStyle = 'rgba(125,211,252,.25)'; ctx.strokeRect(X(x), Y(y), X(w), Y(h));
+      const max = Math.max(1, ...spectrum);
+      ctx.beginPath();
+      for (let i = 0; i < spectrum.length; i++) {
+        const px = X(x + (i / (spectrum.length - 1)) * w);
+        const py = Y(y + h - (spectrum[i] / max) * h);
+        if (!i) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 2.5 * DPR; ctx.stroke();
+      const minEnergy = clamp(values.filter * 7, 0, 45);
+      ctx.fillStyle = 'rgba(20,184,166,.16)';
+      ctx.fillRect(X(x + minEnergy / 130 * w), Y(y), X(w * (1 - minEnergy / 130)), Y(h));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+      ctx.fillText('live spectrum: filtration removes low-energy photons', X(x), Y(y - 0.018));
+      ctx.fillText('energy (keV)', X(x + w * .42), Y(y + h + .04));
+    }
+
+    function drawHeelEffect() {
+      const x = 0.80, y = 0.2, w = 0.12, h = 0.45;
+      for (let j = 0; j < 80; j++) {
+        const t = j / 79;
+        const anodeAbsorption = Math.pow(t, 1.2) * (22 - values.angle) / 18;
+        const intensity = clamp(1 - anodeAbsorption * .72, .12, 1);
+        ctx.fillStyle = `rgba(255,220,90,${0.08 + intensity * .45})`;
+        ctx.fillRect(X(x), Y(y + t * h), X(w), Y(h / 80 + .001));
+      }
+      ctx.strokeStyle = 'rgba(125,211,252,.3)'; ctx.strokeRect(X(x), Y(y), X(w), Y(h));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+      ctx.fillText('heel-effect intensity map', X(x - .035), Y(y - .02));
+      ctx.fillText('cathode side', X(x + .005), Y(y - .045));
+      ctx.fillText('anode side', X(x + .012), Y(y + h + .04));
+    }
+
+    function drawEnergyReadout() {
+      const heatPct = 99 - (values.kvp - 50) / 800;
+      const xrayPct = 100 - heatPct;
+      ctx.fillStyle = 'rgba(3, 10, 18, .72)';
+      roundRect(X(0.34), Y(0.12), X(0.23), Y(0.13), 20 * DPR, true, false);
+      ctx.fillStyle = '#f7c56b'; ctx.font = `${34 * DPR}px Inter, sans-serif`; ctx.fillText(`${heatPct.toFixed(1)}%`, X(0.36), Y(0.18));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${14 * DPR}px Inter, sans-serif`; ctx.fillText('electron energy becomes heat', X(0.36), Y(0.215));
+      ctx.fillStyle = '#67e8f9'; ctx.font = `${34 * DPR}px Inter, sans-serif`; ctx.fillText(`${xrayPct.toFixed(1)}%`, X(0.47), Y(0.18));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${14 * DPR}px Inter, sans-serif`; ctx.fillText('emerges as X-rays', X(0.47), Y(0.215));
+    }
+
+    function render() {
+      clear(); drawTube(); drawFields(); drawCathode(); drawAnode(); drawParticles(); drawHeat(); drawSpectrum(); drawHeelEffect(); drawEnergyReadout();
+    }
+
+    let last = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - last) / 1000, 0.035);
+      last = now;
+      update(dt);
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

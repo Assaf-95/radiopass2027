@@ -1,0 +1,364 @@
+/* ===========================================================================
+   Chest radiograph anatomy lab
+
+   Reading-station chrome around a film that is left alone. Labels sit on rails
+   either side of the image so no text ever lies over lung or mediastinum, and
+   one accent colour marks whatever is active.
+   =========================================================================== */
+
+.cxr {
+  display: flex;
+  flex-direction: column;
+  height: calc(100svh - var(--header-h));
+  background: var(--void);
+  color: #e9eef4;
+  overflow: hidden;
+}
+
+/* --- Toolbar -------------------------------------------------------------- */
+
+.cxr-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(140, 175, 200, 0.14);
+  background: rgba(10, 14, 20, 0.92);
+  flex: none;
+}
+
+.cxr-ident { display: flex; flex-direction: column; gap: 1px; margin-right: auto; }
+.cxr-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+.cxr-sub { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6d7d90; }
+
+.cxr-tools { display: flex; align-items: center; gap: 10px; }
+
+.cxr-seg {
+  display: flex;
+  border: 1px solid rgba(140, 175, 200, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cxr-seg button {
+  padding: 7px 13px;
+  background: none;
+  border: 0;
+  border-right: 1px solid rgba(140, 175, 200, 0.14);
+  color: #a8b6c6;
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.cxr-seg button:last-child { border-right: 0; }
+.cxr-seg button:hover { background: #1a222d; color: #e9eef4; }
+.cxr-seg button.is-on { background: var(--teal-bg); color: var(--teal-bright); }
+
+/* --- Body ----------------------------------------------------------------- */
+
+.cxr-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 306px;
+  flex: 1;
+  min-height: 0;
+}
+
+.cxr-stage {
+  position: relative;
+  min-width: 0;
+  background: #000;
+}
+
+/* Rails take the outer sixth either side; the film keeps the middle. */
+.cxr-canvas {
+  position: absolute;
+  inset: 14px 190px 74px;
+  overflow: hidden;
+}
+
+.cxr-image {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cxr-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* --- Leaders -------------------------------------------------------------- */
+
+.cxr-leader path {
+  stroke: rgba(140, 205, 225, 0.4);
+  stroke-width: 1;
+}
+
+.cxr-leader circle { fill: rgba(160, 225, 240, 0.75); }
+#cxr-tip path { fill: rgba(160, 225, 240, 0.8); }
+
+.cxr-leader.is-on path { stroke: var(--teal-bright); stroke-width: 1.6; }
+.cxr-leader.is-on circle { fill: var(--teal-bright); }
+
+/* An inferred edge is drawn dashed — the viewer should not present a judgement
+   call as though it were a sharp line on the film. */
+.cxr-leader.is-uncertain path { stroke-dasharray: 3 3; }
+
+.cxr-leader.is-quiz path { stroke: #ffd166; stroke-width: 1.6; }
+.cxr-leader.is-quiz circle { fill: #ffd166; r: 4; }
+
+.cxr-leader.is-pulse circle { animation: cxr-pulse 1.2s ease-out 1; }
+
+@keyframes cxr-pulse {
+  0% { r: 3; opacity: 1; }
+  60% { r: 11; opacity: 0.25; }
+  100% { r: 3; opacity: 1; }
+}
+
+/* --- Labels --------------------------------------------------------------- */
+
+.cxr-label {
+  position: absolute;
+  transform: translateY(-50%);
+  max-width: 152px;
+  padding: 3px 7px;
+  background: rgba(11, 16, 23, 0.78);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #cfdcea;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+
+.cxr-label-left { text-align: right; }
+.cxr-label:hover, .cxr-label.is-on {
+  color: #fff;
+  border-color: var(--teal);
+  background: rgba(17, 183, 178, 0.16);
+}
+.cxr-label:focus-visible { outline: 2px solid var(--teal-bright); outline-offset: 2px; }
+.cxr-flag { margin-left: 4px; color: #ffb84d; font-size: 10px; vertical-align: super; }
+
+/* --- Corner readouts and pager -------------------------------------------- */
+
+.cxr-hud {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(160, 180, 200, 0.55);
+  pointer-events: none;
+}
+
+.cxr-hud-l { top: 12px; left: 16px; }
+.cxr-hud-r { top: 12px; right: 16px; text-align: right; align-items: flex-end; }
+
+.cxr-pager {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 18px;
+  border-top: 1px solid rgba(140, 175, 200, 0.12);
+  background: rgba(8, 11, 16, 0.86);
+}
+
+.cxr-count { font-size: 11.5px; color: #8496a8; }
+
+.cxr-dots { display: flex; gap: 8px; }
+
+.cxr-dots button {
+  position: relative;
+  width: 42px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(140, 175, 200, 0.22);
+  border-radius: 6px;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.14s ease;
+}
+
+.cxr-dots button img { width: 100%; height: 100%; object-fit: cover; opacity: 0.55; }
+.cxr-dots button span {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  font-size: 9px;
+  color: #cfdcea;
+  text-shadow: 0 0 3px #000;
+}
+.cxr-dots button.is-on { border-color: var(--teal-bright); }
+.cxr-dots button.is-on img { opacity: 1; }
+
+/* --- Side panel ----------------------------------------------------------- */
+
+.cxr-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid rgba(140, 175, 200, 0.12);
+}
+
+.cxr-panel {
+  position: relative;
+  padding: 16px;
+  border-bottom: 1px solid rgba(140, 175, 200, 0.12);
+}
+
+.cxr-h {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6d7d90;
+  margin: 0 0 10px;
+}
+
+.cxr-cat { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal-bright); }
+.cxr-name { font-family: var(--font-display); font-size: 19px; letter-spacing: -0.03em; margin: 5px 0 10px; }
+.cxr-note { font-size: 12.5px; line-height: 1.6; color: #a8b6c6; margin: 0 0 10px; }
+.cxr-avail { font-size: 10.5px; color: #61707f; margin: 0; }
+
+.cxr-missing {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: rgba(224, 163, 63, 0.12);
+  border: 1px solid rgba(224, 163, 63, 0.3);
+  color: #e0a33f;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.cxr-uncertain { font-size: 11.5px; color: #ffb84d; margin: 0 0 10px; }
+
+.cxr-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #6d7d90;
+  font-size: 16px;
+  cursor: pointer;
+}
+.cxr-close:hover { color: #e9eef4; background: #1d2734; }
+
+/* --- Finder --------------------------------------------------------------- */
+
+.cxr-finder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 0;
+  min-height: 0;
+  flex: 1;
+}
+
+.cxr-input {
+  background: #151c26;
+  border: 1px solid rgba(140, 175, 200, 0.2);
+  color: #e9eef4;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+}
+
+.cxr-wide { width: 100%; }
+.cxr-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.cxr-check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: #a8b6c6; }
+.cxr-check input { accent-color: var(--teal-bright); }
+
+.cxr-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 0 14px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cxr-list button {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: #cfdcea;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cxr-list button:hover { background: #1a222d; color: #fff; }
+.cxr-list button.is-on { background: var(--teal-bg); color: var(--teal-bright); }
+.cxr-list button.is-absent { color: #61707f; }
+.cxr-num { color: #55636f; font-size: 10px; min-width: 17px; }
+.cxr-lname { flex: 1; }
+.cxr-absent { font-size: 9.5px; color: #7a6a4a; }
+
+/* --- Quiz ----------------------------------------------------------------- */
+
+.cxr-q { font-size: 13.5px; margin: 12px 0 8px; color: #cfdcea; }
+.cxr-panel form { display: flex; flex-direction: column; gap: 8px; }
+.cxr-verdict { margin: 12px 0; padding: 11px; border-radius: 9px; font-size: 13px; }
+.cxr-verdict.is-right { background: rgba(63, 190, 131, 0.12); border: 1px solid rgba(63, 190, 131, 0.34); }
+.cxr-verdict.is-wrong { background: rgba(224, 106, 120, 0.1); border: 1px solid rgba(224, 106, 120, 0.3); }
+.cxr-verdict p { margin: 5px 0 0; color: #cfdcea; }
+.cxr-score { font-size: 13px; color: #a8b6c6; margin: 12px 0 0; }
+.cxr-coords { font-size: 10.5px; color: #6d7d90; margin: 10px 0; }
+.cxr-io { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(140, 175, 200, 0.12); }
+.cxr-io .btn { cursor: pointer; }
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+  .cxr-body { grid-template-columns: minmax(0, 1fr) 262px; }
+  .cxr-canvas { inset: 12px 152px 70px; }
+  .cxr-label { max-width: 126px; font-size: 11px; }
+}
+
+@media (max-width: 900px) {
+  .cxr { height: auto; }
+  .cxr-body { grid-template-columns: 1fr; }
+  .cxr-stage { height: 64svh; }
+  .cxr-canvas { inset: 10px 112px 66px; }
+  .cxr-label { max-width: 100px; font-size: 10.5px; }
+  .cxr-side { border-left: 0; border-top: 1px solid rgba(140, 175, 200, 0.12); }
+  .cxr-hud-r { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cxr-leader.is-pulse circle { animation: none; }
+  .cxr-label, .cxr-seg button { transition: none; }
+}

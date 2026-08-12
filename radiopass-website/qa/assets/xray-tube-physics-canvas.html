@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canvas X-ray Tube Physics | FRCR Physics Visual Lab</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <style>
+    .tube-module .sim-layout {
+      width: min(1560px, 100%);
+      grid-template-columns: minmax(250px, 288px) minmax(0, 1fr);
+    }
+
+    .tube-module .control-panel {
+      display: grid;
+      gap: 0.85rem;
+      padding: 0.9rem;
+      border-radius: 22px;
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+    }
+
+    .tube-module .control-panel h2 {
+      font-size: clamp(1.55rem, 3vw, 2.35rem) !important;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .tube-module .control-panel p {
+      margin: 0;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .module-head { display: grid; gap: 0.35rem; }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      padding: 0.25rem;
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      border-radius: 14px;
+      background: rgba(3, 10, 18, 0.56);
+    }
+
+    .mode-btn,
+    .lesson-btn {
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #cceeff;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 0.58rem 0.65rem;
+    }
+
+    .mode-btn.active,
+    .lesson-btn.active {
+      color: #031019;
+      border-color: rgba(103, 232, 249, 0.68);
+      background: linear-gradient(135deg, var(--cyan), var(--teal));
+    }
+
+    .lesson-panel {
+      display: grid;
+      gap: 0.6rem;
+      border-top: 1px solid rgba(125, 211, 252, 0.16);
+      padding-top: 0.75rem;
+    }
+
+    .lesson-panel.hidden { display: none; }
+
+    .lesson-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      color: #dff7ff;
+      font-size: 0.78rem;
+      font-weight: 950;
+    }
+
+    #lessonFocus {
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.42;
+    }
+
+    .tour-progress {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.35rem;
+    }
+
+    .tour-dot {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(125, 211, 252, 0.18);
+    }
+
+    .tour-dot.active,
+    .tour-dot.done {
+      background: linear-gradient(90deg, var(--cyan), var(--teal));
+      box-shadow: 0 0 14px rgba(103, 232, 249, 0.28);
+    }
+
+    .control-groups { display: grid; gap: 0.1rem; }
+
+    .control-group {
+      display: grid;
+      gap: 0.65rem;
+      padding: 0.75rem 0 0.7rem;
+      border-top: 1px solid rgba(125, 211, 252, 0.16);
+    }
+
+    .control-group:first-child { border-top: 0; padding-top: 0.2rem; }
+
+    .control-group-head { display: grid; gap: 0.12rem; }
+
+    .control-group-head span {
+      color: var(--cyan);
+      font-size: 0.68rem;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .control-group-head strong {
+      color: #f4fbff;
+      font-size: 0.92rem;
+    }
+
+    .tube-module .control {
+      margin: 0;
+      display: grid;
+      gap: 0.4rem;
+      transition: opacity 150ms ease;
+    }
+
+    .tube-module .control label {
+      gap: 0.45rem;
+      align-items: baseline;
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .tube-module .control output {
+      flex: 0 0 auto;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tube-module .control input { margin: 0; }
+
+    .control-group.is-hidden-guided,
+    .control.is-hidden-guided { display: none; }
+
+    .control.is-locked { opacity: 0.42; }
+    .control.is-locked input { cursor: not-allowed; }
+
+    .control.is-current-task {
+      padding: 0.7rem;
+      border: 1px solid rgba(103, 232, 249, 0.45);
+      border-radius: 13px;
+      background: rgba(103, 232, 249, 0.08);
+      box-shadow: 0 0 0 0 rgba(103, 232, 249, 0.34);
+      animation: taskPulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes taskPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(103, 232, 249, 0.18); }
+      50% { box-shadow: 0 0 0 7px rgba(103, 232, 249, 0); }
+    }
+
+    .control-lock {
+      color: #7891a6;
+      font-size: 0.66rem;
+      font-weight: 800;
+    }
+
+    .tube-module .action { border-radius: 12px; padding: 0.78rem 0.9rem; }
+
+    .sim-about {
+      border-top: 1px solid rgba(125, 211, 252, 0.14);
+      padding-top: 0.65rem;
+      color: #7891a6;
+    }
+
+    .sim-about summary {
+      cursor: pointer;
+      color: #91b7d4;
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .tube-module .sim-about p,
+    .tube-module .sim-about .note {
+      margin-top: 0.55rem;
+      color: #7891a6;
+      font-size: 0.7rem;
+      line-height: 1.42;
+    }
+
+    .tube-module .sim-about .note {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .tube-module .sim-panel {
+      position: relative;
+      padding: 0.75rem;
+      overflow: hidden;
+    }
+
+    .tube-module .sim-stack {
+      min-width: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .tube-module #tubeCanvas { border-radius: 18px; }
+
+    .tutor-box {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.65rem;
+      border: 1px solid rgba(103, 232, 249, 0.34);
+      border-radius: 14px;
+      background: rgba(3, 12, 22, 0.62);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+      padding: 0.58rem 0.68rem;
+    }
+
+    .tutor-copy { min-width: 0; }
+
+    .tutor-meta {
+      color: var(--cyan);
+      font-size: 0.62rem;
+      font-weight: 950;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .tutor-box h3 {
+      margin: 0.16rem 0 0.18rem;
+      color: #f4fbff;
+      font-size: 0.92rem;
+      line-height: 1.1;
+    }
+
+    .tutor-box p {
+      margin: 0;
+      color: #cbe2f2;
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    .tutor-success {
+      margin-top: 0.65rem;
+      border: 1px solid rgba(74, 222, 128, 0.36);
+      border-radius: 11px;
+      background: rgba(22, 163, 74, 0.12);
+      color: #b8ffd2;
+      padding: 0.58rem 0.65rem;
+      font-size: 0.82rem;
+      line-height: 1.38;
+    }
+
+    .tutor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.45rem;
+      margin-top: 0;
+    }
+
+    .tutor-actions button {
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 10px;
+      color: #dff7ff;
+      background: rgba(8, 20, 35, 0.82);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 900;
+      padding: 0.56rem 0.78rem;
+    }
+
+    .tutor-actions button.primary {
+      color: #031019;
+      border-color: rgba(103, 232, 249, 0.68);
+      background: linear-gradient(135deg, var(--cyan), var(--teal));
+    }
+
+    .tutor-actions button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .tube-module.guided-focus .nav,
+    .tube-module.guided-focus .module-head,
+    .tube-module.guided-focus .mode-switch,
+    .tube-module.guided-focus .lesson-panel,
+    .tube-module.guided-focus .control-panel,
+    .tube-module.guided-focus .action,
+    .tube-module.guided-focus .sim-about {
+      display: none;
+    }
+
+    .tube-module.guided-focus .sim-layout {
+      grid-template-columns: minmax(0, 1fr);
+      width: min(1680px, 100%);
+      gap: 0;
+    }
+
+    .tube-module.guided-focus .tutor-meta {
+      display: none;
+    }
+
+    .tube-module.guided-focus .sim-stack {
+      width: 100%;
+      max-width: 1480px;
+      margin: 0 auto;
+      gap: 0.75rem;
+    }
+
+    .tube-module.guided-focus .tutor-box {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0.95rem 1.05rem;
+    }
+
+    .tube-module.guided-focus .tutor-box h3 {
+      font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+    }
+
+    .tube-module.guided-focus .tutor-box p {
+      font-size: clamp(1rem, 1.35vw, 1.2rem);
+      line-height: 1.5;
+    }
+
+    .guided-control-dock {
+      margin-top: 0.85rem;
+      display: grid;
+      gap: 0.5rem;
+      max-width: 560px;
+    }
+
+    .guided-slider {
+      display: grid;
+      gap: 0.42rem;
+      border: 1px solid rgba(103, 232, 249, 0.34);
+      border-radius: 13px;
+      background: rgba(103, 232, 249, 0.08);
+      padding: 0.7rem;
+    }
+
+    .guided-slider label {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      color: #dff7ff;
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .guided-slider output {
+      color: var(--cyan);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .guided-control-dock[hidden] {
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .tube-module .sim-layout { grid-template-columns: 1fr; }
+      .tube-module .control-panel { max-height: none; }
+      .tutor-box { grid-template-columns: 1fr; align-items: start; }
+      .tutor-actions { justify-content: flex-start; }
+    }
+  </style>
+  <script src="../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="canvas-page tube-module">
+    <header class="nav">
+      <a class="brand" href="index.html">FRCR Physics Visual Lab</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="lessons.html">Lessons</a>
+        <a href="physics-question-bank.html">QBank</a>
+      </nav>
+    </header>
+
+    <section class="sim-layout">
+      <aside class="control-panel">
+        <div class="module-head">
+          <p class="kicker">Canvas physics engine</p>
+          <h2>X-ray tube physics</h2>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Learning mode">
+          <button class="mode-btn active" id="guidedModeBtn" type="button">Guided Mode</button>
+          <button class="mode-btn" id="sandboxModeBtn" type="button">Sandbox Mode</button>
+        </div>
+        <section class="lesson-panel" id="lessonPanel" aria-label="Guided mini-lessons">
+          <div class="lesson-title">
+            <span>Guided tutorial</span>
+            <span id="lessonCounter">1 of 9</span>
+          </div>
+          <p id="lessonFocus">Follow the tutor strip above the diagram. Controls appear only when you need them.</p>
+          <div class="tour-progress" id="tourProgress" aria-label="Guided tutorial progress"></div>
+        </section>
+        <div id="controls" class="control-groups"></div>
+        <button class="action" id="resetBtn" type="button">Reset simulation</button>
+        <details class="sim-about">
+          <summary>About this simulation</summary>
+          <p>Procedural particles only: electrons, field lines, stochastic photons, heat map, spectrum and heel effect are redrawn from simulation state every frame.</p>
+          <div class="note">This is a teaching simulation, not a dosimetry model. Relationships are represented for FRCR revision.</div>
+        </details>
+      </aside>
+
+      <section class="sim-stack">
+        <section class="tutor-box" id="tutorBox" aria-live="polite">
+          <div class="tutor-copy">
+            <div class="tutor-meta" id="tutorMeta">Guided tutorial</div>
+            <h3 id="tutorTitle">Cathode</h3>
+            <p id="tutorText"></p>
+            <div class="tutor-success" id="tutorSuccess" hidden></div>
+            <div id="guidedControlDock" class="guided-control-dock" hidden></div>
+          </div>
+          <div class="tutor-actions">
+            <button id="tourBackBtn" type="button">Start Sandbox Mode</button>
+            <button id="tourNextBtn" class="primary" type="button">Next</button>
+          </div>
+        </section>
+        <section class="sim-panel">
+          <canvas id="tubeCanvas" width="1600" height="900" aria-label="Canvas simulation of an X-ray tube"></canvas>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('tubeCanvas');
+    const ctx = canvas.getContext('2d');
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const tubeModule = document.querySelector('.tube-module');
+    const controls = {
+      temperature: { label: 'Filament temperature', min: 900, max: 2400, value: 2200, unit: 'C', step: 1 },
+      ma: { label: 'Tube current', min: 20, max: 500, value: 180, unit: 'mA', step: 1 },
+      rpm: { label: 'Anode rotation', min: 0, max: 10000, value: 5200, unit: 'rpm', step: 1 },
+      angle: { label: 'Target angle', min: 7, max: 20, value: 12, unit: 'deg', step: 1 },
+      kvp: { label: 'Tube potential', min: 50, max: 130, value: 90, unit: 'kVp', step: 1 },
+      filter: { label: 'Filtration', min: 0, max: 5, value: 2.5, unit: 'mm Al', step: 0.1 },
+      focus: { label: 'Focusing cup strength', min: 0, max: 100, value: 70, unit: '%', step: 1 }
+    };
+    const baseline = Object.fromEntries(Object.entries(controls).map(([k, v]) => [k, v.value]));
+    const values = Object.fromEntries(Object.entries(controls).map(([k, v]) => [k, v.value]));
+    const controlGroups = [
+      { title: 'Cathode', subtitle: 'Electron source', keys: ['temperature', 'ma'] },
+      { title: 'Anode', subtitle: 'Target', keys: ['rpm', 'angle'] },
+      { title: 'Beam', subtitle: 'Output', keys: ['kvp', 'filter', 'focus'] }
+    ];
+    const tourSteps = [
+      {
+        title: 'Meet the cathode',
+        body: 'This is the cathode: the heated tungsten filament on the left. It is the source of electrons for the X-ray tube.',
+        sidebar: 'Component tour: cathode source.',
+        spotlight: 'cathode',
+        active: [],
+        preset: { ...baseline, temperature: 1900, ma: 120 }
+      },
+      {
+        title: 'Follow the electron stream',
+        body: 'These blue particles are electrons crossing the vacuum. They do not form the useful X-ray beam yet; they are the energy carriers moving toward the target.',
+        sidebar: 'Component tour: electron stream.',
+        spotlight: 'electrons',
+        active: [],
+        preset: { ...baseline, temperature: 2200, ma: 220 }
+      },
+      {
+        title: 'Meet the anode target',
+        body: 'This rotating tungsten-rhenium target is where fast electrons lose energy. Most becomes heat; a small fraction emerges as X-rays.',
+        sidebar: 'Component tour: rotating anode target.',
+        spotlight: 'anode',
+        active: [],
+        preset: { ...baseline, temperature: 2200, ma: 220, rpm: 5200 }
+      },
+      {
+        title: 'Task: heat the filament',
+        body: 'Drag the Filament Temperature slider to maximum. Watch the cathode glow and the electron stream become more active.',
+        sidebar: 'Task: increase filament temperature to maximum.',
+        spotlight: 'cathode',
+        active: ['temperature'],
+        preset: { ...baseline, temperature: 1200, ma: 160 },
+        task: {
+          key: 'temperature',
+          done: value => value >= 2380,
+          success: 'Great. Increasing filament temperature boils off more electrons by thermionic emission, so more electrons are available for tube current.'
+        }
+      },
+      {
+        title: 'Task: increase tube current',
+        body: 'Now drag Tube Current above 400 mA. Keep your eye on the number of electrons crossing the tube.',
+        sidebar: 'Task: raise tube current above 400 mA.',
+        spotlight: 'electrons',
+        active: ['ma'],
+        preset: { ...baseline, temperature: 2300, ma: 80 },
+        task: {
+          key: 'ma',
+          done: value => value >= 400,
+          success: 'Exactly. Increasing tube current increases the number of electrons crossing the tube per second, so photon quantity and anode heat both rise.'
+        }
+      },
+      {
+        title: 'Task: accelerate harder with kVp',
+        body: 'Drag Tube Potential above 120 kVp. Notice that the electrons move faster and the emitted photons are more energetic.',
+        sidebar: 'Task: raise kVp above 120.',
+        spotlight: 'electrons',
+        active: ['kvp'],
+        preset: { ...baseline, temperature: 2250, ma: 240, kvp: 60 },
+        task: {
+          key: 'kvp',
+          done: value => value >= 120,
+          success: 'Good. Higher kVp gives each electron more kinetic energy, so the X-ray spectrum can extend to higher photon energies.'
+        }
+      },
+      {
+        title: 'Task: focus the electron beam',
+        body: 'Drag Focusing Cup Strength to maximum. Watch the electron stream narrow toward the target, creating a more concentrated focal spot.',
+        sidebar: 'Task: maximize focusing cup strength.',
+        spotlight: 'electrons',
+        active: ['focus'],
+        preset: { ...baseline, temperature: 2250, ma: 240, focus: 10 },
+        task: {
+          key: 'focus',
+          done: value => value >= 95,
+          success: 'Nice. A stronger focusing cup narrows the electron stream, concentrating impact at the focal spot.'
+        }
+      },
+      {
+        title: 'Task: reveal the heel effect',
+        body: 'Drag Target Angle down to 7 degrees. The anode-side beam becomes weaker because photons travel through more target material.',
+        sidebar: 'Task: reduce target angle to 7 degrees.',
+        spotlight: 'heel',
+        active: ['angle'],
+        preset: { ...baseline, temperature: 2250, ma: 240, angle: 18 },
+        task: {
+          key: 'angle',
+          done: value => value <= 7,
+          success: 'Perfect. A smaller target angle increases self-absorption on the anode side, making the heel-effect intensity gradient more obvious.'
+        }
+      },
+      {
+        title: 'Sandbox unlocked',
+        body: 'All controls are now active. Move any slider and the tutor will call out the cause-and-effect relationship as the simulation changes.',
+        sidebar: 'Full control unlocked. Explore all variables.',
+        spotlight: null,
+        active: Object.keys(controls),
+        freeplay: true,
+        preset: { ...baseline, temperature: 2200, ma: 180 }
+      }
+    ];
+
+    const spotlightRegions = {
+      cathode: { x: 0.035, y: 0.255, w: 0.25, h: 0.49, label: 'Cathode / filament' },
+      electrons: { x: 0.205, y: 0.34, w: 0.48, h: 0.32, label: 'Electron stream' },
+      anode: { x: 0.585, y: 0.22, w: 0.2, h: 0.58, label: 'Rotating anode' },
+      heel: { x: 0.765, y: 0.14, w: 0.19, h: 0.57, label: 'Heel-effect map' }
+    };
+    const controlRoot = document.getElementById('controls');
+    const guidedModeBtn = document.getElementById('guidedModeBtn');
+    const sandboxModeBtn = document.getElementById('sandboxModeBtn');
+    const lessonPanel = document.getElementById('lessonPanel');
+    const lessonFocus = document.getElementById('lessonFocus');
+    const lessonCounter = document.getElementById('lessonCounter');
+    const tourProgress = document.getElementById('tourProgress');
+    const tutorBox = document.getElementById('tutorBox');
+    const tutorMeta = document.getElementById('tutorMeta');
+    const tutorTitle = document.getElementById('tutorTitle');
+    const tutorText = document.getElementById('tutorText');
+    const tutorSuccess = document.getElementById('tutorSuccess');
+    const guidedControlDock = document.getElementById('guidedControlDock');
+    const tourBackBtn = document.getElementById('tourBackBtn');
+    const tourNextBtn = document.getElementById('tourNextBtn');
+    const inputMap = {};
+    const outputMap = {};
+    const guidedInputMap = {};
+    const guidedOutputMap = {};
+    const controlWraps = {};
+    const completedSteps = new Set();
+    let guidedMode = true;
+    let activeLesson = 0;
+
+    function formatValue(key, value) {
+      return `${Number(value).toFixed(key === 'filter' ? 1 : 0)} ${controls[key].unit}`;
+    }
+
+    function setControlValue(key, value, source = 'user') {
+      values[key] = Number(value);
+      if (inputMap[key]) inputMap[key].value = String(value);
+      if (outputMap[key]) outputMap[key].textContent = formatValue(key, value);
+      if (guidedInputMap[key]) guidedInputMap[key].value = String(value);
+      if (guidedOutputMap[key]) guidedOutputMap[key].textContent = formatValue(key, value);
+      if (source === 'user') handleUserControlInput(key, Number(value));
+    }
+
+    function buildControls() {
+      controlRoot.innerHTML = controlGroups.map(group => `
+        <section class="control-group" aria-label="${group.title} controls">
+          <div class="control-group-head">
+            <span>${group.subtitle}</span>
+            <strong>${group.title}</strong>
+          </div>
+          ${group.keys.map(key => {
+            const cfg = controls[key];
+            return `
+              <div class="control" data-control-key="${key}">
+                <label for="${key}">
+                  <span>${cfg.label}</span>
+                  <output id="out-${key}">${formatValue(key, cfg.value)}</output>
+                </label>
+                <input id="${key}" type="range" min="${cfg.min}" max="${cfg.max}" value="${cfg.value}" step="${cfg.step}">
+                <span class="control-lock" id="lock-${key}" hidden>Locked for this focus lesson</span>
+              </div>
+            `;
+          }).join('')}
+        </section>
+      `).join('');
+
+      Object.keys(controls).forEach(key => {
+        const input = document.getElementById(key);
+        const output = document.getElementById(`out-${key}`);
+        inputMap[key] = input;
+        outputMap[key] = output;
+        controlWraps[key] = document.querySelector(`[data-control-key="${key}"]`);
+        input.addEventListener('input', () => setControlValue(key, input.value, 'user'));
+      });
+    }
+
+    function buildTourProgress() {
+      tourProgress.innerHTML = tourSteps.map((_, index) => `<span class="tour-dot" data-tour-dot="${index}"></span>`).join('');
+    }
+
+    function currentStep() {
+      return tourSteps[activeLesson];
+    }
+
+    function isStepComplete(index = activeLesson) {
+      const step = tourSteps[index];
+      return !step.task || completedSteps.has(index);
+    }
+
+    function goToStep(index, usePreset = true) {
+      activeLesson = clamp(index, 0, tourSteps.length - 1);
+      applyLearningMode(usePreset);
+    }
+
+    function setMode(nextGuided) {
+      guidedMode = nextGuided;
+      guidedModeBtn.classList.toggle('active', guidedMode);
+      sandboxModeBtn.classList.toggle('active', !guidedMode);
+      lessonPanel.classList.toggle('hidden', !guidedMode);
+      tutorBox.hidden = !guidedMode;
+      guidedControlDock.hidden = true;
+      applyLearningMode(guidedMode);
+    }
+
+    function renderGuidedControlDock(step) {
+      Object.keys(guidedInputMap).forEach(key => {
+        delete guidedInputMap[key];
+        delete guidedOutputMap[key];
+      });
+
+      const activeKeys = guidedMode && step.task ? step.active : [];
+      guidedControlDock.hidden = activeKeys.length === 0;
+      guidedControlDock.innerHTML = activeKeys.map(key => {
+        const cfg = controls[key];
+        return `
+          <div class="guided-slider">
+            <label for="guided-${key}">
+              <span>${cfg.label}</span>
+              <output id="guided-out-${key}">${formatValue(key, values[key])}</output>
+            </label>
+            <input id="guided-${key}" type="range" min="${cfg.min}" max="${cfg.max}" value="${values[key]}" step="${cfg.step}">
+          </div>
+        `;
+      }).join('');
+
+      activeKeys.forEach(key => {
+        const input = document.getElementById(`guided-${key}`);
+        const output = document.getElementById(`guided-out-${key}`);
+        guidedInputMap[key] = input;
+        guidedOutputMap[key] = output;
+        input.addEventListener('input', () => setControlValue(key, input.value, 'user'));
+      });
+    }
+
+    function applyLearningMode(usePreset) {
+      const step = currentStep();
+      const activeKeys = guidedMode ? step.active : Object.keys(controls);
+      tubeModule.classList.toggle('guided-focus', guidedMode);
+      tubeModule.classList.toggle('guided-has-controls', guidedMode && activeKeys.length > 0);
+      if (guidedMode && usePreset && step.preset) {
+        Object.entries(step.preset).forEach(([key, value]) => setControlValue(key, value, 'preset'));
+        reset();
+      }
+
+      Object.keys(controls).forEach(key => {
+        const visible = !guidedMode || activeKeys.includes(key);
+        const locked = guidedMode && !activeKeys.includes(key);
+        const currentTask = guidedMode && step.task?.key === key && !isStepComplete();
+        inputMap[key].disabled = locked;
+        controlWraps[key].classList.toggle('is-hidden-guided', !visible);
+        controlWraps[key].classList.toggle('is-locked', locked);
+        controlWraps[key].classList.toggle('is-current-task', currentTask);
+        document.getElementById(`lock-${key}`).hidden = !locked;
+      });
+
+      document.querySelectorAll('.control-group').forEach(group => {
+        const hasVisibleControl = [...group.querySelectorAll('.control')].some(control => !control.classList.contains('is-hidden-guided'));
+        group.classList.toggle('is-hidden-guided', guidedMode && !hasVisibleControl);
+      });
+
+      if (guidedMode) {
+        lessonFocus.textContent = step.sidebar;
+        lessonCounter.textContent = `${activeLesson + 1} of ${tourSteps.length}`;
+        updateTourProgress();
+      }
+      renderGuidedControlDock(step);
+      renderTutor();
+    }
+
+    function updateTourProgress() {
+      tourProgress.querySelectorAll('[data-tour-dot]').forEach((dot, index) => {
+        dot.classList.toggle('active', index === activeLesson);
+        dot.classList.toggle('done', index < activeLesson || completedSteps.has(index));
+      });
+    }
+
+    function renderTutor() {
+      if (!guidedMode) {
+        tutorMeta.textContent = 'Sandbox observation';
+        tutorTitle.textContent = 'Full control active';
+        tutorText.textContent = 'Move any slider and I will explain what the change means in the tube.';
+        tutorSuccess.hidden = true;
+        tourBackBtn.hidden = true;
+        tourNextBtn.hidden = true;
+        return;
+      }
+
+      const step = currentStep();
+      const complete = isStepComplete();
+      tutorMeta.textContent = `Guided tutorial • Step ${activeLesson + 1} of ${tourSteps.length}`;
+      tutorTitle.textContent = step.title;
+      tutorText.textContent = step.body;
+      tutorSuccess.hidden = !(step.task && complete);
+      tutorSuccess.textContent = step.task?.success || '';
+      tourBackBtn.hidden = false;
+      tourBackBtn.disabled = false;
+      tourBackBtn.textContent = 'Start Sandbox Mode';
+      tourNextBtn.hidden = activeLesson === tourSteps.length - 1 || (step.task && !complete);
+      tourNextBtn.textContent = activeLesson >= tourSteps.length - 2 ? 'Show full simulator' : 'Next';
+      updateTourProgress();
+    }
+
+    function sandboxMessage(key, value) {
+      const direction = value >= baseline[key] ? 'increase' : 'decrease';
+      const messages = {
+        temperature: `Notice when you ${direction} filament temperature: hotter tungsten boils off more electrons by thermionic emission, so the electron cloud becomes denser.`,
+        ma: `Notice when you ${direction} tube current: the number of electrons crossing the tube changes, so X-ray quantity and anode heat load change.`,
+        kvp: `Notice when you ${direction} kVp: each electron is accelerated with different kinetic energy, so photon energy and beam penetration change.`,
+        focus: `Notice when you ${direction} focusing cup strength: the electron stream becomes more or less concentrated on the target focal spot.`,
+        rpm: `Notice when you ${direction} anode rotation: heat is spread over a wider or narrower target track.`,
+        angle: `Notice when you ${direction} target angle: the effective focal spot and heel-effect intensity gradient both change.`,
+        filter: `Notice when you ${direction} filtration: low-energy photons are removed, hardening the beam but reducing total output.`
+      };
+      return messages[key] || 'Notice how the visual response follows the variable you changed.';
+    }
+
+    function showSandboxObservation(key, value) {
+      tutorMeta.textContent = guidedMode ? 'Full control observation' : 'Sandbox observation';
+      tutorTitle.textContent = controls[key].label;
+      tutorText.textContent = sandboxMessage(key, value);
+      tutorSuccess.hidden = true;
+      if (!guidedMode) {
+        tourBackBtn.hidden = true;
+        tourNextBtn.hidden = true;
+      }
+    }
+
+    function handleUserControlInput(key, value) {
+      const step = currentStep();
+      if (guidedMode && step.freeplay) {
+        showSandboxObservation(key, value);
+        return;
+      }
+      if (!guidedMode) {
+        showSandboxObservation(key, value);
+        return;
+      }
+      if (step.task?.key !== key || completedSteps.has(activeLesson)) return;
+      if (step.task.done(value)) {
+        completedSteps.add(activeLesson);
+        controlWraps[key].classList.remove('is-current-task');
+        renderTutor();
+      }
+    }
+
+    buildControls();
+    buildTourProgress();
+    guidedModeBtn.addEventListener('click', () => setMode(true));
+    sandboxModeBtn.addEventListener('click', () => setMode(false));
+    tourBackBtn.addEventListener('click', () => setMode(false));
+    tourNextBtn.addEventListener('click', () => {
+      if (guidedMode && activeLesson >= tourSteps.length - 2) {
+        setMode(false);
+        return;
+      }
+      goToStep(activeLesson + 1);
+    });
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(900, Math.floor(rect.width * DPR));
+      canvas.height = Math.floor((canvas.width / 16) * 9);
+    }
+    addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const electrons = [];
+    const photons = [];
+    const spectrum = new Array(80).fill(0);
+    const heat = Array.from({ length: 80 }, () => new Array(42).fill(0));
+    let time = 0;
+    let anodePhase = 0;
+
+    function reset() {
+      electrons.length = 0;
+      photons.length = 0;
+      spectrum.fill(0);
+      heat.forEach(row => row.fill(0));
+      time = 0;
+      anodePhase = 0;
+    }
+    document.getElementById('resetBtn').addEventListener('click', reset);
+    applyLearningMode(true);
+
+    function emitElectrons(dt) {
+      const tempFactor = clamp((values.temperature - 1000) / 1300, 0, 1);
+      const rate = tempFactor * (values.ma / 500) * 900;
+      let count = Math.floor(rate * dt + Math.random());
+      count = Math.min(count, 38);
+      for (let i = 0; i < count; i++) {
+        electrons.push({
+          x: 0.16 + rand(-0.006, 0.006),
+          y: 0.5 + rand(-0.055, 0.055),
+          vx: rand(0.05, 0.12),
+          vy: rand(-0.16, 0.16) * (1 - values.focus / 140),
+          life: 0,
+          energy: 0
+        });
+      }
+    }
+
+    function depositHeat(nx, ny, amount) {
+      const ix = clamp(Math.floor(nx * heat.length), 0, heat.length - 1);
+      const iy = clamp(Math.floor(ny * heat[0].length), 0, heat[0].length - 1);
+      heat[ix][iy] += amount;
+    }
+
+    function addSpectrum(energy) {
+      const filtered = energy * (0.72 + values.filter * 0.045);
+      const bin = clamp(Math.floor((filtered / 130) * spectrum.length), 0, spectrum.length - 1);
+      spectrum[bin] += 1;
+    }
+
+    function impactElectron(e) {
+      const thermal = 0.99 - values.kvp / 16000;
+      const xrayFraction = 1 - thermal;
+      depositHeat(0.72 + rand(-0.05, 0.05), e.y + rand(-0.06, 0.06), values.kvp * thermal * 0.014);
+      const photonCount = Math.random() < xrayFraction * 80 ? 1 : 0;
+      const focal = focalGeometry();
+      for (let i = 0; i < photonCount; i++) {
+        const energy = Math.pow(Math.random(), 1.9) * values.kvp;
+        const t = rand(0, 1);
+        const spot = focal.pointAt(t);
+        const drift = rand(-0.001, 0.001);
+        photons.push({
+          x: spot.x,
+          y: spot.y,
+          vx: drift,
+          vy: 0.39 + rand(0, 0.07),
+          energy,
+          life: 0,
+          alpha: clamp(energy / values.kvp, 0.25, 1)
+        });
+        addSpectrum(energy);
+      }
+    }
+
+    function update(dt) {
+      time += dt;
+      anodePhase += (values.rpm / 60000) * Math.PI * 2 * dt;
+      emitElectrons(dt);
+      const accel = values.kvp / 60;
+      const focus = values.focus / 100;
+      for (let i = electrons.length - 1; i >= 0; i--) {
+        const e = electrons[i];
+        const targetY = 0.5 + Math.sin(anodePhase + e.x * 24) * 0.028;
+        e.vx += accel * dt * 0.34;
+        e.vy += (targetY - e.y) * focus * dt * 5.4;
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.energy = clamp((e.x - 0.16) / 0.55, 0, 1) * values.kvp;
+        e.life += dt;
+        if (e.x > 0.705 || e.y < 0.04 || e.y > 0.96 || e.life > 4) {
+          if (e.x > 0.66) impactElectron(e);
+          electrons.splice(i, 1);
+        }
+      }
+      for (let i = photons.length - 1; i >= 0; i--) {
+        const p = photons[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life += dt;
+        if (p.x < -0.05 || p.x > 1.05 || p.y < -0.2 || p.y > 1.2 || p.life > 2.2) photons.splice(i, 1);
+      }
+      const cooling = 1 - dt * (0.35 + values.rpm / 25000);
+      for (const row of heat) for (let i = 0; i < row.length; i++) row[i] *= cooling;
+      for (let i = 0; i < spectrum.length; i++) spectrum[i] *= 0.997;
+    }
+
+    function clear() {
+      const w = canvas.width, h = canvas.height;
+      const g = ctx.createRadialGradient(w * 0.5, h * 0.38, 10, w * 0.5, h * 0.4, w * 0.75);
+      g.addColorStop(0, '#09213a');
+      g.addColorStop(1, '#02070d');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+    const X = nx => nx * canvas.width;
+    const Y = ny => ny * canvas.height;
+
+    function focalGeometry() {
+      const theta = clamp(values.angle, controls.angle.min, controls.angle.max) * Math.PI / 180;
+      const actualLength = 0.22;
+      const projectedWidth = actualLength * Math.sin(theta);
+      const projectedHeight = actualLength * Math.cos(theta);
+      const center = { x: 0.715, y: 0.505 };
+      const top = {
+        x: center.x - projectedWidth / 2,
+        y: center.y - projectedHeight / 2
+      };
+      const bottom = {
+        x: center.x + projectedWidth / 2,
+        y: center.y + projectedHeight / 2
+      };
+      const bottomY = 0.935;
+      const mid = { x: (top.x + bottom.x) / 2, y: (top.y + bottom.y) / 2 };
+
+      return {
+        theta,
+        center,
+        top,
+        bottom,
+        mid,
+        bottomY,
+        actualLength,
+        projectedWidth,
+        projectedHeight,
+        pointAt(t) {
+          return {
+            x: top.x + (bottom.x - top.x) * t,
+            y: top.y + (bottom.y - top.y) * t
+          };
+        }
+      };
+    }
+
+    function line(x1, y1, x2, y2, color, width = 2, alpha = 1) {
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width * DPR;
+      ctx.beginPath(); ctx.moveTo(X(x1), Y(y1)); ctx.lineTo(X(x2), Y(y2)); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    function arrowHead(x, y, angle, size, color, strokeColor = '') {
+      ctx.save();
+      ctx.translate(X(x), Y(y));
+      ctx.rotate(angle);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(-size * DPR, -size * 0.55 * DPR);
+      ctx.lineTo(-size * DPR, size * 0.55 * DPR);
+      ctx.closePath();
+      ctx.fill();
+      if (strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 1 * DPR;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function dashedLine(x1, y1, x2, y2, color, width = 1.4, dash = [0.012, 0.01], alpha = 1) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width * DPR;
+      ctx.setLineDash(dash.map(value => X(value)));
+      ctx.beginPath();
+      ctx.moveTo(X(x1), Y(y1));
+      ctx.lineTo(X(x2), Y(y2));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawTube() {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(180,220,255,.34)';
+      ctx.lineWidth = 3 * DPR;
+      ctx.fillStyle = 'rgba(120,190,255,.035)';
+      roundRect(X(0.06), Y(0.12), X(0.84), Y(0.62), 36 * DPR, true, true);
+      if (!guidedMode) {
+        ctx.fillStyle = '#d8ecff';
+        ctx.font = `${15 * DPR}px Inter, sans-serif`;
+        ctx.fillText('vacuum envelope', X(0.08), Y(0.17));
+      }
+      ctx.restore();
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawCathode() {
+      const hot = clamp((values.temperature - 900) / 1500, 0, 1);
+      const glow = ctx.createRadialGradient(X(0.16), Y(0.5), 0, X(0.16), Y(0.5), X(0.11));
+      glow.addColorStop(0, `rgba(255,${120 + hot*100},40,${0.32 + hot*.35})`);
+      glow.addColorStop(1, 'rgba(255,80,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(X(0.03), Y(0.28), X(0.25), Y(0.44));
+      ctx.strokeStyle = `rgb(255,${90 + hot*145},${20 + hot*120})`;
+      ctx.lineWidth = 5 * DPR;
+      ctx.beginPath();
+      for (let i = 0; i < 42; i++) {
+        const t = i / 41;
+        const x = X(0.12 + t * 0.08);
+        const y = Y(0.5 + Math.sin(t * Math.PI * 8 + time * 10) * 0.028);
+        if (!i) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      line(0.095, 0.38, 0.205, 0.34, '#8fb4d4', 2, .72);
+      line(0.095, 0.62, 0.205, 0.66, '#8fb4d4', 2, .72);
+      if (!guidedMode) {
+        ctx.fillStyle = '#cdefff';
+        ctx.font = `${16 * DPR}px Inter, sans-serif`;
+        ctx.fillText('heated tungsten filament', X(0.08), Y(0.31));
+      }
+    }
+
+    function drawFields() {
+      const f = values.focus / 100;
+      for (let i = -5; i <= 5; i++) {
+        const y0 = 0.5 + i * 0.055;
+        ctx.strokeStyle = `rgba(103,232,249,${0.06 + f * 0.16})`;
+        ctx.lineWidth = 1 * DPR;
+        ctx.beginPath();
+        ctx.moveTo(X(0.21), Y(y0));
+        ctx.bezierCurveTo(X(0.38), Y(y0 + i * 0.018 * (1-f)), X(0.52), Y(0.5 + i * 0.018), X(0.7), Y(0.5));
+        ctx.stroke();
+      }
+    }
+
+    function drawFocalSpotProjection() {
+      const focal = focalGeometry();
+      const guideYs = [0.425, 0.49, 0.555, 0.62];
+      const guidePoints = [0, 0.33, 0.66, 1].map(t => focal.pointAt(t));
+      const outerBeamColor = guidedMode ? 'rgba(255,242,168,0.92)' : 'rgba(255,242,168,0.98)';
+      const innerBeamColor = guidedMode ? 'rgba(255,232,135,0.18)' : 'rgba(255,232,135,0.32)';
+      const geometryColor = guidedMode ? 'rgba(224,242,254,0.5)' : 'rgba(224,242,254,0.8)';
+      const labelAlpha = guidedMode ? 0 : 1;
+
+      ctx.save();
+      guideYs.forEach((y, index) => {
+        const point = guidePoints[index];
+        dashedLine(0.07, y, point.x - 0.01, y, 'rgba(205,239,255,0.42)', 1.25, [0.014, 0.012], guidedMode ? 0.36 : 0.7);
+        arrowHead(point.x - 0.012, y, 0, 6, 'rgba(205,239,255,0.72)');
+      });
+
+      ctx.lineCap = 'butt';
+      ctx.strokeStyle = innerBeamColor;
+      ctx.lineWidth = 0.85 * DPR;
+      guidePoints.slice(1, -1).forEach(point => {
+        ctx.beginPath();
+        ctx.moveTo(X(point.x), Y(point.y));
+        ctx.lineTo(X(point.x), Y(focal.bottomY));
+        ctx.stroke();
+      });
+
+      ctx.strokeStyle = outerBeamColor;
+      ctx.lineWidth = 2.25 * DPR;
+      [focal.top, focal.bottom].forEach(point => {
+        ctx.beginPath();
+        ctx.moveTo(X(point.x), Y(point.y));
+        ctx.lineTo(X(point.x), Y(focal.bottomY));
+        ctx.stroke();
+      });
+
+      dashedLine(focal.mid.x, focal.mid.y, focal.mid.x, focal.bottomY - 0.018, 'rgba(12,18,24,0.92)', 1.45, [0.014, 0.012], 1);
+      dashedLine(focal.mid.x, focal.mid.y, focal.mid.x, focal.bottomY - 0.018, 'rgba(103,232,249,0.35)', 0.75, [0.014, 0.012], 1);
+      arrowHead(focal.mid.x, focal.bottomY - 0.004, Math.PI / 2, 8, '#02070d', 'rgba(103,232,249,0.9)');
+
+      ctx.strokeStyle = geometryColor;
+      ctx.lineWidth = 1.4 * DPR;
+      ctx.beginPath();
+      ctx.moveTo(X(focal.top.x), Y(focal.bottomY));
+      ctx.lineTo(X(focal.bottom.x), Y(focal.bottomY));
+      ctx.stroke();
+      line(focal.top.x, focal.bottomY - 0.035, focal.top.x, focal.bottomY + 0.025, geometryColor, 1.35, 1);
+      line(focal.bottom.x, focal.bottomY - 0.035, focal.bottom.x, focal.bottomY + 0.025, geometryColor, 1.35, 1);
+
+      ctx.globalAlpha = labelAlpha;
+      if (labelAlpha > 0) {
+        ctx.fillStyle = '#dff7ff';
+        ctx.font = `${14 * DPR}px Inter, sans-serif`;
+        ctx.fillText('Electrons', X(0.055), Y(0.468));
+        ctx.fillText('from', X(0.066), Y(0.498));
+        ctx.fillText('cathode', X(0.053), Y(0.528));
+
+        ctx.fillText('X-rays', X(focal.top.x - 0.12), Y(0.745));
+        line(focal.top.x - 0.05, 0.735, focal.top.x - 0.01, 0.735, '#dff7ff', 1.2, 0.9);
+        arrowHead(focal.top.x - 0.01, 0.735, 0, 6, '#dff7ff');
+
+        ctx.fillText('Effective', X(focal.mid.x - 0.038), Y(focal.bottomY + 0.058));
+        ctx.fillText('focal spot', X(focal.mid.x - 0.04), Y(focal.bottomY + 0.087));
+      }
+      ctx.restore();
+    }
+
+    function drawAnode() {
+      const focal = focalGeometry();
+      const dx = focal.bottom.x - focal.top.x;
+      const dy = focal.bottom.y - focal.top.y;
+      const length = Math.hypot(dx, dy) || 1;
+      const nx = dy / length;
+      const ny = -dx / length;
+      const plateThickness = 0.055;
+      const extend = 0.04;
+      const faceTop = {
+        x: focal.top.x - (dx / length) * extend,
+        y: focal.top.y - (dy / length) * extend
+      };
+      const faceBottom = {
+        x: focal.bottom.x + (dx / length) * extend,
+        y: focal.bottom.y + (dy / length) * extend
+      };
+      const corners = [
+        { x: faceTop.x - nx * plateThickness, y: faceTop.y - ny * plateThickness },
+        { x: faceTop.x + nx * plateThickness, y: faceTop.y + ny * plateThickness },
+        { x: faceBottom.x + nx * plateThickness, y: faceBottom.y + ny * plateThickness },
+        { x: faceBottom.x - nx * plateThickness, y: faceBottom.y - ny * plateThickness }
+      ];
+
+      ctx.save();
+      const grd = ctx.createLinearGradient(X(focal.top.x), Y(focal.top.y), X(focal.bottom.x), Y(focal.bottom.y));
+      grd.addColorStop(0, '#596171'); grd.addColorStop(.5, '#b5bdc8'); grd.addColorStop(1, '#424a56');
+      ctx.fillStyle = grd;
+      ctx.strokeStyle = '#eef7ff';
+      ctx.lineWidth = 2 * DPR;
+      ctx.beginPath();
+      corners.forEach((corner, index) => {
+        if (!index) ctx.moveTo(X(corner.x), Y(corner.y)); else ctx.lineTo(X(corner.x), Y(corner.y));
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = '#02070d';
+      ctx.lineWidth = 7 * DPR;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(X(focal.top.x), Y(focal.top.y));
+      ctx.lineTo(X(focal.bottom.x), Y(focal.bottom.y));
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255,196,93,0.92)';
+      ctx.lineWidth = 3 * DPR;
+      ctx.beginPath();
+      ctx.moveTo(X(focal.top.x), Y(focal.top.y));
+      ctx.lineTo(X(focal.bottom.x), Y(focal.bottom.y));
+      ctx.stroke();
+
+      if (!guidedMode) {
+        ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+        ctx.fillText('Target', X(focal.top.x - 0.075), Y(focal.top.y - 0.045));
+        ctx.fillText('angle', X(focal.top.x - 0.075), Y(focal.top.y - 0.018));
+        ctx.strokeStyle = 'rgba(216,236,255,0.75)';
+        ctx.lineWidth = 1.3 * DPR;
+        ctx.beginPath();
+        ctx.arc(X(focal.top.x - 0.01), Y(focal.top.y + 0.035), X(0.035), -Math.PI / 2, -Math.PI / 2 + focal.theta);
+        ctx.stroke();
+        ctx.fillText(`${Math.round(values.angle)}°`, X(focal.top.x - 0.03), Y(focal.top.y + 0.082));
+
+        ctx.fillText('Actual', X(focal.bottom.x + 0.035), Y(focal.mid.y - 0.025));
+        ctx.fillText('focal spot', X(focal.bottom.x + 0.035), Y(focal.mid.y + 0.004));
+        dashedLine(focal.bottom.x + 0.028, focal.mid.y - 0.005, focal.mid.x + 0.005, focal.mid.y, 'rgba(216,236,255,0.62)', 1.1, [0.008, 0.008], 1);
+
+        ctx.fillText('Target face', X(focal.bottom.x + 0.055), Y(focal.bottom.y + 0.125));
+        line(focal.bottom.x + 0.042, focal.bottom.y + 0.105, focal.bottom.x + 0.008, focal.bottom.y + 0.02, '#d8ecff', 1.1, 0.8);
+      }
+      ctx.restore();
+    }
+
+    function drawHeat() {
+      const baseX = 0.66, baseY = 0.77, width = 0.27, height = 0.17;
+      ctx.fillStyle = 'rgba(255,255,255,.03)';
+      ctx.fillRect(X(baseX), Y(baseY), X(width), Y(height));
+      let max = 1;
+      for (const row of heat) for (const v of row) max = Math.max(max, v);
+      const cellW = X(width / heat.length), cellH = Y(height / heat[0].length);
+      for (let i = 0; i < heat.length; i++) for (let j = 0; j < heat[i].length; j++) {
+        const v = clamp(heat[i][j] / max, 0, 1);
+        if (v < .02) continue;
+        ctx.fillStyle = `rgba(${80 + v*175},${80 + v*110},${190 - v*130},${0.22 + v*.72})`;
+        ctx.fillRect(X(baseX + i * width / heat.length), Y(baseY + j * height / heat[i].length), cellW + 1, cellH + 1);
+      }
+      ctx.strokeStyle = 'rgba(125,211,252,.35)'; ctx.strokeRect(X(baseX), Y(baseY), X(width), Y(height));
+      if (!guidedMode) {
+        ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+        ctx.fillText('live anode heat map', X(baseX), Y(baseY - 0.015));
+      }
+    }
+
+    function drawParticles() {
+      electrons.forEach(e => {
+        const r = 1.8 + e.energy / values.kvp * 2.8;
+        ctx.fillStyle = `rgba(103,232,249,${0.38 + e.energy / values.kvp * .55})`;
+        ctx.beginPath(); ctx.arc(X(e.x), Y(e.y), r * DPR, 0, Math.PI * 2); ctx.fill();
+      });
+      photons.forEach(p => {
+        ctx.strokeStyle = `rgba(255,232,135,${p.alpha})`;
+        ctx.lineWidth = (1.2 + p.alpha * 2) * DPR;
+        ctx.beginPath();
+        ctx.moveTo(X(p.x), Y(p.y));
+        ctx.lineTo(X(p.x), Y(p.y - p.vy * 0.09));
+        ctx.stroke();
+      });
+    }
+
+    function drawSpectrum() {
+      const x = 0.08, y = 0.78, w = 0.48, h = 0.15;
+      ctx.strokeStyle = 'rgba(125,211,252,.25)'; ctx.strokeRect(X(x), Y(y), X(w), Y(h));
+      const max = Math.max(1, ...spectrum);
+      ctx.beginPath();
+      for (let i = 0; i < spectrum.length; i++) {
+        const px = X(x + (i / (spectrum.length - 1)) * w);
+        const py = Y(y + h - (spectrum[i] / max) * h);
+        if (!i) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = '#67e8f9'; ctx.lineWidth = 2.5 * DPR; ctx.stroke();
+      const minEnergy = clamp(values.filter * 7, 0, 45);
+      ctx.fillStyle = 'rgba(20,184,166,.16)';
+      ctx.fillRect(X(x + minEnergy / 130 * w), Y(y), X(w * (1 - minEnergy / 130)), Y(h));
+      if (!guidedMode) {
+        ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+        ctx.fillText('live spectrum: filtration removes low-energy photons', X(x), Y(y - 0.018));
+        ctx.fillText('energy (keV)', X(x + w * .42), Y(y + h + .04));
+      }
+    }
+
+    function drawHeelEffect() {
+      const x = 0.80, y = 0.2, w = 0.12, h = 0.45;
+      for (let j = 0; j < 80; j++) {
+        const t = j / 79;
+        const anodeAbsorption = Math.pow(t, 1.2) * (22 - values.angle) / 18;
+        const intensity = clamp(1 - anodeAbsorption * .72, .12, 1);
+        ctx.fillStyle = `rgba(255,220,90,${0.08 + intensity * .45})`;
+        ctx.fillRect(X(x), Y(y + t * h), X(w), Y(h / 80 + .001));
+      }
+      ctx.strokeStyle = 'rgba(125,211,252,.3)'; ctx.strokeRect(X(x), Y(y), X(w), Y(h));
+      if (!guidedMode) {
+        ctx.fillStyle = '#d8ecff'; ctx.font = `${15 * DPR}px Inter, sans-serif`;
+        ctx.fillText('heel-effect intensity map', X(x - .035), Y(y - .02));
+        ctx.fillText('cathode side', X(x + .005), Y(y - .045));
+        ctx.fillText('anode side', X(x + .012), Y(y + h + .04));
+      }
+    }
+
+    function drawEnergyReadout() {
+      const heatPct = 99 - (values.kvp - 50) / 800;
+      const xrayPct = 100 - heatPct;
+      ctx.fillStyle = 'rgba(3, 10, 18, .72)';
+      roundRect(X(0.34), Y(0.12), X(0.23), Y(0.13), 20 * DPR, true, false);
+      ctx.fillStyle = '#f7c56b'; ctx.font = `${34 * DPR}px Inter, sans-serif`; ctx.fillText(`${heatPct.toFixed(1)}%`, X(0.36), Y(0.18));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${14 * DPR}px Inter, sans-serif`; ctx.fillText('electron energy becomes heat', X(0.36), Y(0.215));
+      ctx.fillStyle = '#67e8f9'; ctx.font = `${34 * DPR}px Inter, sans-serif`; ctx.fillText(`${xrayPct.toFixed(1)}%`, X(0.47), Y(0.18));
+      ctx.fillStyle = '#d8ecff'; ctx.font = `${14 * DPR}px Inter, sans-serif`; ctx.fillText('emerges as X-rays', X(0.47), Y(0.215));
+    }
+
+    function drawSpotlight() {
+      if (!guidedMode) return;
+      const step = currentStep();
+      const region = spotlightRegions[step.spotlight];
+      if (!region) return;
+
+      const x = X(region.x);
+      const y = Y(region.y);
+      const w = X(region.w);
+      const h = Y(region.h);
+      const radius = 28 * DPR;
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(1, 6, 12, 0.58)';
+      ctx.fillRect(0, 0, canvas.width, y);
+      ctx.fillRect(0, y, x, h);
+      ctx.fillRect(x + w, y, canvas.width - (x + w), h);
+      ctx.fillRect(0, y + h, canvas.width, canvas.height - (y + h));
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(103, 232, 249, 0.95)';
+      ctx.lineWidth = 3 * DPR;
+      roundRect(x, y, w, h, radius, false, true);
+      ctx.restore();
+    }
+
+    function render() {
+      clear(); drawTube(); drawFields(); drawCathode(); drawAnode(); drawParticles(); drawFocalSpotProjection(); drawHeat(); drawSpectrum(); drawHeelEffect(); if (!guidedMode) drawEnergyReadout(); drawSpotlight();
+    }
+
+    let last = performance.now();
+    function loop(now) {
+      const dt = Math.min((now - last) / 1000, 0.035);
+      last = now;
+      update(dt);
+      render();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

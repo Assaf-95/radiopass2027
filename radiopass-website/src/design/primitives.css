@@ -1,0 +1,183 @@
+/**
+ * Styles for the layout primitives. Every value here is a token.
+ *
+ * If a number appears in this file that is not a var(--…), it is either a
+ * ratio, a hairline, or a bug.
+ */
+
+/* ------------------------------------------------------------- container */
+.rp-container { width: 100%; margin-inline: auto; padding-inline: var(--gutter); }
+.rp-w-wide { max-width: var(--container-wide); }
+.rp-w-main { max-width: var(--container-main); }
+.rp-w-reading { max-width: var(--container-reading); }
+.rp-w-narrow { max-width: var(--container-narrow); }
+
+/* ----------------------------------------------------------- page header
+   Where am I / what am I learning, in the same place on every route. */
+.rp-pagehead { margin-bottom: var(--gap-header-content); }
+.rp-pagehead-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-4); flex-wrap: wrap; margin-bottom: var(--sp-3);
+}
+.rp-eyebrow {
+  margin: 0; font-size: var(--fs-meta); font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary);
+}
+.rp-page-title {
+  font-family: var(--display); font-weight: 340;
+  font-size: var(--fs-page); line-height: var(--lh-tight);
+  letter-spacing: -0.015em; margin: 0;
+  color: var(--text-primary);
+}
+.rp-objective {
+  margin: var(--gap-heading-desc) 0 0;
+  font-size: var(--fs-teach); line-height: var(--lh-body);
+  color: var(--text-secondary); max-width: var(--measure);
+}
+.rp-pagehead-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-5); }
+
+/* -------------------------------------------------------- concept layout
+   The visual and its words share a row and a baseline so they read as one
+   object. Below the tablet breakpoint they stack, visual first, because the
+   words are about the picture. */
+.rp-concept {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: var(--sp-6);
+  align-items: center;
+}
+.rp-concept-wide { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.rp-concept-reverse .rp-concept-visual { order: 2; }
+.rp-concept-visual { min-width: 0; }
+.rp-concept-copy { min-width: 0; display: flex; flex-direction: column; gap: var(--sp-4); }
+
+@media (max-width: 1023px) {
+  .rp-concept, .rp-concept-wide { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
+  .rp-concept-reverse .rp-concept-visual { order: 0; }
+}
+
+/* --------------------------------------------------------------- level 1 */
+.rp-concept-title {
+  font-family: var(--display); font-weight: 340;
+  font-size: var(--fs-concept); line-height: var(--lh-heading);
+  letter-spacing: -0.012em; margin: 0; color: var(--text-primary);
+}
+
+/* --------------------------------------------------------------- level 3 */
+.rp-explanation {
+  font-size: var(--fs-body); line-height: var(--lh-body);
+  color: var(--text-secondary); max-width: var(--measure);
+}
+.rp-explanation > * + * { margin-top: var(--sp-3); }
+.rp-explanation strong { color: var(--text-primary); font-weight: 600; }
+
+/* --------------------------------------------------------------- level 2
+   Marked by a rule and a label, not by a glowing box. It has to be findable
+   at a glance without competing with the diagram it follows. */
+.rp-highyield {
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--sp-4) var(--sp-5);
+}
+.rp-highyield-label {
+  margin: 0 0 var(--sp-2); font-size: var(--fs-meta); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+}
+.rp-highyield-body {
+  font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-primary);
+}
+.rp-highyield-body > * + * { margin-top: var(--sp-2); }
+
+.rp-trap {
+  border-left: 2px solid var(--error);
+  background: rgba(201, 119, 107, 0.1);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--sp-4) var(--sp-5);
+}
+.rp-trap-label {
+  margin: 0 0 var(--sp-2); font-size: var(--fs-meta); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--error);
+}
+.rp-trap-body { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); }
+
+/* --------------------------------------------------------------- level 4 */
+.rp-more { border-top: 1px solid var(--border); padding-top: var(--sp-3); }
+.rp-more > summary {
+  cursor: pointer; list-style: none;
+  font-size: var(--fs-support); font-weight: 600; color: var(--text-tertiary);
+  padding: var(--sp-2) 0; transition: color var(--dur) var(--ease);
+}
+.rp-more > summary::-webkit-details-marker { display: none; }
+.rp-more > summary::after { content: ' ▾'; }
+.rp-more[open] > summary::after { content: ' ▴'; }
+.rp-more > summary:hover { color: var(--text-primary); }
+.rp-more-body {
+  font-size: var(--fs-support); line-height: var(--lh-loose);
+  color: var(--text-secondary); max-width: var(--measure); padding-bottom: var(--sp-3);
+}
+.rp-more-body > * + * { margin-top: var(--sp-3); }
+
+/* ------------------------------------------------------------- formulas
+   An equation is a statement, not an aside. It gets a line to itself. */
+.rp-formula {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: var(--sp-5);
+}
+.rp-formula-eq {
+  margin: 0; font-family: var(--display); font-size: var(--fs-section);
+  line-height: 1.3; color: var(--text-primary); font-variant-numeric: tabular-nums;
+}
+.rp-formula-terms {
+  margin-top: var(--sp-3); font-size: var(--fs-support);
+  line-height: var(--lh-body); color: var(--text-tertiary);
+}
+
+/* --------------------------------------------------------------- level 5 */
+.rp-meta {
+  margin: 0; font-size: var(--fs-meta); color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------------------- progress
+   One representation. A number, a rail and a percentage — read as a unit. */
+.rp-progress { display: flex; align-items: center; gap: var(--sp-3); }
+.rp-progress-text { font-size: var(--fs-meta); color: var(--text-tertiary); white-space: nowrap; }
+.rp-progress-rail {
+  flex: 1 1 80px; min-width: 60px; max-width: 180px; height: 3px;
+  border-radius: 2px; background: rgba(242, 238, 230, 0.12); overflow: hidden;
+}
+.rp-progress-fill { display: block; height: 100%; background: var(--accent); transition: width var(--dur-reveal) var(--ease); }
+.rp-progress-pct { font-size: var(--fs-meta); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------- buttons
+   Three variants, one size scale. A primary action looks the same wherever
+   it appears, which is what lets a learner stop reading the buttons. */
+.rp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font: 600 var(--fs-support)/1 'Inter', system-ui, sans-serif;
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-sm);
+  border: 1px solid transparent; cursor: pointer; text-decoration: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  min-height: 44px; /* touch target */
+}
+.rp-btn-primary { background: var(--text-primary); color: var(--bg-base); }
+.rp-btn-primary:hover { background: #fff; }
+.rp-btn-ghost { background: transparent; border-color: var(--border-strong); color: var(--text-primary); }
+.rp-btn-ghost:hover { border-color: var(--text-tertiary); }
+.rp-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.rp-btn.is-locked { opacity: 0.45; cursor: not-allowed; }
+.rp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* --------------------------------------------------------- concept nav */
+.rp-concept-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-4); margin-top: var(--gap-section);
+  padding-top: var(--sp-4); border-top: 1px solid var(--border);
+}
+.rp-concept-nav-mid { flex: 1; display: flex; justify-content: center; }
+
+@media (max-width: 560px) {
+  .rp-concept-nav { flex-wrap: wrap; }
+  .rp-concept-nav-mid { order: -1; flex-basis: 100%; }
+}

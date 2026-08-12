@@ -1,0 +1,45 @@
+# RadioPass — Apache/LiteSpeed configuration for plain drop-in hosting.
+#
+# This file ships inside the app so that copying the deploy folder into
+# public_html is the whole deployment. It does two jobs:
+#
+#   1. Deep links. The site is a single-page app: /mri/slice-selection is not
+#      a file on disk, so without a rewrite a refresh there is a 404. Anything
+#      that is not a real file falls back to the app shell, which routes it.
+#   2. Caching. Built assets carry a content hash in their filename, so they
+#      can be cached forever; the shell must always be revalidated or a
+#      browser keeps loading chunk names that no longer exist after a deploy.
+#
+# The anatomy app lives under /anatomy/ as its own bundle. It routes with
+# URL hashes, so it only ever requests real files and needs no fallback —
+# it just has to be excluded from this one.
+
+Options -MultiViews
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # /anatomy/ is a separate app: serve its real files, never rewrite into it.
+  RewriteRule ^anatomy(/.*)?$ - [L]
+
+  # Everything else that is not a real file or directory is a client route.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # The app shell: always revalidate.
+  <FilesMatch "^(index\.html|404\.html)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Hashed bundles only (name-XXXXXXXX.js/.css): immutable. Un-hashed files
+  # (favicons, hero posters) deliberately keep the host's default caching so
+  # a redeploy can actually replace them.
+  <FilesMatch "-[A-Za-z0-9_-]{8,}\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

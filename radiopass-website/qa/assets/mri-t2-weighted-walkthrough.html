@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>T2-Weighted Spin Echo — MRI Sequence Contrast Walkthrough</title>
+<meta name="description" content="T2-weighted contrast comes mainly from differences in transverse magnetisation decay before the echo is measured." />
+<link rel="stylesheet" href="../../assets/css/mri-walkthrough.css?v=2" />
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>T2-Weighted Spin Echo</h1>
+    <p class="subtitle">Long TR · Long TE</p>
+    <p class="core-statement">T2-weighted contrast comes mainly from differences in transverse magnetisation decay before the echo is measured.</p>
+    <nav class="crumbs" aria-label="Walkthrough sequence">
+      <a href="mri-t1-weighted-walkthrough.html">1. T1-Weighted</a><span class="sep">→</span>
+      <span class="current">2. T2-Weighted</span><span class="sep">→</span>
+      <a href="mri-flair-walkthrough.html">3. T2 FLAIR</a><span class="sep">→</span>
+      <a href="mri-stir-walkthrough.html">4. STIR</a><span class="sep">→</span>
+      <a href="mri-sequence-contrast-walkthrough.html">5. Summary</a>
+    </nav>
+  </header>
+
+  <section class="panel stage-bar">
+    <span class="stage-progress">Stage <span id="stageNum">1</span> of <span id="stageTotal">12</span></span>
+    <span class="stage-progress" id="stageProgressChip">paused</span>
+    <div class="stage-dots" id="stageDots" role="tablist" aria-label="Stage navigation"></div>
+    <div class="transport">
+      <button id="prevBtn">Previous step</button>
+      <button id="playBtn">Play current step</button>
+      <button id="nextBtn">Next step</button>
+      <button id="replayStepBtn">Replay current step</button>
+      <button id="runFullBtn" class="primary">Run full sequence</button>
+      <button id="resetBtn">Reset</button>
+      <span class="speed-group">
+        <button data-speed="0.5">Slow</button>
+        <button data-speed="1" class="active">Normal</button>
+        <button data-speed="2">Fast</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="panel teach-panel">
+    <p class="teach-stage-title" id="stageTitleBig">Equilibrium</p>
+    <p class="teach-headline" id="whatNow"></p>
+    <p class="notice-label">Notice</p>
+    <ol class="notice-list" id="noticeList"></ol>
+  </section>
+
+  <section class="layout">
+    <div class="panel viz">
+      <canvas id="spinCanvas" aria-label="Individual spins and per-tissue Mz vectors"></canvas>
+      <canvas id="timelineCanvas" aria-label="Pulse sequence timeline, builds progressively"></canvas>
+    </div>
+    <div class="panel viz" id="graphSection">
+      <div class="side-graphs">
+        <div id="mzWrap"><canvas id="mzCanvas" aria-label="Mz vs time by tissue"></canvas></div>
+        <div id="mxyWrap"><canvas id="mxyCanvas" aria-label="Mxy vs time by tissue"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel reveal-section hidden" id="tissueSection" style="padding:0.9rem 1.1rem;">
+    <h2>Tissue Signal Comparison — Fat, Water / CSF, Muscle</h2>
+    <div id="signalBars"></div>
+  </section>
+
+  <section class="panel reveal-section hidden" id="imageSection" style="padding:0.9rem 1.1rem;">
+    <h2>Final T2-Weighted Image</h2>
+    <div class="image-row">
+      <canvas id="phantomCanvas" aria-label="T1-weighted axial head phantom preview"></canvas>
+      <p id="phantomCaption" style="font-size:0.85rem; color:var(--muted); margin:0;">CSF in the ventricles and sulci appears bright, muscle appears relatively dark, and fat is intermediate. Every brightness value is computed from the signal equation for that tissue — none is assigned by hand. Brain parenchyma is rendered from the soft-tissue entry, because white and grey matter are deliberately not modelled on this page; they appear on the <a href="mri-sequence-contrast-walkthrough.html" style="color:var(--accent);">Sequence Summary</a>.</p>
+    </div>
+  </section>
+
+  <section class="panel complete-banner" id="completeBanner">
+    <h3>Guided demonstration complete</h3>
+    <p style="margin:0; color:var(--muted); font-size:0.88rem;">You have seen how this sequence's timing produces its image contrast.</p>
+    <div class="complete-actions">
+      <button id="tryItBtn" class="primary">Try it yourself</button>
+      <button id="replayGuidedBtn">Replay guided demonstration</button>
+      <a href="mri-flair-walkthrough.html"><button type="button">Continue to next sequence</button></a>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="manualPanel" style="padding:0.9rem 1.1rem; display:grid; gap:0.6rem;">
+    <h2 style="margin:0; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:#9ec6f2;">Try it yourself</h2>
+    <p class="locked-note">Adjust TR and TE freely. Vectors, curves, signal bars and the image update immediately.</p>
+    <label style="font-size:0.8rem; color:var(--muted); display:flex; justify-content:space-between;">TR (ms) <span id="trVal">3500</span></label>
+    <input id="trSlider" type="range" min="150" max="9000" step="10" value="3500" />
+    <label style="font-size:0.8rem; color:var(--muted); display:flex; justify-content:space-between;">TE (ms) <span id="teVal">100</span></label>
+    <input id="teSlider" type="range" min="5" max="200" step="1" value="100" />
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <button id="applyChangesBtn" class="primary">Apply changes</button>
+      <button id="restorePresetBtn">Restore sequence preset</button>
+    </div>
+  </section>
+
+  <p class="disclaimer">Educational approximation — illustrative parameters, not a clinical scanning protocol. Tissue values vary with field strength, sequence, temperature, tissue composition, scanner and vendor.</p>
+</div>
+
+<script src="../../assets/js/mri-walkthrough-engine.js?v=2"></script>
+<script>
+function st(title, phase, what, notices, extra) {
+  return Object.assign({ title: title, phase: phase, what: what, notices: notices }, extra || {});
+}
+MRIWalkthrough.init({
+  family: "se",
+  defaultTR: 3500, defaultTE: 100, defaultTI: null,
+  referenceTissue: "csf",
+  realImageSrc: "../../assets/img/mri-t2.jpg",
+  stages: [
+    st("Equilibrium", "equilibrium",
+      "All three tissues sit at equilibrium, magnetisation pointing along B0. Nothing is detectable yet.",
+      ["Mz stands at full height for every tissue.", "Mxy is zero, so there is nothing for the coil to detect.", "This is the same starting state as every other sequence."], { graphVisibility: "mz" }),
+    st("Long TR selected", "equilibrium",
+      "A long repetition time is chosen, so a great deal of time passes before the next excitation.",
+      ["Every tissue now has time to recover almost completely.", "The Mz vectors end up at nearly the same height.", "That deliberately removes T1 as a source of contrast."], { graphVisibility: "mz" }),
+    st("Near-complete longitudinal recovery", "equilibrium",
+      "Fat, muscle and water have all recovered close to full longitudinal magnetisation.",
+      ["The three Mz vectors are now hard to tell apart.", "Starting nearly equal means T1 can no longer create contrast.", "Any difference seen from here on must come from T2."], { graphVisibility: "mz" }),
+    st("90° excitation pulse", "excite",
+      "The 90° excitation pulse tips the recovered longitudinal magnetisation of each tissue into the transverse plane.",
+      ["All three Mz vectors collapse together.", "The green Mxy vector appears in their place.", "Each tissue begins with a similar amount of transverse signal."], { pulse: "excitation", graphVisibility: "mz" }),
+    st("Transverse magnetisation created", "coherence",
+      "The spins are briefly coherent, giving the maximum transverse signal available from this excitation.",
+      ["The individual spins bunch together into one long vector.", "All three tissues start from roughly the same height.", "This shared starting point is what makes what follows purely a T2 effect."], { graphVisibility: "mxy" }),
+    st("T2 and T2* dephasing begins", "dephase",
+      "Each tissue now loses transverse coherence at a rate set by its own T2.",
+      ["Water and CSF hold their signal high for a long time.", "Muscle falls away quickly, because its T2 is short.", "This separation is where T2-weighted contrast is actually created."], { graphVisibility: "mxy" }),
+    st("180° refocusing pulse at TE/2", "refocus",
+      "A 180° refocusing pulse reverses the reversible phase dispersion caused by static field inhomogeneity.",
+      ["The faster spins are thrown behind the slower ones.", "This lets an echo form partway through the decay.", "Signal already lost to true T2 relaxation is not restored."], { pulse: "refocus", graphVisibility: "mxy" }),
+    st("Spin rephasing", "rephase",
+      "The dispersed spins progressively rephase toward a shared direction as the echo builds.",
+      ["The spin fan narrows again.", "Only the reversible part of the dephasing is recovered.", "The true T2 envelope keeps falling underneath."], { graphVisibility: "mxy" }),
+    st("Continued true T2 decay", "rephase",
+      "Even while the spins rephase, irreversible T2 relaxation keeps reducing the maximum signal available.",
+      ["The echo will never return to its original full height.", "The water and muscle curves have separated widely by now.", "That widening gap is exactly what a long TE is there to capture."], { graphVisibility: "mxy", showTissueTable: true }),
+    st("Spin echo acquired at long TE", "rephase",
+      "The receiver samples the echo at a long TE, after substantial T2 decay has taken place.",
+      ["The ADC marker arrives only after a long delay.", "A long TE gives T2 differences the time they need to grow large.", "That is precisely what produces T2 weighting."], { graphVisibility: "mxy", showTissueTable: true }),
+    st("Tissue signal comparison", "tissueCompare",
+      "The calculated signal for the three tissues is now compared side by side.",
+      ["Water and CSF are now the brightest, because their long T2 preserved signal.", "Muscle is darkest, because its short T2 decayed away.", "This is the exact reverse of the T1-weighted ordering."], { graphVisibility: "mxy", showTissueTable: true }),
+    st("Final T2-weighted image", "finalImage",
+      "The image is reconstructed from the sampled signal, and every structure's brightness follows its calculated value.",
+      ["CSF in the ventricles and sulci is now bright.", "Muscle appears comparatively dark.", "Long TR removed T1 weighting; long TE brought out T2."], { graphVisibility: "mxy", showTissueTable: true, showImage: true })
+  ]
+});
+</script>
+</body>
+</html>

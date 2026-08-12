@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MRI Sequence Contrast Summary</title>
+<meta name="description" content="How the same magnetisation behaviour produces T1, T2, FLAIR and STIR image contrast — a guided continuation of the T2 dephasing and spin echo build-up." />
+<style>
+  /* Colour system, panel language and canvas styling copied exactly from
+     t2_dephasing-detailed.html so this reads as the same application. */
+  :root {
+    --bg0: #0b1220;
+    --bg1: #111c2e;
+    --panel: #121b2c;
+    --ink: #e6efff;
+    --muted: #a6b6d1;
+    --accent: #4cc3ff;
+    --accent-2: #ff9b4a;
+    --accent-3: #7bffb8;
+    --accent-4: #ffd76b;
+    --tissue-fat: #ff9b4a;
+    --tissue-wm: #4cc3ff;
+    --tissue-gm: #7bffb8;
+    --tissue-csf: #74a9ff;
+    --tissue-muscle: #c084fc;
+    --tissue-oedema: #ff6ea8;
+    --tissue-marrow: #ffc98a;
+    --line: rgba(120, 150, 190, 0.25);
+    --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 10% 10%, rgba(76, 195, 255, 0.15), transparent 40%),
+      radial-gradient(circle at 88% 86%, rgba(255, 155, 74, 0.12), transparent 44%),
+      linear-gradient(150deg, var(--bg0), var(--bg1));
+    padding: 1rem;
+  }
+  .app { width: min(1500px, 100%); margin: 0 auto; display: grid; gap: 0.9rem; }
+  header {
+    padding: 0.9rem 1.1rem;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(18, 28, 46, 0.96), rgba(13, 22, 38, 0.94));
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  header h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.04em; text-transform: uppercase; }
+  header p { margin: 0.3rem 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.35; }
+  .continuation-note { margin-top: 0.5rem; font-size: 0.8rem; color: var(--accent-3); }
+  .continuation-note a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+
+  .panel {
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(16, 27, 45, 0.96), rgba(12, 21, 36, 0.95));
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  /* sequence tabs */
+  .seq-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; padding: 0.9rem; }
+  @media (max-width: 900px) { .seq-tabs { grid-template-columns: 1fr 1fr; } }
+  .seq-card {
+    text-align: left;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(18, 28, 46, 0.7);
+    color: var(--ink);
+    padding: 0.7rem 0.8rem;
+    cursor: pointer;
+    display: grid;
+    gap: 0.18rem;
+    position: relative;
+  }
+  .seq-card:hover { border-color: rgba(76,195,255,0.5); }
+  .seq-card .sc-name { font-weight: 800; font-size: 0.95rem; letter-spacing: 0.02em; }
+  .seq-card .sc-fam { font-size: 0.72rem; color: var(--accent-4); text-transform: uppercase; letter-spacing: 0.05em; }
+  .seq-card .sc-line { font-size: 0.74rem; color: var(--muted); }
+  .seq-card.active { border-color: var(--accent-3); box-shadow: inset 0 0 0 2px var(--accent-3), 0 0 18px rgba(123,255,184,0.15); }
+  .seq-card.active::after { content: "\2713 ACTIVE"; position: absolute; top: 8px; right: 10px; font-size: 0.62rem; color: var(--accent-3); letter-spacing: 0.06em; font-weight: 800; }
+  .seq-card .sc-start { margin-top: 0.3rem; justify-self: start; border: 1px solid rgba(96,132,176,0.45); background: linear-gradient(180deg,#16273f,#0f1f35); color: var(--ink); border-radius: 999px; padding: 0.3rem 0.7rem; font-size: 0.72rem; font-weight: 650; }
+
+  .layout { display: grid; grid-template-columns: 1.5fr 0.8fr; gap: 0.9rem; align-items: stretch; }
+  @media (max-width: 1080px) { .layout { grid-template-columns: 1fr; } }
+
+  .viz { padding: 0.8rem; display: grid; gap: 0.8rem; }
+  .plots { display: grid; gap: 0.6rem; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 640px) { .plots { grid-template-columns: 1fr; } }
+
+  canvas {
+    width: 100%; display: block; border-radius: 12px;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(76, 195, 255, 0.12), transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(255, 155, 74, 0.12), transparent 40%),
+      linear-gradient(160deg, #0d1625, #0a1220);
+    border: 1px solid rgba(96, 132, 176, 0.25);
+  }
+  #spinCanvas { height: 340px; }
+  #mxyCanvas, #mzCanvas { height: 150px; }
+  #timelineCanvas { height: 200px; }
+  #phantomCanvas { height: 300px; max-width: 300px; }
+
+  /* stage cards row */
+  .stage-cards { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.15rem; }
+  .stage-card {
+    flex: none;
+    min-width: 118px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(18, 28, 46, 0.7);
+    padding: 0.4rem 0.5rem;
+    font-size: 0.68rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .stage-card b { display: block; color: var(--ink); font-size: 0.72rem; margin-bottom: 0.1rem; }
+  .stage-card.active { border-color: var(--accent); background: rgba(76,195,255,0.12); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+  .stage-card.done { opacity: 0.65; }
+
+  .controls { padding: 0.9rem; display: grid; gap: 0.7rem; align-content: start; max-height: calc(100vh - 3rem); overflow: auto; }
+  .controls h2 { margin: 0; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: #9ec6f2; }
+  .group { border: 1px solid rgba(96, 132, 176, 0.3); border-radius: 12px; padding: 0.6rem; background: rgba(18, 28, 46, 0.7); display: grid; gap: 0.42rem; }
+  .group.locked { opacity: 0.55; }
+  .group.highlight { border-color: var(--accent-4); box-shadow: 0 0 0 1px var(--accent-4), 0 0 16px rgba(255,215,107,0.15); }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 0.45rem; align-items: center; }
+  label { font-size: 0.78rem; color: var(--muted); }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  input[type="range"]:disabled { opacity: 0.5; }
+  .value { font-size: 0.78rem; color: #d9e6ff; min-width: 70px; text-align: right; font-variant-numeric: tabular-nums; }
+  button {
+    border: 1px solid rgba(96, 132, 176, 0.45);
+    background: linear-gradient(180deg, #16273f, #0f1f35);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.83rem;
+    cursor: pointer;
+    font-weight: 650;
+  }
+  button:hover { box-shadow: 0 6px 18px rgba(76, 195, 255, 0.2); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button:focus-visible, .seq-card:focus-visible, .stage-card:focus-visible { outline: 2px solid var(--accent-3); outline-offset: 2px; }
+  button.primary { border-color: rgba(123,255,184,0.6); background: linear-gradient(180deg,#123626,#0e2a1d); }
+  .btn-row { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+  .toggle { display: flex; gap: 0.4rem; align-items: center; font-size: 0.78rem; color: var(--muted); }
+  select { width: 100%; border-radius: 8px; border: 1px solid rgba(96, 132, 176, 0.45); background: rgba(10, 18, 32, 0.9); color: var(--ink); padding: 0.35rem 0.5rem; font-size: 0.78rem; }
+  .info-box { border-radius: 10px; border: 1px solid rgba(96, 132, 176, 0.3); background: rgba(12, 20, 34, 0.9); padding: 0.6rem; font-size: 0.78rem; line-height: 1.35; color: #c6d6f0; }
+  .badge { display: inline-block; padding: 0.12rem 0.5rem; border-radius: 999px; border: 1px solid rgba(96, 132, 176, 0.4); font-size: 0.72rem; color: #cfe1ff; margin-right: 0.35rem; }
+
+  /* teaching panel */
+  .teach-title { margin: 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .teach-chip { font-family: monospace; font-size: 0.7rem; color: var(--accent-3); border: 1px solid rgba(123,255,184,0.4); border-radius: 999px; padding: 0.1rem 0.5rem; }
+  .teach-headline { margin: 0; font-size: 1.28rem; line-height: 1.42; font-weight: 600; color: var(--ink); }
+  .notice-label { margin: 0.3rem 0 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-4); font-weight: 700; }
+  .notice-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+  .notice-list li { display: grid; grid-template-columns: 1.4rem 1fr; align-items: baseline; font-size: 0.97rem; line-height: 1.48; color: #cfdcf2; }
+  .notice-list li .n { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.8rem; color: var(--accent-4); font-weight: 700; }
+  .teach-points { margin: 0; padding-left: 1.1rem; font-size: 0.78rem; color: var(--muted); display: grid; gap: 0.15rem; }
+  .remember { border-left: 3px solid var(--accent-4); padding-left: 0.5rem; font-size: 0.78rem; color: var(--accent-4); }
+  .eq-box { font-family: "STIX Two Text", Georgia, serif; font-size: 0.85rem; color: #cfe1ff; background: rgba(10,18,32,0.9); border: 1px solid rgba(96,132,176,0.3); border-radius: 8px; padding: 0.5rem 0.6rem; }
+
+  /* tissue bars / table */
+  .bar-row { display: grid; grid-template-columns: 96px 1fr 42px; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .bar-track { height: 9px; background: rgba(96,132,176,0.18); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 240ms ease; }
+  .bar-label { font-size: 0.72rem; display: flex; align-items: center; gap: 5px; color: var(--muted); }
+  .bar-value { font-family: monospace; font-size: 0.68rem; text-align: right; color: #d9e6ff; }
+  .swatch { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+  table.tt { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+  table.tt th, table.tt td { text-align: left; padding: 3px 5px; border-bottom: 1px solid rgba(96,132,176,0.18); color: var(--muted); }
+  table.tt th { color: #9ec6f2; text-transform: uppercase; font-size: 0.62rem; }
+  table.tt td:first-child { color: var(--ink); }
+
+  /* guided-complete banner */
+  .complete-banner { display: none; padding: 1rem; text-align: center; gap: 0.6rem; }
+  .complete-banner.show { display: grid; }
+  .complete-banner h3 { margin: 0; color: var(--accent-3); letter-spacing: 0.04em; text-transform: uppercase; font-size: 1rem; }
+  .complete-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+  .complete-actions button { font-size: 0.95rem; padding: 0.65rem 1.2rem; }
+
+  /* compare table */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+  .compare-table th, .compare-table td { border: 1px solid rgba(96,132,176,0.25); padding: 6px 8px; text-align: left; }
+  .compare-table th { color: #9ec6f2; text-transform: uppercase; font-size: 0.66rem; background: rgba(18,28,46,0.7); }
+  .compare-table tr[data-seq] { cursor: pointer; }
+  .compare-table tr[data-seq]:hover { background: rgba(76,195,255,0.08); }
+
+  .warn-line { border-left: 3px solid var(--accent-2); padding-left: 0.5rem; font-size: 0.76rem; color: var(--accent-2); margin-top: 0.4rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  /* FRCR responsive text safety */
+  :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+  :where(img,svg,canvas){max-width:100%}
+  @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>MRI Sequence Contrast Summary</h1>
+    <p>Compare the timing, magnetisation behaviour, tissue signal and final appearance of the four sequences.</p>
+    <p class="continuation-note">Guided walkthroughs:
+      <a href="mri-t1-weighted-walkthrough.html">1. T1-Weighted</a> ·
+      <a href="mri-t2-weighted-walkthrough.html">2. T2-Weighted</a> ·
+      <a href="mri-flair-walkthrough.html">3. T2 FLAIR</a> ·
+      <a href="mri-stir-walkthrough.html">4. STIR</a> ·
+      <strong>5. Summary (you are here)</strong>
+    </p>
+    <p class="continuation-note">This consolidation page carries the full tissue set, signal tables, comparison tools and advanced controls. It builds on <a href="t2_dephasing-detailed.html">T2 Dephasing and Spin Echo Build-Up</a>.</p>
+  </header>
+
+  <section class="panel">
+    <div class="seq-tabs" id="seqTabs" role="tablist" aria-label="Choose MRI sequence"></div>
+  </section>
+
+  <section class="panel" style="padding:0.7rem 0.9rem;">
+    <div class="stage-cards" id="stageCards" role="tablist" aria-label="Stage navigation"></div>
+  </section>
+
+  <section class="layout">
+    <div class="panel viz">
+      <canvas id="spinCanvas" aria-label="Transverse plane spins, net magnetisation and Mz indicator"></canvas>
+      <div class="plots">
+        <canvas id="mxyCanvas" aria-label="Mxy magnitude vs time, per tissue"></canvas>
+        <canvas id="mzCanvas" aria-label="Mz vs time, per tissue, signed for inversion recovery"></canvas>
+      </div>
+      <canvas id="timelineCanvas" aria-label="Pulse sequence timeline with moving playhead"></canvas>
+    </div>
+
+    <aside class="panel controls">
+      <div class="row"><h2 style="margin:0;">Stage <span id="stageNum">1</span> / <span id="stageTotal">12</span></h2><span class="teach-chip" id="teachChip">guided</span></div>
+      <p class="teach-title" id="stageTitle">Equilibrium</p>
+
+      <div class="group">
+        <div class="btn-row">
+          <button id="prevStageBtn">Previous</button>
+          <button id="playPauseBtn">Pause</button>
+          <button id="nextStageBtn">Next</button>
+        </div>
+        <div class="btn-row">
+          <button id="replayBtn">Replay</button>
+          <button id="resetBtn">Reset</button>
+          <button id="skipManualBtn">Skip to manual mode</button>
+        </div>
+      </div>
+
+      <p class="teach-headline" id="whatNow"></p>
+      <p class="notice-label">Notice</p>
+      <ol class="notice-list" id="noticeList"></ol>
+      <ul class="teach-points" id="keyPoints"></ul>
+      <div class="eq-box" id="eqBox"></div>
+      <p class="remember" id="rememberLine"></p>
+      <p class="warn-line hidden" id="seqWarn"></p>
+
+      <div class="group" id="tissueViewGroup">
+        <h2 style="margin-bottom:2px;">Display</h2>
+        <div class="btn-row">
+          <button data-view="spins" class="view-btn active">Individual spins</button>
+          <button data-view="multi" class="view-btn">Multi-tissue vectors</button>
+        </div>
+        <select id="referenceTissueSel"></select>
+      </div>
+
+      <div class="group" id="paramGroup">
+        <h2 style="margin-bottom:2px;">Parameters</h2>
+        <div class="row"><label>TR (ms)</label><span class="value" id="trVal">500</span></div>
+        <input id="trSlider" type="range" min="150" max="9000" step="10" value="500" disabled />
+        <div class="row"><label>TE (ms)</label><span class="value" id="teVal">15</span></div>
+        <input id="teSlider" type="range" min="5" max="200" step="1" value="15" disabled />
+        <div class="row" id="tiRow"><label>TI (ms)</label><span class="value" id="tiVal">— </span></div>
+        <input id="tiSlider" type="range" min="50" max="3000" step="10" value="150" disabled />
+      </div>
+
+      <div class="group hidden" id="manualActionsGroup">
+        <button id="applyChangesBtn" class="primary">Apply changes</button>
+        <div class="btn-row">
+          <button id="restorePresetBtn">Restore sequence preset</button>
+          <button id="replayExplainBtn">Replay explanation</button>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="panel complete-banner" id="completeBanner">
+    <h3>Guided demonstration complete</h3>
+    <p style="margin:0; color:var(--muted); font-size:0.85rem;">You've seen how this sequence's timing produces its contrast. Try changing the parameters yourself, or watch it again.</p>
+    <div class="complete-actions">
+      <button id="tryItBtn" class="primary">Try it yourself</button>
+      <button id="replayGuidedBtn">Replay guided demonstration</button>
+    </div>
+  </section>
+
+  <section class="panel" style="padding:0.8rem;">
+    <div class="row" style="grid-template-columns: 1fr auto;">
+      <h2 style="margin:0; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:#9ec6f2;">Tissue Signal &amp; Image Preview</h2>
+    </div>
+    <div class="plots" style="grid-template-columns: 1fr 1fr 1.1fr; margin-top:0.6rem;">
+      <div>
+        <div id="signalBars"></div>
+      </div>
+      <div>
+        <table class="tt" id="signalTable"><thead><tr><th>Tissue</th><th>Mz@exc</th><th>Mxy@TE</th><th>Signal</th></tr></thead><tbody id="signalTableBody"></tbody></table>
+      </div>
+      <div>
+        <canvas id="phantomCanvas" aria-label="MRI image preview phantom"></canvas>
+        <p style="font-size:0.68rem; color:var(--muted); margin:0.3rem 0 0;">Deterministic phantom. Brightness is calculated from the signal equations, updated only after signal acquisition.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" style="padding:0.8rem;">
+    <h2 style="margin:0 0 0.5rem; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:#9ec6f2;">Sequence Comparison</h2>
+    <div style="overflow-x:auto;">
+      <table class="compare-table" id="compareTable">
+        <thead><tr><th>Sequence</th><th>TR</th><th>TE</th><th>TI</th><th>Main mechanism</th><th>Fluid</th><th>Fat</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p style="font-size:0.74rem; color:var(--muted); margin-top:0.5rem;">Click a row to load that guided sequence.</p>
+  </section>
+
+  <div class="info-box" role="note">
+    <div><span class="badge">Note</span>These are simplified educational signal models, not a complete scanner simulation. Tissue values are illustrative approximations.</div>
+  </div>
+</div>
+
+<script>
+(() => {
+/* ============================================================
+   TISSUES — persistent colours across vectors, curves, bars, phantom
+   ============================================================ */
+const TISSUES = [
+  { id: "fat",     name: "Fat",           color: "var(--tissue-fat)",    hex: "#ff9b4a", pd: 0.90, t1: 260,  t2: 80,   t2star: 55 },
+  { id: "wm",      name: "White matter",  color: "var(--tissue-wm)",     hex: "#4cc3ff", pd: 0.66, t1: 660,  t2: 72,   t2star: 55 },
+  { id: "gm",      name: "Grey matter",   color: "var(--tissue-gm)",     hex: "#7bffb8", pd: 0.78, t1: 950,  t2: 98,   t2star: 75 },
+  { id: "csf",     name: "CSF / fluid",   color: "var(--tissue-csf)",    hex: "#74a9ff", pd: 1.00, t1: 3200, t2: 1800, t2star: 900 },
+  { id: "muscle",  name: "Muscle",        color: "var(--tissue-muscle)", hex: "#c084fc", pd: 0.70, t1: 900,  t2: 45,   t2star: 35 },
+  { id: "oedema",  name: "Oedema/lesion", color: "var(--tissue-oedema)", hex: "#ff6ea8", pd: 0.85, t1: 1500, t2: 130,  t2star: 95 },
+  { id: "marrow",  name: "Marrow fat",    color: "var(--tissue-marrow)", hex: "#ffc98a", pd: 0.85, t1: 300,  t2: 70,   t2star: 50 }
+];
+const TISSUE_MAP = Object.fromEntries(TISSUES.map(t => [t.id, t]));
+
+/* ============================================================
+   PHYSICS — matches the simplified educational equations
+   ============================================================ */
+function seSignal(pd, t1, t2, TR, TE) { return pd * (1 - Math.exp(-TR / t1)) * Math.exp(-TE / t2); }
+function irseSignalSigned(pd, t1, t2, TR, TE, TI) { return pd * (1 - 2 * Math.exp(-TI / t1) + Math.exp(-TR / t1)) * Math.exp(-TE / t2); }
+function mzAfterInversion(t1, t) { return 1 - 2 * Math.exp(-t / t1); }
+function mzRecoveryFrom0(t1, t) { return 1 - Math.exp(-t / t1); }
+function tiNull(t1) { return t1 * Math.LN2; }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function lerp(a, b, t) { t = clamp(t, 0, 1); return a + (b - a) * t; }
+
+/* ============================================================
+   SEQUENCE PRESETS — each stage carries the teaching text and a
+   "phase" keyword the shared engine below knows how to animate.
+   ============================================================ */
+function st(id, title, phase, opts) {
+  return Object.assign({ id, title, phase }, opts);
+}
+const SE_FAM = "se", IRSE_FAM = "irse";
+
+const PRESETS = {
+  t1w: {
+    id: "t1w", name: "T1 Weighted", family: SE_FAM,
+    line: "Spin echo · short TR, short TE", contrast: "T1 recovery",
+    bright: "Fat relatively bright", dark: "Fluid relatively dark",
+    defaultTR: 500, defaultTE: 15, defaultTI: null, refTissue: "wm",
+    stages: [
+      st("eq", "Equilibrium", "equilibrium", { what: "Spins precess around B0. Slightly more magnetic moments occupy the lower-energy state aligned with B0, producing net longitudinal magnetisation.", why: "No signal exists yet — nothing has been tipped into the transverse plane.", points: ["Mz sits at equilibrium", "Mxy is approximately zero", "This is the starting point for every tissue"], eq: "Mz = M0 (equilibrium)", remember: "Remember: equilibrium magnetisation is a property of B0 and proton density, not of the sequence." }),
+      st("tr", "Short TR selected", "equilibrium", { activeParam: "TR", what: "A short repetition time means the next excitation pulse occurs before all tissues have fully recovered their longitudinal magnetisation.", why: "Short TR increases T1 weighting — different tissues recover at different rates, and that difference is what the image will show.", points: ["Fat recovers relatively rapidly", "CSF recovers slowly", "TR does not change tissue T1 itself"], eq: "Available Mz before excitation = M0 × [1 − exp(−TR/T1)]", remember: "Remember: short TR reveals T1 differences; it doesn't create them." }),
+      st("exc", "First 90° excitation", "excite", { pulse: "excitation", what: "The 90° pulse converts the currently available longitudinal magnetisation into transverse magnetisation.", why: "Tissues with more Mz immediately before the pulse create more initial Mxy — this is where T1 differences enter the image.", points: ["Mz rotates towards the transverse plane", "Mxy appears", "Receiver signal begins only once transverse coherence exists"], eq: "Mxy(0) = available Mz just before the pulse", remember: "Remember: the receiver detects transverse magnetisation, never static Mz directly." }),
+      st("coh", "Transverse coherence", "coherence", { what: "Immediately after excitation, spins are momentarily more in phase with each other.", why: "Coherent transverse magnetisation induces a detectable voltage in the receiver coil.", points: ["Spins point in a similar direction", "Mxy is at its local maximum for this excitation", "This coherence will not last"], eq: "Signal ∝ |Mxy|", remember: "Remember: coherence, not magnitude alone, is what the coil actually detects." }),
+      st("deph", "T2 decay begins", "dephase", { what: "Individual spins begin separating in phase due to spin-spin interactions (and field inhomogeneity, if T2* is shown).", why: "With a short TE, decay so far is small — T2 differences barely matter yet for this sequence.", points: ["Mxy decreases", "True T2 decay is irreversible", "Static-field dephasing (T2*) is reversible"], eq: "Mxy(t) = Mxy(0) × exp(−t/T2)", remember: "Remember: T2 decay and T1 recovery happen at the same time, not one after the other." }),
+      st("ref", "180° refocusing", "refocus", { pulse: "refocus", activeParam: "TE", what: "The refocusing pulse reverses reversible phase dispersion from static field inhomogeneity.", why: "It cannot recover signal already lost through true T2 decay — only the reversible part is undone.", points: ["Applied at TE/2", "Flips spin phase, not the T2 envelope", "Produces a clean echo without a second excitation"], eq: "180° refocusing at t = TE/2", remember: "Remember: a refocusing pulse is not a second excitation pulse." }),
+      st("echo", "Spin echo", "rephase", { what: "Spins that dephased from static field effects progressively rephase.", why: "At TE, the rephased signal peaks — this is the spin echo, and it's what the receiver samples.", points: ["Coherence is restored where it was reversible", "The echo peaks exactly at TE", "True T2 decay continued underneath the whole time"], eq: "Echo centre at t = TE", remember: "Remember: the echo peak still sits on the true-T2 decay envelope." }),
+      st("acq", "Signal acquisition (short TE)", "rephase", { activeParam: "TE", what: "A short TE limits how much T2-dependent signal loss has occurred before readout.", why: "Because TE is short, tissue signal is barely T2-weighted, so T1 differences dominate the contrast.", points: ["Short TE minimises T2 weighting", "Fat, with fast T1 recovery, is now bright", "CSF, with slow recovery, is dark"], eq: "S ∝ ρ × [1−exp(−TR/T1)] × exp(−TE/T2)", remember: "Remember: short TE protects T1 weighting from being diluted by T2 effects." }),
+      st("t1rec", "Partial T1 recovery", "recover", { activeParam: "TR", what: "Different tissues now recover Mz at different rates, each following its own T1.", why: "Fat recovers faster than white matter, grey matter and CSF — this sets up the contrast for the next excitation.", points: ["Recovery curves diverge by tissue", "Fat's curve rises fastest", "CSF's curve barely rises in a short TR"], eq: "Mz(t) = M0 × [1 − exp(−t/T1)]", remember: "Remember: T1 recovery curves are a tissue property; how far along them you sample is a sequence choice." }),
+      st("rep", "Repeated excitation", "excite", { pulse: "excitation", what: "Before full recovery, the next excitation pulse arrives.", why: "Tissues with more recovered Mz generate more transverse signal — short-T1 tissue produces relatively stronger signal, slow-recovering fluid produces weaker signal.", points: ["Fat: strong signal again", "CSF: weak signal again", "This repeats every TR"], eq: "Signal each TR depends on Mz available at that instant", remember: "Remember: T1 weighting is really a story about incomplete recovery, repeated every TR." }),
+      st("cmp", "Tissue signal comparison", "tissueCompare", { what: "The calculated signal for every tissue is now compared side by side.", why: "For a conventional non-contrast brain T1-weighted image: fat is relatively bright, white matter is brighter than grey matter, grey matter is intermediate, and CSF is dark.", points: ["Fat: bright", "White matter > grey matter", "CSF: dark", "Oedema: usually relatively low signal"], eq: "Ranking driven entirely by [1−exp(−TR/T1)]", remember: "Remember: brightness is always relative to the sequence — never state it as a universal tissue property." }),
+      st("img", "T1-weighted image", "finalImage", { what: "The phantom brightness is generated from the calculated signal, tissue by tissue.", why: "T1 weighting mainly reflects differences in longitudinal recovery because TR is short and TE is short.", points: ["Image forms only after signal acquisition", "Brightness = calculated relative signal", "Not manually painted"], eq: "Final image ∝ calculated S for each tissue", remember: "Remember: T1 is a tissue property. T1 weighting is produced by the sequence timing." })
+    ]
+  },
+  t2w: {
+    id: "t2w", name: "T2 Weighted", family: SE_FAM,
+    line: "Spin echo · long TR, long TE", contrast: "T2 decay",
+    bright: "Fluid and oedema bright", dark: "Short-T2 tissue darker",
+    defaultTR: 3500, defaultTE: 100, defaultTI: null, refTissue: "csf",
+    stages: [
+      st("eq", "Equilibrium", "equilibrium", { what: "All tissue magnetisation points along +z, at rest.", why: "This is the shared starting point before any T1 or T2 weighting is introduced.", points: ["Mz at equilibrium", "Mxy ≈ 0"], eq: "Mz = M0", remember: "Remember: every sequence starts from the same equilibrium — the timing that follows is what differs." }),
+      st("tr", "Long TR selected", "equilibrium", { activeParam: "TR", what: "A long TR allows substantial longitudinal recovery before the next excitation.", why: "This reduces differences caused by T1, clearing the way for T2 to dominate the contrast.", points: ["Long TR minimises T1 weighting", "Applies to every tissue simultaneously"], eq: "Recovery fraction = 1 − exp(−TR/T1), TR large", remember: "Remember: long TR is how you deliberately switch T1 weighting off." }),
+      st("full", "Full T1 recovery", "recover", { what: "Most tissue Mz vectors return close to equilibrium before excitation.", why: "With T1 differences minimised, the sequence is now better able to emphasise differences in T2 decay.", points: ["Nearly all tissues start near M0", "T1 contrast is largely removed"], eq: "1 − exp(−TR/T1) ≈ 1 for long TR", remember: "Remember: near-complete recovery for every tissue means T1 stops mattering much." }),
+      st("exc", "90° excitation", "excite", { pulse: "excitation", what: "The available (nearly full) longitudinal magnetisation is rotated into the transverse plane.", why: "Because recovery was nearly complete for all tissues, initial Mxy starts out similar across tissues.", points: ["Mxy appears, similar magnitude across tissues", "Any contrast from here on is not from T1"], eq: "Mxy(0) ≈ M0 for every tissue", remember: "Remember: similar starting Mxy is exactly what you want before a T2-weighted readout." }),
+      st("coh", "Transverse coherence", "coherence", { what: "Spins are briefly coherent, producing a strong initial transverse signal.", why: "This coherent signal is the baseline the T2-dependent decay will now act on.", points: ["Signal starts strong for every tissue", "Differences will emerge only as time passes"], eq: "Signal ∝ |Mxy|", remember: "Remember: at t≈0, tissues look similar — T2 contrast needs time to develop." }),
+      st("deph", "T2 dephasing", "dephase", { what: "Transverse magnetisation decays at a tissue-specific rate.", why: "This is where contrast is actually generated in a T2-weighted image.", points: ["Short-T2 tissue loses signal quickly", "Long-T2 tissue (fluid) retains signal longer"], eq: "Mxy(t) = Mxy(0) × exp(−t/T2)", remember: "Remember: T2 differences take time to show — that's why TE must be long." }),
+      st("ref", "180° refocusing", "refocus", { pulse: "refocus", what: "The 180° pulse corrects reversible, static-field-related phase dispersion.", why: "It does not reverse irreversible T2 decay — that keeps happening.", points: ["Applied at TE/2", "Fixes only the reversible part of dephasing"], eq: "180° refocusing at t = TE/2", remember: "Remember: refocusing ≠ undoing T2 decay." }),
+      st("cont", "Continued T2 decay", "rephase", { what: "Spins rephase from the reversible dephasing, but the overall vector length keeps shrinking according to true T2.", why: "This is the essential point: the echo does not return to its original full length.", points: ["Coherence improves", "Magnitude envelope keeps falling", "Both are true at once"], eq: "Envelope = exp(−τ/T2), independent of the refocusing pulse", remember: "Remember: rephasing restores direction, not the T2-decayed magnitude." }),
+      st("echo", "Late spin echo", "rephase", { activeParam: "TE", what: "At this long TE, fluid retains relatively high signal; oedema retains relatively high signal; muscle and short-T2 tissue have lower signal.", why: "Long TE is what exposes these T2 differences — a short TE would have hidden them.", points: ["Fluid/oedema: high remaining signal", "Muscle: low remaining signal"], eq: "S ∝ ρ × [1−exp(−TR/T1)] × exp(−TE/T2)", remember: "Remember: long TE increases T2 weighting; long TR reduces T1 weighting — together they define this sequence." }),
+      st("cmp", "Tissue comparison", "tissueCompare", { what: "Calculated signal is now compared across tissues.", why: "For conventional brain T2 weighting: CSF is bright, oedema is bright, grey matter is brighter than white matter.", points: ["CSF: bright", "Oedema: bright", "Grey matter > white matter", "Fat: variable, not the dominant teaching feature here"], eq: "Ranking driven by exp(−TE/T2)", remember: "Remember: T2 and T1 weighting can produce opposite orderings for the same tissues." }),
+      st("img", "T2-weighted image", "finalImage", { what: "The phantom brightness is generated from the calculated T2-weighted signal.", why: "T2 weighting mainly reflects how much transverse magnetisation remains at a long TE; long TR keeps T1 out of the picture.", points: ["Image forms only after acquisition", "CSF and oedema are the brightest structures"], eq: "Final image ∝ calculated S for each tissue", remember: "Remember: T2 weighting is a property of the acquired image, not of the tissue alone." })
+    ]
+  },
+  flair: {
+    id: "flair", name: "T2 FLAIR", family: IRSE_FAM,
+    line: "Inversion recovery + T2 readout · long TI nulls CSF", contrast: "Inversion recovery + T2",
+    bright: "Many oedematous lesions bright", dark: "CSF dark",
+    defaultTR: 8000, defaultTE: 120, refTissue: "csf", suppressed: "csf",
+    stages: [
+      st("eq", "Equilibrium", "equilibrium", { what: "All tissues sit with positive longitudinal magnetisation, along +z.", why: "This is the starting point before the inversion pulse that defines FLAIR.", points: ["Mz > 0 for every tissue"], eq: "Mz = M0", remember: "Remember: FLAIR still starts from the same equilibrium as every other sequence." }),
+      st("inv", "180° inversion", "invert", { pulse: "inversion", what: "This is an inversion pulse — it prepares tissue magnetisation before the later excitation pulse.", why: "It sets up a race: every tissue must now recover from −z back towards +z, each at its own T1 rate.", points: ["Rotates Mz from +z to −z", "Not the same event as a refocusing pulse", "Nothing is excited yet"], eq: "Mz(0+) = −M0", remember: "Remember: the inversion pulse and the later refocusing pulse are two different events — never confuse them." }),
+      st("neg", "Negative Mz", "negMz", { what: "Tissue vectors now point towards −z.", why: "No substantial receiver signal is shown here, because static longitudinal magnetisation is not directly detected by the coil.", points: ["Mz is negative", "Mxy is still zero", "No signal yet, by design"], eq: "Mz = −M0 immediately after inversion", remember: "Remember: the coil only ever detects changing transverse magnetisation." }),
+      st("rec", "Differential T1 recovery", "diffRecovery", { what: "Each tissue recovers from −Mz through zero and towards +Mz, at a rate set by its own T1.", why: "Fat and white/grey matter cross zero early; CSF, with a very long T1, crosses much later.", points: ["Fat crosses zero earliest", "White then grey matter follow", "CSF lags far behind"], eq: "Mz(t) = M0 × [1 − 2exp(−t/T1)]", remember: "Remember: it's the same recovery equation for every tissue — only T1 differs." }),
+      st("appr", "CSF approaches zero", "approachNull", { activeParam: "TI", what: "The animation slows as CSF's magnetisation nears its zero crossing.", why: "The inversion time is chosen so CSF longitudinal magnetisation is close to zero right when the excitation pulse fires.", points: ["CSF curve is highlighted", "Getting the timing right here is the whole point of FLAIR"], eq: "TI_null ≈ T1(CSF) × ln(2)", remember: "Remember: TI is derived from CSF's own T1 — it isn't an arbitrary number." }),
+      st("null", "CSF null point", "correctTI", { activeParam: "TI", what: "At the selected TI, CSF Mz is at approximately zero.", why: "A subsequent 90° pulse can therefore create almost no transverse magnetisation from CSF — suppression is caused by timing, not by painting it dark later.", points: ["CSF NULL POINT reached", "Other tissues are further from their own null points"], eq: "Mz(CSF, TI) ≈ 0", remember: "Remember: CSF suppression comes from the calculated Mz at TI, not from an arbitrary override." }),
+      st("exc", "90° excitation", "excite", { pulse: "excitation", what: "Whatever Mz each tissue has at this instant is tipped into the transverse plane.", why: "CSF contributes almost nothing; tissues further from their own null point contribute normally.", points: ["CSF: minimal Mxy generated", "Other tissue: normal Mxy generated"], eq: "Mxy(0) = |Mz(TI)| for each tissue", remember: "Remember: the excitation pulse just converts whatever Mz happens to be available at that moment." }),
+      st("supp", "CSF suppression", "coherence", { what: "The CSF signal bar stays near zero, calculated directly from its near-zero Mz at excitation.", why: "This is not CSF being manually darkened — it's a direct consequence of the inversion-recovery timing.", points: ["CSF bar ≈ 0", "Other tissues show normal transverse signal"], eq: "Signal(CSF) ≈ 0 because Mxy(0) ≈ 0", remember: "Remember: link every suppressed tissue back to its calculated magnetisation, never assign brightness by hand." }),
+      st("ref", "180° refocusing pulse", "refocus", { pulse: "refocus", what: "A separate 180° refocusing pulse is applied at TE/2, exactly as in a normal spin echo.", why: "This is a different event from the earlier inversion pulse — it corrects reversible dephasing, nothing more.", points: ["180° REFOCUSING PULSE — distinct from the earlier inversion pulse", "Same mechanism as T2-weighted spin echo"], eq: "Refocusing at t = TI + TE/2", remember: "Remember: FLAIR uses two different 180° pulses for two different jobs." }),
+      st("echo", "Long-TE echo", "rephase", { activeParam: "TE", what: "A long TE is used, just as in a T2-weighted sequence.", why: "Oedema and many high-water-content lesions, which have long T2, stay bright even with CSF suppressed.", points: ["Oedema retains T2 signal", "CSF stays suppressed because it contributed almost nothing at excitation"], eq: "S ∝ ρ × [1−2exp(−TI/T1)+exp(−TR/T1)] × exp(−TE/T2)", remember: "Remember: FLAIR keeps T2 sensitivity while removing free-fluid signal specifically." }),
+      st("cmp", "Tissue comparison", "tissueCompare", { what: "Calculated signal is compared across tissues.", why: "CSF is dark; many demyelinating or gliotic lesions are bright in this simplified model; grey matter is intermediate; white matter relatively darker.", points: ["CSF: dark", "Oedematous lesion: bright", "Grey > white matter", "Fat: variable unless separately suppressed"], eq: "Ranking from the IR-SE signal equation above", remember: "Remember: FLAIR does not suppress all fluid in every clinical situation — this is a simplified teaching model." }),
+      st("img", "FLAIR image", "finalImage", { what: "The phantom gradually transforms from a T2-like appearance into the FLAIR appearance.", why: "FLAIR preserves fluid-sensitive T2 contrast while suppressing free fluid such as CSF.", points: ["Image forms only after acquisition", "CSF dark, lesion conspicuity often improved"], eq: "Final image ∝ calculated S for each tissue", remember: "Remember: FLAIR suppresses CSF by selecting an appropriate inversion time, not by identity." })
+    ]
+  },
+  stir: {
+    id: "stir", name: "STIR", family: IRSE_FAM,
+    line: "Short-tau inversion recovery · short TI nulls fat", contrast: "Inversion recovery + fat suppression",
+    bright: "Fluid and oedema bright", dark: "Fat dark",
+    defaultTR: 4000, defaultTE: 40, refTissue: "fat", suppressed: "fat",
+    stages: [
+      st("eq", "Equilibrium", "equilibrium", { what: "Fat, muscle, marrow, fluid and oedema all sit with positive Mz.", why: "This is the shared starting point before the short-tau inversion.", points: ["All tissues at equilibrium"], eq: "Mz = M0", remember: "Remember: STIR and FLAIR share the same starting point — only the chosen TI differs." }),
+      st("inv", "180° inversion pulse", "invert", { pulse: "inversion", what: "Longitudinal magnetisation is rotated towards −z for every tissue.", why: "Fat, with a short T1, will recover fastest of all — this is what STIR exploits.", points: ["180° INVERSION PULSE", "Distinct from the later refocusing pulse"], eq: "Mz(0+) = −M0", remember: "Remember: it's the same inversion mechanism as FLAIR, just aimed at a different tissue." }),
+      st("neg", "Negative Mz", "negMz", { what: "All tissue vectors point towards −z.", why: "No signal is shown yet — this is static Mz, not detectable transverse magnetisation.", points: ["Mz negative for every tissue"], eq: "Mz = −M0", remember: "Remember: nothing has been excited yet." }),
+      st("rap", "Rapid fat recovery", "diffRecovery", { what: "Fat's Mz climbs from −M0 back through zero well before other tissues.", why: "Fat has a much shorter T1 than muscle or fluid, so its recovery race is won early.", points: ["Fat curve rises fastest", "Marrow fat behaves similarly to subcutaneous fat"], eq: "Mz(t) = M0 × [1 − 2exp(−t/T1)]", remember: "Remember: fat's short T1 is the entire reason STIR can null it early." }),
+      st("appr", "Fat approaches zero", "approachNull", { activeParam: "TI", what: "The animation slows as fat nears its zero crossing.", why: "At this short TI, fat has almost no longitudinal magnetisation left to excite.", points: ["Subcutaneous fat curve highlighted", "Marrow fat curve highlighted"], eq: "TI_null ≈ T1(fat) × ln(2)", remember: "Remember: STIR's TI is short specifically because fat's T1 is short." }),
+      st("null", "Fat null point", "correctTI", { activeParam: "TI", what: "At the selected short TI, fat Mz is approximately zero.", why: "The excitation pulse is timed for exactly this instant, so fat contributes almost nothing to the signal.", points: ["FAT NULL POINT reached", "Fluid and oedema are far from their own null points"], eq: "Mz(fat, TI) ≈ 0", remember: "Remember: the excitation pulse is timed when fat longitudinal magnetisation is approximately zero." }),
+      st("exc", "90° excitation", "excite", { pulse: "excitation", what: "Available Mz for every tissue is tipped into the transverse plane.", why: "Fat contributes almost nothing; fluid and oedema, far from their own null points, contribute strongly.", points: ["Minimal Mxy from fat", "Strong Mxy from muscle, fluid, oedema"], eq: "Mxy(0) = |Mz(TI)| for each tissue", remember: "Remember: suppression is a direct result of timing, applied identically to all short-T1 tissue." }),
+      st("supp", "Fat suppression", "coherence", { what: "Fat's signal bar falls close to zero.", why: "This is calculated from fat's near-zero Mz at excitation, not painted on.", points: ["Fat bar ≈ 0", "Marrow fat bar ≈ 0 too"], eq: "Signal(fat) ≈ 0 because Mxy(0) ≈ 0", remember: "Remember: STIR suppresses by short T1, not by chemical identity — see the warning below." }),
+      st("ref", "Refocusing pulse", "refocus", { pulse: "refocus", what: "A separate 180° spin-echo refocusing pulse is applied at TE/2.", why: "This is a different event from the earlier inversion pulse.", points: ["Standard spin-echo refocusing", "Distinct symbol from the inversion pulse"], eq: "Refocusing at t = TI + TE/2", remember: "Remember: two different 180° pulses, two different jobs — inversion first, refocusing second." }),
+      st("echo", "Fluid-sensitive echo", "rephase", { activeParam: "TE", what: "A fluid-sensitive readout is used.", why: "Oedema retains high signal, fluid remains bright, and fat remains dark.", points: ["Oedema/fluid: bright", "Fat: dark"], eq: "S ∝ ρ × [1−2exp(−TI/T1)+exp(−TR/T1)] × exp(−TE/T2)", remember: "Remember: STIR combines fat nulling with genuinely fluid-sensitive contrast." }),
+      st("cmp", "Tissue comparison", "tissueCompare", { what: "Calculated signal is compared across tissues.", why: "Subcutaneous fat and marrow fat are dark; muscle is intermediate-to-dark; fluid and oedema are bright.", points: ["Subcutaneous fat: dark", "Marrow fat: dark", "Muscle: intermediate/dark", "Fluid & oedema: bright"], eq: "Ranking from the IR-SE signal equation above", remember: "Remember: STIR is generally unsuitable for assessing gadolinium enhancement, because enhancement shortens T1 too." }),
+      st("img", "STIR image", "finalImage", { what: "The final phantom is generated from the calculated signal.", why: "STIR suppresses short-T1 tissues, particularly fat, while maintaining fluid-sensitive contrast.", points: ["Image forms only after acquisition", "Fat dark, fluid/oedema bright"], eq: "Final image ∝ calculated S for each tissue", remember: "Remember: STIR is not chemically selective for fat — other short-T1 tissue can also lose signal." })
+    ]
+  }
+};
+const SEQ_IDS = ["t1w", "t2w", "flair", "stir"];
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const spinCanvas = document.getElementById("spinCanvas");
+const mxyCanvas = document.getElementById("mxyCanvas");
+const mzCanvas = document.getElementById("mzCanvas");
+const timelineCanvas = document.getElementById("timelineCanvas");
+const phantomCanvas = document.getElementById("phantomCanvas");
+const sCtx = spinCanvas.getContext("2d");
+const mxyCtx = mxyCanvas.getContext("2d");
+const mzCtx = mzCanvas.getContext("2d");
+const tlCtx = timelineCanvas.getContext("2d");
+const phCtx = phantomCanvas.getContext("2d");
+
+const seqTabs = document.getElementById("seqTabs");
+const stageCardsEl = document.getElementById("stageCards");
+const stageNumEl = document.getElementById("stageNum");
+const stageTotalEl = document.getElementById("stageTotal");
+const teachChip = document.getElementById("teachChip");
+const stageTitleEl = document.getElementById("stageTitle");
+const whatNowEl = document.getElementById("whatNow");
+const noticeListEl = document.getElementById("noticeList");
+const keyPointsEl = document.getElementById("keyPoints");
+const eqBoxEl = document.getElementById("eqBox");
+const rememberEl = document.getElementById("rememberLine");
+const seqWarnEl = document.getElementById("seqWarn");
+const prevStageBtn = document.getElementById("prevStageBtn");
+const nextStageBtn = document.getElementById("nextStageBtn");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const replayBtn = document.getElementById("replayBtn");
+const resetBtn = document.getElementById("resetBtn");
+const skipManualBtn = document.getElementById("skipManualBtn");
+const completeBanner = document.getElementById("completeBanner");
+const tryItBtn = document.getElementById("tryItBtn");
+const replayGuidedBtn = document.getElementById("replayGuidedBtn");
+const trSlider = document.getElementById("trSlider"), trVal = document.getElementById("trVal");
+const teSlider = document.getElementById("teSlider"), teVal = document.getElementById("teVal");
+const tiSlider = document.getElementById("tiSlider"), tiVal = document.getElementById("tiVal");
+const tiRow = document.getElementById("tiRow");
+const paramGroup = document.getElementById("paramGroup");
+const manualActionsGroup = document.getElementById("manualActionsGroup");
+const applyChangesBtn = document.getElementById("applyChangesBtn");
+const restorePresetBtn = document.getElementById("restorePresetBtn");
+const replayExplainBtn = document.getElementById("replayExplainBtn");
+const referenceTissueSel = document.getElementById("referenceTissueSel");
+const signalBars = document.getElementById("signalBars");
+const signalTableBody = document.getElementById("signalTableBody");
+const compareTableBody = document.querySelector("#compareTable tbody");
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let seqId = "t1w";
+let mode = "guided"; /* guided | complete | manual */
+let vectorView = "spins";
+let refTissueId = "wm";
+const params = { TR: 500, TE: 15, TI: 150 };
+
+const spinState = {
+  running: true,
+  simTime: 0, last: performance.now(),
+  stageIdx: 0, stageTime: 0, stageProgress: 0,
+  spins: [], trails: [],
+  mxyHistory: [], mzHistory: [],
+  rfTime: null, echoApplied: false,
+  mz: 0, net: { mxy: 0, sx: 0, sy: 0 },
+  invertStartTime: null,
+  simTI: 0
+};
+
+function preset() { return PRESETS[seqId]; }
+function stage() { return preset().stages[spinState.stageIdx]; }
+function refTissue() { return TISSUE_MAP[refTissueId]; }
+
+function randNorm() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function initSpins(coherent) {
+  const n = 128;
+  spinState.spins = [];
+  for (let i = 0; i < n; i++) spinState.spins.push({ phase: coherent ? 0 : Math.random() * Math.PI * 2, staticHz: randNorm() * 15 });
+  spinState.trails = new Array(n).fill(0).map(() => []);
+}
+function resizeCanvas(canvas, ctx) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* stage wall duration (educational, not literal ms-for-ms) */
+const STAGE_MS = reducedMotion ? 1 : 1700;
+
+/* ============================================================
+   STAGE ENGINE — one shared machine for all four sequences
+   ============================================================ */
+function gotoStage(i) {
+  const stages = preset().stages;
+  spinState.stageIdx = clamp(i, 0, stages.length - 1);
+  spinState.stageTime = 0;
+  spinState.stageProgress = 0;
+  const ph = stages[spinState.stageIdx].phase;
+  if (ph === "equilibrium" || ph === "negMz" || ph === "diffRecovery" || ph === "approachNull" || ph === "correctTI") {
+    initSpins(false);
+    spinState.rfTime = null;
+    spinState.echoApplied = false;
+  }
+  if (ph === "excite") { initSpins(true); spinState.rfTime = spinState.simTime; spinState.echoApplied = false; }
+  update(0); /* force an immediate recompute so the visuals never show a stale previous-stage state, even while paused */
+  renderTeaching();
+  renderStageCards();
+}
+function resetAll() {
+  spinState.simTime = 0; spinState.stageIdx = 0; spinState.stageTime = 0; spinState.stageProgress = 0;
+  spinState.mxyHistory = []; spinState.mzHistory = []; spinState.rfTime = null; spinState.echoApplied = false;
+  spinState.running = true; playPauseBtn.textContent = "Pause";
+  gotoStage(0);
+}
+
+function applyEcho() { spinState.echoApplied = true; for (const s of spinState.spins) s.phase = -s.phase; }
+
+function updateSpinsDephase(dtSec, t2) {
+  for (const s of spinState.spins) {
+    let dPhase = 2 * Math.PI * s.staticHz * dtSec;
+    const diffusionSigma = 0.4 * Math.sqrt(dtSec / Math.max(0.001, t2)) * 0.26;
+    dPhase += randNorm() * diffusionSigma;
+    s.phase += dPhase;
+    if (s.phase > Math.PI) s.phase -= Math.PI * 2;
+    if (s.phase < -Math.PI) s.phase += Math.PI * 2;
+  }
+}
+
+function update(dtMs) {
+  const dtSec = (dtMs / 1000);
+  spinState.simTime += dtSec;
+  spinState.stageTime += dtSec * 1000;
+  spinState.stageProgress = clamp(spinState.stageTime / STAGE_MS, 0, 1);
+
+  const t = refTissue();
+  const p = params;
+  const ph = stage().phase;
+  let transScale = spinState.net.mxy, mz = spinState.mz;
+
+  if (ph === "equilibrium") { transScale = 0; mz = 1; }
+  else if (ph === "invert") { mz = lerp(1, -1, spinState.stageProgress); transScale = 0; }
+  else if (ph === "negMz") { mz = -1; transScale = 0; }
+  else if (ph === "diffRecovery" || ph === "approachNull" || ph === "correctTI") {
+    if (ph === "diffRecovery") spinState.simTI = p.TI * spinState.stageProgress * 0.6;
+    else if (ph === "approachNull") spinState.simTI = p.TI * (0.6 + 0.4 * spinState.stageProgress);
+    else spinState.simTI = p.TI;
+    mz = clamp(mzAfterInversion(t.t1, spinState.simTI), -1, 1);
+    transScale = 0;
+  } else if (ph === "excite") {
+    const avail = preset().family === IRSE_FAM ? Math.abs(mzAfterInversion(t.t1, p.TI)) : 1;
+    transScale = avail * spinState.stageProgress;
+    mz = avail * (1 - spinState.stageProgress);
+    if (spinState.rfTime === null) spinState.rfTime = spinState.simTime - spinState.stageTime / 1000;
+    for (const s of spinState.spins) s.phase = 0;
+  } else if (ph === "coherence") {
+    const avail = preset().family === IRSE_FAM ? Math.abs(mzAfterInversion(t.t1, p.TI)) : 1;
+    transScale = avail; mz = 0;
+  } else if (ph === "dephase" || ph === "rephase" || ph === "tissueCompare" || ph === "finalImage") {
+    if (spinState.rfTime === null) spinState.rfTime = spinState.simTime;
+    const tauRF = Math.max(0, spinState.simTime - spinState.rfTime);
+    const te2 = (p.TE / 1000) * 0.5;
+    if (!spinState.echoApplied && tauRF >= te2 && (ph === "rephase" || ph === "tissueCompare" || ph === "finalImage")) applyEcho();
+    updateSpinsDephase(dtSec, t.t2 / 1000);
+    const avail = preset().family === IRSE_FAM ? Math.abs(mzAfterInversion(t.t1, p.TI)) : 1;
+    transScale = avail * Math.exp(-tauRF / (t.t2 / 1000));
+    mz = avail * mzRecoveryFrom0(t.t1 / 1000, tauRF);
+  } else if (ph === "recover") {
+    if (spinState.rfTime === null) spinState.rfTime = spinState.simTime;
+    const tauRF = Math.max(0, spinState.simTime - spinState.rfTime);
+    transScale = Math.exp(-tauRF / (t.t2 / 1000)) * 0.15;
+    mz = mzRecoveryFrom0(t.t1 / 1000, tauRF);
+  }
+
+  spinState.mz = clamp(mz, -1, 1);
+  spinState.net = computeMxy(transScale);
+  spinState.mxyHistory.push({ t: spinState.simTime, mxy: spinState.net.mxy });
+  spinState.mzHistory.push({ t: spinState.simTime, mz: spinState.mz });
+  if (spinState.mxyHistory.length > 900) spinState.mxyHistory.shift();
+  if (spinState.mzHistory.length > 900) spinState.mzHistory.shift();
+
+  if (mode === "guided" && spinState.running && !reducedMotion) {
+    if (spinState.stageProgress >= 1) {
+      if (spinState.stageIdx < preset().stages.length - 1) gotoStage(spinState.stageIdx + 1);
+      else { mode = "complete"; completeBanner.classList.add("show"); spinState.running = false; }
+    }
+  }
+}
+function computeMxy(transScale) {
+  let sx = 0, sy = 0;
+  const n = Math.max(1, spinState.spins.length);
+  for (const s of spinState.spins) { sx += Math.cos(s.phase); sy += Math.sin(s.phase); }
+  sx = (sx / n) * transScale; sy = (sy / n) * transScale;
+  return { mxy: Math.hypot(sx, sy), sx, sy };
+}
+
+/* ============================================================
+   RENDER — individual spins, Mxy/Mz plots (visual technique
+   reused from the reference page), timeline, bars, phantom
+   ============================================================ */
+function drawArrow(ctx, x1, y1, x2, y2, color, width) {
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const head = 8 + width;
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - head * Math.cos(ang - 0.34), y2 - head * Math.sin(ang - 0.34));
+  ctx.lineTo(x2 - head * Math.cos(ang + 0.34), y2 - head * Math.sin(ang + 0.34));
+  ctx.closePath(); ctx.fill();
+}
+function drawSpinView() {
+  const w = spinCanvas.clientWidth, h = spinCanvas.clientHeight;
+  sCtx.clearRect(0, 0, w, h);
+  const cx = w * 0.4, cy = h * 0.55, r = Math.min(w * 0.32, h * 0.36);
+
+  sCtx.strokeStyle = "rgba(120,150,190,0.22)"; sCtx.lineWidth = 1;
+  sCtx.beginPath(); sCtx.arc(cx, cy, r, 0, Math.PI * 2); sCtx.stroke();
+  sCtx.setLineDash([5, 5]);
+  sCtx.beginPath(); sCtx.moveTo(cx - r - 14, cy); sCtx.lineTo(cx + r + 14, cy);
+  sCtx.moveTo(cx, cy - r - 14); sCtx.lineTo(cx, cy + r + 14); sCtx.stroke();
+  sCtx.setLineDash([]);
+
+  if (vectorView === "spins") {
+    const scale = clamp(spinState.net.mxy, 0.05, 1);
+    for (const s of spinState.spins) {
+      const len = r * Math.max(0.12, scale);
+      const px = cx + Math.cos(s.phase) * len, py = cy - Math.sin(s.phase) * len;
+      sCtx.strokeStyle = "rgba(76,195,255,0.5)"; sCtx.lineWidth = 1.0;
+      sCtx.beginPath(); sCtx.moveTo(cx, cy); sCtx.lineTo(px, py); sCtx.stroke();
+      sCtx.fillStyle = "rgba(76,195,255,0.7)"; sCtx.beginPath(); sCtx.arc(px, py, 2, 0, Math.PI * 2); sCtx.fill();
+    }
+    const nx = cx + spinState.net.sx * r * 1.15, ny = cy - spinState.net.sy * r * 1.15;
+    drawArrow(sCtx, cx, cy, nx, ny, "rgba(123,255,184,0.95)", 4);
+    sCtx.fillStyle = "rgba(123,255,184,0.95)"; sCtx.font = "700 13px Avenir Next"; sCtx.fillText("Mxy", nx + 8, ny - 6);
+  } else {
+    TISSUES.forEach((t0, i) => {
+      const t = t0;
+      const avail = preset().family === IRSE_FAM ? Math.abs(mzAfterInversion(t.t1, params.TI)) : 1;
+      const tauRF = spinState.rfTime === null ? 0 : Math.max(0, spinState.simTime - spinState.rfTime);
+      const mxy = ["dephase", "rephase", "tissueCompare", "finalImage", "recover"].includes(stage().phase) ? avail * Math.exp(-tauRF / (t.t2 / 1000)) : (stage().phase === "coherence" || stage().phase === "excite" ? avail : 0);
+      const angle = i * 0.12;
+      const nx = cx + Math.cos(angle) * mxy * r * 1.1, ny = cy - Math.sin(angle) * mxy * r * 1.1;
+      drawArrow(sCtx, cx, cy, nx, ny, t0.hex, 3);
+    });
+  }
+
+  const mx = w * 0.86, yTop = h * 0.18, yBot = h * 0.84;
+  sCtx.strokeStyle = "rgba(160,185,220,0.55)"; sCtx.lineWidth = 2;
+  sCtx.beginPath(); sCtx.moveTo(mx, yBot); sCtx.lineTo(mx, yTop); sCtx.stroke();
+  sCtx.fillStyle = "rgba(190,210,240,0.9)"; sCtx.font = "700 13px Avenir Next"; sCtx.fillText("Mz", mx + 10, yTop + 4);
+  const yMid = (yTop + yBot) / 2;
+  const y0 = yMid - ((yMid - yTop)) * spinState.mz;
+  drawArrow(sCtx, mx, yMid, mx, y0, "rgba(255,215,107,0.95)", 4);
+  sCtx.strokeStyle = "rgba(255,215,107,0.25)"; sCtx.beginPath(); sCtx.moveTo(mx - 6, yMid); sCtx.lineTo(mx + 6, yMid); sCtx.stroke();
+
+  sCtx.fillStyle = "rgba(210,225,248,0.95)"; sCtx.font = "600 12px Avenir Next";
+  sCtx.fillText(stage().title, 12, 20);
+  sCtx.fillText(`Reference tissue: ${refTissue().name}`, 12, 38);
+  if (stage().pulse === "inversion") { sCtx.fillStyle = "rgba(255,155,74,0.95)"; sCtx.font = "700 13px Avenir Next"; sCtx.fillText("180° INVERSION PULSE", w * 0.5 - 70, h * 0.1); }
+  if (stage().pulse === "excitation") { sCtx.fillStyle = "rgba(76,195,255,0.95)"; sCtx.font = "700 13px Avenir Next"; sCtx.fillText("90° EXCITATION PULSE", w * 0.5 - 68, h * 0.1); }
+  if (stage().pulse === "refocus") { sCtx.fillStyle = "rgba(255,215,107,0.95)"; sCtx.font = "700 13px Avenir Next"; sCtx.fillText("180° REFOCUSING PULSE", w * 0.5 - 72, h * 0.1); }
+  if (stage().phase === "correctTI") { sCtx.fillStyle = "rgba(255,110,168,0.95)"; sCtx.font = "800 13px Avenir Next"; sCtx.fillText(`${refTissue().name.toUpperCase()} NULL POINT`, w * 0.5 - 60, h * 0.86); }
+}
+
+function drawAxes(ctx, w, h, padL, padR, padT, padB) {
+  const pw = w - padL - padR, ph = h - padT - padB;
+  ctx.strokeStyle = "rgba(120,150,190,0.22)"; ctx.lineWidth = 1; ctx.strokeRect(padL, padT, pw, ph);
+  return { pw, ph };
+}
+function drawMxyPlot() {
+  const w = mxyCanvas.clientWidth, h = mxyCanvas.clientHeight;
+  mxyCtx.clearRect(0, 0, w, h);
+  const padL = 42, padR = 10, padT = 16, padB = 20;
+  const { pw, ph } = drawAxes(mxyCtx, w, h, padL, padR, padT, padB);
+  const tWindow = 6, t0 = Math.max(0, spinState.simTime - tWindow);
+  const xOf = (t) => padL + ((t - t0) / tWindow) * pw;
+  const yOf = (v) => padT + (1 - clamp(v, 0, 1)) * ph;
+
+  TISSUES.forEach(t0v => {
+    const avail = preset().family === IRSE_FAM ? Math.abs(mzAfterInversion(t0v.t1, params.TI)) : 1;
+    mxyCtx.strokeStyle = t0v.hex + "cc"; mxyCtx.lineWidth = t0v.id === refTissueId ? 2.2 : 1;
+    mxyCtx.beginPath();
+    let started = false;
+    for (let i = 0; i <= 100; i++) {
+      const t = t0 + (i / 100) * tWindow;
+      const tau = spinState.rfTime === null ? -1 : t - spinState.rfTime;
+      const v = tau < 0 ? 0 : avail * Math.exp(-tau / (t0v.t2 / 1000));
+      const x = xOf(t), y = yOf(v);
+      if (!started) { mxyCtx.moveTo(x, y); started = true; } else mxyCtx.lineTo(x, y);
+    }
+    mxyCtx.stroke();
+  });
+  /* moving "now" playhead — the window always ends at the current instant */
+  const nowX = xOf(spinState.simTime);
+  mxyCtx.strokeStyle = "rgba(255,110,168,0.85)"; mxyCtx.lineWidth = 1.4;
+  mxyCtx.beginPath(); mxyCtx.moveTo(nowX, padT); mxyCtx.lineTo(nowX, padT + ph); mxyCtx.stroke();
+
+  mxyCtx.fillStyle = "rgba(210,225,248,0.9)"; mxyCtx.font = "600 11px Avenir Next"; mxyCtx.fillText("|Mxy| by tissue", 8, padT + 12);
+}
+function drawMzPlot() {
+  const w = mzCanvas.clientWidth, h = mzCanvas.clientHeight;
+  mzCtx.clearRect(0, 0, w, h);
+  const padL = 42, padR = 10, padT = 14, padB = 20;
+  const { pw, ph } = drawAxes(mzCtx, w, h, padL, padR, padT, padB);
+  const irse = preset().family === IRSE_FAM;
+  const tWindow = irse ? params.TI * 1.4 / 1000 : 3;
+  const yOf = (v) => padT + (1 - (irse ? (v + 1) / 2 : clamp(v, 0, 1))) * ph;
+  const xOf = (t) => padL + (t / tWindow) * pw;
+
+  if (irse) {
+    mzCtx.strokeStyle = "rgba(160,185,220,0.3)"; mzCtx.beginPath(); mzCtx.moveTo(padL, yOf(0)); mzCtx.lineTo(padL + pw, yOf(0)); mzCtx.stroke();
+  }
+  TISSUES.forEach(t0v => {
+    mzCtx.strokeStyle = t0v.hex + "cc"; mzCtx.lineWidth = t0v.id === refTissueId ? 2.2 : 1;
+    mzCtx.beginPath();
+    for (let i = 0; i <= 100; i++) {
+      const t = (i / 100) * tWindow;
+      const v = irse ? mzAfterInversion(t0v.t1, t * 1000) : mzRecoveryFrom0(t0v.t1 / 1000, t);
+      const x = xOf(t), y = yOf(v);
+      if (i === 0) mzCtx.moveTo(x, y); else mzCtx.lineTo(x, y);
+    }
+    mzCtx.stroke();
+  });
+  if (irse) {
+    const xTI = xOf(params.TI / 1000);
+    mzCtx.strokeStyle = "rgba(255,110,168,0.7)"; mzCtx.setLineDash([4, 3]);
+    mzCtx.beginPath(); mzCtx.moveTo(xTI, padT); mzCtx.lineTo(xTI, padT + ph); mzCtx.stroke(); mzCtx.setLineDash([]);
+    mzCtx.fillStyle = "rgba(255,110,168,0.9)"; mzCtx.font = "600 10px Avenir Next"; mzCtx.fillText(`TI=${params.TI}`, xTI + 3, padT + 12);
+  }
+
+  /* moving "now" playhead, synchronised with the timeline and spin view */
+  const preExcite = ["equilibrium", "invert", "negMz", "diffRecovery", "approachNull", "correctTI"].includes(stage().phase);
+  let nowT;
+  if (irse && preExcite) nowT = spinState.simTI / 1000;
+  else if (spinState.rfTime !== null) nowT = Math.max(0, spinState.simTime - spinState.rfTime);
+  else nowT = 0;
+  const nowX = clamp(xOf(nowT), padL, padL + pw);
+  mzCtx.strokeStyle = "rgba(255,215,107,0.85)"; mzCtx.lineWidth = 1.4;
+  mzCtx.beginPath(); mzCtx.moveTo(nowX, padT); mzCtx.lineTo(nowX, padT + ph); mzCtx.stroke();
+  mzCtx.fillStyle = "rgba(255,215,107,0.95)";
+  mzCtx.beginPath(); mzCtx.arc(nowX, yOf(spinState.mz), 3, 0, Math.PI * 2); mzCtx.fill();
+
+  mzCtx.fillStyle = "rgba(210,225,248,0.9)"; mzCtx.font = "600 11px Avenir Next"; mzCtx.fillText(irse ? "Signed Mz by tissue" : "Mz by tissue", 8, padT + 12);
+}
+
+const TL_ROWS = ["RF", "Gz", "Gy", "Gx", "ADC"];
+function timelineWindow() { return preset().family === IRSE_FAM ? params.TI + params.TE + 100 : Math.min(params.TR, params.TE * 2 + 200); }
+function timelineEvents() {
+  const p = params, ev = [];
+  if (preset().family === IRSE_FAM) {
+    ev.push({ t: 0, row: "RF", label: "180° inv", color: "#ff9b4a" });
+    ev.push({ t: 0, row: "Gz", label: "slice", color: "#7bffb8" });
+    ev.push({ t: p.TI, row: "RF", label: "90°", color: "#4cc3ff" });
+    ev.push({ t: p.TI, row: "Gz", label: "slice", color: "#7bffb8" });
+    ev.push({ t: p.TI + p.TE * 0.35, row: "Gy", label: "phase", color: "#c084fc" });
+    ev.push({ t: p.TI + p.TE / 2, row: "RF", label: "180° ref", color: "#ffd76b" });
+    ev.push({ t: p.TI + p.TE * 0.85, row: "Gx", label: "freq", color: "#ff9b4a" });
+    ev.push({ t: p.TI + p.TE - 5, row: "ADC", label: "echo", color: "#7bffb8" });
+  } else {
+    ev.push({ t: 0, row: "RF", label: "90°", color: "#4cc3ff" });
+    ev.push({ t: 0, row: "Gz", label: "slice", color: "#7bffb8" });
+    ev.push({ t: p.TE * 0.35, row: "Gy", label: "phase", color: "#c084fc" });
+    ev.push({ t: p.TE / 2, row: "RF", label: "180° ref", color: "#ffd76b" });
+    ev.push({ t: p.TE * 0.85, row: "Gx", label: "freq", color: "#ff9b4a" });
+    ev.push({ t: p.TE - 5, row: "ADC", label: "echo", color: "#7bffb8" });
+  }
+  return ev;
+}
+function drawTimeline() {
+  const w = timelineCanvas.clientWidth, h = timelineCanvas.clientHeight;
+  tlCtx.clearRect(0, 0, w, h);
+  const padL = 60, padR = 16, top = 14, rowH = (h - 40) / TL_ROWS.length;
+  const winMs = timelineWindow();
+  const x = (t) => padL + (t / winMs) * (w - padL - padR);
+
+  TL_ROWS.forEach((row, i) => {
+    const y = top + i * rowH;
+    tlCtx.strokeStyle = "rgba(120,150,190,0.2)"; tlCtx.beginPath(); tlCtx.moveTo(padL, y + rowH / 2); tlCtx.lineTo(w - padR, y + rowH / 2); tlCtx.stroke();
+    tlCtx.fillStyle = "rgba(166,182,209,0.9)"; tlCtx.font = "11px Avenir Next"; tlCtx.fillText(row, 8, y + rowH / 2 + 4);
+  });
+  timelineEvents().forEach(ev => {
+    const rowIdx = TL_ROWS.indexOf(ev.row); if (rowIdx < 0) return;
+    const y = top + rowIdx * rowH;
+    tlCtx.fillStyle = ev.color;
+    tlCtx.fillRect(x(ev.t), y + rowH * 0.2, Math.max(3, winMs * 0.006 * (w / 400)), rowH * 0.6);
+    tlCtx.fillStyle = "rgba(230,239,255,0.9)"; tlCtx.font = "10px Avenir Next"; tlCtx.fillText(ev.label, x(ev.t), y - 2);
+  });
+  if (preset().family === IRSE_FAM) {
+    tlCtx.fillStyle = "rgba(255,110,168,0.85)"; tlCtx.font = "10px monospace"; tlCtx.fillText(`TI=${params.TI}ms`, x(params.TI) - 14, h - 6);
+  }
+  tlCtx.fillStyle = "rgba(255,215,107,0.85)"; tlCtx.font = "10px monospace"; tlCtx.fillText(`TE=${params.TE}ms`, w - padR - 50, h - 6);
+  const playT = clamp(preset().family === IRSE_FAM
+    ? (["excite","coherence","dephase","refocus","rephase","tissueCompare","finalImage"].includes(stage().phase) ? params.TI + (spinState.rfTime !== null ? Math.max(0, spinState.simTime - spinState.rfTime) * 1000 : 0) : spinState.stageProgress * params.TI)
+    : (spinState.rfTime !== null ? Math.max(0, spinState.simTime - spinState.rfTime) * 1000 : 0), 0, winMs);
+  const px = x(playT);
+  tlCtx.strokeStyle = "#ff6ea8"; tlCtx.lineWidth = 2;
+  tlCtx.beginPath(); tlCtx.moveTo(px, top - 4); tlCtx.lineTo(px, top + TL_ROWS.length * rowH); tlCtx.stroke();
+}
+
+/* ============================================================
+   TISSUE SIGNAL / PHANTOM
+   ============================================================ */
+function tissueSignal(t) {
+  const p = params;
+  if (preset().family === IRSE_FAM) return Math.abs(irseSignalSigned(t.pd, t.t1, t.t2, p.TR, p.TE, p.TI));
+  return seSignal(t.pd, t.t1, t.t2, p.TR, p.TE);
+}
+function maxSignal() { let m = 0.0001; TISSUES.forEach(t => m = Math.max(m, tissueSignal(t))); return m; }
+let phantomBrightness = Object.fromEntries(TISSUES.map(t => [t.id, 0.4]));
+function renderSignalPanels() {
+  const maxSig = maxSignal();
+  const showAcquired = ["rephase", "tissueCompare", "finalImage"].includes(stage().phase) || (mode !== "guided");
+  let bars = "", rows = "";
+  TISSUES.forEach(t => {
+    const sig = tissueSignal(t);
+    const bright = showAcquired ? clamp(sig / maxSig, 0, 1) : 0.12;
+    bars += `<div class="bar-row"><span class="bar-label"><span class="swatch" style="background:${t.hex}"></span>${t.name}</span><span class="bar-track"><span class="bar-fill" style="width:${(bright*100).toFixed(0)}%;background:${t.hex}"></span></span><span class="bar-value">${showAcquired ? sig.toFixed(2) : "—"}</span></div>`;
+    const mzExc = preset().family === IRSE_FAM ? mzAfterInversion(t.t1, params.TI).toFixed(2) : "1.00";
+    rows += `<tr><td><span class="swatch" style="background:${t.hex};display:inline-block;margin-right:4px;"></span>${t.name}</td><td>${mzExc}</td><td>${showAcquired ? sig.toFixed(3) : "—"}</td><td>${showAcquired ? sig.toFixed(3) : "—"}</td></tr>`;
+    const target = showAcquired ? clamp(sig / maxSig, 0, 1) : 0.4;
+    phantomBrightness[t.id] += (target - phantomBrightness[t.id]) * 0.12;
+  });
+  signalBars.innerHTML = bars;
+  signalTableBody.innerHTML = rows;
+  drawPhantom();
+}
+function drawPhantom() {
+  const w = phantomCanvas.width, h = phantomCanvas.height, cx = w / 2, cy = h / 2;
+  phCtx.clearRect(0, 0, w, h);
+  phCtx.fillStyle = "#0a1220"; phCtx.fillRect(0, 0, w, h);
+  const col = (id) => { const b = phantomBrightness[id] ?? 0.4; const v = Math.round(15 + b * 225); return `rgb(${v},${v},${v})`; };
+  const stir = seqId === "stir";
+  if (!stir) {
+    phCtx.fillStyle = col("fat"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.46, h * 0.46, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("muscle"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.4, h * 0.4, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("gm"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.33, h * 0.33, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("wm"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.26, h * 0.26, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("csf"); phCtx.beginPath(); phCtx.ellipse(cx - w * 0.06, cy, w * 0.07, h * 0.14, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.beginPath(); phCtx.ellipse(cx + w * 0.06, cy, w * 0.07, h * 0.14, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("oedema"); phCtx.beginPath(); phCtx.ellipse(cx + w * 0.16, cy - h * 0.14, w * 0.07, h * 0.06, 0, 0, Math.PI * 2); phCtx.fill();
+  } else {
+    phCtx.fillStyle = col("fat"); phCtx.fillRect(w * 0.1, h * 0.15, w * 0.8, h * 0.7);
+    phCtx.fillStyle = col("muscle"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.28, h * 0.32, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("marrow"); phCtx.beginPath(); phCtx.ellipse(cx, cy, w * 0.1, h * 0.14, 0, 0, Math.PI * 2); phCtx.fill();
+    phCtx.fillStyle = col("oedema"); phCtx.beginPath(); phCtx.ellipse(cx + w * 0.16, cy + h * 0.1, w * 0.07, h * 0.06, 0, 0, Math.PI * 2); phCtx.fill();
+  }
+  phCtx.strokeStyle = "rgba(255,255,255,0.12)"; phCtx.strokeRect(0, 0, w, h);
+}
+
+/* ============================================================
+   COMPARE TABLE
+   ============================================================ */
+function buildCompareTable() {
+  const rowsMeta = {
+    t1w: { fluid: "Fluid generally dark", fat: "Fat relatively bright" },
+    t2w: { fluid: "Fluid bright", fat: "Fat variable" },
+    flair: { fluid: "CSF dark, other high-water lesions may remain bright", fat: "Not the primary target" },
+    stir: { fluid: "Fluid bright", fat: "Fat dark" }
+  };
+  compareTableBody.innerHTML = SEQ_IDS.map(id => {
+    const pr = PRESETS[id];
+    const ti = pr.defaultTI ? pr.defaultTI + " ms" : "No inversion";
+    return `<tr data-seq="${id}"><td>${pr.name}</td><td>${pr.defaultTR} ms</td><td>${pr.defaultTE} ms</td><td>${ti}</td><td>${pr.contrast}</td><td>${rowsMeta[id].fluid}</td><td>${rowsMeta[id].fat}</td></tr>`;
+  }).join("");
+  compareTableBody.querySelectorAll("tr[data-seq]").forEach(tr => tr.addEventListener("click", () => loadSequence(tr.dataset.seq)));
+}
+
+/* ============================================================
+   UI — sequence tabs, stage cards, teaching panel
+   ============================================================ */
+function buildSeqTabs() {
+  seqTabs.innerHTML = "";
+  SEQ_IDS.forEach(id => {
+    const pr = PRESETS[id];
+    const btn = document.createElement("button");
+    btn.className = "seq-card" + (id === seqId ? " active" : "");
+    btn.setAttribute("role", "tab");
+    btn.innerHTML = `<span class="sc-name">${pr.name.toUpperCase()}</span><span class="sc-fam">${pr.line}</span><span class="sc-line">Main contrast: ${pr.contrast}</span><span class="sc-line">${pr.bright}</span><span class="sc-line">${pr.dark}</span><span class="sc-start">Start walkthrough</span>`;
+    btn.addEventListener("click", () => loadSequence(id));
+    seqTabs.appendChild(btn);
+  });
+}
+function renderStageCards() {
+  const stages = preset().stages;
+  stageCardsEl.innerHTML = stages.map((s, i) => `<button class="stage-card ${i === spinState.stageIdx ? "active" : i < spinState.stageIdx ? "done" : ""}" data-i="${i}" role="tab"><b>${i + 1}</b>${s.title}</button>`).join("");
+  stageCardsEl.querySelectorAll("[data-i]").forEach(b => b.addEventListener("click", () => { spinState.running = false; playPauseBtn.textContent = "Play"; gotoStage(Number(b.dataset.i)); }));
+}
+function renderTeaching() {
+  const pr = preset(), s = stage();
+  stageNumEl.textContent = spinState.stageIdx + 1;
+  stageTotalEl.textContent = pr.stages.length;
+  teachChip.textContent = mode;
+  stageTitleEl.textContent = s.title;
+  whatNowEl.textContent = s.what;
+  /* One headline, then a short numbered list of things to notice. */
+  var notices = s.notices || [s.why].concat(s.points || []).filter(Boolean);
+  noticeListEl.innerHTML = notices.map(function (n, i) {
+    return '<li><span class="n">' + (i + 1) + '</span><span>' + n + '</span></li>';
+  }).join("");
+  keyPointsEl.innerHTML = (s.points || []).map(p => `<li>${p}</li>`).join("");
+  eqBoxEl.textContent = s.eq || "";
+  rememberEl.textContent = s.remember || "";
+  document.querySelectorAll(".group").forEach(g => g.classList.remove("highlight"));
+  if (s.activeParam === "TR") document.getElementById("paramGroup").classList.add("highlight");
+  if (s.activeParam === "TE") document.getElementById("paramGroup").classList.add("highlight");
+  if (s.activeParam === "TI") document.getElementById("paramGroup").classList.add("highlight");
+
+  let warn = "";
+  if (pr.id === "stir" && ["supp", "cmp", "img"].includes(s.id)) warn = "STIR is not chemically selective for fat. Other tissues with a short T1 may also lose signal. STIR is generally unsuitable for assessing gadolinium enhancement.";
+  seqWarnEl.textContent = warn;
+  seqWarnEl.classList.toggle("hidden", !warn);
+}
+
+function syncParamControls() {
+  trSlider.value = Math.min(params.TR, Number(trSlider.max)); trVal.textContent = params.TR;
+  teSlider.value = Math.min(params.TE, Number(teSlider.max)); teVal.textContent = params.TE;
+  const irse = preset().family === IRSE_FAM;
+  tiRow.classList.toggle("hidden", !irse);
+  tiSlider.classList.toggle("hidden", !irse);
+  if (irse) { tiSlider.value = Math.min(params.TI, Number(tiSlider.max)); tiVal.textContent = params.TI; }
+}
+function lockControls(locked) {
+  [trSlider, teSlider, tiSlider].forEach(el => el.disabled = locked);
+  paramGroup.classList.toggle("locked", locked);
+  manualActionsGroup.classList.toggle("hidden", locked);
+}
+
+function loadSequence(id) {
+  seqId = id;
+  const pr = PRESETS[id];
+  params.TR = pr.defaultTR; params.TE = pr.defaultTE;
+  refTissueId = pr.refTissue;
+  if (pr.family === IRSE_FAM) params.TI = Math.round(tiNull(TISSUE_MAP[pr.suppressed].t1));
+  mode = "guided";
+  completeBanner.classList.remove("show");
+  spinState.invertStartTime = null;
+  syncParamControls();
+  lockControls(true);
+  buildSeqTabs();
+  buildReferenceSelect();
+  resetAll();
+  spinState.running = true; playPauseBtn.textContent = "Pause";
+}
+function buildReferenceSelect() {
+  referenceTissueSel.innerHTML = TISSUES.map(t => `<option value="${t.id}" ${t.id === refTissueId ? "selected" : ""}>${t.name}</option>`).join("");
+}
+referenceTissueSel.addEventListener("change", () => { refTissueId = referenceTissueSel.value; });
+
+document.getElementById("tissueViewGroup").querySelectorAll(".view-btn").forEach(b => {
+  b.addEventListener("click", () => { vectorView = b.dataset.view; document.querySelectorAll(".view-btn").forEach(x => x.classList.toggle("active", x === b)); });
+});
+
+prevStageBtn.addEventListener("click", () => { spinState.running = false; playPauseBtn.textContent = "Play"; gotoStage(spinState.stageIdx - 1); });
+nextStageBtn.addEventListener("click", () => { spinState.running = false; playPauseBtn.textContent = "Play"; gotoStage(spinState.stageIdx + 1); });
+playPauseBtn.addEventListener("click", () => { spinState.running = !spinState.running; playPauseBtn.textContent = spinState.running ? "Pause" : "Play"; });
+replayBtn.addEventListener("click", () => { mode = "guided"; completeBanner.classList.remove("show"); resetAll(); spinState.running = true; playPauseBtn.textContent = "Pause"; });
+resetBtn.addEventListener("click", () => { resetAll(); });
+skipManualBtn.addEventListener("click", () => { enterManualMode(); });
+tryItBtn.addEventListener("click", () => { enterManualMode(); });
+replayGuidedBtn.addEventListener("click", () => { mode = "guided"; completeBanner.classList.remove("show"); resetAll(); spinState.running = true; playPauseBtn.textContent = "Pause"; });
+
+function enterManualMode() {
+  mode = "manual";
+  completeBanner.classList.remove("show");
+  spinState.running = false; playPauseBtn.textContent = "Play";
+  lockControls(false);
+  renderTeaching();
+}
+applyChangesBtn.addEventListener("click", () => { renderSignalPanels(); renderTeaching(); });
+restorePresetBtn.addEventListener("click", () => { loadSequence(seqId); });
+replayExplainBtn.addEventListener("click", () => { renderTeaching(); });
+
+[trSlider, teSlider, tiSlider].forEach(el => el.addEventListener("input", () => {
+  params.TR = Number(trSlider.value); trVal.textContent = params.TR;
+  params.TE = Number(teSlider.value); teVal.textContent = params.TE;
+  if (!tiSlider.classList.contains("hidden")) { params.TI = Number(tiSlider.value); tiVal.textContent = params.TI; }
+  checkManualWarning();
+  renderSignalPanels();
+}));
+function checkManualWarning() {
+  if (mode !== "manual") return;
+  let msg = "";
+  const pr = preset();
+  if (pr.id === "t1w" && (params.TR > 1200 || params.TE > 40)) msg = "These parameters no longer produce strong T1 weighting.";
+  if (pr.id === "t2w" && (params.TR < 1500 || params.TE < 40)) msg = "These parameters no longer produce strong T2 weighting.";
+  if ((pr.id === "flair" || pr.id === "stir") && Math.abs(params.TI - tiNull(TISSUE_MAP[pr.suppressed].t1)) > tiNull(TISSUE_MAP[pr.suppressed].t1) * 0.35) msg = `The selected TI no longer suppresses ${TISSUE_MAP[pr.suppressed].name} effectively.`;
+  seqWarnEl.textContent = msg || seqWarnEl.textContent;
+  if (msg) seqWarnEl.classList.remove("hidden");
+}
+
+/* ============================================================
+   MAIN LOOP
+   ============================================================ */
+function frame(now) {
+  const dtMs = Math.min(60, now - spinState.last);
+  spinState.last = now;
+  if (spinState.running) update(dtMs);
+  drawSpinView();
+  drawMxyPlot();
+  drawMzPlot();
+  drawTimeline();
+  renderSignalPanels();
+  if (spinState.stageIdx !== frame._lastStage) { renderStageCards(); frame._lastStage = spinState.stageIdx; }
+  requestAnimationFrame(frame);
+}
+
+window.addEventListener("resize", () => {
+  [[spinCanvas, sCtx], [mxyCanvas, mxyCtx], [mzCanvas, mzCtx], [timelineCanvas, tlCtx]].forEach(([c, ctx]) => resizeCanvas(c, ctx));
+});
+
+[[spinCanvas, sCtx], [mxyCanvas, mxyCtx], [mzCanvas, mzCtx], [timelineCanvas, tlCtx]].forEach(([c, ctx]) => resizeCanvas(c, ctx));
+phantomCanvas.width = 300; phantomCanvas.height = 300;
+buildCompareTable();
+loadSequence("t1w");
+requestAnimationFrame((t) => { spinState.last = t; frame(t); });
+})();
+</script>
+</body>
+</html>

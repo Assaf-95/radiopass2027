@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Interactive Simulator - Version 7</title>
+  <style>
+    :root {
+      --bg: #040814;
+      --bg2: #0a1324;
+      --panel: #101d34;
+      --panel2: #0b1629;
+      --line: #2b4669;
+      --ink: #eef8ff;
+      --muted: #9fb8d4;
+      --rf: #fb7185;
+      --gz: #a78bfa;
+      --gy: #f59e0b;
+      --gx: #38bdf8;
+      --adc: #2dd4bf;
+      --water: #60a5fa;
+      --fat: #f97316;
+      --accent: #22d3ee;
+      --good: #86efac;
+      --warn: #fbbf24;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 560px at 8% -10%, rgba(56, 189, 248, 0.2), transparent 60%),
+        radial-gradient(900px 520px at 102% 0%, rgba(167, 139, 250, 0.2), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      min-height: 100vh;
+      padding: 14px;
+    }
+
+    .app {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background:
+        linear-gradient(150deg, rgba(16, 29, 52, 0.92), rgba(10, 21, 38, 0.95)),
+        radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.08), transparent 36%);
+      box-shadow:
+        0 18px 34px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .header {
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.08rem, 1.8vw, 1.45rem);
+      letter-spacing: 0.15px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.35;
+      font-size: 0.88rem;
+    }
+
+    .quickGuide {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(5, 14, 25, 0.62);
+      display: grid;
+      gap: 6px;
+    }
+
+    .quickGuide h2 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #d7efff;
+      letter-spacing: 0.12px;
+    }
+
+    .quickGuide ol {
+      margin: 0;
+      padding-left: 18px;
+      color: #c3dff7;
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .quickGuide p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .controlGrid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 2fr 2fr 1.3fr;
+      align-items: start;
+    }
+
+    .controlGroup {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(5, 14, 25, 0.58);
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .controlGroup h2 {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #d4ecff;
+      letter-spacing: 0.15px;
+    }
+
+    .btnGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid #2f6f7f;
+      border-radius: 10px;
+      padding: 9px 8px;
+      color: #e9fcff;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 670;
+      background: linear-gradient(120deg, #155d75, #0d9488);
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.07); }
+
+    button.alt {
+      border-color: #5066a0;
+      background: linear-gradient(120deg, #334155, #1f2937);
+    }
+
+    button.warn {
+      border-color: #8b4c1d;
+      background: linear-gradient(120deg, #b45309, #d97706);
+    }
+
+    button.acquire {
+      border-color: #a13d7f;
+      background: linear-gradient(120deg, #be185d, #9333ea);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+
+    .sliderGrid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .row strong {
+      color: #d8f4ff;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.81rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #375778;
+      background: #0a1a30;
+      color: #e1f3ff;
+      padding: 6px 8px;
+      font-size: 0.84rem;
+    }
+
+    .checks {
+      display: grid;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .statusBox {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px;
+      background: rgba(6, 15, 27, 0.62);
+      font-size: 0.84rem;
+      color: #c9e9ff;
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+
+    .panel {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 0.97rem;
+      letter-spacing: 0.15px;
+    }
+
+    .panelSub {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid #304f76;
+      border-radius: 11px;
+      background:
+        radial-gradient(circle at 40% 8%, #12304d, #091528 55%),
+        linear-gradient(180deg, #0d2038, #09192e);
+    }
+
+    #timelineCanvas { aspect-ratio: 16 / 3.1; }
+    #blochGridCanvas { aspect-ratio: 16 / 7.9; }
+    #signalKCanvas { aspect-ratio: 16 / 4.3; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #365477;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      color: #c4def5;
+      background: rgba(6, 17, 30, 0.72);
+    }
+
+    .chip.on {
+      color: #ecfeff;
+      border-color: #2dd4bf;
+      background: linear-gradient(120deg, rgba(16, 88, 86, 0.85), rgba(9, 41, 55, 0.86));
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.24);
+    }
+
+    @media (max-width: 1180px) {
+      .controlGrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card header">
+      <h1>MRI Interactive Simulator: Version 7</h1>
+      <p class="subtitle">Build a pulse sequence step-by-step, then watch Bloch dynamics, spatial phase behavior, signal formation, and k-space traversal update in real time.</p>
+      <section class="quickGuide">
+        <h2>How to use</h2>
+        <ol>
+          <li>Choose line count (16, 32, or 64).</li>
+          <li>Set sequence controls (flip, RF duration, gradients, TE, TR).</li>
+          <li>Click <strong>Acquire Next Line</strong> to run one TR and fill one new k-space line.</li>
+          <li>Repeat until <strong>Lines acquired = N/N</strong>.</li>
+        </ol>
+        <p>k-space is manual in Version 7: it does not auto-fill.</p>
+      </section>
+
+      <div class="controlGrid">
+        <section class="controlGroup">
+          <h2>Sequence Presets</h2>
+          <p class="panelSub">Click one to build the real pulse sequence automatically, then watch the timeline below: when RF fires, when Gz/Gy/Gx fire, when ADC opens, and how flip angle and timing change.</p>
+          <div class="btnGrid">
+            <button id="presetT1Btn">T1-Weighted (SE)</button>
+            <button id="presetT2Btn">T2-Weighted (SE)</button>
+            <button id="presetStirBtn" class="warn">STIR (fat-nulled IR)</button>
+            <button id="presetFlairBtn" class="warn">FLAIR (fluid-nulled IR)</button>
+          </div>
+        </section>
+
+        <section class="controlGroup">
+          <h2>Sequence Builder</h2>
+          <div class="btnGrid">
+            <button id="add90Btn">Add 90 deg RF</button>
+            <button id="add180Btn" class="warn">Add 180 deg RF</button>
+            <button id="addSliceBtn">Add Slice Gradient</button>
+            <button id="addPhaseBtn">Add Phase Encoding Gradient</button>
+            <button id="addFreqBtn">Add Frequency Encoding Gradient</button>
+            <button id="addReadoutBtn">Add Readout</button>
+            <button id="resetSeqBtn" class="alt">Reset Sequence</button>
+            <button id="acquireLineBtn" class="acquire">Acquire Next Line</button>
+          </div>
+          <div class="row"><span>Lines in teaching set</span><strong id="lineCountVal">32</strong></div>
+          <select id="lineCountSel">
+            <option value="16">16</option>
+            <option value="32" selected>32</option>
+            <option value="64">64</option>
+          </select>
+          <div class="row"><span>Lines acquired</span><strong id="lineCounterVal">0 / 32</strong></div>
+          <div class="row"><span>Sequence cursor</span><strong id="cursorVal">0.0 ms</strong></div>
+          <div class="row"><span>Current TR window</span><strong id="trWindowVal">800 ms</strong></div>
+        </section>
+
+        <section class="controlGroup">
+          <h2>Pulse And Timing Controls</h2>
+          <div class="sliderGrid">
+            <div class="row"><span>Flip angle</span><strong id="flipVal">90 deg</strong></div>
+            <input id="flipSlider" type="range" min="10" max="180" step="1" value="90" />
+
+            <div class="row"><span>RF duration</span><strong id="rfDurVal">4.0 ms</strong></div>
+            <input id="rfDurSlider" type="range" min="0.8" max="12" step="0.1" value="4" />
+
+            <div class="row"><span>Gz amplitude</span><strong id="gzAmpVal">5.0</strong></div>
+            <input id="gzAmpSlider" type="range" min="0" max="10" step="0.1" value="5" />
+
+            <div class="row"><span>Gy amplitude</span><strong id="gyAmpVal">3.0</strong></div>
+            <input id="gyAmpSlider" type="range" min="0" max="10" step="0.1" value="3" />
+
+            <div class="row"><span>Gx amplitude</span><strong id="gxAmpVal">4.0</strong></div>
+            <input id="gxAmpSlider" type="range" min="0" max="12" step="0.1" value="4" />
+
+            <div class="row"><span>TE</span><strong id="teVal">80 ms</strong></div>
+            <input id="teSlider" type="range" min="20" max="200" step="1" value="80" />
+
+            <div class="row"><span>TR</span><strong id="trVal">800 ms</strong></div>
+            <input id="trSlider" type="range" min="150" max="2000" step="10" value="800" />
+          </div>
+        </section>
+
+        <section class="controlGroup">
+          <h2>Tissue And Labels</h2>
+          <div class="checks">
+            <label><input id="waterToggle" type="checkbox" checked /> Show water isochromats</label>
+            <label><input id="fatToggle" type="checkbox" checked /> Show fat isochromats</label>
+          </div>
+
+          <div class="chips" id="highlightChips">
+            <span class="chip" data-key="in-phase">In phase</span>
+            <span class="chip" data-key="dephasing">Dephasing</span>
+            <span class="chip" data-key="rephasing">Rephasing</span>
+            <span class="chip" data-key="echo-peak">Echo peak</span>
+            <span class="chip" data-key="t1-recovery">T1 recovery</span>
+            <span class="chip" data-key="chemical-shift">Chemical shift separation</span>
+          </div>
+
+          <div id="statusBox" class="statusBox">Build a sequence using the buttons, then click Acquire Next Line. k-space does not auto-fill: each click performs one TR and one phase-encoding step.</div>
+        </section>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <h2>1) Pulse Sequence Timeline</h2>
+      <p class="panelSub">Tracks: RF, Gz (slice select), Gy (phase encode), Gx (frequency encode), ADC (readout).</p>
+      <canvas id="timelineCanvas" width="1360" height="270"></canvas>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--rf)"></span>RF</span>
+        <span><span class="dot" style="background:var(--gz)"></span>Gz slice</span>
+        <span><span class="dot" style="background:var(--gy)"></span>Gy phase</span>
+        <span><span class="dot" style="background:var(--gx)"></span>Gx frequency</span>
+        <span><span class="dot" style="background:var(--adc)"></span>ADC readout</span>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <h2>2) Bloch Sphere And Spatial Isochromat Grid</h2>
+      <p class="panelSub">Net magnetisation vector (left) with multiple isochromats across X and Y (right). Water and fat can be toggled.</p>
+      <canvas id="blochGridCanvas" width="1360" height="660"></canvas>
+    </section>
+
+    <section class="card panel">
+      <h2>3) Signal And k-space Preview</h2>
+      <p class="panelSub">Real-time waveform and simple k-space trajectory line from gradient and readout activity.</p>
+      <canvas id="signalKCanvas" width="1360" height="370"></canvas>
+    </section>
+  </main>
+
+  <script>
+    const TRACKS = ["RF", "Gz", "Gy", "Gx", "ADC"];
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function wrapPi(v) {
+      while (v > Math.PI) v -= Math.PI * 2;
+      while (v < -Math.PI) v += Math.PI * 2;
+      return v;
+    }
+
+    function rotateXY(mx, my, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx: mx * c - my * s, my: mx * s + my * c };
+    }
+
+    function rotateAroundX(mx, my, mz, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx, my: my * c - mz * s, mz: my * s + mz * c };
+    }
+
+    function prep(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(10, Math.floor(canvas.clientWidth));
+      const h = Math.max(10, Math.floor(canvas.clientHeight));
+      if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w, h };
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, width = 2, head = 8) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const a = Math.atan2(dy, dx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(a - Math.PI / 6), y2 - head * Math.sin(a - Math.PI / 6));
+      ctx.lineTo(x2 - head * Math.cos(a + Math.PI / 6), y2 - head * Math.sin(a + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function makeIsochromats(nX, nY, chemHz, color) {
+      const spins = [];
+      for (let iy = 0; iy < nY; iy += 1) {
+        for (let ix = 0; ix < nX; ix += 1) {
+          const x = nX === 1 ? 0 : -1 + (2 * ix) / (nX - 1);
+          const y = nY === 1 ? 0 : -1 + (2 * iy) / (nY - 1);
+          const z = ((ix + iy) % 3 - 1) * 0.55;
+          spins.push({
+            x,
+            y,
+            z,
+            mx: 0,
+            my: 0,
+            mz: 1,
+            inhomHz: (Math.random() - 0.5) * 16,
+            chemHz,
+            color
+          });
+        }
+      }
+      return spins;
+    }
+
+    class MRIV7 {
+      constructor() {
+        this.timelineCanvas = document.getElementById("timelineCanvas");
+        this.blochGridCanvas = document.getElementById("blochGridCanvas");
+        this.signalKCanvas = document.getElementById("signalKCanvas");
+
+        this.ui = {
+          presetT1Btn: document.getElementById("presetT1Btn"),
+          presetT2Btn: document.getElementById("presetT2Btn"),
+          presetStirBtn: document.getElementById("presetStirBtn"),
+          presetFlairBtn: document.getElementById("presetFlairBtn"),
+          add90Btn: document.getElementById("add90Btn"),
+          add180Btn: document.getElementById("add180Btn"),
+          addSliceBtn: document.getElementById("addSliceBtn"),
+          addPhaseBtn: document.getElementById("addPhaseBtn"),
+          addFreqBtn: document.getElementById("addFreqBtn"),
+          addReadoutBtn: document.getElementById("addReadoutBtn"),
+          resetSeqBtn: document.getElementById("resetSeqBtn"),
+          acquireLineBtn: document.getElementById("acquireLineBtn"),
+          lineCountSel: document.getElementById("lineCountSel"),
+          flipSlider: document.getElementById("flipSlider"),
+          rfDurSlider: document.getElementById("rfDurSlider"),
+          gzAmpSlider: document.getElementById("gzAmpSlider"),
+          gyAmpSlider: document.getElementById("gyAmpSlider"),
+          gxAmpSlider: document.getElementById("gxAmpSlider"),
+          teSlider: document.getElementById("teSlider"),
+          trSlider: document.getElementById("trSlider"),
+          waterToggle: document.getElementById("waterToggle"),
+          fatToggle: document.getElementById("fatToggle"),
+          flipVal: document.getElementById("flipVal"),
+          rfDurVal: document.getElementById("rfDurVal"),
+          gzAmpVal: document.getElementById("gzAmpVal"),
+          gyAmpVal: document.getElementById("gyAmpVal"),
+          gxAmpVal: document.getElementById("gxAmpVal"),
+          teVal: document.getElementById("teVal"),
+          trVal: document.getElementById("trVal"),
+          lineCountVal: document.getElementById("lineCountVal"),
+          lineCounterVal: document.getElementById("lineCounterVal"),
+          cursorVal: document.getElementById("cursorVal"),
+          trWindowVal: document.getElementById("trWindowVal"),
+          statusBox: document.getElementById("statusBox")
+        };
+
+        this.settings = {
+          flipDeg: 90,
+          rfDurMs: 4,
+          gzAmp: 5,
+          gyAmp: 3,
+          gxAmp: 4,
+          TEms: 80,
+          TRms: 800,
+          lineCount: 32,
+          showWater: true,
+          showFat: true
+        };
+
+        this.consts = {
+          t1WaterMs: 1150,
+          t2WaterMs: 95,
+          t1FatMs: 320,
+          t2FatMs: 72,
+          chemShiftHz: 220,
+          gxScaleHz: 58,
+          gyScaleHz: 44,
+          gzScaleHz: 78,
+          kScale: 0.00095
+        };
+
+        this.spins = {
+          water: makeIsochromats(9, 7, 0, "#60a5fa"),
+          fat: makeIsochromats(9, 7, this.consts.chemShiftHz, "#f97316")
+        };
+
+        this.sim = {
+          running: false,
+          absMs: 0,
+          lastTs: performance.now(),
+          events: [],
+          nextEventId: 1,
+          cursorMs: 20,
+          prevActiveIds: new Set(),
+          signalHistory: [],
+          kPath: [],
+          kCurrent: { x: 0, y: 0 },
+          lastCycleT: 0,
+          lastSampleMs: 0,
+          rephaseUntilAbs: 0,
+          echoAtAbs: null,
+          last90Abs: null,
+          currentLineKyNorm: 0,
+          acquiredLineSet: new Set(),
+          lineOrder: [],
+          linesAcquired: 0,
+          activeHighlights: new Set(),
+          prevNetMz: 1
+        };
+
+        this.bindHandlers();
+        this.syncLabels();
+
+        const presetParam = new URLSearchParams(location.search).get("preset");
+        const validPresets = ["t1w", "t2w", "stir", "flair"];
+        if (presetParam && validPresets.includes(presetParam)) {
+          this.applyPreset(presetParam);
+          this.resetLineAcquisition();
+        } else {
+          this.seedStarterSequence();
+        }
+
+        requestAnimationFrame((ts) => this.tick(ts));
+      }
+
+      bindHandlers() {
+        this.ui.presetT1Btn.addEventListener("click", () => this.applyPreset("t1w"));
+        this.ui.presetT2Btn.addEventListener("click", () => this.applyPreset("t2w"));
+        this.ui.presetStirBtn.addEventListener("click", () => this.applyPreset("stir"));
+        this.ui.presetFlairBtn.addEventListener("click", () => this.applyPreset("flair"));
+        this.ui.add90Btn.addEventListener("click", () => this.addRFPulse(this.settings.flipDeg));
+        this.ui.add180Btn.addEventListener("click", () => this.addRFPulse(180));
+        this.ui.addSliceBtn.addEventListener("click", () => this.addGradient("gz"));
+        this.ui.addPhaseBtn.addEventListener("click", () => this.addGradient("gy"));
+        this.ui.addFreqBtn.addEventListener("click", () => this.addGradient("gx"));
+        this.ui.addReadoutBtn.addEventListener("click", () => this.addReadout());
+        this.ui.resetSeqBtn.addEventListener("click", () => this.resetSequence());
+        this.ui.acquireLineBtn.addEventListener("click", () => this.acquireNextLine());
+        this.ui.lineCountSel.addEventListener("input", () => {
+          this.settings.lineCount = Number(this.ui.lineCountSel.value);
+          this.resetLineAcquisition();
+          this.syncLabels();
+          this.updateStatusText("Line count changed. k-space acquisition is click-driven: each 'Acquire Next Line' performs one TR and one phase-encoding step.");
+        });
+
+        const sync = () => {
+          this.settings.flipDeg = Number(this.ui.flipSlider.value);
+          this.settings.rfDurMs = Number(this.ui.rfDurSlider.value);
+          this.settings.gzAmp = Number(this.ui.gzAmpSlider.value);
+          this.settings.gyAmp = Number(this.ui.gyAmpSlider.value);
+          this.settings.gxAmp = Number(this.ui.gxAmpSlider.value);
+          this.settings.TEms = Number(this.ui.teSlider.value);
+          this.settings.TRms = Number(this.ui.trSlider.value);
+          this.settings.lineCount = Number(this.ui.lineCountSel.value);
+          this.settings.showWater = this.ui.waterToggle.checked;
+          this.settings.showFat = this.ui.fatToggle.checked;
+          this.sim.cursorMs = clamp(this.sim.cursorMs, 0, this.settings.TRms - 10);
+          this.syncLabels();
+        };
+
+        [
+          this.ui.flipSlider,
+          this.ui.rfDurSlider,
+          this.ui.gzAmpSlider,
+          this.ui.gyAmpSlider,
+          this.ui.gxAmpSlider,
+          this.ui.teSlider,
+          this.ui.trSlider,
+          this.ui.lineCountSel,
+          this.ui.waterToggle,
+          this.ui.fatToggle
+        ].forEach((el) => el.addEventListener("input", sync));
+
+        window.addEventListener("resize", () => {
+          this.draw();
+        });
+      }
+
+      seedStarterSequence() {
+        this.sim.events = [];
+        this.sim.nextEventId = 1;
+        this.sim.cursorMs = 20;
+        this.addRFPulse(90, true);
+        this.addGradient("gy", true);
+        this.addGradient("gx", true);
+        this.addReadout(true);
+        this.resetLineAcquisition();
+      }
+
+      buildCenterOutOrder(n) {
+        const out = [];
+        const center = Math.floor(n / 2);
+        out.push(center);
+        for (let step = 1; out.length < n; step += 1) {
+          const low = center - step;
+          const high = center + step;
+          if (low >= 0) out.push(low);
+          if (out.length < n && high < n) out.push(high);
+        }
+        return out;
+      }
+
+      resetLineAcquisition() {
+        this.sim.linesAcquired = 0;
+        this.sim.acquiredLineSet = new Set();
+        this.sim.lineOrder = this.buildCenterOutOrder(this.settings.lineCount);
+        this.sim.currentLineKyNorm = 0;
+        this.sim.absMs = 0;
+        this.sim.signalHistory = [];
+        this.sim.kPath = [];
+        this.sim.kCurrent = { x: 0, y: 0 };
+      }
+
+      ensureAcquisitionTemplate() {
+        if (!this.getFirst90Event()) this.addRFPulse(90, true);
+        if (!this.sim.events.some((ev) => ev.type === "gy")) this.addGradient("gy", true);
+        if (!this.sim.events.some((ev) => ev.type === "gx")) this.addGradient("gx", true);
+        if (!this.sim.events.some((ev) => ev.type === "adc")) this.addReadout(true);
+      }
+
+      acquireNextLine() {
+        const n = this.settings.lineCount;
+        if (this.sim.linesAcquired >= n) {
+          this.updateStatusText(`All lines acquired (${n}/${n}). Change line count or reset sequence to reacquire.`);
+          return;
+        }
+
+        this.ensureAcquisitionTemplate();
+
+        const lineSlot = this.sim.lineOrder[this.sim.linesAcquired];
+        const kyNorm = n <= 1 ? 0 : (lineSlot / (n - 1)) * 2 - 1;
+
+        this.sim.currentLineKyNorm = kyNorm;
+        this.sim.kPath.push({ break: true });
+
+        this.runSingleTRAcquisition(kyNorm);
+
+        this.sim.acquiredLineSet.add(lineSlot);
+        this.sim.linesAcquired += 1;
+
+        this.syncLabels();
+        this.updateHighlights();
+
+        if (this.sim.linesAcquired >= n) {
+          this.updateStatusText(`Acquired line ${this.sim.linesAcquired}/${n}. k-space teaching set complete.`);
+        } else {
+          this.updateStatusText(`Acquired line ${this.sim.linesAcquired}/${n}. One click = one TR + one phase-encoding step.`);
+        }
+      }
+
+      runSingleTRAcquisition(kyNorm) {
+        const tr = this.settings.TRms;
+        const dtMs = 2;
+        const startAbs = this.sim.absMs;
+        let localPrevActive = new Set();
+
+        for (let localMs = 0; localMs < tr; localMs += dtMs) {
+          this.sim.absMs = startAbs + localMs;
+          const active = this.getActiveEvents(localMs);
+          const activeIds = new Set(active.map((ev) => ev.id));
+
+          active.forEach((ev) => {
+            if (!localPrevActive.has(ev.id)) {
+              this.onEventStart(ev, active);
+            }
+          });
+          localPrevActive = activeIds;
+
+          const rfEvents = active.filter((ev) => ev.type === "rf");
+          const gzNow = this.eventAmplitude(active, "gz", this.settings.gzAmp);
+          const hasGy = active.some((ev) => ev.type === "gy");
+          const gyNow = hasGy ? this.settings.gyAmp * kyNorm : 0;
+          const gxNow = this.eventAmplitude(active, "gx", this.settings.gxAmp);
+          const adcEvent = active.find((ev) => ev.type === "adc");
+          const adcOn = Boolean(adcEvent);
+
+          const dtSec = dtMs / 1000;
+          const inhomSign = this.sim.absMs < this.sim.rephaseUntilAbs ? -1 : 1;
+          const hasSliceSelectRF = rfEvents.length > 0 && Math.abs(gzNow) > 0.0001;
+          const sliceHalf = clamp(0.95 - Math.abs(gzNow) * 0.07, 0.18, 0.95);
+
+          const stepTissue = (name, t1Ms, t2Ms) => {
+            this.spins[name].forEach((s) => {
+              if (rfEvents.length > 0) {
+                rfEvents.forEach((rf) => {
+                  const selected = !hasSliceSelectRF || Math.abs(s.z) <= sliceHalf;
+                  if (!selected) return;
+                  const dFlip = (rf.flipDeg * Math.PI / 180) * (dtMs / rf.durationMs);
+                  const r = rotateAroundX(s.mx, s.my, s.mz, dFlip);
+                  s.mx = r.mx;
+                  s.my = r.my;
+                  s.mz = r.mz;
+                });
+              }
+
+              let hz = s.chemHz;
+              hz += s.inhomHz * inhomSign;
+              hz += gxNow * this.consts.gxScaleHz * s.x;
+              hz += gyNow * this.consts.gyScaleHz * s.y;
+              hz += gzNow * this.consts.gzScaleHz * s.z;
+
+              const ang = hz * Math.PI * 2 * dtSec;
+              const p = rotateXY(s.mx, s.my, ang);
+              s.mx = p.mx;
+              s.my = p.my;
+
+              const e2 = Math.exp(-dtSec / (t2Ms / 1000));
+              s.mx *= e2;
+              s.my *= e2;
+              s.mz = 1 - (1 - s.mz) * Math.exp(-dtSec / (t1Ms / 1000));
+            });
+          };
+
+          stepTissue("water", this.consts.t1WaterMs, this.consts.t2WaterMs);
+          stepTissue("fat", this.consts.t1FatMs, this.consts.t2FatMs);
+
+          if (adcOn && adcEvent) {
+            const ratio = clamp((localMs - adcEvent.startMs) / adcEvent.durationMs, 0, 1);
+            this.sim.kCurrent = { x: -1 + 2 * ratio, y: kyNorm };
+            this.sim.kPath.push({ x: this.sim.kCurrent.x, y: this.sim.kCurrent.y, t: this.sim.absMs });
+            if (this.sim.kPath.length > 3200) this.sim.kPath.splice(0, this.sim.kPath.length - 3200);
+          } else if (hasGy) {
+            const gyEv = active.find((ev) => ev.type === "gy");
+            if (gyEv) {
+              const gyRatio = clamp((localMs - gyEv.startMs) / gyEv.durationMs, 0, 1);
+              this.sim.kCurrent = { x: 0, y: kyNorm * gyRatio };
+            }
+          }
+
+          if (this.sim.absMs - this.sim.lastSampleMs > 2.5) {
+            const sig = this.computeSignal();
+            this.sim.signalHistory.push({ t: this.sim.absMs, y: sig.re, mag: sig.mag, adcOn });
+            this.sim.lastSampleMs = this.sim.absMs;
+          }
+        }
+
+        this.sim.absMs = startAbs + tr;
+        this.sim.prevActiveIds.clear();
+        this.sim.lastCycleT = 0;
+
+        const keepMs = Math.max(this.settings.TRms * 2.6, 700);
+        while (this.sim.signalHistory.length > 4 && this.sim.signalHistory[0].t < this.sim.absMs - keepMs) {
+          this.sim.signalHistory.shift();
+        }
+      }
+
+      resetMagnetisationOnly() {
+        ["water", "fat"].forEach((name) => {
+          this.spins[name].forEach((s) => {
+            s.mx = 0;
+            s.my = 0;
+            s.mz = 1;
+          });
+        });
+        this.sim.absMs = 0;
+        this.sim.lastCycleT = 0;
+        this.sim.prevActiveIds.clear();
+        this.sim.signalHistory = [];
+        this.sim.kPath = [];
+        this.sim.kCurrent = { x: 0, y: 0 };
+        this.sim.lastSampleMs = 0;
+        this.sim.last90Abs = null;
+        this.sim.echoAtAbs = null;
+        this.sim.rephaseUntilAbs = 0;
+        this.sim.prevNetMz = 1;
+        this.resetLineAcquisition();
+      }
+
+      resetSequence() {
+        this.sim.events = [];
+        this.sim.nextEventId = 1;
+        this.sim.cursorMs = 20;
+        this.resetMagnetisationOnly();
+        this.syncLabels();
+        this.updateStatusText("Sequence reset. k-space fill is manual: click 'Acquire Next Line' for one TR and one new phase-encoding line.");
+      }
+
+      addEvent(ev) {
+        const id = this.sim.nextEventId;
+        this.sim.nextEventId += 1;
+        this.sim.events.push({ id, ...ev });
+        this.sim.events.sort((a, b) => a.startMs - b.startMs);
+      }
+
+      getFirst90Event() {
+        return this.sim.events.find((ev) => ev.type === "rf" && Math.abs(ev.flipDeg - 90) < 20);
+      }
+
+      addRFPulse(flipDeg, silent = false) {
+        const dur = this.settings.rfDurMs;
+        let start = this.sim.cursorMs;
+        const first90 = this.getFirst90Event();
+
+        if (flipDeg === 180 && first90) {
+          start = clamp(first90.startMs + this.settings.TEms * 0.5 - dur * 0.5, 0, this.settings.TRms - dur);
+        }
+
+        this.addEvent({
+          type: "rf",
+          track: "RF",
+          startMs: start,
+          durationMs: dur,
+          flipDeg,
+          label: `${Math.round(flipDeg)} deg`,
+          color: "#fb7185"
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+        if (!silent) {
+          this.updateStatusText(`Added ${Math.round(flipDeg)} deg RF. 90 deg drives strong transverse Mxy; 180 deg can refocus dephasing and produce echo.`);
+        }
+      }
+
+      addGradient(axis, silent = false) {
+        let track = "";
+        let color = "#a78bfa";
+        let label = axis.toUpperCase();
+        let amp = 0;
+        let dur = 5;
+        let start = this.sim.cursorMs;
+
+        if (axis === "gz") {
+          track = "Gz";
+          color = "#a78bfa";
+          amp = this.settings.gzAmp;
+          dur = 4;
+          const lastRF = [...this.sim.events].reverse().find((ev) => ev.type === "rf");
+          if (lastRF) {
+            start = lastRF.startMs;
+            dur = Math.max(lastRF.durationMs, 2);
+            label = "slice";
+          } else {
+            label = "slice";
+          }
+        } else if (axis === "gy") {
+          track = "Gy";
+          color = "#f59e0b";
+          amp = this.settings.gyAmp;
+          dur = 4;
+          label = "phase";
+        } else if (axis === "gx") {
+          track = "Gx";
+          color = "#38bdf8";
+          amp = this.settings.gxAmp;
+          dur = 7;
+          label = "freq";
+        }
+
+        this.addEvent({
+          type: axis,
+          track,
+          startMs: start,
+          durationMs: dur,
+          amp,
+          label,
+          color
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+
+        if (!silent) {
+          if (axis === "gz") this.updateStatusText("Added Gz slice-select gradient. When overlapped with RF, only selected slice spins are tipped and frequency varies with z.");
+          if (axis === "gy") this.updateStatusText("Added Gy phase-encoding gradient. Position-dependent phase is imprinted across y and persists after Gy ends.");
+          if (axis === "gx") this.updateStatusText("Added Gx frequency-encoding gradient. During readout this creates x-dependent frequencies in the measured signal.");
+        }
+      }
+
+      addReadout(silent = false) {
+        const dur = 11;
+        let start = this.sim.cursorMs;
+        const first90 = this.getFirst90Event();
+        if (first90) {
+          start = clamp(first90.startMs + this.settings.TEms - dur * 0.5, 0, this.settings.TRms - dur);
+        }
+
+        this.addEvent({
+          type: "adc",
+          track: "ADC",
+          startMs: start,
+          durationMs: dur,
+          label: "readout",
+          color: "#2dd4bf"
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+
+        if (!silent) {
+          this.updateStatusText("Added ADC readout window. If Gx overlaps this window, the waveform reflects mixed spatial frequencies and k-space trajectory updates.");
+        }
+      }
+
+      setTRTE(trMs, teMs) {
+        const trMin = Number(this.ui.trSlider.min);
+        const trMax = Number(this.ui.trSlider.max);
+        const teMin = Number(this.ui.teSlider.min);
+        const teMax = Number(this.ui.teSlider.max);
+        const tr = clamp(trMs, trMin, trMax);
+        const te = clamp(teMs, teMin, teMax);
+        this.ui.trSlider.value = tr;
+        this.ui.teSlider.value = te;
+        this.settings.TRms = tr;
+        this.settings.TEms = te;
+        this.sim.cursorMs = clamp(this.sim.cursorMs, 0, this.settings.TRms - 10);
+      }
+
+      buildSpinEcho(flipDeg) {
+        this.ui.flipSlider.value = flipDeg;
+        this.settings.flipDeg = flipDeg;
+        this.addRFPulse(flipDeg, true);
+        this.addGradient("gz", true);
+        this.addGradient("gy", true);
+        this.addRFPulse(180, true);
+        this.addGradient("gz", true);
+        this.addGradient("gx", true);
+        this.addReadout(true);
+      }
+
+      buildInversionRecovery(tiMs, flipDeg) {
+        this.addRFPulse(180, true);
+        this.addGradient("gz", true);
+        this.sim.cursorMs = clamp(tiMs, this.sim.cursorMs, this.settings.TRms - 40);
+        this.buildSpinEcho(flipDeg);
+      }
+
+      applyPreset(name) {
+        this.resetSequence();
+        const tr = () => this.settings.TRms.toFixed(0);
+        const te = () => this.settings.TEms.toFixed(0);
+        if (name === "t1w") {
+          this.setTRTE(500, 15);
+          this.buildSpinEcho(90);
+          this.updateStatusText(`T1-weighted spin echo: short TR (${tr()} ms), short TE (${te()} ms). Fat (short T1) recovers fastest and appears bright; fluid (long T1) stays dark. Watch Gz fire with each RF pulse, then Gy, then Gx overlapping the ADC window at TE.`);
+        } else if (name === "t2w") {
+          this.setTRTE(2500, 90);
+          this.buildSpinEcho(90);
+          this.updateStatusText(`T2-weighted spin echo: long TR (${tr()} ms), long TE (${te()} ms). Long TR lets every tissue's Mz fully recover, so T1 differences wash out — contrast now comes from T2 decay: fluid (long T2) stays bright, most tissue is darker.`);
+        } else if (name === "stir") {
+          this.setTRTE(2000, 30);
+          this.buildInversionRecovery(150, 90);
+          this.updateStatusText(`STIR: a 180 deg inversion pulse flips Mz negative, then a short TI (~150 ms) lets it recover. Fat has a short T1, so it crosses zero right around this TI — the 90/180 readout that follows (TR ${tr()} ms, TE ${te()} ms) captures almost no fat signal.`);
+        } else if (name === "flair") {
+          this.setTRTE(2000, 90);
+          this.buildInversionRecovery(1800, 90);
+          this.updateStatusText(`FLAIR: same inversion-recovery structure as STIR, but with a long TI (~1800 ms). CSF has a very long T1 and only crosses zero this late, so a long TI nulls fluid instead of fat (TR ${tr()} ms, TE ${te()} ms) — useful for seeing lesions next to CSF.`);
+        }
+      }
+
+      syncLabels() {
+        this.ui.flipVal.textContent = `${this.settings.flipDeg.toFixed(0)} deg`;
+        this.ui.rfDurVal.textContent = `${this.settings.rfDurMs.toFixed(1)} ms`;
+        this.ui.gzAmpVal.textContent = this.settings.gzAmp.toFixed(1);
+        this.ui.gyAmpVal.textContent = this.settings.gyAmp.toFixed(1);
+        this.ui.gxAmpVal.textContent = this.settings.gxAmp.toFixed(1);
+        this.ui.teVal.textContent = `${this.settings.TEms.toFixed(0)} ms`;
+        this.ui.trVal.textContent = `${this.settings.TRms.toFixed(0)} ms`;
+        this.ui.lineCountVal.textContent = `${this.settings.lineCount}`;
+        this.ui.lineCounterVal.textContent = `${this.sim.linesAcquired} / ${this.settings.lineCount}`;
+        this.ui.cursorVal.textContent = `${this.sim.cursorMs.toFixed(1)} ms`;
+        this.ui.trWindowVal.textContent = `${this.settings.TRms.toFixed(0)} ms`;
+      }
+
+      updateStatusText(text) {
+        this.ui.statusBox.textContent = text;
+      }
+
+      getActiveEvents(tCycle) {
+        return this.sim.events.filter((ev) => {
+          return tCycle >= ev.startMs && tCycle < ev.startMs + ev.durationMs;
+        });
+      }
+
+      eventAmplitude(active, type, defaultAmp) {
+        let amp = 0;
+        active.forEach((ev) => {
+          if (ev.type === type) amp += (ev.amp || defaultAmp);
+        });
+        return amp;
+      }
+
+      onEventStart(ev, activeAtStart) {
+        if (ev.type === "rf") {
+          const hasGz = activeAtStart.some((x) => x.type === "gz");
+          const sliceHalf = clamp(0.95 - this.settings.gzAmp * 0.07, 0.2, 0.95);
+
+          const applyInPhase = (Math.abs(ev.flipDeg - 90) < 6);
+          const applyRefocus = (Math.abs(ev.flipDeg - 180) < 6 && this.sim.last90Abs !== null);
+
+          ["water", "fat"].forEach((name) => {
+            this.spins[name].forEach((s) => {
+              if (hasGz && Math.abs(s.z) > sliceHalf) return;
+              if (applyInPhase) {
+                const amp = Math.hypot(s.mx, s.my);
+                s.mx = amp;
+                s.my = 0;
+              }
+            });
+          });
+
+          if (applyInPhase) {
+            this.sim.last90Abs = this.sim.absMs;
+            this.updateStatusText("In phase: 90 deg RF rotates magnetisation into transverse plane and synchronizes phase, producing strong Mxy.");
+          }
+
+          if (applyRefocus) {
+            const tau = this.sim.absMs - this.sim.last90Abs;
+            if (tau > 0) {
+              this.sim.rephaseUntilAbs = this.sim.absMs + tau;
+              this.sim.echoAtAbs = this.sim.absMs + tau;
+              this.updateStatusText(`Rephasing started: 180 deg pulse reverses static phase dispersion. Echo target near TE = 2*tau = ${(2 * tau).toFixed(1)} ms.`);
+            }
+          }
+        }
+
+        if (ev.type === "adc") {
+          this.updateStatusText("Readout active: RF coils detect induced signal while k-space trajectory is sampled.");
+        }
+      }
+
+      updatePhysics(dtMs) {
+        const tr = this.settings.TRms;
+        const tCycle = this.sim.absMs % tr;
+
+        if (tCycle < this.sim.lastCycleT) {
+          this.sim.kCurrent = { x: 0, y: 0 };
+          this.sim.kPath.push({ break: true });
+        }
+        this.sim.lastCycleT = tCycle;
+
+        const active = this.getActiveEvents(tCycle);
+        const activeIds = new Set(active.map((ev) => ev.id));
+
+        active.forEach((ev) => {
+          if (!this.sim.prevActiveIds.has(ev.id)) {
+            this.onEventStart(ev, active);
+          }
+        });
+        this.sim.prevActiveIds = activeIds;
+
+        const rfEvents = active.filter((ev) => ev.type === "rf");
+        const gzNow = this.eventAmplitude(active, "gz", this.settings.gzAmp);
+        const gyNow = this.eventAmplitude(active, "gy", this.settings.gyAmp);
+        const gxNow = this.eventAmplitude(active, "gx", this.settings.gxAmp);
+        const adcOn = active.some((ev) => ev.type === "adc");
+
+        const dtSec = dtMs / 1000;
+        const inhomSign = this.sim.absMs < this.sim.rephaseUntilAbs ? -1 : 1;
+
+        const hasSliceSelectRF = rfEvents.length > 0 && Math.abs(gzNow) > 0.0001;
+        const sliceHalf = clamp(0.95 - Math.abs(gzNow) * 0.07, 0.18, 0.95);
+
+        const stepTissue = (name, t1Ms, t2Ms) => {
+          this.spins[name].forEach((s) => {
+            if (rfEvents.length > 0) {
+              rfEvents.forEach((rf) => {
+                const selected = !hasSliceSelectRF || Math.abs(s.z) <= sliceHalf;
+                if (!selected) return;
+                const dFlip = (rf.flipDeg * Math.PI / 180) * (dtMs / rf.durationMs);
+                const r = rotateAroundX(s.mx, s.my, s.mz, dFlip);
+                s.mx = r.mx;
+                s.my = r.my;
+                s.mz = r.mz;
+              });
+            }
+
+            let hz = s.chemHz;
+            hz += s.inhomHz * inhomSign;
+            hz += gxNow * this.consts.gxScaleHz * s.x;
+            hz += gyNow * this.consts.gyScaleHz * s.y;
+            hz += gzNow * this.consts.gzScaleHz * s.z;
+
+            if (hasSliceSelectRF && Math.abs(s.z) <= sliceHalf) {
+              hz += gzNow * this.consts.gzScaleHz * s.z;
+            }
+
+            const ang = hz * Math.PI * 2 * dtSec;
+            const p = rotateXY(s.mx, s.my, ang);
+            s.mx = p.mx;
+            s.my = p.my;
+
+            const e2 = Math.exp(-dtSec / (t2Ms / 1000));
+            s.mx *= e2;
+            s.my *= e2;
+            s.mz = 1 - (1 - s.mz) * Math.exp(-dtSec / (t1Ms / 1000));
+          });
+        };
+
+        stepTissue("water", this.consts.t1WaterMs, this.consts.t2WaterMs);
+        stepTissue("fat", this.consts.t1FatMs, this.consts.t2FatMs);
+
+        this.sim.kCurrent.x += gxNow * dtMs * this.consts.kScale;
+        this.sim.kCurrent.y += gyNow * dtMs * this.consts.kScale;
+
+        if (adcOn) {
+          this.sim.kPath.push({ x: this.sim.kCurrent.x, y: this.sim.kCurrent.y, t: this.sim.absMs });
+          if (this.sim.kPath.length > 2200) this.sim.kPath.splice(0, this.sim.kPath.length - 2200);
+        }
+
+        if (this.sim.absMs - this.sim.lastSampleMs > 2.5) {
+          const sig = this.computeSignal();
+          this.sim.signalHistory.push({ t: this.sim.absMs, y: sig.re, mag: sig.mag, adcOn });
+          this.sim.lastSampleMs = this.sim.absMs;
+          const keepMs = Math.max(this.settings.TRms * 2.2, 450);
+          while (this.sim.signalHistory.length > 4 && this.sim.signalHistory[0].t < this.sim.absMs - keepMs) {
+            this.sim.signalHistory.shift();
+          }
+        }
+      }
+
+      tissueNet(name) {
+        const arr = this.spins[name];
+        if (!arr.length) return { mx: 0, my: 0, mz: 1, mxy: 0, phase: 0, coherence: 1 };
+
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        let sumMag = 0;
+        arr.forEach((s) => {
+          sx += s.mx;
+          sy += s.my;
+          sz += s.mz;
+          sumMag += Math.hypot(s.mx, s.my);
+        });
+        const n = arr.length;
+        const mx = sx / n;
+        const my = sy / n;
+        const mz = sz / n;
+        const mxy = Math.hypot(mx, my);
+        const coherence = sumMag > 1e-9 ? clamp(Math.hypot(sx, sy) / sumMag, 0, 1) : 1;
+        return { mx, my, mz, mxy, phase: Math.atan2(my, mx), coherence };
+      }
+
+      computeSignal() {
+        let re = 0;
+        let im = 0;
+        let count = 0;
+
+        if (this.settings.showWater) {
+          this.spins.water.forEach((s) => { re += s.mx; im += s.my; count += 1; });
+        }
+        if (this.settings.showFat) {
+          this.spins.fat.forEach((s) => { re += s.mx; im += s.my; count += 1; });
+        }
+
+        if (count === 0) return { re: 0, im: 0, mag: 0 };
+        re /= count;
+        im /= count;
+        return { re, im, mag: Math.hypot(re, im) };
+      }
+
+      updateHighlights() {
+        const w = this.tissueNet("water");
+        const f = this.tissueNet("fat");
+
+        const useWater = this.settings.showWater;
+        const useFat = this.settings.showFat;
+
+        const combined = {
+          mz: (w.mz + f.mz) * 0.5,
+          mxy: (w.mxy + f.mxy) * 0.5,
+          coherence: (w.coherence + f.coherence) * 0.5
+        };
+
+        const dPhase = Math.abs(wrapPi(w.phase - f.phase)) * 180 / Math.PI;
+        const highlights = new Set();
+
+        if (combined.coherence > 0.82 && combined.mxy > 0.18) highlights.add("in-phase");
+        if (combined.coherence < 0.52 && combined.mxy > 0.08) highlights.add("dephasing");
+        if (this.sim.rephaseUntilAbs > this.sim.absMs) highlights.add("rephasing");
+        if (this.sim.echoAtAbs !== null && Math.abs(this.sim.absMs - this.sim.echoAtAbs) < 14) highlights.add("echo-peak");
+        if (combined.mz < 0.94 && combined.mz > this.sim.prevNetMz - 0.0001) highlights.add("t1-recovery");
+        if (useWater && useFat && dPhase > 35) highlights.add("chemical-shift");
+
+        this.sim.prevNetMz = combined.mz;
+        this.sim.activeHighlights = highlights;
+
+        const chips = document.querySelectorAll("#highlightChips .chip");
+        chips.forEach((chip) => {
+          const key = chip.getAttribute("data-key");
+          chip.classList.toggle("on", highlights.has(key));
+        });
+
+        if (highlights.has("echo-peak")) {
+          this.updateStatusText("Echo peak: rephased transverse vectors produce a local signal maximum near TE.");
+        } else if (highlights.has("rephasing")) {
+          this.updateStatusText("Rephasing: 180 deg pulse has reversed phase dispersion so vectors are converging.");
+        } else if (highlights.has("dephasing")) {
+          this.updateStatusText("Dephasing: phase spread across isochromats reduces net transverse magnetisation.");
+        } else if (highlights.has("in-phase")) {
+          this.updateStatusText("In phase: transverse vectors are aligned and produce strong net Mxy.");
+        } else if (highlights.has("t1-recovery")) {
+          this.updateStatusText("T1 recovery: longitudinal Mz regrows between RF pulses; short TR limits full recovery.");
+        }
+      }
+
+      drawTimeline() {
+        const { ctx, w, h } = prep(this.timelineCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { l: 70, r: 12, t: 12, b: 18 };
+        const iw = w - pad.l - pad.r;
+        const ih = h - pad.t - pad.b;
+        const trH = ih / TRACKS.length;
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.65)";
+        ctx.fillRect(pad.l, pad.t, iw, ih);
+        ctx.strokeStyle = "#3b5f87";
+        ctx.strokeRect(pad.l, pad.t, iw, ih);
+
+        TRACKS.forEach((track, i) => {
+          const y = pad.t + i * trH;
+          ctx.strokeStyle = "rgba(138, 176, 220, 0.22)";
+          ctx.beginPath();
+          ctx.moveTo(pad.l, y);
+          ctx.lineTo(pad.l + iw, y);
+          ctx.stroke();
+
+          ctx.fillStyle = "#b8d7f1";
+          ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+          ctx.fillText(track, 18, y + trH * 0.62);
+        });
+
+        const toX = (ms) => pad.l + (ms / this.settings.TRms) * iw;
+
+        this.sim.events.forEach((ev) => {
+          const tr = TRACKS.indexOf(ev.track);
+          if (tr < 0) return;
+
+          const x = toX(ev.startMs);
+          const ex = toX(Math.min(this.settings.TRms, ev.startMs + ev.durationMs));
+          const y = pad.t + tr * trH + 3;
+          const hh = trH - 6;
+
+          ctx.fillStyle = ev.color;
+          ctx.globalAlpha = 0.86;
+          ctx.fillRect(x, y, Math.max(2, ex - x), hh);
+          ctx.globalAlpha = 1;
+
+          ctx.fillStyle = "#ecfeff";
+          ctx.font = "600 11px Sora, Avenir Next, sans-serif";
+          ctx.fillText(ev.label, x + 4, y + hh * 0.63);
+        });
+
+        const rf90 = this.getFirst90Event();
+        if (rf90) {
+          const xTE = toX(clamp(rf90.startMs + this.settings.TEms, 0, this.settings.TRms));
+          ctx.strokeStyle = "#fbbf24";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(xTE, pad.t);
+          ctx.lineTo(xTE, pad.t + ih);
+          ctx.stroke();
+          ctx.fillStyle = "#fcd34d";
+          ctx.font = "600 11px Sora, Avenir Next, sans-serif";
+          ctx.fillText("TE", xTE + 3, pad.t + 11);
+        }
+
+        if (this.sim.echoAtAbs !== null) {
+          const tCycle = this.sim.echoAtAbs % this.settings.TRms;
+          const xEcho = toX(tCycle);
+          ctx.strokeStyle = "#86efac";
+          ctx.beginPath();
+          ctx.moveTo(xEcho, pad.t);
+          ctx.lineTo(xEcho, pad.t + ih);
+          ctx.stroke();
+          ctx.fillStyle = "#bbf7d0";
+          ctx.fillText("Echo", xEcho + 3, pad.t + 23);
+        }
+
+        const nowX = toX(this.sim.absMs % this.settings.TRms);
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.beginPath();
+        ctx.moveTo(nowX, pad.t);
+        ctx.lineTo(nowX, pad.t + ih);
+        ctx.stroke();
+
+        ctx.fillStyle = "#9fc1de";
+        ctx.font = "600 11px SF Mono, Menlo, Consolas, monospace";
+        ctx.fillText(`0 ms`, pad.l - 2, h - 4);
+        ctx.fillText(`TR ${this.settings.TRms.toFixed(0)} ms`, w - 96, h - 4);
+      }
+
+      drawBlochAndGrid() {
+        const { ctx, w, h } = prep(this.blochGridCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        const wNet = this.tissueNet("water");
+        const fNet = this.tissueNet("fat");
+
+        const left = { x: 0, y: 0, w: w * 0.43, h };
+        const right = { x: w * 0.43, y: 0, w: w * 0.57, h };
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(0, 0, w, h);
+
+        const cx = left.x + left.w * 0.48;
+        const cy = left.h * 0.57;
+        const R = Math.min(left.w, left.h) * 0.31;
+
+        ctx.strokeStyle = "rgba(161, 197, 230, 0.45)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(108, 161, 210, 0.45)";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, R, R * 0.32, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        drawArrow(ctx, cx - R * 1.1, cy, cx + R * 1.1, cy, "#7dd3fc", 1.9, 7);
+        drawArrow(ctx, cx, cy + R * 1.08, cx, cy - R * 1.12, "#7dd3fc", 1.9, 7);
+
+        const combined = {
+          mx: (wNet.mx + fNet.mx) * 0.5,
+          my: (wNet.my + fNet.my) * 0.5,
+          mz: (wNet.mz + fNet.mz) * 0.5
+        };
+
+        const proj = (v, scale = 1) => {
+          const x = cx + (v.mx * R * scale);
+          const y = cy - (v.mz * R * scale) - (v.my * R * 0.35 * scale);
+          return { x, y };
+        };
+
+        if (this.settings.showWater) {
+          const p = proj(wNet, 1);
+          drawArrow(ctx, cx, cy, p.x, p.y, "#60a5fa", 2.8, 8);
+        }
+
+        if (this.settings.showFat) {
+          const p = proj(fNet, 1);
+          drawArrow(ctx, cx, cy, p.x, p.y, "#f97316", 2.8, 8);
+        }
+
+        const pc = proj(combined, 1);
+        drawArrow(ctx, cx, cy, pc.x, pc.y, "#fef08a", 4.2, 10);
+
+        ctx.fillStyle = "#d4ecff";
+        ctx.font = "600 13px Sora, Avenir Next, sans-serif";
+        ctx.fillText("Net magnetisation vectors", left.x + 14, 24);
+        ctx.fillText("z", cx + 6, cy - R - 8);
+        ctx.fillText("x", cx + R + 7, cy + 14);
+
+        ctx.font = "600 12px SF Mono, Menlo, Consolas, monospace";
+        ctx.fillStyle = "#a7cbe6";
+        ctx.fillText(`Water Mz=${wNet.mz.toFixed(2)} Mxy=${wNet.mxy.toFixed(2)}`, left.x + 14, h - 44);
+        ctx.fillStyle = "#ffb487";
+        ctx.fillText(`Fat   Mz=${fNet.mz.toFixed(2)} Mxy=${fNet.mxy.toFixed(2)}`, left.x + 14, h - 25);
+
+        ctx.strokeStyle = "#2e4f75";
+        ctx.beginPath();
+        ctx.moveTo(right.x, 0);
+        ctx.lineTo(right.x, h);
+        ctx.stroke();
+
+        const rx0 = right.x + 24;
+        const ry0 = 34;
+        const rw = right.w - 48;
+        const rh = h - 66;
+
+        ctx.fillStyle = "#d4ecff";
+        ctx.font = "600 13px Sora, Avenir Next, sans-serif";
+        ctx.fillText("Spatial grid (X/Y isochromats)", rx0, 24);
+
+        ctx.strokeStyle = "rgba(124, 162, 204, 0.25)";
+        for (let i = 0; i <= 8; i += 1) {
+          const x = rx0 + (i / 8) * rw;
+          ctx.beginPath();
+          ctx.moveTo(x, ry0);
+          ctx.lineTo(x, ry0 + rh);
+          ctx.stroke();
+        }
+        for (let j = 0; j <= 6; j += 1) {
+          const y = ry0 + (j / 6) * rh;
+          ctx.beginPath();
+          ctx.moveTo(rx0, y);
+          ctx.lineTo(rx0 + rw, y);
+          ctx.stroke();
+        }
+
+        const tCycle = this.sim.absMs % this.settings.TRms;
+        const active = this.getActiveEvents(tCycle);
+        const rfOn = active.some((ev) => ev.type === "rf");
+        const gzOn = active.some((ev) => ev.type === "gz");
+        const sliceHalf = clamp(0.95 - Math.abs(this.settings.gzAmp) * 0.07, 0.18, 0.95);
+
+        const drawSpins = (arr, color, visible) => {
+          if (!visible) return;
+          arr.forEach((s) => {
+            const x = rx0 + (s.x + 1) * 0.5 * rw;
+            const y = ry0 + (1 - (s.y + 1) * 0.5) * rh;
+            const phase = Math.atan2(s.my, s.mx);
+            const amp = clamp(Math.hypot(s.mx, s.my), 0.06, 1);
+            const len = 4 + 8 * amp;
+            const tx = x + Math.cos(phase) * len;
+            const ty = y - Math.sin(phase) * len;
+
+            const selected = !rfOn || !gzOn || Math.abs(s.z) <= sliceHalf;
+            ctx.globalAlpha = selected ? 0.85 : 0.22;
+            drawArrow(ctx, x, y, tx, ty, color, 1.3, 4);
+            ctx.globalAlpha = 1;
+          });
+        };
+
+        drawSpins(this.spins.water, "#60a5fa", this.settings.showWater);
+        drawSpins(this.spins.fat, "#f97316", this.settings.showFat);
+
+        if (rfOn && gzOn) {
+          ctx.fillStyle = "rgba(167, 139, 250, 0.17)";
+          ctx.fillRect(rx0, ry0 + (1 - (sliceHalf + 1) * 0.5) * rh, rw, sliceHalf * rh);
+          ctx.fillStyle = "#e5dbff";
+          ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+          ctx.fillText("Slice-selected spins currently affected by RF", rx0 + 8, ry0 + 18);
+        }
+      }
+
+      drawSignalAndKSpace() {
+        const { ctx, w, h } = prep(this.signalKCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(0, 0, w, h);
+
+        const left = { x: 10, y: 12, w: w * 0.66 - 16, h: h - 24 };
+        const right = { x: w * 0.66 + 6, y: 12, w: w * 0.34 - 16, h: h - 24 };
+
+        ctx.strokeStyle = "#34577d";
+        ctx.strokeRect(left.x, left.y, left.w, left.h);
+        ctx.strokeRect(right.x, right.y, right.w, right.h);
+
+        const tMin = this.sim.signalHistory.length ? this.sim.signalHistory[0].t : this.sim.absMs - this.settings.TRms;
+        const tMax = this.sim.absMs;
+        const tSpan = Math.max(1, tMax - tMin);
+
+        const sy = (v) => {
+          const amp = clamp(v, -1.05, 1.05);
+          return left.y + left.h * 0.5 - amp * left.h * 0.43;
+        };
+
+        ctx.strokeStyle = "rgba(125, 177, 226, 0.26)";
+        ctx.beginPath();
+        ctx.moveTo(left.x, left.y + left.h * 0.5);
+        ctx.lineTo(left.x + left.w, left.y + left.h * 0.5);
+        ctx.stroke();
+
+        const drawADCWindows = () => {
+          const nowCycle = Math.floor(this.sim.absMs / this.settings.TRms);
+          for (let c = nowCycle - 2; c <= nowCycle + 1; c += 1) {
+            this.sim.events.forEach((ev) => {
+              if (ev.type !== "adc") return;
+              const a = c * this.settings.TRms + ev.startMs;
+              const b = a + ev.durationMs;
+              if (b < tMin || a > tMax) return;
+              const x0 = left.x + ((a - tMin) / tSpan) * left.w;
+              const x1 = left.x + ((b - tMin) / tSpan) * left.w;
+              ctx.fillStyle = "rgba(45, 212, 191, 0.15)";
+              ctx.fillRect(x0, left.y, Math.max(1, x1 - x0), left.h);
+            });
+          }
+        };
+
+        drawADCWindows();
+
+        ctx.strokeStyle = "#fbbf24";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        this.sim.signalHistory.forEach((p, i) => {
+          const x = left.x + ((p.t - tMin) / tSpan) * left.w;
+          const y = sy(p.y * 1.9);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        if (this.sim.echoAtAbs !== null && this.sim.echoAtAbs >= tMin && this.sim.echoAtAbs <= tMax) {
+          const xEcho = left.x + ((this.sim.echoAtAbs - tMin) / tSpan) * left.w;
+          ctx.strokeStyle = "#86efac";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(xEcho, left.y);
+          ctx.lineTo(xEcho, left.y + left.h);
+          ctx.stroke();
+          ctx.fillStyle = "#bbf7d0";
+          ctx.font = "600 11px Sora, Avenir Next, sans-serif";
+          ctx.fillText("Echo peak", xEcho + 3, left.y + 13);
+        }
+
+        ctx.fillStyle = "#cce8ff";
+        ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+        ctx.fillText("Signal waveform", left.x + 8, left.y + 14);
+
+        const maxK = 1.05;
+        const kx = (v) => right.x + right.w * 0.5 + (v / maxK) * right.w * 0.42;
+        const ky = (v) => right.y + right.h * 0.5 - (v / maxK) * right.h * 0.42;
+
+        const nLines = this.settings.lineCount;
+        for (let i = 0; i < nLines; i += 1) {
+          const yn = nLines <= 1 ? 0 : (i / (nLines - 1)) * 2 - 1;
+          const yLine = ky(yn);
+          ctx.strokeStyle = "rgba(125, 177, 226, 0.1)";
+          ctx.beginPath();
+          ctx.moveTo(right.x + 8, yLine);
+          ctx.lineTo(right.x + right.w - 8, yLine);
+          ctx.stroke();
+
+          if (this.sim.acquiredLineSet.has(i)) {
+            ctx.strokeStyle = "rgba(45, 212, 191, 0.55)";
+            ctx.beginPath();
+            ctx.moveTo(right.x + 8, yLine);
+            ctx.lineTo(right.x + right.w - 8, yLine);
+            ctx.stroke();
+          }
+        }
+
+        ctx.strokeStyle = "rgba(125, 177, 226, 0.3)";
+        ctx.beginPath();
+        ctx.moveTo(right.x + right.w * 0.5, right.y + 6);
+        ctx.lineTo(right.x + right.w * 0.5, right.y + right.h - 6);
+        ctx.moveTo(right.x + 6, right.y + right.h * 0.5);
+        ctx.lineTo(right.x + right.w - 6, right.y + right.h * 0.5);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.7;
+        let started = false;
+        this.sim.kPath.forEach((p) => {
+          if (p.break) {
+            started = false;
+            return;
+          }
+          const x = kx(p.x);
+          const y = ky(p.y);
+          if (!started) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        if (started) ctx.stroke();
+
+        const cx = kx(this.sim.kCurrent.x);
+        const cy = ky(this.sim.kCurrent.y);
+        ctx.fillStyle = "#86efac";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#cce8ff";
+        ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+        ctx.fillText("k-space trajectory", right.x + 8, right.y + 14);
+        ctx.fillStyle = "#b8f6ef";
+        ctx.font = "600 11px SF Mono, Menlo, Consolas, monospace";
+        ctx.fillText(`Lines: ${this.sim.linesAcquired}/${this.settings.lineCount}`, right.x + 8, right.y + right.h - 10);
+      }
+
+      draw() {
+        this.drawTimeline();
+        this.drawBlochAndGrid();
+        this.drawSignalAndKSpace();
+      }
+
+      tick(ts) {
+        this.sim.lastTs = ts;
+        this.draw();
+        requestAnimationFrame((t) => this.tick(t));
+      }
+    }
+
+    new MRIV7();
+  </script>
+</body>
+</html>

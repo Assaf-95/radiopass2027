@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Ultrasound Wave Simulator - Version 2</title>
+  <style>
+    :root {
+      --bg-a: #f4fafc;
+      --bg-b: #e6f1f6;
+      --card: #ffffff;
+      --ink: #10212d;
+      --muted: #4f6574;
+      --accent: #0f5e8f;
+      --line: #c8d9e6;
+      --compression: #d7263d;
+      --rarefaction: #2a67a8;
+      --medium1: rgba(15, 94, 143, 0.08);
+      --medium2: rgba(22, 143, 102, 0.08);
+      --shadow: 0 10px 24px rgba(16, 33, 45, 0.1);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, var(--bg-a), var(--bg-b));
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sim {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      letter-spacing: 0.01em;
+    }
+
+    .mode {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    #simCanvas {
+      width: 100%;
+      height: min(60vh, 500px);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfdff;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 0.87rem;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 600;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .swatch.compression {
+      background: var(--compression);
+    }
+
+    .swatch.rarefaction {
+      background: var(--rarefaction);
+    }
+
+    .swatch.medium1 {
+      background: rgba(15, 94, 143, 0.45);
+    }
+
+    .swatch.medium2 {
+      background: rgba(22, 143, 102, 0.45);
+    }
+
+    .controls {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    button {
+      font: inherit;
+      font-weight: 700;
+      padding: 10px 11px;
+      border-radius: 10px;
+      border: 1px solid #0d4c70;
+      background: #0f5e8f;
+      color: #ffffff;
+      cursor: pointer;
+      transition: transform 0.14s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: #f4f9fc;
+      color: #134666;
+      border-color: #9db6c8;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: #f9fcff;
+    }
+
+    .toggle-row span {
+      color: #1a3344;
+      font-weight: 700;
+    }
+
+    .toggle-row label {
+      color: var(--muted);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      font-size: 0.9rem;
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      display: grid;
+      gap: 6px;
+      background: #fbfeff;
+    }
+
+    .group h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #18415b;
+    }
+
+    .slider {
+      display: grid;
+      gap: 5px;
+    }
+
+    .slider-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .slider-name {
+      color: #1a3344;
+      font-weight: 700;
+    }
+
+    .slider-value {
+      color: var(--accent);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .physics {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      background: #f7fbfe;
+    }
+
+    .physics h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid #d8e4ed;
+      border-radius: 8px;
+      padding: 8px;
+      background: #ffffff;
+    }
+
+    .metric-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.77rem;
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      color: #113f5b;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
+    }
+
+    .equation {
+      margin: 0;
+      color: #2a4a5f;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .status {
+      margin: 0;
+      color: #2f5a73;
+      font-size: 0.83rem;
+      border: 1px dashed #b8cddd;
+      border-radius: 8px;
+      padding: 7px 8px;
+      background: #ffffff;
+    }
+
+    @media (max-width: 1024px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      #simCanvas {
+        height: min(52vh, 430px);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 10px;
+      }
+
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      #simCanvas {
+        height: min(46vh, 360px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="panel sim">
+      <div class="title">
+        <h1>Ultrasound Wave Simulator v2: Impedance, Reflection, Transmission</h1>
+        <div id="modeText" class="mode">Mode: Particle Compression View</div>
+      </div>
+
+      <canvas id="simCanvas" aria-label="Ultrasound impedance and reflection simulator"></canvas>
+
+      <div class="legend" aria-hidden="true">
+        <span class="legend-item"><span class="swatch compression"></span>Compression</span>
+        <span class="legend-item"><span class="swatch rarefaction"></span>Rarefaction</span>
+        <span class="legend-item"><span class="swatch medium1"></span>Medium 1</span>
+        <span class="legend-item"><span class="swatch medium2"></span>Medium 2</span>
+      </div>
+    </section>
+
+    <aside class="panel controls">
+      <div class="buttons">
+        <button id="startBtn" type="button">Start Wave</button>
+        <button id="pauseBtn" type="button" class="secondary" disabled>Pause Wave</button>
+        <button id="toggleViewBtn" type="button" class="secondary">Show Pressure Graph</button>
+      </div>
+
+      <div class="toggle-row">
+        <span>Label Visibility</span>
+        <label>
+          <input id="labelsToggle" type="checkbox" checked />
+          Show labels
+        </label>
+      </div>
+
+      <section class="group">
+        <h2>Wave Source</h2>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Frequency</span>
+            <span id="freqText" class="slider-value">5.00 MHz</span>
+          </div>
+          <input id="freqSlider" type="range" min="1" max="15" step="0.1" value="5" />
+        </div>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Incident Amplitude (visual)</span>
+            <span id="ampText" class="slider-value">60%</span>
+          </div>
+          <input id="ampSlider" type="range" min="10" max="100" step="1" value="60" />
+        </div>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Playback Speed</span>
+            <span id="speedText" class="slider-value">1.00x</span>
+          </div>
+          <input id="speedSlider" type="range" min="0.1" max="3" step="0.05" value="1" />
+        </div>
+      </section>
+
+      <section class="group">
+        <h2>Medium 1 (Left)</h2>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Density rho1 (kg/m^3)</span>
+            <span id="rho1Text" class="slider-value">1000</span>
+          </div>
+          <input id="rho1Slider" type="range" min="850" max="1300" step="1" value="1000" />
+        </div>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Speed c1 (m/s)</span>
+            <span id="c1Text" class="slider-value">1540</span>
+          </div>
+          <input id="c1Slider" type="range" min="1300" max="1800" step="1" value="1540" />
+        </div>
+      </section>
+
+      <section class="group">
+        <h2>Medium 2 (Right)</h2>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Density rho2 (kg/m^3)</span>
+            <span id="rho2Text" class="slider-value">1060</span>
+          </div>
+          <input id="rho2Slider" type="range" min="850" max="1300" step="1" value="1060" />
+        </div>
+
+        <div class="slider">
+          <div class="slider-head">
+            <span class="slider-name">Speed c2 (m/s)</span>
+            <span id="c2Text" class="slider-value">1540</span>
+          </div>
+          <input id="c2Slider" type="range" min="1300" max="1800" step="1" value="1540" />
+        </div>
+      </section>
+
+      <section class="physics" aria-live="polite">
+        <h2>Live Acoustic Physics</h2>
+
+        <div class="metrics">
+          <div class="metric">
+            <span class="metric-label">Frequency (f)</span>
+            <span id="fMetric" class="metric-value">5.00 MHz</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Lambda1 = c1 / f</span>
+            <span id="lambda1Metric" class="metric-value">0.308 mm</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Lambda2 = c2 / f</span>
+            <span id="lambda2Metric" class="metric-value">0.308 mm</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Z1 = rho1 * c1</span>
+            <span id="z1Metric" class="metric-value">1.540 MRayl</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Z2 = rho2 * c2</span>
+            <span id="z2Metric" class="metric-value">1.632 MRayl</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Pressure r = (Z2 - Z1)/(Z2 + Z1)</span>
+            <span id="rMetric" class="metric-value">0.0290</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Reflection Coefficient (R)</span>
+            <span id="rCoeffMetric" class="metric-value">0.0008 (0.08%)</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Transmission Intensity (1 - R)</span>
+            <span id="tMetric" class="metric-value">99.92%</span>
+          </div>
+        </div>
+
+        <p id="equationLine1" class="equation">Z1 = 1000 * 1540 = 1,540,000 Rayl, Z2 = 1060 * 1540 = 1,632,400 Rayl</p>
+        <p id="equationLine2" class="equation">R = ((Z2 - Z1)/(Z2 + Z1))^2 = 0.0008 (0.08%)</p>
+        <p id="statusText" class="status">Small mismatch: weak reflection, mostly transmitted wave.</p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    "use strict";
+
+    // Canvas + controls.
+    const canvas = document.getElementById("simCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const toggleViewBtn = document.getElementById("toggleViewBtn");
+    const labelsToggle = document.getElementById("labelsToggle");
+    const modeText = document.getElementById("modeText");
+
+    const freqSlider = document.getElementById("freqSlider");
+    const ampSlider = document.getElementById("ampSlider");
+    const speedSlider = document.getElementById("speedSlider");
+    const rho1Slider = document.getElementById("rho1Slider");
+    const c1Slider = document.getElementById("c1Slider");
+    const rho2Slider = document.getElementById("rho2Slider");
+    const c2Slider = document.getElementById("c2Slider");
+
+    const freqText = document.getElementById("freqText");
+    const ampText = document.getElementById("ampText");
+    const speedText = document.getElementById("speedText");
+    const rho1Text = document.getElementById("rho1Text");
+    const c1Text = document.getElementById("c1Text");
+    const rho2Text = document.getElementById("rho2Text");
+    const c2Text = document.getElementById("c2Text");
+
+    const fMetric = document.getElementById("fMetric");
+    const lambda1Metric = document.getElementById("lambda1Metric");
+    const lambda2Metric = document.getElementById("lambda2Metric");
+    const z1Metric = document.getElementById("z1Metric");
+    const z2Metric = document.getElementById("z2Metric");
+    const rMetric = document.getElementById("rMetric");
+    const rCoeffMetric = document.getElementById("rCoeffMetric");
+    const tMetric = document.getElementById("tMetric");
+    const equationLine1 = document.getElementById("equationLine1");
+    const equationLine2 = document.getElementById("equationLine2");
+    const statusText = document.getElementById("statusText");
+
+    // Global simulator state.
+    const state = {
+      running: false,
+      mode: "particle", // particle | pressure
+      showLabels: true,
+      phaseTime: 0,
+      lastTimestamp: 0,
+      particleCount: 120,
+      boundaryRatio: 0.5,
+      frequencyMHz: 5,
+      amplitudePercent: 60,
+      playbackSpeed: 1,
+      rho1: 1000,
+      c1: 1540,
+      rho2: 1060,
+      c2: 1540
+    };
+
+    // Derived physics values, refreshed by updatePhysics().
+    const derived = {
+      frequencyHz: 5e6,
+      lambda1Meters: 0,
+      lambda2Meters: 0,
+      z1: 0,
+      z2: 0,
+      pressureReflection: 0,
+      reflectionCoefficient: 0,
+      transmissionPressure: 1,
+      transmissionIntensity: 1
+    };
+
+    // Visual scaling is intentionally exaggerated for education clarity.
+    const visual = {
+      marginX: 28,
+      marginY: 24,
+      wavelengthScalePxPerMeter: 62000,
+      particleDisplacementBasePx: 30,
+      pressureGraphAmpPx: 92
+    };
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function resizeCanvas() {
+      const dpr = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawFrame();
+    }
+
+    function wavelengthToPx(lambdaMeters, width) {
+      const scaled = lambdaMeters * visual.wavelengthScalePxPerMeter;
+      return clamp(scaled, 48, width * 0.8);
+    }
+
+    function getBoundaryX(width) {
+      return width * state.boundaryRatio;
+    }
+
+    function getAnimationOmega() {
+      // Link visible temporal oscillation speed to frequency control.
+      const animationHz = 0.28 + (state.frequencyMHz / 15) * 1.2;
+      return Math.PI * 2 * animationHz;
+    }
+
+    function getIncidentAmplitude() {
+      return state.amplitudePercent / 100;
+    }
+
+    function updatePhysics() {
+      state.frequencyMHz = Number(freqSlider.value);
+      state.amplitudePercent = Number(ampSlider.value);
+      state.playbackSpeed = Number(speedSlider.value);
+      state.rho1 = Number(rho1Slider.value);
+      state.c1 = Number(c1Slider.value);
+      state.rho2 = Number(rho2Slider.value);
+      state.c2 = Number(c2Slider.value);
+      state.showLabels = labelsToggle.checked;
+
+      derived.frequencyHz = state.frequencyMHz * 1e6;
+
+      derived.lambda1Meters = state.c1 / derived.frequencyHz;
+      derived.lambda2Meters = state.c2 / derived.frequencyHz;
+
+      derived.z1 = state.rho1 * state.c1;
+      derived.z2 = state.rho2 * state.c2;
+
+      derived.pressureReflection = (derived.z2 - derived.z1) / (derived.z2 + derived.z1);
+      derived.reflectionCoefficient = derived.pressureReflection * derived.pressureReflection;
+      derived.transmissionPressure = 1 + derived.pressureReflection;
+      derived.transmissionIntensity = 1 - derived.reflectionCoefficient;
+
+      renderNumericalDisplays();
+      drawFrame();
+    }
+
+    function renderNumericalDisplays() {
+      const lambda1mm = derived.lambda1Meters * 1000;
+      const lambda2mm = derived.lambda2Meters * 1000;
+      const z1MRayl = derived.z1 / 1e6;
+      const z2MRayl = derived.z2 / 1e6;
+      const rPercent = derived.reflectionCoefficient * 100;
+      const tPercent = derived.transmissionIntensity * 100;
+
+      freqText.textContent = `${state.frequencyMHz.toFixed(2)} MHz`;
+      ampText.textContent = `${state.amplitudePercent.toFixed(0)}%`;
+      speedText.textContent = `${state.playbackSpeed.toFixed(2)}x`;
+      rho1Text.textContent = `${state.rho1.toFixed(0)}`;
+      c1Text.textContent = `${state.c1.toFixed(0)}`;
+      rho2Text.textContent = `${state.rho2.toFixed(0)}`;
+      c2Text.textContent = `${state.c2.toFixed(0)}`;
+
+      fMetric.textContent = `${state.frequencyMHz.toFixed(2)} MHz`;
+      lambda1Metric.textContent = `${lambda1mm.toFixed(3)} mm`;
+      lambda2Metric.textContent = `${lambda2mm.toFixed(3)} mm`;
+      z1Metric.textContent = `${z1MRayl.toFixed(3)} MRayl`;
+      z2Metric.textContent = `${z2MRayl.toFixed(3)} MRayl`;
+      rMetric.textContent = `${derived.pressureReflection.toFixed(4)}`;
+      rCoeffMetric.textContent = `${derived.reflectionCoefficient.toFixed(4)} (${rPercent.toFixed(2)}%)`;
+      tMetric.textContent = `${tPercent.toFixed(2)}%`;
+
+      equationLine1.textContent = `Z1 = ${state.rho1} * ${state.c1} = ${derived.z1.toLocaleString()} Rayl, Z2 = ${state.rho2} * ${state.c2} = ${derived.z2.toLocaleString()} Rayl`;
+      equationLine2.textContent = `R = ((Z2 - Z1)/(Z2 + Z1))^2 = ${derived.reflectionCoefficient.toFixed(4)} (${rPercent.toFixed(2)}%)`;
+
+      if (Math.abs(derived.pressureReflection) < 0.01) {
+        statusText.textContent = "Impedance matched: essentially no reflection at the boundary.";
+      } else if (rPercent < 10) {
+        statusText.textContent = "Small mismatch: weak reflection, mostly transmitted wave.";
+      } else if (rPercent < 40) {
+        statusText.textContent = "Moderate mismatch: visible reflection and transmission coexist.";
+      } else {
+        statusText.textContent = "Strong mismatch: large reflected wave and reduced transmission.";
+      }
+    }
+
+    function sampleWaveComponentsAtX(xPx, timeSec, width) {
+      const boundaryX = getBoundaryX(width);
+      const omega = getAnimationOmega();
+      const a = getIncidentAmplitude();
+      const lambda1Px = wavelengthToPx(derived.lambda1Meters, width);
+      const lambda2Px = wavelengthToPx(derived.lambda2Meters, width);
+      const k1 = (Math.PI * 2) / lambda1Px;
+      const k2 = (Math.PI * 2) / lambda2Px;
+
+      const incident = a * Math.sin(k1 * xPx - omega * timeSec);
+      const reflected = a * derived.pressureReflection * Math.sin(k1 * (2 * boundaryX - xPx) - omega * timeSec);
+
+      // Keep phase continuity at the boundary into medium 2.
+      const boundaryPhase = k1 * boundaryX - omega * timeSec;
+      const transmitted = a * derived.transmissionPressure * Math.sin(k2 * (xPx - boundaryX) + boundaryPhase);
+
+      if (xPx <= boundaryX) {
+        return {
+          incident,
+          reflected,
+          transmitted: 0,
+          total: incident + reflected
+        };
+      }
+
+      return {
+        incident: 0,
+        reflected: 0,
+        transmitted,
+        total: transmitted
+      };
+    }
+
+    function pressureToColor(pressure, alphaScale = 0.7) {
+      const intensity = clamp(Math.abs(pressure), 0, 1.1);
+      const alpha = 0.15 + intensity * alphaScale;
+      if (pressure >= 0) {
+        return `rgba(215, 38, 61, ${alpha.toFixed(3)})`;
+      }
+      return `rgba(42, 103, 168, ${alpha.toFixed(3)})`;
+    }
+
+    function drawBackgroundAndBoundary(width, height) {
+      const boundaryX = getBoundaryX(width);
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Medium shading.
+      ctx.fillStyle = "rgba(15, 94, 143, 0.08)";
+      ctx.fillRect(0, 0, boundaryX, height);
+      ctx.fillStyle = "rgba(22, 143, 102, 0.08)";
+      ctx.fillRect(boundaryX, 0, width - boundaryX, height);
+
+      // Reference guide lines.
+      ctx.strokeStyle = "rgba(16, 33, 45, 0.06)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 10; i += 1) {
+        const x = (i / 10) * width;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      // Boundary line between media.
+      ctx.strokeStyle = "rgba(16, 33, 45, 0.62)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(boundaryX, 0);
+      ctx.lineTo(boundaryX, height);
+      ctx.stroke();
+
+      if (state.showLabels) {
+        ctx.font = "700 13px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+
+        ctx.fillStyle = "rgba(11, 65, 99, 0.86)";
+        ctx.fillText("Medium 1", boundaryX * 0.5, 20);
+
+        ctx.fillStyle = "rgba(12, 101, 73, 0.86)";
+        ctx.fillText("Medium 2", boundaryX + (width - boundaryX) * 0.5, 20);
+
+        ctx.fillStyle = "rgba(16, 33, 45, 0.82)";
+        ctx.fillText("Boundary", boundaryX, 40);
+      }
+    }
+
+    function findPressureExtremaX(width, timeSec) {
+      const left = visual.marginX;
+      const right = width - visual.marginX;
+      let xCompression = left;
+      let xRarefaction = left;
+      let maxP = -Infinity;
+      let minP = Infinity;
+
+      for (let x = left; x <= right; x += 2) {
+        const p = sampleWaveComponentsAtX(x, timeSec, width).total;
+        if (p > maxP) {
+          maxP = p;
+          xCompression = x;
+        }
+        if (p < minP) {
+          minP = p;
+          xRarefaction = x;
+        }
+      }
+
+      return { xCompression, xRarefaction };
+    }
+
+    function drawParticleView(width, height, timeSec) {
+      const left = visual.marginX;
+      const right = width - visual.marginX;
+      const centerY = height * 0.55;
+      const span = right - left;
+
+      const displacementScale = visual.particleDisplacementBasePx;
+      const bandHalfHeight = 38;
+
+      // Compression/rarefaction tint strip.
+      for (let x = left; x < right; x += 4) {
+        const p = sampleWaveComponentsAtX(x + 2, timeSec, width).total;
+        ctx.fillStyle = pressureToColor(p, 0.2);
+        ctx.fillRect(x, centerY - bandHalfHeight, 4, bandHalfHeight * 2);
+      }
+
+      // Horizontal center line and rightward propagation arrow.
+      ctx.strokeStyle = "rgba(16, 33, 45, 0.22)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(left, centerY);
+      ctx.lineTo(right, centerY);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(16, 33, 45, 0.5)";
+      ctx.beginPath();
+      ctx.moveTo(right - 34, centerY - 5);
+      ctx.lineTo(right - 34, centerY + 5);
+      ctx.lineTo(right - 14, centerY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Particle chain.
+      for (let i = 0; i < state.particleCount; i += 1) {
+        const x0 = left + (i / (state.particleCount - 1)) * span;
+        const p = sampleWaveComponentsAtX(x0, timeSec, width).total;
+        const x = x0 + p * displacementScale;
+
+        ctx.beginPath();
+        ctx.arc(x, centerY, 3.9, 0, Math.PI * 2);
+        ctx.fillStyle = pressureToColor(p, 0.7);
+        ctx.fill();
+      }
+
+      if (state.showLabels) {
+        const extrema = findPressureExtremaX(width, timeSec);
+
+        ctx.font = "700 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+
+        ctx.fillStyle = "#b71f34";
+        ctx.fillText("Compression", extrema.xCompression, height * 0.2);
+        ctx.strokeStyle = "rgba(183, 31, 52, 0.58)";
+        ctx.beginPath();
+        ctx.moveTo(extrema.xCompression, height * 0.22);
+        ctx.lineTo(extrema.xCompression, centerY - 22);
+        ctx.stroke();
+
+        ctx.fillStyle = "#245e9c";
+        ctx.fillText("Rarefaction", extrema.xRarefaction, height * 0.82);
+        ctx.strokeStyle = "rgba(36, 94, 156, 0.58)";
+        ctx.beginPath();
+        ctx.moveTo(extrema.xRarefaction, height * 0.79);
+        ctx.lineTo(extrema.xRarefaction, centerY + 22);
+        ctx.stroke();
+
+        drawWaveDirectionLabels(width, height, centerY);
+      }
+
+      drawCaption("Particle displacement is exaggerated; calculations use true physics equations.", width, height);
+    }
+
+    function drawWaveDirectionLabels(width, height, centerY) {
+      const boundaryX = getBoundaryX(width);
+      const rMagPercent = Math.abs(derived.pressureReflection) * 100;
+      const tMagPercent = Math.abs(derived.transmissionPressure) * 100;
+
+      ctx.font = "600 12px 'Segoe UI', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillStyle = "rgba(16, 33, 45, 0.82)";
+      ctx.fillText("Incident ->", visual.marginX + 6, centerY - 54);
+
+      ctx.textAlign = "center";
+      if (rMagPercent >= 0.5) {
+        ctx.fillText(`<- Reflected (${rMagPercent.toFixed(1)}%)`, boundaryX - 100, centerY + 56);
+      } else {
+        ctx.fillText("No visible reflection", boundaryX - 90, centerY + 56);
+      }
+
+      ctx.textAlign = "right";
+      ctx.fillText(`Transmitted -> (${tMagPercent.toFixed(1)}%)`, width - visual.marginX - 6, centerY - 54);
+    }
+
+    function drawPressureView(width, height, timeSec) {
+      const left = visual.marginX;
+      const right = width - visual.marginX;
+      const top = visual.marginY;
+      const bottom = height - visual.marginY;
+      const centerY = (top + bottom) / 2;
+
+      // Horizontal zero-pressure axis.
+      ctx.strokeStyle = "rgba(16, 33, 45, 0.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(left, centerY);
+      ctx.lineTo(right, centerY);
+      ctx.stroke();
+
+      // Pressure curve of total field (incident + reflected on left, transmitted on right).
+      ctx.lineWidth = 2.4;
+      const graphAmp = visual.pressureGraphAmpPx;
+      for (let x = left; x < right; x += 2) {
+        const p1 = sampleWaveComponentsAtX(x, timeSec, width).total;
+        const p2 = sampleWaveComponentsAtX(x + 2, timeSec, width).total;
+        const y1 = centerY - p1 * graphAmp;
+        const y2 = centerY - p2 * graphAmp;
+
+        ctx.strokeStyle = p1 >= 0 ? "#d7263d" : "#2a67a8";
+        ctx.beginPath();
+        ctx.moveTo(x, y1);
+        ctx.lineTo(x + 2, y2);
+        ctx.stroke();
+      }
+
+      // Direction arrows for propagation cues.
+      ctx.fillStyle = "rgba(16, 33, 45, 0.5)";
+      ctx.beginPath();
+      ctx.moveTo(right - 34, top + 14);
+      ctx.lineTo(right - 34, top + 24);
+      ctx.lineTo(right - 14, top + 19);
+      ctx.closePath();
+      ctx.fill();
+
+      if (state.showLabels) {
+        const extrema = findPressureExtremaX(width, timeSec);
+
+        ctx.font = "700 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+
+        const yComp = centerY - sampleWaveComponentsAtX(extrema.xCompression, timeSec, width).total * graphAmp;
+        const yRare = centerY - sampleWaveComponentsAtX(extrema.xRarefaction, timeSec, width).total * graphAmp;
+
+        ctx.fillStyle = "#b81f35";
+        ctx.fillText("Compression", extrema.xCompression, yComp - 14);
+
+        ctx.fillStyle = "#245e9c";
+        ctx.fillText("Rarefaction", extrema.xRarefaction, yRare + 20);
+
+        drawWaveDirectionLabels(width, height, centerY);
+      }
+
+      drawCaption("Pressure graph: red positive pressure, blue negative pressure.", width, height);
+    }
+
+    function drawCaption(text, width, height) {
+      ctx.fillStyle = "rgba(16, 33, 45, 0.64)";
+      ctx.font = "600 12px 'Segoe UI', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(text, visual.marginX, height - 8);
+    }
+
+    function drawFrame() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const timeSec = state.phaseTime;
+
+      drawBackgroundAndBoundary(width, height);
+
+      if (state.mode === "particle") {
+        drawParticleView(width, height, timeSec);
+      } else {
+        drawPressureView(width, height, timeSec);
+      }
+    }
+
+    function animationStep(timestamp) {
+      if (!state.lastTimestamp) {
+        state.lastTimestamp = timestamp;
+      }
+
+      const dt = (timestamp - state.lastTimestamp) / 1000;
+      state.lastTimestamp = timestamp;
+
+      if (state.running) {
+        state.phaseTime += dt * state.playbackSpeed;
+      }
+
+      drawFrame();
+      requestAnimationFrame(animationStep);
+    }
+
+    function setMode(nextMode) {
+      state.mode = nextMode;
+      const particleMode = state.mode === "particle";
+
+      modeText.textContent = particleMode
+        ? "Mode: Particle Compression View"
+        : "Mode: Pressure Graph View";
+
+      toggleViewBtn.textContent = particleMode
+        ? "Show Pressure Graph"
+        : "Show Particle View";
+
+      drawFrame();
+    }
+
+    // Event listeners.
+    startBtn.addEventListener("click", () => {
+      state.running = true;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      state.running = false;
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+    });
+
+    toggleViewBtn.addEventListener("click", () => {
+      setMode(state.mode === "particle" ? "pressure" : "particle");
+    });
+
+    [freqSlider, ampSlider, speedSlider, rho1Slider, c1Slider, rho2Slider, c2Slider, labelsToggle].forEach((control) => {
+      control.addEventListener("input", updatePhysics);
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    // Initial state: paused until Start Wave is pressed.
+    resizeCanvas();
+    updatePhysics();
+    setMode("particle");
+    requestAnimationFrame(animationStep);
+  </script>
+</body>
+</html>

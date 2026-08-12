@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Physics Diagrams 6-10</title>
+  <style>
+    :root {
+      --bg: #eaf3f7;
+      --card: rgba(255, 255, 255, 0.93);
+      --text: #173445;
+      --muted: #4f6f81;
+      --edge: rgba(108, 151, 176, 0.34);
+      --line: #62849b;
+      --accent: #0a85ab;
+      --accent-2: #12916f;
+      --warn: #c8782d;
+      --danger: #c55353;
+      --radius: 18px;
+      --shadow: 0 20px 42px rgba(8, 44, 64, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Avenir Next", "IBM Plex Sans", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 7%, rgba(88, 185, 209, 0.14), transparent 40%),
+        radial-gradient(circle at 92% 8%, rgba(29, 176, 141, 0.12), transparent 38%),
+        linear-gradient(160deg, #ecf4f8 0%, #e7f1f6 56%, #ecf5f4 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(8, 68, 101, 0.04) 0px,
+        rgba(8, 68, 101, 0.04) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    }
+
+    .page {
+      width: min(1440px, calc(100% - 2rem));
+      margin: 1rem auto 2rem;
+      display: grid;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.93), rgba(243, 249, 252, 0.95));
+      box-shadow: var(--shadow);
+      padding: 0.95rem 1.05rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.08rem, 2.4vw, 1.78rem);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #0f4864;
+      font-family: "Avenir Next Condensed", "Franklin Gothic Medium", sans-serif;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .diagram-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .diagram-card {
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: var(--card);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+    }
+
+    .card-head {
+      padding: 0.8rem 0.95rem 0.65rem;
+      border-bottom: 1px solid rgba(120, 161, 183, 0.25);
+      background: linear-gradient(180deg, rgba(245, 252, 255, 0.95), rgba(241, 250, 253, 0.9));
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: #0f4561;
+      letter-spacing: 0.02em;
+    }
+
+    .card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(93, 149, 178, 0.38);
+      background: rgba(221, 241, 249, 0.84);
+      color: #0f6685;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      padding: 0.24rem 0.52rem;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scene-wrap {
+      padding: 0.75rem;
+    }
+
+    .scene {
+      width: 100%;
+      aspect-ratio: 18 / 8;
+      border-radius: 14px;
+      border: 1px solid rgba(104, 152, 178, 0.36);
+      background:
+        linear-gradient(180deg, rgba(247, 252, 255, 0.96), rgba(240, 249, 252, 0.92)),
+        radial-gradient(circle at 15% 15%, rgba(76, 173, 202, 0.12), transparent 32%),
+        radial-gradient(circle at 86% 78%, rgba(56, 175, 136, 0.1), transparent 32%);
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .caption {
+      margin: 0;
+      min-height: 70px;
+      padding: 0.66rem 0.95rem;
+      border-top: 1px solid rgba(124, 161, 181, 0.24);
+      border-bottom: 1px solid rgba(124, 161, 181, 0.24);
+      background: linear-gradient(180deg, rgba(244, 251, 254, 0.92), rgba(243, 249, 253, 0.84));
+      color: #1f4d65;
+      font-size: 0.9rem;
+      line-height: 1.36;
+    }
+
+    .info-panel {
+      margin: 0;
+      padding: 0.72rem 0.95rem 0.76rem;
+      background: linear-gradient(180deg, rgba(20, 34, 47, 0.9), rgba(15, 28, 40, 0.95));
+      border-top: 1px solid rgba(104, 145, 171, 0.28);
+      border-bottom: 1px solid rgba(104, 145, 171, 0.28);
+      color: #d4e8f7;
+    }
+
+    .info-title {
+      margin: 0 0 0.42rem;
+      color: #e8f5ff;
+      font-size: 0.84rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .info-list {
+      margin: 0;
+      padding-left: 1.05rem;
+      display: grid;
+      gap: 0.33rem;
+      font-size: 0.8rem;
+      line-height: 1.34;
+    }
+
+    .info-list li::marker {
+      color: #77d9f8;
+    }
+
+    .info-ref {
+      margin: 0.5rem 0 0;
+      color: #99b7cc;
+      font-size: 0.74rem;
+    }
+
+    .controls {
+      padding: 0.72rem 0.82rem 0.92rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid rgba(94, 145, 171, 0.44);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(248, 253, 255, 0.97), rgba(233, 245, 250, 0.94));
+      color: #0f4d6b;
+      font-size: 0.79rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      padding: 0.48rem 0.8rem;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 125, 166, 0.68);
+      box-shadow: 0 10px 20px rgba(13, 66, 94, 0.14);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .pitch-control {
+      margin-left: auto;
+      display: none;
+      align-items: center;
+      gap: 0.55rem;
+      color: #27556d;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .pitch-control.show {
+      display: inline-flex;
+    }
+
+    .pitch-control input[type="range"] {
+      width: 150px;
+      accent-color: #1388ad;
+    }
+
+    .layer {
+      opacity: 0;
+      transition: opacity 420ms ease, transform 760ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .layer.show {
+      opacity: 1;
+    }
+
+    .ray {
+      opacity: 0;
+      stroke: #187fa6;
+      stroke-width: 2.5;
+      stroke-dasharray: 8 6;
+      transition: opacity 360ms ease;
+    }
+
+    .ray.show {
+      opacity: 0.92;
+    }
+
+    .ray.blocked {
+      stroke: #bb6047;
+      opacity: 0.72;
+    }
+
+    .ray.accepted {
+      stroke: #138f73;
+      stroke-width: 3;
+    }
+
+    .label {
+      fill: #2a5c74;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .small {
+      fill: #3e6b81;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .curve {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transition: opacity 420ms ease;
+    }
+
+    .curve.show {
+      opacity: 1;
+    }
+
+    .fade {
+      opacity: 0;
+      transition: opacity 360ms ease;
+    }
+
+    .fade.show {
+      opacity: 1;
+    }
+
+    body {
+      color: #e2eef7;
+      background:
+        radial-gradient(circle at 9% 6%, rgba(54, 144, 183, 0.24), transparent 38%),
+        radial-gradient(circle at 92% 10%, rgba(24, 167, 126, 0.2), transparent 40%),
+        linear-gradient(165deg, #050c16 0%, #0b1624 56%, #08131e 100%);
+    }
+
+    body::before {
+      opacity: 0.16;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(160, 206, 236, 0.09) 0px,
+        rgba(160, 206, 236, 0.09) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    }
+
+    .hero,
+    .diagram-card {
+      background: linear-gradient(160deg, rgba(12, 24, 37, 0.93), rgba(13, 28, 42, 0.94));
+      border-color: rgba(107, 166, 204, 0.24);
+      box-shadow: 0 26px 48px rgba(0, 8, 16, 0.52);
+    }
+
+    .hero h1 {
+      color: #c7e9ff;
+    }
+
+    .hero p,
+    .card-head p {
+      color: #96b8cf;
+    }
+
+    .card-head {
+      background: linear-gradient(180deg, rgba(14, 30, 45, 0.93), rgba(12, 27, 40, 0.94));
+      border-bottom-color: rgba(96, 149, 181, 0.24);
+    }
+
+    .card-head h2 {
+      color: #d7f0ff;
+    }
+
+    .pill {
+      color: #8fdcff;
+      background: rgba(20, 50, 72, 0.86);
+      border-color: rgba(89, 152, 188, 0.45);
+    }
+
+    .scene {
+      border-color: rgba(113, 165, 193, 0.28);
+      background:
+        linear-gradient(180deg, rgba(229, 237, 243, 0.96), rgba(214, 225, 233, 0.96)),
+        radial-gradient(circle at 12% 15%, rgba(119, 175, 202, 0.2), transparent 36%),
+        radial-gradient(circle at 88% 82%, rgba(92, 177, 147, 0.16), transparent 34%);
+    }
+
+    .caption {
+      color: #d9ecfb;
+      background: linear-gradient(180deg, rgba(14, 30, 44, 0.95), rgba(13, 26, 39, 0.95));
+      border-top-color: rgba(97, 146, 175, 0.24);
+      border-bottom-color: rgba(97, 146, 175, 0.24);
+    }
+
+    button {
+      background: linear-gradient(180deg, rgba(16, 40, 58, 0.98), rgba(12, 31, 46, 0.97));
+      border-color: rgba(88, 145, 177, 0.45);
+      color: #d9f1ff;
+    }
+
+    button:hover {
+      border-color: rgba(118, 216, 255, 0.74);
+      box-shadow: 0 10px 22px rgba(0, 14, 26, 0.52);
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        width: calc(100% - 1rem);
+        margin: 0.6rem auto 1rem;
+      }
+
+      .scene {
+        aspect-ratio: 16 / 10;
+      }
+
+      .caption {
+        min-height: 84px;
+      }
+
+      .controls button {
+        flex: 1 1 120px;
+      }
+
+      .pitch-control {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-start;
+      }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1>Interactive Physics Diagrams 6-10</h1>
+      <p>Step-based educational models with manual controls, smooth transitions, and physics-grounded geometry.</p>
+    </header>
+
+    <section class="diagram-list">
+      <article class="diagram-card" id="d6" data-diagram="d6">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 6: Parallel Hole Collimator (Gamma Camera)</h2>
+            <span class="pill">Step 1 / 5</span>
+          </div>
+          <p>Most photons are blocked; only near-parallel trajectories pass to the scintillation crystal.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Parallel hole collimator">
+              <defs>
+                <linearGradient id="d6LeadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#7e8c95" />
+                  <stop offset="100%" stop-color="#626f78" />
+                </linearGradient>
+                <linearGradient id="d6CrystalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#9ac0cf" />
+                  <stop offset="100%" stop-color="#799fb1" />
+                </linearGradient>
+                <filter id="d6Blur">
+                  <feGaussianBlur stdDeviation="5.5" />
+                </filter>
+              </defs>
+
+              <g>
+                <rect x="460" y="78" width="160" height="344" rx="8" fill="url(#d6LeadGrad)" stroke="#4e5f69" stroke-width="4" />
+                <text x="488" y="66" class="label">Lead collimator</text>
+              </g>
+
+              <g id="d6-holes-standard">
+                <rect x="484" y="98" width="18" height="304" fill="#ebf2f6" />
+                <rect x="524" y="98" width="18" height="304" fill="#ebf2f6" />
+                <rect x="564" y="98" width="18" height="304" fill="#ebf2f6" />
+                <rect x="604" y="98" width="18" height="304" fill="#ebf2f6" />
+              </g>
+
+              <g id="d6-holes-thick" class="layer">
+                <rect x="490" y="98" width="12" height="304" fill="#edf4f8" />
+                <rect x="544" y="98" width="12" height="304" fill="#edf4f8" />
+                <rect x="598" y="98" width="12" height="304" fill="#edf4f8" />
+              </g>
+
+              <rect x="670" y="90" width="180" height="320" rx="12" fill="url(#d6CrystalGrad)" stroke="#4e7489" stroke-width="4" />
+              <text x="684" y="72" class="label">Scintillation crystal</text>
+
+              <g id="d6-source-near">
+                <circle cx="170" cy="250" r="18" fill="#0f5677" stroke="#083c53" stroke-width="4" />
+                <text x="72" y="226" class="label">Point source</text>
+              </g>
+
+              <g id="d6-source-far" class="layer">
+                <circle cx="78" cy="250" r="18" fill="#0f5677" stroke="#083c53" stroke-width="4" />
+                <text x="20" y="226" class="label">Source further away</text>
+              </g>
+
+              <g id="d6-isotropic" class="layer">
+                <line class="ray show" x1="170" y1="250" x2="290" y2="140" />
+                <line class="ray show" x1="170" y1="250" x2="336" y2="188" />
+                <line class="ray show" x1="170" y1="250" x2="358" y2="250" />
+                <line class="ray show" x1="170" y1="250" x2="336" y2="312" />
+                <line class="ray show" x1="170" y1="250" x2="290" y2="360" />
+                <line class="ray show" x1="170" y1="250" x2="144" y2="96" />
+                <line class="ray show" x1="170" y1="250" x2="96" y2="398" />
+                <text x="84" y="438" class="small">Isotropic emission</text>
+              </g>
+
+              <g id="d6-blocked" class="layer">
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="126" />
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="170" />
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="328" />
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="374" />
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="210" />
+                <line class="ray blocked show" x1="170" y1="250" x2="460" y2="286" />
+                <g stroke="#c55353" stroke-width="3">
+                  <line x1="452" y1="120" x2="468" y2="136" />
+                  <line x1="468" y1="120" x2="452" y2="136" />
+                  <line x1="452" y1="164" x2="468" y2="180" />
+                  <line x1="468" y1="164" x2="452" y2="180" />
+                  <line x1="452" y1="322" x2="468" y2="338" />
+                  <line x1="468" y1="322" x2="452" y2="338" />
+                  <line x1="452" y1="368" x2="468" y2="384" />
+                  <line x1="468" y1="368" x2="452" y2="384" />
+                </g>
+              </g>
+
+              <g id="d6-pass-near" class="layer">
+                <line class="ray accepted show" x1="170" y1="241" x2="760" y2="236" />
+                <line class="ray accepted show" x1="170" y1="250" x2="760" y2="250" />
+                <line class="ray accepted show" x1="170" y1="260" x2="760" y2="264" />
+              </g>
+
+              <g id="d6-pass-far" class="layer">
+                <line class="ray accepted show" x1="78" y1="248" x2="760" y2="232" />
+                <line class="ray accepted show" x1="78" y1="250" x2="760" y2="250" />
+                <line class="ray accepted show" x1="78" y1="252" x2="760" y2="268" />
+              </g>
+
+              <g id="d6-events" class="layer">
+                <circle cx="760" cy="236" r="10" fill="#10a07b" />
+                <circle cx="760" cy="250" r="10" fill="#10a07b" />
+                <circle cx="760" cy="264" r="10" fill="#10a07b" />
+                <text x="724" y="300" class="small">Scintillation events</text>
+              </g>
+
+              <g id="d6-blur-near" class="layer">
+                <ellipse cx="760" cy="250" rx="24" ry="17" fill="rgba(11, 133, 171, 0.28)" filter="url(#d6Blur)" />
+              </g>
+
+              <g id="d6-blur-far" class="layer">
+                <ellipse cx="760" cy="250" rx="52" ry="30" fill="rgba(11, 133, 171, 0.28)" filter="url(#d6Blur)" />
+                <text x="792" y="287" class="small">Geometric blur widens</text>
+              </g>
+
+              <g id="d6-thick-tradeoff" class="layer">
+                <line class="ray accepted show" x1="78" y1="248" x2="760" y2="240" />
+                <line class="ray accepted show" x1="78" y1="252" x2="760" y2="260" />
+                <text x="462" y="446" class="small">Thicker septa: less septal penetration, lower sensitivity</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d7" data-diagram="d7">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 7: Interaction Probability vs Photon Energy</h2>
+            <span class="pill">Step 1 / 5</span>
+          </div>
+          <p>Relative trends for photoelectric, Compton, and pair production across energy with diagnostic-range emphasis.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Interaction probability vs energy">
+              <rect x="88" y="58" width="938" height="378" fill="rgba(250, 254, 255, 0.9)" stroke="#a9c0ce" stroke-width="2" />
+              <line x1="100" y1="436" x2="1010" y2="436" stroke="#4d6f84" stroke-width="4" />
+              <line x1="100" y1="436" x2="100" y2="70" stroke="#4d6f84" stroke-width="4" />
+
+              <g stroke="#cfdee6" stroke-width="1.1">
+                <line x1="100" y1="360" x2="1010" y2="360" />
+                <line x1="100" y1="284" x2="1010" y2="284" />
+                <line x1="100" y1="208" x2="1010" y2="208" />
+                <line x1="100" y1="132" x2="1010" y2="132" />
+              </g>
+
+              <text x="468" y="478" class="label">Photon Energy (log scale)</text>
+              <text x="38" y="274" transform="rotate(-90 38 274)" class="label">Relative Interaction Probability</text>
+
+              <g class="small">
+                <text x="136" y="460">10 keV</text>
+                <text x="346" y="460">100 keV</text>
+                <text x="640" y="460">1 MeV</text>
+                <text x="886" y="460">10 MeV</text>
+              </g>
+
+              <path id="d7-photo" class="curve" stroke="#0b86ab"
+                d="M140 118 C210 160 270 225 330 292 C390 352 450 398 520 424 C570 440 620 448 670 452" />
+              <text id="d7-photo-label" class="fade small" x="170" y="108">Photoelectric (~ Z^3 / E^3 trend)</text>
+
+              <path id="d7-compton" class="curve" stroke="#c8782d"
+                d="M130 360 C220 312 320 272 430 252 C540 240 650 248 760 278 C860 310 930 338 995 362" />
+              <text id="d7-compton-label" class="fade small" x="510" y="236">Compton (weak Z dependence)</text>
+
+              <path id="d7-pair" class="curve" stroke="#12916f"
+                d="M655 434 C710 426 770 396 832 346 C884 304 942 248 996 180" />
+              <line id="d7-threshold-line" class="fade" x1="648" y1="86" x2="648" y2="436" stroke="#12916f" stroke-width="2.5" stroke-dasharray="8 6" />
+              <text id="d7-threshold-label" class="fade small" x="662" y="102">Pair production threshold: 1.02 MeV</text>
+
+              <g id="d7-diagnostic" class="layer">
+                <rect x="204" y="84" width="200" height="352" fill="rgba(14, 145, 111, 0.14)" />
+                <text x="214" y="118" class="small">Diagnostic range</text>
+                <text x="214" y="138" class="small">Compton usually dominant</text>
+              </g>
+
+              <path id="d7-photo-highz" class="curve" stroke="#1f5d92" stroke-dasharray="10 7"
+                d="M140 86 C210 122 270 178 330 242 C390 300 450 350 520 388 C570 406 620 418 670 424" />
+              <text id="d7-highz-label" class="fade small" x="182" y="72">Higher Z shifts photoelectric upward</text>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d8" data-diagram="d8">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 8: CT Dose Profile and CTDI Measurement</h2>
+            <span class="pill">Step 1 / 5</span>
+          </div>
+          <p>Longitudinal z-dose profile with scatter tails, pencil chamber integration, and multi-slice cumulative overlap.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="CT dose profile and CTDI">
+              <defs>
+                <linearGradient id="d8BeamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(13, 141, 176, 0.35)" />
+                  <stop offset="100%" stop-color="rgba(13, 141, 176, 0.08)" />
+                </linearGradient>
+              </defs>
+
+              <g>
+                <circle cx="550" cy="78" r="26" fill="#1f627f" stroke="#0f445b" stroke-width="4" />
+                <text x="520" y="40" class="label">X-ray source</text>
+              </g>
+
+              <g id="d8-beam" class="layer show">
+                <polygon points="532,104 568,104 588,200 512,200" fill="url(#d8BeamGrad)" stroke="#1286ac" stroke-width="2.2" />
+                <line x1="512" y1="200" x2="512" y2="458" stroke="#5c7f94" stroke-width="2" stroke-dasharray="8 6" />
+                <line x1="588" y1="200" x2="588" y2="458" stroke="#5c7f94" stroke-width="2" stroke-dasharray="8 6" />
+                <text x="500" y="190" class="small">Nominal beam width</text>
+              </g>
+
+              <rect x="100" y="232" width="900" height="48" rx="14" fill="#9fbac8" stroke="#5f8095" stroke-width="3" />
+              <text x="112" y="226" class="small">Patient/phantom along z-direction</text>
+
+              <line x1="100" y1="458" x2="1000" y2="458" stroke="#4f7085" stroke-width="4" />
+              <line x1="100" y1="458" x2="100" y2="288" stroke="#4f7085" stroke-width="3" />
+              <text x="510" y="490" class="label">Longitudinal position (z)</text>
+              <text x="56" y="374" transform="rotate(-90 56 374)" class="label">Dose</text>
+
+              <path id="d8-profile" class="curve" stroke="#0a85ab"
+                d="M100 446 C220 438 320 430 420 392 C470 352 508 296 550 272 C592 296 630 352 680 392 C780 430 880 438 1000 446" />
+
+              <g id="d8-tail-note" class="layer">
+                <text x="760" y="356" class="small">Scatter tails extend beyond beam width</text>
+              </g>
+
+              <g id="d8-chamber" class="layer">
+                <rect x="430" y="120" width="240" height="36" rx="18" fill="#e9f4f8" stroke="#6e93a7" stroke-width="3" />
+                <text x="446" y="143" class="small">100 mm pencil ionisation chamber</text>
+                <line x1="430" y1="120" x2="430" y2="458" stroke="#7b9eb2" stroke-width="1.8" stroke-dasharray="7 6" />
+                <line x1="670" y1="120" x2="670" y2="458" stroke="#7b9eb2" stroke-width="1.8" stroke-dasharray="7 6" />
+              </g>
+
+              <path id="d8-integral" class="layer"
+                d="M430 458 L430 386 C470 352 508 296 550 272 C592 296 630 352 670 386 L670 458 Z"
+                fill="rgba(18, 145, 111, 0.24)" stroke="#12916f" stroke-width="2" />
+              <text id="d8-integral-note" class="fade small" x="438" y="408">Integrated area = CTDI measurement</text>
+
+              <path id="d8-profile-left" class="curve" stroke="#3f9fbe"
+                d="M100 450 C170 445 240 435 320 410 C370 390 410 352 452 322 C492 352 526 390 578 410 C658 435 728 445 790 450" />
+              <path id="d8-profile-right" class="curve" stroke="#3f9fbe"
+                d="M320 450 C400 443 470 430 550 402 C600 378 638 338 680 308 C722 338 760 378 810 402 C880 425 940 438 1000 445" />
+              <text id="d8-multi-note" class="fade small" x="716" y="286">Overlapping profiles raise cumulative dose</text>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d9" data-diagram="d9">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 9: X-Ray Room Shielding Layout</h2>
+            <span class="pill">Step 1 / 5</span>
+          </div>
+          <p>Primary and secondary barrier logic with realistic beam direction, patient scatter, and controlled-area protection.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="X-ray room shielding layout">
+              <rect x="110" y="70" width="690" height="360" fill="rgba(247, 252, 255, 0.92)" stroke="#6f8fa1" stroke-width="6" />
+              <line x1="800" y1="70" x2="800" y2="430" stroke="#536b79" stroke-width="14" />
+              <text x="814" y="258" class="small">Primary barrier (thicker)</text>
+
+              <line x1="110" y1="70" x2="800" y2="70" stroke="#6f8fa1" stroke-width="6" />
+              <line x1="110" y1="430" x2="800" y2="430" stroke="#6f8fa1" stroke-width="6" />
+              <line x1="110" y1="70" x2="110" y2="430" stroke="#6f8fa1" stroke-width="6" />
+
+              <rect x="820" y="205" width="220" height="170" fill="rgba(243, 250, 253, 0.95)" stroke="#6f8fa1" stroke-width="6" />
+              <text x="840" y="194" class="label">Control room</text>
+
+              <circle cx="245" cy="250" r="22" fill="#1f627f" stroke="#0f455c" stroke-width="4" />
+              <text x="165" y="220" class="small">X-ray tube</text>
+
+              <ellipse cx="450" cy="250" rx="78" ry="42" fill="#dfb5c0" stroke="#a67686" stroke-width="3" />
+              <text x="422" y="258" class="small">Patient</text>
+
+              <g id="d9-primary-beam" class="layer">
+                <polygon points="267,236 267,264 796,292 796,208" fill="rgba(12, 136, 173, 0.2)" stroke="#0b86ab" stroke-width="3" />
+                <text x="622" y="202" class="small">Primary beam</text>
+              </g>
+
+              <g id="d9-scatter" class="layer">
+                <line class="ray show" x1="450" y1="250" x2="228" y2="108" />
+                <line class="ray show" x1="450" y1="250" x2="314" y2="404" />
+                <line class="ray show" x1="450" y1="250" x2="548" y2="92" />
+                <line class="ray show" x1="450" y1="250" x2="656" y2="408" />
+                <line class="ray show" x1="450" y1="250" x2="782" y2="332" />
+                <text x="322" y="114" class="small">Scatter from patient</text>
+              </g>
+
+              <g id="d9-secondary-note" class="layer">
+                <text x="126" y="98" class="small">Secondary barriers (thinner)</text>
+              </g>
+
+              <g id="d9-control-wall" class="layer">
+                <line x1="800" y1="205" x2="800" y2="375" stroke="#0f9171" stroke-width="16" opacity="0.6" />
+                <text x="823" y="398" class="small">Shielded control wall</text>
+              </g>
+
+              <g id="d9-screen" class="layer">
+                <rect x="862" y="255" width="22" height="90" fill="#7090a2" />
+                <rect x="884" y="255" width="68" height="58" rx="6" fill="rgba(220, 236, 244, 0.9)" stroke="#6e90a4" stroke-width="2" />
+                <circle cx="960" cy="322" r="11" fill="#1f627f" />
+                <text x="850" y="346" class="small">Operator behind protective screen</text>
+              </g>
+
+              <g id="d9-zones" class="layer">
+                <rect x="120" y="82" width="656" height="336" fill="rgba(197, 84, 84, 0.08)" stroke="#c55353" stroke-width="2" stroke-dasharray="9 6" />
+                <text x="134" y="108" class="small">Controlled area</text>
+                <rect x="832" y="217" width="194" height="144" fill="rgba(18, 145, 111, 0.12)" stroke="#12916f" stroke-width="2" stroke-dasharray="9 6" />
+                <text x="842" y="238" class="small">Supervised/control console area</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+      </article>
+
+      <article class="diagram-card" id="d10" data-diagram="d10">
+        <div class="card-head">
+          <div class="card-row">
+            <h2>Diagram 10: Multi-Detector CT Geometry</h2>
+            <span class="pill">Step 1 / 5</span>
+          </div>
+          <p>Detector-row evolution, fan-beam coverage, helical table motion, and pitch-dependent overlap/gap behavior.</p>
+        </div>
+        <div class="scene-wrap">
+          <div class="scene">
+            <svg viewBox="0 0 1100 500" aria-label="Multi-detector CT geometry">
+              <defs>
+                <linearGradient id="d10BeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="rgba(10, 133, 171, 0.34)" />
+                  <stop offset="100%" stop-color="rgba(10, 133, 171, 0.08)" />
+                </linearGradient>
+              </defs>
+
+              <circle cx="260" cy="250" r="170" fill="none" stroke="#6f8ea1" stroke-width="8" />
+              <circle cx="260" cy="250" r="86" fill="#dcb0bc" stroke="#9f6d80" stroke-width="3" />
+              <text x="220" y="256" class="small">Patient</text>
+
+              <rect x="90" y="236" width="340" height="28" rx="14" fill="#8faebb" stroke="#5f8095" stroke-width="3" />
+              <text x="104" y="228" class="small">Table</text>
+
+              <g id="d10-rotor" class="layer show">
+                <g id="d10-tube" transform="translate(260 80)">
+                  <circle r="20" fill="#1f627f" stroke="#0f455c" stroke-width="4" />
+                  <text x="-26" y="-28" class="small">X-ray tube</text>
+                </g>
+
+                <g id="d10-detector" transform="translate(260 420)">
+                  <rect x="-84" y="-24" width="168" height="48" rx="10" fill="#7f9fb1" stroke="#4f6f82" stroke-width="3" />
+                  <g id="d10-row-single">
+                    <rect x="-22" y="-13" width="44" height="26" fill="#e6f1f5" stroke="#7b98a8" stroke-width="2" />
+                  </g>
+                  <g id="d10-row-multi" class="layer">
+                    <rect x="-56" y="-13" width="24" height="26" fill="#edf4f8" stroke="#7b98a8" stroke-width="2" />
+                    <rect x="-24" y="-13" width="24" height="26" fill="#edf4f8" stroke="#7b98a8" stroke-width="2" />
+                    <rect x="8" y="-13" width="24" height="26" fill="#edf4f8" stroke="#7b98a8" stroke-width="2" />
+                    <rect x="40" y="-13" width="24" height="26" fill="#edf4f8" stroke="#7b98a8" stroke-width="2" />
+                  </g>
+                </g>
+              </g>
+
+              <polygon id="d10-fan-beam-narrow" class="layer"
+                points="250,96 270,96 282,398 238,398"
+                fill="url(#d10BeamGrad)" stroke="#0a85ab" stroke-width="2.5" />
+              <polygon id="d10-fan-beam-wide" class="layer"
+                points="236,96 284,96 342,398 178,398"
+                fill="url(#d10BeamGrad)" stroke="#0a85ab" stroke-width="2.5" />
+              <text id="d10-fan-label" class="fade small" x="336" y="150">Fan beam covers multiple rows</text>
+
+              <g id="d10-z-panel">
+                <rect x="480" y="62" width="560" height="376" fill="rgba(247, 253, 255, 0.88)" stroke="#aac0ce" stroke-width="2" />
+                <line x1="520" y1="390" x2="1000" y2="390" stroke="#4f7085" stroke-width="4" />
+                <text x="736" y="426" class="label">z-axis coverage</text>
+              </g>
+
+              <g id="d10-helical" class="layer">
+                <path d="M520 142 C560 96 600 96 640 142 C680 188 720 188 760 142 C800 96 840 96 880 142 C920 188 960 188 1000 142"
+                  fill="none" stroke="#12916f" stroke-width="4" stroke-dasharray="8 6" />
+                <path d="M520 200 C560 154 600 154 640 200 C680 246 720 246 760 200 C800 154 840 154 880 200 C920 246 960 246 1000 200"
+                  fill="none" stroke="#12916f" stroke-width="4" stroke-dasharray="8 6" />
+                <text x="816" y="118" class="small">Helical path over continuous table motion</text>
+              </g>
+
+              <g id="d10-slice-stack"></g>
+
+              <g id="d10-pitch-note" class="layer">
+                <text id="d10-pitch-text" x="522" y="352" class="small">Pitch = 1.00 (table movement per rotation / beam width)</text>
+                <text id="d10-pitch-effect" x="522" y="372" class="small">Pitch = 1: contiguous coverage</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <p class="caption"></p>
+        <div class="controls">
+          <button type="button" data-action="prev">Previous Step</button>
+          <button type="button" data-action="next">Next Step</button>
+          <button type="button" data-action="reset">Reset</button>
+          <label class="pitch-control" data-role="pitch-control">
+            Pitch
+            <input type="range" min="0.6" max="1.4" step="0.05" value="1.0" data-role="pitch-slider" />
+            <span data-role="pitch-value">1.00</span>
+          </label>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const show = (root, selector, on) => {
+      root.querySelectorAll(selector).forEach((el) => el.classList.toggle("show", Boolean(on)));
+    };
+
+    const diagramConfig = {
+      d6: {
+        steps: [
+          "Gamma photons are emitted in all directions.",
+          "Parallel hole collimator only allows near-parallel photons to pass.",
+          "Accepted photons produce scintillation events in the detector.",
+          "Resolution worsens as source-to-collimator distance increases.",
+          "Thicker septa reduce septal penetration but decrease sensitivity."
+        ],
+        notes: [
+          "In nuclear imaging, most emitted photons are blocked by collimator septa to preserve directional information.",
+          "Parallel-hole geometry transmits near-parallel rays and rejects strongly oblique rays.",
+          "Increasing source-to-collimator distance broadens the effective point spread and worsens resolution.",
+          "Thicker septa reduce septal penetration but reduce count sensitivity.",
+          "Clinical image quality is always a trade-off between sensitivity and spatial resolution."
+        ],
+        render(state, root) {
+          const step = state.step;
+          show(root, "#d6-isotropic", step === 1);
+          show(root, "#d6-blocked", step >= 2);
+          show(root, "#d6-pass-near", step >= 2 && step < 4 && step < 5);
+          show(root, "#d6-events", step >= 3 && step < 5);
+          show(root, "#d6-blur-near", step === 3);
+
+          show(root, "#d6-source-near", step < 4);
+          show(root, "#d6-source-far", step >= 4);
+          show(root, "#d6-pass-far", step >= 4 && step < 5);
+          show(root, "#d6-blur-far", step >= 4);
+
+          show(root, "#d6-holes-thick", step >= 5);
+          show(root, "#d6-thick-tradeoff", step >= 5);
+          root.querySelector("#d6-holes-standard").style.opacity = step >= 5 ? "0.15" : "1";
+          root.querySelector("#d6-pass-near").style.opacity = step >= 5 ? "0" : "";
+          root.querySelector("#d6-pass-far").style.opacity = step >= 5 ? "0" : "";
+          root.querySelector("#d6-events").style.opacity = step >= 5 ? "0" : "";
+        }
+      },
+      d7: {
+        steps: [
+          "Photoelectric effect dominates at low photon energies.",
+          "Compton scattering dominates in the diagnostic energy range.",
+          "Pair production becomes significant above 1.02 MeV.",
+          "In diagnostic radiology, Compton is usually dominant.",
+          "Photoelectric probability increases strongly with atomic number."
+        ],
+        notes: [
+          "Photoelectric probability decreases rapidly with energy and rises strongly with atomic number (approximate trend).",
+          "Compton interaction is less dependent on atomic number and dominates much of diagnostic radiology.",
+          "Pair production begins only above 1.02 MeV and increases at higher energies.",
+          "The curves show qualitative dominance regions rather than exact cross-section magnitudes.",
+          "Energy and material choice jointly determine interaction balance in clinical imaging."
+        ],
+        render(state, root) {
+          const step = state.step;
+          show(root, "#d7-photo", step >= 1);
+          show(root, "#d7-photo-label", step >= 1);
+
+          show(root, "#d7-compton", step >= 2);
+          show(root, "#d7-compton-label", step >= 2);
+
+          show(root, "#d7-pair", step >= 3);
+          show(root, "#d7-threshold-line", step >= 3);
+          show(root, "#d7-threshold-label", step >= 3);
+
+          show(root, "#d7-diagnostic", step >= 4);
+
+          show(root, "#d7-photo-highz", step >= 5);
+          show(root, "#d7-highz-label", step >= 5);
+        }
+      },
+      d8: {
+        steps: [
+          "CT beam produces a dose profile across the detector.",
+          "Dose extends beyond nominal beam width due to scatter.",
+          "CTDI is measured using a 100 mm pencil ionisation chamber.",
+          "CTDI represents the integrated dose across the beam profile.",
+          "In multi-slice CT, overlapping dose profiles increase cumulative dose."
+        ],
+        notes: [
+          "CT dose distribution along z is broader than collimated beam width because of scatter tails.",
+          "CTDI conceptually integrates dose profile area over a defined longitudinal range.",
+          "The 100 mm pencil chamber captures central profile behavior used in CTDI metrics.",
+          "With closely spaced or overlapping acquisitions, cumulative dose increases.",
+          "The diagram emphasizes profile shape and integration logic over scanner-specific numbers."
+        ],
+        render(state, root) {
+          const step = state.step;
+          show(root, "#d8-beam", step >= 1);
+          show(root, "#d8-profile", step >= 2);
+          show(root, "#d8-tail-note", step >= 2);
+          show(root, "#d8-chamber", step >= 3);
+          show(root, "#d8-integral", step >= 4);
+          show(root, "#d8-integral-note", step >= 4);
+          show(root, "#d8-profile-left", step >= 5);
+          show(root, "#d8-profile-right", step >= 5);
+          show(root, "#d8-multi-note", step >= 5);
+        }
+      },
+      d9: {
+        steps: [
+          "Primary barrier must absorb direct beam.",
+          "Secondary barriers protect against scattered radiation.",
+          "Control areas require shielding to meet dose limits.",
+          "Operators stand behind protective barriers.",
+          "Room design separates controlled and supervised areas."
+        ],
+        notes: [
+          "Primary barriers are designed for direct beam transmission and therefore are most heavily shielded.",
+          "Secondary barriers are sized for leakage and patient scatter, not full primary exposure.",
+          "Scatter originates predominantly from the patient at clinical energies.",
+          "Operator positions and control areas are placed behind dedicated protective structures.",
+          "Zoning of controlled and supervised spaces supports regulatory dose compliance."
+        ],
+        render(state, root) {
+          const step = state.step;
+          show(root, "#d9-primary-beam", step >= 1);
+          show(root, "#d9-scatter", step >= 2);
+          show(root, "#d9-secondary-note", step >= 2);
+          show(root, "#d9-control-wall", step >= 3);
+          show(root, "#d9-screen", step >= 4);
+          show(root, "#d9-zones", step >= 5);
+        }
+      },
+      d10: {
+        steps: [
+          "Early CT used a single detector row.",
+          "Modern CT uses multiple detector rows for faster acquisition.",
+          "Fan beam geometry allows simultaneous slice acquisition.",
+          "Continuous table movement enables helical scanning.",
+          "Pitch controls slice overlap and scan speed."
+        ],
+        notes: [
+          "Multi-row detector arrays enable simultaneous sampling of multiple z positions per rotation.",
+          "Helical CT combines gantry rotation with continuous table translation.",
+          "Pitch is table travel per rotation divided by total collimated beam width.",
+          "Pitch below 1 increases overlap and dose; pitch above 1 increases speed but risks gaps.",
+          "The model focuses on geometric relationships used in protocol optimization."
+        ],
+        render(state, root) {
+          const step = state.step;
+          const pitchControl = root.querySelector('[data-role="pitch-control"]');
+          const slider = root.querySelector('[data-role="pitch-slider"]');
+          const pitchValue = root.querySelector('[data-role="pitch-value"]');
+          const rotor = root.querySelector("#d10-rotor");
+
+          show(root, "#d10-row-single", step >= 1);
+          show(root, "#d10-row-multi", step >= 2);
+          root.querySelector("#d10-row-single").style.opacity = step >= 2 ? "0.25" : "1";
+
+          show(root, "#d10-fan-beam-narrow", step >= 1 && step < 3);
+          show(root, "#d10-fan-beam-wide", step >= 3);
+          show(root, "#d10-fan-label", step >= 3);
+
+          show(root, "#d10-helical", step >= 4);
+          show(root, "#d10-pitch-note", step >= 5);
+          pitchControl.classList.toggle("show", step >= 5);
+
+          if (step >= 4) {
+            rotor.setAttribute("transform", "rotate(26 260 250)");
+            root.querySelector("#d10-tube").setAttribute("transform", "translate(260 98)");
+            root.querySelector("#d10-detector").setAttribute("transform", "translate(260 402)");
+          } else {
+            rotor.setAttribute("transform", "rotate(0 260 250)");
+            root.querySelector("#d10-tube").setAttribute("transform", "translate(260 80)");
+            root.querySelector("#d10-detector").setAttribute("transform", "translate(260 420)");
+          }
+
+          if (step < 5) {
+            slider.value = "1.0";
+            state.pitch = 1.0;
+          }
+          pitchValue.textContent = Number(state.pitch).toFixed(2);
+          renderPitchVisualization(root, state.pitch, step >= 5);
+        }
+      }
+    };
+
+    function renderPitchVisualization(root, pitch, active) {
+      const stack = root.querySelector("#d10-slice-stack");
+      const pitchText = root.querySelector("#d10-pitch-text");
+      const pitchEffect = root.querySelector("#d10-pitch-effect");
+      while (stack.firstChild) {
+        stack.removeChild(stack.firstChild);
+      }
+
+      const ns = "http://www.w3.org/2000/svg";
+      const beamWidth = 44;
+      const stepSpacing = beamWidth * pitch;
+      const baseX = 530;
+      const y = 320;
+      const n = 8;
+
+      for (let i = 0; i < n; i += 1) {
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", String(baseX + i * stepSpacing));
+        rect.setAttribute("y", String(y));
+        rect.setAttribute("width", String(beamWidth));
+        rect.setAttribute("height", "32");
+        rect.setAttribute("rx", "6");
+        rect.setAttribute("fill", i % 2 === 0 ? "rgba(10,133,171,0.28)" : "rgba(18,145,111,0.25)");
+        rect.setAttribute("stroke", "rgba(55,104,128,0.62)");
+        rect.setAttribute("stroke-width", "1.5");
+        stack.appendChild(rect);
+      }
+
+      if (!active) {
+        pitchText.textContent = "Pitch = 1.00 (table movement per rotation / beam width)";
+        pitchEffect.textContent = "Pitch preview appears at Step 5";
+        return;
+      }
+
+      pitchText.textContent = `Pitch = ${pitch.toFixed(2)} (table movement per rotation / beam width)`;
+      if (pitch < 1) {
+        pitchEffect.textContent = "Pitch < 1: overlapping slices, higher dose, slower coverage";
+      } else if (pitch > 1) {
+        pitchEffect.textContent = "Pitch > 1: gaps between slices, lower overlap, faster coverage";
+      } else {
+        pitchEffect.textContent = "Pitch = 1: contiguous slice coverage";
+      }
+    }
+
+    class StepStateMachine {
+      constructor(root, config) {
+        this.root = root;
+        this.config = config;
+        this.state = { step: 1, pitch: 1.0 };
+
+        this.caption = root.querySelector(".caption");
+        this.pill = root.querySelector(".pill");
+        this.prev = root.querySelector('[data-action="prev"]');
+        this.next = root.querySelector('[data-action="next"]');
+        this.reset = root.querySelector('[data-action="reset"]');
+        this.pitchSlider = root.querySelector('[data-role="pitch-slider"]');
+        this.pitchValue = root.querySelector('[data-role="pitch-value"]');
+        this.info = document.createElement("div");
+        this.info.className = "info-panel";
+        root.querySelector(".controls").before(this.info);
+        const notesList = (this.config.notes || []).map((item) => `<li>${item}</li>`).join("");
+        this.info.innerHTML = `
+          <h3 class="info-title">Physics Notes</h3>
+          <ul class="info-list">${notesList}</ul>
+          <p class="info-ref">Reference alignment: Farr's Physics for Medical Imaging (3rd ed., 2024), matched to chapter-level geometry and dose concepts.</p>
+        `;
+
+        this.bind();
+        this.render();
+      }
+
+      bind() {
+        this.prev.addEventListener("click", () => {
+          if (this.state.step > 1) {
+            this.state.step -= 1;
+            this.render();
+          }
+        });
+
+        this.next.addEventListener("click", () => {
+          if (this.state.step < this.config.steps.length) {
+            this.state.step += 1;
+            this.render();
+          }
+        });
+
+        this.reset.addEventListener("click", () => {
+          this.state.step = 1;
+          this.state.pitch = 1.0;
+          if (this.pitchSlider) {
+            this.pitchSlider.value = "1.0";
+          }
+          this.render();
+        });
+
+        if (this.pitchSlider) {
+          this.pitchSlider.addEventListener("input", (event) => {
+            this.state.pitch = Number(event.target.value);
+            if (this.pitchValue) {
+              this.pitchValue.textContent = this.state.pitch.toFixed(2);
+            }
+            this.render();
+          });
+        }
+      }
+
+      render() {
+        const total = this.config.steps.length;
+        this.caption.textContent = this.config.steps[this.state.step - 1];
+        this.pill.textContent = `Step ${this.state.step} / ${total}`;
+        this.prev.disabled = this.state.step === 1;
+        this.next.disabled = this.state.step === total;
+        this.config.render(this.state, this.root);
+      }
+    }
+
+    document.querySelectorAll(".diagram-card").forEach((card) => {
+      const key = card.dataset.diagram;
+      new StepStateMachine(card, diagramConfig[key]);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,2107 @@
+/**
+ * Ultrasound laboratory styles.
+ *
+ * The same premium scientific-instrument identity as the MRI laboratory, tuned
+ * to the ultrasound department: deep navy instead of deep green, luminous cyan
+ * instead of lime. Structure, spacing, type scale and control shapes are
+ * deliberately identical so a learner who has used the MRI lab can read this
+ * one immediately.
+ *
+ * Canvas colours are mirrored in components/theme.ts, because a canvas context
+ * cannot read a custom property.
+ *
+ * TYPE. Every size here is a token from design/tokens.css; this file invents
+ * none. The instrument had drifted to 82 hand-picked sizes between 9.5px and
+ * 31px, which meant the learner read the physics at 12.5px while the chrome
+ * around it — badges, counters, rail — sat at almost the same weight. The rule
+ * now applied is the site rule: anything the learner reads to LEARN is
+ * --fs-teach or --fs-body; anything they read to OPERATE (labels, buttons,
+ * options, cells) is at least --fs-support; and --fs-meta is reserved for
+ * genuine tertiary metadata — an experiment number, a count, a unit suffix, a
+ * citation, an all-caps region label. Nothing else may go below 16px.
+ *
+ * The consequence is that a guided caption is now the largest text on the
+ * stage, and the LIVE pill, the progress counter and the step dots are the
+ * smallest. That ordering is the point.
+ */
+
+.us-module {
+  --us-bg: #04090f;
+  --us-bg-2: #060e18;
+  --us-panel: #0a1524;
+  --us-panel-2: #0e1e31;
+  --us-panel-3: #12263d;
+  --us-line: rgba(125, 190, 255, 0.13);
+  --us-line-strong: rgba(125, 190, 255, 0.28);
+  --us-text: #dce9f7;
+  --us-muted: #8199b3;
+  --us-dim: #5f748c;
+  --us-cyan: #52dcff;
+  --us-blue: #6a9bff;
+  --us-green: #3fe3a4;
+  --us-amber: #ffb03a;
+  --us-red: #ff6472;
+  --us-violet: #b18cff;
+  --us-radius: 12px;
+  --us-grid: rgba(82, 220, 255, 0.055);
+
+  background: var(--us-bg);
+  color: var(--us-text);
+  min-height: 100vh;
+  position: relative;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* The faint instrument graticule behind everything. */
+.us-module::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--us-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--us-grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.us-module::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 420px;
+  background: radial-gradient(ellipse at 16% 0%, rgba(82, 220, 255, 0.11), transparent 60%),
+    radial-gradient(ellipse at 88% 4%, rgba(106, 155, 255, 0.08), transparent 58%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.us-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==================================================================
+   Laboratory frame — top bar, rail, stage, controls, teaching panel
+   ================================================================== */
+
+.us-lab {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  /* The laboratory fills the viewport, so an active experiment never scrolls
+     the page. Long-form material scrolls inside its own column.
+
+     --us-header is the height of the site header above us, and on every
+     /ultrasound-lab route that height is zero: App.tsx's hasOwnChrome() returns
+     true for this tree, so <Header/> renders null and the laboratory is the
+     first thing in the document. The variable was still reserving 78px, which
+     on a 660px browser viewport was 78px of empty grid below the transport and
+     78px of empty page above the top bar on tablets — a ninth of the screen
+     taken from the diagram to make room for a bar that is not there. It stays
+     as a variable because the frame is designed to sit under a header if one
+     is ever put back; it is simply zero while there is none. */
+  --us-header: 0px;
+  height: calc(100vh - var(--us-header));
+  height: calc(100dvh - var(--us-header));
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.us-topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-5);
+  border-bottom: 1px solid var(--us-line);
+  background: linear-gradient(180deg, rgba(10, 21, 36, 0.96), rgba(6, 14, 24, 0.88));
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* The wordmark says which instrument you are standing at. It orients; it does
+   not teach, so it is metadata weight even though it is the leftmost thing. */
+.us-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--display);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--us-muted);
+  white-space: nowrap;
+}
+
+.us-topbar-brand svg {
+  color: var(--us-cyan);
+  flex: none;
+}
+
+.us-topbar-title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+/* The page's h1. It reads as a title bar rather than a headline, so the size
+   stays where it was; margin and weight are stated because an h1 arrives with
+   the user agent's own. */
+.us-topbar-title h1 {
+  display: block;
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--fs-support);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--us-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The group this experiment belongs to: pure orientation. */
+.us-topbar-title small {
+  display: block;
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-dim);
+  margin-top: var(--sp-1);
+}
+
+.us-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+}
+
+.us-live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--us-green);
+  border: 1px solid rgba(63, 227, 164, 0.3);
+  background: rgba(63, 227, 164, 0.08);
+  border-radius: 20px;
+  padding: var(--sp-1) var(--sp-3);
+}
+
+.us-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--us-green);
+  box-shadow: 0 0 8px var(--us-green);
+  animation: us-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes us-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.72); }
+}
+
+/* How many experiments have been opened: a count, and nothing but a count. */
+.us-progress-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--us-muted);
+  border: 1px solid var(--us-line);
+  background: var(--us-panel);
+  border-radius: 20px;
+  padding: var(--sp-1) var(--sp-3);
+  white-space: nowrap;
+}
+
+.us-progress-pill b {
+  color: var(--us-cyan);
+}
+
+.us-progress-track {
+  width: 46px;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.us-progress-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--us-blue), var(--us-cyan));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* ---------- experiment rail ---------- */
+
+.us-rail {
+  border-right: 1px solid var(--us-line);
+  background: linear-gradient(180deg, rgba(10, 21, 36, 0.7), rgba(4, 9, 15, 0.5));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 0 28px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 190, 255, 0.22) transparent;
+}
+
+.us-rail::-webkit-scrollbar { width: 7px; }
+.us-rail::-webkit-scrollbar-thumb { background: rgba(125, 190, 255, 0.2); border-radius: 4px; }
+
+/* The group heading names a region of the rail. It is a signpost, not a
+   destination, so it stays at metadata weight below the links it introduces. */
+.us-rail-group {
+  padding: var(--sp-3) var(--sp-4) var(--sp-1);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--us-dim);
+}
+
+/* Twenty-one destinations that have to be read before they can be chosen: the
+   one thing in the chrome that is genuinely read, and so the one thing in the
+   chrome held at support size. */
+.us-rail a {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  color: var(--us-muted);
+  border-left: 2px solid transparent;
+  transition: color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease),
+    border-color var(--dur-micro) var(--ease);
+  line-height: 1.3;
+}
+
+/* The experiment number — an index, kept quiet so the name reads first. */
+.us-rail a span {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  flex: none;
+  width: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.us-rail a:hover {
+  color: var(--us-text);
+  background: rgba(125, 190, 255, 0.05);
+}
+
+.us-rail a.is-current {
+  color: var(--us-cyan);
+  background: linear-gradient(90deg, rgba(82, 220, 255, 0.14), transparent);
+  border-left-color: var(--us-cyan);
+  font-weight: 600;
+}
+
+.us-rail a.is-current span { color: rgba(82, 220, 255, 0.65); }
+
+.us-rail a.is-done span::after {
+  content: '✓';
+  color: var(--us-green);
+}
+
+.us-rail-back {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-1) var(--sp-3) var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-muted);
+}
+
+.us-rail-back:hover { color: var(--us-cyan); border-color: var(--us-line-strong); }
+
+/* ---------- the working area ---------- */
+
+/* The control column is 344px rather than 322px because a slider label and its
+   value now sit at support size on one line; at the old width "c — Propagation
+   speed" and "1540 m/s" collided.
+
+   The frame itself is unchanged — two rows, the upper one taking whatever the
+   viewport has left, the teaching strip pinned below it. What changed is who
+   pays when that is not enough. */
+.us-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 344px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The stage column, not the drawing inside it, absorbs a shortage of height.
+   It used to be the other way round: the stage was told it could shrink to
+   nothing, and the canvas within it was the only element with no minimum of
+   its own — so in the manual laboratory on a 1280x660 window the drawing was
+   compressed to two pixels while the caption, the transport and the six
+   teaching slots all kept their full size. Now the stage grows into free space
+   but never shrinks below its own contents, and where the row cannot hold it
+   this column scrolls. Everything stays present and readable; what moves is
+   which element gives way, and it is no longer the diagram. */
+.us-stage-col {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 190, 255, 0.22) transparent;
+}
+
+.us-stage-col::-webkit-scrollbar { width: 7px; }
+.us-stage-col::-webkit-scrollbar-thumb { background: rgba(125, 190, 255, 0.2); border-radius: 4px; }
+
+.us-controls-col {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 190, 255, 0.22) transparent;
+}
+
+.us-controls-col::-webkit-scrollbar { width: 7px; }
+.us-controls-col::-webkit-scrollbar-thumb { background: rgba(125, 190, 255, 0.2); border-radius: 4px; }
+
+.us-teaching-col {
+  grid-column: 1 / -1;
+  min-width: 0;
+  /* The six teaching slots are always visible; the expandable detail and the
+     model note scroll within this strip rather than lengthening the page.
+     Capped at 34vh, not 40vh: the slots now carry teaching-size text, and on a
+     660px viewport 40vh of prose left the diagram it is describing under
+     150px tall. The strip scrolls, the diagram cannot. */
+  max-height: 34vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 190, 255, 0.22) transparent;
+}
+
+/* A flex item shrinks before it overflows, so in a column with a bounded
+   height the strip's contents were compressed instead of scrolling: .us-teach
+   went from its natural 790px to 185px and, being overflow:hidden, silently
+   clipped the rest. The strip then had nothing to scroll, so two of the six
+   slots — Clinical meaning and the FRCR trap — were painted at a place no
+   scrollbar could reach. The strip is the thing that scrolls; the slots and the
+   notes inside it keep their own height. */
+.us-teaching-col > * { flex: none; }
+
+.us-teaching-col::-webkit-scrollbar { width: 7px; }
+.us-teaching-col::-webkit-scrollbar-thumb { background: rgba(125, 190, 255, 0.2); border-radius: 4px; }
+
+/* Pages that are genuinely documents (fact bank, tables) scroll normally. */
+.us-work.is-scrolling {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.us-work.is-scrolling .us-stage-col { overflow: visible; }
+
+/* ==================================================================
+   Panels and surfaces
+   ================================================================== */
+
+.us-panel {
+  background: var(--us-panel);
+  border: 1px solid var(--us-line);
+  border-radius: var(--us-radius);
+  padding: var(--card-pad);
+  min-width: 0;
+}
+
+/* An all-caps label naming a region of the instrument — the same job as the
+   eyebrow in the shared primitives, and the same weight. */
+.us-panel > h3 {
+  font-family: var(--display);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  margin: 0 0 var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.us-panel > h3 svg { color: var(--us-cyan); }
+
+/* flex: 1 0 auto — take the height the contents need, grow into any surplus,
+   and never shrink below them. The old `flex: 1; min-height: 0` said the
+   opposite, which is what let the stage be compressed until the drawing
+   inside it disappeared. */
+.us-stage {
+  flex: 1 0 auto;
+  min-height: 0;
+  background: linear-gradient(180deg, var(--us-panel), var(--us-bg-2));
+  border: 1px solid var(--us-line);
+  border-radius: var(--us-radius);
+  padding: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  position: relative;
+  overflow: hidden;
+}
+
+.us-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex: none;
+  flex-wrap: wrap;
+}
+
+/* "STAGE · ATTENUATION CHAMBER" names the apparatus. The concept being taught
+   is stated underneath at concept size; this line must not compete with it. */
+.us-stage-head h2 {
+  font-family: var(--display);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.us-stage-head h2 b {
+  color: var(--us-cyan);
+  font-weight: 700;
+}
+
+/* The diagram floor. Everything else in the frame — the caption, the
+   transport, the controls, the six teaching slots — may push the working area
+   into a scroll; none of them may push the drawing below the height at which
+   its axes and labels stop colliding. The floor is proportional rather than
+   fixed so that it rescues a 660px window without forcing a scroll on it: 34vh
+   is 224px there and 320px on a full-height desktop, which is roughly where
+   these scenes stop being readable in either direction. */
+.us-stage-body {
+  /* The floor is the flex BASIS, not a min-height, and that distinction is the
+     whole mechanism. A basis gives the stage a deterministic height to plan
+     around; a min-height would leave the stage sizing itself from the <canvas>
+     element's own intrinsic pixel dimensions, which are large and have nothing
+     to do with how much room the page can spare. Grow into any surplus,
+     never shrink below the floor. */
+  flex: 1 0 clamp(220px, 30vh, 300px);
+  min-height: 0;
+  display: flex;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.us-stage-body > * { min-width: 0; }
+
+.us-canvas-wrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 30%, rgba(14, 30, 49, 0.9), #07080B);
+  border: 1px solid rgba(125, 190, 255, 0.09);
+}
+
+.us-canvas-wrap canvas,
+.us-canvas-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The floating "what just changed" flash inside the stage. This is the third
+   beat of the teaching pattern — move a control, see the consequence — so it is
+   sized to be read at a glance from wherever the eye happens to be. */
+.us-stage-flash {
+  position: absolute;
+  top: var(--sp-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: 22px;
+  background: rgba(8, 20, 34, 0.94);
+  border: 1px solid var(--us-line-strong);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), 0 0 22px rgba(82, 220, 255, 0.14);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-text);
+  animation: us-flash-in 0.28s ease;
+  max-width: min(94%, 640px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@keyframes us-flash-in {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.us-flash-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.us-flash-item.is-up { color: var(--us-green); }
+.us-flash-item.is-down { color: var(--us-amber); }
+.us-flash-item.is-warn { color: var(--us-red); }
+.us-flash-item.is-flat { color: var(--us-muted); }
+
+.us-flash-sep {
+  width: 1px;
+  height: 13px;
+  background: var(--us-line-strong);
+  flex: none;
+}
+
+/* ==================================================================
+   Guided walkthrough transport
+   ================================================================== */
+
+.us-transport {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+  flex-wrap: wrap;
+  padding-top: var(--sp-2);
+}
+
+/* The transport is the thing the learner drives the concept with, so it reads
+   as a real toolbar. It used to get there by overriding the type up to 14px;
+   now every control on the site sits at support size and the transport is
+   distinguished by its padding and its hit area instead — which is what was
+   actually doing the work, and costs the stage no height. */
+.us-transport .us-btn {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius);
+}
+.us-transport .us-btn.is-icon { padding: var(--sp-2) var(--sp-3); }
+.us-transport .us-btn svg { width: 17px; height: 17px; }
+@media (max-width: 760px) {
+  .us-transport .us-btn { padding: var(--sp-2) var(--sp-3); }
+  .us-transport .us-btn.is-icon { padding: var(--sp-2); }
+}
+
+/* Every control label is read before it is clicked, so no button anywhere in
+   the laboratory goes below support size. Small buttons stay small by losing
+   padding, never by losing legibility. */
+.us-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: 1px solid var(--us-line);
+  background: var(--us-panel-2);
+  color: var(--us-text);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+  white-space: nowrap;
+}
+
+.us-btn:hover:not(:disabled) {
+  border-color: var(--us-line-strong);
+  background: var(--us-panel-3);
+}
+
+.us-btn:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+}
+
+.us-btn.is-primary {
+  background: linear-gradient(135deg, var(--us-cyan), var(--us-blue));
+  border-color: transparent;
+  color: #041322;
+}
+
+.us-btn.is-primary:hover:not(:disabled) {
+  filter: brightness(1.09);
+  background: linear-gradient(135deg, var(--us-cyan), var(--us-blue));
+}
+
+.us-btn.is-icon {
+  padding: var(--sp-1) var(--sp-2);
+}
+
+.us-btn.is-on {
+  border-color: rgba(82, 220, 255, 0.5);
+  color: var(--us-cyan);
+  background: rgba(82, 220, 255, 0.1);
+}
+
+.us-btn-small {
+  padding: var(--sp-1) var(--sp-2);
+}
+
+/* "Step 3 of 8" — a count. It is the one thing in the transport allowed to be
+   quiet, because it reports position rather than offering an action. */
+.us-step-count {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--us-muted);
+  letter-spacing: 0.02em;
+  margin-left: var(--sp-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.us-step-count b { color: var(--us-cyan); }
+
+.us-step-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.us-step-dots button {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 0;
+  transition: background 0.16s, transform 0.16s;
+}
+
+.us-step-dots button.is-done { background: rgba(82, 220, 255, 0.42); }
+.us-step-dots button.is-current { background: var(--us-cyan); transform: scale(1.5); }
+
+/* ---------- the guided step caption inside the stage ---------- */
+
+/* The caption lives INSIDE the stage, sharing its border and its background,
+   because the drawing and the sentence explaining the drawing are one object.
+   Splitting them — animation on the stage, words in a panel elsewhere — is the
+   failure this arrangement exists to prevent. */
+.us-step-caption {
+  flex: none;
+  border-left: 2px solid var(--us-cyan);
+  background: rgba(82, 220, 255, 0.06);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+/* The claim this step makes. */
+.us-step-caption strong {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  color: var(--us-text);
+  margin-bottom: var(--sp-2);
+  letter-spacing: -0.01em;
+  line-height: var(--lh-heading);
+}
+
+/* And why it happens — the explanation, at reading size even in the compact
+   manual layout. This paragraph was 12.5px, which is where the laboratory was
+   losing the actual physics under its own instrument panelling. */
+.us-step-caption p {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+  max-width: var(--measure);
+}
+
+.us-step-caption p b,
+.us-step-caption p strong { color: var(--us-text); font-weight: 600; }
+
+/* ---------- focused teaching ----------
+   While a guided step is being taught the learner meets ONE idea. The controls
+   and the analysis panel step aside, the stage grows, and the explanation of
+   what is on screen becomes the largest text on the page. Nothing is deleted:
+   "Show the numbers" brings the readouts back, and the manual laboratory
+   restores the whole instrument. */
+
+.us-work.is-focus {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  place-items: stretch;
+}
+
+.us-work.is-focus .us-controls-col,
+.us-work.is-focus .us-teaching-col,
+.us-work.is-focus .us-focus-hide {
+  display: none;
+}
+
+.us-work.is-focus .us-stage-col {
+  width: min(1180px, 100%);
+  margin-inline: auto;
+}
+
+.us-work.is-focus .us-step-caption {
+  border-left-width: 3px;
+  padding: var(--sp-5) var(--sp-6);
+  background: linear-gradient(90deg, rgba(82, 220, 255, 0.1), rgba(82, 220, 255, 0.02) 70%);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+.us-work.is-focus .us-step-caption strong {
+  font-size: var(--fs-concept);
+  letter-spacing: -0.014em;
+  line-height: var(--lh-heading);
+  margin-bottom: var(--sp-3);
+  color: var(--us-cyan);
+}
+
+.us-work.is-focus .us-step-caption p {
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+  max-width: var(--measure);
+}
+
+.us-work.is-focus .us-step-caption p b,
+.us-work.is-focus .us-step-caption p strong {
+  color: var(--us-cyan);
+  font-weight: 700;
+}
+
+/* A quiet reminder that the rest of the instrument is one click away. Quiet by
+   colour, not by size — it names two buttons the learner has to be able to find. */
+.us-focus-hint {
+  margin: 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-dim);
+  text-align: center;
+  padding-top: var(--sp-1);
+}
+
+.us-focus-hint b { color: var(--us-cyan); font-weight: 600; }
+
+.us-work:not(.is-focus) .us-focus-hint { display: none; }
+
+/* ==================================================================
+   Controls
+   ================================================================== */
+
+.us-group {
+  background: var(--us-panel);
+  border: 1px solid var(--us-line);
+  border-radius: 10px;
+  overflow: hidden;
+  flex: none;
+}
+
+/* An all-caps label naming a bank of controls: the same signpost role as the
+   rail's group heading, and the same weight. */
+.us-group > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: color var(--dur-micro) var(--ease);
+}
+
+.us-group > summary::-webkit-details-marker { display: none; }
+.us-group > summary:hover { color: var(--us-text); }
+
+.us-group > summary::after {
+  content: '';
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s;
+  flex: none;
+}
+
+.us-group[open] > summary::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.us-group[open] > summary {
+  color: var(--us-cyan);
+  border-bottom: 1px solid var(--us-line);
+}
+
+.us-group-body {
+  padding: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.us-slider { display: block; }
+
+.us-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+/* What this control is, and what it currently reads. Both are operated on, so
+   both are at support size; only the unit suffix drops to metadata. */
+.us-slider-head label {
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-text);
+  line-height: 1.35;
+}
+
+.us-slider-head output {
+  font-size: var(--fs-support);
+  font-weight: 700;
+  color: var(--us-cyan);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.us-slider-head output span {
+  color: var(--us-muted);
+  font-weight: 500;
+  font-size: var(--fs-meta);
+}
+
+.us-slider input[type='range'],
+.us-vertical-slider input[type='range'] {
+  width: 100%;
+  height: 22px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+}
+
+.us-slider input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.us-slider input[type='range']::-moz-range-track {
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.us-slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--us-cyan);
+  border: 2px solid #05121f;
+  box-shadow: 0 0 9px rgba(82, 220, 255, 0.55);
+  margin-top: -5.5px;
+}
+
+.us-slider input[type='range']::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--us-cyan);
+  border: 2px solid #05121f;
+  box-shadow: 0 0 9px rgba(82, 220, 255, 0.55);
+}
+
+.us-slider input[type='range']:focus-visible,
+.us-btn:focus-visible,
+.us-chip:focus-visible,
+.us-rail a:focus-visible {
+  outline: 2px solid var(--us-cyan);
+  outline-offset: 2px;
+}
+
+/* The hint under a slider says what moving it will do — that is teaching, not
+   chrome, and it was the smallest teaching text in the laboratory. */
+.us-slider-hint {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+.us-slider-markers {
+  display: flex;
+  gap: var(--sp-1);
+  flex-wrap: wrap;
+  margin-top: var(--sp-2);
+}
+
+.us-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  border: 1px solid var(--us-line);
+  background: var(--us-panel-2);
+  color: var(--us-muted);
+  border-radius: 20px;
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: border-color var(--dur-micro) var(--ease), color var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+  white-space: nowrap;
+}
+
+.us-chip:hover { color: var(--us-text); border-color: var(--us-line-strong); }
+
+.us-chip.is-on {
+  border-color: rgba(82, 220, 255, 0.5);
+  color: var(--us-cyan);
+  background: rgba(82, 220, 255, 0.1);
+}
+
+.us-chip i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.us-chip-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.us-field { display: block; }
+
+.us-field > span {
+  display: block;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-text);
+  margin-bottom: var(--sp-2);
+}
+
+.us-select {
+  width: 100%;
+  background: var(--us-panel-2);
+  border: 1px solid var(--us-line);
+  color: var(--us-text);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-support);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.us-select:focus-visible { outline: 2px solid var(--us-cyan); outline-offset: 1px; }
+
+.us-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-text);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.us-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.us-toggle-track {
+  width: 34px;
+  height: 19px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--us-line);
+  position: relative;
+  flex: none;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.us-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--us-muted);
+  transition: transform 0.18s, background 0.18s;
+}
+
+.us-toggle input:checked + .us-toggle-track {
+  background: rgba(82, 220, 255, 0.24);
+  border-color: rgba(82, 220, 255, 0.5);
+}
+
+.us-toggle input:checked + .us-toggle-track::after {
+  transform: translateX(15px);
+  background: var(--us-cyan);
+}
+
+.us-toggle input:focus-visible + .us-toggle-track {
+  outline: 2px solid var(--us-cyan);
+  outline-offset: 2px;
+}
+
+.us-segmented {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--us-panel-2);
+  border: 1px solid var(--us-line);
+  border-radius: 9px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.us-segmented button {
+  border: 0;
+  background: transparent;
+  color: var(--us-muted);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  transition: background var(--dur-micro) var(--ease), color var(--dur-micro) var(--ease);
+  white-space: nowrap;
+}
+
+.us-segmented button.is-on {
+  background: var(--us-cyan);
+  color: #04131f;
+}
+
+/* ---------- readouts ---------- */
+
+/* An instrument read-out: the number is checked at a glance, so it is legible;
+   the quantity's name and its unit are labels, so they stay quiet. The track
+   widened from 88px to 128px because a tile's label is now 14px and "PULSE
+   LENGTH" was being ellipsised away to "PULSE L…". */
+.us-readout {
+  display: grid;
+  gap: 1px;
+  background: var(--us-line);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+}
+
+.us-readout > div {
+  background: var(--us-panel-2);
+  padding: var(--sp-2) var(--sp-3);
+  min-width: 0;
+}
+
+.us-readout small {
+  display: block;
+  font-size: var(--fs-meta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  margin-bottom: var(--sp-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.us-readout strong {
+  display: block;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--us-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.us-readout strong span {
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  color: var(--us-muted);
+  margin-left: var(--sp-1);
+}
+
+.us-readout > div.is-cyan strong { color: var(--us-cyan); }
+.us-readout > div.is-green strong { color: var(--us-green); }
+.us-readout > div.is-amber strong { color: var(--us-amber); }
+.us-readout > div.is-red strong { color: var(--us-red); }
+.us-readout > div.is-violet strong { color: var(--us-violet); }
+
+/* ==================================================================
+   Live teaching panel
+   ================================================================== */
+
+/* Six fixed slots. The column track went from 210px to 264px because a slot
+   now holds teaching-size prose, and 210px gave it roughly five words a line. */
+.us-teach {
+  background: linear-gradient(180deg, var(--us-panel), rgba(6, 14, 24, 0.9));
+  border: 1px solid var(--us-line);
+  border-radius: var(--us-radius);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(264px, 1fr));
+  gap: 1px;
+  background-color: var(--us-line);
+  overflow: hidden;
+}
+
+.us-teach > section {
+  background: var(--us-panel);
+  padding: var(--sp-3) var(--sp-4);
+  min-width: 0;
+}
+
+/* Which of the six slots this is. A tab, effectively — metadata. */
+.us-teach h4 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--us-muted);
+  margin: 0 0 var(--sp-2);
+}
+
+.us-teach h4 svg { flex: none; }
+
+/* "What is happening now" and the examination trap: the statement and the
+   takeaway, the two things a candidate carries out of the screen. */
+.us-teach p {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+}
+
+.us-teach p + p { margin-top: var(--sp-2); }
+
+/* "Why it happens" and "Clinical meaning" support those two rather than
+   replacing them, so they sit one step down — visible hierarchy, not a
+   different colour of the same size. */
+.us-teach .us-teach-sub {
+  color: var(--us-muted);
+  font-size: var(--fs-support);
+}
+
+/* The revision-mode switch rides in the first slot's heading, where it used to
+   be a 10px word almost nobody found. It is a control, so it is legible; it is
+   chrome, so it stays uncoloured and unemphasised next to the teaching. */
+.us-teach-mode {
+  margin-left: auto;
+  padding: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.us-teach section.is-now h4 { color: var(--us-cyan); }
+.us-teach section.is-why h4 { color: var(--us-blue); }
+.us-teach section.is-eq h4 { color: var(--us-violet); }
+.us-teach section.is-clinical h4 { color: var(--us-green); }
+.us-teach section.is-trap h4 { color: var(--us-amber); }
+.us-teach section.is-trap { background: rgba(255, 176, 58, 0.05); }
+
+/* An equation deserves the room to be read. Monospace runs wide, so this is the
+   one piece of teaching text held at support rather than teaching size — the
+   alternative is a wrapped equation, which is worse than a small one. */
+.us-formula {
+  font-family: 'SFMono-Regular', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: var(--fs-support);
+  line-height: 1.8;
+  color: var(--us-violet);
+  background: rgba(177, 140, 255, 0.07);
+  border: 1px solid rgba(177, 140, 255, 0.18);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.us-formula b { color: #d8c6ff; font-weight: 700; }
+
+/* Direction-of-change chips inside the teaching panel. */
+.us-deltas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.us-deltas li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: 20px;
+  border: 1px solid var(--us-line);
+  background: var(--us-panel-2);
+  color: var(--us-muted);
+  white-space: nowrap;
+}
+
+.us-deltas li.is-up { color: var(--us-green); border-color: rgba(63, 227, 164, 0.3); background: rgba(63, 227, 164, 0.07); }
+.us-deltas li.is-down { color: var(--us-amber); border-color: rgba(255, 176, 58, 0.3); background: rgba(255, 176, 58, 0.07); }
+.us-deltas li.is-warn { color: var(--us-red); border-color: rgba(255, 100, 114, 0.3); background: rgba(255, 100, 114, 0.07); }
+.us-deltas li b { font-weight: 800; font-size: var(--fs-body); line-height: 1; }
+
+/* ==================================================================
+   Badges, notes, source citation
+   ================================================================== */
+
+/* A classification, not a sentence: which kind of fact this is. Metadata. */
+.us-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.us-badge.is-core { color: var(--us-cyan); border-color: rgba(82, 220, 255, 0.35); background: rgba(82, 220, 255, 0.09); }
+.us-badge.is-recall { color: var(--us-red); border-color: rgba(255, 100, 114, 0.35); background: rgba(255, 100, 114, 0.09); }
+.us-badge.is-trap { color: var(--us-amber); border-color: rgba(255, 176, 58, 0.35); background: rgba(255, 176, 58, 0.09); }
+.us-badge.is-equation { color: var(--us-violet); border-color: rgba(177, 140, 255, 0.35); background: rgba(177, 140, 255, 0.09); }
+.us-badge.is-number { color: var(--us-blue); border-color: rgba(106, 155, 255, 0.35); background: rgba(106, 155, 255, 0.09); }
+.us-badge.is-clinical { color: var(--us-green); border-color: rgba(63, 227, 164, 0.35); background: rgba(63, 227, 164, 0.09); }
+.us-badge.is-safety { color: #ff9d5c; border-color: rgba(255, 157, 92, 0.35); background: rgba(255, 157, 92, 0.09); }
+.us-badge.is-clarify { color: #9fb4cc; border-color: rgba(159, 180, 204, 0.32); background: rgba(159, 180, 204, 0.08); }
+
+/* Source clarification and examination trap share a shape: an all-caps label
+   at metadata weight over a body the learner has to read. The label is
+   furniture; the body is the point, and the trap is a level-2 takeaway. */
+.us-source-note {
+  border-left: 2px solid rgba(159, 180, 204, 0.5);
+  background: rgba(159, 180, 204, 0.05);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+.us-source-note strong {
+  color: #c3d3e4;
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.us-trap-note {
+  border-left: 2px solid var(--us-amber);
+  background: rgba(255, 176, 58, 0.06);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+}
+
+.us-trap-note strong {
+  color: var(--us-amber);
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.us-model-note {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+  border-top: 1px solid var(--us-line);
+  padding-top: var(--sp-3);
+  margin: var(--sp-3) 0 0;
+}
+
+.us-model-note strong { color: var(--us-text); }
+
+.us-details {
+  border: 1px solid var(--us-line);
+  border-radius: 9px;
+  background: var(--us-panel-2);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+/* Level 4: the derivation and the edge cases, kept rather than deleted. The
+   summary is the door, so it is legible; what is behind it reads as support. */
+.us-details > summary {
+  padding: var(--sp-3);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--us-cyan);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.us-details > summary::-webkit-details-marker { display: none; }
+
+.us-details > summary::before {
+  content: '+';
+  line-height: 1;
+  color: var(--us-cyan);
+}
+
+.us-details[open] > summary::before { content: '−'; }
+
+.us-details-body {
+  padding: 0 var(--sp-3) var(--sp-3);
+  font-size: var(--fs-support);
+  line-height: var(--lh-loose);
+  color: var(--us-muted);
+}
+
+.us-details-body p { margin: 0 0 var(--sp-3); }
+.us-details-body p:last-child { margin-bottom: 0; }
+.us-details-body strong { color: var(--us-text); }
+
+/* ==================================================================
+   Predict-before-reveal
+   ================================================================== */
+
+.us-predict {
+  border: 1px solid rgba(177, 140, 255, 0.28);
+  background: rgba(177, 140, 255, 0.06);
+  border-radius: var(--radius);
+  padding: var(--sp-4);
+}
+
+.us-predict h4 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-support);
+  font-weight: 700;
+  color: var(--us-violet);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* The question the learner commits to an answer on: it has to be read
+   properly, or the commitment is worthless. */
+.us-predict p {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+}
+
+.us-predict-options { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+.us-predict-options button.is-right {
+  border-color: rgba(63, 227, 164, 0.55);
+  color: var(--us-green);
+  background: rgba(63, 227, 164, 0.12);
+}
+
+.us-predict-options button.is-wrong {
+  border-color: rgba(255, 100, 114, 0.55);
+  color: var(--us-red);
+  background: rgba(255, 100, 114, 0.12);
+}
+
+.us-predict-verdict {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+.us-predict-verdict strong { color: var(--us-text); }
+
+/* ==================================================================
+   Comparison tables
+   ================================================================== */
+
+.us-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--us-line);
+  border-radius: 10px;
+  scrollbar-width: thin;
+}
+
+/* Cells are content and are read as content. The minimum width rose with the
+   type so a comparison row still gets a line rather than a column of syllables;
+   past that the wrapper scrolls horizontally rather than the page. */
+.us-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-support);
+  min-width: 580px;
+}
+
+.us-table th,
+.us-table td {
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  border-bottom: 1px solid var(--us-line);
+  vertical-align: top;
+  line-height: var(--lh-body);
+}
+
+.us-table thead th {
+  background: var(--us-panel-2);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.us-table tbody tr:last-child td { border-bottom: 0; }
+.us-table tbody tr:hover { background: rgba(82, 220, 255, 0.045); }
+.us-table tbody th { font-weight: 600; color: var(--us-text); background: rgba(14, 30, 49, 0.5); }
+.us-table td { color: var(--us-muted); }
+.us-table td b { color: var(--us-text); font-weight: 600; }
+.us-table .is-up { color: var(--us-green); font-weight: 600; }
+.us-table .is-down { color: var(--us-amber); font-weight: 600; }
+.us-table .is-none { color: var(--us-muted); }
+
+/* ==================================================================
+   Fact bank
+   ================================================================== */
+
+.us-fb-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 11px 0;
+  position: sticky;
+  top: 132px;
+  z-index: 10;
+  background: linear-gradient(180deg, var(--us-bg) 72%, transparent);
+}
+
+.us-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--us-line);
+  background: var(--us-panel);
+  border-radius: 9px;
+  padding: 8px 12px;
+  flex: 1;
+  min-width: 200px;
+  color: var(--us-muted);
+}
+
+.us-search input {
+  border: 0;
+  background: transparent;
+  color: var(--us-text);
+  font-size: var(--fs-support);
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+}
+
+.us-search input::placeholder { color: var(--us-muted); }
+
+.us-fact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 11px;
+}
+
+.us-fact {
+  background: var(--us-panel);
+  border: 1px solid var(--us-line);
+  border-radius: 11px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  transition: border-color 0.18s, transform 0.18s;
+}
+
+.us-fact:hover { border-color: var(--us-line-strong); }
+
+.us-fact.is-recall {
+  border-color: rgba(255, 100, 114, 0.28);
+  background: linear-gradient(160deg, rgba(255, 100, 114, 0.05), var(--us-panel) 60%);
+}
+
+.us-fact-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+
+/* A fact card is a miniature of the whole hierarchy: the fact itself, then the
+   reason, then where it came from. Revision reading is the longest reading a
+   candidate does, so it gets card and body sizes, not caption sizes. */
+.us-fact h3 {
+  margin: 0;
+  font-size: var(--fs-card);
+  font-weight: 700;
+  line-height: var(--lh-heading);
+  color: var(--us-text);
+  letter-spacing: -0.008em;
+}
+
+.us-fact > p {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+.us-fact-foot {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* Where the fact came from: a citation. */
+.us-fact-source {
+  font-size: var(--fs-meta);
+  color: var(--us-dim);
+  letter-spacing: 0.02em;
+}
+
+/* ==================================================================
+   Exam lab
+   ================================================================== */
+
+.us-question {
+  background: var(--us-panel);
+  border: 1px solid var(--us-line);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+/* The stem is the question being asked; the options are what a candidate reads
+   four times over before choosing. Neither is a place to save vertical space. */
+.us-question h3 {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-card);
+  line-height: var(--lh-body);
+  font-weight: 600;
+  color: var(--us-text);
+  letter-spacing: -0.008em;
+}
+
+.us-answers { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.us-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--us-line);
+  background: var(--us-panel-2);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--us-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  transition: border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+
+.us-answer:hover:not(:disabled) { border-color: var(--us-line-strong); background: var(--us-panel-3); }
+
+/* The option letter — an index. */
+.us-answer > span {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.07);
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--us-muted);
+}
+
+.us-answer.is-correct {
+  border-color: rgba(63, 227, 164, 0.55);
+  background: rgba(63, 227, 164, 0.1);
+}
+
+.us-answer.is-correct > span { background: var(--us-green); color: #04241a; }
+
+.us-answer.is-wrong {
+  border-color: rgba(255, 100, 114, 0.55);
+  background: rgba(255, 100, 114, 0.1);
+}
+
+.us-answer.is-wrong > span { background: var(--us-red); color: #2b0409; }
+
+.us-answer:disabled { cursor: default; }
+
+.us-explain {
+  margin-top: 14px;
+  border-top: 1px solid var(--us-line);
+  padding-top: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.us-explain h4 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  font-weight: 700;
+}
+
+/* Why the answer is the answer. This is the whole value of a question bank. */
+.us-explain p {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-text);
+}
+.us-explain p.is-muted { color: var(--us-muted); }
+
+.us-confidence {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: var(--fs-support);
+  color: var(--us-muted);
+}
+
+/* Answered, correct, streak: counts. */
+.us-score {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: var(--fs-meta);
+  color: var(--us-muted);
+}
+
+.us-score b { color: var(--us-cyan); font-size: var(--fs-body); font-weight: 700; }
+
+/* ==================================================================
+   Overview / landing grid
+   ================================================================== */
+
+.us-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 12px;
+}
+
+.us-overview a {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  background: var(--us-panel);
+  border: 1px solid var(--us-line);
+  border-radius: 11px;
+  padding: 14px 15px;
+  transition: border-color 0.18s, transform 0.18s, background 0.18s;
+  min-width: 0;
+}
+
+.us-overview a:hover {
+  border-color: rgba(82, 220, 255, 0.4);
+  background: var(--us-panel-2);
+  transform: translateY(-2px);
+}
+
+/* The experiment number — an index. */
+.us-overview a > span {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(82, 220, 255, 0.55);
+}
+
+.us-overview a strong {
+  font-family: var(--display);
+  font-size: var(--fs-card);
+  color: var(--us-text);
+  letter-spacing: -0.01em;
+}
+
+.us-overview a small {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+/* ==================================================================
+   Utility layout helpers used by the experiment pages
+   ================================================================== */
+
+.us-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.us-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+.us-scroll-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 40px;
+  min-width: 0;
+}
+
+.us-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.us-section-head h2 {
+  font-family: var(--display);
+  font-size: var(--fs-section);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--gap-heading-desc);
+  color: var(--us-text);
+}
+
+.us-section-head h2 span { color: var(--us-cyan); }
+
+.us-section-head p {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+  max-width: var(--measure);
+}
+
+.us-prose { font-size: var(--fs-body); line-height: var(--lh-loose); color: var(--us-muted); }
+.us-prose p { margin: 0 0 var(--sp-3); }
+.us-prose strong { color: var(--us-text); }
+.us-prose ul { margin: 0 0 var(--sp-3); padding-left: var(--sp-5); }
+.us-prose li { margin-bottom: var(--sp-2); }
+
+/* A key to the colours in the drawing above it: labels, not prose. */
+.us-legend {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  font-size: var(--fs-meta);
+  color: var(--us-muted);
+  align-items: center;
+}
+
+.us-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.us-legend i { width: 11px; height: 3px; border-radius: 2px; flex: none; }
+.us-legend i.is-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.us-empty {
+  padding: var(--sp-7) var(--sp-5);
+  text-align: center;
+  color: var(--us-muted);
+  font-size: var(--fs-support);
+}
+
+.us-boot {
+  padding: var(--sp-9) var(--sp-5);
+  text-align: center;
+  color: var(--us-muted);
+  font-size: var(--fs-support);
+}
+
+/* ==================================================================
+   Responsive
+   ================================================================== */
+
+@media (max-width: 1180px) {
+  .us-lab {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    /* The rail must never claim the flexible row when the columns stack. */
+    grid-template-rows: auto auto minmax(0, 1fr);
+    padding-top: var(--us-header);
+  }
+  .us-work { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; overflow-y: visible; }
+  /* Below this width the laboratory is a document: the page scrolls, so no
+     column inside it should have a scrollbar of its own. */
+  .us-stage-col { min-height: 460px; overflow: visible; }
+  .us-controls-col { overflow: visible; }
+  .us-teaching-col { grid-column: 1; max-height: none; overflow: visible; }
+  .us-rail { overflow-y: auto; }
+}
+
+@media (max-width: 900px) {
+  .us-lab { grid-template-columns: 1fr; }
+  .us-topbar { flex-wrap: wrap; }
+  .us-topbar-title { order: 3; flex-basis: 100%; text-align: left; }
+  /* The action cluster takes a row of its own and wraps inside it. It used to
+     be a single unbreakable line, which is why the last button hung 72px past
+     the right edge of a phone once the controls became legible. Wrapping keeps
+     every control present and full size; nothing is hidden to make room. */
+  .us-topbar-actions { flex: 1 1 100%; flex-wrap: wrap; }
+  .us-rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--us-line);
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 8px;
+    gap: 4px;
+    position: sticky;
+    top: 118px;
+    z-index: 15;
+    background: rgba(4, 9, 15, 0.96);
+    backdrop-filter: blur(8px);
+  }
+  .us-rail-group { display: none; }
+  /* Each group wrapper dissolves so the links flow as one horizontal strip. */
+  .us-rail > div { display: contents; }
+  .us-rail-back { margin: 0 6px 0 0; flex: none; }
+  .us-rail a {
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    flex: none;
+    border-radius: 7px;
+  }
+  .us-rail a.is-current { border-left: 0; border-bottom-color: var(--us-cyan); }
+  /* Stacked rather than side by side, so the floor moves from the row to each
+     panel in it — otherwise two panels split one floor between them and a phone
+     gets the 175px stage that had the tissue labels overlapping each other.
+     `flex: none` with it: the row must now take its contents' full height
+     rather than a single basis, or the second panel paints over the caption. */
+  .us-stage-body { flex: none; flex-direction: column; min-height: 0; }
+  .us-stage-body > * { min-height: 260px; }
+  .us-stage-col { min-height: 400px; }
+  .us-fb-toolbar { top: 0; position: static; }
+}
+
+@media (max-width: 620px) {
+  .us-work { padding: var(--sp-2); gap: var(--sp-2); }
+  .us-transport { gap: var(--sp-2); }
+  /* Phones lose padding, never type: a thumb-sized button with an unreadable
+     label is worse on a phone than anywhere else. */
+  .us-btn { padding: var(--sp-1) var(--sp-2); }
+  .us-teach { grid-template-columns: 1fr; }
+  /* The progress pill used to be hidden here to buy back 13px of horizontal
+     overflow. The action cluster now wraps onto its own row instead, so the
+     space exists and the counter can stay: a learner on a phone gets the same
+     information as a learner on a laptop. */
+  .us-topbar { padding-left: var(--sp-3); padding-right: var(--sp-3); }
+  .us-topbar-actions { gap: var(--sp-2); }
+}
+
+/* ------------------------------------------------------------------
+   Short viewports.
+
+   A "screen" here is the browser viewport, not the display: a 1512x982 laptop
+   gives the page about 780px once the browser's own chrome is subtracted, and
+   a 1366x768 machine gives around 660px. In that budget the instrument frame
+   has to yield, and the question is what yields. It is not the type and it is
+   not the diagram — a caption set at 12px next to a 150px drawing is exactly
+   the failure this refactor exists to end. So padding and gaps give way, in
+   that order, and the drawing keeps the space they release. Below this height
+   the stage gains roughly 65px, which is the difference between a diagram you
+   can read and one you can only infer.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1181px) and (max-height: 820px) {
+  .us-work { padding: var(--sp-2); gap: var(--sp-2); }
+  .us-stage { padding: var(--sp-2) var(--sp-3); gap: var(--sp-2); }
+  .us-stage-col { gap: var(--sp-2); }
+  .us-work.is-focus .us-step-caption { padding: var(--sp-3) var(--sp-5); }
+  .us-transport { padding-top: var(--sp-1); gap: var(--sp-1); }
+  .us-transport .us-btn { padding: var(--sp-1) var(--sp-3); }
+  .us-transport .us-btn.is-icon { padding: var(--sp-1) var(--sp-2); }
+}
+
+/* ==================================================================
+   Reduced motion
+   ================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .us-live i { animation: none; }
+  .us-stage-flash { animation: none; }
+  .us-overview a:hover { transform: none; }
+  .us-module * { transition-duration: 0.01ms !important; }
+}
+
+.us-module.is-still .us-live i { animation: none; }
+
+/* ==================================================================
+   FOCUS VIEW ("zen"): one concept, the stage and Next — nothing else.
+   Entered from the top bar in guided mode; exited with the floating pill.
+   Nothing is unmounted — chrome is hidden and returns on exit.
+   ================================================================== */
+
+body.us-zen-body .site-header { display: none; }
+/* Zen hides the top bar and the rail, which leaves the working area as the only
+   grid item in a frame still declaring two rows. It landed in the first one —
+   sized to its contents — while the second, an empty 1fr, quietly held about
+   265px of the viewport at the bottom of the screen. One row, and the stage
+   gets the whole window, which is the entire point of the focused course. */
+.us-zen .us-lab {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  --us-header: 0px;
+}
+.us-zen .us-topbar,
+.us-zen .us-rail { display: none; }
+.us-zen .us-transport .us-btn:not(.is-icon) { display: none; }
+.us-zen .us-focus-hint,
+.us-zen .us-focus-hide,
+.us-zen .us-readout { display: none; }
+.us-zen-exit {
+  position: fixed; top: var(--sp-3); right: var(--sp-4); z-index: 200;
+  border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(6, 14, 24, 0.85);
+  color: #dfe8f2; border-radius: 20px; padding: var(--sp-2) var(--sp-4);
+  font-family: 'Inter', system-ui, sans-serif; font-weight: 600; font-size: var(--fs-support);
+  cursor: pointer; transition: var(--dur) var(--ease);
+}
+.us-zen-exit:hover { border-color: rgba(255, 255, 255, 0.5); }
+
+/* Focused-course chaining bar: experiment → experiment without the chrome. */
+/* "All concepts" is a way back, so it lives at the top with the rest of the
+   chrome, opposite Exit focus view. */
+.us-zen-top { position: fixed; top: var(--sp-3); left: var(--sp-4); z-index: 200; }
+.us-zen-top a {
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(6, 14, 24, 0.85);
+  color: #cfdcea; border-radius: 20px; padding: var(--sp-2) var(--sp-4);
+  font-family: 'Inter', system-ui, sans-serif; font-weight: 600; font-size: var(--fs-support);
+  text-decoration: none; transition: var(--dur) var(--ease);
+}
+.us-zen-top a:hover { border-color: rgba(255, 255, 255, 0.45); color: #fff; }
+
+/* Moving on is what the learner does at the end of a concept, so it is a full
+   bar in the flow directly under the controls — not a small link floating at
+   the bottom of the viewport where it was easy to miss. */
+.us-zen-chain {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: var(--sp-3); z-index: 200;
+  display: flex; align-items: center; gap: var(--sp-5);
+  background: rgba(6, 14, 24, 0.94); border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-lg); padding: var(--sp-2) var(--sp-3); backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.us-zen-chain a {
+  font-family: 'Inter', system-ui, sans-serif; font-weight: 600; font-size: var(--fs-support);
+  color: #9fb2c4; text-decoration: none; transition: var(--dur-micro) var(--ease);
+}
+.us-zen-chain a:hover { color: #eef4fa; }
+.us-zen-chain .us-zen-chain-next {
+  color: #06202a; background: var(--us-cyan, #7BCBC4);
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); font-weight: 700;
+}
+.us-zen-chain .us-zen-chain-next:hover { filter: brightness(1.1); color: #06202a; }
+@media (max-width: 760px) {
+  .us-zen-chain { gap: var(--sp-3); padding: var(--sp-2); }
+  .us-zen-chain .us-zen-chain-next { padding: var(--sp-1) var(--sp-3); }
+}
+
+/* ==================================================================
+   Zen, widescreen: in the focused course the animation owns the
+   viewport. No column cap, minimal chrome, the caption kept compact
+   below the stage — the drawing is the page.
+   ================================================================== */
+
+.us-zen .us-work.is-focus .us-stage-col { width: 100%; max-width: none; }
+/* The focused-view chrome (All concepts, Exit focus view) is fixed to the top
+   of the viewport, and the zen layout removes the topbar — so without room
+   reserved here those buttons sit directly on top of the stage heading and the
+   legend. */
+/* Room at the top for Exit focus view and All concepts, and room at the bottom
+   for the concept-chaining bar — both are fixed to the viewport, and now that
+   the working area actually fills the window they would otherwise sit on top of
+   the stage heading and the transport rather than beside them. */
+.us-zen .us-work { padding: var(--sp-7) clamp(8px, 1.6vw, 22px) var(--sp-8); }
+.us-zen .us-stage { padding: var(--sp-3); }
+/* Already at metadata weight; in zen it also fades, because the apparatus name
+   is the last thing that should catch the eye when the drawing is the page. */
+.us-zen .us-stage-head h2 { opacity: 0.7; }
+.us-zen .us-work.is-focus .us-step-caption {
+  padding: var(--sp-5) var(--sp-6);
+}

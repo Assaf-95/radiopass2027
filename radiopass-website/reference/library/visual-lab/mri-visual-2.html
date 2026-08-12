@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MRI VISUAL 2</title>
+  <style>
+    :root {
+      --b0: #1f6feb;
+      --mz: #149447;
+      --mxy: #d93025;
+      --rf: #f97316;
+      --spin: #6b7280;
+      --grad: #7c3aed;
+      --signal: #d4a000;
+      --kspace: #06b6d4;
+      --ink: #101828;
+      --muted: #526070;
+      --line: #d7dee8;
+      --soft: #f5f8fb;
+      --panel: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #ffffff;
+      color: var(--ink);
+      font-family: Arial, "Open Sans", Roboto, sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+
+    .app {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      padding: 18px 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--b0);
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+
+    .brand::before {
+      content: "";
+      width: 4px;
+      height: 34px;
+      background: var(--b0);
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .links { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+    .link,
+    .nav button,
+    .slide-control button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+
+    .link:hover,
+    .nav button:hover,
+    .slide-control button:hover { transform: translateY(-1px); border-color: #9fb4c8; }
+
+    .link.primary,
+    .nav button.primary { background: var(--b0); border-color: var(--b0); color: white; }
+
+    .slide {
+      min-height: calc(100vh - 154px);
+      display: grid;
+      grid-template-columns: minmax(300px, 0.34fr) minmax(0, 0.66fr);
+      gap: clamp(18px, 3vw, 34px);
+      align-items: stretch;
+    }
+
+    .left-panel {
+      padding: clamp(12px, 2vw, 24px) 0 clamp(12px, 2vw, 24px) 12px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .title-block {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .title-block::before {
+      content: "";
+      width: 5px;
+      min-height: 82px;
+      background: var(--b0);
+      border-radius: 999px;
+      flex: 0 0 auto;
+      margin-top: 4px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 5vw, 5.2rem);
+      line-height: 0.86;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .slide-count {
+      width: fit-content;
+      border: 1px solid #bed0e3;
+      border-radius: 999px;
+      padding: 6px 11px;
+      color: var(--b0);
+      background: #f4f8ff;
+      font-weight: 900;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .bullets li {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 12px;
+      color: #27364a;
+      font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .bullets li::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--b0);
+      margin-top: 0.55em;
+    }
+
+    .caption {
+      border-left: 5px solid var(--b0);
+      background: #f3f7fb;
+      border-radius: 0 14px 14px 0;
+      padding: 12px 14px;
+      color: #1f2937;
+      font-size: 1rem;
+      line-height: 1.38;
+      font-weight: 700;
+    }
+
+    .caption strong { color: var(--b0); }
+
+    .visual-panel {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      box-shadow: 0 16px 42px rgba(16, 24, 40, 0.08);
+      min-width: 0;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+      display: block;
+      background: #fff;
+    }
+
+    .control-strip {
+      min-height: 74px;
+      border-top: 1px solid var(--line);
+      background: #fbfdff;
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .slide-control {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .slide-control.active { display: flex; }
+
+    .slide-control label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    input[type="range"] { accent-color: var(--b0); min-width: 240px; }
+
+    .readout {
+      min-width: 86px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 6px 10px;
+      color: var(--ink);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+
+    .progress {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: #e9eef5;
+      overflow: hidden;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 5%;
+      background: linear-gradient(90deg, var(--b0), var(--mxy), var(--grad), var(--kspace));
+      border-radius: inherit;
+      transition: width 180ms ease;
+    }
+
+
+    .export-strip {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.38fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 16px 35px rgba(16, 24, 40, 0.08);
+      padding: 10px;
+    }
+
+    .export-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .export-copy strong {
+      color: var(--ink);
+      font-size: 0.88rem;
+    }
+
+    .export-copy span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+
+    .export-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .export-links a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8fbff;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 7px 10px;
+      font-size: 0.74rem;
+      font-weight: 900;
+    }
+
+    .export-links a:hover {
+      border-color: var(--b0);
+      color: var(--b0);
+    }
+
+    .hidden { visibility: hidden; pointer-events: none; }
+
+    svg text { font-family: Arial, "Open Sans", Roboto, sans-serif; }
+    .label { font-size: 22px; font-weight: 900; fill: var(--ink); }
+    .small { font-size: 17px; font-weight: 800; fill: var(--muted); }
+    .tiny { font-size: 14px; font-weight: 800; fill: var(--muted); }
+    .axis { stroke: #344054; stroke-width: 4; stroke-linecap: round; }
+    .grid-line { stroke: #d9e2ec; stroke-width: 2; }
+    .soft { fill: var(--soft); stroke: var(--line); stroke-width: 2; }
+    .b0 { stroke: var(--b0); fill: var(--b0); }
+    .mz { stroke: var(--mz); fill: var(--mz); }
+    .mxy { stroke: var(--mxy); fill: var(--mxy); }
+    .rf { stroke: var(--rf); fill: var(--rf); }
+    .spin { stroke: var(--spin); fill: var(--spin); }
+    .grad { stroke: var(--grad); fill: var(--grad); }
+    .signal { stroke: var(--signal); fill: var(--signal); }
+    .kspace { stroke: var(--kspace); fill: var(--kspace); }
+    .dash { stroke-dasharray: 9 8; }
+    .thin { stroke-width: 2; fill: none; }
+
+    @media (max-width: 1050px) {
+      .slide { grid-template-columns: 1fr; }
+      .left-panel { padding-left: 0; }
+      svg { min-height: 520px; }
+      .links { justify-content: flex-start; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 680px) {
+      .app { width: min(100% - 16px, 1480px); padding-top: 10px; }
+      h1 { font-size: clamp(2.1rem, 13vw, 3.4rem); }
+      .title-block::before { min-height: 60px; }
+      svg { min-height: 440px; }
+      input[type="range"] { min-width: 170px; width: 100%; }
+      .nav { display: grid; grid-template-columns: 1fr; }
+      .progress { width: 100%; }
+      .nav button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">MRI VISUAL 2</div>
+      <nav class="links" aria-label="Page links">
+        <a class="link" href="lessons.html">Back to Lessons</a>
+        <a class="link" href="mri-physics-visual-deck.html">Visual Deck</a>
+        <a class="link primary" href="physics-question-bank.html">Question Bank</a>
+      </nav>
+    </header>
+
+    <section class="export-strip" aria-label="MRI dephasing exported steps">
+      <div class="export-copy">
+        <strong>Dephasing exports 04-10</strong>
+        <span>Standalone pages for B0, Gz, 90 RF, Gy, T2*, Gx and 180 RF.</span>
+      </div>
+      <nav class="export-links" aria-label="Open dephasing export step">
+        <a href="mri-html-export/dephasing_step_04_apply_b0.html">04 B0</a>
+        <a href="mri-html-export/dephasing_step_05_slice_select_gz.html">05 Gz</a>
+        <a href="mri-html-export/dephasing_step_06_apply_90_rf.html">06 90 RF</a>
+        <a href="mri-html-export/dephasing_step_07_phase_encode_gy.html">07 Gy</a>
+        <a href="mri-html-export/dephasing_step_08_rf_off_t2star.html">08 T2*</a>
+        <a href="mri-html-export/dephasing_step_09_frequency_encode_gx.html">09 Gx</a>
+        <a href="mri-html-export/dephasing_step_10_apply_180_rf.html">10 180 RF</a>
+      </nav>
+    </section>
+
+    <section class="slide" aria-live="polite">
+      <aside class="left-panel">
+        <span id="slideCount" class="slide-count">Slide 1 of 20</span>
+        <div class="title-block"><h1 id="slideTitle">Before B0</h1></div>
+        <ul id="slideBullets" class="bullets"></ul>
+        <div id="slideCaption" class="caption"></div>
+      </aside>
+
+      <section class="visual-panel">
+        <svg id="visual" viewBox="0 0 960 640" role="img" aria-label="MRI physics visualisation"></svg>
+        <div class="control-strip">
+          <div id="controlB0" class="slide-control">
+            <label for="b0Slider">B0 strength</label>
+            <input id="b0Slider" type="range" min="0.6" max="2.4" step="0.9" value="1.5">
+            <span id="b0Readout" class="readout">medium</span>
+          </div>
+          <div id="controlFlip" class="slide-control">
+            <label for="flipSlider">Flip angle</label>
+            <input id="flipSlider" type="range" min="0" max="180" step="30" value="90">
+            <span id="flipReadout" class="readout">90°</span>
+          </div>
+          <div id="controlBandwidth" class="slide-control">
+            <label for="bandwidthSlider">RF bandwidth</label>
+            <input id="bandwidthSlider" type="range" min="0" max="1" step="1" value="0">
+            <span id="bandwidthReadout" class="readout">narrow</span>
+          </div>
+          <span id="controlHint" class="small">Use Previous and Next to move through one MRI idea at a time.</span>
+        </div>
+      </section>
+    </section>
+
+    <footer class="nav">
+      <button id="prevBtn" type="button">Previous</button>
+      <div class="progress"><div id="progressBar"></div></div>
+      <button id="nextBtn" class="primary" type="button">Next</button>
+    </footer>
+  </main>
+
+  <script>
+    const colors = {
+      b0: "#1f6feb",
+      mz: "#149447",
+      mxy: "#d93025",
+      rf: "#f97316",
+      spin: "#6b7280",
+      grad: "#7c3aed",
+      signal: "#d4a000",
+      kspace: "#06b6d4",
+      ink: "#101828",
+      muted: "#526070",
+      line: "#d7dee8",
+      soft: "#f5f8fb"
+    };
+
+    const state = {
+      slide: 0,
+      time: 0,
+      last: performance.now(),
+      b0: 1.5,
+      flip: 90,
+      bandwidth: 0
+    };
+
+    const slides = [
+      { title: "BEFORE B0", bullets: ["Proton spins behave like tiny magnetic moments.", "Without an external field, they point in random directions.", "Random directions cancel, so net magnetisation is zero."], caption: "<strong>Net magnetisation</strong> is zero before B0 is applied.", control: null, draw: drawBeforeB0 },
+      { title: "B0 FIELD", bullets: ["B0 is the strong main magnetic field.", "In MRI diagrams, B0 is usually shown along the z-axis.", "Spins align either parallel or anti-parallel to B0."], caption: "<strong>B0</strong> aligns spins parallel or anti-parallel to the z-axis.", control: null, draw: drawB0Field },
+      { title: "LONGITUDINAL MAGNETISATION", bullets: ["Slightly more spins align parallel to B0.", "This creates a net magnetisation vector.", "The net vector points along the z-axis."], caption: "<strong>Mz</strong> is longitudinal magnetisation along the z-axis.", control: null, draw: drawLongitudinal },
+      { title: "PRECESSION", bullets: ["Spins do not simply sit still.", "They precess around B0.", "The precession frequency is the Larmor frequency."], caption: "<strong>Higher B0</strong> means faster Larmor precession.", control: "B0", draw: drawPrecession },
+      { title: "EQUILIBRIUM", bullets: ["At equilibrium, spins precess at different phases.", "Transverse components cancel each other.", "Net magnetisation remains along B0."], caption: "<strong>At equilibrium:</strong> Mz present, Mxy absent.", control: null, draw: drawEquilibrium },
+      { title: "RF PULSE", bullets: ["The RF pulse is applied at the Larmor frequency.", "It produces a B1 field in the transverse plane.", "The RF pulse tips magnetisation away from the z-axis."], caption: "<strong>B1</strong> is transverse and perpendicular to B0.", control: null, draw: drawRFPulse },
+      { title: "FLIP ANGLE", bullets: ["The RF pulse tips the net magnetisation.", "The amount of tipping is the flip angle.", "Flip angle depends on RF strength and duration."], caption: "<strong>90°</strong> moves magnetisation fully into the x-y plane.", control: "Flip", draw: drawFlipAngle },
+      { title: "TRANSVERSE MAGNETISATION", bullets: ["After a 90° RF pulse, magnetisation lies in the x-y plane.", "Spins become phase-coherent.", "Their transverse components add together."], caption: "<strong>Mxy</strong> rotates in the x-y plane when spins are coherent.", control: null, draw: drawTransverse },
+      { title: "SIGNAL GENERATION", bullets: ["Rotating Mxy induces voltage in the receiver coil.", "This voltage is the MR signal.", "Signal exists only while transverse magnetisation remains."], caption: "<strong>MR signal</strong> is induced by rotating transverse magnetisation.", control: null, draw: drawSignal },
+      { title: "RELAXATION", bullets: ["After the RF pulse, Mz recovers.", "Mxy decays.", "These processes happen at the same time."], caption: "<strong>T1 and T2</strong> occur simultaneously after RF excitation.", control: null, draw: drawRelaxation },
+      { title: "T1 RECOVERY", bullets: ["T1 describes recovery of longitudinal magnetisation.", "Mz gradually returns toward equilibrium.", "Fat has shorter T1 than fluid."], caption: "<strong>T1</strong> is longitudinal recovery, not decay.", control: null, draw: drawT1 },
+      { title: "T2 DECAY", bullets: ["T2 describes decay of transverse magnetisation.", "Spins lose phase coherence.", "Mxy becomes smaller with time."], caption: "<strong>T2</strong> is transverse decay from loss of phase coherence.", control: null, draw: drawT2 },
+      { title: "DEPHASING", bullets: ["In-phase spins add together.", "Out-of-phase spins cancel.", "More dephasing means less measured signal."], caption: "<strong>Dephasing</strong> shrinks the net Mxy vector.", control: null, draw: drawDephasing },
+      { title: "GRADIENTS", bullets: ["Gradients make B0 vary with position.", "Position changes the Larmor frequency.", "This allows spatial encoding."], caption: "<strong>Gradients</strong> localise signal; they do not create signal.", control: null, draw: drawGradients },
+      { title: "SLICE SELECTION", bullets: ["A gradient is applied along the slice direction.", "Different slices have different frequencies.", "The RF pulse excites only the matching slice."], caption: "<strong>Slice selection</strong> requires Gz plus RF bandwidth.", control: "Bandwidth", draw: drawSliceSelection },
+      { title: "PHASE ENCODING", bullets: ["A gradient briefly changes spin phase.", "Different y-positions acquire different phase shifts.", "This encodes position along the phase direction."], caption: "<strong>Phase encoding</strong> stores y-position as phase.", control: null, draw: drawPhaseEncoding },
+      { title: "FREQUENCY ENCODING", bullets: ["The readout gradient is applied during signal collection.", "Different x-positions precess at different frequencies.", "This encodes position along the frequency direction."], caption: "<strong>Frequency encoding</strong> stores x-position as frequency during readout.", control: null, draw: drawFrequencyEncoding },
+      { title: "BASIC SEQUENCE TIMING", bullets: ["RF and gradients are applied in a timed order.", "Gz selects the slice.", "Gy gives phase encoding.", "Gx is used during readout."], caption: "<strong>Pulse sequence timing</strong> shows when RF and gradients act.", control: null, draw: drawTiming },
+      { title: "K-SPACE", bullets: ["K-space stores raw MRI signal data.", "Gradients control where data is placed in k-space.", "The image is reconstructed from k-space."], caption: "<strong>K-space</strong> is filled line-by-line using gradients.", control: null, draw: drawKspace },
+      { title: "MRI PHYSICS SUMMARY", bullets: ["B0 creates longitudinal magnetisation.", "RF pulse tips magnetisation into the transverse plane.", "Rotating Mxy creates signal.", "Gradients encode spatial position."], caption: "<strong>MRI signal</strong> comes from Mxy; location comes from gradients.", control: null, draw: drawSummary }
+    ];
+
+    const svgEl = document.getElementById("visual");
+    const titleEl = document.getElementById("slideTitle");
+    const countEl = document.getElementById("slideCount");
+    const bulletsEl = document.getElementById("slideBullets");
+    const captionEl = document.getElementById("slideCaption");
+    const progressBar = document.getElementById("progressBar");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const b0Slider = document.getElementById("b0Slider");
+    const flipSlider = document.getElementById("flipSlider");
+    const bandwidthSlider = document.getElementById("bandwidthSlider");
+    const b0Readout = document.getElementById("b0Readout");
+    const flipReadout = document.getElementById("flipReadout");
+    const bandwidthReadout = document.getElementById("bandwidthReadout");
+
+    function setSlide(index) {
+      state.slide = Math.max(0, Math.min(slides.length - 1, index));
+      state.time = 0;
+      updateChrome();
+      render();
+    }
+
+    function updateChrome() {
+      const slide = slides[state.slide];
+      titleEl.textContent = slide.title;
+      countEl.textContent = `Slide ${state.slide + 1} of ${slides.length}`;
+      bulletsEl.innerHTML = slide.bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+      captionEl.innerHTML = slide.caption;
+      progressBar.style.width = `${((state.slide + 1) / slides.length) * 100}%`;
+      prevBtn.classList.toggle("hidden", state.slide === 0);
+      nextBtn.classList.toggle("hidden", state.slide === slides.length - 1);
+      document.querySelectorAll(".slide-control").forEach(control => control.classList.remove("active"));
+      if (slide.control === "B0") document.getElementById("controlB0").classList.add("active");
+      if (slide.control === "Flip") document.getElementById("controlFlip").classList.add("active");
+      if (slide.control === "Bandwidth") document.getElementById("controlBandwidth").classList.add("active");
+      b0Readout.textContent = state.b0 < 1 ? "low" : state.b0 > 2 ? "high" : "medium";
+      flipReadout.textContent = `${state.flip}°`;
+      bandwidthReadout.textContent = state.bandwidth ? "wide" : "narrow";
+    }
+
+    function render() {
+      svgEl.innerHTML = defs() + slides[state.slide].draw(state.time);
+    }
+
+    function tick(now) {
+      const dt = Math.min(0.05, (now - state.last) / 1000);
+      state.last = now;
+      state.time += dt;
+      render();
+      requestAnimationFrame(tick);
+    }
+
+    prevBtn.addEventListener("click", () => setSlide(state.slide - 1));
+    nextBtn.addEventListener("click", () => setSlide(state.slide + 1));
+    b0Slider.addEventListener("input", () => { state.b0 = Number(b0Slider.value); updateChrome(); render(); });
+    flipSlider.addEventListener("input", () => { state.flip = Number(flipSlider.value); updateChrome(); render(); });
+    bandwidthSlider.addEventListener("input", () => { state.bandwidth = Number(bandwidthSlider.value); updateChrome(); render(); });
+    window.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight") setSlide(state.slide + 1);
+      if (event.key === "ArrowLeft") setSlide(state.slide - 1);
+    });
+
+    function defs() {
+      return `<defs>
+        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#101828" flood-opacity="0.12"/></filter>
+        <linearGradient id="purpleRamp" x1="0" x2="1"><stop offset="0" stop-color="#ede9fe"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+        <linearGradient id="sliceRamp" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#1f6feb"/></linearGradient>
+      </defs>`;
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    }
+
+    function label(x, y, text, color = colors.ink, size = 22) {
+      return `<text x="${x}" y="${y}" font-size="${size}" font-weight="900" fill="${color}">${escapeHtml(text)}</text>`;
+    }
+
+    function small(x, y, text, color = colors.muted, size = 17) {
+      return `<text x="${x}" y="${y}" font-size="${size}" font-weight="800" fill="${color}">${escapeHtml(text)}</text>`;
+    }
+
+    function arrow(x1, y1, x2, y2, color, width = 5, text = "", tx = x2 + 10, ty = y2 - 10) {
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      const head = 12 + width * 1.5;
+      const p2 = `${x2 - Math.cos(a - 0.45) * head},${y2 - Math.sin(a - 0.45) * head}`;
+      const p3 = `${x2 - Math.cos(a + 0.45) * head},${y2 - Math.sin(a + 0.45) * head}`;
+      return `<g><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" stroke-linecap="round"/><polygon points="${x2},${y2} ${p2} ${p3}" fill="${color}"/>${text ? label(tx, ty, text, color, 20) : ""}</g>`;
+    }
+
+    function line(x1, y1, x2, y2, color = colors.ink, width = 3, extra = "") {
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" stroke-linecap="round" ${extra}/>`;
+    }
+
+    function box(x, y, w, h, title = "") {
+      return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="24" fill="#fff" stroke="${colors.line}" stroke-width="2" filter="url(#softShadow)"/>${title ? label(x + 24, y + 42, title, colors.ink, 23) : ""}</g>`;
+    }
+
+    function axes(cx = 470, cy = 350, scale = 1, faint = false) {
+      const op = faint ? 0.35 : 1;
+      return `<g opacity="${op}">
+        ${arrow(cx, cy, cx + 210 * scale, cy, colors.ink, 3, "x", cx + 220 * scale, cy + 7)}
+        ${arrow(cx, cy, cx - 125 * scale, cy + 90 * scale, colors.ink, 3, "y", cx - 158 * scale, cy + 112 * scale)}
+        ${arrow(cx, cy, cx, cy - 230 * scale, colors.b0, 5, "z / B0", cx + 12, cy - 232 * scale)}
+        <ellipse cx="${cx}" cy="${cy}" rx="${220 * scale}" ry="${82 * scale}" fill="rgba(22,163,74,0.08)" stroke="${colors.mxy}" stroke-width="2" stroke-dasharray="9 7"/>
+      </g>`;
+    }
+
+    function spinArrow(x, y, angle, len = 42, color = colors.spin, width = 3) {
+      return arrow(x, y, x + Math.cos(angle) * len, y + Math.sin(angle) * len, color, width);
+    }
+
+    function spinCloud(x, y, w, h, mode, t) {
+      let out = "";
+      for (let i = 0; i < 38; i++) {
+        const px = x + 40 + (i % 8) * (w - 80) / 7;
+        const py = y + 45 + Math.floor(i / 8) * (h - 90) / 4;
+        const wobble = Math.sin(t * 2 + i) * 0.22;
+        let angle = (i * 2.03 + wobble) % (Math.PI * 2);
+        if (mode === "aligning") {
+          const p = Math.min(1, t / 2.2);
+          const target = (i % 7 === 0 || i % 13 === 0) ? Math.PI / 2 : -Math.PI / 2;
+          angle = angle * (1 - p) + target * p;
+        }
+        if (mode === "aligned") angle = (i % 7 === 0 || i % 13 === 0) ? Math.PI / 2 : -Math.PI / 2;
+        out += spinArrow(px, py, angle, 33, colors.spin, 2.4);
+      }
+      return out;
+    }
+
+    function xyPlane(cx, cy, r, title = "x-y plane") {
+      return `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(22,163,74,0.06)" stroke="${colors.mxy}" stroke-width="3"/>${line(cx - r - 26, cy, cx + r + 26, cy, colors.ink, 3)}${line(cx, cy + r + 26, cx, cy - r - 26, colors.ink, 3)}${label(cx + r + 24, cy + 8, "x", colors.ink, 18)}${label(cx + 10, cy - r - 20, "y", colors.ink, 18)}${label(cx - r, cy - r - 36, title, colors.mxy, 20)}</g>`;
+    }
+
+    function drawBeforeB0(t) {
+      return `${axes(480, 345, 0.9, true)}${spinCloud(180, 130, 600, 390, "random", t)}${label(330, 555, "Net magnetisation = 0", colors.muted, 25)}`;
+    }
+
+    function drawB0Field(t) {
+      return `${arrow(480, 570, 480, 90, colors.b0, 8, "B0 direction / z-axis", 500, 115)}${spinCloud(185, 130, 590, 390, "aligning", t)}${label(650, 190, "Parallel = low energy", colors.b0, 21)}${label(610, 505, "Anti-parallel = high energy", colors.rf, 21)}`;
+    }
+
+    function drawLongitudinal(t) {
+      return `${arrow(480, 570, 480, 90, colors.b0, 8, "B0 direction / z-axis", 500, 115)}${spinCloud(180, 130, 590, 390, "aligned", t)}${arrow(520, 520, 520, 165, colors.mz, 13, "Mz", 545, 175)}${label(575, 340, "Longitudinal magnetisation = Mz", colors.mz, 25)}`;
+    }
+
+    function drawPrecession(t) {
+      const speed = state.b0 * 1.5;
+      const a = t * speed;
+      const cx = 435, cy = 395;
+      const x = cx + Math.cos(a) * 135;
+      const y = cy - 155 + Math.sin(a) * 46;
+      return `${axes(cx, cy, 1, false)}<ellipse cx="${cx}" cy="${cy - 155}" rx="135" ry="46" fill="none" stroke="${colors.rf}" stroke-width="5" stroke-dasharray="10 7"/>${arrow(cx, cy, x, y, colors.mz, 8, "precessing spin", x + 14, y)}${box(650, 140, 230, 130)}${label(678, 196, "ω0 = γB0", colors.ink, 32)}${small(676, 242, "Larmor frequency", colors.muted, 18)}${label(650, 360, `B0: ${state.b0 < 1 ? "low" : state.b0 > 2 ? "high" : "medium"}`, colors.b0, 26)}`;
+    }
+
+    function drawEquilibrium(t) {
+      let fan = "";
+      for (let i = 0; i < 20; i++) {
+        const a = i * Math.PI * 2 / 20 + t * 0.2;
+        fan += spinArrow(700 + Math.cos(a) * 82, 350 + Math.sin(a) * 82, a, 35, colors.spin, 2.2);
+      }
+      return `${axes(365, 395, 0.82, false)}${arrow(365, 395, 365, 170, colors.mz, 12, "Mz", 385, 180)}${xyPlane(700, 350, 130, "top-down x-y inset")}${fan}${label(575, 555, "At equilibrium: Mz present, Mxy absent.", colors.ink, 26)}`;
+    }
+
+    function rfWave(x, y, w) {
+      let d = "";
+      for (let i = 0; i <= w; i += 7) d += `${i ? "L" : "M"}${x + i} ${y + Math.sin(i * 0.12) * 28} `;
+      return `<path d="${d}" fill="none" stroke="${colors.rf}" stroke-width="7" stroke-linecap="round"/>`;
+    }
+
+    function drawRFPulse(t) {
+      const p = (Math.sin(t * 1.2) + 1) / 2;
+      const angle = p * 70;
+      const rad = (angle - 90) * Math.PI / 180;
+      const cx = 455, cy = 410;
+      const ex = cx + Math.cos(rad) * 210;
+      const ey = cy + Math.sin(rad) * 210;
+      return `${axes(cx, cy, 0.95, false)}${rfWave(80, 240, 230)}${arrow(280, 270, 405, 330, colors.rf, 7, "RF pulse at Larmor frequency", 110, 205)}<ellipse cx="${cx}" cy="${cy}" rx="180" ry="66" fill="rgba(249,115,22,0.06)" stroke="${colors.rf}" stroke-width="4" stroke-dasharray="10 7"/>${label(590, 420, "B1 field in transverse plane", colors.rf, 22)}${arrow(cx, cy, ex, ey, colors.mz, 11, "M tipping", ex + 10, ey)}${label(112, 515, "B1 is perpendicular to B0", colors.rf, 25)}`;
+    }
+
+    function drawFlipAngle() {
+      const cx = 460, cy = 420;
+      const theta = state.flip;
+      const rad = (theta - 90) * Math.PI / 180;
+      const ex = cx + Math.cos(rad) * 235;
+      const ey = cy + Math.sin(rad) * 235;
+      const mxy = Math.abs(Math.sin(theta * Math.PI / 180));
+      const mz = Math.cos(theta * Math.PI / 180);
+      return `${axes(cx, cy, 0.9, false)}${arrow(cx, cy, ex, ey, theta === 180 ? colors.b0 : colors.mxy, 12, "M", ex + 12, ey)}<path d="M${cx} ${cy - 140} A140 140 0 0 1 ${ex} ${ey}" fill="none" stroke="${colors.rf}" stroke-width="5" stroke-dasharray="8 7"/>${label(cx + 70, cy - 125, "Flip angle", colors.rf, 22)}${box(665, 150, 210, 170)}${label(694, 205, `${theta}°`, colors.rf, 42)}${small(695, 250, `Mz ${mz.toFixed(2)}`, colors.mz, 20)}${small(695, 285, `Mxy ${mxy.toFixed(2)}`, colors.mxy, 20)}`;
+    }
+
+    function drawTransverse(t) {
+      const cx = 485, cy = 330, r = 205;
+      const a = t * 1.6;
+      let spins = "";
+      for (let i = 0; i < 26; i++) {
+        const loc = i * Math.PI * 2 / 26;
+        spins += spinArrow(cx + Math.cos(loc) * (55 + (i % 3) * 28), cy + Math.sin(loc) * (55 + (i % 3) * 28), a, 42, colors.spin, 2.4);
+      }
+      return `${xyPlane(cx, cy, r, "top-down x-y plane")}${spins}${arrow(cx, cy, cx + Math.cos(a) * 165, cy + Math.sin(a) * 165, colors.mxy, 13, "Mxy", cx + Math.cos(a) * 180, cy + Math.sin(a) * 180)}${label(285, 590, "Phase-coherent spins rotate together", colors.mxy, 26)}`;
+    }
+
+    function drawSignal(t) {
+      const cx = 315, cy = 255, r = 150;
+      const a = t * 1.8;
+      return `${xyPlane(cx, cy, r, "rotating Mxy")}${arrow(cx, cy, cx + Math.cos(a) * 125, cy + Math.sin(a) * 125, colors.mxy, 12, "Mxy", cx + 125, cy - 120)}${coil(610, 235)}${arrow(465, 255, 565, 255, colors.signal, 5, "receiver coil", 530, 205)}${waveGraph(520, 380, 340, 160, t, true)}${label(570, 585, "Yellow signal oscillates with Mxy rotation", colors.signal, 22)}`;
+    }
+
+    function coil(x, y) {
+      let out = "";
+      for (let i = 0; i < 4; i++) out += `<ellipse cx="${x + i * 34}" cy="${y}" rx="28" ry="72" fill="none" stroke="${colors.signal}" stroke-width="5"/>`;
+      return `<g>${out}</g>`;
+    }
+
+    function waveGraph(x, y, w, h, t, extend = false) {
+      let d = "";
+      const max = extend ? Math.floor((t * 80) % w) : w;
+      for (let i = 0; i <= max; i += 4) {
+        const yy = y + h / 2 + Math.sin(i * 0.08 - t * 1.8) * 48;
+        d += `${i ? "L" : "M"}${x + i} ${yy} `;
+      }
+      return `${line(x, y + h, x + w, y + h, colors.ink, 3)}${line(x, y, x, y + h, colors.ink, 3)}${small(x + w - 36, y + h + 34, "time", colors.muted, 17)}<text x="${x - 34}" y="${y + h / 2}" transform="rotate(-90 ${x - 34} ${y + h / 2})" font-size="17" font-weight="800" fill="${colors.muted}">signal amplitude</text><path d="${d}" fill="none" stroke="${colors.signal}" stroke-width="6" stroke-linecap="round"/>`;
+    }
+
+    function drawRelaxation(t) {
+      const p = (Math.sin(t * 0.7) + 1) / 2;
+      const mzLen = 40 + p * 190;
+      const mxyLen = 170 * (1 - p * 0.85);
+      return `${box(70, 90, 380, 420, "T1 recovery")}${axes(260, 380, 0.58, false)}${arrow(260, 420, 260, 420 - mzLen, colors.mz, 11, "Mz regrows", 285, 240)}${box(510, 90, 380, 420, "T2 decay")}${xyPlane(700, 330, 120, "x-y plane")}${arrow(700, 330, 700 + mxyLen, 330, colors.mxy, 11, "Mxy shrinks", 725, 455)}${label(105, 565, "T1 recovery = Mz returns", colors.mz, 24)}${label(525, 565, "T2 decay = Mxy disappears", colors.mxy, 24)}`;
+    }
+
+    function graphAxes(x, y, w, h, xlabel, ylabel) {
+      return `${line(x, y + h, x + w, y + h, colors.ink, 4)}${line(x, y, x, y + h, colors.ink, 4)}${small(x + w - 30, y + h + 38, xlabel, colors.muted, 18)}<text x="${x - 42}" y="${y + h / 2}" transform="rotate(-90 ${x - 42} ${y + h / 2})" font-size="18" font-weight="900" fill="${colors.muted}">${ylabel}</text>`;
+    }
+
+    function pathCurve(x, y, w, h, mode, rate) {
+      let d = "";
+      for (let i = 0; i <= 90; i++) {
+        const p = i / 90;
+        const val = mode === "rise" ? 1 - Math.exp(-p * rate) : Math.exp(-p * rate);
+        const px = x + p * w;
+        const py = y + h - val * h;
+        d += `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)} `;
+      }
+      return d;
+    }
+
+    function drawT1() {
+      const x = 125, y = 95, w = 650, h = 390;
+      return `${graphAxes(x,y,w,h,"time","Mz")}<path d="${pathCurve(x,y,w,h,"rise",5.0)}" fill="none" stroke="${colors.b0}" stroke-width="7" stroke-linecap="round"/><path d="${pathCurve(x,y,w,h,"rise",1.7)}" fill="none" stroke="#60a5fa" stroke-width="7" stroke-linecap="round" stroke-dasharray="11 8"/>${label(540, 185, "fat", colors.b0, 24)}${label(570, 355, "fluid", "#60a5fa", 24)}${box(570, 515, 310, 70)}${label(600, 560, "Mz recovers exponentially", colors.b0, 22)}`;
+    }
+
+    function drawT2(t) {
+      const x = 85, y = 95, w = 520, h = 355;
+      const p = (Math.sin(t * 0.8) + 1) / 2;
+      return `${graphAxes(x,y,w,h,"time","Mxy")}<path d="${pathCurve(x,y,w,h,"fall",1.4)}" fill="none" stroke="#ef4444" stroke-width="7" stroke-linecap="round"/><path d="${pathCurve(x,y,w,h,"fall",4.2)}" fill="none" stroke="${colors.mxy}" stroke-width="7" stroke-linecap="round"/>${label(405, 190, "fluid", "#ef4444", 22)}${label(280, 382, "solid tissue", colors.mxy, 22)}${xyPlane(760, 270, 115, "dephasing")}${dephaseSpins(760, 270, 105, p)}${arrow(760,270,760 + (1-p)*110,270,colors.mxy,8,"Mxy",740,430)}`;
+    }
+
+    function dephaseSpins(cx, cy, r, spread) {
+      let out = "";
+      for (let i = 0; i < 18; i++) {
+        const loc = i * Math.PI * 2 / 18;
+        const a = spread * (i - 9) * 0.22;
+        out += spinArrow(cx + Math.cos(loc) * 55, cy + Math.sin(loc) * 55, a, 30, colors.spin, 2.2);
+      }
+      return out;
+    }
+
+    function drawDephasing(t) {
+      const p = (Math.sin(t * 0.75) + 1) / 2;
+      const xs = [220, 480, 740];
+      const spreads = [0, Math.max(0.35, p), Math.max(1.8, p * 2.8)];
+      const names = ["1. In phase", "2. Partly dephased", "3. Fully dephased"];
+      let out = "";
+      xs.forEach((x, i) => {
+        out += xyPlane(x, 295, 102, names[i]) + dephaseSpins(x, 295, 92, spreads[i]);
+        const len = i === 0 ? 100 : i === 1 ? 58 : 12;
+        out += arrow(x, 295, x + len, 295, colors.mxy, i === 2 ? 5 : 9, "Mxy", x - 42, 450);
+      });
+      return out + label(292, 565, "More dephasing = less measured signal", colors.mxy, 28);
+    }
+
+    function drawGradients() {
+      return `${box(100,110,760,360,"B0 + gradient")}<rect x="190" y="215" width="570" height="150" rx="22" fill="url(#purpleRamp)" stroke="${colors.grad}" stroke-width="4"/>${label(210, 255, "Lower B = lower frequency", colors.grad, 22)}${label(470, 340, "Higher B = higher frequency", "#fff", 22)}${arrow(185,420,765,420,colors.grad,9,"gradient direction",360,455)}${box(615,500,230,70)}${label(655,545,"ω = γB", colors.ink, 31)}`;
+    }
+
+    function drawSliceSelection() {
+      const wide = state.bandwidth === 1;
+      const selectedStart = wide ? 2 : 3;
+      const selectedEnd = wide ? 4 : 3;
+      let slices = "";
+      for (let i = 0; i < 7; i++) {
+        const y = 100 + i * 62;
+        const selected = i >= selectedStart && i <= selectedEnd;
+        slices += `<rect x="300" y="${y}" width="320" height="44" rx="10" fill="${selected ? 'rgba(22,163,74,0.18)' : '#f8fbfd'}" stroke="${selected ? colors.mxy : colors.line}" stroke-width="${selected ? 5 : 2}"/>${label(330, y + 30, `f${i + 1}`, selected ? colors.mxy : colors.muted, 18)}`;
+      }
+      return `${arrow(665,555,665,90,colors.grad,8,"Gz",685,120)}${slices}${rfWave(100,315,180)}${arrow(285,325,300,325,colors.rf,6,"RF bandwidth",110,280)}<rect x="115" y="${wide ? 250 : 305}" width="130" height="${wide ? 120 : 48}" rx="12" fill="rgba(249,115,22,0.12)" stroke="${colors.rf}" stroke-width="4"/>${label(705, 420, "Gz = slice-selection gradient", colors.grad, 22)}${label(705, 460, "RF bandwidth = selected slice thickness", colors.rf, 22)}${label(340, 565, wide ? "Wide bandwidth: thicker selected region" : "Narrow bandwidth: thin selected slice", colors.mxy, 24)}`;
+    }
+
+    function drawPhaseEncoding(t) {
+      const phase = (t % 3);
+      const during = phase > 0.8 && phase < 1.6;
+      const after = phase >= 1.6;
+      let out = `${box(80,80,800,450,"Gy phase-encoding gradient")}`;
+      for (let row = 0; row < 4; row++) {
+        const y = 165 + row * 82;
+        out += `<rect x="170" y="${y}" width="610" height="58" fill="${during ? 'rgba(124,58,237,0.10)' : row % 2 ? '#fbfdff' : '#f5f8fb'}" stroke="${colors.line}"/>`;
+        for (let col = 0; col < 6; col++) {
+          const angle = after ? (row - 1.5) * 0.42 : 0;
+          out += spinArrow(245 + col * 92, y + 29, angle, 33, colors.spin, 2.4);
+        }
+      }
+      if (during) out += `<rect x="170" y="165" width="610" height="304" fill="rgba(124,58,237,0.12)" stroke="${colors.grad}" stroke-width="5" stroke-dasharray="12 8"/>${label(295,140,"Gy phase-encoding gradient ON", colors.grad, 24)}`;
+      out += label(180, 545, after ? "After Gy: rows keep different phase angles" : during ? "During Gy: phase shifts accumulate" : "Before Gy: all rows point right", after ? colors.mxy : colors.grad, 25);
+      return out;
+    }
+
+    function drawFrequencyEncoding(t) {
+      let out = `${box(70,80,820,420,"Gx frequency-encoding gradient / readout")}`;
+      for (let col = 0; col < 4; col++) {
+        const x = 160 + col * 150;
+        out += `<rect x="${x}" y="165" width="110" height="240" fill="rgba(124,58,237,${0.06 + col * 0.05})" stroke="${colors.line}"/>`;
+        for (let row = 0; row < 4; row++) out += spinArrow(x + 55, 205 + row * 52, t * (0.8 + col * 0.55), 28, colors.spin, 2.4);
+        out += waveMini(x + 15, 445, 82, 0.05 + col * 0.04);
+      }
+      out += arrow(145,425,770,425,colors.grad,8,"Gx on during readout",350,462);
+      out += waveGraph(575, 155, 260, 155, t, false);
+      out += label(590, 350, "Composite signal", colors.signal, 22);
+      return out;
+    }
+
+    function waveMini(x,y,w,f) {
+      let d = "";
+      for (let i=0;i<=w;i+=4) d += `${i?'L':'M'}${x+i} ${y + Math.sin(i*f)*18} `;
+      return `<path d="${d}" fill="none" stroke="${colors.signal}" stroke-width="4"/>`;
+    }
+
+    function drawTiming() {
+      const rows = ["RF", "Gz", "Gy", "Gx", "Signal"];
+      let out = box(70,80,820,450,"Basic sequence timing");
+      rows.forEach((r,i)=>{ const y=150+i*70; out += label(115,y+7,r,colors.ink,20)+line(210,y,835,y,colors.line,3); });
+      out += block(260,126,72,38,colors.rf,"RF");
+      out += block(245,196,110,38,colors.grad,"Gz");
+      out += block(415,266,105,38,colors.grad,"Gy");
+      out += block(585,336,180,38,colors.grad,"Gx readout");
+      out += `<path d="M590 430 C610 400 630 460 650 430 C670 400 690 460 710 430 C730 400 750 460 770 430" fill="none" stroke="${colors.signal}" stroke-width="6" stroke-linecap="round"/>`;
+      out += label(230,565,"RF overlaps with Gz. Signal occurs during Gx.", colors.ink, 25);
+      return out;
+    }
+
+    function block(x,y,w,h,color,text) {
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${color}" opacity="0.9"/><text x="${x+w/2}" y="${y+25}" text-anchor="middle" font-size="15" font-weight="900" fill="white">${text}</text>`;
+    }
+
+    function drawKspace(t) {
+      const x=260,y=95,w=410,h=410;
+      const rows = 9;
+      const active = Math.floor((t * 1.4) % (rows + 1));
+      let out = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="#f8fdff" stroke="${colors.kspace}" stroke-width="4"/>`;
+      for(let i=1;i<rows;i++){ out += line(x+i*w/rows,y+20,x+i*w/rows,y+h-20,colors.line,2)+line(x+20,y+i*h/rows,x+w-20,y+i*h/rows,colors.line,2); }
+      for(let r=0;r<active;r++){ const yy=y+(r+0.5)*h/rows; out += `<line x1="${x+25}" y1="${yy}" x2="${x+w-25}" y2="${yy}" stroke="${colors.kspace}" stroke-width="8" stroke-linecap="round" opacity="${0.35+r*0.06}"/>`; }
+      out += arrow(x+w/2,y+h+65,x+w/2,y-20,colors.grad,6,"Gy chooses ky line",x+w/2+20,y+15);
+      out += arrow(x-75,y+h/2,x+w+75,y+h/2,colors.mxy,6,"Gx fills line",x+w-25,y+h/2-30);
+      out += label(x+w+45,y+h/2+55,"kx",colors.kspace,22)+label(x+w/2+20,y+30,"ky",colors.kspace,22);
+      out += label(255,570,"Repeated Gy steps fill k-space line-by-line",colors.kspace,25);
+      return out;
+    }
+
+    function drawSummary() {
+      const items = [
+        ["B0", colors.b0], ["Mz", colors.mz], ["RF pulse", colors.rf], ["Mxy", colors.mxy],
+        ["signal", colors.signal], ["gradients", colors.grad], ["k-space", colors.kspace], ["image", colors.ink]
+      ];
+      let out = "";
+      items.forEach((item,i)=>{
+        const x = 60 + i * 110;
+        const y = i % 2 ? 325 : 240;
+        out += `<rect x="${x}" y="${y}" width="92" height="72" rx="16" fill="#fff" stroke="${item[1]}" stroke-width="4" filter="url(#softShadow)"/>${label(x+14,y+43,item[0],item[1],18)}`;
+        if(i<items.length-1) out += arrow(x+92,y+36,60+(i+1)*110, (i+1)%2 ? 361 : 276, colors.ink,3);
+      });
+      return out + label(205,520,"B0 → Mz → RF → Mxy → signal → gradients → k-space → image", colors.ink, 25);
+    }
+
+    function rfWave(x, y, w) {
+      let d = "";
+      for (let i = 0; i <= w; i += 6) d += `${i ? "L" : "M"}${x+i} ${y + Math.sin(i*0.13)*24} `;
+      return `<path d="${d}" fill="none" stroke="${colors.rf}" stroke-width="6" stroke-linecap="round"/>`;
+    }
+
+    setSlide(0);
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Proton Phase and Magnetization Animator</title>
+  <style>
+    :root {
+      --bg0: #def4ff;
+      --bg1: #ffe3c8;
+      --ink: #132f44;
+      --muted: #3f5f78;
+      --panel: rgba(255, 255, 255, 0.91);
+      --line: rgba(55, 98, 140, 0.34);
+      --accent: #00a38d;
+      --accent2: #ff8c1a;
+      --water: #0a86df;
+      --fat: #e08217;
+      --danger: #e23f52;
+      --ok: #139a57;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Avenir Next", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 10%, rgba(0, 163, 141, 0.19), transparent 44%),
+        radial-gradient(circle at 88% 92%, rgba(255, 140, 26, 0.2), transparent 42%),
+        radial-gradient(circle at 46% 18%, rgba(255, 255, 255, 0.6), transparent 38%),
+        linear-gradient(165deg, var(--bg0), #f4faff 52%, var(--bg1));
+      min-height: 100vh;
+      padding: 14px;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 6px 20px rgba(15, 35, 48, 0.09);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.01em;
+    }
+
+    .sub {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 8px;
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(235, 246, 255, 0.89));
+    }
+
+    .group h2 {
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      color: #335b78;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #35566e;
+    }
+
+    .v {
+      width: 58px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.78rem;
+      color: #1d4b6a;
+    }
+
+    input[type="range"] {
+      width: 140px;
+      accent-color: var(--accent);
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    button {
+      border: 1px solid rgba(43, 85, 110, 0.35);
+      background: linear-gradient(180deg, #fcffff, #ebf5fb);
+      color: #1f4965;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: rgba(0, 163, 141, 0.62); }
+    button.active {
+      background: linear-gradient(180deg, #def6f2, #c7efe8);
+      border-color: rgba(0, 163, 141, 0.68);
+      color: #0b5a50;
+      font-weight: 600;
+    }
+
+    .viz {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+      min-height: 640px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+      grid-template-rows: 1fr 1fr 1fr;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background:
+        radial-gradient(circle at 15% 14%, rgba(10, 134, 223, 0.16), transparent 42%),
+        radial-gradient(circle at 86% 86%, rgba(224, 130, 23, 0.17), transparent 41%),
+        linear-gradient(180deg, rgba(253, 255, 255, 0.94), rgba(238, 248, 255, 0.9));
+      display: block;
+    }
+
+    #ensembleCanvas { min-height: 630px; }
+    #phaseCanvas { min-height: 200px; }
+    #barsCanvas { min-height: 190px; }
+    #timelineCanvas { min-height: 200px; }
+
+    .status {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .chip {
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      border: 1px solid var(--line);
+      background: rgba(247, 252, 255, 0.84);
+      color: #284e68;
+    }
+
+    .note {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #385f79;
+    }
+
+    .checks {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.81rem;
+      color: #2e526a;
+      line-height: 1.45;
+    }
+
+    .checks li.pass { color: var(--ok); }
+    .checks li.fail { color: var(--danger); }
+
+    .legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: #2f5670;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 1080px) {
+      .viz { grid-template-columns: 1fr; }
+      #ensembleCanvas { min-height: 500px; }
+      .status { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 8px; }
+      .controls { grid-template-columns: 1fr; }
+      .row { align-items: flex-start; }
+      input[type="range"] { width: 100%; }
+      .v { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="panel">
+      <h1>MRI Proton Phase and Magnetization Animator</h1>
+      <p class="sub">Full proton ensemble arrows, phase coherence/dephasing, T1 recovery, T2/T2* decay, spin-echo refocusing at TE with 180° at TE/2.</p>
+      <div class="legend">
+        <span><span class="dot" style="background:#0a86df"></span>Water pool</span>
+        <span><span class="dot" style="background:#e08217"></span>Fat pool</span>
+        <span><span class="dot" style="background:#00a38d"></span>Net magnetization</span>
+        <span><span class="dot" style="background:#e23f52"></span>RF pulse marker</span>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <div class="group">
+        <h2>Sequence</h2>
+        <div class="row">
+          <button id="spinEchoBtn" class="active">Spin Echo</button>
+          <button id="greBtn">Gradient Echo</button>
+        </div>
+        <div class="row">
+          <label><input id="showSpinEcho" type="checkbox" checked /> showSpinEcho</label>
+        </div>
+        <div class="row">
+          <label><input id="showGradientEcho" type="checkbox" /> showGradientEcho</label>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Timing</h2>
+        <div class="row">
+          <label for="te">TE ms</label>
+          <input id="te" type="range" min="2" max="200" step="1" value="80" />
+          <span class="v" id="teV"></span>
+        </div>
+        <div class="row">
+          <label for="tr">TR ms</label>
+          <input id="tr" type="range" min="8" max="3000" step="1" value="2000" />
+          <span class="v" id="trV"></span>
+        </div>
+        <div class="row">
+          <label for="flip">flipAngleDeg</label>
+          <input id="flip" type="range" min="1" max="180" step="1" value="90" />
+          <span class="v" id="flipV"></span>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Field + Offsets</h2>
+        <div class="row">
+          <label for="b0">B0 Tesla</label>
+          <input id="b0" type="range" min="0.2" max="3" step="0.1" value="1.5" />
+          <span class="v" id="b0V"></span>
+        </div>
+        <div class="row">
+          <label for="inhom">inhomogeneity Hz</label>
+          <input id="inhom" type="range" min="0" max="250" step="1" value="38" />
+          <span class="v" id="inhomV"></span>
+        </div>
+        <div class="note" id="larmorNote"></div>
+      </div>
+
+      <div class="group">
+        <h2>Relaxation</h2>
+        <div class="row">
+          <label for="t1">T1 ms</label>
+          <input id="t1" type="range" min="80" max="3000" step="10" value="1200" />
+          <span class="v" id="t1V"></span>
+        </div>
+        <div class="row">
+          <label for="t2">T2 ms</label>
+          <input id="t2" type="range" min="10" max="300" step="1" value="80" />
+          <span class="v" id="t2V"></span>
+        </div>
+        <div class="row">
+          <label for="t2s">T2* ms</label>
+          <input id="t2s" type="range" min="5" max="220" step="1" value="40" />
+          <span class="v" id="t2sV"></span>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Display</h2>
+        <div class="row">
+          <label><input id="showWaterFat" type="checkbox" checked /> showWaterAndFat</label>
+        </div>
+        <div class="row">
+          <label><input id="showNetOnly" type="checkbox" /> showNetVectorOnly</label>
+        </div>
+        <div class="row">
+          <label><input id="showAllSpins" type="checkbox" checked /> showAllSpins</label>
+        </div>
+        <div class="row">
+          <label for="speed">Speed</label>
+          <input id="speed" type="range" min="0.1" max="2.0" step="0.05" value="0.35" />
+          <span class="v" id="speedV"></span>
+        </div>
+        <div class="row">
+          <button id="playBtn">play</button>
+          <button id="pauseBtn">pause</button>
+          <button id="stepBtn">stepForward</button>
+          <button id="resetBtn">reset</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="viz">
+      <canvas id="ensembleCanvas" aria-label="ensemble vectors and net magnetization"></canvas>
+      <div class="stack">
+        <canvas id="phaseCanvas" aria-label="transverse phase spread"></canvas>
+        <canvas id="barsCanvas" aria-label="Mz and Mxy bars"></canvas>
+        <canvas id="timelineCanvas" aria-label="sequence timeline"></canvas>
+      </div>
+    </section>
+
+    <section class="panel status">
+      <div>
+        <div class="chip" id="statusText">Idle. Press play to start simulation.</div>
+        <div class="note" id="segmentText">Segment: initial</div>
+        <div class="note" id="metricsText"></div>
+      </div>
+      <ol class="checks" id="checksList">
+        <li id="c1">After 90° at t=0, net Mxy jumps up and net Mz drops.</li>
+        <li id="c2">At TE/2 just before 180°, phases are spread.</li>
+        <li id="c3">At TE in Spin Echo, phases are most refocused.</li>
+        <li id="c4">Gradient Echo does not fully refocus static offsets.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const TAU = Math.PI * 2;
+      const DT_MS = 1;
+      const SPIN_COUNT = 200;
+      const GAMMA_HZ_PER_T = 42580000;
+
+      const WATER_DEFAULT = { name: "water", t1: 1200, t2: 80, t2s: 40, color: "#0a86df", chemShiftHzAt1p5: 0 };
+      const FAT_DEFAULT = { name: "fat", t1: 300, t2: 60, t2s: 35, color: "#e08217", chemShiftHzAt1p5: -220 };
+
+      const els = {
+        spinEchoBtn: document.getElementById("spinEchoBtn"),
+        greBtn: document.getElementById("greBtn"),
+        showSpinEcho: document.getElementById("showSpinEcho"),
+        showGradientEcho: document.getElementById("showGradientEcho"),
+        te: document.getElementById("te"),
+        tr: document.getElementById("tr"),
+        flip: document.getElementById("flip"),
+        b0: document.getElementById("b0"),
+        inhom: document.getElementById("inhom"),
+        t1: document.getElementById("t1"),
+        t2: document.getElementById("t2"),
+        t2s: document.getElementById("t2s"),
+        speed: document.getElementById("speed"),
+        showWaterFat: document.getElementById("showWaterFat"),
+        showNetOnly: document.getElementById("showNetOnly"),
+        showAllSpins: document.getElementById("showAllSpins"),
+        playBtn: document.getElementById("playBtn"),
+        pauseBtn: document.getElementById("pauseBtn"),
+        stepBtn: document.getElementById("stepBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        teV: document.getElementById("teV"),
+        trV: document.getElementById("trV"),
+        flipV: document.getElementById("flipV"),
+        b0V: document.getElementById("b0V"),
+        inhomV: document.getElementById("inhomV"),
+        t1V: document.getElementById("t1V"),
+        t2V: document.getElementById("t2V"),
+        t2sV: document.getElementById("t2sV"),
+        speedV: document.getElementById("speedV"),
+        larmorNote: document.getElementById("larmorNote"),
+        statusText: document.getElementById("statusText"),
+        segmentText: document.getElementById("segmentText"),
+        metricsText: document.getElementById("metricsText"),
+        c1: document.getElementById("c1"),
+        c2: document.getElementById("c2"),
+        c3: document.getElementById("c3"),
+        c4: document.getElementById("c4"),
+        ensemble: document.getElementById("ensembleCanvas"),
+        phase: document.getElementById("phaseCanvas"),
+        bars: document.getElementById("barsCanvas"),
+        timeline: document.getElementById("timelineCanvas")
+      };
+
+      const ctx = {
+        ensemble: els.ensemble.getContext("2d"),
+        phase: els.phase.getContext("2d"),
+        bars: els.bars.getContext("2d"),
+        timeline: els.timeline.getContext("2d")
+      };
+
+      const state = {
+        mode: "se",
+        playing: false,
+        timeMs: 0,
+        cycleMs: 0,
+        cycleIndex: 0,
+        accumMs: 0,
+        playbackRate: 0.35,
+        lastNow: performance.now(),
+        globalLarmorPhase: 0,
+        spins: [],
+        history: [],
+        checks: { c1: false, c2: false, c3: false, c4: false },
+        observed: {
+          afterPulseMxy: 0,
+          afterPulseMz: 1,
+          spreadAtHalfTE: 0,
+          coherenceAtTE: 0,
+          maxCoherenceNearTE: 0,
+          greCoherenceAtTE: 0
+        },
+        events: {
+          startPulseFired: false,
+          refocusFired: false,
+          echoFired: false
+        }
+      };
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function toRad(deg) { return (deg * Math.PI) / 180; }
+      function wrapRad(a) {
+        let x = a % TAU;
+        if (x < 0) x += TAU;
+        return x;
+      }
+      function gauss(mean = 0, sd = 1) {
+        let u = 0;
+        let v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v);
+        return mean + z * sd;
+      }
+
+      function getConfig() {
+        const cfg = {
+          B0Tesla: parseFloat(els.b0.value),
+          TEms: parseFloat(els.te.value),
+          TRms: parseFloat(els.tr.value),
+          flipDeg: parseFloat(els.flip.value),
+          inhomHz: parseFloat(els.inhom.value),
+          T1ms: parseFloat(els.t1.value),
+          T2ms: parseFloat(els.t2.value),
+          T2starMs: parseFloat(els.t2s.value),
+          showWaterFat: els.showWaterFat.checked,
+          showNetOnly: els.showNetOnly.checked,
+          showAllSpins: els.showAllSpins.checked
+        };
+
+        if (state.mode === "se") {
+          cfg.flipDeg = 90;
+          cfg.TEms = Math.round(cfg.TEms);
+          cfg.TRms = Math.max(cfg.TEms + 20, cfg.TRms);
+        } else {
+          cfg.TRms = Math.max(cfg.TEms + 2, cfg.TRms);
+        }
+
+        cfg.larmorHz = GAMMA_HZ_PER_T * cfg.B0Tesla;
+        return cfg;
+      }
+
+      function updateControlText() {
+        const cfg = getConfig();
+        els.teV.textContent = `${Math.round(cfg.TEms)} ms`;
+        els.trV.textContent = `${Math.round(cfg.TRms)} ms`;
+        els.flipV.textContent = `${Math.round(cfg.flipDeg)}°`;
+        els.b0V.textContent = `${cfg.B0Tesla.toFixed(1)} T`;
+        els.inhomV.textContent = `${Math.round(cfg.inhomHz)} Hz`;
+        els.t1V.textContent = `${Math.round(cfg.T1ms)} ms`;
+        els.t2V.textContent = `${Math.round(cfg.T2ms)} ms`;
+        els.t2sV.textContent = `${Math.round(cfg.T2starMs)} ms`;
+        state.playbackRate = clamp(parseFloat(els.speed.value), 0.1, 2.0);
+        els.speedV.textContent = `${state.playbackRate.toFixed(2)}x`;
+        els.larmorNote.textContent = `larmorHz = gamma(${GAMMA_HZ_PER_T.toLocaleString()} Hz/T) × B0 = ${Math.round(cfg.larmorHz).toLocaleString()} Hz`;
+      }
+
+      function buildPools(cfg) {
+        if (cfg.showWaterFat) {
+          const scale = cfg.B0Tesla / 1.5;
+          return [
+            {
+              ...WATER_DEFAULT,
+              t1: WATER_DEFAULT.t1,
+              t2: WATER_DEFAULT.t2,
+              t2s: WATER_DEFAULT.t2s,
+              chemShift: WATER_DEFAULT.chemShiftHzAt1p5 * scale
+            },
+            {
+              ...FAT_DEFAULT,
+              t1: FAT_DEFAULT.t1,
+              t2: FAT_DEFAULT.t2,
+              t2s: FAT_DEFAULT.t2s,
+              chemShift: FAT_DEFAULT.chemShiftHzAt1p5 * scale
+            }
+          ];
+        }
+
+        return [{
+          name: "single",
+          t1: cfg.T1ms,
+          t2: cfg.T2ms,
+          t2s: cfg.T2starMs,
+          color: "#0a86df",
+          chemShift: 0
+        }];
+      }
+
+      function createSpins() {
+        const cfg = getConfig();
+        const pools = buildPools(cfg);
+        const spins = [];
+
+        const cols = 20;
+        const rows = Math.ceil(SPIN_COUNT / cols);
+        for (let i = 0; i < SPIN_COUNT; i += 1) {
+          const pool = pools.length === 1 ? pools[0] : pools[i % 2];
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          const px = (col / (cols - 1)) * 2 - 1;
+          const py = (row / (rows - 1)) * 2 - 1;
+
+          spins.push({
+            phaseRad: Math.random() * TAU,
+            freqOffsetHzStatic: pool.chemShift + gauss(0, cfg.inhomHz),
+            freqOffsetHzRandom: gauss(0, cfg.inhomHz * 0.03),
+            Mx: 0,
+            My: 0,
+            Mz: 1,
+            pool,
+            px,
+            py
+          });
+        }
+
+        state.spins = spins;
+      }
+
+      function resetChecks() {
+        state.checks = { c1: false, c2: false, c3: false, c4: false };
+        state.observed.afterPulseMxy = 0;
+        state.observed.afterPulseMz = 1;
+        state.observed.spreadAtHalfTE = 0;
+        state.observed.coherenceAtTE = 0;
+        state.observed.maxCoherenceNearTE = 0;
+        state.observed.greCoherenceAtTE = 0;
+      }
+
+      function resetAll() {
+        createSpins();
+        state.timeMs = 0;
+        state.cycleMs = 0;
+        state.cycleIndex = 0;
+        state.globalLarmorPhase = 0;
+        state.events = { startPulseFired: false, refocusFired: false, echoFired: false };
+        state.history = [];
+        resetChecks();
+        startCycle();
+        updateStatus("Reset complete. Initial state: random phase, Mxy ~ 0, Mz ~ 1.");
+      }
+
+      function updateStatus(msg) {
+        els.statusText.textContent = msg;
+      }
+
+      function netMag() {
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        let sumMxyAbs = 0;
+        for (let i = 0; i < state.spins.length; i += 1) {
+          const s = state.spins[i];
+          sx += s.Mx;
+          sy += s.My;
+          sz += s.Mz;
+          sumMxyAbs += Math.hypot(s.Mx, s.My);
+        }
+        const n = state.spins.length || 1;
+        const mx = sx / n;
+        const my = sy / n;
+        const mz = sz / n;
+        const mxy = Math.hypot(mx, my);
+        const meanAbsMxy = sumMxyAbs / n;
+        const coherence = meanAbsMxy <= 1e-6 ? 0 : clamp(mxy / meanAbsMxy, 0, 1);
+        return { mx, my, mz, mxy, coherence };
+      }
+
+      function phaseSpread() {
+        let c = 0;
+        let s = 0;
+        for (let i = 0; i < state.spins.length; i += 1) {
+          const p = state.spins[i].phaseRad;
+          c += Math.cos(p);
+          s += Math.sin(p);
+        }
+        const n = state.spins.length || 1;
+        const r = Math.hypot(c / n, s / n);
+        return 1 - clamp(r, 0, 1);
+      }
+
+      function rotateAboutX(spin, angleRad) {
+        const c = Math.cos(angleRad);
+        const s = Math.sin(angleRad);
+        const my = spin.My;
+        const mz = spin.Mz;
+        spin.My = my * c + mz * s;
+        spin.Mz = mz * c - my * s;
+      }
+
+      function applyRfPulse(flipAngleDeg, synchronizePhases) {
+        const a = toRad(flipAngleDeg);
+        for (let i = 0; i < state.spins.length; i += 1) {
+          const spin = state.spins[i];
+          rotateAboutX(spin, a);
+          if (synchronizePhases) {
+            const amp = Math.hypot(spin.Mx, spin.My);
+            spin.Mx = 0;
+            spin.My = amp;
+            spin.phaseRad = Math.PI / 2;
+          } else {
+            spin.phaseRad = wrapRad(Math.atan2(spin.My, spin.Mx));
+          }
+        }
+      }
+
+      function applyEvolution(dtMs, mode, cfg) {
+        const dtSec = dtMs / 1000;
+        for (let i = 0; i < state.spins.length; i += 1) {
+          const s = state.spins[i];
+
+          s.freqOffsetHzRandom = s.freqOffsetHzRandom * 0.9 + gauss(0, 0.35 + (cfg.inhomHz * 0.001));
+          let dphi = TAU * (s.freqOffsetHzStatic + s.freqOffsetHzRandom) * dtSec;
+
+          if (state.mode === "gre" && state.cycleMs <= cfg.TEms) {
+            const sign = state.cycleMs <= (cfg.TEms * 0.5) ? 1 : -1;
+            const gHz = 220 * sign * s.px;
+            dphi += TAU * gHz * dtSec;
+          }
+
+          const c = Math.cos(dphi);
+          const k = Math.sin(dphi);
+          const mx = s.Mx;
+          const my = s.My;
+          s.Mx = mx * c - my * k;
+          s.My = mx * k + my * c;
+
+          let decay = 1;
+          if (mode === "t2") {
+            decay = Math.exp(-dtMs / s.pool.t2);
+          } else if (mode === "t2star") {
+            decay = Math.exp(-dtMs / s.pool.t2s);
+          } else if (mode === "relax") {
+            decay = Math.exp(-dtMs / (state.mode === "se" ? s.pool.t2 : s.pool.t2s));
+          }
+          s.Mx *= decay;
+          s.My *= decay;
+
+          const e1 = 1 - Math.exp(-dtMs / s.pool.t1);
+          s.Mz += (1 - s.Mz) * e1;
+          s.phaseRad = wrapRad(Math.atan2(s.My, s.Mx));
+        }
+
+        state.globalLarmorPhase = wrapRad(state.globalLarmorPhase + TAU * cfg.larmorHz * dtSec);
+      }
+
+      function startCycle() {
+        const cfg = getConfig();
+        state.cycleMs = 0;
+        state.events.startPulseFired = true;
+        state.events.refocusFired = false;
+        state.events.echoFired = false;
+
+        if (state.mode === "se") {
+          applyRfPulse(90, true);
+          updateStatus("Spin Echo: 90° pulse at t=0 created transverse coherence and maximum Mxy.");
+        } else {
+          applyRfPulse(cfg.flipDeg, true);
+          updateStatus(`Gradient Echo: ${Math.round(cfg.flipDeg)}° pulse at t=0 created partial transverse coherence.`);
+        }
+
+        const m = netMag();
+        state.observed.afterPulseMxy = m.mxy;
+        state.observed.afterPulseMz = m.mz;
+      }
+
+      function endCycleAndRestart() {
+        state.cycleIndex += 1;
+        startCycle();
+      }
+
+      function markEcho(cfg) {
+        const m = netMag();
+        if (state.mode === "se") {
+          state.observed.coherenceAtTE = m.coherence;
+          state.observed.maxCoherenceNearTE = Math.max(state.observed.maxCoherenceNearTE, m.coherence);
+          updateStatus(`Spin Echo peak at TE=${Math.round(cfg.TEms)} ms. Static dephasing refocused; true T2 decay remains.`);
+        } else {
+          state.observed.greCoherenceAtTE = m.coherence;
+          updateStatus(`Gradient Echo at TE=${Math.round(cfg.TEms)} ms. No RF 180° refocusing: T2* behavior persists.`);
+        }
+      }
+
+      function setCheck(el, pass) {
+        el.classList.toggle("pass", !!pass);
+        el.classList.toggle("fail", !pass);
+      }
+
+      function updateChecks(cfg) {
+        state.checks.c1 = state.observed.afterPulseMxy > 0.45 && state.observed.afterPulseMz < 0.45;
+        setCheck(els.c1, state.checks.c1);
+
+        if (state.mode === "se") {
+          const spreadEnough = state.observed.spreadAtHalfTE > 0.25;
+          state.checks.c2 = spreadEnough;
+          state.checks.c3 = state.observed.coherenceAtTE > 0.55 && state.observed.coherenceAtTE >= (state.observed.spreadAtHalfTE * 0.7);
+          setCheck(els.c2, state.checks.c2);
+          setCheck(els.c3, state.checks.c3);
+          setCheck(els.c4, true);
+          state.checks.c4 = true;
+        } else {
+          state.checks.c2 = true;
+          state.checks.c3 = true;
+          state.checks.c4 = state.observed.greCoherenceAtTE < 0.82;
+          setCheck(els.c2, true);
+          setCheck(els.c3, true);
+          setCheck(els.c4, state.checks.c4);
+        }
+      }
+
+      function stepPhysics(dtMs) {
+        const cfg = getConfig();
+        if (cfg.TRms <= 0) return;
+
+        if (state.mode === "se") {
+          if (!state.events.refocusFired && state.cycleMs >= (cfg.TEms * 0.5)) {
+            state.observed.spreadAtHalfTE = phaseSpread();
+            applyRfPulse(180, false);
+            state.events.refocusFired = true;
+            updateStatus(`180° pulse at TE/2=${Math.round(cfg.TEms * 0.5)} ms. Leading spins become lagging.`);
+          }
+
+          if (!state.events.echoFired && state.cycleMs >= cfg.TEms) {
+            state.events.echoFired = true;
+            markEcho(cfg);
+          }
+
+          if (state.cycleMs < cfg.TEms) {
+            applyEvolution(dtMs, "t2", cfg);
+          } else {
+            applyEvolution(dtMs, "relax", cfg);
+          }
+        } else {
+          if (!state.events.echoFired && state.cycleMs >= cfg.TEms) {
+            state.events.echoFired = true;
+            markEcho(cfg);
+          }
+
+          if (state.cycleMs < cfg.TEms) {
+            applyEvolution(dtMs, "t2star", cfg);
+          } else {
+            applyEvolution(dtMs, "relax", cfg);
+          }
+        }
+
+        state.cycleMs += dtMs;
+        state.timeMs += dtMs;
+
+        const nm = netMag();
+        state.history.push({ t: state.timeMs, mz: nm.mz, mxy: nm.mxy, coh: nm.coherence });
+        if (state.history.length > 1800) state.history.shift();
+
+        if (state.cycleMs >= cfg.TRms) {
+          endCycleAndRestart();
+        }
+
+        updateChecks(cfg);
+      }
+
+      function drawArrow(g, x0, y0, x1, y1, color, lw) {
+        g.strokeStyle = color;
+        g.fillStyle = color;
+        g.lineWidth = lw;
+        g.beginPath();
+        g.moveTo(x0, y0);
+        g.lineTo(x1, y1);
+        g.stroke();
+        const ang = Math.atan2(y1 - y0, x1 - x0);
+        const h = 7 + lw;
+        g.beginPath();
+        g.moveTo(x1, y1);
+        g.lineTo(x1 - h * Math.cos(ang - 0.34), y1 - h * Math.sin(ang - 0.34));
+        g.lineTo(x1 - h * Math.cos(ang + 0.34), y1 - h * Math.sin(ang + 0.34));
+        g.closePath();
+        g.fill();
+      }
+
+      function drawEnsemble() {
+        const g = ctx.ensemble;
+        const w = els.ensemble.width;
+        const h = els.ensemble.height;
+        g.clearRect(0, 0, w, h);
+
+        const ox = w * 0.52;
+        const oy = h * 0.56;
+        const scale = Math.min(w, h) * 0.22;
+        const yDepth = scale * 0.56;
+
+        g.strokeStyle = "rgba(56,93,120,0.5)";
+        g.lineWidth = 1.2;
+
+        drawArrow(g, ox - scale * 1.5, oy, ox + scale * 1.7, oy, "rgba(56,93,120,0.7)", 1.4);
+        g.fillStyle = "#355a73";
+        g.font = "12px Segoe UI";
+        g.fillText("Z / B0", ox + scale * 1.64, oy - 5);
+
+        drawArrow(g, ox, oy + scale * 1.2, ox, oy - scale * 1.35, "rgba(56,93,120,0.7)", 1.4);
+        g.fillText("X", ox + 8, oy - scale * 1.3);
+
+        drawArrow(g, ox - yDepth * 0.55, oy + yDepth * 0.35, ox + yDepth * 0.95, oy - yDepth * 0.65, "rgba(56,93,120,0.4)", 1.2);
+        g.fillText("Y", ox + yDepth * 0.9, oy - yDepth * 0.72);
+
+        const showSpins = !els.showNetOnly.checked;
+        if (showSpins && els.showAllSpins.checked) {
+          for (let i = 0; i < state.spins.length; i += 1) {
+            const s = state.spins[i];
+            const color = s.pool.color;
+
+            const sx = ox + (s.Mz * scale) + (s.My * yDepth);
+            const sy = oy - (s.Mx * scale) + (s.My * yDepth * 0.25);
+            drawArrow(g, ox, oy, sx, sy, color + "66", 1.2);
+          }
+        }
+
+        const nm = netMag();
+        const nx = ox + (nm.mz * scale * 1.15) + (nm.my * yDepth * 1.1);
+        const ny = oy - (nm.mx * scale * 1.15) + (nm.my * yDepth * 0.3);
+        drawArrow(g, ox, oy, nx, ny, "#00a38d", 3.2);
+
+        g.fillStyle = "#24566f";
+        g.font = "13px Segoe UI";
+        g.fillText(`Net Mz=${nm.mz.toFixed(3)}  Mxy=${nm.mxy.toFixed(3)}  coherence=${(nm.coherence * 100).toFixed(1)}%`, 14, 22);
+        g.fillText(`mode=${state.mode === "se" ? "Spin Echo" : "Gradient Echo"}  cycle t=${Math.round(state.cycleMs)} ms  cycle #${state.cycleIndex + 1}`, 14, 40);
+
+        const seg = segmentName(getConfig());
+        els.segmentText.textContent = `Segment: ${seg}`;
+        els.metricsText.textContent = `time=${Math.round(state.timeMs)} ms | spread=${phaseSpread().toFixed(3)} | dt=${DT_MS} ms | speed=${state.playbackRate.toFixed(2)}x | spins=${state.spins.length}`;
+      }
+
+      function segmentName(cfg) {
+        if (state.mode === "se") {
+          if (state.cycleMs < cfg.TEms * 0.5) return "dephasing (0 -> TE/2)";
+          if (state.cycleMs < cfg.TEms) return "rephasing (TE/2 -> TE)";
+          return "relaxation (TE -> TR)";
+        }
+        if (state.cycleMs < cfg.TEms) return "dephasing (0 -> TE, T2*)";
+        return "relaxation (TE -> TR)";
+      }
+
+      function drawPhase() {
+        const g = ctx.phase;
+        const w = els.phase.width;
+        const h = els.phase.height;
+        g.clearRect(0, 0, w, h);
+
+        const cx = w * 0.5;
+        const cy = h * 0.53;
+        const r = Math.min(w, h) * 0.34;
+        g.strokeStyle = "rgba(62,103,132,0.55)";
+        g.lineWidth = 1.1;
+        g.beginPath();
+        g.arc(cx, cy, r, 0, TAU);
+        g.stroke();
+
+        g.strokeStyle = "rgba(62,103,132,0.4)";
+        g.beginPath();
+        g.moveTo(cx - r - 10, cy);
+        g.lineTo(cx + r + 10, cy);
+        g.moveTo(cx, cy - r - 10);
+        g.lineTo(cx, cy + r + 10);
+        g.stroke();
+
+        const showSpins = !els.showNetOnly.checked;
+        if (showSpins && els.showAllSpins.checked) {
+          for (let i = 0; i < state.spins.length; i += 1) {
+            const s = state.spins[i];
+            const amp = clamp(Math.hypot(s.Mx, s.My), 0, 1);
+            const px = cx + Math.cos(s.phaseRad) * r * amp;
+            const py = cy + Math.sin(s.phaseRad) * r * amp;
+            ctx.phase.fillStyle = s.pool.color + "b8";
+            ctx.phase.fillRect(px - 1.6, py - 1.6, 3.2, 3.2);
+          }
+        }
+
+        const nm = netMag();
+        const pa = Math.atan2(nm.my, nm.mx);
+        const nx = cx + Math.cos(pa) * r * nm.mxy;
+        const ny = cy + Math.sin(pa) * r * nm.mxy;
+        drawArrow(g, cx, cy, nx, ny, "#00a38d", 2.3);
+
+        g.fillStyle = "#2f5b76";
+        g.font = "12px Segoe UI";
+        g.fillText("Transverse phase circle", 10, 16);
+        g.fillText(`spread=${phaseSpread().toFixed(3)} (0 coherent, 1 dispersed)`, 10, h - 10);
+      }
+
+      function drawBars() {
+        const g = ctx.bars;
+        const w = els.bars.width;
+        const h = els.bars.height;
+        g.clearRect(0, 0, w, h);
+
+        const nm = netMag();
+        const pad = 28;
+        const bw = 56;
+        const base = h - 36;
+        const maxH = h - 60;
+
+        function bar(x, val, color, label) {
+          const vh = clamp(val, 0, 1) * maxH;
+          g.fillStyle = color;
+          g.fillRect(x, base - vh, bw, vh);
+          g.strokeStyle = "rgba(34,66,88,0.4)";
+          g.strokeRect(x, base - maxH, bw, maxH);
+          g.fillStyle = "#2a536d";
+          g.font = "12px Segoe UI";
+          g.fillText(label, x + 8, base + 16);
+          g.fillText(val.toFixed(2), x + 10, base - vh - 6);
+        }
+
+        bar(pad, nm.mz, "#2c7eb9", "Mz");
+        bar(pad + 96, nm.mxy, "#00a38d", "|Mxy|");
+        bar(pad + 192, nm.coherence, "#ff8c1a", "coh");
+
+        g.fillStyle = "#2f5d76";
+        g.font = "12px Segoe UI";
+        g.fillText("Longitudinal and transverse metrics", 12, 18);
+      }
+
+      function drawTimeline() {
+        const g = ctx.timeline;
+        const w = els.timeline.width;
+        const h = els.timeline.height;
+        g.clearRect(0, 0, w, h);
+
+        const cfg = getConfig();
+        const padL = 36;
+        const padR = 18;
+        const padT = 30;
+        const padB = 28;
+        const tW = w - padL - padR;
+        const tH = h - padT - padB;
+
+        function tx(ms) {
+          return padL + (ms / cfg.TRms) * tW;
+        }
+
+        g.strokeStyle = "rgba(58,96,122,0.45)";
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(padL, padT + tH * 0.25);
+        g.lineTo(w - padR, padT + tH * 0.25);
+        g.moveTo(padL, padT + tH * 0.55);
+        g.lineTo(w - padR, padT + tH * 0.55);
+        g.moveTo(padL, padT + tH * 0.82);
+        g.lineTo(w - padR, padT + tH * 0.82);
+        g.stroke();
+
+        g.fillStyle = "#2f5d76";
+        g.font = "12px Segoe UI";
+        g.fillText("RF", 10, padT + tH * 0.25 + 4);
+        g.fillText("Signal", 4, padT + tH * 0.55 + 4);
+        g.fillText("Time", 8, padT + tH * 0.82 + 4);
+
+        const t90 = tx(0);
+        const tHalf = tx(cfg.TEms * 0.5);
+        const tE = tx(cfg.TEms);
+        const tR = tx(cfg.TRms);
+
+        g.strokeStyle = "#e23f52";
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(t90, padT + tH * 0.18);
+        g.lineTo(t90, padT + tH * 0.32);
+        if (state.mode === "se") {
+          g.moveTo(tHalf, padT + tH * 0.18);
+          g.lineTo(tHalf, padT + tH * 0.32);
+        }
+        g.stroke();
+
+        if (state.mode === "se") {
+          g.fillStyle = "#e23f52";
+          g.fillText("90°", t90 + 3, padT + 10);
+          g.fillText("180°", tHalf + 3, padT + 10);
+        } else {
+          g.fillStyle = "#e23f52";
+          g.fillText(`${Math.round(getConfig().flipDeg)}°`, t90 + 3, padT + 10);
+        }
+
+        g.strokeStyle = "#00a38d";
+        g.lineWidth = 2;
+        g.beginPath();
+        const start = padL;
+        const y0 = padT + tH * 0.55;
+        g.moveTo(start, y0);
+        for (let x = 0; x <= tW; x += 1) {
+          const ms = (x / tW) * cfg.TRms;
+          let tau = state.mode === "se" ? (ms <= cfg.TEms ? cfg.T2ms : cfg.T2ms) : cfg.T2starMs;
+          tau = Math.max(1, tau);
+          const y = y0 - (Math.exp(-ms / tau) * 24);
+          g.lineTo(padL + x, y);
+        }
+        g.stroke();
+
+        g.strokeStyle = "#8f6e2a";
+        g.lineWidth = 1.6;
+        g.beginPath();
+        g.moveTo(tE, padT + tH * 0.48);
+        g.lineTo(tE, padT + tH * 0.62);
+        g.stroke();
+        g.fillStyle = "#8f6e2a";
+        g.fillText("TE", tE + 2, padT + tH * 0.68);
+
+        g.strokeStyle = "#2f6da1";
+        g.beginPath();
+        g.moveTo(tR, padT + tH * 0.76);
+        g.lineTo(tR, padT + tH * 0.88);
+        g.stroke();
+        g.fillStyle = "#2f6da1";
+        g.fillText("TR", tR - 16, padT + tH * 0.95);
+
+        const nowX = tx(state.cycleMs);
+        g.strokeStyle = "rgba(26,63,88,0.75)";
+        g.setLineDash([4, 4]);
+        g.beginPath();
+        g.moveTo(nowX, padT);
+        g.lineTo(nowX, h - padB);
+        g.stroke();
+        g.setLineDash([]);
+
+        g.fillStyle = "#2d5871";
+        g.font = "12px Segoe UI";
+        const modeName = state.mode === "se"
+          ? "Spin Echo: 90° at 0, 180° at TE/2, echo at TE"
+          : "Gradient Echo: no RF 180°, T2* dominates";
+        g.fillText(modeName, padL, 16);
+      }
+
+      function resizeCanvas(canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(2, Math.round(rect.width));
+        const h = Math.max(2, Math.round(rect.height));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      }
+
+      function resizeAll() {
+        resizeCanvas(els.ensemble);
+        resizeCanvas(els.phase);
+        resizeCanvas(els.bars);
+        resizeCanvas(els.timeline);
+      }
+
+      function drawAll() {
+        drawEnsemble();
+        drawPhase();
+        drawBars();
+        drawTimeline();
+      }
+
+      function enforceSequenceToggle() {
+        if (els.showSpinEcho.checked && els.showGradientEcho.checked) {
+          // keep whichever was clicked most recently via mode
+          if (state.mode === "se") els.showGradientEcho.checked = false;
+          else els.showSpinEcho.checked = false;
+        }
+        if (!els.showSpinEcho.checked && !els.showGradientEcho.checked) {
+          if (state.mode === "se") els.showSpinEcho.checked = true;
+          else els.showGradientEcho.checked = true;
+        }
+      }
+
+      function setMode(mode) {
+        state.mode = mode;
+        els.spinEchoBtn.classList.toggle("active", mode === "se");
+        els.greBtn.classList.toggle("active", mode === "gre");
+        els.showSpinEcho.checked = mode === "se";
+        els.showGradientEcho.checked = mode === "gre";
+        if (mode === "se") {
+          els.flip.value = "90";
+        } else {
+          els.flip.value = String(clamp(parseFloat(els.flip.value), 5, 90));
+        }
+        updateControlText();
+        resetAll();
+      }
+
+      function loop(now) {
+        const elapsed = now - state.lastNow;
+        state.lastNow = now;
+
+        if (state.playing) {
+          state.accumMs += elapsed * state.playbackRate;
+          const cap = 60;
+          let n = 0;
+          while (state.accumMs >= DT_MS && n < cap) {
+            stepPhysics(DT_MS);
+            state.accumMs -= DT_MS;
+            n += 1;
+          }
+        }
+
+        drawAll();
+        requestAnimationFrame(loop);
+      }
+
+      function bind() {
+        const inputs = [els.te, els.tr, els.flip, els.b0, els.inhom, els.t1, els.t2, els.t2s, els.speed, els.showWaterFat, els.showNetOnly, els.showAllSpins];
+        for (let i = 0; i < inputs.length; i += 1) {
+          inputs[i].addEventListener("input", () => {
+            updateControlText();
+            if (inputs[i] === els.showWaterFat) {
+              resetAll();
+            }
+          });
+        }
+
+        els.spinEchoBtn.addEventListener("click", () => setMode("se"));
+        els.greBtn.addEventListener("click", () => setMode("gre"));
+
+        els.showSpinEcho.addEventListener("change", () => {
+          enforceSequenceToggle();
+          setMode(els.showSpinEcho.checked ? "se" : "gre");
+        });
+
+        els.showGradientEcho.addEventListener("change", () => {
+          enforceSequenceToggle();
+          setMode(els.showGradientEcho.checked ? "gre" : "se");
+        });
+
+        els.playBtn.addEventListener("click", () => {
+          state.playing = true;
+          updateStatus("Playing.");
+        });
+
+        els.pauseBtn.addEventListener("click", () => {
+          state.playing = false;
+          updateStatus("Paused.");
+        });
+
+        els.stepBtn.addEventListener("click", () => {
+          state.playing = false;
+          stepPhysics(DT_MS);
+          updateStatus("Stepped forward by 1 ms.");
+        });
+
+        els.resetBtn.addEventListener("click", () => {
+          resetAll();
+        });
+
+        window.addEventListener("resize", () => {
+          resizeAll();
+          drawAll();
+        });
+      }
+
+      function init() {
+        bind();
+        updateControlText();
+        resizeAll();
+        resetAll();
+        requestAnimationFrame((t) => {
+          state.lastNow = t;
+          requestAnimationFrame(loop);
+        });
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

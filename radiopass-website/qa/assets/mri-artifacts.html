@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Artifacts Step Guide</title>
+  <style>
+    :root {
+      --bg: #f8fbff;
+      --panel: #ffffff;
+      --line: #dbe7f8;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #0b5ed7;
+      --warn: #b45309;
+      --ok: #0f766e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 14px;
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 10% 8%, #fff, var(--bg));
+    }
+
+    .layout {
+      max-width: 1350px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(11, 94, 215, 0.08);
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: sticky;
+      top: 10px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+    }
+
+    h1 { margin: 0; font-size: 1.06rem; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.35; }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #f8fbff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid #cbd8ef;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .btn2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-weight: 650;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+      font-size: 0.85rem;
+    }
+
+    button.secondary { background: linear-gradient(120deg, #475569, #334155); }
+    button.warn { background: linear-gradient(120deg, #b45309, #d97706); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .main {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .artifact-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #c8dbff;
+      background: #e8f0ff;
+      color: #1d4ed8;
+      font-size: 0.76rem;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 3px 8px;
+    }
+
+    .fact {
+      font-size: 1rem;
+      line-height: 1.42;
+      font-weight: 600;
+    }
+
+    .artifact-diagram {
+      border: 1px solid #d8e6ff;
+      border-radius: 8px;
+      background: #f5f9ff;
+      padding: 6px;
+    }
+
+    .artifact-diagram svg {
+      width: 100%;
+      height: 130px;
+      display: block;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    .artifact-canvas {
+      width: 100%;
+      height: 150px;
+      display: block;
+      border-radius: 6px;
+      background: #ffffff;
+      border: 1px solid #dbe7f8;
+    }
+
+    .explain {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbff;
+      padding: 9px;
+      font-size: 0.9rem;
+      line-height: 1.42;
+      color: #334155;
+    }
+
+    .fix {
+      border: 1px solid #caeddc;
+      border-radius: 8px;
+      background: #f0fbf5;
+      padding: 8px;
+      font-size: 0.87rem;
+      line-height: 1.4;
+      color: #0f5132;
+    }
+
+    .formula {
+      border: 1px solid #d8e6ff;
+      border-radius: 8px;
+      background: #eef4ff;
+      padding: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.84rem;
+      color: #113f82;
+      white-space: pre-wrap;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      max-height: calc(100vh - 190px);
+      overflow: auto;
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #f8fbff;
+      font-size: 0.84rem;
+      line-height: 1.35;
+      color: #334155;
+    }
+
+    .mini b { color: #0f172a; }
+    .warn-txt { color: var(--warn); font-weight: 700; }
+    .ok-txt { color: var(--ok); font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+      .list { max-height: none; }
+      .mini-grid { grid-template-columns: 1fr; }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>MRI Artifacts Step Guide</h1>
+      <p class="subtitle">Artifact-only new version. Review one artifact at a time, then switch to all.</p>
+
+      <section class="section">
+        <div class="row"><span>Mode</span><strong id="modeLabel">Step-by-step</strong></div>
+        <select id="modeSelect">
+          <option value="step">Step-by-step (one artifact)</option>
+          <option value="all">All artifacts</option>
+        </select>
+        <div class="btn2">
+          <button id="prevBtn" class="secondary">Previous</button>
+          <button id="nextBtn">Next</button>
+        </div>
+        <div class="row"><span>Progress</span><strong id="progressLabel">1 / 1</strong></div>
+      </section>
+
+      <section class="section">
+        <div class="subtitle">Artifact type</div>
+        <select id="typeSelect"></select>
+        <input id="searchInput" type="text" placeholder="Search (chemical shift, susceptibility, aliasing...)" />
+      </section>
+
+      <section class="section">
+        <div class="subtitle">Exam formula</div>
+        <div id="formulaBox" class="formula">Select an artifact to show formula or rule.</div>
+      </section>
+
+      <section class="section">
+        <div class="subtitle">High-yield rules</div>
+        <div class="mini"><b>Chemical shift:</b> along <span class="warn-txt">frequency-encoding</span> axis.</div>
+        <div class="mini"><b>Narrow receiver BW:</b> <span class="ok-txt">SNR up</span>, chemical shift up, min TE longer.</div>
+        <div class="mini"><b>Wide receiver BW:</b> chemical shift down, min TE shorter, <span class="warn-txt">SNR down</span>.</div>
+        <div class="mini"><b>Aliasing:</b> FOV too small for anatomy extent.</div>
+      </section>
+    </aside>
+
+    <section class="card main">
+      <div id="stepCard" class="artifact-card"></div>
+      <div id="allList" class="list"></div>
+
+      <section class="mini-grid">
+        <div class="mini">
+          <b>Chemical shift in pixels</b><br />
+          Shift = frequency difference / receiver BW per pixel.<br />
+          Appears as fat-water boundary misregistration or signal void/band.
+        </div>
+        <div class="mini">
+          <b>Scan-time rule</b><br />
+          Scan time = TR x phase steps x NEX.<br />
+          Artifact-control changes should be balanced against scan-time cost.
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const ARTIFACTS = [
+      {
+        type: "Chemical Shift",
+        title: "Chemical shift artifact occurs at fat-water interfaces because fat and water resonate at different frequencies.",
+        why: "This causes spatial misregistration along the frequency-encoding axis and can create dark/bright boundary bands.",
+        fix: "Increase receiver bandwidth, use fat suppression, swap frequency direction if needed.",
+        formula: "Shift (pixels) = Delta f / (receiver BW per pixel)"
+      },
+      {
+        type: "Chemical Shift",
+        title: "Chemical shift can manifest as signal void between fat and water, not true enhancement.",
+        why: "Opposed-phase cancellation and boundary misregistration can mimic pathology if not recognized.",
+        fix: "Correlate with in-phase/opposed-phase imaging and anatomic sequence context.",
+        formula: ""
+      },
+      {
+        type: "Chemical Shift",
+        title: "Decreasing receiver bandwidth increases chemical-shift artifact likelihood.",
+        why: "Lower BW per pixel increases displacement in pixels for the same fat-water frequency difference.",
+        fix: "Use wider receiver BW when chemical-shift artifact is problematic.",
+        formula: "BW down => pixel shift up"
+      },
+      {
+        type: "Chemical Shift",
+        title: "Reducing FOV can reduce apparent displacement distance in mm, but pixel-shift behavior remains bandwidth dependent.",
+        why: "Smaller pixels change physical distance per pixel even if the pixel-shift mechanism is unchanged.",
+        fix: "Use FOV/matrix and bandwidth together; do not treat FOV as sole fix.",
+        formula: ""
+      },
+      {
+        type: "Susceptibility",
+        title: "Susceptibility artifact arises from magnetic field distortion near air-bone interfaces or metallic objects.",
+        why: "Local B0 distortion causes rapid dephasing, signal loss, and geometric warping.",
+        fix: "Use spin echo, shorten TE, reduce voxel size, apply metal-artifact reduction options (MARS/VAT).",
+        formula: ""
+      },
+      {
+        type: "Susceptibility",
+        title: "Susceptibility artifact worsens at higher field strengths (e.g., 3T vs 1.5T).",
+        why: "Frequency offsets from susceptibility scale with B0, increasing dephasing and distortion.",
+        fix: "Tune protocol per field strength and consider lower-field imaging in severe metal cases.",
+        formula: "Artifact severity generally scales with B0"
+      },
+      {
+        type: "Aliasing",
+        title: "Aliasing (wrap-around) occurs when anatomy extends beyond selected FOV.",
+        why: "Under-covered object content is mapped back into image space during reconstruction.",
+        fix: "Increase FOV, use phase oversampling/no-phase-wrap options.",
+        formula: ""
+      },
+      {
+        type: "Motion",
+        title: "Motion artifacts from respiration, cardiac pulsation, or patient movement degrade sharpness and create ghosting.",
+        why: "Inconsistent phase across acquisitions causes misregistered k-space lines.",
+        fix: "Use gating, navigator echoes, faster sequences, coaching/immobilization.",
+        formula: ""
+      },
+      {
+        type: "Distortion",
+        title: "Gradient non-linearity causes geometric distortion, especially toward image edges.",
+        why: "Spatial encoding assumes linear gradients; nonlinearity breaks position mapping accuracy.",
+        fix: "Use vendor distortion correction and keep key anatomy near isocenter.",
+        formula: ""
+      },
+      {
+        type: "B0 Inhomogeneity",
+        title: "B0 inhomogeneity causes signal loss and distortion, especially in GRE and EPI.",
+        why: "Off-resonance accumulates phase error and dephasing during readout.",
+        fix: "Apply shimming, shorten TE/readout, use spin-echo-based approaches when feasible.",
+        formula: ""
+      },
+      {
+        type: "Bandwidth Tradeoff",
+        title: "Bandwidth affects SNR and artifact behavior, but does not directly change voxel size.",
+        why: "Voxel size is set by FOV, matrix, and slice thickness; bandwidth changes frequency sampling characteristics.",
+        fix: "Choose bandwidth based on artifact vs SNR priorities.",
+        formula: "Narrow BW: SNR up, chem shift up | Wide BW: SNR down, chem shift down"
+      },
+      {
+        type: "Noise/Interference",
+        title: "External RF interference can corrupt MRI data if shielding is inadequate.",
+        why: "MR receive signals are weak and easily contaminated by environmental RF noise.",
+        fix: "Use proper RF shielding/Faraday cage integrity checks.",
+        formula: ""
+      }
+    ];
+
+    const ui = {
+      modeSelect: document.getElementById("modeSelect"),
+      modeLabel: document.getElementById("modeLabel"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      progressLabel: document.getElementById("progressLabel"),
+      typeSelect: document.getElementById("typeSelect"),
+      searchInput: document.getElementById("searchInput"),
+      formulaBox: document.getElementById("formulaBox"),
+      stepCard: document.getElementById("stepCard"),
+      allList: document.getElementById("allList")
+    };
+
+    const state = {
+      mode: "step",
+      type: "All",
+      query: "",
+      idx: 0,
+      rafId: null
+    };
+
+    function norm(s) {
+      return String(s || "").toLowerCase().trim();
+    }
+
+    function setupTypes() {
+      const types = ["All", ...Array.from(new Set(ARTIFACTS.map((a) => a.type))).sort()];
+      ui.typeSelect.innerHTML = types.map((t) => `<option value="${t}">${t}</option>`).join("");
+    }
+
+    function filtered() {
+      const q = norm(state.query);
+      return ARTIFACTS.filter((a) => {
+        const byType = state.type === "All" || a.type === state.type;
+        const byQ = !q || norm(`${a.type} ${a.title} ${a.why} ${a.fix} ${a.formula}`).includes(q);
+        return byType && byQ;
+      });
+    }
+
+    function p3d(x, y, z, w, h, s) {
+      return {
+        x: w * 0.50 + (x - y * 0.58) * s,
+        y: h * 0.70 - z * s - y * 0.34 * s
+      };
+    }
+
+    function line3d(ctx, a, b, w, h, s, color, lw) {
+      const p0 = p3d(a.x, a.y, a.z, w, h, s);
+      const p1 = p3d(b.x, b.y, b.z, w, h, s);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lw;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+    }
+
+    function drawCube(ctx, cx, cy, cz, sx, sy, sz, w, h, s, color) {
+      const pts = [
+        { x: cx - sx, y: cy - sy, z: cz - sz },
+        { x: cx + sx, y: cy - sy, z: cz - sz },
+        { x: cx + sx, y: cy + sy, z: cz - sz },
+        { x: cx - sx, y: cy + sy, z: cz - sz },
+        { x: cx - sx, y: cy - sy, z: cz + sz },
+        { x: cx + sx, y: cy - sy, z: cz + sz },
+        { x: cx + sx, y: cy + sy, z: cz + sz },
+        { x: cx - sx, y: cy + sy, z: cz + sz }
+      ];
+      const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [4, 5], [5, 6], [6, 7], [7, 4],
+        [0, 4], [1, 5], [2, 6], [3, 7]
+      ];
+      edges.forEach((e) => line3d(ctx, pts[e[0]], pts[e[1]], w, h, s, color, 1.5));
+    }
+
+    function drawArtifactCanvas(cv, tSec) {
+      const ctx = cv.getContext("2d");
+      const w = cv.width;
+      const h = cv.height;
+      const type = cv.dataset.type || "Generic";
+      const idx = Number(cv.dataset.index || 0);
+      const s = 56;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.font = "700 12px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText(type, 12, 16);
+
+      // Soft 3D axes guide
+      line3d(ctx, { x: -2.2, y: 0, z: 0 }, { x: 2.2, y: 0, z: 0 }, w, h, s, "#cbd5e1", 1.1);
+      line3d(ctx, { x: 0, y: -1.8, z: 0 }, { x: 0, y: 1.8, z: 0 }, w, h, s, "#e2e8f0", 1.0);
+      line3d(ctx, { x: 0, y: 0, z: -1.2 }, { x: 0, y: 0, z: 1.2 }, w, h, s, "#cbd5e1", 1.1);
+
+      if (type === "Chemical Shift") {
+        const shift = 0.25 + 0.08 * Math.sin(tSec * 1.2 + idx * 0.5);
+        drawCube(ctx, -0.65, 0, 0, 0.45, 0.25, 0.25, w, h, s, "rgba(14,165,233,0.95)");
+        drawCube(ctx, -0.65 + shift, 0, 0, 0.45, 0.25, 0.25, w, h, s, "rgba(220,38,38,0.95)");
+        ctx.fillStyle = "rgba(15,23,42,0.13)";
+        const p0 = p3d(-0.2 + shift * 0.5, -0.15, -0.22, w, h, s);
+        ctx.fillRect(p0.x - 7, p0.y - 26, 14, 52);
+        return;
+      }
+
+      if (type === "Susceptibility") {
+        const r = 14 + 2 * Math.sin(tSec * 1.6);
+        const c = p3d(0.0, 0.0, 0.0, w, h, s);
+        ctx.fillStyle = "#334155";
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        for (let k = 0; k < 7; k += 1) {
+          const z = -0.7 + k * 0.22;
+          ctx.strokeStyle = "#94a3b8";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          for (let i = 0; i <= 40; i += 1) {
+            const x = -2.0 + i * 0.1;
+            const dx = x;
+            const bend = 0.33 / (Math.abs(dx) + 0.22) * Math.exp(-(z * z) * 0.9);
+            const y = 0.20 * Math.sin(tSec + k * 0.35) * bend * Math.sign(dx);
+            const p = p3d(x, y, z, w, h, s);
+            if (i === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+        }
+        return;
+      }
+
+      if (type === "Aliasing") {
+        drawCube(ctx, 0, 0, 0, 1.2, 0.8, 0.55, w, h, s, "#93c5fd");
+        const out = p3d(1.95, 0.0, 0.1, w, h, s);
+        const inp = p3d(-0.95 + 0.16 * Math.sin(tSec * 1.6), 0.0, 0.1, w, h, s);
+        ctx.fillStyle = "rgba(220,38,38,0.78)";
+        ctx.beginPath();
+        ctx.arc(out.x, out.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(inp.x, inp.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = "#dc2626";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(out.x, out.y);
+        ctx.lineTo(inp.x, inp.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        return;
+      }
+
+      if (type === "Motion") {
+        drawCube(ctx, 0, 0, 0, 1.15, 0.75, 0.45, w, h, s, "#cbd5e1");
+        const baseX = 0.10 * Math.sin(tSec * 2.0);
+        const ghosts = [-0.48, 0, 0.48];
+        ghosts.forEach((g, k) => {
+          const alpha = k === 1 ? 0.45 : 0.18;
+          const p = p3d(baseX, g, 0.15, w, h, s);
+          ctx.fillStyle = `rgba(14,165,233,${alpha.toFixed(2)})`;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, 40, 18, 0, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        return;
+      }
+
+      if (type === "Distortion") {
+        drawCube(ctx, 0, 0, 0, 1.2, 0.8, 0.5, w, h, s, "#cbd5e1");
+        for (let i = -4; i <= 4; i += 1) {
+          const x = i * 0.27;
+          const warp = 0.18 * (Math.abs(i) / 4) * Math.sin(tSec * 1.2 + i * 0.35);
+          line3d(ctx, { x, y: -0.75, z: -0.35 + warp }, { x, y: 0.75, z: -0.35 - warp }, w, h, s, "#94a3b8", 1.1);
+        }
+        return;
+      }
+
+      if (type === "B0 Inhomogeneity") {
+        const left = p3d(-1.0, 0, 0, w, h, s);
+        const right = p3d(1.0, 0, 0, w, h, s);
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.arc(left.x, left.y, 32, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(right.x, right.y, 32, 0, Math.PI * 2); ctx.stroke();
+        const ang = tSec * 2.2;
+        ctx.strokeStyle = "#0ea5e9";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(left.x, left.y);
+        ctx.lineTo(left.x + Math.cos(ang) * 30, left.y - Math.sin(ang) * 30);
+        ctx.stroke();
+        for (let k = 0; k < 6; k += 1) {
+          const a = ang + k * 0.42;
+          ctx.strokeStyle = "rgba(220,38,38,0.85)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(right.x, right.y);
+          ctx.lineTo(right.x + Math.cos(a) * 30, right.y - Math.sin(a) * 30);
+          ctx.stroke();
+        }
+        return;
+      }
+
+      if (type === "Bandwidth Tradeoff") {
+        const s1 = 0.75 + 0.25 * Math.sin(tSec * 1.4);
+        const s2 = 1.15 - s1 * 0.5;
+        const left = p3d(-1.1, 0, 0, w, h, s);
+        const right = p3d(1.1, 0, 0, w, h, s);
+        ctx.fillStyle = "rgba(250,204,21,0.35)";
+        ctx.fillRect(left.x - 55, left.y - 45, 110, 88);
+        ctx.fillStyle = "rgba(96,165,250,0.30)";
+        ctx.fillRect(right.x - 55, right.y - 45, 110, 88);
+        ctx.fillStyle = "#854d0e";
+        ctx.fillRect(left.x - 35, left.y + 28 - 40 * s1, 22, 40 * s1);
+        ctx.fillRect(left.x + 10, left.y + 28 - 40 * (1.35 - s1), 22, 40 * (1.35 - s1));
+        ctx.fillStyle = "#1e3a8a";
+        ctx.fillRect(right.x - 35, right.y + 28 - 40 * s2, 22, 40 * s2);
+        ctx.fillRect(right.x + 10, right.y + 28 - 40 * (1.35 - s2), 22, 40 * (1.35 - s2));
+        return;
+      }
+
+      if (type === "Noise/Interference") {
+        drawCube(ctx, 0.1, 0.0, 0.0, 1.15, 0.78, 0.48, w, h, s, "#cbd5e1");
+        ctx.strokeStyle = "#0ea5e9";
+        ctx.lineWidth = 2.1;
+        ctx.beginPath();
+        for (let i = 0; i <= 40; i += 1) {
+          const x = -2.1 + i * 0.11;
+          const z = 0.15 * Math.sin(i * 0.4 + tSec * 5.0);
+          const p = p3d(x, -1.15, z, w, h, s);
+          if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+        const spikeX = -1.1 + 0.8 * Math.sin(tSec * 3.2);
+        line3d(ctx, { x: spikeX, y: -0.2, z: -0.3 }, { x: spikeX, y: -0.2, z: 0.9 }, w, h, s, "#dc2626", 1.7);
+        return;
+      }
+
+      drawCube(ctx, 0, 0, 0, 1.1, 0.75, 0.5, w, h, s, "#93c5fd");
+    }
+
+    function restartArtifactAnimation() {
+      if (state.rafId !== null) {
+        cancelAnimationFrame(state.rafId);
+        state.rafId = null;
+      }
+
+      const loop = (ts) => {
+        const tSec = ts * 0.001;
+        document.querySelectorAll(".artifact-canvas").forEach((cv) => drawArtifactCanvas(cv, tSec));
+        state.rafId = requestAnimationFrame(loop);
+      };
+      state.rafId = requestAnimationFrame(loop);
+    }
+
+    function card(a, i, n) {
+      return `
+        <div class="head">
+          <span class="chip">${a.type}</span>
+          <span class="chip">${i + 1} / ${n}</span>
+        </div>
+        <div class="fact">${a.title}</div>
+        <div class="artifact-diagram">
+          <canvas class="artifact-canvas" width="620" height="150" data-type="${a.type.replace(/"/g, "&quot;")}" data-index="${i}"></canvas>
+        </div>
+        <div class="explain"><b>Why:</b> ${a.why}</div>
+        <div class="fix"><b>How to reduce:</b> ${a.fix}</div>
+        ${a.formula ? `<div class="formula">${a.formula}</div>` : ""}
+      `;
+    }
+
+    function renderStep(list) {
+      if (!list.length) {
+        ui.stepCard.innerHTML = `<div class="fact">No matching artifacts. Change filter/search.</div>`;
+        ui.formulaBox.textContent = "No formula for current filter.";
+        ui.progressLabel.textContent = "0 / 0";
+        ui.prevBtn.disabled = true;
+        ui.nextBtn.disabled = true;
+        return;
+      }
+
+      state.idx = Math.max(0, Math.min(state.idx, list.length - 1));
+      const a = list[state.idx];
+      ui.stepCard.innerHTML = card(a, state.idx, list.length);
+      ui.formulaBox.textContent = a.formula || "No single equation attached to this artifact.";
+      ui.progressLabel.textContent = `${state.idx + 1} / ${list.length}`;
+      ui.prevBtn.disabled = state.idx <= 0;
+      ui.nextBtn.disabled = state.idx >= list.length - 1;
+    }
+
+    function renderAll(list) {
+      ui.allList.innerHTML = list.map((a, i) => `<article class="artifact-card">${card(a, i, list.length)}</article>`).join("");
+      ui.formulaBox.textContent = "All-artifacts mode: formula/rules appear inside each card.";
+      ui.progressLabel.textContent = `${list.length} artifacts`;
+      ui.prevBtn.disabled = true;
+      ui.nextBtn.disabled = true;
+    }
+
+    function render() {
+      const list = filtered();
+      const isStep = state.mode === "step";
+      ui.modeLabel.textContent = isStep ? "Step-by-step" : "All artifacts";
+      ui.stepCard.style.display = isStep ? "grid" : "none";
+      ui.allList.style.display = isStep ? "none" : "grid";
+      if (isStep) renderStep(list);
+      else renderAll(list);
+      restartArtifactAnimation();
+    }
+
+    function bind() {
+      ui.modeSelect.addEventListener("change", () => {
+        state.mode = ui.modeSelect.value;
+        render();
+      });
+      ui.typeSelect.addEventListener("change", () => {
+        state.type = ui.typeSelect.value;
+        state.idx = 0;
+        render();
+      });
+      ui.searchInput.addEventListener("input", () => {
+        state.query = ui.searchInput.value;
+        state.idx = 0;
+        render();
+      });
+      ui.prevBtn.addEventListener("click", () => {
+        state.idx -= 1;
+        render();
+      });
+      ui.nextBtn.addEventListener("click", () => {
+        state.idx += 1;
+        render();
+      });
+    }
+
+    setupTypes();
+    bind();
+    render();
+  </script>
+</body>
+</html>

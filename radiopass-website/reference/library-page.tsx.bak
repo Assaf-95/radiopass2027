@@ -1,0 +1,98 @@
+/**
+ * The demo library — everything already built, in one place.
+ *
+ * Years of standalone demos had accumulated across four duplicated folder
+ * trees on disk, unreachable from the site. They are now served from
+ * public/library and indexed here so they can be looked at, judged, and
+ * either promoted into a real module or discarded. This is deliberately a
+ * holding area, not a finished part of the product: the demos open in their
+ * own tab, in whatever style they were originally written in.
+ */
+
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import groups from './libraryIndex.json'
+import './labs.css'
+
+type Item = { path: string; file: string; kb: number }
+type Group = { name: string; items: Item[] }
+
+/** Filenames carry the meaning here, so make them readable. */
+function pretty(file: string) {
+  return file
+    .replace(/\.html$/, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^./, (c) => c.toUpperCase())
+}
+
+export default function DemoLibrary() {
+  const [query, setQuery] = useState('')
+  const all = groups as Group[]
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return all
+    return all
+      .map((g) => ({ ...g, items: g.items.filter((i) => i.file.toLowerCase().includes(q)) }))
+      .filter((g) => g.items.length > 0)
+  }, [all, query])
+
+  const total = all.reduce((n, g) => n + g.items.length, 0)
+  const shown = filtered.reduce((n, g) => n + g.items.length, 0)
+
+  return (
+    <main className="lx-root" style={{ ['--lx-accent' as string]: '#D9A84E' }}>
+      <header className="lx-bar">
+        <Link to="/visual-lab" className="lx-exit">← Visual Lab</Link>
+        <span className="lx-bar-title">Demo library</span>
+        <span className="lx-bar-count">{shown} of {total}</span>
+      </header>
+      <section className="lx-cover">
+        <p className="lx-kicker">Everything already built</p>
+        <h1>The archive.</h1>
+        <p className="lx-intro">
+          Every interactive demo and diagram built for RadioPass, gathered from four
+          duplicated folders and served here so it can actually be opened. These are{' '}
+          <strong>as they were originally written</strong> — the good ones get rebuilt into
+          proper modules in the site's own style; the rest are here to be judged and
+          discarded. Each opens in a new tab.
+        </p>
+
+        <input
+          className="lx-search"
+          type="search"
+          value={query}
+          placeholder="Filter by name — try k-space, spin echo, anode, chemical shift…"
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Filter demos by name"
+        />
+
+        {filtered.map((group) => (
+          <div key={group.name} className="lx-course-group">
+            <h2>
+              {group.name} · {group.items.length}
+            </h2>
+            <div className="lx-lib-grid">
+              {group.items.map((item) => (
+                <a
+                  key={item.path}
+                  className="lx-lib-card"
+                  href={`/library/${item.path}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <strong>{pretty(item.file)}</strong>
+                  <small>{item.kb} KB · {item.path.split('/')[0]}</small>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {shown === 0 && <p className="lx-course-note">Nothing matches “{query}”.</p>}
+      </section>
+    </main>
+  )
+}

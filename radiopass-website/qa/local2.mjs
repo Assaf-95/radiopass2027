@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1400, height: 900 } });
+const errs=[];
+p.on('pageerror', e => errs.push({ m: String(e.message).slice(0,300), s: String(e.stack||'').split('\n').slice(0,10).join('\n').slice(0,1200) }));
+await p.goto('http://localhost:5199/visual-lab', { waitUntil: 'load' });
+await p.waitForTimeout(5000);
+const st = await p.evaluate(()=>({ url: location.pathname, rootKids: document.getElementById('root')?.children.length, txt: document.body.innerText.slice(0,150) }));
+console.log(JSON.stringify({ st, errs }, null, 1));
+await b.close();

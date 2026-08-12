@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FRCR Physics Visual Lab</title>
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="index.html">FRCR Physics Visual Lab</a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="physics-question-bank.html">Question Bank</a>
+      <a href="lessons.html">Lessons</a>
+      <a href="xray-tube-physics-canvas.html">Canvas X-ray Tube</a>
+      <a href="mri-fat-water-spin-echo-stepwise.html">MRI Spin Echo</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div>
+        <p class="kicker">FRCR Part 1 Physics</p>
+        <h1>Visual physics, rebuilt in one place.</h1>
+        <p>A consolidated revision lab for radiology trainees: question bank, recovered animations, and interactive teaching pages without the liver anatomy side quest.</p>
+        <div class="hero-actions">
+          <a class="action" href="physics-question-bank.html">Open QBank</a>
+          <a class="action secondary" href="lessons.html">Browse lessons</a>
+        </div>
+      </div>
+      <div class="status-card">
+        <span class="badge">Recovered physics pages</span>
+        <strong id="lessonCount">0</strong>
+        <p>animations and teaching modules are now indexed from this folder.</p>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-head">
+        <div><p class="kicker">Start here</p><h2>Core tools</h2></div>
+      </div>
+      <div class="grid feature-grid" id="featuredGrid"></div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-head">
+        <div><p class="kicker">Physics modules</p><h2>Topics</h2></div>
+      </div>
+      <div class="grid module-grid">
+        <a class="card" href="lessons.html#mri"><span>MRI</span><h3>Magnetisation, RF, T1/T2, gradients</h3><p>FID, spin echo, fat-water behaviour, k-space and artefacts.</p></a>
+        <a class="card" href="lessons.html#radiography-x-ray-physics"><span>X-ray / CT</span><h3>Tube physics, spectrum, CTDI, pitch</h3><p>Canvas simulation plus recovered interaction and beam quality lessons.</p></a>
+        <a class="card" href="lessons.html#ultrasound"><span>Ultrasound</span><h3>Waves, impedance, Doppler</h3><p>Core ultrasound visuals for quick physics revision.</p></a>
+        <a class="card" href="lessons.html#nuclear-medicine"><span>Nuclear medicine</span><h3>PET, SPECT and gamma cameras</h3><p>Recovered diagrams for collimation, PET coincidence and SPECT ideas.</p></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/site-data.js"></script>
+  <script>
+    const lessons = window.FRCR_PHYSICS_LESSONS || [];
+    document.getElementById('lessonCount').textContent = lessons.length;
+    const grid = document.getElementById('featuredGrid');
+    lessons.filter(l => l.featured).slice(0, 9).forEach(lesson => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = lesson.href;
+      a.innerHTML = `<span>${lesson.badge}</span><h3>${lesson.title}</h3><p>${lesson.description}</p><small>${lesson.topic}</small>`;
+      grid.appendChild(a);
+    });
+  </script>
+</body>
+</html>

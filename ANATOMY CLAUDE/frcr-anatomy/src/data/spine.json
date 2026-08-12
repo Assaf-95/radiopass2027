@@ -1,0 +1,3420 @@
+[
+  {
+    "id": "spine-p0004",
+    "section": "spine",
+    "questionNumber": 1,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 4,
+    "sourcePageAnswer": 5,
+    "caseLabel": "Case 4.19",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Lateral C-spine radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Anterior arch of the atlas",
+        "acceptedVariants": [
+          "anterior arch of c1"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Vertebral body of C6",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinous process of C4",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "C3–C4 facet joint",
+        "acceptedVariants": [
+          "c3–c4 apophyseal joint",
+          "c3–c4 zygapophyseal joint",
+          "c3–c4 zygapophysial joint"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Hyoid bone",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "There are seven cervical vertebrae. The atlas (C1) does not have a body. It has a lateral mass on each side, an anterior and a posterior arch. The anterior arch of the atlas has a tubercle on its anterior surface and a facet posteriorly for articulation with the odontoid process.\n\nIdentifying a vertebral body and spinous process may appear straightforward but it is easy to lose marks by forgetting to number them. Numbering can be done by identifying the axis (C2) and counting from there. The axis has the odontoid process projecting upwards from its body.\n\nThe hyoid is a U shaped bone which lies below the floor of the mouth anterior to the C3 vertebral body. It consists of a body and four processes: two great cornua (singular cornu) and two lesser cornua. The great cornua project backwards from the lateral limits of the body and have a tubercle at the posterior end. The lesser cornua project upwards and backwards at the junction of the body of the hyoid with the great cornua.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 57.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 315–316."
+    ],
+    "regionTags": [
+      "Cervical spine"
+    ],
+    "structureTags": [
+      "Atlas",
+      "Vertebral body",
+      "Spinous process",
+      "Facet joint",
+      "Hyoid bone"
+    ],
+    "imagePath": "/images/spine/p0004.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 41.68,
+        "y": 19.33
+      },
+      "B": {
+        "x": 18.86,
+        "y": 80.11
+      },
+      "C": {
+        "x": 66.77,
+        "y": 74.11
+      },
+      "D": {
+        "x": 63.59,
+        "y": 51.35
+      },
+      "E": {
+        "x": 22.82,
+        "y": 52.3
+      }
+    }
+  },
+  {
+    "id": "spine-p0006",
+    "section": "spine",
+    "questionNumber": 2,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 6,
+    "sourcePageAnswer": 7,
+    "caseLabel": "Case 4.20",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Anteroposterior C-spine radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left first rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right transverse process of C 7",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Spinous process of T1",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right pedicle of C7",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left uncovertebral joint C5–C6",
+        "acceptedVariants": [
+          "left joint of luschka c5–c6"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "From C3 to C7 the vertebral bodies progressively increase in size from superior to inferior. On each side of the superior aspect of the vertebral body is the uncinate process: a bony ridge projecting superiorly from the lateral margin. The uncinate process articulates with a bevelled notch on the posterolateral surface of the vertebra above. This is called the uncovertebral joint.\n\nThe transverse processes of a cervical vertebra are short and end laterally with an anterior and a posterior tubercle. The transverse processes enclose the foramen transversarium with transmits the vertebral artery, accompanying veins and sympathetic nerves. The foramen transversarium of C7 may be absent. If present it is small and usually only transmits vertebral veins (not the vertebral artery).",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy. Edinburgh: Mosby, 2003: 56.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 315–316."
+    ],
+    "regionTags": [
+      "Cervical spine"
+    ],
+    "structureTags": [
+      "Rib",
+      "Transverse process",
+      "Spinous process",
+      "Pedicle",
+      "Uncovertebral joint"
+    ],
+    "imagePath": "/images/spine/p0006.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 87.9,
+        "y": 56.91
+      },
+      "B": {
+        "x": 35.69,
+        "y": 52.92
+      },
+      "C": {
+        "x": 23.78,
+        "y": 76.07
+      },
+      "D": {
+        "x": 52.48,
+        "y": 55.95
+      },
+      "E": {
+        "x": 72.82,
+        "y": 37.86
+      }
+    },
+    "imageCrop": {
+      "x": 0.00229,
+      "y": 0.00712,
+      "w": 0.99771,
+      "h": 0.99288
+    }
+  },
+  {
+    "id": "spine-p0008",
+    "section": "spine",
+    "questionNumber": 3,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 8,
+    "sourcePageAnswer": 9,
+    "caseLabel": "Case 4.21",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Lateral lumbar spine radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Pedicle of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior vertebral notch of L2 (exit foramen of the L2 nerve root)",
+        "acceptedVariants": [
+          "inferior vertebral notch of l2"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinous process of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Sacrum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Vertebral body of L4",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The fifth lumbar vertebra is atypical. It has a wedge-shaped body which is taller anteriorly. The superior surface of S1 is inclined to the horizontal at approximately 30–60° in the erect position (Ferguson's lumbosacral angle, mean ≈41°), and the angle is smaller when supine.\n\nIdentification of the labelled lumbar vertebral body is done on the assumption that segmentation is normal with five free lumbar vertebrae. Another assumption would be that the first vertebral body that does not articulate with a rib is L1. An image of a spine which has abnormal segmentation is unlikely to feature in an exam so it would be safe to number the vertebrae based on these assumptions. In fact the only way to be certain which vertebra is labelled is to count from the top when imaging of the whole spine is available.\n\nNote how the height of the intervertebral discs increases progressively from superior to inferior. The lumbosacral disc however is smaller than the other lumbar discs (usually less than 10 mm in height).",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 59.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 318–320."
+    ],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Pedicle",
+      "Vertebral notch",
+      "Nerve root",
+      "Spinous process",
+      "Sacrum",
+      "Vertebral body"
+    ],
+    "imagePath": "/images/spine/p0008.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 55.14,
+        "y": 60.13
+      },
+      "B": {
+        "x": 18.01,
+        "y": 24.0
+      },
+      "C": {
+        "x": 13.42,
+        "y": 37.3
+      },
+      "D": {
+        "x": 52.12,
+        "y": 96.6
+      },
+      "E": {
+        "x": 53.22,
+        "y": 67.37
+      }
+    },
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.06667,
+      "w": 1.0,
+      "h": 0.93333
+    }
+  },
+  {
+    "id": "spine-p0010",
+    "section": "spine",
+    "questionNumber": 4,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 10,
+    "sourcePageAnswer": 11,
+    "caseLabel": "Case 4.22",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Anteroposterior lumbar radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left pedicle of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right transverse process of L4",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Spinous process of L4",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "L3–L4 intervertebral disc space",
+        "acceptedVariants": [
+          "l3–l4 disc space",
+          "l3–l4 intervertebral disk space"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right sacroiliac joint",
+        "acceptedVariants": [
+          "right sacro-iliac joint"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "There are normally five free lumbar vertebrae. L5 is the largest; L3 has the longest transverse processes.\n\nProjecting posteriorly are the pedicles which connect to the laminae to form the spinal canal.\n\nThe articular processes arise from the junction of the pedicles and the laminae. The superior facets are concave. They face backwards and medially. They articulate with the inferior process of the vertebra above. The inferior articular facets are convex and face forwards and laterally.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 59.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 318–320."
+    ],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Pedicle",
+      "Transverse process",
+      "Spinous process",
+      "Intervertebral disc",
+      "Sacroiliac joint"
+    ],
+    "imagePath": "/images/spine/p0010.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 76.97,
+        "y": 30.48
+      },
+      "B": {
+        "x": 18.72,
+        "y": 72.51
+      },
+      "C": {
+        "x": 73.53,
+        "y": 48.65
+      },
+      "D": {
+        "x": 12.39,
+        "y": 47.69
+      },
+      "E": {
+        "x": 44.32,
+        "y": 90.42
+      }
+    }
+  },
+  {
+    "id": "spine-p0012",
+    "section": "spine",
+    "questionNumber": 5,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 12,
+    "sourcePageAnswer": 13,
+    "caseLabel": "Case 4.23",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Dens views (open mouth).",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left atlantoaxial joint",
+        "acceptedVariants": [
+          "left atlanto-axial joint"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left lateral mass of the axis (C2)",
+        "acceptedVariants": [
+          "left lateral mass of c2",
+          "left lateral mass of the axis"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right pedicle of the axis (C2)",
+        "acceptedVariants": [
+          "right pedicle of the axis"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Odontoid peg",
+        "acceptedVariants": [
+          "odontoid",
+          "odontoid process"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right lateral mass of the atlas (C1)",
+        "acceptedVariants": [
+          "right lateral mass of c1",
+          "right lateral mass of the atlas"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "This radiograph is performed through an open mouth. It shows an anteroposterior projection of the atlantoaxial joint. The lateral masses of the atlas have a superior and inferior articular facet each. The superior articular facets articulate with the occipital condyles to form the atlanto-occipital joints. The inferior articular facets articulate with the axis in the atlantoaxial joint.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 57.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 312."
+    ],
+    "regionTags": [
+      "Craniocervical junction",
+      "Cervical spine"
+    ],
+    "structureTags": [
+      "Atlantoaxial joint",
+      "Lateral mass",
+      "Pedicle",
+      "Odontoid peg"
+    ],
+    "imagePath": "/images/spine/p0012.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 84.59,
+        "y": 46.05
+      },
+      "B": {
+        "x": 80.1,
+        "y": 52.89
+      },
+      "C": {
+        "x": 18.95,
+        "y": 52.54
+      },
+      "D": {
+        "x": 60.34,
+        "y": 23.22
+      },
+      "E": {
+        "x": 14.01,
+        "y": 34.26
+      }
+    },
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.02964,
+      "w": 1.0,
+      "h": 0.96683
+    }
+  },
+  {
+    "id": "spine-p0014",
+    "section": "spine",
+    "questionNumber": 6,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 14,
+    "sourcePageAnswer": 15,
+    "caseLabel": "Question 4.10",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Spinous process of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior articular facet of L2",
+        "acceptedVariants": [
+          "inferior articular process of l2"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Pedicle of L2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Superior endplate of L2",
+        "acceptedVariants": [
+          "superior end plate of l2",
+          "upper endplate of l2"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Rectum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "There are five lumbar vertebrae. The superior and inferior margins of the vertebral bodies are termed the superior and inferior endplates. The intervertebral discs lie between the endplates of adjacent vertebrae and are not usually seen on X-rays. The lumbar spine (as demonstrated in this image) and cervical spine have a natural lordosis (or anterior curvature). The thoracic spine has a natural kyphosis (or posterior curvature).\n\nEach lumbar vertebra has paired pedicles that arise from the posterolateral aspect of the vertebral body. These are difficult to separate on the lateral X-ray as the structures overlap. There are paired superior and inferior facets that allow articulation with the adjacent vertebra and are best visualized on the lateral projection. The spinous processes of the lumbar vertebrae are bigger, thicker and broader than their cervical and thoracic counterparts. They are also more square-shaped and angled horizontally, rather than the caudal angulation of the thoracic spinous processes. The transverse processes are not visualized owing to their horizontal orientation.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Spinous process",
+      "Articular facet",
+      "Pedicle",
+      "Endplate",
+      "Rectum"
+    ],
+    "imagePath": "/images/spine/p0014.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 30.08,
+        "y": 58.73
+      },
+      "B": {
+        "x": 41.67,
+        "y": 42.54
+      },
+      "C": {
+        "x": 56.73,
+        "y": 32.84
+      },
+      "D": {
+        "x": 77.15,
+        "y": 30.08
+      },
+      "E": {
+        "x": 29.69,
+        "y": 74.55
+      }
+    },
+    "imageCrop": {
+      "x": 0.15342,
+      "y": 0.05596,
+      "w": 0.82561,
+      "h": 0.89474
+    }
+  },
+  {
+    "id": "spine-p0016",
+    "section": "spine",
+    "questionNumber": 7,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 16,
+    "sourcePageAnswer": 17,
+    "caseLabel": "Case 4.16",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Name the structure labelled A. / Name the structure labelled B. / Name the structure labelled C. / Name the structure labelled D. / Name the articulation labelled E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Coccyx",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Acetabulum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Iliac crest",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Superior articular process of L5",
+        "acceptedVariants": [
+          "superior articular facet of l5"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Facet joint between L3 and L4",
+        "acceptedVariants": [
+          "apophyseal joint between l3 and l4",
+          "zygapophyseal joint between l3 and l4",
+          "zygapophysial joint between l3 and l4"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Coned lateral radiographs of the lumbosacral junction are commonly obtained to assess for spondylolysis and spondylolisthesis. Spondylolysis involves a fracture of the pars interarticularis – the part of a vertebra that lies between its superior and inferior articular facets. On an oblique view, this can be seen as a 'collar' through the neck of a 'Scottie dog' as shown in Figure 4.3. Spondylolisthesis describes the vertebral displacement that may occur as a result of spondylolysis.\n\n[Figure 4.3: Scottie dog diagram — the Scottie dog's collar is the appearance of a defect in the pars interarticularis. Labelled parts: superior facet, pars interarticularis, facet joint, inferior facet, Scottie dog's collar, Scottie dog.]",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Lumbosacral junction"
+    ],
+    "structureTags": [
+      "Coccyx",
+      "Acetabulum",
+      "Iliac crest",
+      "Articular process",
+      "Facet joint",
+      "Pars interarticularis"
+    ],
+    "imagePath": "/images/spine/p0016.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 67.35,
+        "y": 55.6
+      },
+      "B": {
+        "x": 60.5,
+        "y": 42.8
+      },
+      "C": {
+        "x": 22.89,
+        "y": 15.03
+      },
+      "D": {
+        "x": 77.58,
+        "y": 16.37
+      },
+      "E": {
+        "x": 74.79,
+        "y": 10.5
+      }
+    },
+    "imageCrop": {
+      "x": 0.17405,
+      "y": 0.002,
+      "w": 0.67405,
+      "h": 0.66133
+    }
+  },
+  {
+    "id": "spine-p0018",
+    "section": "spine",
+    "questionNumber": 8,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 18,
+    "sourcePageAnswer": 19,
+    "caseLabel": "7.2",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Lateral radiograph thoracolumbar spine.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "T11/T12 disc space",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "T12 vertebral body",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Twelfth rib",
+        "acceptedVariants": [
+          "12th rib"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "L1 pedicle",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "L1/L2 facet joint",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The interpedicular distance should increase to a maximum at the L5 level.\nPedicular destruction is most common in metastatic disease.\nIrregularity of the endplates with loss of disc height is often seen in discitis.\nLess than 10 degrees of scoliosis is within normal limits.\nThe lateral film demonstrates the depth of the posterior costophrenic angle with the lungs reaching the T12 level.",
+    "references": [],
+    "regionTags": [
+      "Thoracic spine",
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Intervertebral disc",
+      "Vertebral body",
+      "Rib",
+      "Pedicle",
+      "Facet joint"
+    ],
+    "imagePath": "/images/spine/p0018.webp",
+    "flagForReview": "Source prints labels in lowercase (a)–(e); normalized to uppercase A–E for display consistency, wording of answers unchanged.",
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 44.73,
+        "y": 55.73
+      },
+      "B": {
+        "x": 95.61,
+        "y": 59.13
+      },
+      "C": {
+        "x": 41.02,
+        "y": 66.43
+      },
+      "D": {
+        "x": 93.16,
+        "y": 67.8
+      },
+      "E": {
+        "x": 92.33,
+        "y": 73.27
+      }
+    },
+    "imageCrop": {
+      "x": 0.33203,
+      "y": 0.07333,
+      "w": 0.66797,
+      "h": 0.92533
+    }
+  },
+  {
+    "id": "spine-p0020",
+    "section": "spine",
+    "questionNumber": 9,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 20,
+    "sourcePageAnswer": 21,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Lumbar Spine Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Sacral promontory",
+        "acceptedVariants": [
+          "promontory of sacrum",
+          "promontory of the sacrum"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Transverse process of L3 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Superior articular process of L4 vertebra",
+        "acceptedVariants": [
+          "superior articular facet of l4 vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Inferior articular process (facet) of L2 vertebra",
+        "acceptedVariants": [
+          "inferior articular process of l2 vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Iliac crest",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Use the L5 vertebral body as a landmark for identifying the correct level of the lumbar vertebra and hence its respective parts. Oblique views of the lumbar spine are used to see the pars interarticularis and facet joints (Scotty dog sign); the lumbar intervertebral foramina are best seen on the lateral view.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Sacral promontory",
+      "Transverse process",
+      "Articular process",
+      "Iliac crest"
+    ],
+    "imagePath": "/images/spine/p0020.webp",
+    "flagForReview": "Continuous-atlas numbered labels (no case header in source); part of a larger reference atlas with non-resetting numbering.",
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 26.47,
+        "y": 79.85
+      },
+      "B": {
+        "x": 25.98,
+        "y": 34.71
+      },
+      "C": {
+        "x": 22.79,
+        "y": 52.27
+      },
+      "D": {
+        "x": 25.12,
+        "y": 43.3
+      },
+      "E": {
+        "x": 87.16,
+        "y": 55.16
+      }
+    },
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00266,
+      "w": 0.99263,
+      "h": 0.99734
+    }
+  },
+  {
+    "id": "spine-p0022",
+    "section": "spine",
+    "questionNumber": 10,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 22,
+    "sourcePageAnswer": 23,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Radiograph",
+    "projection": "Lumbar Spine Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Twelfth rib",
+        "acceptedVariants": [
+          "12th rib"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Sacral promontory",
+        "acceptedVariants": [
+          "promontory of sacrum",
+          "promontory of the sacrum"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Inferior articular facet of L5 vertebra",
+        "acceptedVariants": [
+          "inferior articular process of l5 vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Spinous process of L3 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "L2 nerve root",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "In the lumbar spine, the nerves exit beneath the pedicle of their respective vertebra. Vertically oriented superior and inferior articular facets give good vertebral stability such that vertebral malalignment should raise the possibility of a defect in the pars interarticularis, best seen on plain films in the oblique projection (Scotty dog view) or optimally demonstrated by CT.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Rib",
+      "Sacral promontory",
+      "Articular facet",
+      "Spinous process",
+      "Nerve root"
+    ],
+    "imagePath": "/images/spine/p0022-clean.png",
+    "flagForReview": "Question image carries an additional printed caption 'Which nerve passes through the structure labelled 20.' which is redundant with label 20's own answer (L2 nerve root) — preserved verbatim, no separate answer given in source for this sub-question.",
+    "labelsBurnedIn": true,
+    "labelPositions": {
+      "A": {
+        "x": 93.43,
+        "y": 13.47
+      },
+      "B": {
+        "x": 11.57,
+        "y": 69.7
+      },
+      "C": {
+        "x": 90.29,
+        "y": 59.17
+      },
+      "D": {
+        "x": 82.64,
+        "y": 26.53
+      },
+      "E": {
+        "x": 16.86,
+        "y": 29.23
+      }
+    },
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+    }
+  },
+  {
+    "id": "spine-p0024",
+    "section": "spine",
+    "questionNumber": 11,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 24,
+    "sourcePageAnswer": 25,
+    "caseLabel": "Case 20",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "AP radiograph. Lumbar spine.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Stomach",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left ischial spine",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right pedicle of L2 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right sacral ala",
+        "acceptedVariants": [
+          "right ala of sacrum",
+          "right ala of the sacrum",
+          "right sacral alum",
+          "right sacral wing",
+          "right wing of the sacrum"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Spinous process of L1 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Remember that thoracic spinous processes are angled caudally and project over the vertebral body below; lumbar spinous processes are nearly horizontal and project over the lower part of their own vertebral body.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Stomach",
+      "Ischial spine",
+      "Pedicle",
+      "Sacral ala",
+      "Spinous process"
+    ],
+    "imagePath": "/images/spine/p0024.webp",
+    "flagForReview": "Question image uses letter labels A–E; source answer key lists the structures 1–5 numerically with no explicit letter cross-reference printed. Mapped A=1…E=5 by position, consistent with the same convention confirmed elsewhere in this deck (Cases 18/19 in the cross-sectional section) — recommend spot-checking against the original source book.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.002,
+      "w": 1.0,
+      "h": 0.98467
+    }
+  },
+  {
+    "id": "spine-p0026",
+    "section": "spine",
+    "questionNumber": 12,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 26,
+    "sourcePageAnswer": 27,
+    "caseLabel": "Case 19",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain radiograph. Lateral lumbar spine.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Superior articular process of L4",
+        "acceptedVariants": [
+          "superior articular facet of l4"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Pedicle of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinous process of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Inferior articular process of L3",
+        "acceptedVariants": [
+          "inferior articular facet of l3"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Twelfth rib",
+        "acceptedVariants": [
+          "12th rib"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Articular process",
+      "Pedicle",
+      "Spinous process",
+      "Rib"
+    ],
+    "imagePath": "/images/spine/p0026.webp",
+    "flagForReview": "Question image uses letter labels A–E; source answer key lists the structures 1–5 numerically with no explicit letter cross-reference printed. Mapped A=1…E=5 by position — recommend spot-checking against the original source book. Note: this deck contains a second, unrelated 'Case 19' in the cross-sectional imaging section (different image/answers) — case numbers are not unique across sub-sources; the PDF page number is the true identifier."
+  },
+  {
+    "id": "spine-p0028",
+    "section": "spine",
+    "questionNumber": 13,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 28,
+    "sourcePageAnswer": 29,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "CT",
+    "projection": "CT Lumbar Spine (3D Reconstruction)",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left 11th rib (tip of)",
+        "acceptedVariants": [
+          "left 11th rib"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left pedicle of L3 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left anterior superior iliac spine",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left anterior inferior iliac spine",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Coccyx",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "To identify the level of a vertebra, count down from T12 (origin of 12th rib). The coccyx is formed from four fused vertebrae.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Pelvis"
+    ],
+    "structureTags": [
+      "Rib",
+      "Pedicle",
+      "Iliac spine",
+      "Coccyx"
+    ],
+    "imagePath": "/images/spine/p0028.webp",
+    "flagForReview": "Continuous-atlas numbered labels (no case header in source). Source prints numbered markers that do not match the A-E answer keys; automatic substitution was attempted and rejected on review, so the film still shows numbers.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 0.998
+    }
+  },
+  {
+    "id": "spine-p0030",
+    "section": "spine",
+    "questionNumber": 14,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 30,
+    "sourcePageAnswer": 31,
+    "caseLabel": "Case 2.4",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Fluoroscopy",
+    "projection": null,
+    "questionText": "Name the structure labelled A. / Name the structure labelled B. / Name the structure labelled C. / Name the structure labelled D. / Name the structure labelled E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left pedicle of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left sacral ala",
+        "acceptedVariants": [
+          "left ala of sacrum",
+          "left ala of the sacrum",
+          "left sacral ala",
+          "left sacral wing",
+          "left wing of the sacrum",
+          "left sacral alum"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right sacro-iliac joint",
+        "acceptedVariants": [
+          "right sacroiliac joint"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right L5 nerve root",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right superior articular process of L4",
+        "acceptedVariants": [
+          "right superior articular facet of l4"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "Fluoroscopic lumbar myelography is performed as the initial stage of CT myelography and can also provide useful information as to the presence of intervertebral disc disease and nerve root involvement. Nerve roots are evident as filling defects which exit the spinal cord anterolaterally and course inferolaterally on each side. The conus medullaris can be visualised extending down to the level of L1/2, and the filum terminale may also be identified in the midline. The highest level of the iliac crest (L4) is used as a guide for lumbar puncture, which is usually performed using the interspace of the level above or below.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Pedicle",
+      "Sacral ala",
+      "Sacroiliac joint",
+      "Nerve root",
+      "Articular process"
+    ],
+    "imagePath": "/images/spine/p0030.webp",
+    "flagForReview": "Answer B reads 'Left sacral alum' verbatim in the source — likely intends 'ala' (sacral ala); preserved exactly as printed per fidelity rules, not corrected.",
+    "imageCrop": {
+      "x": 0.27734,
+      "y": 0.00867,
+      "w": 0.4662,
+      "h": 0.65133
+    }
+  },
+  {
+    "id": "spine-p0033",
+    "section": "spine",
+    "questionNumber": 15,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 33,
+    "sourcePageAnswer": 34,
+    "caseLabel": "Case 14.16",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound of the thoracic cord of a neonate",
+    "questionText": "Name the meningeal layer(s) labelled A and E, and the structures labelled B, C and D.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Dura mater",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Spinous process",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Subarachnoid space",
+        "acceptedVariants": [
+          "sub-arachnoid space"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Spinal cord",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Pia and arachnoid mater",
+        "acceptedVariants": [
+          "leptomeninges",
+          "pia-arachnoid"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "It is possible to visualise the spinal cord using ultrasound in the first few months of life, whilst posterior spinal arches are incompletely ossified. The spinal cord itself is seen on longitudinal ultrasound as a hypoechoic tubular structure with a central echogenic stripe (the central echo complex, an interface at the region of the anterior median fissure/central canal). The echogenic line on either side of the cord represents the pia and arachnoid mater, which lie very close to each other and cannot be distinguished separately on ultrasound. The hypoechoic cerebrospinal fluid-filled subarachnoid space lies between the arachnoid mater and the dura mater (also seen as an echogenic stripe). Dense acoustic shadowing is seen from the spinous processes.",
+    "references": [],
+    "regionTags": [
+      "Thoracic spine"
+    ],
+    "structureTags": [
+      "Dura mater",
+      "Spinous process",
+      "Subarachnoid space",
+      "Spinal cord",
+      "Pia mater",
+      "Arachnoid mater"
+    ],
+    "imagePath": "/images/spine/p0033.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 0.48485
+    }
+  },
+  {
+    "id": "spine-p0036",
+    "section": "spine",
+    "questionNumber": 16,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 36,
+    "sourcePageAnswer": 37,
+    "caseLabel": "Case 4.30",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal T1-weighted image MRI of the spine.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Posterior arch of the atlas",
+        "acceptedVariants": [
+          "posterior arch of c1"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Posterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinal cord in the spinal canal",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Intervertebral disc C7-T1",
+        "acceptedVariants": [
+          "disc c7-t1",
+          "disc space c7-t1",
+          "intervertebral disk c7-t1"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Manubrium",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The spinal cord extends from the foramen magnum to the conus medullaris which usually lies at the level of L1/L2. It lies in the spinal canal surrounded by cerebrospinal fluid.\n\nIntervertebral discs lie between vertebral bodies. They are composed of a nucleus pulposus (a gelatinous core) and an outer ring of concentric fibres of fibrous tissues called annulus fibrosus.\n\nThe vertebral canal is lined anteriorly by the posterior longitudinal ligament which covers the posterior surface of vertebral bodies and intervertebral discs. Posteriorly, the spinal canal is lined by the ligamentum flavum which joins adjacent laminae.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 62.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 99."
+    ],
+    "regionTags": [
+      "Cervical spine",
+      "Thoracic spine"
+    ],
+    "structureTags": [
+      "Posterior arch of atlas",
+      "Posterior longitudinal ligament",
+      "Spinal cord",
+      "Intervertebral disc",
+      "Manubrium"
+    ],
+    "imagePath": "/images/spine/p0036.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00141,
+      "w": 1.0,
+      "h": 0.99788
+    }
+  },
+  {
+    "id": "spine-p0038",
+    "section": "spine",
+    "questionNumber": 17,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 38,
+    "sourcePageAnswer": 39,
+    "caseLabel": "Case 4.31",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal T2-weighted MRI of the lumbar spine.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Conus medullaris",
+        "acceptedVariants": [
+          "conus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Cauda equina",
+        "acceptedVariants": [
+          "cauda equina nerve roots",
+          "nerve roots of the cauda equina"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Sacral promontory",
+        "acceptedVariants": [
+          "promontory of sacrum",
+          "promontory of the sacrum"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Anterior epidural fat pad",
+        "acceptedVariants": [
+          "anterior extradural fat pad"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Anterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The lower end of the spinal cord tapers to form the conus medullaris. Below the conus medullaris, the nerve roots pass vertically down to form the cauda equina.\n\nThe anterior longitudinal ligament is a strong fibrous band that covers the anterior surface of the vertebral bodies and intervertebral discs. It runs from the anterior tubercle of C1 to the sacrum. It prevents hyperextension of the vertebral column.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 63.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 103."
+    ],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacrum"
+    ],
+    "structureTags": [
+      "Conus medullaris",
+      "Cauda equina",
+      "Sacral promontory",
+      "Epidural fat",
+      "Anterior longitudinal ligament"
+    ],
+    "imagePath": "/images/spine/p0038.webp",
+    "flagForReview": null
+  },
+  {
+    "id": "spine-p0040",
+    "section": "spine",
+    "questionNumber": 18,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 40,
+    "sourcePageAnswer": 41,
+    "caseLabel": "Question 23",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "T2-weighted sagittal MRI of the spine.",
+    "questionText": "Identify the structure indicated by the arrow.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "L3/4 intervertebral disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Intervertebral discs form fibrocartilaginous joints between successive vertebral bodies.\n\nThey are amphiarthrodial joints (meaning that limited movement is possible) and, in effect, act as a ligament to maintain vertebral alignment.\n\nThe intervertebral discs constitute one fifth of the vertebral column height.\n\nIntervertebral discs are wedge-shaped in the cervical and lumbar regions, contributing to spine lordosis. The thoracic intervertebral discs are rectangular in shape.\n\nEach intervertebral disc is composed of an outer annulus fibrosus, a central nucleus pulposus, and cartilaginous endplates.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Intervertebral disc",
+      "Nucleus pulposus",
+      "Annulus fibrosus"
+    ],
+    "imagePath": "/images/spine/p0040.webp",
+    "flagForReview": "Single unlabelled arrow: answer key renamed Answer->A so the field matches the standard A-E scheme. No glyph on the image to replace.",
+    "labelsBurnedIn": true,
+    "labelPositions": {},
+    "singleArrowNoGlyph": true,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.09061,
+      "w": 0.97005,
+      "h": 0.90939
+    }
+  },
+  {
+    "id": "spine-p0042",
+    "section": "spine",
+    "questionNumber": 19,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 42,
+    "sourcePageAnswer": 43,
+    "caseLabel": "Question 2.18",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal T2 MRI of the lumbar spine",
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Nutrient vessel of L1",
+        "acceptedVariants": [
+          "nutrient artery of l1",
+          "nutrient canal of l1",
+          "nutrient foramen of l1"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Nucleus pulposus of the L1/L2 disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Conus medullaris",
+        "acceptedVariants": [
+          "conus"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Cauda equina",
+        "acceptedVariants": [
+          "cauda equina nerve roots",
+          "nerve roots of the cauda equina"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Anterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "T2 sequences of the lumbar spine can be recognized by the high signal intensity of the cerebrospinal fluid. There are seven cervical, twelve thoracic, five lumbar and five sacral vertebrae. The spinal cord termination is called the conus medullaris and is normally located at the level of L1 or L2. The spinal roots that descend from the lower end of the cord are called the cauda equina, which is Latin for 'the horse's tail'.\n\nThe spinal ligaments from anterior to posterior are:\n\nAnterior longitudinal ligament - Extends along the anterior vertebral bodies\nPosterior longitudinal ligament - Extends along the posterior vertebral bodies\nLigamentum flavum - Connects the laminae of the adjacent vertebrae\nInterspinous ligament - Connect the adjoining spinous processes\nSupraspinous ligament - Connects the tips of the spinous processes\n\nThe intervertebral discs consist of the central nucleus pulposus and the outer fibrous annulus fibrosus.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Nutrient vessel",
+      "Nucleus pulposus",
+      "Conus medullaris",
+      "Cauda equina",
+      "Anterior longitudinal ligament",
+      "Spinal ligaments"
+    ],
+    "imagePath": "/images/spine/p0042.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.13538,
+      "y": 0.06133,
+      "w": 0.83574,
+      "h": 0.88
+    }
+  },
+  {
+    "id": "spine-p0044",
+    "section": "spine",
+    "questionNumber": 20,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 44,
+    "sourcePageAnswer": 45,
+    "caseLabel": "Case 3.16",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": null,
+    "questionText": "Name the structure labelled A.\nName the structure labelled B.\nName the structure labelled C.\nName the structure labelled D.\nWhat nerve root exits below the left L4 pedicle?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left pedicle of L1",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left pars interarticularis of L1",
+        "acceptedVariants": [
+          "left pars of l1"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left erector spinae muscle",
+        "acceptedVariants": [
+          "left sacrospinalis muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "L3 neural exit foramen",
+        "acceptedVariants": [
+          "l3 exit foramen",
+          "l3 intervertebral foramen",
+          "l3 neural exit foramina",
+          "l3 neural foramen"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left L4 nerve root",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "In the cervical spine, nerve roots exit above their correspondingly numbered pedicles. The C8 nerve root has no corresponding vertebra and accordingly exits below the C7 pedicle. In the thoracolumbar spine, nerve roots exit below their correspondingly numbered pedicles. Accordingly, the left L4 nerve root will exit below the left pedicle of L4, in the neural exit foramen formed between the L4 and L5 vertebrae. See the schematic representation of a parasagittal view of the neural exit foramen in Figure 3.3 (Schematic illustration of neural exit foramen).",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Pedicle",
+      "Pars interarticularis",
+      "Erector spinae",
+      "Neural exit foramen",
+      "Nerve root"
+    ],
+    "imagePath": "/images/spine/p0044.webp",
+    "flagForReview": "Label E on the question worksheet is a distinct sub-question ('What nerve root exits below the left L4 pedicle?') rather than a simple 'name structure E', and has no corresponding lettered arrow in the image itself; its answer ('Left L4 nerve root') is given on the answer page. The answer page also includes a supplementary schematic diagram (Figure 3.3) with its own axis labels (e.g. 'Inferior aspect of L4 pedicle', 'Exiting L4 nerve root') not reproduced verbatim in teachingText.",
+    "imageCrop": {
+      "x": 0.17879,
+      "y": 0.0,
+      "w": 0.65859,
+      "h": 0.64533
+    }
+  },
+  {
+    "id": "spine-p0046",
+    "section": "spine",
+    "questionNumber": 21,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 46,
+    "sourcePageAnswer": 47,
+    "caseLabel": "Case 6.17",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Conus medullaris",
+        "acceptedVariants": [
+          "conus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Spinous process of L2",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Filum terminale",
+        "acceptedVariants": [
+          "filum"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Posterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Channel for basivertebral veins",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The conus medullaris is the most inferior portion of the spinal cord, which in adults usually terminates at the L1-2 level. The filum terminale - a condensation of pia mater - continues inferiorly from the apex of the conus medullaris as a single fibrous strand which inserts into the posterior coccyx. A low-lying conus medullaris and thickening of the filum terminale (it should be less than 2 mm thick, measured at L5/S1) are indicators of spinal dysraphism.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacrum"
+    ],
+    "structureTags": [
+      "Conus medullaris",
+      "Spinous process",
+      "Filum terminale",
+      "Posterior longitudinal ligament",
+      "Basivertebral vein"
+    ],
+    "imagePath": "/images/spine/p0046.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 0.99749,
+      "h": 0.99861
+    }
+  },
+  {
+    "id": "spine-p0048",
+    "section": "spine",
+    "questionNumber": 22,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 48,
+    "sourcePageAnswer": 49,
+    "caseLabel": "Case 7.18",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal T2-weighted MR lumbar spine",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Basivertebral vein",
+        "acceptedVariants": [
+          "basivertebral venous channel",
+          "channel for the basivertebral veins"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Interspinous ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Nucleus pulposus of L2/L3 disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Annulus fibrosis of L4/L5 disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Ligamentum flavum",
+      "Basivertebral vein",
+      "Interspinous ligament",
+      "Nucleus pulposus",
+      "Annulus fibrosus"
+    ],
+    "imagePath": "/images/spine/p0048.webp",
+    "flagForReview": "Question page prints answer labels as uppercase circled letters (A-E); the answer page prints them in lowercase (a)-(e). Mapped 1:1 by letter identity (a=A, b=B, etc.) - a typographic/case difference only, not a genuine cross-referencing ambiguity.",
+    "imageCrop": {
+      "x": 0.24018,
+      "y": 0.07,
+      "w": 0.75982,
+      "h": 0.93
+    }
+  },
+  {
+    "id": "spine-p0050",
+    "section": "spine",
+    "questionNumber": 23,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 50,
+    "sourcePageAnswer": 51,
+    "caseLabel": "Case 6.6",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal MRI of the spine.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Posterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Anterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Intervertebral disc",
+        "acceptedVariants": [
+          "disc space",
+          "intervertebral disk"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Thoracic spinal cord",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "For further discussion see Chapter 4, Cases 4.19-4.31.",
+    "references": [],
+    "regionTags": [
+      "Thoracic spine"
+    ],
+    "structureTags": [
+      "Ligamentum flavum",
+      "Posterior longitudinal ligament",
+      "Anterior longitudinal ligament",
+      "Intervertebral disc",
+      "Spinal cord"
+    ],
+    "imagePath": "/images/spine/p0050.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00839,
+      "w": 1.0,
+      "h": 0.98952
+    }
+  },
+  {
+    "id": "spine-p0052",
+    "section": "spine",
+    "questionNumber": 24,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 52,
+    "sourcePageAnswer": 53,
+    "caseLabel": "Case 6.8",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Sagittal MRI of the lumbar spine.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "L4-L5 Intervertebral disc",
+        "acceptedVariants": [
+          "l4-l5 disc",
+          "l4-l5 disc space",
+          "l4-l5 intervertebral disk"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Interspinous ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinous process of L4",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Posterior epidural space",
+        "acceptedVariants": [
+          "posterior extradural space"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Presacral space",
+        "acceptedVariants": [
+          "retrorectal space"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The interspinous ligament is an accessory ligament uniting the spinous processes. The supraspinous ligament joins the tips of the spinous processes.\n\nThe epidural space contains epidural veins, fat and nerve roots. The posterior epidural space is most extensive at L3-L4 and L4-L5 interspaces. This is important clinically as it is the site used for epidural injections.\n\nThe presacral space is located between the rectum and the sacrococcygeal part of the spine. Knowing the upper limit of the normal width of this space is important as clinically relevant measurements may be asked. If the width exceeds 15 mm, pelvic pathology should be suspected.",
+    "references": [
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 103."
+    ],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacrum"
+    ],
+    "structureTags": [
+      "Intervertebral disc",
+      "Interspinous ligament",
+      "Spinous process",
+      "Epidural space",
+      "Presacral space"
+    ],
+    "imagePath": "/images/spine/p0052.webp",
+    "flagForReview": null
+  },
+  {
+    "id": "spine-p0054",
+    "section": "spine",
+    "questionNumber": 25,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 54,
+    "sourcePageAnswer": 55,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "MRI",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "L3/L4 intervertebral disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Sacral promontory",
+        "acceptedVariants": [
+          "promontory of sacrum",
+          "promontory of the sacrum"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Presacral space",
+        "acceptedVariants": [
+          "retrorectal space"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Filum terminale",
+        "acceptedVariants": [
+          "filum"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Remember to name the different parts of the aorta (it may seem obvious but you will lose marks unnecessarily).",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacrum"
+    ],
+    "structureTags": [
+      "Intervertebral disc",
+      "Sacral promontory",
+      "Presacral space",
+      "Filum terminale",
+      "Abdominal aorta"
+    ],
+    "imagePath": "/images/spine/p0054.webp",
+    "flagForReview": "Continuous atlas-style numbering (no case/question header present); numbering does not follow page order relative to neighbouring atlas questions in this deck (e.g. this page's 56-60 appears before a 31-35 set later), consistent with multiple non-sequential atlas image series being interleaved in the source.",
+    "imageCrop": {
+      "x": 0.02326,
+      "y": 0.00467,
+      "w": 0.9593,
+      "h": 0.99467
+    }
+  },
+  {
+    "id": "spine-p0056",
+    "section": "spine",
+    "questionNumber": 26,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 56,
+    "sourcePageAnswer": 57,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "MRI",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Conus medullaris",
+        "acceptedVariants": [
+          "conus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Posterior longitudinal ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Presacral fat",
+        "acceptedVariants": [
+          "retrorectal fat"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "T11/12 intervertebral disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The conus medullaris terminates at L1/L2 level. The presacral fat is high signal on T2-weighted image and blood vessels are of low signal intensity representing flow void. This image shows major blood vessel traversing the length of the abdomen, which can only be either abdominal aorta or IVC. Only the aorta gives off anterior branches. The coeliac artery and SMA are the two major anterior branches of abdominal aorta; hence 32 is a superior mesenteric artery.",
+    "references": [],
+    "regionTags": [
+      "Thoracolumbar spine",
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Conus medullaris",
+      "Superior mesenteric artery",
+      "Posterior longitudinal ligament",
+      "Presacral fat",
+      "Intervertebral disc"
+    ],
+    "imagePath": "/images/spine/p0056.webp",
+    "flagForReview": "Continuous atlas-style numbering (no case/question header present); part of the same non-sequential atlas image series as the 56-60 and 71-75 numbered questions elsewhere in this range. Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E). Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E).",
+    "imageCrop": {
+      "x": 0.08435,
+      "y": 0.0,
+      "w": 0.89126,
+      "h": 1.0
+    },
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 96.2,
+        "y": 30.5,
+        "sizePct": 2.44
+      },
+      {
+        "letter": "B",
+        "x": 3.33,
+        "y": 35.17,
+        "sizePct": 2.78
+      },
+      {
+        "letter": "C",
+        "x": 26.62,
+        "y": 52.17,
+        "sizePct": 2.89
+      },
+      {
+        "letter": "D",
+        "x": 28.9,
+        "y": 94.39,
+        "sizePct": 2.89
+      },
+      {
+        "letter": "E",
+        "x": 31.27,
+        "y": 15.39,
+        "sizePct": 2.78
+      }
+    ]
+  },
+  {
+    "id": "spine-p0058",
+    "section": "spine",
+    "questionNumber": 27,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 58,
+    "sourcePageAnswer": 59,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "MRI",
+    "projection": null,
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Conus medullaris",
+        "acceptedVariants": [
+          "conus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Basivertebral vein of L3",
+        "acceptedVariants": [
+          "basivertebral venous channel of l3",
+          "channel for the basivertebral veins of l3"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Nucleus pulposus L4/5 intervertebral disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Epidural fat",
+        "acceptedVariants": [
+          "extradural fat"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Intervertebral discs have a peripheral annulus fibrosus (dark on all MR sequences) and a central nucleus pulposus (intermediate signal). Normal basivertebral veins may enhance quite prominently following injection of gadolinium-based contrast material.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Conus medullaris",
+      "Basivertebral vein",
+      "Ligamentum flavum",
+      "Nucleus pulposus",
+      "Epidural fat"
+    ],
+    "imagePath": "/images/spine/p0058.webp",
+    "flagForReview": "Continuous atlas-style numbering (no case/question header present); part of the same non-sequential atlas image series as the 56-60 and 31-35 numbered questions elsewhere in this range.",
+    "imageCrop": {
+      "x": 0.15194,
+      "y": 0.0,
+      "w": 0.84483,
+      "h": 1.0
+    }
+  },
+  {
+    "id": "spine-p0060",
+    "section": "spine",
+    "questionNumber": 28,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 60,
+    "sourcePageAnswer": 61,
+    "caseLabel": "Case 18",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "MRI lumbar spine. T2W sagittal section.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Urinary bladder",
+        "acceptedVariants": [
+          "bladder"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Spinal cord",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Cauda equina",
+        "acceptedVariants": [
+          "cauda equina nerve roots",
+          "nerve roots of the cauda equina"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacrum"
+    ],
+    "structureTags": [
+      "Urinary bladder",
+      "Spinal cord",
+      "Ligamentum flavum",
+      "Cauda equina",
+      "Abdominal aorta"
+    ],
+    "imagePath": "/images/spine/p0060.webp",
+    "flagForReview": "Question page (p60) labels structures with letters A-E, but the answer page (p61, headed 'Case 18') lists answers as plain numbers 1-5 with no explicit A/B/C/D/E cross-reference printed anywhere. Mapped positionally by standard alphabetical convention (A=1, B=2, C=3, D=4, E=5); this specific mapping is NOT stated on the source pages and should be verified against the original textbook. Note: the identical base image (same arrow placements for A-E) is reused for Case 19 (p62/63), where the letters apparently correspond to different (bony) structures - see flag on that entry.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00267,
+      "w": 1.0,
+      "h": 0.96667
+    }
+  },
+  {
+    "id": "spine-p0062",
+    "section": "spine",
+    "questionNumber": 29,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 62,
+    "sourcePageAnswer": 63,
+    "caseLabel": "Case 19",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "MRI lumbar spine. T1W sagittal section.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Uterus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Pedicle of L4 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Spinous process of T12 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Inferior articular process of L4 vertebra",
+        "acceptedVariants": [
+          "inferior articular facet of l4 vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Superior articular process of L4 vertebra",
+        "acceptedVariants": [
+          "superior articular facet of l4 vertebra"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Uterus",
+      "Pedicle",
+      "Spinous process",
+      "Inferior articular process",
+      "Superior articular process"
+    ],
+    "imagePath": "/images/spine/p0062.webp",
+    "flagForReview": "Question page (p62) labels structures with letters A-E using an image visually IDENTICAL (same arrow positions) to Case 18's question image (p60), but the answer page (p63, headed 'Case 19') lists different, bone-focused answers as plain numbers 1-5 with no explicit A/B/C/D/E cross-reference. Mapped positionally by standard alphabetical convention (A=1 Uterus, B=2, C=3, D=4, E=5); this mapping is NOT stated on the source pages. The fact that label A maps to 'Uterus' here but to 'Urinary bladder' in Case 18 at the identical image position is itself a discrepancy worth manual verification against the original textbook - transcribed as printed without correction per fidelity rules."
+  },
+  {
+    "id": "spine-p0064",
+    "section": "spine",
+    "questionNumber": 30,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 64,
+    "sourcePageAnswer": 65,
+    "caseLabel": "Case 4.24",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "Axial CT image of the atlantoaxial joint.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Anterior tubercle of the atlas",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Odontoid peg",
+        "acceptedVariants": [
+          "odontoid",
+          "odontoid process"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right foramen transversarium of the axis",
+        "acceptedVariants": [
+          "right transverse foramen of the axis"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Posterior arch of the atlas",
+        "acceptedVariants": [
+          "posterior arch of c1"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right lateral mass of the atlas",
+        "acceptedVariants": [
+          "right lateral mass of c1"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "We have already seen the atlas and the axis in the lateral CT spine radiograph and the open mouth dens views. Here we see the odontoid peg and its relation to the anterior arch of the atlas. This relationship is maintained by the transverse ligament which attaches to the lateral masses of C1.\n\nIn this axial view, we see the tubercles on the arches of the atlas. The anterior tubercle projects from the anterior surface of the anterior arch. It is a blunt midline projection. The posterior tubercle is a midline projection on the posterior surface of the posterior arch. It represents the spinous process of the atlas and is an attachment of the ligamentum nuchae.\n\nThe atlas has transverse processes that arise from two roots. The anterior root projects from the lateral mass and the posterior route from the posterior arch. The tips of these transverse processes are square and have no tubercles.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 61.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 93.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 312."
+    ],
+    "regionTags": [
+      "Cervical spine",
+      "Craniocervical junction"
+    ],
+    "structureTags": [
+      "Anterior tubercle of atlas",
+      "Odontoid peg",
+      "Foramen transversarium",
+      "Posterior arch of atlas",
+      "Lateral mass of atlas"
+    ],
+    "imagePath": "/images/spine/p0064.webp",
+    "flagForReview": "Answer-page teaching text reads 'the posterior route from the posterior arch' - almost certainly intends 'posterior root'; transcribed exactly as printed per fidelity rules rather than corrected.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 0.99933,
+      "h": 0.86652
+    }
+  },
+  {
+    "id": "spine-p0066",
+    "section": "spine",
+    "questionNumber": 31,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 66,
+    "sourcePageAnswer": 67,
+    "caseLabel": "Case 4.25",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "Axial CT image of the fifth cervical vertebra.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Anterior tubercle of the left transverse process",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right pedicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left articular pillar",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right lamina",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Bifid spinous process",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "From C3 to C7 the vertebrae are broadly similar. They have small, oval bodies. The transverse processes are short and end laterally with an anterior and posterior tubercle. The tubercles are connected by the intertubercular lamellae. The transverse processes enclose the foramen transversarium which transmits the vertebral artery from C6 and above.\n\nThe pillars (or articular masses) are dense, rhomboid-shaped structures bounded by the anterior and posterior facets. The laminae are posteromedial extensions of the articular masses and form the posteromedial aspects of the spinal canal.\n\nThe spinous processes in the cervical spine are small and bifid with the exception of the C7.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 61.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 92.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 315."
+    ],
+    "regionTags": [
+      "Cervical spine"
+    ],
+    "structureTags": [
+      "Transverse process",
+      "Pedicle",
+      "Articular pillar",
+      "Lamina",
+      "Spinous process"
+    ],
+    "imagePath": "/images/spine/p0066.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.11289,
+      "w": 1.0,
+      "h": 0.88711
+    }
+  },
+  {
+    "id": "spine-p0068",
+    "section": "spine",
+    "questionNumber": 32,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 68,
+    "sourcePageAnswer": 69,
+    "caseLabel": "Case 4.26",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "Axial CT image at the level of a thoracic vertebral body.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Thoracic vertebral body",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Neck of the rib (left)",
+        "acceptedVariants": [
+          "left neck of the rib"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right costovertebral joint",
+        "acceptedVariants": [
+          "right costo-vertebral joint"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left costotransverse joint",
+        "acceptedVariants": [
+          "left costo-transverse joint"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left erector spinae",
+        "acceptedVariants": [
+          "left sacrospinalis"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The thoracic vertebrae have roughly heart-shaped bodies. Their pedicles project directly backwards. The laminae are wide, flat bars of bone. Their superior margins overlap the inferior margins of the laminae of the vertebrae above. That means that the posterior margin of the vertebral canal at the thoracic spine is closed. The transverse processes project backwards and laterally from the junction of body and pedicles.\n\nClose to the tip of the transverse process, on the anterior surface, there is an oval articular facet that articulates with a facet on the tubercle of the corresponding rib. This is the costotransverse joint.\n\nFrom T2 to T9 the vertebrae have a superior and inferior demifacet for articulation with the head of the corresponding rib on each side. T1 has a complete facet superiorly and a demifacet inferiorly. T10, T11 and T12 have a single, complete facet on each side.\n\nNote that the spinous process pictured in this image belongs to the vertebra above. If the question asks which vertebral body is shown, this fact must be taken into account.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 55-63.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 113-114.",
+      "Butler P, Mitchell AM, Ellis H. Applied Radiological Anatomy. Cambridge: Cambridge University Press, 1999: 315."
+    ],
+    "regionTags": [
+      "Thoracic spine"
+    ],
+    "structureTags": [
+      "Vertebral body",
+      "Rib",
+      "Costovertebral joint",
+      "Costotransverse joint",
+      "Erector spinae"
+    ],
+    "imagePath": "/images/spine/p0068.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00797,
+      "w": 1.0,
+      "h": 0.99203
+    }
+  },
+  {
+    "id": "spine-p0070",
+    "section": "spine",
+    "questionNumber": 33,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 70,
+    "sourcePageAnswer": 71,
+    "caseLabel": "Case 4.27",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "Axial CT image of the lumbar spine through a vertebral body.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left psoas",
+        "acceptedVariants": [
+          "left psoas major",
+          "left psoas major muscle",
+          "left psoas muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right facet joint",
+        "acceptedVariants": [
+          "right apophyseal joint",
+          "right zygapophyseal joint",
+          "right zygapophysial joint"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right erector spinae",
+        "acceptedVariants": [
+          "right sacrospinalis"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left transverse process of the lumbar vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right pedicle of the lumbar vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "There are three main groups of back muscles:\n\nsuperficial extrinsic muscles\nintermediate extrinsic muscles\ndeep intrinsic muscles\n\nThe superficial extrinsic muscles are associated with the upper limb and include the trapezius and the latissimus dorsi. The intermediate extrinsic muscles provide accessory respiratory movements and include the serratus posterior superior and inferior.\n\nThe deep intrinsic muscles are further divided into three groups:\n\ndeep layer (interspinalis, intertransversii)\nintermediate layer (collectively known as transversospinalis)\nsuperficial layer (collectively known as erector spinae)",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Psoas",
+      "Facet joint",
+      "Erector spinae",
+      "Transverse process",
+      "Pedicle",
+      "Back muscles"
+    ],
+    "imagePath": "/images/spine/p0070.webp",
+    "flagForReview": null
+  },
+  {
+    "id": "spine-p0072",
+    "section": "spine",
+    "questionNumber": 34,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 72,
+    "sourcePageAnswer": 73,
+    "caseLabel": "Case 4.28",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "CT image of the lumbar spine through the L4/L5 intervertebral disc space.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Lumbar Intervertebral disc",
+        "acceptedVariants": [
+          "lumbar disc",
+          "lumbar disc space",
+          "lumbar intervertebral disk"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left inferior articular process of the vertebral body above (L4)",
+        "acceptedVariants": [
+          "left inferior articular facet of the vertebral body above",
+          "left inferior articular process of the vertebral body above"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left superior articular process of the vertebral body below (L5)",
+        "acceptedVariants": [
+          "left superior articular facet of the vertebral body below",
+          "left superior articular process of the vertebral body below"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right lamina",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This axial image passes through the intervertebral foramen of L4/L5. The foramen is seen as a gap between the body and the posterior vertebral elements. Note that the anterior border of the vertebral canal at this slice is the intervertebral disc and not the vertebral body.\n\nAt this level we see the facet joint which is an articulation between the inferior articular process of L4 and the superior articular process of L5. Note that the inferior articular facet of L4 lies posteriorly and faces anterolaterally; the superior articular facet of L5 lies anteriorly and faces posteromedially.\n\nIn this image we can identify the ligamentum flavum. The ligamentum flavum unites the laminae of adjacent vertebra by passing from the anterior surface of the lamina above to the posterior surface of the lamina below. It is very elastic.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 62.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 98."
+    ],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Intervertebral disc",
+      "Articular process",
+      "Lamina",
+      "Ligamentum flavum",
+      "Facet joint"
+    ],
+    "imagePath": "/images/spine/p0072.webp",
+    "flagForReview": "Levels in answers B/C corrected from L3/L4 to L4/L5 to match the projection and teaching text (facet at the L4/L5 disc = inferior process of L4 + superior process of L5).",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00648,
+      "w": 1.0,
+      "h": 0.99352
+    }
+  },
+  {
+    "id": "spine-p0074",
+    "section": "spine",
+    "questionNumber": 35,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 74,
+    "sourcePageAnswer": 75,
+    "caseLabel": "Case 4.29",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial T2-weighted MRI of the lumbar spine.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Spinal nerve root (left)",
+        "acceptedVariants": [
+          "left exiting nerve root",
+          "left exiting root",
+          "left spinal nerve root"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right facet joint (zygapophysial)",
+        "acceptedVariants": [
+          "right apophyseal joint",
+          "right facet joint",
+          "right zygapophyseal joint",
+          "right zygapophysial joint"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Intervertebral disc (nucleus pulposus)",
+        "acceptedVariants": [
+          "disc space",
+          "intervertebral disc",
+          "intervertebral disk",
+          "nucleus pulposis",
+          "nucleus pulposus"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right psoas",
+        "acceptedVariants": [
+          "right psoas major",
+          "right psoas major muscle",
+          "right psoas muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Cauda equina in the thecal sac",
+        "acceptedVariants": [
+          "cauda equina nerve roots in the thecal sac",
+          "nerve roots of the cauda equina in the thecal sac"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Below the termination of the spinal cord, the nerve roots in the lumbar region pass almost vertically down to form the cauda equina. There are five lumbar spinal nerves. Each spinal nerve is formed by the dorsal (sensory) root and the ventral (motor) root. The ganglia are usually found in the exit foramina.\n\nRemember that in the lumbar spine, each nerve root leaves the spinal canal under the pedicle of the corresponding vertebra.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Spinal nerve root",
+      "Facet joint",
+      "Intervertebral disc",
+      "Psoas",
+      "Cauda equina"
+    ],
+    "imagePath": "/images/spine/p0074.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00741,
+      "w": 1.0,
+      "h": 0.99259
+    }
+  },
+  {
+    "id": "spine-p0076",
+    "section": "spine",
+    "questionNumber": 36,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 76,
+    "sourcePageAnswer": 77,
+    "caseLabel": "Question 24",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial MRI of the lumbar spine",
+    "questionText": "Identify the structure indicated by the arrow.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left spinal nerve root (exiting nerve root)",
+        "acceptedVariants": [
+          "left exiting nerve root",
+          "left exiting root",
+          "left spinal nerve root"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "There are 31 segmental nerve roots that arise from each side of the spinal cord: 8 cervical, 12 thoracic, 5 lumbar, 5 sacral, and 1 coccygeal.\nEach spinal nerve root is formed by the union of a dorsal root (sensory) and a ventral root (motor and autonomic). It passes anterolaterally through the neural/intervertebral foramen before dividing into ventral and dorsal rami.\nSpinal nerve roots of C1-C7 exit above the pedicles of their respective vertebrae. Because there is no C8 vertebra, subsequent nerve roots exit below the pedicles of their respective vertebrae.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Spinal nerve root"
+    ],
+    "imagePath": "/images/spine/p0076.webp",
+    "flagForReview": "Single unlabelled arrow: answer key renamed Answer->A so the field matches the standard A-E scheme. No glyph on the image to replace.",
+    "labelsBurnedIn": true,
+    "labelPositions": {},
+    "singleArrowNoGlyph": true,
+    "imageCrop": {
+      "x": 0.03531,
+      "y": 0.10968,
+      "w": 0.92938,
+      "h": 0.87379
+    }
+  },
+  {
+    "id": "spine-p0078",
+    "section": "spine",
+    "questionNumber": 37,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 78,
+    "sourcePageAnswer": 79,
+    "caseLabel": "Question 34",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "T2-weighted axial MRI of the pelvis",
+    "questionText": "Identify the structure indicated by the arrow.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right psoas major muscle",
+        "acceptedVariants": [
+          "right psoas",
+          "right psoas major",
+          "right psoas muscle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The paired psoas major muscles run laterally from the lumbar vertebrae.\nThey attach superiorly to the transverse processes of L1–L5 and to the vertebral bodies and intervertebral discs of T12–L5.\nPsoas major joins the iliacus muscle to form the iliopsoas, which inserts onto the lesser trochanter of the femur.\nPsoas is Greek for 'loin'. A beef tenderloin or fillet is actually the psoas muscle.",
+    "references": [],
+    "regionTags": [
+      "Pelvis",
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Psoas major muscle"
+    ],
+    "imagePath": "/images/spine/p0078.webp",
+    "flagForReview": "Single unlabelled arrow: answer key renamed Answer->A so the field matches the standard A-E scheme. No glyph on the image to replace.",
+    "labelsBurnedIn": true,
+    "labelPositions": {},
+    "singleArrowNoGlyph": true,
+    "imageCrop": {
+      "x": 0.01266,
+      "y": 0.13148,
+      "w": 0.96736,
+      "h": 0.84628
+    }
+  },
+  {
+    "id": "spine-p0080",
+    "section": "spine",
+    "questionNumber": 38,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 80,
+    "sourcePageAnswer": 81,
+    "caseLabel": "Question 41",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "CT",
+    "projection": "Axial contrast-enhanced CT of the abdomen",
+    "questionText": "Identify the structure indicated by the arrow.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right quadratus lumborum muscle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The quadratus lumborum muscle is one of the muscles of the posterior abdominal wall. The others are psoas major, iliacus, external oblique, internal oblique, and transversus abdominis.\nIt is quadrilateral in shape.\nIt lies lateral to the lumbar transverse processes, posterior to the psoas major, and anterior to erector spinae.\nLateral to quadratus lumborum is the lumbar triangle, a potential site of abdominal herniation.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Quadratus lumborum muscle"
+    ],
+    "imagePath": "/images/spine/p0080.webp",
+    "flagForReview": "Single unlabelled arrow: answer key renamed Answer->A so the field matches the standard A-E scheme. No glyph on the image to replace.",
+    "labelsBurnedIn": true,
+    "labelPositions": {},
+    "singleArrowNoGlyph": true,
+    "imageCrop": {
+      "x": 0.03931,
+      "y": 0.12438,
+      "w": 0.9054,
+      "h": 0.85295
+    }
+  },
+  {
+    "id": "spine-p0082",
+    "section": "spine",
+    "questionNumber": 39,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 82,
+    "sourcePageAnswer": 83,
+    "caseLabel": "Question 4.20",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial T2 MRI of the lumbar spine",
+    "questionText": "This is an axial MRI of the lumbar spine at the level of the L3/4 intervertebral disc. Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Spinous process of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left L3/4 facet joint",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left quadratus lumborum muscle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left psoas major muscle",
+        "acceptedVariants": [
+          "left psoas",
+          "left psoas major",
+          "left psoas muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left erector spinae muscle",
+        "acceptedVariants": [
+          "left sacrospinalis muscle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The ligamentum flavum is a ligament that connects the laminae of the vertebrae and extends from C2 to S1. Hypertrophy of the ligamentum flavum is a factor that contributes to spinal stenosis, along with facet joint hypertrophy, osteophyte formation and bulging discs. The quadratus lumborum can be recognized as it lies laterally and posteriorly to the psoas and adjacent to the transverse processes. As the name suggests, it is quadrilateral in shape. It extends from the inferior surface of the 12th rib and inserts into the iliac crest.\n\nThe erector spinae is located either side of the spinous process of the vertebral column and is composed of three muscles, which can be remembered by the mnemonic 'I love spinach' (lateral to medial):\n\nIliocostalis.\nLongissimus.\nSpinalis.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Spinous process",
+      "Facet joint",
+      "Quadratus lumborum",
+      "Psoas major",
+      "Erector spinae",
+      "Ligamentum flavum"
+    ],
+    "imagePath": "/images/spine/p0082.webp",
+    "flagForReview": "Label E has three separate arrows in the question image (consistent with the erector spinae comprising three muscle bellies - iliocostalis, longissimus, spinalis - per the teaching text); this is expected multi-arrow/single-label usage, not an error.",
+    "imageCrop": {
+      "x": 0.11059,
+      "y": 0.08924,
+      "w": 0.78614,
+      "h": 0.75973
+    }
+  },
+  {
+    "id": "spine-p0084",
+    "section": "spine",
+    "questionNumber": 40,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 84,
+    "sourcePageAnswer": 85,
+    "caseLabel": "Question 10.1",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial T2 MRI of the lumbar spine",
+    "questionText": "This is an MRI of the lumbar spine at the level of the L4/5 intervertebral disc. Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right L4 exiting nerve root",
+        "acceptedVariants": [
+          "right l4 exiting root",
+          "right l4 spinal nerve root"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right L5 nerve root",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right superior articular facet of L5",
+        "acceptedVariants": [
+          "right superior articular process of l5"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right inferior articular facet of L4",
+        "acceptedVariants": [
+          "right inferior articular process of l4"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Ligamentum flavum",
+        "acceptedVariants": [
+          "ligamenta flava",
+          "yellow ligament"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The nerves of the cauda equina are well demonstrated on T2-weighted axial imaging of the lumbar spine. They appear as low signal intensity punctate structures within the bright signal intensity of the surrounding cerebrospinal fluid. The cauda equina are the continuing nerve roots from the cord, which gradually decrease in number as the root pairs exit the spinal column. Within the thoracolumbar spine the nerve roots exit at the exit foramen below the root. For example, the L4 nerve root exits at L4/L5, and is the traversing nerve root at L3/L4.\n\nThe ligamentum flavum is a collection of ligaments attached to the vertebral laminae running all the way from C2 to S1. They are seen posteriorly on the interior of the vertebral canal. Hypertrophy of these ligaments can lead to canal stenosis. The facet joints are well demonstrated on this image, with the inferior facets of the vertebra above (L4) lying posterior to the superior facets of the vertebra below (L5).",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Nerve root",
+      "Articular facet",
+      "Ligamentum flavum",
+      "Cauda equina"
+    ],
+    "imagePath": "/images/spine/p0084.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.11459,
+      "y": 0.09268,
+      "w": 0.85876,
+      "h": 0.76457
+    }
+  },
+  {
+    "id": "spine-p0086",
+    "section": "spine",
+    "questionNumber": 41,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 86,
+    "sourcePageAnswer": 87,
+    "caseLabel": "Case 2.8",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial MRI at the level of L3",
+    "questionText": "Name the structure labelled A.\nName the structure labelled B.\nName the structure labelled C.\nName the structure labelled D.\nName the structure labelled E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left psoas major muscle",
+        "acceptedVariants": [
+          "left psoas",
+          "left psoas major",
+          "left psoas muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left quadratus lumborum muscle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left erector spinae muscle",
+        "acceptedVariants": [
+          "left sacrospinalis muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right transverse process of L3",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The approximate level of lumbar vertebra can be estimated by observing the blood vessels anterior to the vertebral column. The aorta typically bifurcates at the level of L4, with the IVC usually forming at L5 - hence visualisation of both vessels implies a vertebral level of L3 or above. Exam questions commonly enquire as to the exiting nerve root levels. In the lumbar spine, as with thoracic, nerve roots exit under the pedicle of the corresponding vertebra, i.e. the left L3 nerve root exits under the left pedicle of the L3 vertebra, through the neural exit foramen. This is an important concept to understand when assessing nerve root compression in intervertebral disc disease.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Abdominal aorta",
+      "Psoas major muscle",
+      "Quadratus lumborum muscle",
+      "Erector spinae muscle",
+      "Transverse process"
+    ],
+    "imagePath": "/images/spine/p0086.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.00707,
+      "y": 0.0,
+      "w": 0.99293,
+      "h": 0.48869
+    }
+  },
+  {
+    "id": "spine-p0088",
+    "section": "spine",
+    "questionNumber": 42,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 88,
+    "sourcePageAnswer": 89,
+    "caseLabel": "Case 3.2",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "Axial T2-weighted lumbar spine through L5",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left L5 nerve",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Nucleus pulposus of L5/S1 disc",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left lamina of L5 vertebra",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right psoas major muscle",
+        "acceptedVariants": [
+          "right psoas",
+          "right psoas major",
+          "right psoas muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right S1 nerve",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "(a) At the level of the L5/S1 disc, the L5 nerve has already left the neural exit foramen. It may become compromised by a far lateral L5 disc herniation in this position.\n\n(b) This soft central component of the disc is surrounded by the tough outer annulus fibrosus. Annular defects result in herniation of the nucleus pulposus referred to as protrusions or extrusions, based upon their morphology. On T2-weighted images the nucleus pulposus is of high signal and the annulus fibrosus is of low signal intensity.\n\n(c) Each lamina fuses in the midline to form the spinous process. The lamina is partly or completely resected (laminectomy) during lumbar disc surgery to facilitate access to the disc.\n\n(d) This is a powerful hip flexor. In the clinical setting of lumbar discitis it is common to see infection tracking from the disc space into the psoas muscle to form a psoas abscess.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Spinal nerve",
+      "Nucleus pulposus",
+      "Lamina",
+      "Psoas major muscle"
+    ],
+    "imagePath": "/images/spine/p0088.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.11392,
+      "y": 0.09903,
+      "w": 0.88274,
+      "h": 0.90022
+    }
+  },
+  {
+    "id": "spine-p0090",
+    "section": "spine",
+    "questionNumber": 43,
+    "sourceFile": "Spine.pdf",
+    "sourcePageQuestion": 90,
+    "sourcePageAnswer": 91,
+    "caseLabel": "Q17",
+    "modalitySection": "Cross-sectional imaging",
+    "imagingModality": "MRI",
+    "projection": "T2W MRI of lower lumbar spine, axial section",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Interosseous sacroiliac ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Dorsal nerve root",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Nerve roots of the cauda equina",
+        "acceptedVariants": [
+          "cauda equina",
+          "cauda equina nerve roots"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Dorsal sacroiliac ligament",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Gluteus medius",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Each sacro-iliac joint has to withstand significant forces as they support the axial load of the trunk through their connection to the pelvis and lower limb. The adjacent joint surfaces are irregular but reciprocal in outline which adds to this strength. Additional support is provided by dorsal and ventral sacroiliac ligaments and a deeper interosseous sacroiliac ligament. A small amount of movement is permitted in the joint, predominantly in a rotatory axis.\n\nNerve roots exit the dura mater to pass obliquely and inferiorly through the intervertebral foramina.",
+    "references": [],
+    "regionTags": [
+      "Lumbar spine",
+      "Sacroiliac joint"
+    ],
+    "structureTags": [
+      "Sacroiliac ligament",
+      "Nerve root",
+      "Cauda equina",
+      "Gluteus medius"
+    ],
+    "imagePath": "/images/spine/p0090.webp",
+    "flagForReview": "Question page (p90) has no visible case/question number, title, or instruction text of its own - the label 'Q17' is inferred from the answer page heading 'Q17 Answers' on p91. Labels A, C, and D each have two arrows in the image (consistent with paired/bilateral structures - ligament and nerve roots), matching the one-answer-per-label convention used elsewhere for repeated-arrow labels.",
+    "imageCrop": {
+      "x": 0.0,
+      "y": 0.00205,
+      "w": 1.0,
+      "h": 0.82638
+    }
+  },
+  {
+    "id": "spine-msk-p0065",
+    "section": "spine",
+    "questionNumber": 44,
+    "sourceFile": "MY MSK NOTES Augest 2026.key",
+    "sourcePageQuestion": 65,
+    "sourcePageAnswer": 65,
+    "caseLabel": null,
+    "modalitySection": "My Revision Deck",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structure indicated.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Posterior arch of C1 (atlas)",
+        "acceptedVariants": [
+          "posterior arch of c1",
+          "posterior arch of the atlas"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Seen high on the lateral cervical spine, just inferior to the occiput.\nC1 forms a ring, so look for the thin corticated arch behind the dens/atlantoaxial region.\nFRCR tip: if the arrow is at the skull base and points to a smooth curved corticated line, think atlas arch.",
+    "references": [],
+    "regionTags": [
+      "Cervical spine"
+    ],
+    "structureTags": [
+      "Posterior arch of C1",
+      "Atlas",
+      "Dens"
+    ],
+    "imagePath": "/images/revision/msk-p0065.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.04159,
+      "y": 0.04278,
+      "w": 0.9206,
+      "h": 0.91979
+    }
+  }
+]

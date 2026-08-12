@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Step-by-Step Version 5: Phase Encoding + k-space</title>
+  <style>
+    :root {
+      --bg: #f5f8fd;
+      --panel: #ffffff;
+      --line: #d8e1ee;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #1d4ed8;
+      --axis-x: #b91c1c;
+      --axis-y: #047857;
+      --axis-z: #2563eb;
+      --water: #1d4ed8;
+      --fat: #16a34a;
+      --net: #111827;
+      --rf: #ea580c;
+      --gz: #0f766e;
+      --gy: #8b5cf6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      aspect-ratio: 16 / 10;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #f8fafc;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    #stepText {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      white-space: pre-line;
+      min-height: 64px;
+    }
+
+    #equation {
+      margin: 0;
+      min-height: 22px;
+      color: #1e3a8a;
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+      white-space: pre-line;
+    }
+
+    #status {
+      margin: 0;
+      color: #0f172a;
+      font-size: 0.84rem;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      white-space: pre-line;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 0.92rem;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button.aux {
+      border-color: #7c3aed;
+      color: #5b21b6;
+      background: #f6f0ff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .opt {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 12px; }
+      .panel { padding: 12px; }
+      #stepText { min-height: 86px; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="wrap">
+    <section class="panel">
+      <div class="top">
+        <h1>MRI Step-by-Step (Version 5): Phase Encoding + k-space Teaching Mode</h1>
+        <div id="stepPill" class="pill">Step 1 of 4</div>
+      </div>
+      <p class="sub">Controlled phase encoding only: Gy amplitude sets phase map across Y and fills one ky line per click. No frequency encoding and no reconstruction here.</p>
+    </section>
+
+    <section class="panel">
+      <canvas id="scene" width="1320" height="840" aria-label="Phase encoding with k-space line filling"></canvas>
+      <div class="legend">
+        <span class="key"><span class="dot" style="background: var(--water);"></span>Water</span>
+        <span class="key"><span class="dot" style="background: var(--fat);"></span>Fat (optional)</span>
+        <span class="key"><span class="dot" style="background: var(--net);"></span>Net</span>
+        <span class="key"><span class="dot" style="background: var(--rf);"></span>RF</span>
+        <span class="key"><span class="dot" style="background: var(--gz);"></span>Gz</span>
+        <span class="key"><span class="dot" style="background: var(--gy);"></span>Gy</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="stepTitle"></h2>
+      <p id="stepText"></p>
+      <p id="equation"></p>
+      <p id="status"></p>
+
+      <div class="controls">
+        <button id="backBtn">Back</button>
+        <button id="nextBtn" class="primary">Next</button>
+        <button id="nextPEBtn" class="aux">Next Phase Encode Step</button>
+      </div>
+
+      <label class="opt">
+        <input id="showFatToggle" type="checkbox" />
+        Show fat vectors (small fixed offset)
+      </label>
+    </section>
+  </main>
+
+  <script>
+    const TAU = Math.PI * 2;
+    const Y_POSITIONS = [-3, -2, -1, 0, 1, 2, 3];
+
+    const KY_ORDER = [-3, -2, -1, 0, 1, 2];
+    const KY_TOTAL = KY_ORDER.length;
+
+    const steps = [
+      {
+        title: "Step 1 - After Slice Selection + 90°",
+        text: "All transverse spins are in phase across space.",
+        equation: "Selected slice active; no Gy applied."
+      },
+      {
+        title: "Step 2 - Apply Phase Encoding Gradient (Gy)",
+        text: "Phase encoding creates position-dependent phase shifts.",
+        equation: "Delta phi(y) = gamma * Gy * y * Delta t"
+      },
+      {
+        title: "Step 3 - After Phase Encoding Gradient Ends",
+        text: "Phase differences remain even after gradient is turned off.",
+        equation: "Gy is off, encoded phase offsets persist."
+      },
+      {
+        title: "Step 4 - Multiple Phase Encoding Steps",
+        text: "Each Gy strength creates a different spatial phase pattern.",
+        equation: "Each TR acquires one ky line."
+      }
+    ];
+
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+
+    const stepPill = document.getElementById("stepPill");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepText = document.getElementById("stepText");
+    const equationEl = document.getElementById("equation");
+    const statusEl = document.getElementById("status");
+
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const nextPEBtn = document.getElementById("nextPEBtn");
+    const showFatToggle = document.getElementById("showFatToggle");
+
+    const view = {
+      yaw: degToRad(35),
+      pitch: degToRad(-22),
+      radiusPx: 175
+    };
+
+    const state = {
+      stepIndex: 0,
+      stepStartMs: performance.now(),
+      basePhase: 0,
+      spreadDeg: 0,
+      phaseSign: 1,
+      gyAmpNow: 0,
+      gyOn: 0,
+      pe: {
+        completed: -1,
+        active: -1,
+        fill: new Array(KY_TOTAL).fill(0),
+        pulse: null,
+        glow: 0
+      }
+    };
+
+    function kyToGyAmp(ky) {
+      return ky / 2;
+    }
+
+    function kyToSpreadDeg(ky) {
+      return Math.abs(ky) * 32;
+    }
+
+    function resetPEMode() {
+      state.pe.completed = -1;
+      state.pe.active = -1;
+      state.pe.fill = new Array(KY_TOTAL).fill(0);
+      state.pe.pulse = null;
+      state.pe.glow = 0;
+      state.spreadDeg = 0;
+      state.phaseSign = 1;
+      state.gyAmpNow = 0;
+      state.gyOn = 0;
+    }
+
+    function setStep(index) {
+      const prev = state.stepIndex;
+      state.stepIndex = clamp(index, 0, steps.length - 1);
+      state.stepStartMs = performance.now();
+
+      if (state.stepIndex === 0) {
+        state.spreadDeg = 0;
+        state.phaseSign = 1;
+        state.gyAmpNow = 0;
+        state.gyOn = 0;
+      }
+
+      if (state.stepIndex === 3 && prev !== 3) {
+        resetPEMode();
+      }
+
+      renderStepText();
+      updateButtons();
+    }
+
+    function renderStepText() {
+      const s = steps[state.stepIndex];
+      stepPill.textContent = `Step ${state.stepIndex + 1} of ${steps.length}`;
+      stepTitle.textContent = s.title;
+      stepText.textContent = s.text;
+      equationEl.textContent = s.equation;
+    }
+
+    function getDisplayedPhaseStep() {
+      if (state.stepIndex !== 3) return 0;
+      if (state.pe.pulse) return state.pe.active + 1;
+      return state.pe.completed + 1;
+    }
+
+    function updateButtons() {
+      backBtn.disabled = state.stepIndex === 0;
+      nextBtn.disabled = state.stepIndex === steps.length - 1;
+
+      const phaseDone = state.pe.completed >= KY_TOTAL - 1;
+      nextPEBtn.disabled = state.stepIndex !== 3 || !!state.pe.pulse || phaseDone;
+    }
+
+    function startNextPhaseEncodeStep() {
+      if (state.stepIndex !== 3 || state.pe.pulse) return;
+      if (state.pe.completed >= KY_TOTAL - 1) return;
+
+      const next = state.pe.completed + 1;
+      const ky = KY_ORDER[next];
+      const amp = kyToGyAmp(ky);
+      const spread = kyToSpreadDeg(ky);
+      const sign = ky < 0 ? -1 : 1;
+
+      state.pe.active = next;
+      state.pe.fill[next] = 0;
+      state.pe.pulse = {
+        startMs: performance.now(),
+        durationMs: 1200,
+        ky,
+        amp,
+        spread,
+        sign,
+        fromSpread: state.spreadDeg
+      };
+    }
+
+    function updatePhysics(nowMs, dt) {
+      state.basePhase += dt * 2.3;
+      state.pe.glow *= Math.exp(-dt * 3.8);
+
+      if (state.stepIndex === 0) {
+        approach(0, 0, 0, dt);
+        return;
+      }
+
+      if (state.stepIndex === 1) {
+        const elapsed = (nowMs - state.stepStartMs) / 1000;
+        const pulseDur = 1.05;
+        const targetSpread = 90;
+
+        if (elapsed < pulseDur) {
+          const u = smooth01(elapsed / pulseDur);
+          state.spreadDeg += (targetSpread * u - state.spreadDeg) * (1 - Math.exp(-dt * 10));
+          state.phaseSign = 1;
+          state.gyAmpNow += (1.0 - state.gyAmpNow) * (1 - Math.exp(-dt * 11));
+          state.gyOn += (1 - state.gyOn) * (1 - Math.exp(-dt * 11));
+        } else {
+          state.spreadDeg += (targetSpread - state.spreadDeg) * (1 - Math.exp(-dt * 8));
+          state.phaseSign = 1;
+          state.gyAmpNow += (0 - state.gyAmpNow) * (1 - Math.exp(-dt * 11));
+          state.gyOn += (0 - state.gyOn) * (1 - Math.exp(-dt * 11));
+        }
+        return;
+      }
+
+      if (state.stepIndex === 2) {
+        state.spreadDeg += (90 - state.spreadDeg) * (1 - Math.exp(-dt * 8));
+        state.phaseSign = 1;
+        state.gyAmpNow += (0 - state.gyAmpNow) * (1 - Math.exp(-dt * 10));
+        state.gyOn += (0 - state.gyOn) * (1 - Math.exp(-dt * 10));
+        return;
+      }
+
+      if (state.stepIndex === 3) {
+        if (state.pe.pulse) {
+          const p = state.pe.pulse;
+          const t = clamp((nowMs - p.startMs) / p.durationMs, 0, 1);
+          state.pe.fill[state.pe.active] = smooth01(t);
+
+          if (t < 0.55) {
+            const u = smooth01(t / 0.55);
+            const spread = lerp(p.fromSpread, p.spread, u);
+            state.spreadDeg += (spread - state.spreadDeg) * (1 - Math.exp(-dt * 11));
+            state.phaseSign = p.sign;
+            state.gyAmpNow += (p.amp - state.gyAmpNow) * (1 - Math.exp(-dt * 12));
+            state.gyOn += (1 - state.gyOn) * (1 - Math.exp(-dt * 12));
+          } else {
+            state.spreadDeg += (p.spread - state.spreadDeg) * (1 - Math.exp(-dt * 10));
+            state.phaseSign = p.sign;
+            state.gyAmpNow += (0 - state.gyAmpNow) * (1 - Math.exp(-dt * 11));
+            state.gyOn += (0 - state.gyOn) * (1 - Math.exp(-dt * 11));
+          }
+
+          if (t >= 1) {
+            state.pe.fill[state.pe.active] = 1;
+            state.pe.completed = state.pe.active;
+            state.pe.glow = 1;
+            state.pe.pulse = null;
+          }
+        } else {
+          if (state.pe.completed >= 0) {
+            const ky = KY_ORDER[state.pe.completed];
+            state.spreadDeg += (kyToSpreadDeg(ky) - state.spreadDeg) * (1 - Math.exp(-dt * 7));
+            state.phaseSign = ky < 0 ? -1 : 1;
+          } else {
+            state.spreadDeg += (0 - state.spreadDeg) * (1 - Math.exp(-dt * 7));
+            state.phaseSign = 1;
+          }
+          state.gyAmpNow += (0 - state.gyAmpNow) * (1 - Math.exp(-dt * 10));
+          state.gyOn += (0 - state.gyOn) * (1 - Math.exp(-dt * 10));
+        }
+      }
+    }
+
+    function approach(spread, sign, amp, dt) {
+      state.spreadDeg += (spread - state.spreadDeg) * (1 - Math.exp(-dt * 8));
+      state.phaseSign = sign || 1;
+      state.gyAmpNow += (amp - state.gyAmpNow) * (1 - Math.exp(-dt * 9));
+      state.gyOn += (amp === 0 ? 0 : 1 - state.gyOn) * (1 - Math.exp(-dt * 9));
+    }
+
+    function getVectors() {
+      const showFat = showFatToggle.checked;
+      const water = [];
+      const fat = [];
+      const offsets = [];
+
+      for (const y of Y_POSITIONS) {
+        const yNorm = y / 3;
+        const offDeg = state.phaseSign * state.spreadDeg * yNorm;
+        const offRad = degToRad(offDeg);
+        offsets.push(offDeg);
+
+        const angW = state.basePhase + offRad;
+        water.push({ x: Math.cos(angW), y: Math.sin(angW), z: 0 });
+
+        if (showFat) {
+          const angF = angW + degToRad(10);
+          fat.push({ x: Math.cos(angF), y: Math.sin(angF), z: 0 });
+        }
+      }
+
+      const waterAvg = avg(water);
+      let fatAvg = null;
+      let net = waterAvg;
+      if (showFat) {
+        fatAvg = avg(fat);
+        net = {
+          x: 0.5 * (waterAvg.x + fatAvg.x),
+          y: 0.5 * (waterAvg.y + fatAvg.y),
+          z: 0.5 * (waterAvg.z + fatAvg.z)
+        };
+      }
+
+      return { water, fat, offsets, waterAvg, fatAvg, net, showFat };
+    }
+
+    function avg(arr) {
+      let sx = 0;
+      let sy = 0;
+      let sz = 0;
+      for (const v of arr) {
+        sx += v.x;
+        sy += v.y;
+        sz += v.z;
+      }
+      const n = arr.length || 1;
+      return { x: sx / n, y: sy / n, z: sz / n };
+    }
+
+    function project(v, cx, cy, zoom) {
+      const cyaw = Math.cos(view.yaw);
+      const syaw = Math.sin(view.yaw);
+      const cp = Math.cos(view.pitch);
+      const sp = Math.sin(view.pitch);
+
+      const x1 = v.x * cyaw + v.z * syaw;
+      const z1 = -v.x * syaw + v.z * cyaw;
+      const y2 = v.y * cp - z1 * sp;
+
+      return {
+        x: cx + x1 * view.radiusPx * zoom,
+        y: cy - y2 * view.radiusPx * zoom
+      };
+    }
+
+    function draw(v) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBloch(v);
+      drawYRow(v);
+      drawTimeline();
+      drawKspacePanel();
+      drawSignal(v);
+      drawOverlay();
+      updateStatus(v);
+      updateButtons();
+    }
+
+    function drawBloch(v) {
+      const cx = canvas.width * 0.26;
+      const cy = 230;
+      const r = view.radiusPx;
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#dbe3ee";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 0.38, 0, 0, TAU);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      drawAxis(cx, cy, { x: -1.08, y: 0, z: 0 }, { x: 1.08, y: 0, z: 0 }, getCss("--axis-x"), "X");
+      drawAxis(cx, cy, { x: 0, y: -1.08, z: 0 }, { x: 0, y: 1.08, z: 0 }, getCss("--axis-y"), "Y");
+      drawAxis(cx, cy, { x: 0, y: 0, z: -1.2 }, { x: 0, y: 0, z: 1.2 }, getCss("--axis-z"), "Z");
+
+      drawVec3D(cx, cy, v.waterAvg, getCss("--water"), 3, "Water avg");
+      if (v.showFat && v.fatAvg) {
+        drawVec3D(cx, cy, v.fatAvg, getCss("--fat"), 3, "Fat avg");
+      }
+      drawVec3D(cx, cy, v.net, getCss("--net"), 4, "Net");
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Bloch sphere (selected slice)", cx - 75, cy + r + 24);
+    }
+
+    function drawAxis(cx, cy, a, b, color, label) {
+      const p1 = project(a, cx, cy, 1);
+      const p2 = project(b, cx, cy, 1);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      drawArrowHead(p1, p2, color, 10);
+      ctx.fillStyle = color;
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText(label, p2.x + 6, p2.y - 6);
+    }
+
+    function drawVec3D(cx, cy, v, color, width, label) {
+      const p0 = project({ x: 0, y: 0, z: 0 }, cx, cy, 1);
+      const p1 = project(v, cx, cy, 1);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+      drawArrowHead(p0, p1, color, width >= 4 ? 13 : 11);
+      ctx.fillStyle = color;
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText(label, p1.x + 8, p1.y - 3);
+    }
+
+    function drawYRow(v) {
+      const xStart = 650;
+      const xEnd = 1200;
+      const yMid = 280;
+      const dx = (xEnd - xStart) / (Y_POSITIONS.length - 1);
+      const len = 30;
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(xStart - 24, yMid);
+      ctx.lineTo(xEnd + 24, yMid);
+      ctx.stroke();
+      drawArrowHead({ x: xStart - 24, y: yMid }, { x: xEnd + 24, y: yMid }, "#94a3b8", 9);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("Y positions (selected slice)", xStart - 8, yMid - 34);
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("-Y", xStart - 34, yMid + 22);
+      ctx.fillText("+Y", xEnd + 10, yMid + 22);
+
+      for (let i = 0; i < Y_POSITIONS.length; i += 1) {
+        const x = xStart + i * dx;
+        const y = yMid;
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.beginPath();
+        ctx.arc(x, y, 7, 0, TAU);
+        ctx.fill();
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, y, 7, 0, TAU);
+        ctx.stroke();
+
+        const vw = v.water[i];
+        const xw = x + vw.x * len;
+        const yw = y - vw.y * len;
+        ctx.strokeStyle = getCss("--water");
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(xw, yw);
+        ctx.stroke();
+        drawArrowHead({ x, y }, { x: xw, y: yw }, getCss("--water"), 7);
+
+        if (v.showFat) {
+          const vf = v.fat[i];
+          const xf = x + vf.x * (len - 7);
+          const yf = y - vf.y * (len - 7);
+          ctx.strokeStyle = getCss("--fat");
+          ctx.lineWidth = 1.9;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(xf, yf);
+          ctx.stroke();
+          drawArrowHead({ x, y }, { x: xf, y: yf }, getCss("--fat"), 6);
+        }
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px Segoe UI";
+        ctx.fillText(`${Y_POSITIONS[i]}`, x - 3, y + 24);
+      }
+
+      const minPh = Math.min(...v.offsets);
+      const maxPh = Math.max(...v.offsets);
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText(`Phase spread across Y: ${minPh.toFixed(0)}° to ${maxPh.toFixed(0)}°`, xStart, yMid + 52);
+    }
+
+    function drawTimeline() {
+      const x0 = 700;
+      const y0 = 510;
+      const w = 500;
+      const h = 42;
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText("Pulse timeline", x0, y0 - 18);
+
+      drawTimelineRow(x0, y0, w, h, "RF", getCss("--rf"), [{ s: 0.08, e: 0.20, amp: 1 }]);
+      drawTimelineRow(x0, y0 + h, w, h, "Gz", getCss("--gz"), [{ s: 0.06, e: 0.22, amp: 0.85 }]);
+
+      const gySeg = [];
+      if (state.gyOn > 0.05) {
+        gySeg.push({ s: 0.45, e: 0.57, amp: state.gyAmpNow });
+      } else if (state.stepIndex >= 2) {
+        gySeg.push({ s: 0.45, e: 0.57, amp: 0, ghost: true });
+      }
+      drawTimelineRow(x0, y0 + h * 2, w, h, "Gy", getCss("--gy"), gySeg);
+
+      if (state.stepIndex === 3) {
+        const current = state.pe.pulse ? state.pe.pulse.amp : (state.pe.completed >= 0 ? kyToGyAmp(KY_ORDER[state.pe.completed]) : 0);
+        ctx.fillStyle = "#5b21b6";
+        ctx.font = "12px Segoe UI";
+        ctx.fillText(`Current Gy value: ${current.toFixed(2)} a.u.`, x0, y0 + h * 3 + 20);
+      }
+    }
+
+    function drawTimelineRow(x0, y0, w, h, label, color, segments) {
+      const mid = y0 + h * 0.5;
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(label, x0 - 28, mid + 4);
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.beginPath();
+      ctx.moveTo(x0, mid);
+      ctx.lineTo(x0 + w, mid);
+      ctx.stroke();
+
+      for (const s of segments) {
+        const x1 = x0 + s.s * w;
+        const x2 = x0 + s.e * w;
+        const y = mid - (s.amp || 0) * (h * 0.32);
+        ctx.strokeStyle = s.ghost ? "#c7b8ec" : color;
+        ctx.lineWidth = s.ghost ? 2 : 8;
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawKspacePanel() {
+      const x0 = 700;
+      const y0 = 636;
+      const w = 500;
+      const h = 145;
+      const leftPad = 56;
+      const rightPad = 18;
+      const topPad = 20;
+      const bottomPad = 20;
+      const rows = KY_TOTAL;
+      const rowGap = (h - topPad - bottomPad) / (rows - 1);
+      const xL = x0 + leftPad;
+      const xR = x0 + w - rightPad;
+
+      ctx.strokeStyle = "#d6deea";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText("k-space (2D view)", x0 + 8, y0 + 16);
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("ky", x0 + 10, y0 + 32);
+      ctx.fillText("kx (placeholder)", xR - 92, y0 + h - 4);
+
+      // Vertical divider for ky labels.
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.beginPath();
+      ctx.moveTo(xL - 12, y0 + topPad - 6);
+      ctx.lineTo(xL - 12, y0 + h - bottomPad + 6);
+      ctx.stroke();
+
+      const active = state.pe.pulse ? state.pe.active : state.pe.completed;
+      const isFinal = state.pe.completed >= KY_TOTAL - 1 && !state.pe.pulse;
+
+      for (let i = 0; i < rows; i += 1) {
+        const ky = KY_ORDER[i];
+        const y = y0 + topPad + i * rowGap;
+        const isCenter = ky === 0;
+        const progress = clamp(state.pe.fill[i], 0, 1);
+        const activeLine = i === active;
+
+        if (isCenter) {
+          ctx.fillStyle = "rgba(29,78,216,0.08)";
+          ctx.fillRect(xL - 6, y - rowGap * 0.35, (xR - xL) + 10, rowGap * 0.7);
+        }
+
+        ctx.strokeStyle = isCenter ? "#1d4ed8" : "#cbd5e1";
+        ctx.lineWidth = isCenter ? 1.8 : 1;
+        ctx.beginPath();
+        ctx.moveTo(xL, y);
+        ctx.lineTo(xR, y);
+        ctx.stroke();
+
+        ctx.fillStyle = isCenter ? "#1d4ed8" : "#475569";
+        ctx.font = isCenter ? "bold 12px Segoe UI" : "12px Segoe UI";
+        ctx.fillText(`ky=${ky >= 0 ? "+" : ""}${ky}`, x0 + 8, y + 4);
+
+        if (progress > 0.001) {
+          const xF = xL + progress * (xR - xL);
+
+          if (activeLine) {
+            ctx.save();
+            ctx.shadowColor = "rgba(139,92,246,0.75)";
+            ctx.shadowBlur = 12 + 8 * state.pe.glow;
+            ctx.strokeStyle = "#7c3aed";
+            ctx.lineWidth = 4.5;
+            ctx.beginPath();
+            ctx.moveTo(xL, y);
+            ctx.lineTo(xF, y);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          ctx.strokeStyle = "#8b5cf6";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(xL, y);
+          ctx.lineTo(xF, y);
+          ctx.stroke();
+        }
+      }
+
+      const pStep = getDisplayedPhaseStep();
+      const counterText = `Phase Step ${pStep} of ${KY_TOTAL}`;
+      const eduText = isFinal
+        ? "Phase encoding fills k-space vertically."
+        : (pStep >= 1 ? "Each TR acquires one ky line." : "Click Next Phase Encode Step to begin ky filling.");
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText(counterText, x0, y0 + h + 20);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(eduText, x0, y0 + h + 38);
+
+      if (isFinal) {
+        ctx.fillStyle = "#0f766e";
+        ctx.font = "bold 12px Segoe UI";
+        ctx.fillText("All ky lines filled in this teaching example.", x0, y0 + h + 56);
+      }
+    }
+
+    function drawSignal(v) {
+      const x0 = 90;
+      const y0 = 650;
+      const w = 560;
+      const h = 170;
+      const yBottom = y0 + h - 20;
+      const yTop = y0 + 18;
+
+      ctx.strokeStyle = "#d6deea";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Net signal from encoded row", x0 + 8, y0 + 16);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x0 + 30, yBottom);
+      ctx.lineTo(x0 + w - 10, yBottom);
+      ctx.moveTo(x0 + 30, yBottom);
+      ctx.lineTo(x0 + 30, yTop);
+      ctx.stroke();
+
+      const amp = Math.hypot(v.net.x, v.net.y);
+      const u = clamp(Math.abs(state.spreadDeg) / 120, 0, 1);
+      const x = x0 + 30 + u * (w - 40);
+      const y = yBottom - clamp(amp, 0, 1) * (yBottom - yTop);
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x0 + 30, yBottom - 0.95 * (yBottom - yTop));
+      ctx.lineTo(x0 + w - 10, yBottom - 0.1 * (yBottom - yTop));
+      ctx.stroke();
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, TAU);
+      ctx.fill();
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(`Current net transverse signal = ${amp.toFixed(2)}`, x0 + w - 220, y0 + 16);
+    }
+
+    function drawOverlay() {
+      const x = 90;
+      const y = 74;
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 19px Segoe UI";
+      ctx.fillText(steps[state.stepIndex].title.replace(/^Step\s\d+\s-\s/, ""), x, y);
+
+      if (state.stepIndex === 1) {
+        ctx.fillStyle = "#5b21b6";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText("Gy ON briefly: Y-dependent phase accrual.", x, y + 23);
+      }
+      if (state.stepIndex === 2) {
+        ctx.fillStyle = "#5b21b6";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText("Gy OFF: phase offsets remain mapped to Y position.", x, y + 23);
+      }
+      if (state.stepIndex === 3) {
+        ctx.fillStyle = "#5b21b6";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText("Gy amplitude -> phase map -> one ky line per click.", x, y + 23);
+      }
+    }
+
+    function updateStatus(v) {
+      const minP = Math.min(...v.offsets);
+      const maxP = Math.max(...v.offsets);
+      const net = Math.hypot(v.net.x, v.net.y);
+      const gyVal = state.pe.pulse
+        ? state.pe.pulse.amp
+        : (state.stepIndex === 3 && state.pe.completed >= 0 ? kyToGyAmp(KY_ORDER[state.pe.completed]) : state.gyAmpNow);
+
+      statusEl.textContent =
+        `Gy active=${state.gyOn > 0.08 ? "ON" : "OFF"}  Gy value=${gyVal.toFixed(2)} a.u.\n` +
+        `Phase range=${minP.toFixed(0)}° to ${maxP.toFixed(0)}°\n` +
+        `Net Mxy=${net.toFixed(2)}  (No frequency encoding yet)`;
+    }
+
+    function drawArrowHead(a, b, color, size) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const left = {
+        x: b.x - ux * size - uy * (size * 0.45),
+        y: b.y - uy * size + ux * (size * 0.45)
+      };
+      const right = {
+        x: b.x - ux * size + uy * (size * 0.45),
+        y: b.y - uy * size - ux * (size * 0.45)
+      };
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function getCss(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function degToRad(d) {
+      return (d * Math.PI) / 180;
+    }
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function smooth01(t) {
+      const c = clamp(t, 0, 1);
+      return c * c * (3 - 2 * c);
+    }
+
+    backBtn.addEventListener("click", () => setStep(state.stepIndex - 1));
+    nextBtn.addEventListener("click", () => setStep(state.stepIndex + 1));
+    nextPEBtn.addEventListener("click", startNextPhaseEncodeStep);
+
+    let lastMs = performance.now();
+    function tick(nowMs) {
+      const dt = Math.min(0.05, (nowMs - lastMs) / 1000);
+      updatePhysics(nowMs, dt);
+      const vectors = getVectors();
+      draw(vectors);
+      lastMs = nowMs;
+      requestAnimationFrame(tick);
+    }
+
+    renderStepText();
+    updateButtons();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

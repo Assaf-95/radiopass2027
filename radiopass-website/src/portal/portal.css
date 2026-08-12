@@ -1,0 +1,997 @@
+/* ===========================================================================
+   The RadioPass front door, and the author console behind it.
+
+   Same identity as the physics homepage and the anatomy site — near-black
+   ground, warm ivory type, one amber accent spent sparingly, Fraunces set
+   LIGHT for display and Inter for everything else, 4px buttons — but carrying
+   none of their content.
+
+   What this page adds on top of that shared system is an academic register:
+   a masthead rule, roman numerals in the section margin, a contents index set
+   with dotted leaders, and a monospace data layer. The monospace is not
+   decoration: it is the typeface a DICOM corner overlay is set in, which is
+   why the two image viewports are annotated in it.
+
+   That register is also where this page went wrong. A journal sets its data
+   layer small, so every count, caption, label and note here was 9.5–12.5px —
+   and because the front door is almost entirely data layer, most of the page
+   was set below the size at which it can be read. The register survives; the
+   sizes now come from design/tokens.css, which means the mono layer sits at
+   --fs-meta where it is genuinely tertiary (a numeral, a count, a corner
+   annotation) and at --fs-support where it is a sentence someone has to read.
+   =========================================================================== */
+
+.pt-root {
+  --pt-void: #07080B;
+  /* The pt- names are kept — they are referenced by the console and the
+     crossing as well as this page — but they now resolve to tokens rather
+     than restating the palette. */
+  --pt-bg: var(--bg-base);
+  --pt-surface: var(--bg-elevated);
+  --pt-surface-2: var(--bg-interactive);
+  --pt-ink: var(--text-primary);
+  /* Two greys, one step brighter each than before. Prose used to sit on the
+     tertiary grey and metadata a step under it; the token rule is that
+     anything instructional stops at --text-secondary, so --pt-mut (prose)
+     takes that and --pt-faint (labels, counts) takes the old prose grey. */
+  --pt-mut: var(--text-secondary);
+  --pt-faint: var(--text-tertiary);
+  --pt-line: var(--border);
+  --pt-line-2: var(--border-strong);
+  --pt-amber: var(--accent);
+  /* Not --hue-xray: this blue is also painted directly into the plate canvas
+     as rgba(168,203,234,…) and the two must not drift apart. */
+  --pt-xray: #A8CBEA;
+  --pt-us: var(--hue-us);
+  --pt-mri: var(--hue-mri);
+
+  --pt-serif: var(--display, 'Fraunces', 'Iowan Old Style', Georgia, serif);
+  --pt-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --pt-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* One measure, shared with the physics homepage — both are now the same
+     container token rather than two hand-written copies of the same sum. */
+  --pt-wrap: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+
+  min-height: 100vh;
+  min-height: 100svh;
+  /* Flat. No tint, no glow — the ground is the same colour here as on every
+     other page of both apps. */
+  background: var(--pt-bg);
+  color: var(--pt-ink);
+  font-family: var(--pt-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.pt-root ::selection { background: rgba(217, 168, 78, 0.32); }
+.pt-root :focus-visible { outline: 2px solid var(--pt-amber); outline-offset: 3px; border-radius: 2px; }
+
+.pt-skip {
+  position: fixed; left: var(--sp-4); top: -60px; z-index: 200;
+  background: var(--pt-amber); color: var(--bg-base); font-weight: 600; font-size: var(--fs-support);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-sm);
+  transition: top var(--dur) var(--ease);
+}
+.pt-skip:focus { top: var(--sp-3); }
+
+/* ---------- masthead ------------------------------------------------------
+   A journal masthead rather than a product nav: the wordmark, a hairline, and
+   what the publication is about — then the doors, quietly, on the right. */
+
+.pt-bar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(11, 13, 16, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--pt-line);
+}
+
+.pt-bar-inner {
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  /* The same bar height as the physics homepage — the two front doors should
+     not disagree about how tall a masthead is. */
+  min-height: var(--sp-8);
+  padding-block: var(--sp-2);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+.pt-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-family: var(--pt-sans);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--pt-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* The standfirst names the publication, which is orientation rather than
+   reading matter — level 5, and quiet enough that the four doors beside it
+   stay the loudest thing in the bar. */
+.pt-bar-sub {
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--pt-line);
+  font-size: var(--fs-meta);
+  color: var(--pt-faint);
+  white-space: nowrap;
+}
+
+.pt-bar-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+.pt-bar-nav a {
+  font-size: var(--fs-support);
+  font-weight: 500;
+  color: var(--pt-mut);
+  text-decoration: none;
+  transition: color var(--dur-micro) var(--ease);
+}
+.pt-bar-nav a:hover { color: var(--pt-ink); }
+
+/* The author's own door. It is not for candidates, so it stays at the
+   metadata step and in the faint ink — visible to whoever is looking for it,
+   invisible to everyone else. */
+.pt-admin-link {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  border: 1px solid var(--pt-line);
+  border-radius: 4px;
+  padding: var(--sp-2) var(--sp-3);
+  background: transparent;
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease);
+}
+.pt-admin-link:hover { color: var(--pt-ink); border-color: var(--pt-line-2); }
+
+/* The author console keeps the old single-row bar: it has no inner wrapper. */
+.pt-admin .pt-bar {
+  position: static;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  min-height: var(--sp-8);
+  padding-block: var(--sp-2);
+}
+
+/* ---------- shared type --------------------------------------------------- */
+
+.pt-kicker {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  margin: 0 0 var(--sp-3);
+}
+/* The one flourish the house style allows above a heading. */
+.pt-kicker::before {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  margin-right: var(--sp-3);
+  background: var(--pt-amber);
+  vertical-align: middle;
+}
+
+.pt-admin-head h1,
+.pt-admin-gate h1 {
+  font-family: var(--pt-serif);
+  font-optical-sizing: auto;
+  font-weight: 330;
+  font-size: var(--fs-page);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.018em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+
+/* The hero heading is the largest thing on the page — centred over the line,
+   set light, with the accent spent on a single italic word. It takes the one
+   display step nothing else on the site is allowed. */
+.pt-hero h1 {
+  font-family: var(--pt-serif);
+  font-optical-sizing: auto;
+  font-weight: 330;
+  font-size: var(--fs-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+.pt-hero h1 em,
+.pt-close h2 em,
+.pt-admin-gate h1 em { font-style: italic; color: var(--pt-amber); }
+
+.pt-lede {
+  max-width: var(--measure);
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+}
+
+/* ---------- buttons ------------------------------------------------------- */
+
+.pt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--pt-sans);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  padding: var(--sp-3) var(--sp-5);
+  min-height: 44px; /* touch target, same as the shared primitive */
+  /* 4px, not --radius-sm: the square-ish button is part of the identity both
+     sites share, and it is the one geometry the token file does not carry. */
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.pt-btn:hover { transform: translateY(-1px); }
+.pt-btn-solid { background: var(--pt-ink); color: #0B0D10; }
+.pt-btn-solid:hover { background: #fff; }
+.pt-btn-ghost { border-color: var(--pt-line-2); color: var(--pt-ink); background: transparent; }
+.pt-btn-ghost:hover { border-color: rgba(242, 238, 230, 0.55); }
+
+/* ---------- hero ----------------------------------------------------------
+   Centred over the line. The claim is one sentence; the proof is the drawing
+   underneath it — a single unbroken hairline that is a profile at one end and
+   a decaying resonance at the other — and the counted colophon under that. */
+
+.pt-hero {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--gap-section);
+}
+
+.pt-hero-copy {
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.pt-hero-copy .pt-lede { max-width: var(--measure-tight); }
+
+.pt-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-top: var(--gap-desc-main);
+}
+
+/* The line's stage: full-bleed, quiet, no border — the colophon rule below
+   is its shelf. */
+.pt-heroline {
+  position: relative;
+  width: 100%;
+  /* A drawing's stage, not whitespace: it has to stay tall enough for the
+     profile to keep human proportions, and short enough that the counted
+     colophon under it is still on the first screen of a 780px laptop. */
+  height: clamp(200px, 26vh, 300px);
+  margin-top: var(--gap-desc-main);
+}
+.pt-heroline-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* The colophon: what is inside, counted, set the way a results table is. The
+   figure is the claim and the label under it is the unit — so the figure takes
+   a display step and the label stays at metadata size, which is exactly what
+   --fs-meta exists for. */
+.pt-colophon {
+  list-style: none;
+  width: var(--pt-wrap);
+  margin: 0 auto;
+  padding: var(--sp-5) 0 var(--sp-8);
+  border-top: 1px solid var(--pt-line);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+.pt-colophon li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--pt-line);
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  line-height: var(--lh-heading);
+}
+.pt-colophon li:first-child { padding-left: 0; border-left: 0; }
+.pt-colophon b {
+  font-family: var(--pt-serif);
+  font-weight: 380;
+  font-size: var(--fs-section);
+  letter-spacing: -0.01em;
+  color: var(--pt-ink);
+}
+
+/* The examination format, as the college states it — a data band, reused at
+   the foot of the method section. The band's label is metadata; what the band
+   actually says about the paper is not, so the figures read at support size. */
+.pt-spec-head {
+  margin: 0;
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--pt-line-2);
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+}
+.pt-spec { margin: 0; }
+.pt-spec > div {
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--pt-line);
+}
+.pt-spec > div:last-child { border-bottom: 0; padding-bottom: var(--sp-1); }
+.pt-spec dt {
+  font-family: var(--pt-serif);
+  font-weight: 380;
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  margin-bottom: var(--sp-2);
+}
+.pt-spec dd {
+  margin: 0;
+  font-family: var(--pt-mono);
+  font-size: var(--fs-support);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pt-amber);
+}
+.pt-spec-note {
+  margin: var(--sp-4) 0 0;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--pt-line);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--pt-faint);
+}
+
+/* ---------- section scaffolding -------------------------------------------
+   The roman numeral lives in the margin at wide widths and folds into the
+   heading line when there is no margin to live in. */
+
+.pt-section {
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  padding: var(--gap-page) 0;
+  border-top: 1px solid var(--pt-line);
+}
+
+.pt-section-head {
+  position: relative;
+  margin-bottom: var(--gap-header-content);
+}
+
+/* Level 5, and the clearest case of it on the site: a roman numeral in the
+   margin says where you are and nothing else. */
+.pt-numeral {
+  position: absolute;
+  left: -64px;
+  top: var(--sp-2);
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.16em;
+  color: var(--pt-faint);
+}
+
+.pt-section-head h2 {
+  font-family: var(--pt-serif);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-page);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.012em;
+  margin: 0;
+  /* Wide enough that the longest of the three headings still sets on one
+     line at full measure, rather than breaking two words from the end. */
+  max-width: 30ch;
+}
+
+.pt-section-lede {
+  margin: var(--gap-heading-desc) 0 0;
+  max-width: var(--measure);
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+}
+
+/* ---------- the two plates ------------------------------------------------
+   Not cards: figures. Each module is presented the way a plate is set in a
+   monograph — the drawing on one side, the caption paragraph on the other,
+   alternating, separated by hairlines rather than boxed in. */
+
+.pt-plates { display: flex; flex-direction: column; }
+
+/* A plate is one object: the drawing and the paragraph that reads it are two
+   halves of the same row, on the same baseline, inside one link. The gap
+   between them is a card gap, not a chasm — at 72px they had started to read
+   as a picture and, separately, some text. */
+.pt-plate {
+  display: grid;
+  grid-template-areas: 'fig body';
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: var(--sp-7);
+  align-items: center;
+  padding: var(--sp-7) 0;
+  text-decoration: none;
+  color: inherit;
+}
+.pt-plate + .pt-plate { border-top: 1px solid var(--pt-line); }
+.pt-plate-flip {
+  grid-template-areas: 'body fig';
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.pt-plate-fig { grid-area: fig; margin: 0; }
+.pt-plate-body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.pt-plate-body strong {
+  font-family: var(--pt-serif);
+  font-weight: 370;
+  font-size: var(--fs-section);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.014em;
+}
+
+.pt-plate .pt-viewport {
+  border: 1px solid var(--pt-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--dur) var(--ease);
+}
+.pt-door-anatomy:hover .pt-viewport,
+.pt-door-anatomy:focus-visible .pt-viewport { border-color: rgba(217, 168, 78, 0.45); }
+.pt-door-physics:hover .pt-viewport,
+.pt-door-physics:focus-visible .pt-viewport { border-color: rgba(168, 203, 234, 0.45); }
+
+/* The figure caption, set as a catalogue line under the drawing: it names the
+   plate, which is orientation, so it stays at the metadata step. */
+.pt-plate-cap {
+  margin: var(--sp-3) var(--sp-1) 0;
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+}
+.pt-plate-cap i { font-style: normal; margin-right: var(--sp-2); }
+.pt-door-anatomy .pt-plate-cap i { color: var(--pt-amber); }
+.pt-door-physics .pt-plate-cap i { color: var(--pt-xray); }
+
+/* The image viewport: a deeper ground than the page, a hairline inset, and
+   corner annotations in the overlay's own typeface. */
+.pt-viewport {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  background: var(--pt-void);
+}
+.pt-viewport::after {
+  content: '';
+  position: absolute;
+  inset: var(--sp-3);
+  border: 1px solid rgba(242, 238, 230, 0.07);
+  pointer-events: none;
+}
+.pt-door-art { display: block; width: 100%; height: 100%; }
+
+/* Corner annotations, in the overlay's own typeface. Metadata about the
+   picture, in the picture — the one place on the page where the mono layer is
+   quoting an instrument rather than talking to the reader. */
+.pt-viewport > span {
+  position: absolute;
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: rgba(242, 238, 230, 0.34);
+  pointer-events: none;
+}
+.pt-vp-tl { top: var(--sp-5); left: var(--sp-5); }
+.pt-vp-tr { top: var(--sp-5); right: var(--sp-5); }
+.pt-vp-bl { bottom: var(--sp-5); left: var(--sp-5); }
+.pt-vp-br { bottom: var(--sp-5); right: var(--sp-5); }
+.pt-door-anatomy .pt-vp-tl { color: rgba(217, 168, 78, 0.6); }
+.pt-door-physics .pt-vp-tl { color: rgba(168, 203, 234, 0.6); }
+
+.pt-door-tag {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pt-mut);
+}
+.pt-door-anatomy .pt-door-tag { color: var(--pt-amber); }
+.pt-door-physics .pt-door-tag { color: var(--pt-xray); }
+
+/* The paragraph that says what the module actually is. On a page with two
+   doors and nothing else to read, this is the reading. */
+.pt-door-text {
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+}
+
+/* Modality chips, coloured with the hues both sites already use for them. */
+.pt-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-1); }
+.pt-chip {
+  font-family: var(--pt-mono);
+  font-style: normal;
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  border: 1px solid var(--pt-line);
+  border-radius: 3px;
+  padding: var(--sp-1) var(--sp-2);
+  white-space: nowrap;
+}
+.pt-chip-xray { color: var(--pt-xray); border-color: rgba(168, 203, 234, 0.25); }
+.pt-chip-us   { color: var(--pt-us);   border-color: rgba(123, 203, 196, 0.25); }
+.pt-chip-mri  { color: var(--pt-mri);  border-color: rgba(169, 158, 219, 0.25); }
+
+/* The figures: a serif number over a monospace label, three across, hairline
+   separated — the way a results table is set. */
+.pt-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: auto;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--pt-line);
+}
+.pt-figures > span {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--pt-line);
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  line-height: var(--lh-heading);
+}
+.pt-figures > span:first-child { padding-left: 0; border-left: 0; }
+.pt-figures b {
+  font-family: var(--pt-serif);
+  font-weight: 380;
+  font-size: var(--fs-section);
+  letter-spacing: -0.01em;
+  color: var(--pt-ink);
+  text-transform: none;
+}
+
+.pt-door-go {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  color: var(--pt-amber);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.pt-door-physics .pt-door-go { color: var(--pt-xray); }
+.pt-door-go i { font-style: normal; transition: transform var(--dur) var(--ease); }
+.pt-plate:hover .pt-door-go i { transform: translateX(4px); }
+
+/* ---------- contents index ------------------------------------------------
+   Dotted leaders, because that is what a contents page looks like and this
+   is a contents page. */
+
+.pt-index-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-7);
+}
+
+/* The column head names half the syllabus, so it was the one thing on the
+   page set smaller than its own children — a heading below the weight of the
+   list under it. It keeps the ledger treatment and takes a readable size. */
+.pt-index h3 {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--pt-mut);
+  margin: 0 0 var(--sp-1);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--pt-line-2);
+}
+
+.pt-index ul { list-style: none; margin: 0; padding: 0; }
+
+.pt-index a {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--pt-line);
+  text-decoration: none;
+  color: inherit;
+  min-height: 44px; /* touch target */
+}
+
+.pt-idx-label {
+  font-family: var(--pt-serif);
+  font-weight: 380;
+  font-size: var(--fs-card);
+  letter-spacing: -0.008em;
+  transition: color var(--dur-micro) var(--ease);
+}
+.pt-idx-leader {
+  flex: 1;
+  min-width: 24px;
+  margin: 0 var(--sp-3);
+  transform: translateY(-4px);
+  border-bottom: 1px dotted rgba(242, 238, 230, 0.24);
+  transition: border-color var(--dur-micro) var(--ease);
+}
+/* A count, on the right of a leader — the textbook case for --fs-meta. */
+.pt-idx-note {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pt-faint);
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease);
+}
+
+.pt-index a:hover .pt-idx-label { color: var(--pt-amber); }
+.pt-index a:hover .pt-idx-leader { border-bottom-color: rgba(217, 168, 78, 0.5); }
+.pt-index a:hover .pt-idx-note { color: var(--pt-mut); }
+
+/* Column totals — the ledger is summed at the foot, as a ledger is. */
+.pt-idx-total {
+  margin: var(--sp-3) 0 0;
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--pt-faint);
+  text-align: right;
+}
+
+/* ---------- method -------------------------------------------------------- */
+
+.pt-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap-cards);
+}
+.pt-method-grid article { padding-top: var(--sp-5); border-top: 1px solid var(--pt-line-2); }
+.pt-method-grid h3 {
+  font-family: var(--pt-serif);
+  font-weight: 380;
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+.pt-method-grid p {
+  margin: 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+}
+
+/* The examination format band at the foot of the method section: the two
+   modules side by side over one shared head rule, no box. */
+.pt-spec-band {
+  margin-top: var(--gap-section);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--sp-6);
+}
+.pt-spec-band .pt-spec-head { grid-column: 1 / -1; }
+.pt-spec-band .pt-spec { display: contents; }
+.pt-spec-band .pt-spec > div { border-bottom: 0; padding: var(--sp-4) 0 0; }
+.pt-spec-band .pt-spec-note {
+  grid-column: 1 / -1;
+  border-top: 0;
+  margin-top: var(--sp-4);
+  padding-top: 0;
+}
+
+/* ---------- reveal --------------------------------------------------------
+   A section rises a few pixels into place the first time it is seen, once.
+   Nothing on this page moves sideways and nothing moves twice. */
+.pt-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+}
+.pt-reveal.in-view {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- close --------------------------------------------------------- */
+
+.pt-close {
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  padding: var(--sp-9) 0 var(--gap-page);
+  border-top: 1px solid var(--pt-line);
+  text-align: center;
+}
+.pt-close h2 {
+  font-family: var(--pt-serif);
+  font-optical-sizing: auto;
+  font-weight: 330;
+  font-size: var(--fs-page);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.016em;
+  margin: 0 0 var(--gap-desc-main);
+}
+.pt-close .pt-hero-actions { justify-content: center; margin-top: 0; }
+/* What it costs, and the one thing that is free — a sentence a candidate acts
+   on, so it is not filed with the copyright line. */
+.pt-close-note {
+  margin: var(--gap-desc-main) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+}
+.pt-close-note a { color: var(--pt-amber); text-decoration: none; border-bottom: 1px solid rgba(217, 168, 78, 0.4); }
+.pt-close-note a:hover { border-bottom-color: var(--pt-amber); }
+
+/* ---------- footer -------------------------------------------------------- */
+
+.pt-foot {
+  width: var(--pt-wrap);
+  margin-inline: auto;
+  border-top: 1px solid var(--pt-line);
+  padding: var(--sp-7) 0 var(--sp-6);
+  font-size: var(--fs-support);
+  color: var(--pt-mut);
+}
+
+.pt-foot-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: var(--sp-6);
+  padding-bottom: var(--sp-7);
+}
+.pt-foot-brand p { margin: var(--sp-4) 0 0; max-width: 34ch; line-height: var(--lh-body); color: var(--pt-mut); }
+.pt-foot-grid nav { display: flex; flex-direction: column; gap: var(--sp-2); }
+.pt-foot-grid h4 {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  margin: 0 0 var(--sp-1);
+}
+.pt-foot-grid nav a { color: var(--pt-mut); text-decoration: none; transition: color var(--dur-micro) var(--ease); }
+.pt-foot-grid nav a:hover { color: var(--pt-ink); }
+
+.pt-foot-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--pt-line);
+  font-size: var(--fs-meta);
+  color: var(--pt-faint);
+}
+
+/* The author console's footer is a single row and predates the grid above. */
+.pt-admin .pt-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding: var(--sp-5) 0 var(--sp-6);
+  font-size: var(--fs-support);
+}
+.pt-foot-links { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
+.pt-foot-links a { color: var(--pt-mut); text-decoration: none; }
+.pt-foot-links a:hover { color: var(--pt-ink); }
+
+/* ---------- author console ------------------------------------------------ */
+
+.pt-admin { display: flex; flex-direction: column; }
+
+.pt-admin-gate, .pt-admin-head {
+  width: min(var(--container-reading), calc(100% - 2 * var(--gutter)));
+  margin: var(--sp-8) auto var(--gap-header-content);
+}
+.pt-admin-head { width: var(--pt-wrap); }
+
+.pt-gate-form { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 340px; margin: var(--gap-header-content) 0 var(--gap-desc-main); }
+/* A form label is an instruction — the one word telling you what to type. */
+.pt-gate-form label { font-size: var(--fs-support); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pt-mut); }
+.pt-gate-form input {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 4px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-surface-2);
+  color: var(--pt-ink);
+  /* At or above 16px, or iOS zooms the page on focus and never zooms back. */
+  font-size: var(--fs-body);
+  min-height: 44px;
+}
+.pt-gate-form input:focus { outline: none; border-color: var(--pt-amber); }
+
+.pt-gate-error { color: #e0955a; font-size: var(--fs-support); margin: var(--sp-1) 0 0; }
+
+.pt-admin-warning {
+  max-width: var(--measure);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--pt-mut);
+  border-left: 2px solid rgba(224, 149, 90, 0.5);
+  padding-left: var(--sp-3);
+  margin: 0 0 var(--gap-desc-main);
+}
+.pt-admin-warning strong { color: #e0955a; }
+
+.pt-back { font-size: var(--fs-support); color: var(--pt-mut); text-decoration: none; }
+.pt-back:hover { color: var(--pt-ink); }
+
+.pt-admin-group { width: var(--pt-wrap); margin: 0 auto var(--gap-section); }
+.pt-admin-group h2 {
+  font-family: var(--pt-serif);
+  font-weight: 380; font-size: var(--fs-section); margin: 0 0 var(--sp-1);
+}
+.pt-admin-note { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--pt-mut); margin: 0 0 var(--gap-heading-desc); max-width: var(--measure); }
+.pt-admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: var(--sp-3); }
+.pt-admin-card {
+  display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-4);
+  border: 1px solid var(--pt-line);
+  border-radius: var(--radius-sm);
+  background: var(--pt-surface);
+  text-decoration: none; color: inherit;
+  transition: border-color var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+}
+.pt-admin-card:hover { border-color: var(--pt-amber); transform: translateY(-2px); }
+.pt-admin-card strong { font-size: var(--fs-card); font-weight: 600; line-height: var(--lh-heading); }
+.pt-admin-card span { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--pt-mut); }
+
+/* ---------- responsive ---------------------------------------------------- */
+
+/* The roman numerals need a margin to sit in; below this width there isn't
+   one, so they step back into the flow above the heading.
+   1400, not 1180: the numeral is set 64px outside the container, and the
+   container only has 64px of margin once the viewport exceeds its own maximum
+   width by that much twice over. Between the old breakpoint and here the
+   numerals were being drawn past the left edge of the window — present in the
+   markup, invisible on screen, and not counted as overflow because nothing
+   scrolls leftwards. */
+@media (max-width: 1400px) {
+  .pt-numeral { position: static; display: block; margin-bottom: var(--sp-3); }
+}
+
+/* --pt-wrap no longer needs stepping down per breakpoint: --gutter is itself
+   a clamp, so the measure narrows continuously instead of in three jumps. */
+@media (max-width: 1000px) {
+  .pt-index-grid { grid-template-columns: minmax(0, 1fr); }
+  /* The plates stack, drawing first — the figure stays above its caption. */
+  .pt-plate, .pt-plate-flip {
+    grid-template-areas: 'fig' 'body';
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gap-cards);
+  }
+  .pt-colophon { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5) var(--sp-4); }
+  .pt-method-grid { grid-template-columns: minmax(0, 1fr); gap: var(--gap-cards); }
+  .pt-foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* The masthead standfirst is the first thing to go: it is the only item in
+     the bar that is not a door, and below this width the doors need the room. */
+  .pt-bar-sub { display: none; }
+}
+
+@media (max-width: 720px) {
+  /* Four links plus the wordmark do not fit one phone-width row, and
+     dropping one would make it unreachable — so the masthead becomes two
+     rows rather than losing anything. */
+  .pt-bar-inner { flex-wrap: wrap; gap: var(--sp-2) var(--sp-3); padding-block: var(--sp-3); }
+  .pt-bar-nav { margin-left: 0; width: 100%; justify-content: space-between; gap: var(--sp-3); }
+  .pt-hero-actions .pt-btn { flex: 1 1 auto; }
+  /* A 16:10 frame at phone width leaves the plate too small to read; a
+     squarer viewport gives it back its height. */
+  .pt-viewport { aspect-ratio: 4 / 3; }
+  .pt-colophon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pt-colophon li:nth-child(odd) { padding-left: 0; border-left: 0; }
+  /* Tracking, not size, is what makes this kicker too wide for a phone: at a
+     third of an em, twenty-six letters need 383px of a 358px column, and the
+     rule before it ends up beside a two-line label. */
+  .pt-kicker { letter-spacing: 0.2em; }
+  .pt-spec-band { grid-template-columns: minmax(0, 1fr); }
+  .pt-foot-grid { grid-template-columns: minmax(0, 1fr); gap: var(--gap-cards); }
+  /* The corner overlays crowd each other on a phone-width plate; the two that
+     repeat what the caption underneath already says step out. */
+  .pt-vp-tr, .pt-vp-br { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-btn:hover { transform: none; }
+  .pt-plate:hover .pt-door-go i { transform: none; }
+}
+
+/* ---------- the crossing ----------
+   Shown only where the anatomy folder is absent and the door has to travel to
+   the separate deployment. One breath of brand, then gone — designed so the
+   hop between hosts reads as part of the product, never as an error page. */
+/* margin:auto rather than justify-content on the root: it centres in the
+   flex column unconditionally, whatever else the chassis class sets. */
+.pt-crossing-body {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-7) var(--sp-5);
+  margin: auto;
+}
+/* The only sentence on the screen. It gets read at reading size. */
+.pt-crossing-note { margin: 0; font-size: var(--fs-teach); color: var(--pt-mut); }
+.pt-crossing-note strong { color: var(--pt-amber); font-weight: 600; }
+.pt-crossing-rail {
+  width: 180px; height: 2px; border-radius: 2px;
+  background: rgba(242, 238, 230, 0.1);
+  overflow: hidden;
+}
+.pt-crossing-rail i {
+  display: block; height: 100%; width: 40%;
+  background: var(--pt-amber);
+  animation: pt-cross 0.45s linear forwards;
+}
+@keyframes pt-cross { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@media (prefers-reduced-motion: reduce) { .pt-crossing-rail i { animation: none; width: 100%; } }

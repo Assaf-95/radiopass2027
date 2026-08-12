@@ -1,0 +1,922 @@
+{
+ "id": "hip-axial-t1",
+ "title": "Axial T1 — hip and proximal thigh",
+ "plane": "axial",
+ "weighting": "T1-weighted, non fat-suppressed",
+ "region": "Hemipelvis, hip joint and proximal thigh",
+ "side": null,
+ "sideNote": "Side not confirmed from the screen recording. No L or R marker is visible on the images; the only orientation marker present is P (posterior), at the foot of each slice.",
+ "markers": [
+  "P — posterior"
+ ],
+ "sliceCount": 38,
+ "width": 994,
+ "height": 938,
+ "imagePattern": "/mri/hip-axial-t1/s{index}.webp",
+ "provenance": "Reconstructed from a screen recording: 321 frames reduced to 173 distinct images by collapsing held frames, ordered anatomically by spectral seriation of the slice-similarity graph with 2-opt refinement, then merged to 38 unique levels. Frame order in the recording is not slice order — the reader scrolled back over the same anatomy twice.",
+ "levels": [
+  {
+   "from": 0,
+   "to": 2,
+   "label": "Lower hemipelvis, iliac wing"
+  },
+  {
+   "from": 3,
+   "to": 5,
+   "label": "Supra-acetabular ilium"
+  },
+  {
+   "from": 6,
+   "to": 7,
+   "label": "Acetabular roof"
+  },
+  {
+   "from": 8,
+   "to": 12,
+   "label": "Femoral head and hip joint"
+  },
+  {
+   "from": 13,
+   "to": 14,
+   "label": "Head–neck junction"
+  },
+  {
+   "from": 15,
+   "to": 17,
+   "label": "Femoral neck and greater trochanter"
+  },
+  {
+   "from": 18,
+   "to": 20,
+   "label": "Intertrochanteric"
+  },
+  {
+   "from": 21,
+   "to": 23,
+   "label": "Lesser trochanter"
+  },
+  {
+   "from": 24,
+   "to": 26,
+   "label": "Subtrochanteric femur"
+  },
+  {
+   "from": 27,
+   "to": 37,
+   "label": "Proximal thigh"
+  }
+ ],
+ "structures": [
+  {
+   "structureId": "femoral-head",
+   "name": "Femoral head",
+   "category": "bone",
+   "firstSlice": 6,
+   "lastSlice": 14,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "6": {
+     "targetX": 0.54,
+     "targetY": 0.42,
+     "labelSide": "right",
+     "labelY": 0.36
+    },
+    "10": {
+     "targetX": 0.55,
+     "targetY": 0.44,
+     "labelSide": "right",
+     "labelY": 0.4
+    },
+    "14": {
+     "targetX": 0.52,
+     "targetY": 0.47,
+     "labelSide": "right",
+     "labelY": 0.44
+    }
+   },
+   "recognition": "The only large sphere in the section: uniformly bright fatty marrow inside a thin, uniformly dark cortical rim, sitting in the acetabular cup. On T1 its marrow signal should match the greater trochanter and the shaft.",
+   "synonyms": [
+    "head of femur",
+    "caput femoris"
+   ]
+  },
+  {
+   "structureId": "acetabulum",
+   "name": "Acetabulum",
+   "category": "bone",
+   "firstSlice": 5,
+   "lastSlice": 13,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "5": {
+     "targetX": 0.37,
+     "targetY": 0.42,
+     "labelSide": "left",
+     "labelY": 0.38
+    },
+    "10": {
+     "targetX": 0.36,
+     "targetY": 0.44,
+     "labelSide": "left",
+     "labelY": 0.42
+    },
+    "13": {
+     "targetX": 0.36,
+     "targetY": 0.47,
+     "labelSide": "left",
+     "labelY": 0.46
+    }
+   },
+   "recognition": "The C-shaped socket medial to the head. On an axial slice you see it as anterior and posterior walls with the joint space between them and the head; the posterior wall is the thicker of the two."
+  },
+  {
+   "structureId": "femoral-neck",
+   "name": "Femoral neck",
+   "category": "bone",
+   "firstSlice": 13,
+   "lastSlice": 18,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "13": {
+     "targetX": 0.57,
+     "targetY": 0.48,
+     "labelSide": "right",
+     "labelY": 0.5
+    },
+    "16": {
+     "targetX": 0.6,
+     "targetY": 0.5,
+     "labelSide": "right",
+     "labelY": 0.5
+    },
+    "18": {
+     "targetX": 0.62,
+     "targetY": 0.5,
+     "labelSide": "right",
+     "labelY": 0.52
+    }
+   },
+   "recognition": "The marrow-filled bar running posterolaterally from the head toward the trochanter. Follow it down the stack: the head becomes an oval, then a bar, then merges with the trochanteric mass."
+  },
+  {
+   "structureId": "greater-trochanter",
+   "name": "Greater trochanter",
+   "category": "bone",
+   "firstSlice": 14,
+   "lastSlice": 21,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "14": {
+     "targetX": 0.75,
+     "targetY": 0.55,
+     "labelSide": "right",
+     "labelY": 0.62
+    },
+    "18": {
+     "targetX": 0.74,
+     "targetY": 0.55,
+     "labelSide": "right",
+     "labelY": 0.62
+    },
+    "21": {
+     "targetX": 0.72,
+     "targetY": 0.52,
+     "labelSide": "right",
+     "labelY": 0.6
+    }
+   },
+   "recognition": "The lateral marrow-containing prominence with the gluteal tendons converging on it. It appears lateral to the neck and is the most lateral bone in the section.",
+   "synonyms": [
+    "trochanter major"
+   ]
+  },
+  {
+   "structureId": "femoral-shaft",
+   "name": "Proximal femoral shaft",
+   "category": "bone",
+   "firstSlice": 22,
+   "lastSlice": 37,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "22": {
+     "targetX": 0.7,
+     "targetY": 0.5,
+     "labelSide": "right",
+     "labelY": 0.48
+    },
+    "28": {
+     "targetX": 0.72,
+     "targetY": 0.47,
+     "labelSide": "right",
+     "labelY": 0.46
+    },
+    "37": {
+     "targetX": 0.7,
+     "targetY": 0.47,
+     "labelSide": "right",
+     "labelY": 0.46
+    }
+   },
+   "recognition": "A thick black ring of cortex with bright fatty marrow inside — the densest black on a T1 thigh. Everything else in the thigh is arranged around it.",
+   "synonyms": [
+    "femoral diaphysis",
+    "shaft of femur",
+    "femur"
+   ]
+  },
+  {
+   "structureId": "gluteus-maximus",
+   "name": "Gluteus maximus",
+   "category": "muscle",
+   "firstSlice": 0,
+   "lastSlice": 30,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "0": {
+     "targetX": 0.5,
+     "targetY": 0.72,
+     "labelSide": "left",
+     "labelY": 0.78
+    },
+    "10": {
+     "targetX": 0.55,
+     "targetY": 0.74,
+     "labelSide": "left",
+     "labelY": 0.8
+    },
+    "20": {
+     "targetX": 0.5,
+     "targetY": 0.74,
+     "labelSide": "left",
+     "labelY": 0.8
+    },
+    "30": {
+     "targetX": 0.44,
+     "targetY": 0.72,
+     "labelSide": "left",
+     "labelY": 0.8
+    }
+   },
+   "origin": "Posterior gluteal line of the ilium, dorsal sacrum and coccyx, sacrotuberous ligament",
+   "insertion": "Iliotibial tract and the gluteal tuberosity of the femur",
+   "innervation": "Inferior gluteal nerve (L5, S1, S2)",
+   "action": "Extension and external rotation of the hip; its upper fibres abduct",
+   "recognition": "The most superficial and most posterior muscle in every slice from the pelvis down — it forms the whole back of the section, immediately deep to subcutaneous fat.",
+   "synonyms": [
+    "glut max",
+    "gluteus maximus muscle"
+   ]
+  },
+  {
+   "structureId": "gluteus-medius",
+   "name": "Gluteus medius",
+   "category": "muscle",
+   "firstSlice": 0,
+   "lastSlice": 17,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "0": {
+     "targetX": 0.72,
+     "targetY": 0.4,
+     "labelSide": "right",
+     "labelY": 0.24
+    },
+    "8": {
+     "targetX": 0.78,
+     "targetY": 0.48,
+     "labelSide": "right",
+     "labelY": 0.26
+    },
+    "14": {
+     "targetX": 0.79,
+     "targetY": 0.52,
+     "labelSide": "right",
+     "labelY": 0.28
+    },
+    "17": {
+     "targetX": 0.78,
+     "targetY": 0.5,
+     "labelSide": "right",
+     "labelY": 0.3
+    }
+   },
+   "origin": "Outer surface of the ilium between the posterior and anterior gluteal lines",
+   "insertion": "Lateral facet of the greater trochanter",
+   "innervation": "Superior gluteal nerve (L4, L5, S1)",
+   "action": "Hip abduction; anterior fibres internally rotate. Holds the pelvis level in single-leg stance",
+   "recognition": "Lateral, and superficial to gluteus minimus — the pair look like two shells wrapped round the outer ilium, medius the outer one. Trace them down and both converge as tendons on the greater trochanter.",
+   "synonyms": [
+    "glut med",
+    "gluteus medius muscle"
+   ]
+  },
+  {
+   "structureId": "gluteus-minimus",
+   "name": "Gluteus minimus",
+   "category": "muscle",
+   "firstSlice": 1,
+   "lastSlice": 15,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "1": {
+     "targetX": 0.66,
+     "targetY": 0.38,
+     "labelSide": "right",
+     "labelY": 0.16
+    },
+    "8": {
+     "targetX": 0.7,
+     "targetY": 0.44,
+     "labelSide": "right",
+     "labelY": 0.18
+    },
+    "15": {
+     "targetX": 0.71,
+     "targetY": 0.47,
+     "labelSide": "right",
+     "labelY": 0.2
+    }
+   },
+   "origin": "Outer ilium between the anterior and inferior gluteal lines",
+   "insertion": "Anterior facet of the greater trochanter",
+   "innervation": "Superior gluteal nerve (L4, L5, S1)",
+   "action": "Hip abduction and internal rotation",
+   "recognition": "The deeper of the two — it lies directly on the outer table of the ilium with gluteus medius outside it, separated by a thin fat plane. If you can see bone touching muscle with no muscle between, that muscle is minimus.",
+   "synonyms": [
+    "glut min",
+    "gluteus minimus muscle"
+   ]
+  },
+  {
+   "structureId": "tensor-fasciae-latae",
+   "name": "Tensor fasciae latae",
+   "category": "muscle",
+   "firstSlice": 4,
+   "lastSlice": 24,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "4": {
+     "targetX": 0.78,
+     "targetY": 0.24,
+     "labelSide": "right",
+     "labelY": 0.1
+    },
+    "12": {
+     "targetX": 0.82,
+     "targetY": 0.26,
+     "labelSide": "right",
+     "labelY": 0.12
+    },
+    "20": {
+     "targetX": 0.84,
+     "targetY": 0.3,
+     "labelSide": "right",
+     "labelY": 0.14
+    },
+    "24": {
+     "targetX": 0.85,
+     "targetY": 0.32,
+     "labelSide": "right",
+     "labelY": 0.14
+    }
+   },
+   "origin": "Anterior part of the outer lip of the iliac crest and the anterior superior iliac spine",
+   "insertion": "Iliotibial tract",
+   "innervation": "Superior gluteal nerve (L4, L5, S1)",
+   "action": "Assists hip abduction and internal rotation; tenses the iliotibial tract",
+   "recognition": "A small anterolateral muscle sitting right under the skin at the front-outer corner of the section. Follow it down and it disappears into the iliotibial band while sartorius runs the opposite way, medially.",
+   "synonyms": [
+    "TFL",
+    "tensor fascia lata"
+   ]
+  },
+  {
+   "structureId": "sartorius",
+   "name": "Sartorius",
+   "category": "muscle",
+   "firstSlice": 4,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "4": {
+     "targetX": 0.44,
+     "targetY": 0.14,
+     "labelSide": "left",
+     "labelY": 0.1
+    },
+    "14": {
+     "targetX": 0.38,
+     "targetY": 0.16,
+     "labelSide": "left",
+     "labelY": 0.12
+    },
+    "24": {
+     "targetX": 0.32,
+     "targetY": 0.2,
+     "labelSide": "left",
+     "labelY": 0.14
+    },
+    "37": {
+     "targetX": 0.26,
+     "targetY": 0.26,
+     "labelSide": "left",
+     "labelY": 0.16
+    }
+   },
+   "origin": "Anterior superior iliac spine",
+   "insertion": "Pes anserinus, on the medial surface of the proximal tibia",
+   "innervation": "Femoral nerve (L2, L3)",
+   "action": "Flexes, abducts and externally rotates the hip; flexes the knee",
+   "recognition": "A small, flat, strap-like muscle just under the skin that migrates medially as you scroll down — it starts near the anterior superior iliac spine and crosses the front of the thigh to the medial side. It forms the lateral border of the femoral triangle, and further down it roofs the adductor canal. It is sartorius, never serratus.",
+   "synonyms": [
+    "sartorius muscle",
+    "tailor's muscle"
+   ]
+  },
+  {
+   "structureId": "rectus-femoris",
+   "name": "Rectus femoris",
+   "category": "muscle",
+   "firstSlice": 8,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "8": {
+     "targetX": 0.6,
+     "targetY": 0.16,
+     "labelSide": "right",
+     "labelY": 0.06
+    },
+    "18": {
+     "targetX": 0.58,
+     "targetY": 0.18,
+     "labelSide": "right",
+     "labelY": 0.06
+    },
+    "28": {
+     "targetX": 0.55,
+     "targetY": 0.2,
+     "labelSide": "right",
+     "labelY": 0.06
+    },
+    "37": {
+     "targetX": 0.52,
+     "targetY": 0.22,
+     "labelSide": "right",
+     "labelY": 0.06
+    }
+   },
+   "origin": "Direct head from the anterior inferior iliac spine; reflected head from the supra-acetabular groove",
+   "insertion": "Quadriceps tendon to the patella, then the tibial tuberosity via the patellar ligament",
+   "innervation": "Femoral nerve (L2, L3, L4)",
+   "action": "Extends the knee and flexes the hip — the only quadriceps head that crosses both joints",
+   "recognition": "The most anterior and superficial of the quadriceps, oval in cross-section, sitting on top of vastus intermedius. Near the hip it is a tendon at the anterior inferior iliac spine; it only becomes a belly further down.",
+   "synonyms": [
+    "rectus femoris muscle"
+   ]
+  },
+  {
+   "structureId": "vastus-lateralis",
+   "name": "Vastus lateralis",
+   "category": "muscle",
+   "firstSlice": 20,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "20": {
+     "targetX": 0.82,
+     "targetY": 0.36,
+     "labelSide": "right",
+     "labelY": 0.2
+    },
+    "28": {
+     "targetX": 0.82,
+     "targetY": 0.32,
+     "labelSide": "right",
+     "labelY": 0.2
+    },
+    "37": {
+     "targetX": 0.8,
+     "targetY": 0.32,
+     "labelSide": "right",
+     "labelY": 0.22
+    }
+   },
+   "origin": "Greater trochanter, intertrochanteric line and lateral lip of the linea aspera",
+   "insertion": "Quadriceps tendon and the lateral patella",
+   "innervation": "Femoral nerve (L2, L3, L4)",
+   "action": "Knee extension",
+   "recognition": "The bulk of the lateral thigh, lying directly deep to the iliotibial band and wrapping the lateral cortex of the femur.",
+   "synonyms": [
+    "vastus lateralis muscle"
+   ]
+  },
+  {
+   "structureId": "vastus-intermedius",
+   "name": "Vastus intermedius",
+   "category": "muscle",
+   "firstSlice": 24,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "24": {
+     "targetX": 0.66,
+     "targetY": 0.3,
+     "labelSide": "right",
+     "labelY": 0.32
+    },
+    "31": {
+     "targetX": 0.66,
+     "targetY": 0.3,
+     "labelSide": "right",
+     "labelY": 0.32
+    },
+    "37": {
+     "targetX": 0.64,
+     "targetY": 0.32,
+     "labelSide": "right",
+     "labelY": 0.34
+    }
+   },
+   "origin": "Anterior and lateral surfaces of the femoral shaft",
+   "insertion": "Quadriceps tendon",
+   "innervation": "Femoral nerve (L2, L3, L4)",
+   "action": "Knee extension",
+   "recognition": "The layer sandwiched between rectus femoris and the front of the femur — it is the quadriceps head lying directly on the bone.",
+   "synonyms": [
+    "vastus intermedius muscle"
+   ]
+  },
+  {
+   "structureId": "iliopsoas",
+   "name": "Iliopsoas",
+   "category": "muscle",
+   "firstSlice": 0,
+   "lastSlice": 22,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "0": {
+     "targetX": 0.3,
+     "targetY": 0.3,
+     "labelSide": "left",
+     "labelY": 0.22
+    },
+    "8": {
+     "targetX": 0.38,
+     "targetY": 0.3,
+     "labelSide": "left",
+     "labelY": 0.24
+    },
+    "14": {
+     "targetX": 0.4,
+     "targetY": 0.32,
+     "labelSide": "left",
+     "labelY": 0.26
+    },
+    "22": {
+     "targetX": 0.4,
+     "targetY": 0.36,
+     "labelSide": "left",
+     "labelY": 0.28
+    }
+   },
+   "origin": "Psoas major from T12–L5 vertebral bodies and transverse processes; iliacus from the iliac fossa",
+   "insertion": "Lesser trochanter of the femur",
+   "innervation": "Psoas major, anterior rami L1–L3; iliacus, femoral nerve (L2, L3)",
+   "action": "The principal hip flexor",
+   "recognition": "Sits directly in front of the hip joint, between the femoral vessels medially and the anterior acetabulum behind. Scroll down and it narrows into a tendon that heads for the lesser trochanter — that is the moment psoas and iliacus have fused.",
+   "synonyms": [
+    "ilio-psoas",
+    "psoas",
+    "iliopsoas muscle"
+   ]
+  },
+  {
+   "structureId": "adductor-longus",
+   "name": "Adductor longus",
+   "category": "muscle",
+   "firstSlice": 20,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "20": {
+     "targetX": 0.26,
+     "targetY": 0.42,
+     "labelSide": "left",
+     "labelY": 0.4
+    },
+    "28": {
+     "targetX": 0.24,
+     "targetY": 0.44,
+     "labelSide": "left",
+     "labelY": 0.4
+    },
+    "37": {
+     "targetX": 0.24,
+     "targetY": 0.42,
+     "labelSide": "left",
+     "labelY": 0.4
+    }
+   },
+   "origin": "Anterior body of the pubis, below the pubic crest",
+   "insertion": "Middle third of the linea aspera",
+   "innervation": "Obturator nerve, anterior division (L2, L3, L4)",
+   "action": "Adducts and assists flexion of the hip",
+   "recognition": "The most anterior and most superficial of the adductor group, forming the medial border of the femoral triangle. Depth is the key: longus in front, brevis behind it, magnus behind that.",
+   "synonyms": [
+    "adductor longus muscle"
+   ]
+  },
+  {
+   "structureId": "adductor-magnus",
+   "name": "Adductor magnus",
+   "category": "muscle",
+   "firstSlice": 19,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "19": {
+     "targetX": 0.3,
+     "targetY": 0.6,
+     "labelSide": "left",
+     "labelY": 0.58
+    },
+    "28": {
+     "targetX": 0.3,
+     "targetY": 0.58,
+     "labelSide": "left",
+     "labelY": 0.58
+    },
+    "37": {
+     "targetX": 0.3,
+     "targetY": 0.56,
+     "labelSide": "left",
+     "labelY": 0.58
+    }
+   },
+   "origin": "Inferior pubic ramus, ischial ramus and ischial tuberosity",
+   "insertion": "Linea aspera and the adductor tubercle of the femur",
+   "innervation": "Obturator nerve, and the tibial division of the sciatic nerve for the hamstring part",
+   "action": "Powerful hip adduction; the hamstring part extends the hip",
+   "recognition": "The largest and most posterior of the adductors, forming a broad sheet between the adductor group in front and the hamstrings behind.",
+   "synonyms": [
+    "adductor magnus muscle"
+   ]
+  },
+  {
+   "structureId": "gracilis",
+   "name": "Gracilis",
+   "category": "muscle",
+   "firstSlice": 20,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "20": {
+     "targetX": 0.16,
+     "targetY": 0.5,
+     "labelSide": "left",
+     "labelY": 0.5
+    },
+    "28": {
+     "targetX": 0.15,
+     "targetY": 0.5,
+     "labelSide": "left",
+     "labelY": 0.5
+    },
+    "37": {
+     "targetX": 0.16,
+     "targetY": 0.48,
+     "labelSide": "left",
+     "labelY": 0.5
+    }
+   },
+   "origin": "Body and inferior ramus of the pubis",
+   "insertion": "Pes anserinus, on the medial proximal tibia",
+   "innervation": "Obturator nerve (L2, L3)",
+   "action": "Adducts the hip and flexes the knee",
+   "recognition": "The thin strap right at the medial edge of the thigh, immediately under the skin — the most medial muscle in the section at every level.",
+   "synonyms": [
+    "gracilis muscle"
+   ]
+  },
+  {
+   "structureId": "hamstring-origin",
+   "name": "Hamstring origin (common tendon)",
+   "category": "tendon",
+   "firstSlice": 15,
+   "lastSlice": 24,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "15": {
+     "targetX": 0.4,
+     "targetY": 0.66,
+     "labelSide": "left",
+     "labelY": 0.68
+    },
+    "20": {
+     "targetX": 0.4,
+     "targetY": 0.66,
+     "labelSide": "left",
+     "labelY": 0.68
+    },
+    "24": {
+     "targetX": 0.4,
+     "targetY": 0.64,
+     "labelSide": "left",
+     "labelY": 0.68
+    }
+   },
+   "origin": "Ischial tuberosity",
+   "innervation": "Sciatic nerve (tibial division; short head of biceps from the common peroneal division)",
+   "action": "Hip extension and knee flexion",
+   "recognition": "A dark, low-signal tendinous mass on the back of the ischial tuberosity, deep to gluteus maximus. Semimembranosus arises anterolaterally on the tuberosity, and semitendinosus with the biceps long head share a conjoint tendon posteromedially.",
+   "synonyms": [
+    "common hamstring tendon",
+    "conjoint tendon",
+    "hamstring tendon origin"
+   ]
+  },
+  {
+   "structureId": "sciatic-nerve",
+   "name": "Sciatic nerve",
+   "category": "nerve",
+   "firstSlice": 12,
+   "lastSlice": 32,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "12": {
+     "targetX": 0.54,
+     "targetY": 0.62,
+     "labelSide": "left",
+     "labelY": 0.62
+    },
+    "20": {
+     "targetX": 0.52,
+     "targetY": 0.62,
+     "labelSide": "left",
+     "labelY": 0.64
+    },
+    "26": {
+     "targetX": 0.5,
+     "targetY": 0.62,
+     "labelSide": "left",
+     "labelY": 0.64
+    },
+    "32": {
+     "targetX": 0.48,
+     "targetY": 0.62,
+     "labelSide": "left",
+     "labelY": 0.64
+    }
+   },
+   "innervation": "L4–S3",
+   "action": "Motor to the hamstrings and everything below the knee; sensory to most of the leg and foot",
+   "recognition": "A flat, ovoid, slightly striated structure lying in fat between the ischium and gluteus maximus, then running behind adductor magnus in the thigh. It is larger than any vessel at this level and does not have a flow void.",
+   "synonyms": [
+    "sciatic n",
+    "nervus ischiadicus"
+   ]
+  },
+  {
+   "structureId": "femoral-vessels",
+   "name": "Femoral vessels",
+   "category": "vessel",
+   "firstSlice": 6,
+   "lastSlice": 24,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "6": {
+     "targetX": 0.3,
+     "targetY": 0.22,
+     "labelSide": "left",
+     "labelY": 0.18
+    },
+    "14": {
+     "targetX": 0.3,
+     "targetY": 0.26,
+     "labelSide": "left",
+     "labelY": 0.2
+    },
+    "24": {
+     "targetX": 0.28,
+     "targetY": 0.3,
+     "labelSide": "left",
+     "labelY": 0.22
+    }
+   },
+   "recognition": "Paired round low-signal structures in the fat of the femoral triangle, anteromedial to iliopsoas. Artery and vein cannot be separated with confidence on this study, so they are labelled together.",
+   "note": "Labelled as a pair deliberately. On this recording the artery and vein cannot be told apart reliably, and guessing which is which would be inventing a finding.",
+   "synonyms": [
+    "femoral artery and vein",
+    "femoral neurovascular bundle",
+    "common femoral vessels"
+   ]
+  },
+  {
+   "structureId": "iliotibial-band",
+   "name": "Iliotibial band",
+   "category": "fascia",
+   "firstSlice": 14,
+   "lastSlice": 37,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "14": {
+     "targetX": 0.9,
+     "targetY": 0.42,
+     "labelSide": "right",
+     "labelY": 0.4
+    },
+    "26": {
+     "targetX": 0.92,
+     "targetY": 0.4,
+     "labelSide": "right",
+     "labelY": 0.4
+    },
+    "37": {
+     "targetX": 0.92,
+     "targetY": 0.4,
+     "labelSide": "right",
+     "labelY": 0.4
+    }
+   },
+   "recognition": "A hairline of very low signal hugging the lateral margin of the thigh, superficial to vastus lateralis. It is the thickened lateral part of the fascia lata, and receives tensor fasciae latae and part of gluteus maximus.",
+   "synonyms": [
+    "IT band",
+    "iliotibial tract",
+    "tractus iliotibialis"
+   ]
+  },
+  {
+   "structureId": "subcutaneous-fat",
+   "name": "Subcutaneous fat",
+   "category": "other",
+   "firstSlice": 0,
+   "lastSlice": 37,
+   "confidence": "high",
+   "verified": false,
+   "annotations": {
+    "0": {
+     "targetX": 0.6,
+     "targetY": 0.88,
+     "labelSide": "left",
+     "labelY": 0.9
+    },
+    "20": {
+     "targetX": 0.6,
+     "targetY": 0.86,
+     "labelSide": "left",
+     "labelY": 0.9
+    },
+    "37": {
+     "targetX": 0.58,
+     "targetY": 0.84,
+     "labelSide": "left",
+     "labelY": 0.9
+    }
+   },
+   "recognition": "The bright rind around the whole section. On T1 fat is the brightest tissue there is, which is what makes this a T1 image: were this fat-suppressed, this rind would be black.",
+   "synonyms": [
+    "subcutaneous tissue",
+    "subcutaneous layer"
+   ]
+  }
+ ]
+}

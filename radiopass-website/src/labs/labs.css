@@ -1,0 +1,753 @@
+/* Focused lesson player — one concept, one diagram, one Next button.
+   Charcoal, ivory, Fraunces + Inter, one accent colour per module (set via
+   --lx-accent). Every size, space and colour below comes from design/tokens
+   .css; this file only decides which token a thing deserves.
+
+   The one thing it computes rather than quotes is the step screen's type
+   ramp, at the bottom of the file: a guided concept must fit a 660px-tall
+   browser window, so the tokens are capped against the height available. The
+   height may only push a size DOWN its own token's range — it can never
+   invent a size the scale does not have. */
+
+.lx-root {
+  /* The bar's height, declared rather than guessed. The step screen subtracts
+     it to guarantee the fold and a pinned diagram parks exactly beneath it;
+     when those two numbers drift apart a concept ends up either 20px too tall
+     or sitting behind its own navigation, so the bar is given this height and
+     both users read it from here. */
+  --lx-bar-h: 54px;
+  min-height: 100vh; background: var(--bg-base); color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif; display: flex; flex-direction: column;
+}
+.lx-root ::selection { background: rgba(217, 168, 78, 0.32); }
+.lx-root :focus-visible { outline: 2px solid var(--lx-accent); outline-offset: 3px; border-radius: 2px; }
+
+/* The bar is orientation, not teaching: which module, which concept, the way
+   out. It is the site's one progress read-out for this screen, which is why
+   the copy column no longer repeats it on a wide viewport. */
+.lx-bar {
+  display: flex; align-items: center; gap: var(--sp-4);
+  height: var(--lx-bar-h); padding: 0 var(--sp-5);
+  border-bottom: 1px solid var(--border);
+  background: rgba(11, 13, 16, 0.8); position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.lx-exit { font-size: var(--fs-support); color: var(--text-tertiary); text-decoration: none; white-space: nowrap; }
+.lx-exit:hover { color: var(--text-primary); }
+.lx-bar-title { flex: 1; text-align: center; font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-tertiary); }
+.lx-bar-count { font-size: var(--fs-meta); color: var(--lx-accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- buttons ---------- */
+.lx-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font: 600 var(--fs-support)/1 'Inter', sans-serif; padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-sm); min-height: 44px;
+  border: 1px solid transparent; cursor: pointer; text-decoration: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.lx-btn-solid { background: var(--text-primary); color: var(--bg-base); }
+.lx-btn-solid:hover { background: #fff; }
+.lx-btn-ghost { background: transparent; border-color: var(--border-strong); color: var(--text-primary); }
+.lx-btn-ghost:hover { border-color: var(--text-tertiary); }
+
+/* ---------- cover / finish ---------- */
+.lx-cover { max-width: var(--container-reading); margin: 0 auto; padding: var(--sp-8) var(--gutter) var(--gap-page); text-align: center; }
+.lx-kicker { font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase; color: var(--lx-accent); margin: 0 0 var(--sp-5); }
+.lx-cover h1 {
+  font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; font-weight: 335;
+  font-size: var(--fs-page); line-height: var(--lh-tight); margin: 0 0 var(--gap-heading-desc);
+}
+/* The module's objective, and the one sentence a learner reads before
+   committing to sixteen concepts — teaching voice, not caption voice. */
+.lx-intro { font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-secondary); margin: 0 auto var(--sp-3); max-width: var(--measure-tight); }
+.lx-intro strong, .lx-body strong { color: var(--text-primary); font-weight: 600; }
+.lx-count { font-size: var(--fs-meta); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); margin: 0 0 var(--sp-6); }
+.lx-contents { list-style: none; margin: var(--gap-section) auto 0; padding: 0; max-width: var(--container-narrow); text-align: left; border-top: 1px solid var(--border); }
+.lx-contents li { border-bottom: 1px solid var(--border); }
+.lx-contents button {
+  width: 100%; display: flex; gap: var(--sp-4); align-items: baseline; background: none; border: 0;
+  color: var(--text-secondary); font: 400 var(--fs-support) 'Inter', sans-serif;
+  padding: var(--sp-3) var(--sp-2); cursor: pointer; text-align: left; transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.lx-contents button:hover { color: var(--text-primary); background: rgba(242, 238, 230, 0.03); }
+.lx-contents span { font-size: var(--fs-meta); color: var(--lx-accent); font-variant-numeric: tabular-nums; }
+.lx-finish { padding-top: var(--sp-9); }
+.lx-next { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; margin-top: var(--sp-6); }
+
+/* ---------- the step screen ---------- */
+.lx-step { flex: 1; display: flex; flex-direction: column; max-width: var(--container-main); width: 100%; margin: 0 auto; padding: var(--sp-5) var(--gutter) var(--sp-6); }
+.lx-stage {
+  position: relative; height: min(46vh, 430px); border-radius: var(--radius-lg); overflow: hidden;
+  background: radial-gradient(85% 90% at 50% 42%, var(--bg-elevated), var(--bg-base));
+  border: 1px solid rgba(242, 238, 230, 0.07);
+}
+.lx-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.lx-replay {
+  position: absolute; right: var(--sp-3); bottom: var(--sp-3); width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid rgba(242, 238, 230, 0.2); background: rgba(11, 13, 16, 0.6); color: var(--text-secondary);
+  font-size: var(--fs-support); cursor: pointer; transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.lx-replay:hover { color: var(--text-primary); border-color: rgba(242, 238, 230, 0.45); }
+.lx-sound {
+  position: absolute; right: 54px; bottom: var(--sp-3); width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid rgba(242, 238, 230, 0.2); background: rgba(11, 13, 16, 0.6); color: var(--text-secondary);
+  font-size: var(--fs-meta); cursor: pointer; transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.lx-sound:hover, .lx-sound[aria-pressed='true'] { color: var(--text-primary); border-color: rgba(242, 238, 230, 0.45); }
+
+/* ---------- the film player ---------- */
+.lx-cover-actions { display: flex; gap: var(--sp-3); align-items: center; justify-content: center; flex-wrap: wrap; }
+/* The film is one screen too: picture, caption, transport. Its padding is
+   capped against the height for the same reason the step's is — a 660px
+   window has nothing to spare. */
+.lxf-body { flex: 1; display: flex; flex-direction: column; max-width: var(--container-main); width: 100%; margin: 0 auto; padding: clamp(var(--sp-3), 2dvh, var(--sp-5)) var(--gutter); }
+.lxf-stage { height: min(58vh, 560px); }
+.lxf-caption { padding: var(--sp-5) var(--sp-2) 0; }
+/* The scene title and its sentence are the film's whole commentary, so they
+   take the concept tokens — capped by the height, because the picture above
+   them has already claimed 58vh. */
+.lxf-caption h2 {
+  font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; font-weight: 360;
+  font-size: clamp(var(--fs-card), 3.4dvh, var(--fs-concept)); line-height: var(--lh-heading); margin: 0 0 var(--sp-2);
+}
+.lxf-caption p { font-size: clamp(var(--fs-support), 2.4dvh, var(--fs-body)); line-height: var(--lh-body); color: var(--text-secondary); margin: 0; max-width: var(--measure); }
+.lxf-controls { display: flex; align-items: center; gap: var(--sp-4); margin-top: var(--sp-5); }
+.lxf-play { min-width: 108px; }
+.lxf-track { flex: 1; display: flex; gap: 6px; }
+.lxf-track button {
+  flex: 1; height: 5px; border-radius: 3px; padding: 0; border: none; cursor: pointer;
+  background: rgba(242, 238, 230, 0.12); transition: background var(--dur) var(--ease);
+}
+.lxf-track button:hover { background: rgba(242, 238, 230, 0.3); }
+.lxf-track button.is-seen { background: rgba(242, 238, 230, 0.35); }
+.lxf-track button.is-on {
+  /* fills left-to-right as the scene plays; --p is set from the film clock */
+  background: linear-gradient(
+    90deg,
+    var(--lx-accent) calc(var(--p, 0) * 100%),
+    rgba(242, 238, 230, 0.18) calc(var(--p, 0) * 100%)
+  );
+}
+.lxf-endcard {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: var(--sp-4);
+  background: rgba(11, 13, 16, 0.74);
+}
+.lxf-endcard p {
+  font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; font-weight: 360;
+  font-size: var(--fs-section); margin: 0; color: var(--text-primary);
+}
+.lxf-rm-note { font-size: var(--fs-support); color: var(--text-tertiary); margin: var(--sp-4) 0 0; }
+@media (max-width: 720px) {
+  .lxf-stage { height: 44vh; }
+  .lxf-controls { flex-wrap: wrap; }
+  .lxf-track { order: 3; flex-basis: 100%; }
+}
+
+.lx-panel { padding: var(--sp-5) var(--sp-2) var(--sp-2); max-width: var(--container-reading); }
+/* Level 5. It answers "where am I" and nothing else, so it is set at metadata
+   size in metadata grey — it used to be 10.5px of accent-coloured capitals,
+   which is both too small to read and too loud for what it says. On a wide
+   viewport it is hidden outright: the bar overhead already carries the module
+   and the concept number, and one screen does not need two of them. */
+.lx-step-no { font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-tertiary); margin: 0 0 var(--sp-2); }
+.lx-panel h2 {
+  font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; font-weight: 360;
+  font-size: var(--fs-concept); line-height: var(--lh-heading); margin: 0 0 var(--gap-heading-desc);
+  color: var(--text-primary);
+}
+.lx-body { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-secondary); margin: 0; }
+.lx-body + .lx-body { margin-top: var(--sp-3); }
+
+/* The exam material — <HighYield> and <CommonTrap> — arrives with the site's
+   own shape. Inside the player it is only tightened: the concept has to fit a
+   660px browser window beside its diagram, so the boxes lose the outer ring of
+   padding while keeping their rule, their label and their reading size. */
+.lx-panel .rp-highyield, .lx-panel .rp-trap { padding: var(--sp-2) var(--sp-4); margin-top: var(--sp-4); }
+.lx-panel .rp-highyield-label, .lx-panel .rp-trap-label { margin-bottom: var(--sp-1); }
+.lx-panel .rp-highyield-body, .lx-panel .rp-trap-body { font-size: var(--fs-support); line-height: var(--lh-body); }
+.lx-panel .rp-trap-body { color: var(--text-primary); }
+.lx-panel .rp-highyield-body strong, .lx-panel .rp-trap-body strong { color: var(--text-primary); font-weight: 600; }
+
+.lx-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-top: var(--sp-5); }
+.lx-dots { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.lx-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(242, 238, 230, 0.15); transition: background var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.lx-dots i.seen { background: rgba(242, 238, 230, 0.4); }
+.lx-dots i.on { background: var(--lx-accent); transform: scale(1.35); }
+
+@media (max-width: 760px) {
+  .lx-step { padding: var(--sp-3) var(--gutter) var(--sp-5); }
+  .lx-stage { height: 38vh; }
+  .lx-panel { padding-top: var(--sp-4); }
+  .lx-bar { padding: 0 var(--gutter); }
+  .lx-bar-title { display: none; }
+  .lx-nav { position: sticky; bottom: 0; background: linear-gradient(transparent, var(--bg-base) 30%); padding: var(--sp-4) 0 var(--sp-1); }
+  .lx-dots { display: none; }
+}
+
+/* ---------- hub cards (X-ray techniques) ---------- */
+.lx-hub { display: grid; gap: var(--sp-3); margin-top: var(--gap-section); text-align: left; }
+.lx-hub-card {
+  display: block; background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--card-pad); text-decoration: none; color: var(--text-primary);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.lx-hub-card:hover { border-color: var(--lx-accent); transform: translateY(-2px); }
+.lx-hub-count { font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--lx-accent); }
+.lx-hub-card h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 360; font-size: var(--fs-card); margin: var(--sp-2) 0 var(--sp-2); }
+.lx-hub-card p { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); margin: 0 0 var(--sp-3); }
+.lx-hub-go { font-size: var(--fs-support); font-weight: 600; color: var(--lx-accent); }
+
+/* ---------- focused course cover (ultrasound) ---------- */
+.lx-contents a {
+  width: 100%; display: flex; gap: var(--sp-4); align-items: baseline;
+  color: var(--text-secondary); font: 400 var(--fs-support) 'Inter', sans-serif; padding: var(--sp-3) var(--sp-2);
+  text-decoration: none; text-align: left; transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.lx-contents a:hover { color: var(--text-primary); background: rgba(242, 238, 230, 0.03); }
+.lx-course-group { margin-top: var(--gap-section); text-align: left; }
+.lx-course-group h2 {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--lx-accent); margin: 0 0 var(--sp-1); text-align: left;
+}
+.lx-course-note { margin-top: var(--gap-section); font-size: var(--fs-support); color: var(--text-secondary); }
+.lx-course-note a { color: var(--lx-accent); text-decoration: none; }
+.lx-course-note a:hover { text-decoration: underline; }
+
+/* The gathered diagram set on the X-ray hub. Same card shape as the modules
+   above it, marked so a diagram is not mistaken for a taught module. */
+.lx-designs{border-top:1px solid rgba(242,238,230,.10);margin-top:8px}
+.lx-designs h2{font-family:var(--display,'Fraunces',serif);font-weight:360}
+.lx-hub-cross{opacity:.92}
+.lx-hub-cross .lx-hub-count{color:var(--hue-mri)}
+
+/* --- demo library ---------------------------------------------------------
+   A holding area for the archived demos: dense enough to scan a hundred of
+   them, using the same card language as the rest of the lab pages. */
+.lx-search {
+  display: block;
+  width: min(560px, 100%);
+  margin: 0 0 var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  border: 1px solid rgba(242, 238, 230, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: 500 var(--fs-support)/1.4 'Inter', system-ui, sans-serif;
+}
+.lx-search:focus { outline: none; border-color: var(--lx-accent); }
+.lx-search::placeholder { color: rgba(242, 238, 230, 0.38); }
+
+.lx-lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--sp-2);
+}
+.lx-lib-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.02);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+}
+.lx-lib-card:hover { border-color: var(--lx-accent); transform: translateY(-2px); }
+.lx-lib-card strong { font-size: var(--fs-support); font-weight: 600; line-height: 1.35; }
+.lx-lib-card small { font-size: var(--fs-meta); color: var(--text-tertiary); }
+
+/* ---------- a live instrument as the lesson stage ----------
+   Used by the MRI concepts, where the thing being explained is the same
+   three-dimensional chamber the laboratory runs on. The fixed-height picture
+   frame is dropped: the instrument brings its own housing, and the row of
+   controls under it has to be reachable, not cropped. */
+.lx-stage-live {
+  height: auto;
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.lx-stage-live canvas { position: static; }
+
+/* ---------- a built simulator as the lesson stage ----------
+   /visuals/*.html hosted inside the concept and dressed down by SimFrame. The
+   frame gets a real height rather than an aspect ratio: the simulators lay
+   themselves out from their own breakpoints, so the stage's only job is to
+   give them room. */
+.lx-sim {
+  position: relative;
+  height: clamp(360px, 56vh, 560px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(242, 238, 230, 0.07);
+  background: var(--bg-base);
+}
+.lx-sim-tall { height: clamp(420px, 68vh, 680px); }
+.lx-sim iframe { width: 100%; height: 100%; border: 0; display: block; }
+.lx-sim-open {
+  position: absolute; right: var(--sp-2); bottom: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3); border-radius: 999px;
+  font-size: var(--fs-meta); letter-spacing: 0.02em;
+  color: var(--text-secondary); text-decoration: none;
+  background: rgba(11, 13, 16, 0.72);
+  border: 1px solid rgba(242, 238, 230, 0.16);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.lx-sim-open:hover { color: var(--text-primary); border-color: rgba(242, 238, 230, 0.42); }
+
+@media (max-width: 700px) {
+  .lx-sim, .lx-sim-tall { height: clamp(340px, 64vh, 520px); }
+}
+
+.mrx { display: grid; gap: var(--sp-3); grid-template-columns: minmax(0, 1fr); }
+
+.mrx-instrument {
+  height: clamp(300px, 44vh, 470px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(242, 238, 230, 0.07);
+  background: radial-gradient(85% 90% at 50% 42%, var(--bg-elevated), var(--bg-base));
+}
+
+.mrx-foot { display: grid; gap: var(--sp-2); }
+.mrx-foot .mri-stage-caption { margin: 0; }
+.mrx-note {
+  margin: 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  border-left: 2px solid var(--lx-accent);
+  padding-left: var(--sp-3);
+}
+
+/* Curves beside the vectors: the same instant read two ways. Below 1040px
+   they stack, because a 300px-wide graph teaches nothing. */
+@media (min-width: 1040px) {
+  .mrx-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+  .mrx-split .mrx-timeline,
+  .mrx-split .mrx-foot { grid-column: 1 / -1; }
+}
+
+.mrx-handoff {
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-loose);
+  color: var(--text-secondary);
+}
+.mrx-handoff a { color: var(--lx-accent); text-decoration: none; font-weight: 600; }
+.mrx-handoff a:hover { text-decoration: underline; }
+
+@media (max-width: 760px) {
+  .mrx-instrument { height: clamp(280px, 56vw, 380px); }
+}
+
+/* ---------- the MRI module front door ----------
+   A path, not a menu. The cover is the module's own instrument running, so the
+   page previews what the lessons are taught on rather than illustrating it. */
+.mrp { display: flex; flex-direction: column; }
+
+.mrp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-6);
+  /* One width for the whole portal, taken from the scale — the page used to
+     pick 1180px and a 48px inset of its own. */
+  width: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+  margin: var(--gap-section) auto;
+  align-items: center;
+}
+
+.mrp-hero-copy h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.018em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+.mrp-intro, .mrp-order {
+  font-size: var(--fs-teach);
+  line-height: var(--lh-loose);
+  color: var(--text-secondary);
+  margin: 0 0 var(--sp-4);
+  max-width: var(--measure-tight);
+}
+.mrp-intro strong { color: var(--text-primary); font-weight: 500; }
+.mrp-order {
+  font-size: var(--fs-support);
+  border-left: 2px solid rgba(169, 158, 219, 0.45);
+  padding-left: var(--sp-3);
+  color: var(--text-tertiary);
+}
+.mrp-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-5); }
+
+.mrp-cover-stage {
+  height: clamp(280px, 40vh, 420px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: radial-gradient(85% 90% at 50% 45%, var(--bg-elevated), #07080B);
+}
+.mrp-cover-cap {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-tertiary);
+}
+
+/* ---------- the path ---------- */
+.mrp-path {
+  width: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+  margin: 0 auto;
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.mrp-chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+.mrp-chapter-head h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 360;
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  margin: 0 0 var(--sp-2);
+}
+.mrp-chapter-head p { margin: 0; font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); max-width: 34ch; }
+
+.mrp-entries { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+
+.mrp-entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  align-items: start;
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.015);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.mrp-entry:hover, .mrp-entry:focus-visible {
+  border-color: rgba(169, 158, 219, 0.5);
+  background: rgba(169, 158, 219, 0.04);
+  transform: translateX(2px);
+  outline: none;
+}
+.mrp-n {
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+  color: var(--lx-accent);
+  padding-top: 3px;
+}
+.mrp-entry-body { display: grid; gap: var(--sp-1); }
+.mrp-entry-body strong { font-size: var(--fs-support); font-weight: 600; }
+.mrp-entry-body span { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); }
+.mrp-kind {
+  flex: none;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  border: 1px solid rgba(242, 238, 230, 0.12);
+  border-radius: 20px;
+  padding: var(--sp-1) var(--sp-2);
+  white-space: nowrap;
+}
+.mrp-entry.is-instrument .mrp-kind { color: #9aa1aa; border-color: rgba(242, 238, 230, 0.2); }
+.mrp-entry.is-lesson .mrp-kind { color: var(--lx-accent); border-color: rgba(169, 158, 219, 0.35); }
+
+.mrp-foot {
+  width: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+  margin: var(--gap-section) auto 0;
+  padding: var(--sp-5) 0 var(--sp-7);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-support);
+  color: var(--text-secondary);
+}
+.mrp-foot a { color: var(--lx-accent); text-decoration: none; }
+.mrp-foot a:hover { text-decoration: underline; }
+
+@media (min-width: 940px) {
+  .mrp-hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: var(--sp-7); }
+  .mrp-chapter { grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: var(--sp-6); }
+}
+
+@media (max-width: 700px) {
+  /* The width comes from the gutter now, so only the entry's own shape
+     changes here: number and title, with the badge dropping underneath. */
+  .mrp-entry { grid-template-columns: auto minmax(0, 1fr); }
+  .mrp-kind { grid-column: 2; justify-self: start; }
+}
+
+/* The sequence course pointing at the full syllabus module it lives inside. */
+.mrp-elsewhere {
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-loose);
+  color: var(--text-secondary);
+  max-width: var(--measure-tight);
+}
+.mrp-elsewhere a { color: var(--lx-accent); text-decoration: none; font-weight: 600; }
+.mrp-elsewhere a:hover { text-decoration: underline; }
+
+/* ---------- leaving a lesson ----------
+   Two targets: RadioPass leaves the module, the arrow goes up one level to the
+   course or hub the lesson belongs to. A lesson used to carry only the second,
+   so returning to the site depended on the parent page having its own exit. */
+.lx-bar-exits { display: inline-flex; align-items: center; gap: var(--sp-2); min-width: 0; }
+.lx-home {
+  flex: none;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  border: 1px solid rgba(242, 238, 230, 0.14);
+  border-radius: 16px;
+  padding: var(--sp-1) var(--sp-3);
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease);
+}
+.lx-home:hover, .lx-home:focus-visible {
+  color: var(--text-primary);
+  border-color: rgba(242, 238, 230, 0.4);
+}
+@media (max-width: 620px) {
+  /* The arrow keeps the context; the wordmark keeps the exit. Both stay. */
+  .lx-home { letter-spacing: 0.1em; padding: var(--sp-1) var(--sp-2); }
+  .lx-bar-exits { gap: var(--sp-2); }
+}
+
+/* ---------- progressive disclosure in the lesson player ----------
+   Level 4 waits behind a trigger; the drawer overlays without moving the
+   learner, and closing it returns them exactly where they were.
+
+   The trigger is deliberately NOT a button any more. Two bordered ghost
+   buttons sat at the same weight as Back and Next, so optional depth looked
+   like the way forward. It now reads as the <MoreDetail> summary used
+   everywhere else — quiet text and a caret — while staying an overlay,
+   because a <details> expanding inline would be cut off by the height-bounded
+   copy column. */
+.lx-drawerbar { display: flex; gap: var(--sp-5); margin: var(--sp-3) 0 0; }
+.lx-more {
+  background: none; border: 0; padding: var(--sp-2) 0; cursor: pointer;
+  font: 600 var(--fs-support) 'Inter', system-ui, sans-serif;
+  color: var(--text-tertiary); transition: color var(--dur) var(--ease);
+}
+.lx-more::after { content: ' ▾'; }
+.lx-more[aria-expanded='true']::after { content: ' ▴'; }
+.lx-more:hover { color: var(--text-primary); }
+.lx-scrim { position: fixed; inset: 0; z-index: 55; background: rgba(4, 5, 8, 0.55); border: 0; cursor: pointer; }
+.lx-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 60;
+  width: min(460px, 92vw); overflow-y: auto;
+  background: var(--bg-elevated); border-left: 1px solid rgba(242, 238, 230, 0.16);
+  box-shadow: -30px 0 80px rgba(0, 0, 0, 0.6);
+  padding: var(--sp-5) var(--sp-5) var(--sp-7);
+  animation: lx-drawer-in var(--dur) var(--ease);
+}
+.lx-drawer h3 {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 380;
+  font-size: var(--fs-card); margin: 0 0 var(--gap-heading-desc);
+}
+/* The drawer scrolls, so its prose is set at reading size rather than at
+   whatever the step's remaining height would allow. */
+.lx-drawer .lx-body { font-size: var(--fs-body); line-height: var(--lh-loose); }
+.lx-drawer .lx-btn { margin-top: var(--sp-4); }
+@keyframes lx-drawer-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lx-drawer { animation: none; } }
+
+/* ---------- predict-then-look ---------- */
+.lx-predict {
+  display: grid; gap: var(--sp-2); margin: 0 0 var(--sp-4);
+  padding: var(--sp-3) var(--sp-4); border: 1px solid rgba(242, 238, 230, 0.12);
+  border-radius: var(--radius); background: rgba(255, 255, 255, 0.02);
+}
+/* The question and its options are read and answered, so they are sized as
+   copy, not as chrome. */
+.lx-predict-q { font-size: var(--fs-support); font-weight: 600; }
+.lx-predict-opts { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.lx-predict-chip {
+  font-size: var(--fs-support); font-weight: 500; font-family: inherit;
+  color: var(--text-secondary); background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(242, 238, 230, 0.16); border-radius: 16px;
+  padding: var(--sp-1) var(--sp-3); cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease);
+}
+.lx-predict-chip:hover:not(:disabled) { color: var(--text-primary); border-color: rgba(242, 238, 230, 0.4); }
+.lx-predict-chip:disabled { cursor: default; opacity: 0.55; }
+.lx-predict-chip.is-right { opacity: 1; color: var(--hue-us); border-color: rgba(123, 203, 196, 0.6); background: rgba(123, 203, 196, 0.08); }
+.lx-predict-chip.is-wrong { opacity: 1; color: var(--hue-nm); border-color: rgba(224, 149, 90, 0.6); background: rgba(224, 149, 90, 0.08); }
+.lx-predict-verdict { font-size: var(--fs-support); color: var(--text-secondary); }
+
+
+/* ---------- one idea, one screen (the lesson player) ----------
+   The same contract the MRI module keeps: while a single concept is open,
+   nothing about it may sit below the fold. Stage and words become two columns
+   of one grid rather than a stack, the navigation is pinned under both, and the
+   type is sized from the height available so "big" survives on a short laptop.
+
+   The drawers stay shut. Opening "Why?" or "Exam detail" is the reader
+   deliberately stepping out of the one-screen contract, which is exactly the
+   one kind of scrolling the owner asked to keep.
+
+   HOW THE HEIGHT GETS A VOTE. Every size here is written
+   clamp(<token>, <fraction of the viewport height>, <token>): the scale still
+   owns both ends, and a short window can only slide a size down its own
+   token's range. That is the difference between this and what was here before,
+   which reached 26px of body copy and 54px of heading on a tall screen —
+   sizes the shared scale does not contain. */
+.lx-step {
+  max-width: var(--container-wide);
+  min-height: calc(100dvh - var(--lx-bar-h));
+  padding: clamp(var(--sp-3), 2dvh, var(--sp-5)) var(--gutter);
+}
+.lx-panel { padding: 0; max-width: none; }
+.lx-panel h2 { line-height: var(--lh-tight); margin: 0 0 var(--gap-heading-desc); }
+.lx-body { color: var(--text-secondary); }
+
+/* Diagram and words side by side.
+   Stacked, this player ran 66-172px past the bottom of every real browser
+   viewport — a screen is not the 1080px of the display, it is what is left
+   after the browser's own chrome, and measuring against the display is how
+   that went unnoticed. Two columns is the answer the owner asked for: the
+   instrument takes the wider column, the words take the rest, and the
+   navigation spans both underneath. Nothing is ever below the fold, so an
+   animation is never playing with its explanation out of sight. */
+@media (min-width: 1040px) {
+  .lx-step {
+    display: grid;
+    /* The diagram still leads, but the words get a real measure. At 1.22/0.78
+       the copy column was 460px on a 1280px laptop, which turned every
+       explanation into six short lines — and lines cost height, which is the
+       one thing a one-screen concept has none of. */
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    /* The content row takes every pixel the navigation does not, so the
+       instrument stretches into it instead of floating in a band of empty
+       screen. Centring the whole grid instead used to leave 130px of nothing
+       above the diagram and 140px below it on a 1440x760 laptop — whitespace
+       that was not doing any work. */
+    /* 1fr, not minmax(0, 1fr): the row still takes the leftover height, but
+       its floor stays the content's own height, so a step that grows past the
+       window overflows visibly instead of being silently cut off. */
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      'stage copy'
+      'nav   nav';
+    align-items: center;
+    column-gap: clamp(var(--sp-5), 2.4vw, var(--sp-7));
+    row-gap: 0;
+  }
+  .lx-step > .lx-stage, .lx-step > .lx-sim, .lx-step > .lx-sim-tall { grid-area: stage; }
+  .lx-step > .lx-panel { grid-area: copy; }
+  .lx-step > .lx-nav { grid-area: nav; margin-top: 0; padding-top: clamp(var(--sp-2), 1.6dvh, var(--sp-5)); }
+
+  /* The hosted stage carries the instrument AND the task cue beneath it. The
+     cue takes its natural height and the instrument absorbs whatever is left,
+     so the pair fills the row exactly instead of overrunning it. */
+  .lx-step > .lx-stage-live { display: flex; flex-direction: column; justify-content: center; min-height: 0; gap: 0; }
+  /* The instrument keeps the height it needs and no more; the cue sits under
+     it. Both are capped against the window so a tall simulator still cannot
+     push the pair past the fold. */
+  .lx-step > .lx-stage-live > .lx-sim,
+  .lx-step > .lx-stage-live > .lx-sim-tall {
+    /* SimFrame measures the instrument and sets an inline height that hugs it.
+       Overriding that to auto collapses the frame to its floor, so the measured
+       height stands and only a ceiling is imposed here — enough to guarantee
+       the pair cannot reach past the fold.
+
+       The ceiling has to be a real length, not 100% of the row: the row's own
+       floor is its content, so a percentage would resolve against a height
+       that depends on this element, the browser would treat it as none, and
+       the instrument would push the concept 19-173px past the bottom. It is
+       measured against the viewport instead, leaving room for the task cue
+       that sits beneath it. */
+    flex: 0 1 auto; max-height: calc(100dvh - 230px); min-height: 240px;
+  }
+  .lx-step > .lx-stage-live > .rp-task { flex: 0 0 auto; }
+
+  /* The words are read top-down beside a diagram, not centred against it. */
+  .lx-step > .lx-panel {
+    /* One rhythm for the whole column, and it knows how tall the window is:
+       every gap between the title, the copy and the exam material is this
+       value, so a short laptop compresses the column evenly instead of some
+       blocks staying generous while others are squeezed. */
+    --lx-gap: clamp(var(--sp-1), 1.4dvh, var(--sp-4));
+    padding-top: 0;
+    max-width: none;
+    align-self: center;
+    min-height: 0;
+    overflow: hidden;
+  }
+  /* Level 5 goes: the bar above already says which module this is and which
+     concept of how many, and one screen may carry that answer once. */
+  .lx-step > .lx-panel .lx-step-no { display: none; }
+  /* L1 — the claim, and the largest thing on the screen. On a 660px-tall
+     window it settles at the section size; a tall window lets it reach the
+     page size. Both ends are the shared scale's. */
+  .lx-step > .lx-panel h2 { font-size: clamp(var(--fs-section), 5.4dvh, var(--fs-page)); margin-bottom: var(--lx-gap); }
+  .lx-step > .lx-panel .lx-predict { margin-bottom: var(--lx-gap); }
+  /* L3 — the mechanism. It is allowed the column's full measure: a 46ch cap
+     inside a 590px column only bought extra lines, and lines cost height. */
+  .lx-step > .lx-panel .lx-body { font-size: clamp(var(--fs-support), 2.6dvh, var(--fs-body)); line-height: 1.56; max-width: var(--measure-tight); }
+  /* L2 — never smaller than the explanation it summarises. */
+  .lx-step > .lx-panel .rp-highyield-body,
+  .lx-step > .lx-panel .rp-trap-body { font-size: clamp(var(--fs-support), 2.8dvh, var(--fs-teach)); }
+  .lx-step > .lx-panel .rp-highyield,
+  .lx-step > .lx-panel .rp-trap { margin-top: var(--lx-gap); }
+  /* The label is a line of 14px capitals; it does not need a 1.6 line box. */
+  .lx-step > .lx-panel .rp-highyield-label,
+  .lx-step > .lx-panel .rp-trap-label { line-height: 1.1; }
+  .lx-step > .lx-panel .rp-task { font-size: clamp(var(--fs-support), 2.1dvh, var(--fs-teach)); }
+  .lx-step > .lx-panel .lx-drawerbar { margin-top: var(--lx-gap); }
+  /* The stage is a picture frame in this layout: it takes the height the row
+     has left rather than a fixed slab, but never drops below the size at
+     which the procedural labels inside it start to collide. The canvas
+     re-measures through its ResizeObserver, so a taller frame is simply a
+     bigger drawing. */
+  .lx-step > .lx-stage:not(.lx-stage-live) { align-self: stretch; height: 100%; min-height: 260px; }
+  .lx-step > .lx-stage-live { align-self: stretch; height: 100%; }
+}
+
+/* Narrow: the diagram leads, the words follow — still one idea at a time. */
+@media (max-width: 1039px) {
+  .lx-step > .lx-panel { padding-top: var(--sp-4); }
+}
+
+/* On a phone the diagram cannot sit beside the words and the two together
+   cannot fit 844px — so the rule is kept a different way: the diagram STAYS ON
+   SCREEN while the words move under it. The owner's objection was never to
+   scrolling as such, it was "I shouldn't see animation moving and have reading
+   down below" — a pinned diagram means the animation is never out of sight
+   while its explanation is being read. */
+@media (max-width: 1039px) {
+  .lx-step > .lx-stage, .lx-step > .lx-sim {
+    position: sticky;
+    top: var(--lx-bar-h);
+    z-index: 5;
+  }
+  /* The pinned diagram needs an opaque backing or the text scrolls through it. */
+  .lx-step > .lx-stage { background: var(--bg-base); }
+  .lx-step > .lx-sim { background: var(--bg-base); box-shadow: 0 10px 22px rgba(11, 13, 16, 0.85); }
+}
+
+/* Stacked, nothing is height-bound: the page is allowed to scroll under a
+   pinned diagram, so the type is simply the scale, at full size. */
+@media (max-width: 1039px) {
+  .lx-panel h2 { font-size: var(--fs-page); }
+  .lx-body { font-size: var(--fs-body); line-height: var(--lh-body); }
+}

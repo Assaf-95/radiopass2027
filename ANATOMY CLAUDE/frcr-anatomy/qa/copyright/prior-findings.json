@@ -1,0 +1,272 @@
+{
+ "blockers": [
+  {
+   "area": "phi",
+   "issue": "Burned-in overlay text survives in the bottom-left corner of a published chest radiograph. Two lines of white glyphs sit on the black collimation border \u2014 exactly where DICOM/PACS demographic annotation is burned in. The text is too low-resolution to read at the shipped size, so its content cannot be confirmed to be free of a name, date, accession or MRN. Both project docs assert this does not exist, so nobody will look for it.",
+   "evidence": "Measured on dist/cxr/radiograph-2.png (1176x1205): pixels >90 in the 110x30 bottom-left corner box = 207, bbox y1189-1204 x0-83 (second line clipped by the image edge). The identical box in dist/cxr/radiograph-1.png yields 6 pixels and no glyphs. Visual confirmation: two lines of alphanumeric characters after contrast-stretch and 14x upscale. dist and public are byte-identical (md5 3f1c4199813278435e95d8e41b9fb9a1). Contradicts src/data/cxr/README.md:32 'No mirroring, no resampling of the anatomy, no burnt-in labels.' and DEPLOY.md:54 'Every film served has been cropped or masked so no burned-in patient identifier is present'.",
+   "severity": "blocker"
+  },
+  {
+   "area": "phi",
+   "issue": "A Cambridge Books Online download watermark, including a third party's IP address, is stored in the question data and rendered to every learner under 'Source explanation & references'. It publicly documents that the question bank is derived from a copyrighted Cambridge University Press textbook obtained through one institution's download, on a site that sells 'Pass' and 'Pass Plus' plans.",
+   "evidence": "src/data/upperLimb.json:7845, src/data/lowerLimb.json:3601 and src/data/headNeck.json:3649 contain 'Downloaded from Cambridge Books Online by IP 121.246.53.177 on Tue Apr 10 15:07:10 BST 2012. http://dx.doi.org/10.1017/CBO9781139087384.019 Cambridge Books Online \u00a9 Cambridge University Press, 2012'. Present in the shipped bundle dist/assets/index-Daf0_0e9.js: 3x 'IP 121.246.53.177', 11x 'Cambridge Books Online', 35x 'Cambridge University Press'. Rendered at src/pages/QuestionPlayer.tsx:366 `{question.references.map((r, i) => <li key={i}>{r}</li>)}` inside the <summary>Source explanation & references</summary> block (line 364).",
+   "severity": "blocker"
+  },
+  {
+   "area": "phi",
+   "issue": "This file is not a cleaned teaching image; it is a raw screen capture of a different commercial anatomy application, republished on a paid site. It includes the other product's entire UI chrome and the capturing device's status bar with a date and battery level.",
+   "evidence": "Full-image render of dist/images/revision/msk-p0079.webp (972x720) shows: device status bar '17:18  Fri 31 Jul' top-left with wifi icon and '42%' battery top-right; the third-party app's header 'Pelvis - MRI / Axial - T2' with back, search and hamburger controls; padlock badges on label pills; and a slice filmstrip with '21/70' pagination. Detector flagged it as the strongest text-bearing image in the corpus (91 aligned glyph components at bbox y666-689 x33-940).",
+   "severity": "blocker"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "A stranger's IP address and a Cambridge Books Online piracy/download watermark are baked into the question data and rendered to every visitor on the live site. This is third-party personal data (an IP address is personal data under UK/EU GDPR) plus an artefact that publicly documents that the source PDF was obtained from someone else's institutional ebook download.",
+   "evidence": "src/data/lowerLimb.json:3601 (inside a `references` array): \"Downloaded from Cambridge Books Online by IP 121.246.53.177 on Tue Apr 10 15:07:10 BST 2012. http://dx.doi.org/10.1017/CBO9781139087384.019. Cambridge Books Online \u00a9 Cambridge University Press, 2012.\"\nsrc/data/upperLimb.json:7845 \u2014 same string in a `references` array.\nsrc/data/headNeck.json:3649 \u2014 same watermark quoted inside `flagForReview`.\nThese fields are user-visible: src/pages/QuestionPlayer.tsx:366 `{question.references.map((r, i) => <li key={i}>{r}</li>)}` and src/pages/QuestionPlayer.tsx:371 `{question.flagForReview && <p className=\"teaching-flag\">\u2691 Flagged for manual review: {question.flagForReview}</p>}`.\nAlready in the shipped bundle \u2014 `grep -o \"121\\.246\\.53\\.177\" dist/assets/index-BZRKVPP2.js | wc -l` \u2192 3; `grep -o \"Cambridge Books Online\" dist/assets/index-BZRKVPP2.js | wc -l` \u2192 11.",
+   "severity": "blocker"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "The question images are not transcriptions, they are direct reproductions of the published book's printed pages, including the book's own case numbering, typography, printed question wording and printed arrow annotations. All 501 question images are of this kind. The repo carries no licence, no permission statement and no user-visible attribution to the source work anywhere. This is a rights question the owner must resolve before a public upload; I am reporting the facts, not giving a legal opinion.",
+   "evidence": "501 of 501 question images are page captures: `grep -rho '\"imagePath\": \"[^\"]*\"' src/data/*.json | wc -l` \u2192 501.\nVisual confirmation \u2014 public/images/lowerlimb/p0093.webp shows the book's own printed heading \"Case 8.9\", the book's A\u2013D arrow annotations and its printed sub-question \"(e) Which normal variant is present on this image?\"; public/images/headneck/p0170.webp shows \"Question 19:\" in the source's own typography.\nSource identified in the data itself: DOI 10.1017/CBO9781139087384 (chapters .015 and .019), \"Cambridge Books Online \u00a9 Cambridge University Press, 2012\" (src/data/lowerLimb.json:3601, src/data/upperLimb.json:7845, src/data/headNeck.json:3649).\nA further third-party figure credit is shipped and rendered: src/data/headNeck.json:6280 `\"From Atlas of Anatomy, \u00a9 Thieme 2008, illustration by Karl Wesker.\"`, with src/data/headNeck.json flagForReview noting \"p172 ... and p173 are further labelled Thieme atlas figures\".\nNo attribution exists user-visible: `grep -rni \"copyright|licence|license|\u00a9|attribution|permission of|all rights\" src/*.tsx src/pages src/components index.html README.md DEPLOY.md` returns no statement; there is no LICENSE file at the repo root; the only user-visible provenance is `Source: {question.sourceFile}` (src/pages/QuestionPlayer.tsx:370), which prints internal filenames such as \"Upper Limb.pdf\" (150 questions), \"Lower Limb.pdf\" (130), \"head _ neck.pdf\" (102).",
+   "severity": "blocker"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The 104px fixed header sits on top of the first ~105px of every non-Home page and swallows taps meant for the page. `.app-main` has no top offset, so the \"\u2190 Back to sections\" link and the page <h1> on Dashboard, SectionHub and Disputes render *underneath* the header and cannot be tapped at all.",
+   "evidence": "src/components/Layout.css:18-20 `.app-header { position: fixed; top: 0; }`; src/components/Layout.css:130 `.app-main { flex: 1; min-height: 0; }` (no padding-top); src/index.css:74 `--header-h: 104px;`; src/pages/Dashboard.css:1-6 `.dash { ... padding: 24px 24px 80px; }`.\nMeasured live on http://localhost:3000/#/dashboard at 375x812:\n  back-link rect = {t:27, b:49}, header rect = {t:0, b:105}\n  document.elementFromPoint(centre of .back-link) -> \"DIV.app-header-inner\"\n  elementsFromPoint stack -> [\"DIV.app-header-inner\",\"HEADER.app-header is-scrolled\",\"A.back-link\",\"DIV.dash\"]\nSame result at 1280x800: hit = \"DIV.app-header-inner\", back-link {t:27,b:49}. On Home the brand wordmark (y 42-62) and the \"Start Learning\" CTA (y 32-72) print directly over `.hero-title` (y 17-161) because `.app-header { background: transparent }` (Layout.css:24) until scrolled.",
+   "severity": "blocker"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "On a 375px phone every control in the chest X-ray atlas toolbar (Clean / Major / All / Quiz mode switch, Reset view, Edit) is either covered by the fixed header or rendered off-screen, and the page does not scroll horizontally, so none of them can be reached.",
+   "evidence": "src/pages/ChestXrayAtlas.css:20-28 `.cxr-top { display: flex; align-items: center; gap: 20px; padding: 10px 18px; ... }` and :34 `.cxr-tools { display: flex; align-items: center; gap: 10px; }` \u2014 no `flex-wrap`, and no rule for `.cxr-tools` in the `@media (max-width: 900px)` block (:351-359).\nMeasured live on #/cxr at 375x812:\n  document.documentElement.scrollWidth = 375 (no horizontal scroll available)\n  .cxr-tools rect = {l:215, r:625}\n  hit-test at centre of each `.cxr-seg button`:\n    \"Clean\" (l:216) -> A.app-cta\n    \"Major\" (l:277) -> A.app-cta\n    \"All\"   (l:337) -> BUTTON.account-chip\n    \"Quiz\"  (l:379) -> null (off-screen)\n  \"Reset view\" btn {l:416, r:535}, \"Edit\" btn {l:545, r:625} \u2014 both entirely off-screen.",
+   "severity": "blocker"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "Same class of failure on the MRI/CT viewer: the study selector, label-mode selector, structure search, Edit and Full screen buttons all render past the right edge of a 375px viewport with no wrap and no horizontal scroll, so the viewer cannot be switched, searched or fullscreened on a phone.",
+   "evidence": "src/pages/MriViewer.css:27-35 `.mri-top { display: flex; align-items: center; gap: 20px; ... }` (no `flex-wrap`), :41 `.mri-modes { display: flex; align-items: center; gap: 8px; position: relative; }`, :55 `.mri-search { width: 190px; }`; the `@media (max-width: 900px)` block (:346-355) only narrows `.mri-search` to 140px.\nMeasured live on #/mri/hip-axial-t1 at 375x812:\n  document.documentElement.scrollWidth = 375\n  .mri-modes rect = {l:209, r:970}\n  study `.mri-select` {l:209, r:406} (clipped)\n  label-mode `.mri-select` {l:414, r:626} (off-screen)\n  `.mri-search` {l:634, r:774} (off-screen)\n  \"Edit\" {l:782, r:862}, \"Full screen\" {l:870, r:970} (off-screen)",
+   "severity": "blocker"
+  }
+ ],
+ "shouldFix": [
+  {
+   "area": "phi",
+   "issue": "The PACS annotation block that carries patient demographics was left in-frame on two live question images. The MRN and DOB values are blank (the publisher redacted the values) but the field labels and the study time survive, which shows the de-identification crop was never applied to these films rather than that they were checked and found clean.",
+   "evidence": "dist/images/upperlimb/p0295.webp (1500x1125), top-right: 'Study Time:12:51:09' / 'MRN:' / 'DOB:'. dist/images/lowerlimb/p0269.webp (1500x1125), top-right: 'Study Time:13:39:47' / 'MRN:' / 'DOB:'. Both are live questions with excludeFromPlay unset: src/data/upperLimb.json id=upper-limb-p0295, src/data/lowerLimb.json id=lower-limb-p0269. DEPLOY.md:54-56 claims every film was cropped or masked and that the check was done 'by counting coloured (annotation-layer) pixels' \u2014 that test cannot detect this text, which is greyscale.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "phi",
+   "issue": "Every image URL is root-absolute, so the site only works when served from a domain root. DEPLOY.md promises it also works in a subfolder and from disk; in a subfolder the page renders but all 41 MB of imagery 404s, which is the whole product.",
+   "evidence": "All 503 image paths in src/data/*.json begin with '/' (e.g. src/data/thorax.json '/images/thorax/p0004.webp'); consumed verbatim at src/pages/QuestionPlayer.tsx:35 `setResolvedImageSrc(question.imagePath)`. Also hardcoded at src/components/AnatomyJourney.tsx:255 `src=\"/images/hero/body-full.webp\"` and src/data/cxr/radiographs.ts:49 `file: '/cxr/radiograph-1.png'`. No import.meta.env.BASE_URL anywhere in src. Verified by serving dist from /anatomy/: 'GET /anatomy/assets/index-Daf0_0e9.js \u2192 200', 'GET /anatomy/assets/index-Clrna9FT.css \u2192 200', but 'GET /images/hero/body-full.webp \u2192 404 File not found', 'GET /ct/head-bone/s012.webp \u2192 404', 'GET /cxr/radiograph-1.png \u2192 404', 'GET /mri/hip-axial-t1/s006.webp \u2192 404'. The same build at a root served all of these 200. Contradicts DEPLOY.md:23-24 'The same dist/ works at a domain root, inside a subfolder (example.com/anatomy/), or opened straight off disk.'",
+   "severity": "should-fix"
+  },
+  {
+   "area": "phi",
+   "issue": "Twelve images were cleaned of printed question text and republished as '-clean.png', but the original un-cleaned .webp for each is still in the build at a predictable adjacent URL. Anyone who guesses the filename gets the version with the question text still on it, which undoes the cleaning entirely.",
+   "evidence": "12 files match dist/images/*/*-clean.png and the data references them (e.g. src/data/spine.json:941 '\"imagePath\": \"/images/spine/p0022-clean.png\"'), yet dist/images/spine/p0022.webp is also shipped. Pixel diff of the pair (both 700x1500): 57,278 pixels differ by >20, bbox y1119-1499 x0-320; rendering that region shows the original still carries the printed line '\u2026e labelled 20.' which the -clean version blacks out. Same pattern for abdopelvis/p0081, lowerlimb/p0091, thorax/p0060, upperlimb/p0106, p0134, p0185, p0201, p0205, p0211, p0258, p0269 \u2014 a montage of all 12 originals shows case headers ('Case 5.1', 'Case 6.5', 'Case 7.15', 'Case 8.12', 'Case 9.12', 'Q18') and printed question boxes on every one.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "phi",
+   "issue": "Source page furniture that DEPLOY.md says was removed is still burned into shipped images, including live question images and 146 page scans that no question references but that remain publicly downloadable. Several give away the answer or the question stem.",
+   "evidence": "Live question images: dist/images/abdopelvis/p0093.webp shows 'Case 3.17'; dist/images/upperlimb/p0295.webp shows 'Case 3.10'; dist/images/lowerlimb/p0186.webp shows 'Case 3.6'. Unreferenced-but-shipped scans (146 of 721 files on disk have no reference in src/): dist/images/thorax/p0102.webp reads 'b  Name the lymph node station indicated by label B'; dist/images/thorax/p0134.webp reads 'Question 92.'; dist/images/abdopelvis/p0052.webp reads 'e the muscle that attaches to the structure labelled'; dist/images/lowerlimb/p0048.webp reads '4.7  AP oblique X-ray of the left foo[t]'; dist/images/lowerlimb/p0052.webp reads '6.7  AP X-ray of a paediatric ankle'. dist/images/thorax/p0076.webp carries the mirror-reversed burned-in diagnosis 'complete situs inversus'. Contradicts DEPLOY.md:56-57 'Source page furniture (case numbers, printed question boxes) has been removed'.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "phi",
+   "issue": "A partially-masked reference/identifier string is burned into the bottom-right of a published chest radiograph, alongside exposure data. Some leading characters are legible and only the trailing digits appear X-masked, so the redaction is incomplete rather than absent.",
+   "evidence": "dist/images/thorax/p0078.webp (1501x1229), three-line overlay block at bbox y1183-1200 x1355-1501. Line 1 reads 'REF' followed by digits then a run of X characters; lines 2-3 are 'kV 120  mAs 1.60' and 'DAP= 7.30 e(1) mGycm2'. Flagged by the overlay-text detector at [1183, 1192, 1363, 1490] and confirmed at 14x upscale.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "phi",
+   "issue": "macOS Finder metadata is copied from public/ into the build and would be uploaded to the public host. It is well-known crawler bait and serves no purpose.",
+   "evidence": "`find dist -name \".DS_Store\"` returns dist/.DS_Store (6148 bytes, present in the current 18:52 build). Source is public/.DS_Store, which Vite copies verbatim. `strings dist/.DS_Store` shows Finder view state (window bounds '{{245, 86}, {1027, 770}}', sicvpblob, bplist00).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "routes",
+   "issue": "Every runtime media URL is root-absolute (\"/images/...\", \"/ct/...\", \"/mri/...\", \"/cxr/...\"), while vite.config.ts sets base:'./'. The build therefore only works when dist/ is at a domain ROOT. DEPLOY.md explicitly promises subfolder and file:// hosting, and that promise is false \u2014 under either, the HTML and JS load but every single radiograph, CT/MRI slice and the hero image 404s. Blocker if the chosen host is a subpath (e.g. GitHub Pages project pages, example.com/anatomy/); harmless if uploaded to a bare domain root.",
+   "evidence": "src/data/thorax.json:79: \"imagePath\": \"/images/thorax/p0004.webp\"  |  src/data/ct/headBone.json:15: \"imagePattern\": \"/ct/head-bone/s{index}.webp\"  |  src/data/mri/hipAxialT1.json:15: \"imagePattern\": \"/mri/hip-axial-t1/s{index}.webp\"  |  src/data/cxr/radiographs.ts:49:  file: '/cxr/radiograph-1.png',  |  src/components/AnatomyJourney.tsx:255: <img className=\"body-full\" src=\"/images/hero/body-full.webp\" ... />  |  vite.config.ts:8:  base: './',  |  DEPLOY.md:23-24: \"dist/ works at a domain root, inside a subfolder (example.com/anatomy/), or opened straight off disk.\"  |  Subfolder test (dist symlinked as /frcr-anatomy, python3 -m http.server 8898): 200 /frcr-anatomy/  \u00b7  200 /frcr-anatomy/assets/index-BZRKVPP2.js  \u00b7  404 /images/thorax/p0004.webp  \u00b7  404 /ct/head-bone/s000.webp  \u00b7  404 /cxr/radiograph-1.png  |  file:// test (dist/index.html opened directly in the browser): route #/section/spine/q/spine-p0004 -> imgsBad: [\"/images/spine/p0004.webp\"]; route #/mri/head-bone -> imgsBad: [\"/ct/head-bone/s011.webp\"]  (naturalWidth === 0, i.e. failed to load). Zero occurrences of import.meta.env.BASE_URL anywhere in src/.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "routes",
+   "issue": "Any unrecognised section id in the URL crashes the entire React tree to a permanent white screen. getSectionMeta uses a non-null assertion on Array.find, returns undefined for an unknown id, and SectionHub immediately dereferences meta. There is no error boundary, so the app does not recover when the user navigates away \u2014 only a full page reload brings it back. Reachable by a mistyped or stale shared link (e.g. #/section/upperlimb instead of #/section/upper-limb).",
+   "evidence": "src/data/sections.ts:81-83:  export function getSectionMeta(id: SectionId): SectionMeta {  return SECTION_META.find((s) => s.id === id)!;  }   |   src/pages/SectionHub.tsx:15-16:  const section = sectionId as SectionId;  const meta = getSectionMeta(section);   |   Browser at http://127.0.0.1:8899/#/section/bogus \u2014 console: \"[error] Uncaught TypeError: Cannot read properties of undefined (reading 'title') (.../assets/index-BZRKVPP2.js:1:10256)\"; document.getElementById('root').innerText.trim().length === 0.   |   Recovery test: setting location.hash='#/' and waiting 1.2s still gives {\"hash\":\"#/\",\"chars\":0} \u2014 the app stays blank until location.reload(). (By contrast #/section/thorax/q/no-such-question correctly renders \"Question not found. / Back to section\", and #/mri/does-not-exist correctly falls back to DEFAULT_STUDY.)",
+   "severity": "should-fix"
+  },
+  {
+   "area": "deploy",
+   "issue": "DEPLOY.md promises the same dist/ works at a domain root, in a subfolder, or off disk. Only the domain root is true. `base: './'` makes the JS/CSS/favicon relative, but every one of the 501 imaging URLs is a root-absolute public-dir path baked into the bundle, so a subfolder or file:// deploy loads the app shell and then 404s every single film \u2014 i.e. the site is unusable.",
+   "evidence": "vite.config.ts:8 `base: './',` | DEPLOY.md:22-24 \"**Relative asset paths** (`base: './'` in `vite.config.ts`). The same `dist/` works at a domain root, inside a subfolder (`example.com/anatomy/`), or opened straight off disk.\" | dist/index.html emits relative shell paths: `<script type=\"module\" crossorigin src=\"./assets/index-BZRKVPP2.js\">` and `<link rel=\"stylesheet\" crossorigin href=\"./assets/index-Clrna9FT.css\">` | BUT 501 unique root-absolute asset URLs are hardcoded in dist/assets/index-BZRKVPP2.js, e.g. `\"/images/spine/p0004.webp\"`; sources: src/data/upperLimb.json:72 `\"/images/upperlimb/p0004.webp\"`, src/data/abdoPelvis.json `\"imagePath\": \"/images/abdopelvis/p0004.webp\"`, src/data/ct/headBone.json:14 `\"imagePattern\": \"/ct/head-bone/s{index}.webp\"`, src/data/mri/hipAxialT1.json `\"imagePattern\": \"/mri/hip-axial-t1/s{index}.webp\"`, src/components/AnatomyJourney.tsx:255 `src=\"/images/hero/body-full.webp\"`, src/data/cxr/radiographs.ts:49 `'/cxr/radiograph-1.png'`. `grep -rn \"BASE_URL\" src/` returns nothing \u2014 no import.meta.env.BASE_URL prefixing anywhere. | SUBFOLDER TEST (copied dist to <root>/anatomy, python3 -m http.server 8811): GET /anatomy/ -> 200; GET /anatomy/assets/index-BZRKVPP2.js -> 200; GET /images/spine/p0004.webp (the URL the bundle actually requests) -> 404; GET /anatomy/images/spine/p0004.webp -> 200. | FILE:// TEST (opened dist/index.html off disk): in-page `new URL('/images/spine/p0004.webp', location.href).href` -> `file:///images/spine/p0004.webp`, and the network log shows `GET file:///images/spine/p0004.webp [FAILED]`. | Verified correct and NOT an issue: the app is HashRouter (src/App.tsx:1 `import { HashRouter, ... }`, src/App.tsx:14 `<HashRouter>`), so no SPA rewrite/404 fallback is needed \u2014 confirmed, and no netlify.toml / vercel.json / _redirects / _headers / .htaccess / CNAME / staticwebapp.config.json / 404.html exists anywhere in the project, which is correct. Also verified: documented build steps work exactly as written \u2014 `npm ci --dry-run` -> \"up to date in 467ms\" (lockfileVersion 3, deps in sync with package.json), `./node_modules/.bin/tsc -b` exits 0, `vite build` exits 0 and reproduces the identical hashes already in dist/ (index-BZRKVPP2.js, index-Clrna9FT.css), default outDir is dist/, and `du -sh dist` = 41M matching DEPLOY.md:10. No .env files, no fetch()/XHR calls anywhere in src/, no localhost or hardcoded domain in the bundle \u2014 the only external request is Google Fonts in index.html:9-14, which is already documented at DEPLOY.md:46-50 and does not break on any domain.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "deploy",
+   "issue": "A Cambridge Books Online download watermark, including a third party's IP address and download timestamp, was OCR'd into the `references` array of two questions and is rendered to users in the question player. It is compiled into the production bundle and will be publicly visible on the live site.",
+   "evidence": "src/data/upperLimb.json:7845 `\"Downloaded from Cambridge Books Online by IP 121.246.53.177 on Tue Apr 10 15:07:10 BST 2012. http://dx.doi.org/10.1017/CBO9781139087384.019 Cambridge Books Online \u00a9 Cambridge University Press, 2012\"` inside a `\"references\": [ ... ]` block; same string at src/data/lowerLimb.json:3601 inside `\"references\"`. Rendered by src/pages/QuestionPlayer.tsx:364-366: `<summary>Source explanation & references</summary>` ... `{question.references.map((r, i) => <li key={i}>{r}</li>)}`. Present in the shipped build: `grep -o \"Downloaded from Cambridge Books Online\" dist/assets/index-BZRKVPP2.js | wc -l` -> 3 (the third is a non-rendered `flagForReview` note at src/data/headNeck.json:3649, which correctly says the watermark \"has been excluded from references\" \u2014 the other two were not excluded).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "deploy",
+   "issue": "dist/.DS_Store is shipped and publicly served. It is not a stale leftover \u2014 public/.DS_Store is copied into the output on every build, so it reappears after any rebuild.",
+   "evidence": "`ls -la dist` shows `-rw-r--r--@ 1 User1 staff 6148 Aug 7 17:12 .DS_Store`; `ls -la public` shows `-rw-r--r--@ 1 User1 staff 6148 Aug 3 06:18 .DS_Store`. A fresh `vite build --outDir <scratch>/distcheck --emptyOutDir` reproduced it: `find <scratch>/distcheck -name \".DS_Store\"` -> `<scratch>/distcheck/.DS_Store`. Served over HTTP in the local test: `curl -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8811/anatomy/.DS_Store` -> 200. It is the only non-image/non-bundle file in dist (`find dist -type f ! -name \"*.webp\" ! -name \"*.png\" ! -name \"*.jpg\" ! -name \"*.svg\" ! -name \"*.js\" ! -name \"*.css\" ! -name \"*.html\"` -> `dist/.DS_Store`).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "Exactly one external request exists: Google Fonts. Every visitor's browser contacts fonts.googleapis.com and fonts.gstatic.com, disclosing their IP address and user agent to Google. The sign-in screen tells users the opposite in plain text. Confirmed: nothing else leaves the device \u2014 all learner data is localStorage/IndexedDB only.",
+   "evidence": "dist/index.html:9-12 \u2014 `<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />`, `<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />`, `<link href=\"https://fonts.googleapis.com/css2?family=Fraunces...\" rel=\"stylesheet\" />` (identical at index.html:9-12).\nContradicted by src/components/SignIn.tsx:75: \"No password, and nothing leaves this browser.\"\nEvidence that this is the ONLY external request: `grep -ho -E \"//[a-zA-Z0-9.-]+\\.[a-z]{2,}\" dist/assets/index-BZRKVPP2.js dist/assets/index-Clrna9FT.css dist/index.html | sort -u` \u2192 //dx.doi.org, //fonts.googleapis.com, //fonts.gstatic.com, //github.com, //react.dev, //reactrouter.com, //www.w3.org \u2014 the last four are inert strings (React/Router error-message URLs, SVG namespaces) and dx.doi.org appears only as plain text inside a rendered `<li>`, never as a link or a request.\nNetwork API scan of the bundle: `grep -o -E \"fetch\\(|XMLHttpRequest|WebSocket|sendBeacon|gtag|dataLayer|EventSource\" dist/assets/*.js | sort | uniq -c` \u2192 1 \u00d7 `fetch(`, which is Vite's own modulepreload polyfill calling `fetch(e.href, n)` on same-origin asset links. Zero analytics, zero beacons, zero sockets. Source-tree grep for fetch/XHR/WebSocket/beacon/gtag/analytics/axios across src/ returned only `new Image()` at src/pages/MriViewer.tsx:186, which sets a local slice path.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "All runtime image paths are root-absolute (\"/images/...\"), and no code prefixes import.meta.env.BASE_URL. `base: './'` only rewrites the built JS/CSS entry tags, not these runtime strings. If dist/ is uploaded into a subdirectory, index.html loads but every question image, CT/MRI slice, chest film and the homepage hero 404s. DEPLOY.md explicitly promises subfolder and file:// hosting work.",
+   "evidence": "All 501 paths are absolute: `grep -rho '\"imagePath\": \"[^\"]*\"' src/data/*.json | grep -c '\"/'` \u2192 501 of 501.\nConsumed unmodified at src/pages/QuestionPlayer.tsx:35 `setResolvedImageSrc(question.imagePath);`.\nSame pattern elsewhere: src/components/AnatomyJourney.tsx:85-92 (`'/ct/head-bone/s012.webp'`, `'/cxr/radiograph-1.png'`, `'/mri/hip-axial-t1/s006.webp'`), src/components/AnatomyJourney.tsx:255 `src=\"/images/hero/body-full.webp\"`, src/data/cxr/radiographs.ts:49 and :109 `file: '/cxr/radiograph-1.png'`.\n`grep -rn \"BASE_URL|import\\.meta\\.env\" src` \u2192 only src/pages/ChestXrayAtlas.tsx:472 (an unrelated DEV check). BASE_URL is never used.\nEmpirical test, dist served from /anatomy/ on a static server: `GET /images/headneck/p0170.webp -> 404`, `GET /anatomy/images/headneck/p0170.webp -> 200`, `GET /anatomy/ (index) -> 200`.\nContradicted by DEPLOY.md: \"The same `dist/` works at a domain root, inside a subfolder (`example.com/anatomy/`), or opened straight off disk.\"",
+   "severity": "should-fix"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "The chest X-ray annotation editor is enabled purely by a URL query parameter with no environment gate. Only the button that links to it is DEV-gated. On the live site any visitor reaching #/cxr?editAnnotations=true gets the authoring tool, and edits are written to localStorage and then applied to the normal learner view. There is no reset path \u2014 the key is never removed anywhere in the file.",
+   "evidence": "src/pages/ChestXrayAtlas.tsx:79 `const editMode = params.get('editAnnotations') === 'true';` \u2014 no `import.meta.env.DEV` guard.\nOnly the entry link is gated: src/pages/ChestXrayAtlas.tsx:472 `{!editMode && import.meta.env.DEV && (`.\nEdits persist: src/pages/ChestXrayAtlas.tsx:357 and :423 `localStorage.setItem(EDIT_KEY, JSON.stringify(next));` with `EDIT_KEY = 'radiopass-cxr-annotations-v1'` (line 24).\nThey then override the shipped data in the ordinary view \u2014 `placementFor` (lines ~106-112) checks `overrides[film.id]` first and is not conditioned on editMode.\nNo way back: `grep -n \"EDIT_KEY|removeItem\" src/pages/ChestXrayAtlas.tsx` \u2192 lines 24, 100, 357, 423 only; no removeItem.\nShipped: `grep -o \"editAnnotations\" dist/assets/index-BZRKVPP2.js | wc -l` \u2192 1.\nThe panel itself says \"Development only.\" (src/pages/ChestXrayAtlas.tsx, editor panel copy).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "The chest films and the MRI/CT stacks are real clinical images pulled from a PACS (screenshots and a screen recording), not licensed teaching images. I spot-checked them and found no burned-in identifiers, so the DEPLOY.md de-identification claim holds for the samples I looked at \u2014 but the repo records no consent or information-governance basis for publishing them. That is a factual gap for the owner to close, in the same category as the copyright question.",
+   "evidence": "src/data/cxr/README.md: \"Two real, unmodified chest radiographs with an interactive annotation layer.\" and \"Cropped only of PACS interface chrome; pixels otherwise untouched.\" and \"the red PACS badge and border rules were detected by colour and cropped off\".\ntools/mri/README.md: \"# Building an MRI stack from a screen recording\" \u2014 \"crops to the MRI viewport, discarding the recording's letterbox while keeping the P orientation marker\".\nMy checks: public/cxr/radiograph-1.png and public/mri/hip-axial-t1/s012.webp inspected visually \u2014 no name, MRN, date or demographic burn-in; only the anatomical \"R\" marker and the \"P\" orientation marker are present, consistent with DEPLOY.md \"Imagery and patient data\".\nNo consent/IG record exists anywhere in the repo (no grep hit for consent, ethics, IG, or approval in src/, README.md, DEPLOY.md or tools/).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The film itself is squeezed to roughly 150px wide on a 375px phone because the mobile rules still reserve ~108-112px of label rail on each side. A chest radiograph rendered at 151x149 CSS px is too small to revise anatomy from, which is the entire purpose of these pages.",
+   "evidence": "src/pages/ChestXrayAtlas.css:355 `.cxr-canvas { inset: 10px 112px 66px; }` (inside `@media (max-width: 900px)`); src/pages/MriViewer.css:351 `.mri-canvas { inset: 8px 108px; }`.\nMeasured live at 375x812:\n  #/cxr \u2014 `.cxr-stage` w:375, `.cxr-canvas` {l:112, r:263, w:151}, `.cxr-image` w:151 h:149\n  #/mri/hip-axial-t1 \u2014 `.mri-stage` w:375, `.mri-canvas` {l:108, r:267, w:159}, `.mri-image` w:159 h:150",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The structure labels on both rails overlap each other on a phone and are illegible; several also run past the right edge of the viewport. The rail is only ~94px wide but `max-width` is 100px/98px, and the labels are positioned by anatomical y-coordinate with no collision avoidance at this density.",
+   "evidence": "src/pages/ChestXrayAtlas.css:356 `.cxr-label { max-width: 100px; font-size: 10.5px; }` (rail width at 375px = 375-281 = 94px); src/pages/MriViewer.css:352 `.mri-label { max-width: 98px; font-size: 10.5px; }`.\nMeasured live on #/cxr at 375x812 (right rail, all at l:281):\n  \"Aortic arch\"        t:327 h:21  (327-348)\n  \"Pulmonary trunk\"    t:330 h:34  (330-364)  <- overlaps previous\n  \"L pulmonary artery\" t:337 h:34  (337-371)  <- overlaps\n  \"L main bronchus\"    t:345 h:34  (345-379)  <- overlaps\n  \"Descending aorta\"   t:353 h:34  (353-387)  <- overlaps\n  many with r:375 (flush to / past the viewport edge)\nOn #/mri/hip-axial-t1: \"Rectus femoris?\" t:1117 h:38, \"Tensor fasciae latae?\" t:1128 h:38, \"Gluteus medius\" t:1151 h:34 \u2014 same overlap, all r:375.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The progress table is 10 columns wide with no responsive treatment and no scroll container, so the whole Dashboard page scrolls sideways to 775px on a 375px phone. The Score, %, Flagged and Open columns are entirely off-screen.",
+   "evidence": "src/pages/Dashboard.tsx:87 `<th>Section</th><th>Total</th><th>Attempted</th><th>Correct</th><th>Partial</th><th>Incorrect</th><th>Score</th><th>%</th><th>Flagged</th><th></th>`; src/pages/Dashboard.css:22-27 `.dash-table { width: 100%; border-collapse: collapse; ... }` with no wrapper and no `@media` rule in the file.\nMeasured live on #/dashboard at 375x812:\n  document.documentElement.scrollWidth = 775, clientWidth = 375\n  `.dash-table` rect {l:24, r:775, w:751}, scrollWidth 751 == clientWidth 751 (the table itself is not scrolling; the page is)\nScreenshot at 375px shows the header row cut off mid-word at \"PARTI\u2026\".",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The question player top bar does not wrap, so the whole question page scrolls sideways to 478px on a 375px phone. The \"Flag\" button is clipped and the \"Navigator\" button (the only way to jump between questions) sits entirely off-screen. This is the main revision screen.",
+   "evidence": "src/pages/QuestionPlayer.css:9-13 `.qp-topbar { display: flex; align-items: center; gap: 16px; }` and :28-31 `.qp-topbar-actions { display: flex; gap: 8px; }` \u2014 no `flex-wrap`; the `@media (max-width: 900px)` block (:332-340) only touches `.qp-body` and `.qp-image-pane`.\nMeasured live on #/section/upper-limb/q/upper-limb-p0004 at 375x812:\n  document.documentElement.scrollWidth = 478, clientWidth = 375\n  `.qp-topbar-actions` {l:244, r:478}\n  `.qp-flag` \"\u2606 Flag\" {l:335, r:386} (clipped)\n  `.qp-nav-toggle` \"Navigator\" {l:394, r:478} (fully off-screen)",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "Every text input, select and textarea in the app is set below 16px, which makes iOS Safari zoom the page in on focus and never zoom back out. This fires on every answer field of every question, on sign-in, and in both viewers' search/quiz boxes.",
+   "evidence": "src/index.css:283-297 global rule for input/select/textarea sets `font-size: 15px;` (:291).\nsrc/pages/QuestionPlayer.css:194-202 `.answer-row input { ... font-size: 14px; }` (:201) \u2014 measured live at 14px on #/section/upper-limb/q/upper-limb-p0004.\nsrc/pages/ChestXrayAtlas.css:285-293 `.cxr-input { ... font-size: 12.5px; }` (:291).\nsrc/pages/MriViewer.css:43-53 `.mri-select, .mri-input, .mri-search { ... font-size: 13px; }` (:51).\nsrc/components/SignIn.css:48-52 `.signin-field input, .signin-field select { width: 100%; font-size: 14px; }` (:51).\nindex.html:6 viewport is `width=device-width, initial-scale=1.0` with no `maximum-scale`, so the zoom does happen.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The account chip (the only route to Sign out and the account menu) is clipped off the right edge of a 375px viewport, because `.brand` and `.app-header-actions` are set to `flex: none` and all their children are `white-space: nowrap`, so nothing shrinks.",
+   "evidence": "src/components/Layout.css:134 `.brand, .app-header-actions { flex: none; }`; :108 `.app-cta { ... white-space: nowrap; }`; :65 `.brand-mark { ... white-space: nowrap; }`; the `@media (max-width: 640px)` block (:138-145) shrinks font sizes but leaves `flex: none` in place.\nMeasured live at 375x812 on #/ , #/cxr and #/mri/hip-axial-t1 \u2014 identical every time:\n  `.app-header-actions` {l:127, r:379}\n  `.account-chip` {l:328, r:379}  (4px past the 375px viewport)\nOn #/dashboard, where the page itself scrolls to 775px, the header stretches with it and `.account-chip` lands at {l:709, r:760} \u2014 completely off the first screen.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The entire header nav is hidden below 1180px with no replacement, so X-ray, CT, MRI, Progress and Disputes have no header entry point on any phone or tablet. The only remaining header links are the brand (Home) and the \"Start Learning\" CTA.",
+   "evidence": "src/components/Layout.css:132-136 `@media (max-width: 1180px) { .app-nav { display: none; } ... }`. The six links removed are src/components/Layout.tsx:107-115: `/?goto=modules`, `/cxr`, `/mri/head-bone`, `/mri/hip-axial-t1`, `/dashboard`, `/disputes`. Grepping the repo shows no menu/hamburger/drawer component: `grep -rn \"hamburger\\|menu-toggle\\|<nav\" src/` returns only `.app-nav` (Layout.tsx:107) and `journey-modules` (AnatomyJourney.tsx:299), which links to sections only.",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The hero copy block is absolutely positioned with a left offset and no right offset, so on a phone it shrink-fits to exactly the viewport edge: 24px of gutter on the left and 0px on the right. Headline, sub-copy and buttons all touch the right edge of the screen.",
+   "evidence": "src/components/AnatomyJourney.css:175-186 `.journey-copy { position: absolute; ... left: max(4vw, 24px); ... max-width: 620px; }` \u2014 no `right` and no `padding-right`.\nMeasured live on #/ at 375x812:\n  `.hero-title` {l:24, r:375, w:351}\n  `.hero-sub`   {l:24, r:375, w:351}\n  `.hero-actions` {l:24, r:375, w:351}",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "Several primary controls are well under the ~40px minimum touch target, including the question navigator cells and the panel close buttons in both viewers.",
+   "evidence": "src/pages/QuestionPlayer.css:104-107 `.nav-dot { width: 30px; height: 30px; ... }` \u2014 measured 30x30 live on #/section/upper-limb/q/upper-limb-p0004 after opening the navigator, with only a 5px gap (:95).\nsrc/pages/ChestXrayAtlas.css:259-264 `.cxr-close { ... width: 24px; height: 24px; }`.\nsrc/pages/MriViewer.css:249-253 `.mri-close { ... width: 26px; height: 26px; }`.\nsrc/components/Layout.css:142 `.theme-toggle { width: 34px; height: 34px; }` (in `@media (max-width: 640px)`) \u2014 measured 34x34.\nsrc/pages/ChestXrayAtlas.css:130-144 `.cxr-label { ... padding: 3px 7px; font-size: 11.5px; }` \u2014 the primary tap target in the atlas, measured 21px tall for single-line labels (e.g. \"Trachea\" {t:300, h:21}).\nsrc/pages/QuestionPlayer.css:33-42 `.qp-flag, .qp-nav-toggle { padding: 6px 12px; font-size: 12.5px; }` \u2014 measured 48px tall (these are fine).",
+   "severity": "should-fix"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "Several selects and inputs have no accessible name at all (no <label>, no aria-label, no title). The core answer field on every question is labelled only by a placeholder, which disappears as soon as the user types.",
+   "evidence": "src/pages/ChestXrayAtlas.tsx:567 `<select className=\"cxr-input\" value={quizKind} ...>` (quiz type) and :575 `<select className=\"cxr-input\" value={scope} ...>` (film scope) \u2014 neither has a label or aria-label.\nsrc/pages/ChestXrayAtlas.tsx:778 `<input className=\"cxr-input cxr-wide\" type=\"search\" placeholder=\"Search structures\" ...>` and :785 `<select className=\"cxr-input cxr-wide\" value={cat} ...>` (category filter) \u2014 same.\nsrc/pages/MriViewer.tsx:876 `<select className=\"mri-select\" value={quizKind} ...>` and :884 `<select className=\"mri-select\" value={quizFilter} ...>` \u2014 same.\nsrc/pages/QuestionPlayer.tsx:313-321 `<input type=\"text\" data-answer-label={label} ... placeholder={label === 'Answer' ? 'Your answer' : `Structure ${label}`} ...>` \u2014 placeholder only; the visible `.answer-label` span at :579 is not associated with it.\n(For contrast, MriViewer.tsx:575-578 and :592-595 do it correctly with `<label className=\"sr-only\" htmlFor=...>`, and MriViewer.tsx:1223 uses `aria-label=\"Slice position\"`. All <img> elements checked do carry alt: ImageViewer.tsx:274 `alt={alt}` fed from QuestionPlayer.tsx:265 `alt={question.questionText}`, ChestXrayAtlas.tsx:497, MriViewer.tsx:774; decorative ones use alt=\"\".)",
+   "severity": "should-fix"
+  }
+ ],
+ "niceToHave": [
+  {
+   "area": "phi",
+   "issue": "The annotation editor is reachable on the live site via a query parameter. Only the button that opens it is gated behind a dev check; the mode itself is not, so the URL works in the production build. The docs state it is not reachable.",
+   "evidence": "src/pages/ChestXrayAtlas.tsx:79 `const editMode = params.get('editAnnotations') === 'true';` \u2014 no environment guard. The DEV guard is only on the entry button at line 472: `{!editMode && import.meta.env.DEV && (`. The string 'editAnnotations' is present once in the shipped bundle dist/assets/index-Daf0_0e9.js. src/data/cxr/README.md states the editor 'is not reachable from the learner interface'.",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "routes",
+   "issue": "No catch-all route is declared, so any hash that matches none of the eight patterns renders a completely blank page with no navigation back \u2014 the user sees white with no header, footer or link.",
+   "evidence": "src/App.tsx:16-24 declares only '/', '/dashboard', '/disputes', '/mri/:studyId', '/cxr', '/section/:sectionId', '/section/:sectionId/custom', '/section/:sectionId/q/:questionId' \u2014 there is no <Route path=\"*\" ...>.  |  Browser test at http://127.0.0.1:8899/#/totally/unknown: {\"hash\":\"#/totally/unknown\",\"chars\":0,\"txt\":\"\"} (no console error; recovers to 1811 chars on navigating back to #/).",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "routes",
+   "issue": "A macOS .DS_Store from public/ is copied into dist/ by Vite's public-dir copy and is publicly served, so it will be uploaded to the host and fetchable by anyone. .gitignore covers .DS_Store but the file is inside public/, which Vite copies verbatim regardless.",
+   "evidence": "`find dist -name '.*' -type f` -> dist/.DS_Store  |  `ls public` -> public/.DS_Store  |  `curl -s -o /dev/null -w \"%{http_code}\" http://127.0.0.1:8899/.DS_Store` -> 200  |  .gitignore:19: .DS_Store (does not stop Vite copying public/.DS_Store into dist/)",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "routes",
+   "issue": "148 image files totalling 8.8 MB of the 37.1 MB dist payload are unreachable by any code path \u2014 no string literal in the bundle, no slice pattern and no JSON imagePath refers to them. They are pure upload weight (~24% of the site) and include five hero region images and the icon sprite.",
+   "evidence": "Script over dist/assets/index-BZRKVPP2.js + dist/index.html + expanded {index} slice patterns: \"dist total bytes 37.1 MB / unreferenced files 148 = 8.8 MB\".  Examples: images/hero/abdo-pelvis.webp, images/hero/head-neck.webp, images/hero/spine.webp, images/hero/thorax.webp, images/hero/upper-limb.webp, icons.svg, images/lowerlimb/p0091.webp (the -clean.png variant is what the data references), images/thorax/p0048.webp ... p0146.webp (43 files), images/lowerlimb/p0036.webp ... p0154.webp (60 files).  Cross-check: `grep -c \"hero/abdo-pelvis\" dist/assets/index-BZRKVPP2.js` -> 0, while `grep -c \"hero/body-full\" ...` -> 1; and grep for 'images/hero' / template literals across src/ (excluding data) returns only src/components/AnatomyJourney.tsx:255.",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "deploy",
+   "issue": "146 image files in dist/images are never referenced by any code path \u2014 8.4 MB, about 20% of the 41 MB upload \u2014 so they are dead weight that still ends up publicly fetchable at guessable sequential URLs. This includes the two printed-answer pages that DEPLOY.md describes as \"withheld\".",
+   "evidence": "Scanned dist/assets/index-BZRKVPP2.js for every literal asset URL (both quote styles; verified there is no dynamic path construction \u2014 `grep -rn 'images/' --include='*.ts' --include='*.tsx' --include='*.css' src/ | grep -v '\"/images/'` returns no template-literal builders). Result: 648 files under dist/images, 514 referenced, 146 orphaned, 8.4 MB. Breakdown by folder: `{ abdopelvis: 25, headneck: 1, hero: 5, lowerlimb: 62, revision: 1, spine: 1, thorax: 43, upperlimb: 8 }`. Only /images/hero/body-full.webp is used (src/components/AnatomyJourney.tsx:255); the other five hero files (abdo-pelvis.webp, head-neck.webp, spine.webp, thorax.webp, upper-limb.webp) ship unused. Separately, DEPLOY.md:58-60 says two printed answer pages are \"flagged `excludeFromPlay` and withheld from the question bank rather than deleted\" \u2014 src/data/lowerLimb.json:1415 and :7475 flag lower-limb-p0034 and lower-limb-p0199, filtered out at src/data/sections.ts:68 `.filter((q) => !q.excludeFromPlay)` \u2014 but both image files are present in the upload and directly retrievable: /images/lowerlimb/p0034.webp and /images/lowerlimb/p0199.webp both exist in dist/.",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "deploy",
+   "issue": "README.md is still the unmodified Vite scaffold boilerplate and describes nothing about this project, contradicting DEPLOY.md as the project's front-door documentation.",
+   "evidence": "README.md:1 `# React + TypeScript + Vite`, README.md:3 \"This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.\" \u2014 the whole 33-line file is the generator default (React Compiler section, Oxlint config sample). Not part of dist/, so it does not affect the served site.",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "363 questions carry a non-null `flagForReview`, and that field is rendered verbatim under the answer. The text is internal transcription-pipeline commentary, including references to the extraction agents and their page assignments, which will appear on the public site.",
+   "evidence": "Rendered at src/pages/QuestionPlayer.tsx:371 `{question.flagForReview && <p className=\"teaching-flag\">\u2691 Flagged for manual review: {question.flagForReview}</p>}`.\nCount: `grep -rho '\"flagForReview\": \"' src/data/*.json | wc -l` \u2192 363.\nExamples of internal-process language that reaches the browser: src/data/lowerLimb.json:9307 \"Question page for this item is PDF page 259, which falls outside this agent's assigned range (260-272)...\"; src/data/upperLimb.json:3802 \"Answer page (p.99) falls just outside this agent's assigned range (51-98)...\"; src/data/upperLimb.json:5641 \"Question page (qPage 146, at the end of this agent's assigned range)...\"; src/data/lowerLimb.json:6966 \"...omitted from teachingText as non-content boilerplate.\"",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "dist/ contains a macOS .DS_Store copied from public/, which would be uploaded to the public host. It exposes local folder listing metadata and serves no purpose.",
+   "evidence": "`find dist -name \".DS_Store\" -exec ls -la {} \\;` \u2192 `-rw-r--r--@ 1 User1 staff 6148 Aug 7 17:12 dist/.DS_Store`. It originates from `public/.DS_Store` (also 6148 bytes) which Vite copies wholesale from publicDir. .gitignore lists `.DS_Store` but that does not affect the build copy. (No sourcemaps leak \u2014 `find dist -name \"*.map\"` returns nothing, and the build is current: rebuilding to a temp dir reproduced the identical hashes index-BZRKVPP2.js / index-Clrna9FT.css.)",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "privacy-legal",
+   "issue": "The sign-in form asks the visitor to choose a subscription-style plan (\"Pass \u2014 full question bank\", \"Pass Plus \u2014 bank, atlases and viewers\", \"Trial\") and then displays it as a badge, but the value is never read for gating anywhere. On a public site this reads as a paid tier that does not exist.",
+   "evidence": "src/components/SignIn.tsx:57-61 offers the three options; src/lib/account.ts:85-89 stores `plan` in localStorage key `radiopass-account-v1`; displayed at src/components/Layout.tsx:142 `<span className=\"account-plan mono\">{PLAN_LABEL[account.plan]}</span>`, src/components/Layout.tsx:151 and src/pages/Dashboard.tsx:41. A grep for `plan` across src/pages, src/components and src/lib found no read of `account.plan` that gates any content \u2014 the label descriptions (\"full question bank\", \"bank, atlases and viewers\") are inert.",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "The shared page container hard-codes a 96px total gutter that is never reduced at any breakpoint, so on a 375px phone the module worklist rows are only 279px wide \u2014 26% of the screen is empty margin.",
+   "evidence": "src/index.css:73 `--container: min(1200px, calc(100vw - 96px));` \u2014 no mobile override anywhere (`grep -rn \"--container\" src/` matches only this line and its consumers `.measure` :329, `.stats-grid` Home.css:517, `.worklist` Home.css:648, `.stop-panel` Home.css:113).\nMeasured live on #/ at 375x812, scrolled to the worklist:\n  getComputedStyle(document.documentElement).getPropertyValue('--container') = \"min(1200px, calc(100vw - 96px))\"\n  `.wl-row` rect w = 279 (viewport clientWidth 375)",
+   "severity": "nice-to-have"
+  },
+  {
+   "area": "a11y-mobile",
+   "issue": "Several blocks of running prose (not micro-labels) are set below 12px, which is hard to read on a phone.",
+   "evidence": "src/pages/MriViewer.css:287 `.mri-provenance { ... font-size: 10.5px; line-height: 1.6; ... }` \u2014 multi-sentence source/provenance text.\nsrc/pages/MriViewer.css:286 `.mri-note { font-size: 11.5px; line-height: 1.6; ... }` \u2014 the \"Pick a structure, then click the image\u2026\" instruction block (MriViewer.tsx:980-983).\nsrc/pages/MriViewer.css:136 `.mri-sidenote { ... font-size: 11px; line-height: 1.5; ... }`.\nsrc/components/Layout.css:233 `.account-note { ... font-size: 11px; line-height: 1.5; ... }` \u2014 \"Signing out keeps your work. It is still here next time.\"\nsrc/components/SignIn.css:72-77 `.signin-note { ... font-size: 11.5px; line-height: 1.6; ... }`.\nsrc/pages/ChestXrayAtlas.css:244 `.cxr-avail { font-size: 10.5px; ... }`.",
+   "severity": "nice-to-have"
+  }
+ ]
+}

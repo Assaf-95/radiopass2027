@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Proton Behavior — Simple — Radiopass</title>
+<meta name="description" content="Flip angle, Mz and Mxy, T1 and T2 — the building blocks, one at a time." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/simple-slides.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="ss-header">
+  <div class="shell">
+    <div class="ss-header-top">
+      <div>
+        <span class="eyebrow">MRI · Proton Behaviour · Simple version</span>
+        <h1 class="ss-title">The building blocks, one at a time.</h1>
+        <p class="lede ss-subtitle">Flip angle, Mz, Mxy, T1, T2 — each one on its own before they combine.</p>
+      </div>
+      <div class="ss-count-pill" id="ss-count">SLIDE 1 / 6</div>
+    </div>
+    <div class="ss-progress-track"><div class="ss-progress-fill" id="ss-progress-fill"></div></div>
+    <a href="mri-magnetisation-recovery-detailed.html" class="btn btn-ghost ss-more-link">want more detail? open the full trainer</a>
+  </div>
+</header>
+
+<div class="shell ss-layout">
+  <div class="card glass ss-stage-card">
+    <svg id="ss-stage" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card glass ss-teach-card">
+    <div class="ss-slide-title" id="ss-slide-title"></div>
+    <ul class="ss-bullets" id="ss-bullets"></ul>
+    <div class="ss-caption" id="ss-caption"></div>
+    <div class="ss-control" id="ss-control">
+      <label id="ss-control-label"></label>
+      <input type="range" id="ss-control-input" />
+      <span class="ss-readout" id="ss-control-readout"></span>
+    </div>
+    <div class="ss-nav">
+      <button type="button" class="btn btn-ghost" id="ss-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="ss-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/simple-slides.js"></script>
+<script>
+(function () {
+  var cx = 350, cy = 220;
+  function txt(x, y, s, colour, size) { return '<text x="' + x + '" y="' + y + '" fill="' + colour + '" font-size="' + (size || 15) + '" font-family="Inter,sans-serif" font-weight="700" text-anchor="middle">' + s + '</text>'; }
+  function dot(x, y, r, colour) { return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="' + colour + '"/>'; }
+
+  function axes() {
+    return '<line x1="' + cx + '" y1="' + (cy + 110) + '" x2="' + cx + '" y2="' + (cy - 110) + '" stroke="rgba(148,197,224,0.2)" stroke-width="1"/>' +
+      '<line x1="' + (cx - 110) + '" y1="' + cy + '" x2="' + (cx + 110) + '" y2="' + cy + '" stroke="rgba(148,197,224,0.2)" stroke-width="1"/>';
+  }
+
+  function larmorFormula() {
+    return txt(cx, cy - 20, 'f0 = (γ / 2π) × B0', '#5FE3F2', 30) + txt(cx, cy + 30, 'for hydrogen: γ / 2π = 42.58 MHz per tesla', '#8FA3BB', 14) + txt(cx, cy + 60, 'at 1.5 T → f0 = 63.87 MHz', '#8FA3BB', 14);
+  }
+
+  function flipVector(t, flipDeg) {
+    var angle = -Math.PI / 2 + (flipDeg / 180) * Math.PI;
+    var x = cx + Math.cos(angle) * 100, y = cy + Math.sin(angle) * 100;
+    return axes() +
+      '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#F2B84B" stroke-width="4" marker-end="url(#ssArrow3)"/>' +
+      dot(cx, cy, 5, '#F2B84B') + txt(cx, cy + 140, flipDeg.toFixed(0) + '° flip angle', '#F2B84B', 16);
+  }
+
+  function mzMxyBars(mz, mxy) {
+    return '<rect x="230" y="' + (350 - 160 * mz) + '" width="50" height="' + (160 * mz) + '" rx="8" fill="#A78BFA"/>' + txt(255, 375, 'Mz', '#A78BFA', 14) +
+      '<rect x="420" y="' + (350 - 160 * mxy) + '" width="50" height="' + (160 * mxy) + '" rx="8" fill="#F2B84B"/>' + txt(445, 375, 'Mxy', '#F2B84B', 14);
+  }
+
+  function t1t2Toggle(showT1, showT2, t) {
+    var out = '';
+    if (showT1) out += '<path d="M100 350 C200 200, 320 180, 420 175" fill="none" stroke="#A78BFA" stroke-width="3"/>' + txt(460, 175, 'T1 recovery', '#A78BFA', 13);
+    if (showT2) out += '<path d="M100 175 C200 180, 320 300, 420 350" fill="none" stroke="#F2B84B" stroke-width="3"/>' + txt(460, 350, 'T2 decay', '#F2B84B', 13);
+    if (!showT1 && !showT2) out += txt(cx, cy, 'toggle T1 / T2 in the full trainer', '#8FA3BB', 15);
+    return out;
+  }
+
+  function gradientBars() {
+    var names = [['Gz', '#5FE3F2', 140], ['Gy', '#A78BFA', 350], ['Gx', '#F2B84B', 560]];
+    var out = '';
+    names.forEach(function (n) {
+      out += '<rect x="' + (n[2] - 40) + '" y="180" width="80" height="120" rx="10" fill="' + n[1] + '" opacity="0.12" stroke="' + n[1] + '"/>' + txt(n[2], 320, n[0], n[1], 16);
+    });
+    return out;
+  }
+
+  var SLIDES = [
+    {
+      title: 'The Larmor constant for hydrogen',
+      bullets: ['f0 = (γ/2π) × B0 — precessional frequency scales linearly with field strength.', 'For hydrogen, γ/2π = 42.58 MHz/T — fixed, independent of scanner or sequence.', 'At 1.5T: f0 = 63.87 MHz. At 3T: 127.7 MHz. This is why RF hardware is field-strength-specific.'],
+      caption: '<strong>f0 = (γ/2π) × B0</strong> — the resonance frequency an RF pulse must match.',
+      draw: function () { return larmorFormula(); }
+    },
+    {
+      title: 'Flip angle — drag the slider',
+      bullets: ['B1 amplitude and pulse duration determine how far Mz rotates: the flip angle.', 'It is independent of B0 — a design choice of the RF pulse, not a fixed property.', 'A 90° pulse rotates all of Mz into the transverse plane, for maximum Mxy.'],
+      caption: '<strong>Flip angle</strong> is set by the pulse, not the field.',
+      control: { id: 'flip', label: 'Flip angle', min: 0, max: 180, step: 1, default: 90, format: function (v) { return v + '°'; } },
+      draw: function (t, v) { return flipVector(t, v.flip); }
+    },
+    {
+      title: 'Mz and Mxy as cos θ and sin θ',
+      bullets: ['At flip angle θ: Mz = M0 cos θ, Mxy = M0 sin θ.', 'Only Mxy induces a detectable signal in the receiver coil.', 'At exactly 90°, Mz = 0 and Mxy is maximal; beyond 90°, Mz becomes negative.'],
+      caption: '<strong>Mxy = M0 sin θ</strong> — signal amplitude is a direct function of flip angle.',
+      control: { id: 'flip2', label: 'Flip angle', min: 0, max: 180, step: 1, default: 90, format: function (v) { return v + '°'; } },
+      draw: function (t, v) {
+        var rad = (v.flip2 / 180) * Math.PI;
+        return mzMxyBars(Math.abs(Math.cos(rad)), Math.abs(Math.sin(rad)));
+      }
+    },
+    {
+      title: 'T1 and T2 are mechanistically independent',
+      bullets: ['T1 recovery: Mz regrows via spin-lattice energy exchange.', 'T2 decay: Mxy falls via spin-spin dephasing.', 'Each can be modelled with one process disabled — they don’t drive each other.'],
+      caption: '<strong>T1 and T2</strong> run on separate physical mechanisms, concurrently.',
+      draw: function (t) { return t1t2Toggle(true, true, t); }
+    },
+    {
+      title: 'Gradients encode position, not signal',
+      bullets: ['Gz, Gy and Gx are independently switchable linear field gradients.', 'Each imposes a spatially-varying Larmor frequency or phase along one axis.', 'Gradients localise the signal spatially — the RF pulse is what generates it.'],
+      caption: '<strong>Gradients encode where</strong>; the RF pulse determines whether there’s signal at all.',
+      draw: function () { return gradientBars(); }
+    },
+    {
+      title: 'That was the short version',
+      bullets: ['This covered flip angle, Mz/Mxy, T1/T2 and gradients as separate variables.', 'The full trainer lets you combine all of them live, with numeric readouts.', 'Same physics, same equations — this time with every control active at once.'],
+      caption: '<strong>Ready for more?</strong> The full trainer is one click away, above.',
+      draw: function () {
+        return '<rect x="120" y="140" width="460" height="180" rx="24" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+          txt(350, 220, 'Full trainer available', '#5FE3F2', 20) +
+          txt(350, 255, 'flip angle · T1 / T2 · Gz Gx Gy · live readouts', '#8FA3BB', 14);
+      }
+    }
+  ];
+
+  var defs = '<defs><marker id="ssArrow3" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>';
+  SLIDES.forEach(function (s) {
+    var d = s.draw;
+    s.draw = function (t, v) { return defs + '<g color="#5FE3F2">' + d(t, v) + '</g>'; };
+  });
+
+  window.SimpleSlides.init({ slides: SLIDES });
+})();
+</script>
+</body>
+</html>

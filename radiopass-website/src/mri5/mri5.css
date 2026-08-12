@@ -1,0 +1,1269 @@
+/**
+ * MRI module styling.
+ *
+ * Built on the site's own palette — the near-black chassis, the serif display
+ * face, the muted body grey — with the module's identity carried by one accent
+ * (the violet already reserved for MRI in home/fx) and one instrument colour
+ * (the X-ray blue, used for fields and axes). Nothing else is coloured, so when
+ * a diagram does use colour it means something.
+ *
+ * Every size in this file comes from design/tokens.css. It used to carry 74
+ * independent font-size declarations, and the cost was not untidiness: a third
+ * of them were between 9.5 and 13px, so the things a reader had to work from —
+ * the slider that changes the physics, the caption saying what the diagram is
+ * currently doing, the live numbers under it — were set smaller than the
+ * furniture around them. The rule now is the site's rule: nothing a learner
+ * reads goes under 16px, and --fs-meta (14-15px) is reserved for text that only
+ * says where you are — a section number, a step index, a count.
+ *
+ * The one place a bare number is still right is the paged concept screen, where
+ * type has to answer to the height of the window as well as its width. Those
+ * rules read `clamp(var(--fs-support), NNdvh, var(--fs-teach))`: the token sets
+ * the floor and the ceiling, dvh chooses between them. That keeps the promise
+ * of one idea per screen without ever letting the screen argue the type below
+ * the legibility floor — which is exactly the trade the old numbers were making
+ * silently.
+ *
+ * Order of prominence on a concept screen, which the sizes here exist to make
+ * visible at a glance:
+ *   L1 the claim (title + .m5-what)   L2 the exam takeaway (.rp-highyield)
+ *   L3 the mechanism (.m5-why, folded) L4 what else to try (.m5-change-fold)
+ *   L5 progress, step index, counts (--fs-meta)
+ */
+
+.m5-root {
+  /* Aliases, not new values: where the module's colour was already the site's
+     colour, it now says so, and the four that remain literal (the instrument
+     blue, the dim grey, the two panel lines) are the ones that genuinely differ
+     from the shared palette. */
+  --m5-bg: var(--bg-base);
+  --m5-panel: var(--bg-elevated);
+  --m5-panel-2: var(--bg-interactive);
+  --m5-line: rgba(242, 238, 230, 0.09);
+  --m5-line-2: rgba(242, 238, 230, 0.16);
+  --m5-ink: var(--text-primary);
+  --m5-mut: var(--text-tertiary);
+  --m5-dim: #6f757e;
+  /* Prose grey. The palette is explicit that instructional text never goes
+     below --text-secondary, and the module was setting whole paragraphs in the
+     tertiary grey reserved for counts and captions. */
+  --m5-read: var(--text-secondary);
+  --m5-mri: var(--hue-mri);
+  --m5-field: #a8cbea;
+  --m5-warm: var(--accent);
+  --m5-good: var(--hue-us);
+  --m5-bad: var(--hue-nm);
+
+  /* How much of the window the sticky bar has already spent, so that the paged
+     concept screen can claim exactly the rest of it. It was written into the
+     one-screen rules as a bare 74px, which was right for the desktop bar and
+     wrong by 38px for the phone one, where the bar wraps to two rows — and that
+     38px appeared as a scrollbar on every concept that was otherwise a perfect
+     fit. One number, declared where it can be corrected per breakpoint. */
+  --m5-chrome: 66px;
+
+  min-height: 100vh;
+  background:
+    radial-gradient(120% 70% at 50% -8%, rgba(169, 158, 219, 0.08), transparent 62%),
+    var(--m5-bg);
+  color: var(--m5-ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.m5-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.m5-body { flex: 1; }
+
+/* ---------- navigator ---------- */
+
+.m5-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(11, 13, 16, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--m5-line);
+}
+.m5-nav-bar {
+  width: min(var(--container-main), calc(100% - var(--sp-6)));
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  /* The paged concept screen sizes itself against this number. Change one and
+     the other has to move with it, or the idea that was meant to fit a screen
+     runs off the bottom of it. */
+  min-height: 62px;
+}
+.m5-nav-home { text-decoration: none; color: inherit; display: grid; gap: 1px; flex: none; }
+.m5-nav-kicker {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.22em; color: var(--m5-mri);
+}
+.m5-nav-title { font-size: var(--fs-meta); color: var(--m5-mut); }
+
+.m5-nav-groups {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; gap: 2px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
+}
+.m5-nav-groups::-webkit-scrollbar { display: none; }
+/* The group rail is orientation, not teaching — it says which part of the
+   chapter you are in. It takes the metadata size, and loses the uppercase
+   tracking it was using to look deliberate at 10px: at a readable size the
+   tracking only makes six words take the width of nine. */
+.m5-nav-group {
+  display: block;
+  white-space: nowrap;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--m5-dim);
+  text-decoration: none;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.m5-nav-group:hover { color: var(--m5-ink); background: rgba(242, 238, 230, 0.04); }
+.m5-nav-group.is-here { color: #12101c; background: var(--m5-mri); }
+
+.m5-nav-progress { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
+.m5-nav-count { font-size: var(--fs-meta); color: var(--m5-mut); white-space: nowrap; }
+.m5-nav-count b { color: var(--m5-ink); font-variant-numeric: tabular-nums; }
+.m5-nav-toggle {
+  font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.02em;
+  color: var(--m5-mut); background: transparent;
+  border: 1px solid var(--m5-line-2); border-radius: 18px;
+  padding: var(--sp-2) var(--sp-3); cursor: pointer;
+}
+.m5-nav-toggle:hover { color: var(--m5-ink); border-color: rgba(242, 238, 230, 0.36); }
+
+.m5-nav-rail { height: 2px; background: rgba(242, 238, 230, 0.06); }
+.m5-nav-rail i { display: block; height: 100%; background: var(--m5-mri); transition: width 0.3s; }
+
+.m5-nav-panel {
+  width: min(var(--container-main), calc(100% - var(--sp-6)));
+  margin-inline: auto;
+  padding: var(--sp-5) 0 var(--sp-5);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--sp-5);
+  border-top: 1px solid var(--m5-line);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.m5-nav-col h4 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--m5-dim);
+}
+.m5-nav-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+/* A contents entry is a destination the reader has to be able to read the name
+   of, so it takes the support size; the section number beside it is the only
+   part that is genuinely just a label. */
+.m5-nav-col a {
+  display: flex; gap: var(--sp-3); align-items: baseline;
+  font-size: var(--fs-support); color: var(--m5-read); text-decoration: none;
+  padding: var(--sp-2) var(--sp-2); border-radius: var(--radius-sm);
+}
+.m5-nav-col a span { font-size: var(--fs-meta); color: var(--m5-dim); font-variant-numeric: tabular-nums; flex: none; }
+.m5-nav-col a:hover { color: var(--m5-ink); background: rgba(242, 238, 230, 0.04); }
+.m5-nav-col a.is-here { color: var(--m5-mri); }
+.m5-nav-col a.is-here span { color: var(--m5-mri); }
+
+/* ---------- hero ---------- */
+
+.m5-home { width: min(var(--container-main), calc(100% - var(--sp-6))); margin: 0 auto; }
+
+.m5-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-6);
+  align-items: center;
+  padding: clamp(30px, 6vh, 70px) 0 clamp(30px, 6vh, 62px);
+}
+/* Section number and "section n of 21": the definition of level 5. It is the
+   one place in the module where an uppercase micro-label is the right answer,
+   and even here it sits at the metadata size rather than under it. */
+.m5-eyebrow {
+  display: flex; align-items: center; gap: var(--sp-3);
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--m5-dim); margin: 0 0 var(--sp-4);
+}
+.m5-number {
+  font-variant-numeric: tabular-nums; color: #12101c; background: var(--m5-mri);
+  border-radius: var(--radius-sm); padding: 2px var(--sp-2); letter-spacing: 0.04em;
+}
+.m5-of { color: var(--m5-dim); }
+
+.m5-hero h1 {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-optical-sizing: auto;
+  font-weight: 330;
+  font-size: var(--fs-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--sp-4);
+}
+.m5-hero h1 em { font-style: italic; color: var(--m5-mri); }
+.m5-hero-lede {
+  font-size: var(--fs-teach); line-height: var(--lh-loose);
+  color: var(--m5-read); max-width: var(--measure-tight); margin: 0;
+}
+.m5-hero-actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-5); }
+
+.m5-btn {
+  font-size: var(--fs-support); font-weight: 600; text-decoration: none;
+  /* Explicitly transparent, not merely unset. This class dresses both <a> and
+     <button>; an anchor has no background of its own, but a button inherits the
+     user agent's buttonface — near-white — under the near-white ghost colour.
+     That put "Back" at a contrast of 1.01:1 on every paged section while the
+     anchor version looked perfect, which is exactly why it went unnoticed. */
+  background: transparent;
+  border-radius: var(--radius); padding: var(--sp-3) var(--sp-5);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.m5-btn-solid { background: var(--m5-ink); color: #0b0d10; }
+.m5-btn-solid:hover { background: #fff; }
+.m5-btn-ghost { border-color: var(--m5-line-2); color: var(--m5-ink); }
+.m5-btn-ghost:hover { border-color: rgba(242, 238, 230, 0.4); }
+
+.m5-hero-art {
+  height: clamp(280px, 42vh, 430px);
+  border: 1px solid var(--m5-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: radial-gradient(85% 90% at 50% 45%, #101318, #07080B);
+}
+.m5-hero-art canvas { display: block; }
+
+/* ---------- contents ---------- */
+
+/* Group name on the left, its sections on the right — so a group holding one
+   section does not leave three empty grid tracks beside it. */
+.m5-contents { display: grid; gap: var(--sp-5); padding-bottom: var(--sp-7); }
+.m5-contents-group {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3);
+  padding-top: var(--sp-5); border-top: 1px solid var(--m5-line);
+}
+.m5-contents-label h3 {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-weight: 360; font-size: var(--fs-card); margin: 0 0 var(--sp-1);
+}
+.m5-contents-label span { font-size: var(--fs-meta); color: var(--m5-dim); }
+.m5-contents-group ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: var(--sp-2);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+}
+.m5-contents-card {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-3);
+  padding: var(--sp-4); height: 100%;
+  border: 1px solid var(--m5-line); border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.015);
+  text-decoration: none; color: inherit;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.m5-contents-card:hover {
+  border-color: rgba(169, 158, 219, 0.5);
+  background: rgba(169, 158, 219, 0.05);
+  transform: translateY(-2px);
+}
+.m5-contents-n { font-size: var(--fs-meta); color: var(--m5-mri); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.m5-contents-body { display: grid; gap: var(--sp-1); }
+.m5-contents-body strong { font-size: var(--fs-body); font-weight: 600; }
+.m5-contents-body span { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--m5-read); }
+
+/* ---------- knowledge map ---------- */
+
+.m5-map { padding: var(--sp-6) 0 var(--sp-8); border-top: 1px solid var(--m5-line); }
+.m5-map h3 {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-weight: 360; font-size: var(--fs-section); margin: 0 0 var(--sp-2);
+}
+.m5-map-lede {
+  font-size: var(--fs-body); line-height: var(--lh-loose);
+  color: var(--m5-read); margin: 0 0 var(--sp-4); max-width: var(--measure);
+}
+.m5-map-chain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-width: var(--container-narrow); }
+.m5-map-chain li { position: relative; padding-left: var(--sp-4); }
+.m5-map-chain li::before {
+  content: ''; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(var(--m5-line-2), var(--m5-line-2));
+}
+.m5-map-chain li:first-child::before { top: 50%; }
+.m5-map-chain li:last-child::before { bottom: 50%; }
+.m5-map-chain li::after {
+  content: ''; position: absolute; left: 2px; top: calc(50% - 3px);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--m5-mri); opacity: 0.6;
+}
+.m5-map-chain a {
+  display: flex; gap: var(--sp-3); align-items: baseline;
+  padding: var(--sp-2) var(--sp-3); font-size: var(--fs-body); color: var(--m5-ink);
+  text-decoration: none; border-radius: var(--radius-sm);
+}
+.m5-map-chain a span { font-size: var(--fs-meta); color: var(--m5-dim); font-variant-numeric: tabular-nums; }
+.m5-map-chain a:hover { background: rgba(242, 238, 230, 0.04); color: var(--m5-mri); }
+
+/* ---------- a section ---------- */
+
+/* One width for a section, taken from the system rather than invented here.
+   --container-reading is the measure the rest of the site reads at; the paged
+   concept screen widens past it only when it has an instrument to place. */
+.m5-section {
+  width: min(1000px, calc(100% - var(--sp-6)));
+  margin: 0 auto;
+  padding: clamp(26px, 5vh, 52px) 0 var(--sp-8);
+}
+.m5-section-head { margin-bottom: var(--gap-header-content); }
+.m5-section-head h2 {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-optical-sizing: auto; font-weight: 340;
+  font-size: var(--fs-page); line-height: var(--lh-tight); letter-spacing: -0.018em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+.m5-lede {
+  font-size: var(--fs-teach); line-height: var(--lh-loose);
+  color: var(--m5-read); margin: 0; max-width: var(--measure);
+}
+.m5-inherits {
+  display: grid; gap: var(--sp-1); margin: var(--sp-5) 0 0; max-width: var(--measure);
+  border-left: 2px solid var(--m5-line-2); padding-left: var(--sp-3);
+}
+.m5-inherits > span:first-child {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--m5-dim);
+}
+/* What the section takes as read is a list of things to go and revise if they
+   are not solid — instruction, not a footnote, so it reads at support size. */
+.m5-inherits > span:last-child { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--m5-read); }
+
+/* ---------- a concept ---------- */
+
+.m5-concept { padding-top: var(--gap-section); margin-top: var(--gap-section); border-top: 1px solid var(--m5-line); }
+.m5-concept:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+/* LEVEL 1. The title and the claim below it are one object and the largest
+   thing on the screen; everything else on a concept screen is sized so that
+   this is unmistakably what the screen is about. */
+.m5-concept-head h3 {
+  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-weight: 340; font-size: var(--fs-concept); line-height: var(--lh-tight);
+  letter-spacing: -0.005em; margin: 0 0 var(--gap-heading-desc);
+}
+/* The claim carries the idea, so it is set at teaching size rather than caption
+   size, and the terms that matter wear the modality's colour. This is the Fact
+   Bank's contract — a large statement whose load-bearing words are coloured —
+   applied to a screen the reader is working on rather than browsing. */
+.m5-what {
+  font-size: var(--fs-teach); line-height: var(--lh-body);
+  color: var(--m5-ink); margin: 0 0 var(--gap-desc-main); max-width: var(--measure-tight);
+}
+.m5-what strong { color: var(--m5-mri); font-weight: 600; }
+
+/* LEVEL 3, folded. The mechanism is prose the reader has chosen to open, so it
+   is set at body size in the reading grey — not at the caption size the module
+   was using for several hundred words at a time. */
+.m5-prose { font-size: var(--fs-body); line-height: var(--lh-loose); color: var(--m5-read); margin: 0 0 var(--sp-3); }
+.m5-prose:last-child { margin-bottom: 0; }
+.m5-prose strong { color: var(--m5-ink); font-weight: 600; }
+
+/* Used by the sequence-family map to caption its own two asides. */
+.m5-change {
+  display: grid; gap: var(--sp-1); margin: var(--sp-4) 0 0; max-width: var(--measure);
+  border-left: 2px solid var(--m5-mri); padding-left: var(--sp-3);
+}
+.m5-change > span:first-child {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--m5-mri);
+}
+.m5-change > span:last-child { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--m5-read); }
+.m5-change strong { color: var(--m5-ink); font-weight: 600; }
+
+/* ---------- the simulation host ---------- */
+
+.m5-sim { margin: 0; display: grid; gap: var(--sp-3); }
+.m5-stage {
+  position: relative;
+  border: 1px solid var(--m5-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background:
+    radial-gradient(90% 85% at 50% 40%, #101318, #07080B);
+}
+/* Out of flow on purpose: the simulation sizes this canvas from the box it is
+   given, so if the canvas could also size the box the two would chase each
+   other. Absolute positioning makes the influence one-way. */
+.m5-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.m5-stage-short { height: clamp(220px, 30vh, 300px); }
+.m5-stage-normal { height: clamp(300px, 46vh, 440px); }
+.m5-stage-tall { height: clamp(360px, 58vh, 560px); }
+
+/* The step badge names what is happening in the frame you are looking at, so
+   it is instruction sitting on top of the picture rather than a caption of it.
+   Only the step's index inside it is metadata. */
+.m5-stage-step {
+  position: absolute; left: var(--sp-3); top: var(--sp-3); margin: 0;
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: var(--fs-support); font-weight: 600; color: var(--m5-ink);
+  background: rgba(8, 10, 13, 0.78);
+  border: 1px solid var(--m5-line-2);
+  border-radius: 20px; padding: var(--sp-1) var(--sp-3) var(--sp-1) var(--sp-2);
+  backdrop-filter: blur(6px);
+  max-width: calc(100% - var(--sp-6));
+}
+.m5-stage-step span {
+  font-size: var(--fs-meta); font-weight: 700; color: #12101c; background: var(--m5-mri);
+  border-radius: 12px; padding: 1px var(--sp-2); font-variant-numeric: tabular-nums;
+}
+
+/* readouts
+   The value is the thing the concept asks you to watch change, so it reads at
+   support size; the name beside it is a label for that value and is the one
+   part of the pair that qualifies as metadata. */
+/* A grid, not a wrapped row. Six readouts with names like "Field at hold
+   point" wrapped into five ragged rows and took 216px of a 660px window — more
+   height than the diagram they belong to — because a flex wrap packs by width
+   and never by row count. Equal columns give the same six chips in three rows,
+   align every value down a common edge, and stop the block reflowing into a
+   different shape each time a number gains a digit. */
+.m5-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--sp-2);
+}
+.m5-readout {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
+  border: 1px solid var(--m5-line); border-radius: var(--radius-sm);
+  padding: var(--sp-1) var(--sp-3); background: rgba(255, 255, 255, 0.02);
+  margin: 0;
+}
+.m5-readout dt {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--m5-dim); margin: 0;
+}
+.m5-readout dd {
+  margin: 0; font-size: var(--fs-support); font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--m5-ink);
+  font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+.m5-readout.is-z dd { color: var(--m5-good); }
+.m5-readout.is-xy dd { color: var(--m5-field); }
+.m5-readout.is-rf dd { color: var(--m5-mri); }
+.m5-readout.is-warn dd { color: var(--m5-warm); }
+
+/* transport */
+.m5-transport {
+  display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+}
+.m5-tbtn {
+  flex: none;
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  border: 1px solid var(--m5-line-2); background: rgba(255, 255, 255, 0.03);
+  color: var(--m5-mut); font-size: var(--fs-support); cursor: pointer; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.m5-tbtn:hover { color: var(--m5-ink); border-color: rgba(242, 238, 230, 0.4); }
+.m5-tbtn-primary { background: var(--m5-mri); border-color: var(--m5-mri); color: #12101c; }
+.m5-tbtn-primary:hover { background: #c0b6ee; border-color: #c0b6ee; color: #12101c; }
+
+.m5-scrub { flex: 1; min-width: 120px; display: flex; }
+.m5-scrub input { width: 100%; }
+.m5-speed select {
+  background: rgba(255, 255, 255, 0.03); color: var(--m5-read);
+  border: 1px solid var(--m5-line-2); border-radius: var(--radius-sm);
+  padding: var(--sp-1) var(--sp-2); font-size: var(--fs-support); font-family: inherit; cursor: pointer;
+}
+
+.m5-root input[type='range'] {
+  appearance: none; -webkit-appearance: none;
+  width: 100%; height: 4px; border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  outline-offset: 5px; cursor: pointer;
+}
+.m5-root input[type='range']::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--m5-mri); border: 3px solid #12141a;
+  box-shadow: 0 0 0 1px rgba(169, 158, 219, 0.5);
+}
+.m5-root input[type='range']::-moz-range-thumb {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--m5-mri); border: 3px solid #12141a;
+}
+.m5-root :focus-visible { outline: 2px solid var(--m5-mri); outline-offset: 2px; }
+
+/* controls
+   A control's label and its hint are instructions — "drag this, and here is
+   what it does to the physics". They were the smallest type in the module,
+   which is precisely backwards: the reader is being asked to act on them. */
+.m5-controls {
+  display: grid; gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  padding: var(--sp-4);
+  border: 1px solid var(--m5-line); border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.015);
+}
+.m5-slider { display: grid; gap: var(--sp-2); }
+.m5-slider-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2);
+  font-size: var(--fs-support); color: var(--m5-read);
+}
+.m5-slider-head b {
+  font-size: var(--fs-support); color: var(--m5-ink); font-variant-numeric: tabular-nums;
+  font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+.m5-slider small { font-size: var(--fs-support); line-height: 1.45; color: var(--m5-mut); }
+
+.m5-choice { display: grid; gap: var(--sp-2); }
+.m5-choice-label { font-size: var(--fs-support); color: var(--m5-read); }
+.m5-choice-set { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.m5-chip {
+  font-size: var(--fs-support); font-weight: 500;
+  color: var(--m5-read); background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--m5-line-2); border-radius: 18px;
+  padding: var(--sp-1) var(--sp-3); cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.m5-chip:hover { color: var(--m5-ink); border-color: rgba(242, 238, 230, 0.36); }
+.m5-chip.is-on { background: var(--m5-mri); border-color: var(--m5-mri); color: #12101c; font-weight: 600; }
+
+/* The caption is the diagram saying what it is doing right now. It is the
+   sentence a reader checks against the picture, so it reads at support size in
+   the reading grey rather than as a dim footnote. */
+.m5-caption {
+  font-size: var(--fs-support); line-height: var(--lh-body); color: var(--m5-read);
+  margin: 0; padding-left: var(--sp-3); border-left: 2px solid var(--m5-line-2);
+  /* One line held open, so the layout does not jump as the text changes. */
+  min-height: calc(var(--lh-body) * 1em);
+}
+
+/* ---------- high yield ---------- */
+
+/* LEVEL 2 — what the exam actually asks for.
+   It sits above the explanation in the hierarchy and now looks it: the points
+   read at teaching size in the primary ink, one step below the concept title
+   and one step above the prose. The amber label is the same mark the rest of
+   the site uses for high-yield, so it is recognised before it is read. */
+.m5-hy {
+  margin-top: var(--gap-section); padding: var(--card-pad);
+  border: 1px solid rgba(217, 168, 78, 0.28); border-radius: var(--radius);
+  background: rgba(217, 168, 78, 0.045);
+}
+.m5-hy h4 {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--m5-warm); margin: 0 0 var(--sp-3);
+}
+.m5-hy ul { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
+.m5-hy li {
+  font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--m5-read);
+  padding-left: var(--sp-4); position: relative;
+}
+.m5-hy li::before {
+  content: ''; position: absolute; left: 0; top: 0.62em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--m5-warm); opacity: 0.7;
+}
+.m5-hy strong { color: var(--m5-ink); font-weight: 600; }
+
+/* ---------- checkpoint ---------- */
+
+.m5-quiz { margin-top: var(--sp-5); padding: var(--card-pad); border: 1px solid var(--m5-line); border-radius: var(--radius); }
+.m5-quiz h4 {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--m5-dim); margin: 0 0 var(--sp-3);
+}
+.m5-quiz-stem { font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--m5-ink); margin: 0 0 var(--sp-4); }
+.m5-quiz-options { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.m5-quiz-option {
+  width: 100%; text-align: left;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sp-3); align-items: baseline;
+  font-size: var(--fs-body); line-height: var(--lh-body); font-family: inherit; color: var(--m5-read);
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--m5-line); border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.015); cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+/* Answered options are marked with aria-disabled rather than the `disabled`
+   attribute, so that they stay in the tab order and a reader on a keyboard can
+   go back over their answer. These two rules follow it. */
+.m5-quiz-option:hover:not([aria-disabled='true']) { border-color: rgba(242, 238, 230, 0.3); color: var(--m5-ink); }
+.m5-quiz-option[aria-disabled='true'] { cursor: default; }
+/* A, B, C, D: an index, and the only part of an option that is. */
+.m5-quiz-key {
+  font-size: var(--fs-meta); font-weight: 700; color: var(--m5-dim);
+  border: 1px solid var(--m5-line-2); border-radius: var(--radius-sm); padding: 1px var(--sp-2);
+}
+.m5-quiz-mark { font-size: var(--fs-support); font-weight: 700; }
+.m5-quiz-option.is-right {
+  border-color: rgba(123, 203, 196, 0.6); background: rgba(123, 203, 196, 0.08); color: var(--m5-ink);
+}
+.m5-quiz-option.is-right .m5-quiz-mark { color: var(--m5-good); }
+.m5-quiz-option.is-wrong {
+  border-color: rgba(224, 149, 90, 0.6); background: rgba(224, 149, 90, 0.08); color: var(--m5-ink);
+}
+.m5-quiz-option.is-wrong .m5-quiz-mark { color: var(--m5-bad); }
+.m5-quiz-option.is-dim { opacity: 0.42; }
+.m5-quiz-explain { margin-top: var(--sp-3); padding-left: var(--sp-3); border-left: 2px solid var(--m5-line-2); }
+.m5-quiz-explain p { margin: 0; font-size: var(--fs-body); line-height: var(--lh-loose); color: var(--m5-read); }
+.m5-quiz-explain strong { color: var(--m5-ink); }
+
+/* ---------- pager and footer ---------- */
+
+.m5-pager { display: flex; gap: var(--sp-3); justify-content: space-between; margin-top: var(--gap-section); }
+.m5-pager-link {
+  display: grid; gap: var(--sp-1); max-width: 46%;
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--m5-line); border-radius: var(--radius);
+  text-decoration: none; color: inherit;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.m5-pager-link:hover { border-color: rgba(169, 158, 219, 0.5); background: rgba(169, 158, 219, 0.04); }
+.m5-pager-link small { font-size: var(--fs-meta); color: var(--m5-mri); font-variant-numeric: tabular-nums; }
+.m5-pager-link strong { font-size: var(--fs-body); font-weight: 600; }
+.m5-pager-link.is-next { text-align: right; }
+
+.m5-foot {
+  width: min(var(--container-main), calc(100% - var(--sp-6))); margin: 0 auto;
+  display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap;
+  padding: var(--sp-5) 0 var(--sp-6); border-top: 1px solid var(--m5-line);
+  font-size: var(--fs-support); color: var(--m5-mut);
+}
+.m5-foot a { color: var(--m5-mut); text-decoration: none; }
+.m5-foot a:hover { color: var(--m5-ink); }
+
+/* ---------- layout up ---------- */
+
+@media (min-width: 940px) {
+  .m5-hero { grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr); gap: var(--sp-7); }
+  .m5-contents-group { grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: var(--sp-6); }
+}
+
+/* ---------- phone: animation, then explanation, then controls ----------
+   The order in the markup is already stage → prose → controls, so the only
+   thing to do here is stop the desktop grids from surviving into a column
+   that cannot hold them. */
+@media (max-width: 720px) {
+  /* The bar wraps to two rows on a phone, so it costs 112px rather than 65.
+     Telling the concept screen otherwise is what put a 46px scroll on every
+     section that was otherwise an exact fit. */
+  .m5-root { --m5-chrome: 116px; }
+  .m5-home, .m5-section, .m5-nav-bar, .m5-nav-panel, .m5-foot { width: calc(100% - var(--sp-5)); }
+  .m5-nav-bar { flex-wrap: wrap; gap: var(--sp-3); min-height: 0; padding: var(--sp-3) 0; }
+  .m5-nav-groups { display: none; }
+  .m5-nav-progress { margin-left: auto; }
+  .m5-contents-group ul { grid-template-columns: minmax(0, 1fr); }
+  .m5-controls { grid-template-columns: minmax(0, 1fr); }
+  .m5-stage-normal { height: clamp(260px, 42vh, 340px); }
+  .m5-stage-tall { height: clamp(300px, 50vh, 400px); }
+  .m5-pager { flex-direction: column; }
+  .m5-pager-link { max-width: none; }
+  .m5-pager-link.is-next { text-align: left; }
+  .m5-hy, .m5-quiz { padding: var(--sp-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m5-nav-rail i { transition: none; }
+  .m5-contents-card:hover { transform: none; }
+}
+
+/* ---------- one concept at a time ----------
+   The paged reading mode. Same concepts, same simulations; what changes is how
+   many are on screen, and therefore how much the reader has to decide for
+   themselves about where to stop. */
+
+.m5-readmode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-5);
+}
+.m5-readmode {
+  font-size: var(--fs-support);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--m5-mut);
+  background: transparent;
+  border: 1px solid var(--m5-line-2);
+  border-radius: 18px;
+  padding: var(--sp-1) var(--sp-3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.m5-readmode:hover { color: var(--m5-ink); border-color: rgba(242, 238, 230, 0.4); }
+
+/* LEVEL 5. "Concept 3 of 6" is the definition of orientation: useful, never
+   the thing being read. It keeps the metadata size and the dim grey so that it
+   cannot be mistaken for part of the idea it sits above. */
+.m5-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m5-dim);
+}
+.m5-progress-rail {
+  display: block;
+  width: clamp(80px, 22vw, 180px);
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(242, 238, 230, 0.1);
+}
+.m5-progress-rail i { display: block; height: 100%; border-radius: 2px; background: var(--m5-mri); transition: width 0.3s; }
+
+/* The section's own contents, on its opening screen. */
+.m5-plan {
+  list-style: none;
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--m5-line);
+}
+.m5-plan li { border-bottom: 1px solid var(--m5-line); }
+.m5-plan button {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-3) var(--sp-2);
+  background: none;
+  border: 0;
+  color: var(--m5-read);
+  font-family: inherit;
+  font-size: var(--fs-body);
+  line-height: var(--lh-heading);
+  cursor: pointer;
+  transition: color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.m5-plan button:hover { color: var(--m5-ink); background: rgba(242, 238, 230, 0.03); }
+.m5-plan button span {
+  flex: none;
+  font-size: var(--fs-meta);
+  color: var(--m5-mri);
+  font-variant-numeric: tabular-nums;
+}
+
+.m5-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--m5-line);
+}
+.m5-dots { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; }
+.m5-dots i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(242, 238, 230, 0.16);
+  transition: 0.25s;
+}
+.m5-dots i.seen { background: rgba(242, 238, 230, 0.4); }
+.m5-dots i.on { background: var(--m5-mri); transform: scale(1.35); }
+
+/* In paged mode the single concept carries the screen, so it does not need the
+   rule that separates it from a sibling above it. */
+.m5-section-paged .m5-concept { border-top: 0; margin-top: 0; padding-top: 0; }
+
+@media (max-width: 720px) {
+  .m5-step-nav:not(.is-static) {
+    position: sticky;
+    bottom: 0;
+    /* Back and Next are the only way through a section, so they win every
+       stacking argument on the page. Without this the row was a positioned box
+       with z-index auto and lost to anything above it in the concept: a pinned
+       instrument at z-index 5 put its canvas over both buttons and a tap on
+       "Next concept →" was swallowed by the diagram. */
+    z-index: 6;
+    background: linear-gradient(transparent, var(--m5-bg) 34%);
+    padding: var(--sp-4) 0 var(--sp-3);
+    margin-top: var(--sp-5);
+    border-top: 0;
+  }
+  .m5-dots { display: none; }
+  .m5-readmode-row { margin-bottom: var(--sp-4); }
+}
+
+/* ---------- simulation layout: controls beside the diagram ----------
+   A band of control groups under a tall stage pushed the explanation a screen
+   and a half down the page. A narrow column beside it costs nothing
+   vertically, and keeps each setting next to the thing it changes. */
+.m5-sim-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+.m5-sim-main { display: grid; gap: var(--sp-3); min-width: 0; }
+
+@media (min-width: 1040px) {
+  /* 244px, not 216: the labels and hints in this column are now readable
+     rather than fine print, and a column too narrow for them buys its width
+     back in wrapped lines — which is height, on the one screen that cannot
+     spare any. */
+  .m5-sim-body.has-controls {
+    grid-template-columns: 244px minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: start;
+  }
+  /* Follows the reader down a tall diagram instead of scrolling away. */
+  .m5-sim-body.has-controls .m5-controls { position: sticky; top: 78px; }
+}
+
+/* The panel is now a column, so its groups stack rather than sitting in a
+   responsive grid of their own. */
+.m5-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-content: start;
+}
+
+.m5-choice-menu { display: grid; gap: var(--sp-2); }
+.m5-choice-menu select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--m5-ink);
+  border: 1px solid var(--m5-line-2);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-2);
+  font-size: var(--fs-support);
+  font-family: inherit;
+  cursor: pointer;
+}
+.m5-choice-menu select:hover { border-color: rgba(242, 238, 230, 0.36); }
+
+/* The speed button doubles as the disclosure for scrubbing and speed. */
+.m5-tbtn-wide {
+  width: auto;
+  min-width: 44px;
+  padding: 0 var(--sp-3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.m5-tbtn-wide.is-on {
+  background: rgba(169, 158, 219, 0.16);
+  border-color: var(--m5-mri);
+  color: var(--m5-ink);
+}
+
+/* ---------- LEVEL 2: the exam takeaway, inside a concept ----------
+   The shared primitive, so a high-yield line looks the same here as it does in
+   X-ray or CT and is recognised before it is read. Only the box it sits in is
+   the module's business: on the paged screen it has to earn its height against
+   the diagram beside it, so the padding tightens while the type — which is the
+   entire point of the block — does not. */
+.m5-concept-copy .rp-highyield { margin-top: var(--sp-4); }
+.m5-section-paged .m5-concept-copy .rp-highyield {
+  margin-top: clamp(var(--sp-2), 1.6dvh, var(--sp-4));
+  padding: clamp(var(--sp-2), 1.2dvh, var(--sp-3)) var(--sp-4);
+}
+.m5-section-paged .m5-concept-copy .rp-highyield-label { margin-bottom: var(--sp-1); }
+.m5-section-paged .m5-concept-copy .rp-highyield-body {
+  font-size: clamp(var(--fs-support), 2.2dvh, var(--fs-teach));
+}
+.m5-concept-copy .rp-highyield-body strong { color: var(--m5-ink); font-weight: 600; }
+
+/* ---------- LEVEL 4: the mechanism, folded away ----------
+   The control that opens it is a sentence the reader has to read and decide
+   about, so it is set at support size in sentence case. It was 12px uppercase
+   with 0.14em tracking, which is the typography of a label — it looked like
+   furniture and was skipped, which is a poor outcome for the door to the
+   explanation. */
+.m5-why {
+  margin-top: var(--sp-4);
+  max-width: var(--measure);
+  border-left: 2px solid var(--m5-line-2);
+  padding-left: var(--sp-3);
+}
+.m5-why > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--m5-mri);
+  padding: var(--sp-1) 0;
+  transition: color var(--dur) var(--ease);
+}
+.m5-why > summary::-webkit-details-marker { display: none; }
+.m5-why > summary:hover { color: var(--m5-ink); }
+.m5-why > summary::after { content: ' ▾'; }
+.m5-why[open] > summary::after { content: ' ▴'; }
+.m5-why .m5-why-close { display: none; }
+.m5-why[open] .m5-why-open { display: none; }
+.m5-why[open] .m5-why-close { display: inline; }
+.m5-why-body { padding-top: var(--sp-3); }
+
+/* ---------- the way out ----------
+   The module suppresses the site header, so this is the only persistent route
+   back to RadioPass. It sits first in the sticky bar and survives every
+   breakpoint — on a phone the word collapses to the arrow, but the target
+   never disappears. */
+.m5-nav-exit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--m5-mut);
+  text-decoration: none;
+  border: 1px solid var(--m5-line-2);
+  border-radius: 18px;
+  padding: var(--sp-1) var(--sp-3);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.m5-nav-exit:hover,
+.m5-nav-exit:focus-visible {
+  color: var(--m5-ink);
+  border-color: rgba(242, 238, 230, 0.4);
+  background: rgba(242, 238, 230, 0.04);
+}
+/* A divider between leaving and where you are. */
+.m5-nav-home {
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--m5-line);
+}
+
+/* Only in the band where the group rail is still shown and competing for the
+   bar does the word collapse to its arrow. Below 720px the rail is hidden, so
+   there is room — and on a phone a bare arrow is exactly the ambiguity this
+   link exists to remove. */
+@media (min-width: 721px) and (max-width: 900px) {
+  .m5-nav-exit-word { display: none; }
+  .m5-nav-exit { padding: var(--sp-1) var(--sp-3); }
+}
+@media (max-width: 720px) {
+  .m5-nav-home { padding-left: var(--sp-3); }
+}
+
+
+/* ---------- one idea, one screen ----------
+   While a single idea is being explained, nothing about it may sit below the
+   fold: the reader should never have to choose between reading the sentence
+   and watching the diagram it describes. So the paged section is a column the
+   height of the viewport — concept in the middle, navigation pinned under it —
+   and a concept that owns an instrument splits into two columns rather than
+   growing downwards.
+
+   Scrolling is still allowed for the one thing the owner asked it to mean:
+   moving to another idea. `why` stays folded, and opening it is a deliberate
+   step out of the one-screen contract.
+
+   dvh, not vh: on iOS Safari the address bar makes vh taller than the visible
+   viewport, which would push the navigation off the exact screen this rule
+   exists to protect. */
+.m5-section-paged {
+  min-height: calc(100dvh - 200px);
+  display: flex;
+  flex-direction: column;
+}
+.m5-section-paged .m5-concept {
+  flex: 1 1 auto;
+  display: grid;
+  align-content: center;
+  gap: 0;
+}
+.m5-section-paged .m5-step-nav { margin-top: auto; }
+
+@media (min-width: 1040px) {
+  /* One width per purpose, and a concept holding an instrument is a different
+     purpose from a column of prose. Reading mode keeps the 1000px measure; the
+     paged screen takes --container-main, the same width as the bar above it, so
+     the two line up and the diagram gets the room it was being denied. At 1000px
+     the readouts under a wide simulation were squeezed into a 260px column and
+     stacked six deep — 313px of chips beside a 489px diagram. */
+  .m5-section-paged { width: min(var(--container-main), calc(100% - var(--gutter) * 2)); }
+  .m5-section-paged .m5-concept.has-watch {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: clamp(var(--sp-5), 3.4vw, var(--sp-7));
+  }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-copy { align-self: center; }
+  /* A concept with no instrument gets the hero treatment lower down in this
+     file; what it sets here would only be overridden there. */
+}
+
+/* Narrow: the instrument comes first, because the words are about it. */
+@media (max-width: 1039px) {
+  .m5-section-paged .m5-concept.has-watch { grid-template-areas: 'stage' 'copy'; }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage { grid-area: stage; margin-bottom: var(--sp-4); }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-copy { grid-area: copy; }
+}
+
+/* The instrument has to fit the band it now shares with the words, so its
+   canvas is sized from the viewport rather than from its own taste. The
+   controls and readouts beneath it are NOT shrunk away — they are what the
+   concept asks the reader to touch — only tightened. */
+.m5-section-paged .m5-concept-stage .m5-stage { height: clamp(210px, 33dvh, 400px); }
+.m5-section-paged .m5-concept-stage .m5-readouts { gap: var(--sp-2); }
+.m5-section-paged .m5-concept-stage .m5-readout { padding: var(--sp-1) var(--sp-2); }
+.m5-section-paged .m5-concept-stage .m5-sim { gap: var(--sp-2); }
+.m5-section-paged .m5-concept-stage .m5-sim-body { gap: var(--sp-2); }
+
+/* Size the words by the height available, not only the width.
+   "Big" is a ratio, not a number: a size that is commanding on a 1080-tall
+   screen simply does not fit on a 768-tall one, so the height of the window
+   has to be part of the sum.
+
+   The form is always the same: the TOKEN sets the floor and the ceiling, and
+   dvh only chooses between them. That is the difference from what was here
+   before, which reached its own floor of 15.5px on a short laptop — the screen
+   was allowed to argue the type below the point where it could be read. Now
+   the screen can make the claim smaller than --fs-teach but never smaller than
+   --fs-support, and if a window is too short to hold the concept at that size,
+   the window scrolls. */
+.m5-section-paged .m5-concept-head h3 {
+  font-size: min(var(--fs-concept), 5dvh);
+  margin-bottom: clamp(var(--sp-2), 1.4dvh, var(--sp-3));
+}
+.m5-section-paged .m5-what {
+  font-size: clamp(var(--fs-support), 2.4dvh, var(--fs-teach));
+  margin-bottom: clamp(var(--sp-3), 2.2dvh, var(--sp-5));
+}
+.m5-section-paged .m5-concept:not(.has-watch) .m5-what {
+  font-size: clamp(var(--fs-teach), 3dvh, var(--fs-section));
+}
+.m5-section-paged .m5-why { margin-top: clamp(var(--sp-3), 1.8dvh, var(--sp-5)); }
+.m5-section-paged .rp-task { margin-top: clamp(var(--sp-2), 1.4dvh, var(--sp-3)); padding: clamp(var(--sp-2), 1.2dvh, var(--sp-3)) var(--sp-3); }
+.m5-section-paged .m5-step-nav { margin-top: auto; padding-top: clamp(var(--sp-3), 2dvh, var(--sp-5)); }
+.m5-section-paged .m5-readmode-row { margin-bottom: clamp(var(--sp-3), 1.8dvh, var(--sp-5)); }
+
+/* Furniture yields to the idea.
+   At 1280x720 the page spent 246 of its 720 pixels on padding, a footer and
+   margins — a third of the screen — and then asked the concept to fit in what
+   was left. Inside a paged section the padding is drawn from the viewport, and
+   the site footer stands down: the concept's own Back / Next row is the only
+   navigation a reader needs while an idea is open, and the top bar still holds
+   Contents and the way out. */
+.m5-section-paged { padding-top: clamp(var(--sp-3), 2.2dvh, var(--sp-6)); padding-bottom: clamp(var(--sp-3), 1.8dvh, var(--sp-6)); }
+.m5-root:has(.m5-section-paged) .m5-foot { display: none; }
+/* 300px is a floor, not a preference: below it the simulations' own axis and
+   tissue labels overlap each other, and an unreadable diagram defeats the
+   point of keeping it on screen. If a screen cannot hold the whole concept at
+   this size, the screen scrolls — the diagram does not shrink. */
+.m5-section-paged .m5-concept-stage .m5-stage { height: clamp(300px, min(52dvh, 44vw), 700px); }
+/* The instrument's own furniture — readouts, caption, gaps — is the last thing
+   to give, and it gives by tightening SPACING rather than by shrinking text:
+   a reader asked to drag a slider still needs to read what the number did. The
+   caption is held between the support and body sizes for the same reason the
+   claim is. */
+.m5-section-paged .m5-caption { font-size: clamp(var(--fs-support), 2dvh, var(--fs-body)); line-height: 1.5; }
+.m5-section-paged .m5-concept-stage .m5-readout { padding: clamp(2px, 0.55dvh, var(--sp-1)) var(--sp-2); }
+/* The control panel gives up its spacing, never its words. Three sliders with
+   a line of explanation each ran to 594px against a 473px column once the
+   hints were set at a size they could be read at — so the rhythm inside the
+   panel tightens and the sentences stay. */
+.m5-section-paged .m5-controls {
+  padding: var(--sp-3);
+  gap: clamp(var(--sp-2), 1.4dvh, var(--sp-3));
+}
+.m5-section-paged .m5-slider,
+.m5-section-paged .m5-choice { gap: var(--sp-1); }
+.m5-section-paged .m5-slider small { line-height: 1.35; }
+
+/* A panel taller than the window scrolls inside itself, not the page.
+   5.19 carries eleven controls: at a size they can be read at that is 1144px
+   of panel beside a 304px diagram, and letting the page take the strain means
+   scrolling the animation off the screen to reach the setting that changes it
+   — the one thing the paged mode exists to prevent. Capped and scrolled in
+   place, the diagram stays put while the reader goes to find the control. */
+@media (min-width: 1040px) {
+  .m5-section-paged .m5-concept.has-watch .m5-controls {
+    max-height: min(56dvh, 520px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+.m5-section-paged .m5-concept-stage .m5-sim,
+.m5-section-paged .m5-concept-stage .m5-sim-body { gap: clamp(var(--sp-1), 0.9dvh, var(--sp-3)); }
+
+/* The old "change a variable" paragraph lists everything worth trying — useful
+   as reference, ruinous as the thing beside a single instruction. It folds to
+   one line and opens for anyone who wants the whole menu. */
+.m5-change-fold { margin-top: var(--sp-3); }
+/* Quieter than "why it happens" by colour, not by size — the reader still has
+   to read it to decide whether to open it. */
+.m5-change-fold > summary {
+  cursor: pointer; list-style: none;
+  font-size: var(--fs-support); font-weight: 600; letter-spacing: 0;
+  color: var(--m5-mut); padding: var(--sp-1) 0;
+  transition: color var(--dur) var(--ease);
+}
+.m5-change-fold > summary::-webkit-details-marker { display: none; }
+.m5-change-fold > summary::after { content: ' \25BE'; }
+.m5-change-fold[open] > summary::after { content: ' \25B4'; }
+.m5-change-fold > summary:hover { color: var(--m5-ink); }
+.m5-change-body { font-size: var(--fs-body); line-height: var(--lh-loose); color: var(--m5-read); margin: var(--sp-2) 0 0; }
+.m5-change-body strong { color: var(--m5-ink); font-weight: 600; }
+
+/* The last 60 pixels on a 768-tall laptop come out of the spacing around the
+   readout chips, not out of the canvas and not out of the type. The block used
+   to end by setting the readout value at 12.5px and the caption at 12px, which
+   is the same mistake as the one this refactor exists to end: the numbers a
+   concept asks you to read were the first thing made unreadable. Every rule
+   here is now spacing. */
+@media (max-height: 820px) {
+  .m5-section-paged { padding-top: var(--sp-3); padding-bottom: var(--sp-2); }
+  .m5-section-paged .m5-readmode-row { margin-bottom: var(--sp-2); }
+  .m5-section-paged .m5-step-nav { padding-top: var(--sp-3); }
+  .m5-section-paged .m5-why { margin-top: var(--sp-2); }
+  .m5-section-paged .m5-change-fold { margin-top: var(--sp-2); }
+  .m5-section-paged .rp-task { margin-top: var(--sp-2); }
+  .m5-section-paged .m5-concept-stage .m5-readouts { gap: var(--sp-1); }
+  .m5-section-paged .m5-concept-stage .m5-readout { padding: 2px var(--sp-2); }
+  .m5-section-paged .m5-concept-stage .m5-sim,
+  .m5-section-paged .m5-concept-stage .m5-sim-body { gap: var(--sp-2); }
+  .m5-section-paged .m5-caption { line-height: 1.45; }
+}
+
+/* A concept carrying no instrument was 217px of copy centred in an 860px band:
+   two voids, one above and one below. The space is not a layout problem to be
+   absorbed, it is the room the statement should be using — so a wordless
+   concept is set at hero scale and given a wider measure. */
+@media (min-width: 1040px) {
+  .m5-section-paged .m5-concept:not(.has-watch) .m5-concept-head h3 {
+    font-size: min(var(--fs-hero), 9dvh);
+    line-height: var(--lh-tight);
+    margin-bottom: clamp(var(--sp-3), 2.4dvh, var(--sp-5));
+  }
+  .m5-section-paged .m5-concept:not(.has-watch) .m5-what {
+    font-size: clamp(var(--fs-teach), 4dvh, var(--fs-section));
+    line-height: 1.45;
+    max-width: 32ch;
+  }
+  .m5-section-paged .m5-concept:not(.has-watch) .m5-concept-copy {
+    max-width: var(--measure);
+    margin: 0 auto;
+  }
+}
+
+/* On a phone the diagram cannot sit beside the words and the two together
+   cannot fit 844px. The rule used to be kept a different way: the stage was
+   pinned so the diagram STAYED ON SCREEN while the words moved under it — the
+   owner's objection was never to scrolling as such, it was "I shouldn't see
+   animation moving and have reading down below".
+
+   That only works while the pinned box is SHORTER than the screen, and it never
+   is. The stage is content-sized — controls, a 300px canvas, up to five
+   readouts, a caption and the transport, all stacked in one column below 1040px
+   — and measured 728-1436px on every concept in the module at 390x844 and
+   430x932. Pinned, opaque, and z-index 5, it did not let the words move under
+   it: it buried them. On 5.2 "Resonance" at 390x844 the copy column sat at
+   426-734 with the stage still covering 0-718 at maximum scroll, so the
+   concept's own claim sentence was unreachable at every scroll position, and a
+   real touch tap at the centre of "Next concept →" landed on the canvas and did
+   nothing.
+
+   So the diagram is left in flow here: picture, then words, then the step
+   navigation, all of them reachable. The pin stays at 1040px and up, where the
+   two genuinely sit side by side and nothing is covered. */
+
+/* Centre the whole column, do not pin the navigation.
+   With the concept stretching and the nav held at the floor, the slack collected
+   between them — 130px of nothing directly under the diagram, which is the worst
+   place for it. Letting the block keep its natural height and centring the lot
+   puts that slack at the edges, where it is margin. The min-height matches the
+   real chrome (a 62px bar) so the block centres against the whole screen rather
+   than against a box that stopped 150px early. */
+/* `safe` centring: centred while the content fits, start-aligned the moment it
+   does not. Plain `center` splits any overflow between the two ends, which on
+   the wrap-up screen — six high-yield points plus a four-option question —
+   rendered the progress row at -190px and the top of the list at -104px. Not
+   scrolled off: thrown away, with no scrollbar to get it back. */
+.m5-section-paged { min-height: calc(100dvh - var(--m5-chrome)); justify-content: safe center; }
+.m5-section-paged .m5-concept { flex: 0 0 auto; }
+.m5-section-paged .m5-step-nav { margin-top: clamp(var(--sp-3), 2.4dvh, var(--sp-6)); }
+
+/* Narrow screens are top-aligned. Centring a tall block on a phone opened a
+   157px gap under the bar on every section — slack at the top of a screen you
+   are about to scroll is pure waste, whereas at the bottom it is simply where
+   the page ends. */
+@media (max-width: 1039px) {
+  .m5-section-paged { justify-content: flex-start; }
+}
+
+/* The instrument fills the row it was given.
+   Sizing the canvas from dvh cannot work: the clamp has no idea that readouts,
+   a caption and a transport bar sit under it, so on a short window the column
+   came out 100-180px taller than the screen. Making the stage a flex column and
+   letting the canvas take the remainder means the furniture keeps its natural
+   height and the picture absorbs the rest — which is also the right priority,
+   since the numbers under a diagram are what the concept asks you to read. */
+@media (min-width: 1040px) {
+  .m5-section-paged .m5-concept.has-watch { align-items: stretch; min-height: 0; }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage {
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-sim {
+    flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0;
+  }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-stage {
+    flex: 1 1 0; min-height: 230px;
+  }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-copy {
+    align-self: center; min-height: 0; overflow: hidden;
+  }
+}
+
+/* A definite height, all the way down.
+   `flex: 1 1 0` can only work against a container that knows how tall it is.
+   With the article on min-height the chain stayed indefinite, the basis
+   resolved to nothing and the stage fell back to its floor while the furniture
+   below it pushed the page past the fold. Fixing the article's height gives the
+   flex something real to divide, so the diagram takes exactly what the words,
+   the readouts and the navigation leave. */
+@media (min-width: 1040px) {
+  /* min-height, never height. A definite height was given so the stage's
+     `flex: 1 1 0` had real space to divide — but a flex container on
+     min-height still resolves to a definite height whenever its content is
+     shorter, which is every concept screen. The wrap-up is the one screen
+     that is taller, and it must be allowed to grow and scroll rather than be
+     cropped to fit. */
+  .m5-section-paged { min-height: calc(100dvh - var(--m5-chrome)); }
+  .m5-section-paged .m5-concept { flex: 1 1 auto; min-height: 0; }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-sim-body { min-height: 0; }
+}
+
+/* A 660px-tall window is a real laptop, not an edge case. The last 60 pixels
+   come from the diagram's floor and the spacing around its furniture — never
+   from the readouts themselves, which are what the concept asks to be read. */
+@media (min-width: 1040px) and (max-height: 720px) {
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-stage { min-height: 180px; }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-sim { gap: var(--sp-1); }
+  .m5-section-paged .m5-concept.has-watch .m5-concept-stage .m5-sim-body { gap: var(--sp-1); }
+  .m5-section-paged .m5-caption { margin: 0; }
+  .m5-section-paged .m5-step-nav { padding-top: var(--sp-2); }
+  .m5-section-paged .m5-readmode-row { margin-bottom: var(--sp-2); }
+  /* The transport is a row of fixed squares; on a short window they give up
+     four pixels each and nothing else on the screen has to. */
+  .m5-section-paged .m5-tbtn { width: 30px; height: 30px; }
+  .m5-section-paged .m5-btn { padding: var(--sp-2) var(--sp-4); }
+}
+
+/* The diagram's own ceiling on a short window.
+   The last 60px belong to the concepts whose readouts run to three rows. The
+   safe lever is this clamp — not the flex chain, which cannot be joined here:
+   .m5-sim-body lays its children out in its own way, and forcing it to a
+   column stacked them and cost 250-470px. Trimming the diagram's ceiling at
+   short heights leaves every other concept untouched. */
+@media (min-width: 1040px) and (max-height: 720px) {
+  .m5-section-paged .m5-concept-stage .m5-stage { height: clamp(220px, 40dvh, 300px); }
+}
+
+/* The same lever, one band up. A 1440x760 or 1512x780 laptop is the size this
+   module is actually read on, and 52dvh there is a 395px picture with 300px of
+   its own readouts, transport and caption hanging underneath it — 695px of
+   instrument in a 694px column, which is how a concept that looks generous
+   ends up 26px past the fold. Capping the picture at 40% of a short window
+   leaves the numbers under it at full size, which is the right way round: the
+   diagram shows the shape of the thing, the readouts are what the concept asks
+   you to read off it. */
+@media (min-width: 1040px) and (min-height: 721px) and (max-height: 830px) {
+  .m5-section-paged .m5-concept-stage .m5-stage { height: clamp(280px, 40dvh, 340px); }
+}

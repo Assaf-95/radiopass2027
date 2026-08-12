@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydrogen MRI Phase and Pulse Diagram</title>
+  <style>
+    :root {
+      --bg-a: #f3f8ff;
+      --bg-b: #dfeaf8;
+      --ink: #13263f;
+      --muted: #4f6682;
+      --panel: #ffffff;
+      --line: #c6d8eb;
+      --z: #2e6fb0;
+      --x: #2f8a60;
+      --proton: #7a8fa7;
+      --rf: #b55f21;
+      --coil: #624ca0;
+      --signal: #be3f54;
+      --radius: 14px;
+      --shadow: 0 14px 34px rgba(16, 35, 62, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.9), transparent 46%),
+        radial-gradient(circle at 90% 90%, rgba(171, 201, 236, 0.35), transparent 42%),
+        linear-gradient(148deg, var(--bg-a), var(--bg-b));
+      padding: 1rem;
+    }
+
+    .app {
+      width: min(1140px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.8rem;
+      animation: rise 360ms ease-out;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .panel {
+      border: 1px solid rgba(154, 182, 211, 0.45);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 251, 255, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 0.85rem 1rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.1vw, 1.55rem);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .controls {
+      padding: 0.7rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid rgba(47, 85, 130, 0.38);
+      border-radius: 999px;
+      padding: 0.46rem 0.88rem;
+      background: linear-gradient(180deg, #fbfdff, #eaf3ff);
+      color: #173451;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      box-shadow: 0 6px 14px rgba(20, 49, 83, 0.16);
+    }
+
+    button.rf {
+      background: linear-gradient(180deg, #fff2e7, #ffe2ca);
+      border-color: rgba(175, 99, 41, 0.42);
+      color: #6f3f13;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .chip {
+      border: 1px solid rgba(113, 142, 170, 0.35);
+      border-radius: 999px;
+      padding: 0.32rem 0.68rem;
+      font-size: 0.8rem;
+      color: #24476a;
+      background: rgba(232, 243, 255, 0.74);
+      white-space: nowrap;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 0.8rem;
+      align-items: stretch;
+    }
+
+    .canvas-wrap {
+      padding: 0.75rem;
+      min-height: 500px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(142, 171, 201, 0.42);
+      display: block;
+      background:
+        radial-gradient(circle at 16% 16%, rgba(204, 224, 246, 0.42), transparent 43%),
+        radial-gradient(circle at 84% 85%, rgba(182, 208, 239, 0.34), transparent 40%),
+        linear-gradient(160deg, #f8fcff, #edf5ff);
+    }
+
+    .side {
+      padding: 0.75rem;
+      display: grid;
+      gap: 0.55rem;
+      align-content: start;
+    }
+
+    .card {
+      border: 1px solid rgba(146, 174, 203, 0.38);
+      border-radius: 11px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(237, 246, 255, 0.9));
+      box-shadow: 0 7px 18px rgba(24, 50, 82, 0.08);
+      padding: 0.58rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.42rem;
+      font-size: 0.79rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2e547a;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #264467;
+      line-height: 1.34;
+    }
+
+    .steps {
+      display: grid;
+      gap: 0.36rem;
+    }
+
+    .step {
+      border: 1px solid rgba(136, 164, 193, 0.36);
+      border-radius: 10px;
+      padding: 0.4rem 0.48rem;
+      font-size: 0.78rem;
+      color: #2b4c71;
+      background: rgba(246, 251, 255, 0.88);
+    }
+
+    .step.active {
+      border-color: rgba(45, 106, 168, 0.52);
+      background: linear-gradient(180deg, rgba(229, 243, 255, 0.92), rgba(214, 234, 255, 0.86));
+      color: #183d63;
+      font-weight: 600;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.42rem;
+      margin-top: 0.48rem;
+    }
+
+    .metric {
+      border: 1px solid rgba(131, 161, 191, 0.36);
+      border-radius: 10px;
+      padding: 0.4rem;
+      font-size: 0.77rem;
+      color: #2b4d73;
+      background: rgba(248, 252, 255, 0.88);
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 0.18rem;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 980px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="panel header">
+      <h1>Hydrogen Only: Spin, Precession, Phase, and RF Pulse</h1>
+      <p>Single diagram with flat axes only: Z is horizontal and X is vertical. No oblique perspective and no full-page crossing lines.</p>
+      <p>Use the buttons in order: one proton, few out-of-phase, apply B0 (Larmor precession in phase), then apply RF pulse.</p>
+    </section>
+
+    <section class="panel controls">
+      <button id="btnOne">1) Show One Hydrogen</button>
+      <button id="btnFew">2) Show Few Out-of-Phase</button>
+      <button id="btnB0">3) Apply B0 Field</button>
+      <button id="btnRF" class="rf">4) Apply RF Pulse</button>
+      <button id="btnReset">Reset</button>
+      <button id="btnPlay">Pause</button>
+      <span id="modeChip" class="chip">Mode: single proton</span>
+    </section>
+
+    <section class="main">
+      <div class="panel canvas-wrap">
+        <canvas id="scene" aria-label="Hydrogen-only MRI phase and pulse diagram"></canvas>
+      </div>
+
+      <aside class="panel side">
+        <article class="card">
+          <h2>Teaching Line</h2>
+          <p id="teachingLine">One hydrogen nucleus behaves like a tiny magnet. Its magnetic moment precesses in a circle.</p>
+        </article>
+
+        <article class="card">
+          <h2>Step Flow</h2>
+          <div class="steps" id="steps">
+            <div class="step active" data-step="single">1. Single hydrogen proton with spin and dipole</div>
+            <div class="step" data-step="few">2. A few protons with different phases</div>
+            <div class="step" data-step="b0">3. Apply B0 and show Larmor precession in phase (teaching simplification)</div>
+            <div class="step" data-step="rf">4. Apply RF pulse and observe transverse signal in coil</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Readout</h2>
+          <p>Approximate components:</p>
+          <div class="metrics">
+            <div class="metric">Mz (along Z)<strong id="mzVal">0.90</strong></div>
+            <div class="metric">Mxy (transverse)<strong id="mxyVal">0.30</strong></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("scene");
+      const ctx = canvas.getContext("2d");
+
+      const els = {
+        btnOne: document.getElementById("btnOne"),
+        btnFew: document.getElementById("btnFew"),
+        btnB0: document.getElementById("btnB0"),
+        btnRF: document.getElementById("btnRF"),
+        btnReset: document.getElementById("btnReset"),
+        btnPlay: document.getElementById("btnPlay"),
+        modeChip: document.getElementById("modeChip"),
+        teachingLine: document.getElementById("teachingLine"),
+        steps: document.getElementById("steps"),
+        mzVal: document.getElementById("mzVal"),
+        mxyVal: document.getElementById("mxyVal")
+      };
+
+      const state = {
+        mode: "single",
+        running: true,
+        time: 0,
+        syncStart: null,
+        rfStart: null,
+        lastFrameMs: performance.now(),
+        protonCount: 9,
+        phaseOffsets: []
+      };
+
+      for (let i = 0; i < state.protonCount; i += 1) {
+        state.phaseOffsets.push(Math.random() * Math.PI * 2);
+      }
+
+      const OMEGA = 1.9;
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function lerpAngle(a, b, t) {
+        const diff = Math.atan2(Math.sin(b - a), Math.cos(b - a));
+        return a + diff * t;
+      }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(280, Math.floor(rect.width));
+        const h = Math.max(280, Math.floor(rect.height));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function drawArrow(from, to, color, width) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+
+        const ang = Math.atan2(to.y - from.y, to.x - from.x);
+        const head = 9 + width * 0.6;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(to.x, to.y);
+        ctx.lineTo(to.x - head * Math.cos(ang - 0.34), to.y - head * Math.sin(ang - 0.34));
+        ctx.lineTo(to.x - head * Math.cos(ang + 0.34), to.y - head * Math.sin(ang + 0.34));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function computePhases() {
+        const t = state.time;
+        const phases = [];
+
+        if (state.mode === "single") {
+          phases.push(OMEGA * t);
+          return phases;
+        }
+
+        if (state.mode === "few") {
+          for (let i = 0; i < state.protonCount; i += 1) {
+            phases.push(state.phaseOffsets[i] + OMEGA * t);
+          }
+          return phases;
+        }
+
+        if (state.mode === "b0" || state.mode === "rf") {
+          const sync = state.syncStart === null ? 0 : clamp((t - state.syncStart) / 2.0, 0, 1);
+          const common = OMEGA * t;
+          for (let i = 0; i < state.protonCount; i += 1) {
+            const raw = state.phaseOffsets[i] + OMEGA * t;
+            phases.push(lerpAngle(raw, common, sync));
+          }
+          return phases;
+        }
+
+        return phases;
+      }
+
+      function netFromPhases(phases) {
+        let sumX = 0;
+        let sumY = 0;
+        for (let i = 0; i < phases.length; i += 1) {
+          sumX += Math.cos(phases[i]);
+          sumY += Math.sin(phases[i]);
+        }
+
+        const n = Math.max(1, phases.length);
+        const x = sumX / n;
+        const y = sumY / n;
+        return {
+          mag: Math.sqrt(x * x + y * y),
+          phase: Math.atan2(y, x)
+        };
+      }
+
+      function model() {
+        const phases = computePhases();
+        const net = netFromPhases(phases);
+
+        let mz = 0.92;
+        let mxy = net.mag * 0.2;
+
+        if (state.mode === "few") {
+          mz = 0.75;
+          mxy = net.mag * 0.25;
+        }
+
+        if (state.mode === "b0") {
+          const sync = state.syncStart === null ? 0 : clamp((state.time - state.syncStart) / 2.0, 0, 1);
+          mz = lerp(0.75, 0.65, sync);
+          mxy = lerp(0.18, 0.95, sync);
+        }
+
+        if (state.mode === "rf") {
+          const tip = state.rfStart === null ? 0 : clamp((state.time - state.rfStart) / 1.15, 0, 1);
+          const rfPhase = OMEGA * (state.time - (state.rfStart || state.time));
+          const synced = state.syncStart === null ? 0 : clamp((state.time - state.syncStart) / 2.0, 0, 1);
+          const syncedMxy = lerp(0.3, 1.0, synced);
+          mz = Math.cos(tip * Math.PI * 0.5) * 0.8;
+          mxy = Math.max(syncedMxy, Math.sin(tip * Math.PI * 0.5));
+          return { phases, phase: rfPhase, mz, mxy, net };
+        }
+
+        return { phases, phase: net.phase, mz, mxy, net };
+      }
+
+      function drawHydrogenIcon(x, y, scale) {
+        const r = 26 * scale;
+        const grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, 2, x, y, r);
+        grad.addColorStop(0, "#f8fbff");
+        grad.addColorStop(1, "#7b93ab");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#133151";
+        ctx.font = `${Math.floor(17 * scale)}px Avenir Next`;
+        ctx.fontWeight = "700";
+        ctx.textAlign = "center";
+        ctx.fillText("1H", x, y + 6 * scale);
+
+        drawArrow({ x, y: y + r + 28 * scale }, { x, y: y - r - 32 * scale }, "#244d7c", 3.5 * scale);
+
+        for (let i = 1; i <= 3; i += 1) {
+          const a = r * (1 + 0.45 * i);
+          const b = r * (0.45 + 0.2 * i);
+          ctx.strokeStyle = "rgba(70, 110, 160, 0.34)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(x, y, a, b, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        const orbitA = state.time * 1.8;
+        const ox = x + Math.cos(orbitA) * r * 1.75;
+        const oy = y + Math.sin(orbitA) * r * 0.75;
+        ctx.fillStyle = "#c34755";
+        ctx.beginPath();
+        ctx.arc(ox, oy, 5.8 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `${Math.floor(10 * scale)}px Avenir Next`;
+        ctx.fillText("+", ox, oy + 3 * scale);
+      }
+
+      function drawPhaseWheel(phases, cx, cy, r) {
+        ctx.strokeStyle = "rgba(70, 114, 166, 0.42)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        for (let i = 0; i < phases.length; i += 1) {
+          const p = phases[i];
+          const tx = cx + Math.cos(p) * r * 0.78;
+          const ty = cy + Math.sin(p) * r * 0.78;
+          drawArrow({ x: cx, y: cy }, { x: tx, y: ty }, "#3a6ea3", 2.1);
+        }
+
+        ctx.fillStyle = "#29496f";
+        ctx.font = "600 12px Avenir Next";
+        ctx.textAlign = "center";
+        ctx.fillText("Phase wheel", cx, cy + r + 18);
+      }
+
+      function drawAxes(origin, axisLenZ, axisLenX) {
+        drawArrow({ x: origin.x - axisLenZ * 0.22, y: origin.y }, { x: origin.x + axisLenZ, y: origin.y }, "#2e6fb0", 3.2);
+        drawArrow({ x: origin.x, y: origin.y + axisLenX * 0.24 }, { x: origin.x, y: origin.y - axisLenX }, "#2f8a60", 3.2);
+
+        ctx.fillStyle = "#284b73";
+        ctx.font = "600 13px Avenir Next";
+        ctx.textAlign = "left";
+        ctx.fillText("+Z", origin.x + axisLenZ + 8, origin.y + 3);
+        ctx.fillText("+X", origin.x + 8, origin.y - axisLenX - 8);
+      }
+
+      function drawCoilAndSignal(mxy, cx, cy) {
+        ctx.strokeStyle = "#624ca0";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 33, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "#523f8c";
+        ctx.font = "700 13px Avenir Next";
+        ctx.textAlign = "center";
+        ctx.fillText("Receiver coil", cx, cy + 50);
+
+        const amp = clamp(mxy, 0, 1);
+        if (amp > 0.04) {
+          ctx.strokeStyle = `rgba(190, 63, 84, ${0.35 + 0.55 * amp})`;
+          ctx.lineWidth = 2.3;
+          ctx.beginPath();
+          for (let i = 0; i <= 170; i += 1) {
+            const x = cx - 85 + i;
+            const y = cy + 58 + Math.sin(i * 0.2 + state.time * 6.4) * 8.5 * amp;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+
+          ctx.fillStyle = "#8e3042";
+          ctx.font = "700 13px Avenir Next";
+          ctx.fillText("Induced MR signal", cx, cy + 86);
+        }
+      }
+
+      function render() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        const origin = { x: w * 0.36, y: h * 0.62 };
+        const axisLenZ = Math.min(w * 0.3, 240);
+        const axisLenX = Math.min(h * 0.28, 190);
+
+        const m = model();
+
+        drawAxes(origin, axisLenZ, axisLenX);
+
+        const vecLen = Math.min(w, h) * 0.23;
+        const vx = origin.x + m.mz * vecLen;
+        const vy = origin.y - m.mxy * Math.sin(m.phase) * vecLen;
+        drawArrow(origin, { x: vx, y: vy }, "#355f8f", 5.1);
+
+        ctx.setLineDash([6, 5]);
+        ctx.strokeStyle = "#5e80a9";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(origin.x + m.mz * vecLen, origin.y);
+        ctx.stroke();
+
+        ctx.setLineDash([2, 5]);
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(origin.x, origin.y - m.mxy * Math.sin(m.phase) * vecLen);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#355981";
+        ctx.font = "600 12px Avenir Next";
+        ctx.textAlign = "left";
+        ctx.fillText("Mz", origin.x + 20, origin.y + 18);
+        ctx.fillText("Mxy", origin.x + 8, origin.y - 18);
+
+        const phaseCx = w * 0.76;
+        const phaseCy = h * 0.45;
+        const phaseR = Math.min(w, h) * 0.14;
+        drawPhaseWheel(m.phases, phaseCx, phaseCy, phaseR);
+
+        drawHydrogenIcon(w * 0.16, h * 0.27, 0.9);
+
+        // RF annotation
+        ctx.strokeStyle = "#b55f21";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i <= 120; i += 1) {
+          const x = origin.x - 62 + i;
+          const y = origin.y - axisLenX - 40 + Math.sin(i * 0.22 + state.time * 2.2) * 6;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = "#764116";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText("RF pulse", origin.x - 62, origin.y - axisLenX - 50);
+
+        drawCoilAndSignal(m.mxy, w * 0.77, h * 0.76);
+
+        ctx.fillStyle = "#4a617f";
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Flat view only: Z horizontal, X vertical.", 18, h - 18);
+
+        els.mzVal.textContent = m.mz.toFixed(2);
+        els.mxyVal.textContent = m.mxy.toFixed(2);
+      }
+
+      function setMode(mode) {
+        state.mode = mode;
+
+        if (mode === "single") {
+          state.syncStart = null;
+          state.rfStart = null;
+          els.modeChip.textContent = "Mode: single proton";
+          els.teachingLine.textContent = "One hydrogen nucleus behaves like a tiny magnet. Its magnetic moment precesses in a circle.";
+        }
+
+        if (mode === "few") {
+          state.syncStart = null;
+          state.rfStart = null;
+          els.modeChip.textContent = "Mode: few protons, out of phase";
+          els.teachingLine.textContent = "A few hydrogen spins precess with different phases, so their transverse effects mostly cancel.";
+        }
+
+        if (mode === "b0") {
+          state.syncStart = state.time;
+          state.rfStart = null;
+          els.modeChip.textContent = "Mode: B0 applied, Larmor precession in phase";
+          els.teachingLine.textContent = "B0 is applied and the spins are shown converging to in-phase Larmor precession (teaching simplification).";
+        }
+
+        if (mode === "rf") {
+          if (state.syncStart === null) {
+            state.syncStart = state.time;
+          }
+          state.rfStart = state.time;
+          els.modeChip.textContent = "Mode: RF pulse applied";
+          els.teachingLine.textContent = "RF pulse tips magnetization toward the transverse plane, so coil signal increases.";
+        }
+
+        syncStepUI();
+        syncButtons();
+      }
+
+      function syncStepUI() {
+        const items = els.steps.querySelectorAll(".step");
+        items.forEach((item) => {
+          const step = item.getAttribute("data-step");
+          item.classList.toggle("active", step === state.mode);
+        });
+      }
+
+      function syncButtons() {
+        els.btnB0.disabled = !(state.mode === "few" || state.mode === "b0" || state.mode === "rf");
+        els.btnRF.disabled = !(state.mode === "b0" || state.mode === "rf");
+      }
+
+      function reset() {
+        state.time = 0;
+        state.phaseOffsets = [];
+        for (let i = 0; i < state.protonCount; i += 1) {
+          state.phaseOffsets.push(Math.random() * Math.PI * 2);
+        }
+        setMode("single");
+      }
+
+      els.btnOne.addEventListener("click", () => setMode("single"));
+      els.btnFew.addEventListener("click", () => setMode("few"));
+      els.btnB0.addEventListener("click", () => setMode("b0"));
+      els.btnRF.addEventListener("click", () => setMode("rf"));
+      els.btnReset.addEventListener("click", reset);
+
+      els.btnPlay.addEventListener("click", () => {
+        state.running = !state.running;
+        els.btnPlay.textContent = state.running ? "Pause" : "Play";
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      reset();
+
+      function frame(nowMs) {
+        const dt = clamp((nowMs - state.lastFrameMs) / 1000, 0, 0.05);
+        state.lastFrameMs = nowMs;
+
+        if (state.running) {
+          state.time += dt;
+        }
+
+        render();
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

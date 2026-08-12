@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B0D10" />
+    <meta name="description" content="RadioPass Anatomy — image-based FRCR Part 1 radiological anatomy: six regions, hundreds of cases, graded on what you actually wrote." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RadioPass" />
+    <meta property="og:title" content="RadioPass Anatomy — FRCR Part 1" />
+    <meta
+      property="og:description"
+      content="Radiographs, CT, MRI and ultrasound with every labelled structure marked and marked back. One half of RadioPass — the other half teaches the physics."
+    />
+    <!-- Written by scripts/build-hero-frames.mjs, and empty until a hero
+         poster exists on disk. The app is client-rendered, so without this
+         the preload scanner sees no image at all and the first hero byte
+         cannot be requested until the bundle has downloaded and run. -->
+    <!-- hero-preload:start -->
+    <link rel="preload" as="image" href="/images/hero/skull/poster.webp" fetchpriority="high" />
+    <!-- hero-preload:end -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>RadioPass Anatomy</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

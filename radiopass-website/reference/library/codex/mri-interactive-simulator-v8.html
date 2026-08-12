@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Interactive Simulator - Version 8 k-space Mode</title>
+  <style>
+    :root {
+      --bg: #030813;
+      --bg2: #0a1323;
+      --panel: #101d34;
+      --line: #2b4669;
+      --ink: #eef8ff;
+      --muted: #a7bfd8;
+      --rf: #fb7185;
+      --gz: #a78bfa;
+      --gy: #f59e0b;
+      --gx: #38bdf8;
+      --adc: #2dd4bf;
+      --water: #60a5fa;
+      --fat: #f97316;
+      --accent: #22d3ee;
+      --ok: #86efac;
+      --warn: #fbbf24;
+      --bad: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 560px at 8% -10%, rgba(56, 189, 248, 0.2), transparent 62%),
+        radial-gradient(900px 520px at 102% 0%, rgba(167, 139, 250, 0.2), transparent 64%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      min-height: 100vh;
+      padding: 14px;
+    }
+
+    .app {
+      max-width: 1520px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background:
+        linear-gradient(155deg, rgba(16, 29, 52, 0.92), rgba(10, 21, 38, 0.95)),
+        radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.08), transparent 36%);
+      box-shadow:
+        0 18px 34px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .header {
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 1.9vw, 1.48rem);
+      letter-spacing: 0.14px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.89rem;
+      line-height: 1.38;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 2fr 2fr 1.5fr;
+      align-items: start;
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(5, 14, 25, 0.58);
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .group h2 {
+      margin: 0;
+      font-size: 0.88rem;
+      letter-spacing: 0.15px;
+      color: #d4ecff;
+    }
+
+    .btnGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid #2f6f7f;
+      border-radius: 10px;
+      padding: 9px 8px;
+      color: #e9fcff;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 670;
+      background: linear-gradient(120deg, #155d75, #0d9488);
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.07); }
+
+    button.alt {
+      border-color: #5066a0;
+      background: linear-gradient(120deg, #334155, #1f2937);
+    }
+
+    button.warn {
+      border-color: #8b4c1d;
+      background: linear-gradient(120deg, #b45309, #d97706);
+    }
+
+    .sliderGrid { display: grid; gap: 8px; }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .row strong {
+      color: #d8f4ff;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.81rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #375778;
+      background: #0a1a30;
+      color: #e1f3ff;
+      padding: 6px 8px;
+      font-size: 0.84rem;
+    }
+
+    .checks {
+      display: grid;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .checks label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .modeRow {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .modeRow label {
+      border: 1px solid #355571;
+      border-radius: 999px;
+      padding: 3px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(6, 17, 30, 0.72);
+    }
+
+    .status {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px;
+      background: rgba(6, 15, 27, 0.62);
+      font-size: 0.84rem;
+      color: #c9e9ff;
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #365477;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      color: #c4def5;
+      background: rgba(6, 17, 30, 0.72);
+    }
+
+    .chip.on {
+      color: #ecfeff;
+      border-color: #2dd4bf;
+      background: linear-gradient(120deg, rgba(16, 88, 86, 0.85), rgba(9, 41, 55, 0.86));
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.24);
+    }
+
+    .panels {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 0.97rem;
+      letter-spacing: 0.15px;
+    }
+
+    .panelSub {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid #304f76;
+      border-radius: 11px;
+      background:
+        radial-gradient(circle at 40% 8%, #12304d, #091528 55%),
+        linear-gradient(180deg, #0d2038, #09192e);
+    }
+
+    #timelineCanvas { aspect-ratio: 16 / 3.1; }
+    #blochCanvas { aspect-ratio: 16 / 7.6; }
+    #kspaceCanvas { aspect-ratio: 16 / 8.6; }
+    #reconCanvas { aspect-ratio: 16 / 8.6; }
+
+    .bottom {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 1240px) {
+      .controls { grid-template-columns: 1fr; }
+      .bottom { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card header">
+      <h1>MRI Interactive Simulator: Version 8 - k-space visualisation mode</h1>
+      <p class="subtitle">Gradients -> spatial encoding -> k-space filling -> inverse Fourier reconstruction. Build sequence events, watch ky and kx trajectories, then reconstruct with different k-space selections.</p>
+
+      <div class="controls">
+        <section class="group">
+          <h2>Sequence Builder</h2>
+          <div class="btnGrid">
+            <button id="add90Btn">Add 90 deg RF</button>
+            <button id="add180Btn" class="warn">Add 180 deg RF</button>
+            <button id="addSliceBtn">Add Slice Gradient</button>
+            <button id="addPhaseBtn">Add Phase Encoding Gradient</button>
+            <button id="addFreqBtn">Add Frequency Encoding Gradient</button>
+            <button id="addReadoutBtn">Add Readout</button>
+            <button id="resetSeqBtn" class="alt">Reset Sequence</button>
+            <button id="pauseBtn" class="alt">Pause</button>
+          </div>
+
+          <div class="row"><span>Sequence cursor</span><strong id="cursorVal">0.0 ms</strong></div>
+          <div class="row"><span>Current TR window</span><strong id="trWindowVal">800 ms</strong></div>
+          <div class="row"><span>Selected slice (Z)</span><strong id="sliceVal">Mid</strong></div>
+          <div class="row"><span>Current ky line</span><strong id="kyLineVal">0</strong></div>
+        </section>
+
+        <section class="group">
+          <h2>Pulse And Timing Controls</h2>
+          <div class="sliderGrid">
+            <div class="row"><span>Flip angle</span><strong id="flipVal">90 deg</strong></div>
+            <input id="flipSlider" type="range" min="10" max="180" step="1" value="90" />
+
+            <div class="row"><span>RF duration</span><strong id="rfDurVal">4.0 ms</strong></div>
+            <input id="rfDurSlider" type="range" min="0.8" max="12" step="0.1" value="4" />
+
+            <div class="row"><span>Gz amplitude</span><strong id="gzAmpVal">5.0</strong></div>
+            <input id="gzAmpSlider" type="range" min="0" max="10" step="0.1" value="5" />
+
+            <div class="row"><span>Gy amplitude</span><strong id="gyAmpVal">3.0</strong></div>
+            <input id="gyAmpSlider" type="range" min="0" max="10" step="0.1" value="3" />
+
+            <div class="row"><span>Gx amplitude</span><strong id="gxAmpVal">4.0</strong></div>
+            <input id="gxAmpSlider" type="range" min="0" max="12" step="0.1" value="4" />
+
+            <div class="row"><span>TE</span><strong id="teVal">80 ms</strong></div>
+            <input id="teSlider" type="range" min="20" max="220" step="1" value="80" />
+
+            <div class="row"><span>TR</span><strong id="trVal">800 ms</strong></div>
+            <input id="trSlider" type="range" min="150" max="2200" step="10" value="800" />
+          </div>
+        </section>
+
+        <section class="group">
+          <h2>k-space / Reconstruction</h2>
+          <div class="row"><span>Matrix size</span></div>
+          <select id="matrixSel">
+            <option value="64">64</option>
+            <option value="128" selected>128</option>
+            <option value="256">256</option>
+          </select>
+
+          <div class="row"><span>FOV</span><strong id="fovVal">220 mm</strong></div>
+          <input id="fovSlider" type="range" min="120" max="380" step="5" value="220" />
+
+          <div class="row"><span>Bandwidth</span><strong id="bwVal">200 kHz</strong></div>
+          <input id="bwSlider" type="range" min="60" max="320" step="5" value="200" />
+
+          <div class="row"><span>Add noise</span><strong id="noiseVal">0.00</strong></div>
+          <input id="noiseSlider" type="range" min="0" max="0.2" step="0.01" value="0" />
+
+          <label class="checks"><span><input id="partialToggle" type="checkbox" /> Partial Fourier</span></label>
+          <div class="row"><span>Partial factor</span><strong id="pfVal">0.70</strong></div>
+          <input id="pfSlider" type="range" min="0.55" max="1.0" step="0.01" value="0.70" />
+
+          <div class="checks">
+            <label><input id="waterToggle" type="checkbox" checked /> Show water</label>
+            <label><input id="fatToggle" type="checkbox" checked /> Show fat</label>
+          </div>
+
+          <button id="reconBtn">Reconstruct Image</button>
+
+          <div class="modeRow">
+            <label><input type="radio" name="reconMode" value="full" checked /> Full k-space</label>
+            <label><input type="radio" name="reconMode" value="central" /> Central lines</label>
+            <label><input type="radio" name="reconMode" value="outer" /> Outer lines</label>
+          </div>
+
+          <div class="chips" id="eduChips">
+            <span class="chip" data-key="central">Central k-space -> contrast</span>
+            <span class="chip" data-key="outer">Outer k-space -> resolution</span>
+            <span class="chip" data-key="alias">Undersampling -> aliasing</span>
+            <span class="chip" data-key="blur">Truncated k-space -> blurring</span>
+          </div>
+
+          <div id="statusBox" class="status">Press Add Readout and run TR cycles. Each TR can fill one ky line: Gy chooses ky position, and Gx sweeps kx during ADC.</div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panels">
+      <article class="card panel">
+        <h2>1) Pulse Sequence Timeline</h2>
+        <p class="panelSub">RF, Gz, Gy, Gx, ADC tracks with live TR cursor and TE marker.</p>
+        <canvas id="timelineCanvas" width="1400" height="272"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--rf)"></span>RF</span>
+          <span><span class="dot" style="background:var(--gz)"></span>Gz slice select</span>
+          <span><span class="dot" style="background:var(--gy)"></span>Gy phase encode</span>
+          <span><span class="dot" style="background:var(--gx)"></span>Gx frequency encode</span>
+          <span><span class="dot" style="background:var(--adc)"></span>ADC readout</span>
+        </div>
+      </article>
+
+      <article class="card panel">
+        <h2>2) Bloch + Spatial Grid</h2>
+        <p class="panelSub">Net magnetisation vectors and XY isochromat phase map. Slice selection during RF+Gz limits which Z slab contributes.</p>
+        <canvas id="blochCanvas" width="1400" height="660"></canvas>
+      </article>
+
+      <section class="bottom">
+        <article class="card panel">
+          <h2>3) k-space Plane (2D)</h2>
+          <p class="panelSub">Gy shifts ky line, Gx sweeps kx during ADC, and each full TR can fill one line.</p>
+          <canvas id="kspaceCanvas" width="700" height="560"></canvas>
+        </article>
+
+        <article class="card panel">
+          <h2>4) Reconstructed Image Preview</h2>
+          <p class="panelSub">Inverse Fourier preview using selected reconstruction mode (full/central/outer) and current acquisition state.</p>
+          <canvas id="reconCanvas" width="700" height="560"></canvas>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const TRACKS = ["RF", "Gz", "Gy", "Gx", "ADC"];
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function wrapPi(v) {
+      while (v > Math.PI) v -= Math.PI * 2;
+      while (v < -Math.PI) v += Math.PI * 2;
+      return v;
+    }
+
+    function rotateXY(mx, my, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx: mx * c - my * s, my: mx * s + my * c };
+    }
+
+    function rotateAroundX(mx, my, mz, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx, my: my * c - mz * s, mz: my * s + mz * c };
+    }
+
+    function prep(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(10, Math.floor(canvas.clientWidth));
+      const h = Math.max(10, Math.floor(canvas.clientHeight));
+      if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w, h };
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, width = 2, head = 8) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const a = Math.atan2(dy, dx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(a - Math.PI / 6), y2 - head * Math.sin(a - Math.PI / 6));
+      ctx.lineTo(x2 - head * Math.cos(a + Math.PI / 6), y2 - head * Math.sin(a + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function fft1d(re, im, inverse) {
+      const n = re.length;
+
+      for (let i = 1, j = 0; i < n; i += 1) {
+        let bit = n >> 1;
+        for (; j & bit; bit >>= 1) j ^= bit;
+        j ^= bit;
+        if (i < j) {
+          const tr = re[i]; re[i] = re[j]; re[j] = tr;
+          const ti = im[i]; im[i] = im[j]; im[j] = ti;
+        }
+      }
+
+      for (let len = 2; len <= n; len <<= 1) {
+        const ang = (inverse ? 2 : -2) * Math.PI / len;
+        const wlenCos = Math.cos(ang);
+        const wlenSin = Math.sin(ang);
+        for (let i = 0; i < n; i += len) {
+          let wCos = 1;
+          let wSin = 0;
+          const half = len >> 1;
+          for (let j = 0; j < half; j += 1) {
+            const uRe = re[i + j];
+            const uIm = im[i + j];
+            const vRe = re[i + j + half] * wCos - im[i + j + half] * wSin;
+            const vIm = re[i + j + half] * wSin + im[i + j + half] * wCos;
+
+            re[i + j] = uRe + vRe;
+            im[i + j] = uIm + vIm;
+            re[i + j + half] = uRe - vRe;
+            im[i + j + half] = uIm - vIm;
+
+            const nextCos = wCos * wlenCos - wSin * wlenSin;
+            const nextSin = wCos * wlenSin + wSin * wlenCos;
+            wCos = nextCos;
+            wSin = nextSin;
+          }
+        }
+      }
+
+      if (inverse) {
+        for (let i = 0; i < n; i += 1) {
+          re[i] /= n;
+          im[i] /= n;
+        }
+      }
+    }
+
+    function fft2d(reGrid, imGrid, inverse) {
+      const n = reGrid.length;
+
+      for (let y = 0; y < n; y += 1) {
+        fft1d(reGrid[y], imGrid[y], inverse);
+      }
+
+      for (let x = 0; x < n; x += 1) {
+        const colRe = new Float64Array(n);
+        const colIm = new Float64Array(n);
+        for (let y = 0; y < n; y += 1) {
+          colRe[y] = reGrid[y][x];
+          colIm[y] = imGrid[y][x];
+        }
+        fft1d(colRe, colIm, inverse);
+        for (let y = 0; y < n; y += 1) {
+          reGrid[y][x] = colRe[y];
+          imGrid[y][x] = colIm[y];
+        }
+      }
+    }
+
+    function alloc2d(n, Type = Float64Array) {
+      return Array.from({ length: n }, () => new Type(n));
+    }
+
+    function shift2d(re, im) {
+      const n = re.length;
+      const outRe = alloc2d(n, Float64Array);
+      const outIm = alloc2d(n, Float64Array);
+      const half = n >> 1;
+      for (let y = 0; y < n; y += 1) {
+        for (let x = 0; x < n; x += 1) {
+          const yy = (y + half) % n;
+          const xx = (x + half) % n;
+          outRe[yy][xx] = re[y][x];
+          outIm[yy][xx] = im[y][x];
+        }
+      }
+      return { re: outRe, im: outIm };
+    }
+
+    function makeIsochromats(nX, nY, chemHz, color) {
+      const spins = [];
+      for (let iy = 0; iy < nY; iy += 1) {
+        for (let ix = 0; ix < nX; ix += 1) {
+          const x = nX === 1 ? 0 : -1 + (2 * ix) / (nX - 1);
+          const y = nY === 1 ? 0 : -1 + (2 * iy) / (nY - 1);
+          const z = ((ix + iy) % 3 - 1) * 0.55;
+          spins.push({
+            x,
+            y,
+            z,
+            mx: 0,
+            my: 0,
+            mz: 1,
+            inhomHz: (Math.random() - 0.5) * 16,
+            chemHz,
+            color
+          });
+        }
+      }
+      return spins;
+    }
+
+    class MRIV8 {
+      constructor() {
+        this.timelineCanvas = document.getElementById("timelineCanvas");
+        this.blochCanvas = document.getElementById("blochCanvas");
+        this.kspaceCanvas = document.getElementById("kspaceCanvas");
+        this.reconCanvas = document.getElementById("reconCanvas");
+
+        this.ui = this.bindUI();
+
+        this.settings = {
+          flipDeg: 90,
+          rfDurMs: 4,
+          gzAmp: 5,
+          gyAmp: 3,
+          gxAmp: 4,
+          TEms: 80,
+          TRms: 800,
+          matrix: 128,
+          fov: 220,
+          bandwidth: 200,
+          noise: 0,
+          partialFourier: false,
+          partialFactor: 0.70,
+          showWater: true,
+          showFat: true
+        };
+
+        this.consts = {
+          t1WaterMs: 1150,
+          t2WaterMs: 95,
+          t1FatMs: 320,
+          t2FatMs: 72,
+          chemShiftHz: 220,
+          gxScaleHz: 58,
+          gyScaleHz: 44,
+          gzScaleHz: 78,
+          kScale: 0.001
+        };
+
+        this.spins = {
+          water: makeIsochromats(9, 7, 0, "#60a5fa"),
+          fat: makeIsochromats(9, 7, this.consts.chemShiftHz, "#f97316")
+        };
+
+        this.phantom = {
+          waterSlices: [],
+          fatSlices: []
+        };
+
+        this.kspace = {
+          baseSlices: [],
+          acquiredRe: [],
+          acquiredIm: [],
+          sampledMask: [],
+          sampledCount: 0
+        };
+
+        this.recon = {
+          mode: "full",
+          offscreen: null,
+          info: "No reconstruction yet."
+        };
+
+        this.sim = {
+          running: true,
+          absMs: 0,
+          lastTs: performance.now(),
+          events: [],
+          nextEventId: 1,
+          cursorMs: 20,
+          prevActiveIds: new Set(),
+          signalHistory: [],
+          kPath: [],
+          kCurrent: { x: 0, y: 0 },
+          lastCycleT: 0,
+          lastSampleMs: 0,
+          trIndex: 0,
+          lineIndex: 0,
+          currentKy: 0,
+          currentGyNorm: 0,
+          selectedSlice: 1,
+          adcStamp: "",
+          adcLastKx: -1,
+          rephaseUntilAbs: 0,
+          echoAtAbs: null,
+          last90Abs: null,
+          prevNetMz: 1,
+          highlights: new Set()
+        };
+
+        this.bindHandlers();
+        this.syncLabels();
+        this.refreshPhantomAndKspace();
+        this.seedStarterSequence();
+        this.reconstructImage("full");
+
+        requestAnimationFrame((ts) => this.tick(ts));
+      }
+
+      bindUI() {
+        const out = {
+          add90Btn: document.getElementById("add90Btn"),
+          add180Btn: document.getElementById("add180Btn"),
+          addSliceBtn: document.getElementById("addSliceBtn"),
+          addPhaseBtn: document.getElementById("addPhaseBtn"),
+          addFreqBtn: document.getElementById("addFreqBtn"),
+          addReadoutBtn: document.getElementById("addReadoutBtn"),
+          resetSeqBtn: document.getElementById("resetSeqBtn"),
+          pauseBtn: document.getElementById("pauseBtn"),
+          flipSlider: document.getElementById("flipSlider"),
+          rfDurSlider: document.getElementById("rfDurSlider"),
+          gzAmpSlider: document.getElementById("gzAmpSlider"),
+          gyAmpSlider: document.getElementById("gyAmpSlider"),
+          gxAmpSlider: document.getElementById("gxAmpSlider"),
+          teSlider: document.getElementById("teSlider"),
+          trSlider: document.getElementById("trSlider"),
+          matrixSel: document.getElementById("matrixSel"),
+          fovSlider: document.getElementById("fovSlider"),
+          bwSlider: document.getElementById("bwSlider"),
+          noiseSlider: document.getElementById("noiseSlider"),
+          partialToggle: document.getElementById("partialToggle"),
+          pfSlider: document.getElementById("pfSlider"),
+          waterToggle: document.getElementById("waterToggle"),
+          fatToggle: document.getElementById("fatToggle"),
+          reconBtn: document.getElementById("reconBtn"),
+          flipVal: document.getElementById("flipVal"),
+          rfDurVal: document.getElementById("rfDurVal"),
+          gzAmpVal: document.getElementById("gzAmpVal"),
+          gyAmpVal: document.getElementById("gyAmpVal"),
+          gxAmpVal: document.getElementById("gxAmpVal"),
+          teVal: document.getElementById("teVal"),
+          trVal: document.getElementById("trVal"),
+          fovVal: document.getElementById("fovVal"),
+          bwVal: document.getElementById("bwVal"),
+          noiseVal: document.getElementById("noiseVal"),
+          pfVal: document.getElementById("pfVal"),
+          cursorVal: document.getElementById("cursorVal"),
+          trWindowVal: document.getElementById("trWindowVal"),
+          sliceVal: document.getElementById("sliceVal"),
+          kyLineVal: document.getElementById("kyLineVal"),
+          statusBox: document.getElementById("statusBox"),
+          eduChips: document.querySelectorAll("#eduChips .chip")
+        };
+
+        out.reconModeRadios = Array.from(document.querySelectorAll('input[name="reconMode"]'));
+        return out;
+      }
+
+      bindHandlers() {
+        this.ui.add90Btn.addEventListener("click", () => this.addRFPulse(this.settings.flipDeg));
+        this.ui.add180Btn.addEventListener("click", () => this.addRFPulse(180));
+        this.ui.addSliceBtn.addEventListener("click", () => this.addGradient("gz"));
+        this.ui.addPhaseBtn.addEventListener("click", () => this.addGradient("gy"));
+        this.ui.addFreqBtn.addEventListener("click", () => this.addGradient("gx"));
+        this.ui.addReadoutBtn.addEventListener("click", () => this.addReadout());
+        this.ui.resetSeqBtn.addEventListener("click", () => this.resetSequence());
+
+        this.ui.pauseBtn.addEventListener("click", () => {
+          this.sim.running = !this.sim.running;
+          this.ui.pauseBtn.textContent = this.sim.running ? "Pause" : "Resume";
+          this.sim.lastTs = performance.now();
+        });
+
+        const sync = () => {
+          const prevMatrix = this.settings.matrix;
+          const prevFov = this.settings.fov;
+          const prevWater = this.settings.showWater;
+          const prevFat = this.settings.showFat;
+          const prevBandwidth = this.settings.bandwidth;
+          const prevPartial = this.settings.partialFourier;
+          const prevPf = this.settings.partialFactor;
+
+          this.settings.flipDeg = Number(this.ui.flipSlider.value);
+          this.settings.rfDurMs = Number(this.ui.rfDurSlider.value);
+          this.settings.gzAmp = Number(this.ui.gzAmpSlider.value);
+          this.settings.gyAmp = Number(this.ui.gyAmpSlider.value);
+          this.settings.gxAmp = Number(this.ui.gxAmpSlider.value);
+          this.settings.TEms = Number(this.ui.teSlider.value);
+          this.settings.TRms = Number(this.ui.trSlider.value);
+          this.settings.matrix = Number(this.ui.matrixSel.value);
+          this.settings.fov = Number(this.ui.fovSlider.value);
+          this.settings.bandwidth = Number(this.ui.bwSlider.value);
+          this.settings.noise = Number(this.ui.noiseSlider.value);
+          this.settings.partialFourier = this.ui.partialToggle.checked;
+          this.settings.partialFactor = Number(this.ui.pfSlider.value);
+          this.settings.showWater = this.ui.waterToggle.checked;
+          this.settings.showFat = this.ui.fatToggle.checked;
+
+          this.sim.cursorMs = clamp(this.sim.cursorMs, 0, this.settings.TRms - 10);
+          this.syncLabels();
+
+          const needsKspaceRefresh =
+            prevMatrix !== this.settings.matrix ||
+            prevFov !== this.settings.fov ||
+            prevWater !== this.settings.showWater ||
+            prevFat !== this.settings.showFat;
+          if (needsKspaceRefresh) {
+            this.refreshPhantomAndKspace();
+            this.reconstructImage(this.getReconMode());
+          }
+
+          const acquisitionProfileChanged =
+            prevBandwidth !== this.settings.bandwidth ||
+            prevPartial !== this.settings.partialFourier ||
+            prevPf !== this.settings.partialFactor;
+
+          if (!needsKspaceRefresh && acquisitionProfileChanged) {
+            this.clearAcquiredKspace();
+            this.sim.kPath = [];
+            this.sim.kCurrent = { x: 0, y: 0 };
+            this.reconstructImage(this.getReconMode());
+          }
+        };
+
+        [
+          this.ui.flipSlider,
+          this.ui.rfDurSlider,
+          this.ui.gzAmpSlider,
+          this.ui.gyAmpSlider,
+          this.ui.gxAmpSlider,
+          this.ui.teSlider,
+          this.ui.trSlider,
+          this.ui.matrixSel,
+          this.ui.fovSlider,
+          this.ui.bwSlider,
+          this.ui.noiseSlider,
+          this.ui.partialToggle,
+          this.ui.pfSlider,
+          this.ui.waterToggle,
+          this.ui.fatToggle
+        ].forEach((el) => el.addEventListener("input", sync));
+
+        this.ui.reconBtn.addEventListener("click", () => {
+          this.reconstructImage(this.getReconMode());
+        });
+
+        this.ui.reconModeRadios.forEach((r) => {
+          r.addEventListener("change", () => {
+            this.reconstructImage(this.getReconMode());
+          });
+        });
+
+        window.addEventListener("resize", () => this.drawAll());
+      }
+
+      getReconMode() {
+        const on = this.ui.reconModeRadios.find((r) => r.checked);
+        return on ? on.value : "full";
+      }
+
+      syncLabels() {
+        this.ui.flipVal.textContent = `${this.settings.flipDeg.toFixed(0)} deg`;
+        this.ui.rfDurVal.textContent = `${this.settings.rfDurMs.toFixed(1)} ms`;
+        this.ui.gzAmpVal.textContent = this.settings.gzAmp.toFixed(1);
+        this.ui.gyAmpVal.textContent = this.settings.gyAmp.toFixed(1);
+        this.ui.gxAmpVal.textContent = this.settings.gxAmp.toFixed(1);
+        this.ui.teVal.textContent = `${this.settings.TEms.toFixed(0)} ms`;
+        this.ui.trVal.textContent = `${this.settings.TRms.toFixed(0)} ms`;
+        this.ui.fovVal.textContent = `${this.settings.fov.toFixed(0)} mm`;
+        this.ui.bwVal.textContent = `${this.settings.bandwidth.toFixed(0)} kHz`;
+        this.ui.noiseVal.textContent = this.settings.noise.toFixed(2);
+        this.ui.pfVal.textContent = this.settings.partialFactor.toFixed(2);
+        this.ui.cursorVal.textContent = `${this.sim.cursorMs.toFixed(1)} ms`;
+        this.ui.trWindowVal.textContent = `${this.settings.TRms.toFixed(0)} ms`;
+
+        const sliceText = this.sim.selectedSlice === 0 ? "Superior" : this.sim.selectedSlice === 1 ? "Mid" : "Inferior";
+        this.ui.sliceVal.textContent = sliceText;
+        this.ui.kyLineVal.textContent = `${this.sim.currentKy - (this.settings.matrix >> 1)}`;
+      }
+
+      updateStatus(text) {
+        this.ui.statusBox.textContent = text;
+      }
+
+      seedStarterSequence() {
+        this.sim.events = [];
+        this.sim.nextEventId = 1;
+        this.sim.cursorMs = 20;
+        this.addRFPulse(90, true);
+        this.addGradient("gz", true);
+        this.addGradient("gy", true);
+        this.addGradient("gx", true);
+        this.addReadout(true);
+      }
+
+      resetSpinsAndAcquisition() {
+        ["water", "fat"].forEach((name) => {
+          this.spins[name].forEach((s) => {
+            s.mx = 0;
+            s.my = 0;
+            s.mz = 1;
+          });
+        });
+
+        this.sim.absMs = 0;
+        this.sim.lastCycleT = 0;
+        this.sim.prevActiveIds.clear();
+        this.sim.signalHistory = [];
+        this.sim.kPath = [];
+        this.sim.kCurrent = { x: 0, y: 0 };
+        this.sim.lastSampleMs = 0;
+        this.sim.trIndex = 0;
+        this.sim.lineIndex = 0;
+        this.sim.currentKy = this.settings.matrix >> 1;
+        this.sim.currentGyNorm = 0;
+        this.sim.adcStamp = "";
+        this.sim.adcLastKx = -1;
+        this.sim.rephaseUntilAbs = 0;
+        this.sim.echoAtAbs = null;
+        this.sim.last90Abs = null;
+        this.sim.prevNetMz = 1;
+
+        this.clearAcquiredKspace();
+      }
+
+      resetSequence() {
+        this.sim.events = [];
+        this.sim.nextEventId = 1;
+        this.sim.cursorMs = 20;
+        this.resetSpinsAndAcquisition();
+        this.syncLabels();
+        this.updateStatus("Sequence reset. Build RF/Gz/Gy/Gx/ADC events. With each full TR, one ky line can be filled.");
+      }
+
+      addEvent(ev) {
+        const id = this.sim.nextEventId;
+        this.sim.nextEventId += 1;
+        this.sim.events.push({ id, ...ev });
+        this.sim.events.sort((a, b) => a.startMs - b.startMs);
+      }
+
+      first90Event() {
+        return this.sim.events.find((ev) => ev.type === "rf" && Math.abs(ev.flipDeg - 90) < 20);
+      }
+
+      addRFPulse(flipDeg, silent = false) {
+        const dur = this.settings.rfDurMs;
+        let start = this.sim.cursorMs;
+        const first90 = this.first90Event();
+        if (Math.abs(flipDeg - 180) < 6 && first90) {
+          start = clamp(first90.startMs + this.settings.TEms * 0.5 - dur * 0.5, 0, this.settings.TRms - dur);
+        }
+
+        this.addEvent({
+          type: "rf",
+          track: "RF",
+          startMs: start,
+          durationMs: dur,
+          flipDeg,
+          label: `${Math.round(flipDeg)} deg`,
+          color: "#fb7185"
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+
+        if (!silent) {
+          this.updateStatus(`Added ${Math.round(flipDeg)} deg RF. 90 deg creates strong transverse phase coherence; 180 deg can rephase and form echo near TE = 2*tau.`);
+        }
+      }
+
+      addGradient(axis, silent = false) {
+        let track = "";
+        let color = "#a78bfa";
+        let label = axis.toUpperCase();
+        let amp = 0;
+        let dur = 5;
+        let start = this.sim.cursorMs;
+
+        if (axis === "gz") {
+          track = "Gz";
+          color = "#a78bfa";
+          amp = this.settings.gzAmp;
+          const lastRF = [...this.sim.events].reverse().find((ev) => ev.type === "rf");
+          if (lastRF) {
+            start = lastRF.startMs;
+            dur = Math.max(lastRF.durationMs, 2);
+          } else {
+            dur = 4;
+          }
+          label = "slice";
+        } else if (axis === "gy") {
+          track = "Gy";
+          color = "#f59e0b";
+          amp = this.settings.gyAmp;
+          dur = 4;
+          label = "phase";
+        } else if (axis === "gx") {
+          track = "Gx";
+          color = "#38bdf8";
+          amp = this.settings.gxAmp;
+          dur = 12;
+          label = "freq";
+        }
+
+        this.addEvent({
+          type: axis,
+          track,
+          startMs: start,
+          durationMs: dur,
+          amp,
+          label,
+          color
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+
+        if (!silent) {
+          if (axis === "gz") this.updateStatus("Added Gz slice-select gradient. During RF, only spins in selected Z slab tip and contribute.");
+          if (axis === "gy") this.updateStatus("Added Gy phase-encoding gradient. This moves sampling to a different ky line.");
+          if (axis === "gx") this.updateStatus("Added Gx frequency-encoding gradient. During ADC, this sweeps across kx.");
+        }
+      }
+
+      addReadout(silent = false) {
+        const dur = 12;
+        let start = this.sim.cursorMs;
+        const first90 = this.first90Event();
+        if (first90) {
+          start = clamp(first90.startMs + this.settings.TEms - dur * 0.5, 0, this.settings.TRms - dur);
+        }
+
+        this.addEvent({
+          type: "adc",
+          track: "ADC",
+          startMs: start,
+          durationMs: dur,
+          label: "readout",
+          color: "#2dd4bf"
+        });
+
+        this.sim.cursorMs = clamp(Math.max(this.sim.cursorMs, start + dur + 8), 0, this.settings.TRms - 8);
+        this.syncLabels();
+
+        if (!silent) {
+          this.updateStatus("Added ADC readout. If Gx overlaps ADC, one k-space line is traced across kx during that TR.");
+        }
+      }
+
+      refreshPhantomAndKspace() {
+        const n = this.settings.matrix;
+        this.phantom.waterSlices = [];
+        this.phantom.fatSlices = [];
+
+        for (let s = 0; s < 3; s += 1) {
+          const { water, fat } = this.buildPhantomComponents(n, this.settings.fov, s);
+          this.phantom.waterSlices.push(water);
+          this.phantom.fatSlices.push(fat);
+        }
+
+        this.kspace.baseSlices = [];
+        for (let s = 0; s < 3; s += 1) {
+          const baseRe = alloc2d(n, Float64Array);
+          const baseIm = alloc2d(n, Float64Array);
+          for (let y = 0; y < n; y += 1) {
+            for (let x = 0; x < n; x += 1) {
+              const w = this.settings.showWater ? this.phantom.waterSlices[s][y][x] : 0;
+              const f = this.settings.showFat ? this.phantom.fatSlices[s][y][x] : 0;
+              baseRe[y][x] = w + f;
+              baseIm[y][x] = 0;
+            }
+          }
+
+          fft2d(baseRe, baseIm, false);
+          this.kspace.baseSlices.push(shift2d(baseRe, baseIm));
+        }
+
+        this.clearAcquiredKspace();
+      }
+
+      clearAcquiredKspace() {
+        const n = this.settings.matrix;
+        this.kspace.acquiredRe = alloc2d(n, Float64Array);
+        this.kspace.acquiredIm = alloc2d(n, Float64Array);
+        this.kspace.sampledMask = alloc2d(n, Uint8Array);
+        this.kspace.sampledCount = 0;
+      }
+
+      buildPhantomComponents(n, fovMm, sliceIndex) {
+        const water = alloc2d(n, Float64Array);
+        const fat = alloc2d(n, Float64Array);
+
+        const scale = 220 / fovMm;
+        const zShift = (sliceIndex - 1) * 0.12;
+
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            const xn = ((x - n * 0.5) / (n * 0.5)) * scale;
+            const yn = ((y - n * 0.5) / (n * 0.5)) * scale;
+
+            let w = 0;
+            let f = 0;
+
+            const head = (xn * xn) / 0.82 + ((yn + zShift * 0.35) * (yn + zShift * 0.35)) / 0.72;
+            if (head <= 1) w += 0.62;
+
+            const vent = ((xn + 0.1) * (xn + 0.1)) / 0.06 + ((yn - 0.08 - zShift * 0.4) * (yn - 0.08 - zShift * 0.4)) / 0.03;
+            if (vent <= 1) w -= 0.18;
+
+            const lesion = ((xn - 0.32) * (xn - 0.32)) / 0.02 + ((yn + 0.12 + zShift * 0.28) * (yn + 0.12 + zShift * 0.28)) / 0.04;
+            if (lesion <= 1) w += 0.28;
+
+            const fatLobe = ((xn + 0.28) * (xn + 0.28)) / 0.08 + ((yn - 0.2 + zShift * 0.25) * (yn - 0.2 + zShift * 0.25)) / 0.12;
+            if (fatLobe <= 1) f += 0.35;
+
+            const ringR = Math.hypot(xn - 0.25, yn + 0.25 - zShift * 0.35);
+            if (ringR < 0.21 && ringR > 0.14) f += 0.52;
+
+            if (Math.abs(xn + 0.04) < 0.03 && Math.abs(yn + 0.3) < 0.09) w += 0.22;
+
+            water[y][x] = clamp(w, 0, 1);
+            fat[y][x] = clamp(f, 0, 1);
+          }
+        }
+
+        return { water, fat };
+      }
+
+      computeKyForCurrentTR() {
+        const n = this.settings.matrix;
+        const center = n >> 1;
+        const lineOrder = this.sim.lineIndex % n;
+        const norm = n <= 1 ? 0 : (lineOrder / (n - 1)) * 2 - 1;
+        const span = (n * 0.5 - 1) * clamp(this.settings.gyAmp / 10, 0, 1);
+        const ky = clamp(Math.round(center + norm * span), 0, n - 1);
+        return { ky, norm };
+      }
+
+      onCycleStart() {
+        this.sim.trIndex += 1;
+        this.sim.lineIndex += 1;
+
+        const hasGy = this.sim.events.some((ev) => ev.type === "gy");
+        const center = this.settings.matrix >> 1;
+
+        if (hasGy) {
+          const plan = this.computeKyForCurrentTR();
+          this.sim.currentKy = plan.ky;
+          this.sim.currentGyNorm = plan.norm;
+        } else {
+          this.sim.currentKy = center;
+          this.sim.currentGyNorm = 0;
+        }
+
+        this.syncLabels();
+      }
+
+      getActiveEvents(tCycle) {
+        return this.sim.events.filter((ev) => tCycle >= ev.startMs && tCycle < ev.startMs + ev.durationMs);
+      }
+
+      eventAmplitude(active, type) {
+        let amp = 0;
+        active.forEach((ev) => {
+          if (ev.type === type) amp += (ev.amp || 0);
+        });
+        return amp;
+      }
+
+      onEventStart(ev, activeNow) {
+        if (ev.type === "rf") {
+          const hasGz = activeNow.some((x) => x.type === "gz");
+          const sliceHalf = clamp(0.95 - this.settings.gzAmp * 0.07, 0.2, 0.95);
+
+          if (hasGz) {
+            this.sim.selectedSlice = clamp(Math.round((this.settings.gzAmp / 10) * 2), 0, 2);
+          }
+
+          const is90 = Math.abs(ev.flipDeg - 90) < 20;
+          const is180 = Math.abs(ev.flipDeg - 180) < 8;
+
+          ["water", "fat"].forEach((name) => {
+            this.spins[name].forEach((s) => {
+              if (hasGz && Math.abs(s.z) > sliceHalf) return;
+              if (is90) {
+                const amp = Math.hypot(s.mx, s.my);
+                s.mx = amp;
+                s.my = 0;
+              }
+            });
+          });
+
+          if (is90) {
+            this.sim.last90Abs = this.sim.absMs;
+            this.updateStatus("In phase after RF: spins tip into the transverse plane and align, creating strong detectable signal.");
+          }
+
+          if (is180 && this.sim.last90Abs !== null) {
+            const tau = this.sim.absMs - this.sim.last90Abs;
+            if (tau > 0) {
+              this.sim.rephaseUntilAbs = this.sim.absMs + tau;
+              this.sim.echoAtAbs = this.sim.absMs + tau;
+              this.updateStatus(`Rephasing active: 180 deg refocus pulse reverses phase spread. Echo expected near TE = 2*tau = ${(2 * tau).toFixed(1)} ms.`);
+            }
+          }
+        }
+
+        if (ev.type === "gy") {
+          this.updateStatus(`Gy event: ky shifted to line ${this.sim.currentKy - (this.settings.matrix >> 1)}. Different Gy amplitudes map to different ky lines.`);
+        }
+
+        if (ev.type === "adc") {
+          this.updateStatus("ADC window active: if Gx overlaps now, trace moves horizontally across kx and writes one line.");
+        }
+
+        this.syncLabels();
+      }
+
+      isKyAllowedByPartial(ky) {
+        if (!this.settings.partialFourier) return true;
+        const n = this.settings.matrix;
+        const center = n >> 1;
+        const maxHigh = Math.floor((n - center - 1) * this.settings.partialFactor);
+        return ky <= center + maxHigh;
+      }
+
+      sampleKSpaceAt(ky, kx, scale) {
+        const n = this.settings.matrix;
+        const center = n >> 1;
+
+        if (!this.isKyAllowedByPartial(ky)) return;
+
+        const bwScale = clamp(this.settings.bandwidth / 200, 0.35, 1.0);
+        const sourceKx = clamp(Math.round(center + (kx - center) * bwScale), 0, n - 1);
+
+        const slice = this.kspace.baseSlices[this.sim.selectedSlice];
+        let re = slice.re[ky][sourceKx] * scale;
+        let im = slice.im[ky][sourceKx] * scale;
+
+        const nz = this.settings.noise;
+        if (nz > 0) {
+          re += (Math.random() * 2 - 1) * nz * 0.08;
+          im += (Math.random() * 2 - 1) * nz * 0.08;
+        }
+
+        if (this.kspace.sampledMask[ky][kx] === 0) {
+          this.kspace.sampledMask[ky][kx] = 1;
+          this.kspace.sampledCount += 1;
+        }
+
+        this.kspace.acquiredRe[ky][kx] = re;
+        this.kspace.acquiredIm[ky][kx] = im;
+      }
+
+      updateSpins(dtMs, active) {
+        const dtSec = dtMs / 1000;
+
+        const rfEvents = active.filter((ev) => ev.type === "rf");
+        const gzNow = this.eventAmplitude(active, "gz");
+        const gyNow = this.eventAmplitude(active, "gy");
+        const gxNow = this.eventAmplitude(active, "gx");
+
+        const inhomSign = this.sim.absMs < this.sim.rephaseUntilAbs ? -1 : 1;
+
+        const hasSliceSelectRF = rfEvents.length > 0 && Math.abs(gzNow) > 0.0001;
+        const sliceHalf = clamp(0.95 - Math.abs(this.settings.gzAmp) * 0.07, 0.18, 0.95);
+
+        const stepTissue = (name, t1Ms, t2Ms) => {
+          this.spins[name].forEach((s) => {
+            if (rfEvents.length > 0) {
+              rfEvents.forEach((rf) => {
+                const selected = !hasSliceSelectRF || Math.abs(s.z) <= sliceHalf;
+                if (!selected) return;
+                const dFlip = (rf.flipDeg * Math.PI / 180) * (dtMs / rf.durationMs);
+                const r = rotateAroundX(s.mx, s.my, s.mz, dFlip);
+                s.mx = r.mx;
+                s.my = r.my;
+                s.mz = r.mz;
+              });
+            }
+
+            let hz = s.chemHz;
+            hz += s.inhomHz * inhomSign;
+            hz += gxNow * this.consts.gxScaleHz * s.x;
+            hz += gyNow * this.consts.gyScaleHz * s.y;
+            hz += gzNow * this.consts.gzScaleHz * s.z;
+
+            const p = rotateXY(s.mx, s.my, hz * Math.PI * 2 * dtSec);
+            s.mx = p.mx;
+            s.my = p.my;
+
+            const e2 = Math.exp(-dtSec / (t2Ms / 1000));
+            s.mx *= e2;
+            s.my *= e2;
+            s.mz = 1 - (1 - s.mz) * Math.exp(-dtSec / (t1Ms / 1000));
+          });
+        };
+
+        stepTissue("water", this.consts.t1WaterMs, this.consts.t2WaterMs);
+        stepTissue("fat", this.consts.t1FatMs, this.consts.t2FatMs);
+      }
+
+      tissueNet(name) {
+        const arr = this.spins[name];
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        let magSum = 0;
+        arr.forEach((s) => {
+          sx += s.mx;
+          sy += s.my;
+          sz += s.mz;
+          magSum += Math.hypot(s.mx, s.my);
+        });
+        const n = arr.length;
+        const mx = sx / n;
+        const my = sy / n;
+        const mz = sz / n;
+        const mxy = Math.hypot(mx, my);
+        const coherence = magSum > 1e-9 ? clamp(Math.hypot(sx, sy) / magSum, 0, 1) : 1;
+        return { mx, my, mz, mxy, phase: Math.atan2(my, mx), coherence };
+      }
+
+      computeSignalSample() {
+        let re = 0;
+        let im = 0;
+        let n = 0;
+
+        if (this.settings.showWater) {
+          this.spins.water.forEach((s) => { re += s.mx; im += s.my; n += 1; });
+        }
+        if (this.settings.showFat) {
+          this.spins.fat.forEach((s) => { re += s.mx; im += s.my; n += 1; });
+        }
+
+        if (n <= 0) return { re: 0, im: 0, mag: 0 };
+        re /= n;
+        im /= n;
+        return { re, im, mag: Math.hypot(re, im) };
+      }
+
+      updatePhysics(dtMs) {
+        const tr = this.settings.TRms;
+        const tCycle = this.sim.absMs % tr;
+
+        if (tCycle < this.sim.lastCycleT) {
+          this.onCycleStart();
+          this.sim.kCurrent = { x: 0, y: 0 };
+          this.sim.kPath.push({ break: true });
+        }
+        this.sim.lastCycleT = tCycle;
+
+        const active = this.getActiveEvents(tCycle);
+        const activeIds = new Set(active.map((ev) => ev.id));
+
+        active.forEach((ev) => {
+          if (!this.sim.prevActiveIds.has(ev.id)) {
+            this.onEventStart(ev, active);
+          }
+        });
+        this.sim.prevActiveIds = activeIds;
+
+        this.updateSpins(dtMs, active);
+
+        const adc = active.find((ev) => ev.type === "adc");
+        const gx = active.find((ev) => ev.type === "gx");
+        const gy = active.find((ev) => ev.type === "gy");
+
+        if (adc) {
+          const center = this.settings.matrix >> 1;
+          const ratio = clamp((tCycle - adc.startMs) / adc.durationMs, 0, 1);
+          const targetKx = gx ? Math.floor(ratio * (this.settings.matrix - 1)) : center;
+          const adcStamp = `${this.sim.trIndex}:${adc.id}`;
+          if (adcStamp !== this.sim.adcStamp) {
+            this.sim.adcStamp = adcStamp;
+            this.sim.adcLastKx = -1;
+          }
+
+          const sig = this.computeSignalSample();
+          const scale = clamp(sig.mag * 2.4, 0.05, 1);
+
+          if (gx) {
+            for (let k = this.sim.adcLastKx + 1; k <= targetKx; k += 1) {
+              this.sampleKSpaceAt(this.sim.currentKy, k, scale);
+            }
+          } else {
+            this.sampleKSpaceAt(this.sim.currentKy, center, scale);
+          }
+          this.sim.adcLastKx = Math.max(this.sim.adcLastKx, targetKx);
+
+          const kxNorm = (targetKx - center) / (center || 1);
+          const kyNorm = (this.sim.currentKy - center) / (center || 1);
+          this.sim.kCurrent = { x: kxNorm, y: kyNorm };
+          this.sim.kPath.push({ x: kxNorm, y: kyNorm });
+          if (this.sim.kPath.length > 3200) this.sim.kPath.splice(0, this.sim.kPath.length - 3200);
+
+          if (this.sim.absMs - this.sim.lastSampleMs > 2) {
+            this.sim.signalHistory.push({ t: this.sim.absMs, y: sig.re * 1.6, adcOn: true });
+            this.sim.lastSampleMs = this.sim.absMs;
+          }
+        } else if (this.sim.absMs - this.sim.lastSampleMs > 2) {
+          this.sim.signalHistory.push({ t: this.sim.absMs, y: 0, adcOn: false });
+          this.sim.lastSampleMs = this.sim.absMs;
+          this.sim.adcStamp = "";
+          this.sim.adcLastKx = -1;
+        }
+
+        if (!adc && gy) {
+          const gyRatio = clamp((tCycle - gy.startMs) / gy.durationMs, 0, 1);
+          this.sim.kCurrent = { x: 0, y: this.sim.currentGyNorm * gyRatio };
+        }
+
+        const keepMs = Math.max(this.settings.TRms * 2.4, 500);
+        while (this.sim.signalHistory.length > 3 && this.sim.signalHistory[0].t < this.sim.absMs - keepMs) {
+          this.sim.signalHistory.shift();
+        }
+      }
+
+      updateEducationalHighlights() {
+        const mode = this.getReconMode();
+        const n = this.settings.matrix;
+        const total = n * n;
+        const sampling = this.kspace.sampledCount / total;
+        const h = new Set();
+
+        if (mode === "central") {
+          h.add("central");
+          h.add("blur");
+        }
+        if (mode === "outer") {
+          h.add("outer");
+        }
+        if (this.settings.partialFourier || sampling < 0.55) {
+          h.add("alias");
+        }
+        if (this.settings.bandwidth < 120 || mode === "central") {
+          h.add("blur");
+        }
+
+        this.sim.highlights = h;
+        this.ui.eduChips.forEach((chip) => {
+          const key = chip.getAttribute("data-key");
+          chip.classList.toggle("on", h.has(key));
+        });
+      }
+
+      reconstructImage(mode) {
+        this.recon.mode = mode;
+        const n = this.settings.matrix;
+        const center = n >> 1;
+
+        const srcRe = alloc2d(n, Float64Array);
+        const srcIm = alloc2d(n, Float64Array);
+
+        const sampledEnough = this.kspace.sampledCount > 0;
+        const base = this.kspace.baseSlices[this.sim.selectedSlice];
+
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            let keep = true;
+
+            if (mode === "central") {
+              keep = Math.abs(y - center) <= n * 0.18;
+            } else if (mode === "outer") {
+              keep = Math.abs(y - center) >= n * 0.20 || Math.abs(x - center) >= n * 0.20;
+            }
+
+            if (!sampledEnough) {
+              srcRe[y][x] = keep ? base.re[y][x] : 0;
+              srcIm[y][x] = keep ? base.im[y][x] : 0;
+            } else {
+              const got = this.kspace.sampledMask[y][x] === 1;
+              srcRe[y][x] = keep && got ? this.kspace.acquiredRe[y][x] : 0;
+              srcIm[y][x] = keep && got ? this.kspace.acquiredIm[y][x] : 0;
+            }
+          }
+        }
+
+        const unshift = shift2d(srcRe, srcIm);
+        fft2d(unshift.re, unshift.im, true);
+
+        let maxMag = 1e-9;
+        let minMag = Number.POSITIVE_INFINITY;
+        const mag = alloc2d(n, Float64Array);
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            const m = Math.hypot(unshift.re[y][x], unshift.im[y][x]);
+            mag[y][x] = m;
+            if (m > maxMag) maxMag = m;
+            if (m < minMag) minMag = m;
+          }
+        }
+
+        const off = document.createElement("canvas");
+        off.width = n;
+        off.height = n;
+        const octx = off.getContext("2d");
+        const img = octx.createImageData(n, n);
+
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            const idx = (y * n + x) * 4;
+            const norm = (mag[y][x] - minMag) / (maxMag - minMag + 1e-9);
+            const gamma = Math.pow(clamp(norm, 0, 1), 0.55);
+            const val = Math.round(gamma * 255);
+            img.data[idx] = val;
+            img.data[idx + 1] = val;
+            img.data[idx + 2] = val;
+            img.data[idx + 3] = 255;
+          }
+        }
+        octx.putImageData(img, 0, 0);
+
+        this.recon.offscreen = off;
+
+        const total = n * n;
+        const sampling = (this.kspace.sampledCount / total) * 100;
+        if (mode === "full") {
+          this.recon.info = `Reconstruction mode: Full k-space. Sampling ${(sampling).toFixed(1)}% of grid.`;
+        } else if (mode === "central") {
+          this.recon.info = "Reconstruction mode: Central lines only. Contrast preserved but edges blur due to missing high spatial frequencies.";
+        } else {
+          this.recon.info = "Reconstruction mode: Outer lines only. Edge detail stays but low-frequency contrast is reduced.";
+        }
+
+        this.updateEducationalHighlights();
+      }
+
+      drawTimeline() {
+        const { ctx, w, h } = prep(this.timelineCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { l: 70, r: 12, t: 12, b: 18 };
+        const iw = w - pad.l - pad.r;
+        const ih = h - pad.t - pad.b;
+        const trH = ih / TRACKS.length;
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(pad.l, pad.t, iw, ih);
+        ctx.strokeStyle = "#3b5f87";
+        ctx.strokeRect(pad.l, pad.t, iw, ih);
+
+        TRACKS.forEach((track, i) => {
+          const y = pad.t + i * trH;
+          ctx.strokeStyle = "rgba(138, 176, 220, 0.22)";
+          ctx.beginPath();
+          ctx.moveTo(pad.l, y);
+          ctx.lineTo(pad.l + iw, y);
+          ctx.stroke();
+          ctx.fillStyle = "#b8d7f1";
+          ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+          ctx.fillText(track, 18, y + trH * 0.62);
+        });
+
+        const toX = (ms) => pad.l + (ms / this.settings.TRms) * iw;
+
+        this.sim.events.forEach((ev) => {
+          const tr = TRACKS.indexOf(ev.track);
+          if (tr < 0) return;
+          const x = toX(ev.startMs);
+          const ex = toX(Math.min(this.settings.TRms, ev.startMs + ev.durationMs));
+          const y = pad.t + tr * trH + 3;
+          const hh = trH - 6;
+          ctx.fillStyle = ev.color;
+          ctx.globalAlpha = 0.86;
+          ctx.fillRect(x, y, Math.max(2, ex - x), hh);
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = "#ecfeff";
+          ctx.font = "600 11px Sora, Avenir Next, sans-serif";
+          ctx.fillText(ev.label, x + 4, y + hh * 0.63);
+        });
+
+        const rf90 = this.first90Event();
+        if (rf90) {
+          const xTE = toX(clamp(rf90.startMs + this.settings.TEms, 0, this.settings.TRms));
+          ctx.strokeStyle = "#fbbf24";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(xTE, pad.t);
+          ctx.lineTo(xTE, pad.t + ih);
+          ctx.stroke();
+          ctx.fillStyle = "#fcd34d";
+          ctx.fillText("TE", xTE + 3, pad.t + 11);
+        }
+
+        if (this.sim.echoAtAbs !== null) {
+          const xEcho = toX(this.sim.echoAtAbs % this.settings.TRms);
+          ctx.strokeStyle = "#86efac";
+          ctx.beginPath();
+          ctx.moveTo(xEcho, pad.t);
+          ctx.lineTo(xEcho, pad.t + ih);
+          ctx.stroke();
+          ctx.fillStyle = "#bbf7d0";
+          ctx.fillText("Echo", xEcho + 3, pad.t + 24);
+        }
+
+        const nowX = toX(this.sim.absMs % this.settings.TRms);
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.beginPath();
+        ctx.moveTo(nowX, pad.t);
+        ctx.lineTo(nowX, pad.t + ih);
+        ctx.stroke();
+
+        ctx.fillStyle = "#9fc1de";
+        ctx.font = "600 11px SF Mono, Menlo, Consolas, monospace";
+        ctx.fillText("0 ms", pad.l - 2, h - 4);
+        ctx.fillText(`TR ${this.settings.TRms.toFixed(0)} ms`, w - 96, h - 4);
+      }
+
+      drawBlochPanel() {
+        const { ctx, w, h } = prep(this.blochCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        const wNet = this.tissueNet("water");
+        const fNet = this.tissueNet("fat");
+
+        const left = { x: 0, y: 0, w: w * 0.42, h };
+        const right = { x: w * 0.42, y: 0, w: w * 0.58, h };
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(0, 0, w, h);
+
+        const cx = left.x + left.w * 0.48;
+        const cy = left.h * 0.58;
+        const R = Math.min(left.w, left.h) * 0.3;
+
+        ctx.strokeStyle = "rgba(161, 197, 230, 0.45)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(108, 161, 210, 0.45)";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, R, R * 0.32, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        drawArrow(ctx, cx - R * 1.1, cy, cx + R * 1.1, cy, "#7dd3fc", 1.9, 7);
+        drawArrow(ctx, cx, cy + R * 1.08, cx, cy - R * 1.12, "#7dd3fc", 1.9, 7);
+
+        const combined = {
+          mx: (wNet.mx + fNet.mx) * 0.5,
+          my: (wNet.my + fNet.my) * 0.5,
+          mz: (wNet.mz + fNet.mz) * 0.5
+        };
+
+        const proj = (v) => ({
+          x: cx + v.mx * R,
+          y: cy - v.mz * R - v.my * R * 0.35
+        });
+
+        if (this.settings.showWater) {
+          const p = proj(wNet);
+          drawArrow(ctx, cx, cy, p.x, p.y, "#60a5fa", 2.6, 8);
+        }
+        if (this.settings.showFat) {
+          const p = proj(fNet);
+          drawArrow(ctx, cx, cy, p.x, p.y, "#f97316", 2.6, 8);
+        }
+        const pc = proj(combined);
+        drawArrow(ctx, cx, cy, pc.x, pc.y, "#fef08a", 4.2, 10);
+
+        ctx.fillStyle = "#d4ecff";
+        ctx.font = "600 13px Sora, Avenir Next, sans-serif";
+        ctx.fillText("Net magnetisation vectors", 14, 24);
+        ctx.fillText("z", cx + 6, cy - R - 8);
+        ctx.fillText("x", cx + R + 7, cy + 14);
+
+        ctx.font = "600 12px SF Mono, Menlo, Consolas, monospace";
+        ctx.fillStyle = "#a7cbe6";
+        ctx.fillText(`Water Mz=${wNet.mz.toFixed(2)} Mxy=${wNet.mxy.toFixed(2)}`, 14, h - 44);
+        ctx.fillStyle = "#ffb487";
+        ctx.fillText(`Fat   Mz=${fNet.mz.toFixed(2)} Mxy=${fNet.mxy.toFixed(2)}`, 14, h - 25);
+
+        ctx.strokeStyle = "#2e4f75";
+        ctx.beginPath();
+        ctx.moveTo(right.x, 0);
+        ctx.lineTo(right.x, h);
+        ctx.stroke();
+
+        const rx0 = right.x + 24;
+        const ry0 = 34;
+        const rw = right.w - 48;
+        const rh = h - 66;
+
+        ctx.fillStyle = "#d4ecff";
+        ctx.font = "600 13px Sora, Avenir Next, sans-serif";
+        ctx.fillText("Spatial XY grid (isochromat phase)", rx0, 24);
+
+        ctx.strokeStyle = "rgba(124, 162, 204, 0.25)";
+        for (let i = 0; i <= 8; i += 1) {
+          const x = rx0 + (i / 8) * rw;
+          ctx.beginPath();
+          ctx.moveTo(x, ry0);
+          ctx.lineTo(x, ry0 + rh);
+          ctx.stroke();
+        }
+        for (let j = 0; j <= 6; j += 1) {
+          const y = ry0 + (j / 6) * rh;
+          ctx.beginPath();
+          ctx.moveTo(rx0, y);
+          ctx.lineTo(rx0 + rw, y);
+          ctx.stroke();
+        }
+
+        const tCycle = this.sim.absMs % this.settings.TRms;
+        const active = this.getActiveEvents(tCycle);
+        const rfOn = active.some((ev) => ev.type === "rf");
+        const gzOn = active.some((ev) => ev.type === "gz");
+        const sliceHalf = clamp(0.95 - Math.abs(this.settings.gzAmp) * 0.07, 0.18, 0.95);
+
+        const drawSpins = (arr, color, visible) => {
+          if (!visible) return;
+          arr.forEach((s) => {
+            const x = rx0 + (s.x + 1) * 0.5 * rw;
+            const y = ry0 + (1 - (s.y + 1) * 0.5) * rh;
+            const phase = Math.atan2(s.my, s.mx);
+            const amp = clamp(Math.hypot(s.mx, s.my), 0.06, 1);
+            const len = 4 + 8 * amp;
+            const tx = x + Math.cos(phase) * len;
+            const ty = y - Math.sin(phase) * len;
+
+            const selected = !rfOn || !gzOn || Math.abs(s.z) <= sliceHalf;
+            ctx.globalAlpha = selected ? 0.85 : 0.2;
+            drawArrow(ctx, x, y, tx, ty, color, 1.3, 4);
+            ctx.globalAlpha = 1;
+          });
+        };
+
+        drawSpins(this.spins.water, "#60a5fa", this.settings.showWater);
+        drawSpins(this.spins.fat, "#f97316", this.settings.showFat);
+
+        if (rfOn && gzOn) {
+          ctx.fillStyle = "rgba(167, 139, 250, 0.17)";
+          ctx.fillRect(rx0, ry0 + (1 - (sliceHalf + 1) * 0.5) * rh, rw, sliceHalf * rh);
+          ctx.fillStyle = "#e5dbff";
+          ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+          ctx.fillText("Slice-selected spins currently affected by RF+Gz", rx0 + 8, ry0 + 18);
+        }
+      }
+
+      drawKspacePanel() {
+        const { ctx, w, h } = prep(this.kspaceCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(0, 0, w, h);
+
+        const pad = { l: 44, r: 18, t: 24, b: 34 };
+        const iw = w - pad.l - pad.r;
+        const ih = h - pad.t - pad.b;
+
+        ctx.strokeStyle = "#355a82";
+        ctx.strokeRect(pad.l, pad.t, iw, ih);
+
+        const n = this.settings.matrix;
+        const center = n >> 1;
+
+        const toX = (kx) => pad.l + (kx / (n - 1)) * iw;
+        const toY = (ky) => pad.t + (ky / (n - 1)) * ih;
+
+        const c0 = Math.floor(center - n * 0.12);
+        const c1 = Math.ceil(center + n * 0.12);
+        const cx0 = toX(c0);
+        const cx1 = toX(c1);
+        const cy0 = toY(c0);
+        const cy1 = toY(c1);
+
+        ctx.fillStyle = "rgba(45, 212, 191, 0.11)";
+        ctx.fillRect(cx0, cy0, cx1 - cx0, cy1 - cy0);
+        ctx.fillStyle = "#b8f6ef";
+        ctx.font = "600 11px Sora, Avenir Next, sans-serif";
+        ctx.fillText("central -> contrast", cx0 + 4, cy0 + 12);
+
+        ctx.strokeStyle = "rgba(248, 250, 252, 0.2)";
+        ctx.beginPath();
+        ctx.moveTo(toX(center), pad.t);
+        ctx.lineTo(toX(center), pad.t + ih);
+        ctx.moveTo(pad.l, toY(center));
+        ctx.lineTo(pad.l + iw, toY(center));
+        ctx.stroke();
+
+        let maxMag = 1e-9;
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            if (this.kspace.sampledMask[y][x]) {
+              const m = Math.hypot(this.kspace.acquiredRe[y][x], this.kspace.acquiredIm[y][x]);
+              if (m > maxMag) maxMag = m;
+            }
+          }
+        }
+
+        const px = iw / n;
+        const py = ih / n;
+
+        for (let y = 0; y < n; y += 1) {
+          for (let x = 0; x < n; x += 1) {
+            if (!this.kspace.sampledMask[y][x]) continue;
+            const m = Math.hypot(this.kspace.acquiredRe[y][x], this.kspace.acquiredIm[y][x]);
+            const norm = clamp(m / maxMag, 0, 1);
+            const lum = Math.floor(35 + norm * 220);
+            ctx.fillStyle = `rgb(${Math.floor(lum * 0.52)}, ${Math.floor(lum * 0.8)}, ${lum})`;
+            ctx.fillRect(toX(x), toY(y), Math.max(1, px + 0.35), Math.max(1, py + 0.35));
+          }
+        }
+
+        const ky = this.sim.currentKy;
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.8)";
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(pad.l, toY(ky));
+        ctx.lineTo(pad.l + iw, toY(ky));
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffd28b";
+        ctx.fillText("Gy -> ky line", pad.l + 8, toY(ky) - 4);
+
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.5;
+        let started = false;
+        this.sim.kPath.forEach((p) => {
+          if (p.break) {
+            started = false;
+            return;
+          }
+          const x = pad.l + (p.x * 0.5 + 0.5) * iw;
+          const y = pad.t + (p.y * 0.5 + 0.5) * ih;
+          if (!started) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        if (started) ctx.stroke();
+
+        const cx = pad.l + (this.sim.kCurrent.x * 0.5 + 0.5) * iw;
+        const cy = pad.t + (this.sim.kCurrent.y * 0.5 + 0.5) * ih;
+        ctx.fillStyle = "#86efac";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#cce8ff";
+        ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+        ctx.fillText("kx", pad.l + iw - 18, toY(center) - 4);
+        ctx.fillText("ky", toX(center) + 4, pad.t + 12);
+
+        ctx.fillStyle = "#a9cce8";
+        ctx.font = "600 11px SF Mono, Menlo, Consolas, monospace";
+        const pct = (this.kspace.sampledCount / (n * n) * 100).toFixed(1);
+        ctx.fillText(`Filled: ${this.kspace.sampledCount} / ${n * n} (${pct}%)`, pad.l, h - 8);
+      }
+
+      drawReconPanel() {
+        const { ctx, w, h } = prep(this.reconCanvas);
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.fillStyle = "rgba(8, 20, 35, 0.66)";
+        ctx.fillRect(0, 0, w, h);
+
+        const pad = 16;
+        const size = Math.min(w - pad * 2, h - 80);
+        const x = (w - size) * 0.5;
+        const y = 28;
+
+        ctx.strokeStyle = "#355a82";
+        ctx.strokeRect(x, y, size, size);
+
+        if (this.recon.offscreen) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(this.recon.offscreen, x, y, size, size);
+        } else {
+          ctx.fillStyle = "#9fb8d4";
+          ctx.font = "600 13px Sora, Avenir Next, sans-serif";
+          ctx.fillText("No reconstruction yet.", x + 10, y + 20);
+        }
+
+        ctx.fillStyle = "#d4ecff";
+        ctx.font = "600 12px Sora, Avenir Next, sans-serif";
+        ctx.fillText(this.recon.info, pad, h - 30);
+
+        const mode = this.getReconMode();
+        if (mode === "central") {
+          ctx.fillStyle = "#b8f6ef";
+          ctx.fillText("Central lines emphasize contrast but blur fine detail.", pad, h - 12);
+        } else if (mode === "outer") {
+          ctx.fillStyle = "#fde68a";
+          ctx.fillText("Outer lines preserve edge detail but weaken low-frequency contrast.", pad, h - 12);
+        } else {
+          ctx.fillStyle = "#c7dcff";
+          ctx.fillText("Full mode uses all available samples from current acquisition state.", pad, h - 12);
+        }
+      }
+
+      drawAll() {
+        this.drawTimeline();
+        this.drawBlochPanel();
+        this.drawKspacePanel();
+        this.drawReconPanel();
+      }
+
+      tick(ts) {
+        const rawDt = Math.min(40, ts - this.sim.lastTs);
+        this.sim.lastTs = ts;
+
+        if (this.sim.running) {
+          let left = rawDt;
+          while (left > 0) {
+            const step = Math.min(4, left);
+            this.sim.absMs += step;
+            this.updatePhysics(step);
+            left -= step;
+          }
+          this.updateEducationalHighlights();
+          this.syncLabels();
+        }
+
+        this.drawAll();
+        requestAnimationFrame((t) => this.tick(t));
+      }
+    }
+
+    new MRIV8();
+  </script>
+</body>
+</html>

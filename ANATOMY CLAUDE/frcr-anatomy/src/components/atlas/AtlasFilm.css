@@ -1,0 +1,83 @@
+/* One film. The frame is sized by whoever uses it; the image is contained
+   inside it and the badge layer is pinned to the image, not the frame. */
+
+.atlas-film {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--void);
+}
+
+.atlas-film-box {
+  position: absolute;
+}
+
+.atlas-film-orient {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  overflow: hidden;
+  transform-origin: center center;
+}
+
+.atlas-film-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.atlas-film-leaders {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* The badge. Deliberately the same flat disc the question player draws, so a
+   film reads identically in both places — but the one the page is about is
+   amber, and the others are dimmed until pointed at. */
+.atlas-badge {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: var(--badge-size, 6%);
+  aspect-ratio: 1;
+  min-width: 18px;
+  min-height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(11, 13, 16, 0.85);
+  background: rgba(255, 255, 255, 0.92);
+  color: #14181d;
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 1.6cqw, 13px);
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  cursor: default;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+button.atlas-badge {
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+button.atlas-badge:hover,
+button.atlas-badge:focus-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.15);
+  background: #ffffff;
+}
+
+.atlas-badge.is-active {
+  background: var(--amber-accent);
+  border-color: rgba(11, 13, 16, 0.9);
+  color: #14181d;
+  box-shadow: 0 0 0 3px rgba(217, 168, 78, 0.35);
+}

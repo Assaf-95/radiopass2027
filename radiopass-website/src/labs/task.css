@@ -1,0 +1,89 @@
+/* One instruction at a time — see task.tsx.
+
+   Deliberately loud before, quiet after: an open task is the only thing the
+   learner should be reading, and a finished one is a footnote to the diagram
+   above it. Both states occupy the same box so completing a task does not
+   shift the page under the pointer that just completed it.
+
+   Sizes, spaces and colours come from design/tokens.css. The instruction and
+   the way past it are text a learner has to act on, so neither may drop below
+   the 16px floor; only the "Your turn" / "Notice" tag is metadata. */
+
+.rp-task {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  border: 1px solid rgba(107, 163, 214, 0.34);
+  background: rgba(107, 163, 214, 0.07);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-primary);
+}
+
+.rp-task-tag {
+  flex: 0 0 auto;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #8FBEE4;
+}
+
+.rp-task-copy { flex: 1 1 240px; min-width: 0; }
+
+.rp-task-skip {
+  flex: 0 0 auto;
+  /* Bottom of the line, not the first baseline. The instruction wraps to two
+     lines beside it, and a way-out button parked against line one reads as if
+     it had been dropped into the middle of the sentence. */
+  align-self: flex-end;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--fs-support);
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.rp-task-skip:hover { color: var(--text-primary); }
+
+/* On a phone this is a real touch target, not an 18px strip of underlined
+   text — the site's own audit fails anything under 32px in its short side. */
+@media (max-width: 700px) {
+  .rp-task-skip {
+    padding: var(--sp-2) var(--sp-1);
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.rp-task.is-done {
+  border-color: var(--border);
+  background: rgba(242, 238, 230, 0.03);
+  color: var(--text-secondary);
+}
+.rp-task.is-done .rp-task-tag { color: var(--success); }
+
+/* A single pulse on arrival, so an open instruction is noticed without
+   becoming a blinking distraction for the rest of the step. */
+@media (prefers-reduced-motion: no-preference) {
+  .rp-task:not(.is-done) { animation: rp-task-in var(--dur-reveal) var(--ease) both; }
+}
+@keyframes rp-task-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The gated Next: still focusable and still explains itself, never a dead
+   grey button with no reason given. */
+.rp-nav-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

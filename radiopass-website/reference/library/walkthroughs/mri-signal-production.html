@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hydrogen, Precession & RF Pulse — Simple — Radiopass</title>
+<meta name="description" content="One hydrogen atom to a detectable signal, in four small steps." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/simple-slides.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="ss-header">
+  <div class="shell">
+    <div class="ss-header-top">
+      <div>
+        <span class="eyebrow">MRI · Hydrogen & RF Pulse · Simple version</span>
+        <h1 class="ss-title">Just hydrogen. Nothing else yet.</h1>
+        <p class="lede ss-subtitle">One nucleus, then a few, then order, then a signal.</p>
+      </div>
+      <div class="ss-count-pill" id="ss-count">SLIDE 1 / 5</div>
+    </div>
+    <div class="ss-progress-track"><div class="ss-progress-fill" id="ss-progress-fill"></div></div>
+    <a href="mri-signal-production-detailed.html" class="btn btn-ghost ss-more-link">want more detail? open the full page</a>
+  </div>
+</header>
+
+<div class="shell ss-layout">
+  <div class="card glass ss-stage-card">
+    <svg id="ss-stage" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card glass ss-teach-card">
+    <div class="ss-slide-title" id="ss-slide-title"></div>
+    <ul class="ss-bullets" id="ss-bullets"></ul>
+    <div class="ss-caption" id="ss-caption"></div>
+    <div class="ss-control" id="ss-control">
+      <label id="ss-control-label"></label>
+      <input type="range" id="ss-control-input" />
+      <span class="ss-readout" id="ss-control-readout"></span>
+    </div>
+    <div class="ss-nav">
+      <button type="button" class="btn btn-ghost" id="ss-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="ss-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/simple-slides.js"></script>
+<script>
+(function () {
+  var cx = 350, cy = 220;
+  function txt(x, y, s, colour, size) { return '<text x="' + x + '" y="' + y + '" fill="' + colour + '" font-size="' + (size || 15) + '" font-family="Inter,sans-serif" font-weight="700" text-anchor="middle">' + s + '</text>'; }
+  function dot(x, y, r, colour) { return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="' + colour + '"/>'; }
+
+  function oneProton(t) {
+    var angle = t * 1.5;
+    var x = cx + Math.cos(angle) * 60, y = cy + Math.sin(angle) * 60;
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="60" fill="none" stroke="rgba(148,197,224,0.2)" stroke-width="1"/>' +
+      '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#5FE3F2" stroke-width="3"/>' +
+      dot(x, y, 7, '#5FE3F2') + txt(cx, cy + 100, 'one hydrogen nucleus, precessing', '#8FA3BB', 13);
+  }
+
+  function fewOutOfPhase(t) {
+    var out = '';
+    var seeds = [200, 350, 500];
+    seeds.forEach(function (sx, i) {
+      var angle = t * (1.2 + i * 0.5) + i * 2;
+      var x = sx + Math.cos(angle) * 40, y = 220 + Math.sin(angle) * 40;
+      out += '<circle cx="' + sx + '" cy="220" r="40" fill="none" stroke="rgba(148,197,224,0.18)" stroke-width="1"/>' +
+        '<line x1="' + sx + '" y1="220" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#8FA3BB" stroke-width="2.5"/>' + dot(x, y, 5, '#8FA3BB');
+    });
+    return out + txt(cx, 340, 'different phases — no shared direction', '#8FA3BB', 13);
+  }
+
+  function b0Ordered(t) {
+    var out = '<line x1="' + cx + '" y1="' + (cy + 130) + '" x2="' + cx + '" y2="' + (cy - 130) + '" stroke="#5FE3F2" stroke-width="3" marker-end="url(#ssArrow4)"/>' + txt(cx + 30, cy - 120, 'B0', '#5FE3F2', 15);
+    var seeds = [200, 350, 500];
+    seeds.forEach(function (sx) {
+      var angle = t * 1.4;
+      var x = sx + Math.cos(angle) * 30, y = 220 + Math.sin(angle) * 30 * 0.3 - 10;
+      out += '<line x1="' + sx + '" y1="220" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#16BFA6" stroke-width="2.5"/>' + dot(x, y, 5, '#16BFA6');
+    });
+    return out + txt(cx, 340, 'B0 brings them into shared alignment', '#16BFA6', 13);
+  }
+
+  function rfSignal(t) {
+    var wave = '';
+    for (var x = 0; x <= 300; x += 6) {
+      var y = 260 + Math.sin((x / 300) * Math.PI * 5 + t * 4) * 40 * Math.exp(-x / 260);
+      wave += (x + 220) + ',' + y.toFixed(1) + ' ';
+    }
+    return txt(cx, 90, '90° RF pulse applied', '#F2B84B', 16) + '<polyline points="' + wave + '" fill="none" stroke="#5FE3F2" stroke-width="3"/>' + txt(cx, 380, 'transverse signal in the coil', '#5FE3F2', 14);
+  }
+
+  var SLIDES = [
+    {
+      title: 'A single magnetic moment',
+      bullets: ['A hydrogen nucleus has a magnetic moment from its charge and intrinsic spin.', 'In isolation it precesses freely, at its own Larmor frequency.', 'One isochromat produces a magnetic moment too small to detect.'],
+      caption: '<strong>One nucleus</strong> — below the detection threshold, but the same physics.',
+      draw: function (t) { return oneProton(t); }
+    },
+    {
+      title: 'An incoherent population',
+      bullets: ['A population of nuclei precesses with no fixed phase relationship.', 'Individual transverse components sum to zero by vector cancellation.', 'Without phase coherence, net Mxy is zero regardless of population size.'],
+      caption: '<strong>No coherence</strong> — cancellation, not signal, however many spins are present.',
+      draw: function (t) { return fewOutOfPhase(t); }
+    },
+    {
+      title: 'B0 establishes a common axis',
+      bullets: ['Applying B0 gives every nucleus a shared precession axis.', 'A small population excess parallel to B0 produces net longitudinal magnetisation, Mz.', 'Alignment along one axis is the precondition for any subsequent coherent signal.'],
+      caption: '<strong>Common axis</strong> — necessary, but Mz alone still isn’t detectable.',
+      draw: function (t) { return b0Ordered(t); }
+    },
+    {
+      title: 'RF excitation produces detectable Mxy',
+      bullets: ['A 90° RF pulse at the Larmor frequency rotates Mz into the transverse plane.', 'The excited population now precesses coherently, in phase, together.', 'That coherent, rotating Mxy induces a measurable EMF in the receiver coil.'],
+      caption: '<strong>Coherence + rotation</strong> = the induced signal a coil can detect.',
+      draw: function (t) { return rfSignal(t); }
+    },
+    {
+      title: 'That was the short version',
+      bullets: ['Isolated moment, incoherent population, B0 alignment, then RF-induced signal — in sequence.', 'The full page lets you trigger each stage yourself, with the same terminology.', 'Same physics — presented as a manual step-flow rather than a slide deck.'],
+      caption: '<strong>Ready for more?</strong> The detailed page is one click away, above.',
+      draw: function () {
+        return '<rect x="120" y="140" width="460" height="180" rx="24" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+          txt(350, 220, 'Full step-flow page available', '#5FE3F2', 20) +
+          txt(350, 255, 'one proton · out-of-phase group · B0 · RF pulse, in order', '#8FA3BB', 14);
+      }
+    }
+  ];
+
+  var defs = '<defs><marker id="ssArrow4" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>';
+  SLIDES.forEach(function (s) {
+    var d = s.draw;
+    s.draw = function (t, v) { return defs + '<g color="#5FE3F2">' + d(t, v) + '</g>'; };
+  });
+
+  window.SimpleSlides.init({ slides: SLIDES });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ultrasound Core Visuals</title>
+  <style>
+    :root { --bg:#050b14; --panel:#0d1b2c; --line:#29445f; --text:#eaf4ff; --muted:#a8bbd0; --cyan:#36d6ef; --amber:#ffb454; --green:#47d7a0; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--text); font-family:"Avenir Next","Segoe UI",sans-serif; background:radial-gradient(circle at 12% 0%,rgba(54,214,239,.18),transparent 28%),linear-gradient(145deg,#0a1727,var(--bg)); }
+    main { width:min(980px,calc(100% - 20px)); margin:auto; padding:18px 0 34px; }
+    header { margin-bottom:14px; }
+    h1 { margin:0; font-size:clamp(1.8rem,4vw,3.2rem); letter-spacing:-.04em; }
+    header p,p { color:var(--muted); line-height:1.5; }
+    section { scroll-margin-top:12px; margin:14px 0; padding:18px; border:1px solid var(--line); border-radius:22px; background:rgba(13,27,44,.9); box-shadow:0 20px 50px rgba(0,0,0,.35); }
+    h2 { margin:0 0 6px; color:#b6f4ff; }
+    svg { width:100%; height:auto; display:block; margin-top:10px; border-radius:16px; background:linear-gradient(150deg,#071321,#0a1d31); }
+    .controls { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; margin-top:12px; }
+    input[type="range"] { width:100%; accent-color:var(--cyan); }
+    output { min-width:92px; padding:8px 10px; border-radius:10px; background:#152b44; color:#a5f3fc; font-weight:800; text-align:center; }
+    .note { padding:11px 12px; border-left:3px solid var(--cyan); background:rgba(54,214,239,.08); border-radius:8px; color:#d8e8f8; }
+    .meter { height:12px; margin-top:8px; border-radius:99px; overflow:hidden; background:#152b44; }
+    .meter span { display:block; height:100%; width:50%; background:linear-gradient(90deg,var(--green),var(--amber)); transition:width .2s ease; }
+    @media(max-width:560px){ section{padding:13px;border-radius:17px}.controls{grid-template-columns:1fr}output{width:100%} }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main>
+    <header><h1>Ultrasound Core Visuals</h1><p>Compact FRCR-focused visual explanations. Nothing moves until you adjust a control.</p></header>
+
+    <section id="doppler-angle">
+      <h2>Doppler angle</h2>
+      <p>The measured Doppler shift is greatest when the beam is parallel to flow and approaches zero at 90 degrees.</p>
+      <svg viewBox="0 0 900 430" role="img" aria-label="Interactive Doppler angle diagram">
+        <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#47d7a0"/></marker></defs>
+        <rect x="110" y="195" width="680" height="85" rx="42" fill="#17314b" stroke="#3f6687" stroke-width="3"/>
+        <line x1="180" y1="237" x2="720" y2="237" stroke="#47d7a0" stroke-width="8" marker-end="url(#arrow)"/>
+        <text x="450" y="260" fill="#b7f7df" text-anchor="middle" font-size="20">Blood flow</text>
+        <g id="probe" transform="translate(160 92)"><rect x="-48" y="-22" width="96" height="44" rx="15" fill="#36d6ef"/><text x="0" y="6" text-anchor="middle" fill="#052431" font-weight="800">Probe</text></g>
+        <line id="beam" x1="160" y1="110" x2="450" y2="237" stroke="#ffb454" stroke-width="6" stroke-dasharray="12 8"/>
+        <path id="angleArc" d="M450 237 A95 95 0 0 0 365 194" fill="none" stroke="#36d6ef" stroke-width="4"/>
+        <text id="angleText" x="352" y="178" fill="#a5f3fc" font-size="20" font-weight="800">30 degrees</text>
+        <text id="shiftText" x="450" y="350" text-anchor="middle" fill="#eaf4ff" font-size="25" font-weight="800">Strong Doppler shift</text>
+      </svg>
+      <div class="controls"><input id="angle" type="range" min="0" max="90" value="30"/><output id="angleOut">30 degrees</output></div>
+      <div class="meter"><span id="shiftMeter"></span></div>
+    </section>
+
+    <section id="acoustic-impedance">
+      <h2>Acoustic impedance and reflection</h2>
+      <p>A larger impedance mismatch produces a stronger reflected echo. Soft tissue-air interfaces therefore reflect almost all incident ultrasound.</p>
+      <svg viewBox="0 0 900 330" role="img" aria-label="Acoustic impedance mismatch diagram">
+        <rect x="70" y="55" width="360" height="220" rx="18" fill="#17314b"/><rect x="470" y="55" width="360" height="220" rx="18" fill="#362a20"/>
+        <text x="250" y="90" fill="#a5f3fc" text-anchor="middle" font-size="22">Medium 1</text><text x="650" y="90" fill="#fed7aa" text-anchor="middle" font-size="22">Medium 2</text>
+        <line x1="130" y1="170" x2="450" y2="170" stroke="#36d6ef" stroke-width="8"/>
+        <line x1="450" y1="170" x2="250" y2="250" stroke="#ffb454" stroke-width="7"/>
+        <line x1="450" y1="170" x2="760" y2="170" stroke="#47d7a0" stroke-width="3"/>
+        <text x="285" y="145" fill="#a5f3fc" font-size="18">Incident</text><text x="285" y="275" fill="#fed7aa" font-size="18">Reflected</text><text x="610" y="145" fill="#b7f7df" font-size="18">Transmitted</text>
+      </svg>
+      <p class="note">FRCR rule: greater difference in acoustic impedance means greater reflection and less transmission.</p>
+    </section>
+
+    <section id="mi-ti">
+      <h2>Mechanical index and thermal index</h2>
+      <p>MI relates to the likelihood of mechanical effects such as cavitation. TI estimates the potential for tissue heating.</p>
+      <svg viewBox="0 0 900 300" role="img" aria-label="Mechanical and thermal index comparison">
+        <rect x="80" y="65" width="330" height="170" rx="24" fill="#112b42" stroke="#36d6ef"/><rect x="490" y="65" width="330" height="170" rx="24" fill="#30261e" stroke="#ffb454"/>
+        <text x="245" y="120" text-anchor="middle" fill="#a5f3fc" font-size="30" font-weight="800">MI</text><text x="655" y="120" text-anchor="middle" fill="#fed7aa" font-size="30" font-weight="800">TI</text>
+        <text x="245" y="165" text-anchor="middle" fill="#eaf4ff" font-size="20">Mechanical effects</text><text x="655" y="165" text-anchor="middle" fill="#eaf4ff" font-size="20">Heating potential</text>
+        <text x="245" y="200" text-anchor="middle" fill="#a8bbd0" font-size="17">Cavitation / pressure</text><text x="655" y="200" text-anchor="middle" fill="#a8bbd0" font-size="17">Power / exposure time</text>
+      </svg>
+      <p class="note">Use ALARA: keep output and dwell time as low as reasonably achievable while obtaining diagnostic information.</p>
+    </section>
+  </main>
+  <script>
+    const slider=document.getElementById('angle'),out=document.getElementById('angleOut'),beam=document.getElementById('beam'),angleText=document.getElementById('angleText'),shiftText=document.getElementById('shiftText'),meter=document.getElementById('shiftMeter');
+    function update(){const deg=Number(slider.value),rad=deg*Math.PI/180,length=320,x=450-Math.cos(rad)*length,y=237-Math.sin(rad)*length,strength=Math.max(0,Math.cos(rad));beam.setAttribute('x1',x);beam.setAttribute('y1',y);out.textContent=`${deg} degrees`;angleText.textContent=`${deg} degrees`;meter.style.width=`${strength*100}%`;shiftText.textContent=strength>.8?'Strong Doppler shift':strength>.25?'Reduced Doppler shift':'Doppler shift approaches zero';}
+    slider.addEventListener('input',update);update();
+  </script>
+</body>
+</html>

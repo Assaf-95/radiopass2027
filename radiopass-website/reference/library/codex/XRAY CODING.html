@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radiographic Magnification Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --surface: #12161d;
+      --line: #252c36;
+      --ink: #f0f4f8;
+      --muted: #a0abb8;
+      --primary: #2f5f93;
+      --accent: #2f5f93;
+      --alert: #8a949f;
+      --graph: #2f5f93;
+      --mono: "IBM Plex Mono", "Menlo", "Consolas", monospace;
+      --sans: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(1200px 560px at 96% -180px, rgba(47, 95, 147, 0.22) 0%, rgba(47, 95, 147, 0) 72%),
+        radial-gradient(1000px 520px at -8% 112%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 68%),
+        linear-gradient(180deg, #080a0d 0%, #0d1117 56%, #0b0e13 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 1.1rem + 0.9vw, 2rem);
+      letter-spacing: 0.01em;
+    }
+
+    .header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      max-width: 88ch;
+      font-size: 0.99rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(540px, 1.55fr) minmax(320px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 1120px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    }
+
+    .scene-card {
+      padding: 14px;
+    }
+
+    #scene {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid #2b3440;
+      background: linear-gradient(180deg, #121821 0%, #0f141b 58%, #0d1218 100%);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .scene-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .scene-guide {
+      margin-top: 10px;
+      border: 1px solid #2a323d;
+      border-radius: 10px;
+      background: #151b24;
+      padding: 10px 12px;
+    }
+
+    .scene-guide h3 {
+      margin: 0 0 6px;
+      color: #dce5ef;
+      font-size: 0.95rem;
+    }
+
+    .scene-guide ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .scene-guide li {
+      margin: 0 0 4px;
+      color: #b2bfcd;
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .scene-guide li:last-child {
+      margin-bottom: 0;
+    }
+
+    .panel {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .controls,
+    .graph-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #151b24;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      letter-spacing: 0.01em;
+      color: #dce5ef;
+    }
+
+    .control {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .control:last-child {
+      margin-bottom: 0;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      font-size: 0.92rem;
+    }
+
+    .control label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .control output {
+      font-family: var(--mono);
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    input[type="range"]:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+
+    #graph {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid #2a323d;
+      border-radius: 10px;
+      background: #10151d;
+    }
+
+    .graph-caption {
+      margin-top: 8px;
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>2nd Interactive Radiographic Magnification Simulator for FRCR Physics</h1>
+      <p>
+        Drag the object between source and detector to see real-time magnification, projected image size,
+        and focal-spot-driven geometric unsharpness.
+      </p>
+    </header>
+
+    <div class="layout">
+      <section class="card scene-card" aria-label="Radiographic geometry scene">
+        <svg id="scene" viewBox="0 0 1100 560" role="img" aria-label="Projection radiography geometry">
+          <defs>
+            <filter id="edgeBlur" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur id="edgeBlurStd" stdDeviation="2.2" />
+            </filter>
+          </defs>
+
+          <rect x="0" y="0" width="1100" height="560" fill="transparent"></rect>
+          <g id="beamLayer"></g>
+
+          <g id="sourceGroup">
+            <circle cx="120" cy="280" r="52" fill="#1a2029" stroke="#434d5a" stroke-width="3" />
+            <circle cx="120" cy="280" r="20" fill="#0f1319" stroke="#5f6a78" stroke-width="2" />
+            <line id="focalSpotLine" x1="120" y1="272" x2="120" y2="288" stroke="#c95d56" stroke-width="3" stroke-linecap="round" />
+            <text x="120" y="490" text-anchor="middle" fill="#b7c2cf" font-size="20" font-weight="700">X-ray Source</text>
+          </g>
+
+          <g id="objectGroup" cursor="grab">
+            <rect id="objectShape" x="460" y="220" width="54" height="120" rx="10" fill="#2f5f93" stroke="#4d78a8" stroke-width="2" />
+            <rect id="objectHit" x="445" y="208" width="84" height="144" rx="14" fill="transparent" />
+            <text id="objectLabel" x="487" y="380" text-anchor="middle" fill="#b7c2cf" font-size="20" font-weight="700">Object</text>
+          </g>
+
+          <g id="detectorGroup">
+            <rect x="900" y="95" width="120" height="370" rx="16" fill="#dbe8f4" stroke="#9bb3c9" stroke-width="3" />
+            <rect x="920" y="115" width="80" height="330" rx="10" fill="#edf3fa" stroke="#c4d3e2" stroke-width="2" />
+            <text x="960" y="490" text-anchor="middle" fill="#b7c2cf" font-size="20" font-weight="700">Detector</text>
+          </g>
+
+          <g id="projectionGroup">
+            <rect id="projectionBlur" x="930" y="224" width="60" height="120" rx="10" fill="#2f5f93" fill-opacity="0.24" />
+            <rect id="projectionCore" x="936" y="240" width="48" height="88" rx="10" fill="#90a2b7" fill-opacity="0.72" />
+            <rect id="projectionEdge" x="936" y="240" width="48" height="88" rx="10" fill="none" stroke="#90a2b7" stroke-opacity="0.45" stroke-width="8" filter="url(#edgeBlur)" />
+          </g>
+
+          <g id="rayLegend">
+            <line x1="706" y1="56" x2="750" y2="56" stroke="#8a949f" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="1 7" />
+            <text x="758" y="60" fill="#c0c9d4" font-size="12" font-weight="700">Penumbra rays / blur boundary</text>
+          </g>
+
+          <g id="distanceLayer"></g>
+        </svg>
+
+        <p class="scene-caption">
+          Source, object, and detector are center-aligned and parallel on the same geometric plane.
+          Dotted boundary rays and shading show penumbra boundaries and the full blur region at the detector surface.
+          Color-coded lines mark SID, SOD, and ODD.
+        </p>
+        <div class="scene-guide" aria-label="Diagram explanation">
+          <h3>Key points</h3>
+          <ul>
+            <li>Dotted boundary rays start from both focal-spot edges and show penumbra boundaries.</li>
+            <li>Shaded band on detector = blurred region (geometric unsharpness, Ug).</li>
+            <li>Dark central band on detector = sharp image core.</li>
+            <li>Penumbra is caused by the finite focal spot size (not an ideal point source): multiple point sources within the focal spot create overlapping edge shadows at object margins (represented as xxx in our diagram); as focal spot size increases, penumbra increases and edges become less sharp; if the focal spot were an ideal point source, there would be no penumbra and edges would be perfectly sharp.</li>
+            <li>Notice how increasing ODD leads to increased magnification and increased geometric unsharpness.</li>
+            <li>Notice how increasing SID (while keeping SOD constant) increases magnification and increases geometric unsharpness because ODD (SID - SOD) increases.</li>
+            <li>Observe dynamically in the diagram: decreasing SOD -> magnification up -> penumbra up; increasing focal spot size -> penumbra up; increasing ODD -> penumbra up.</li>
+          </ul>
+        </div>
+      </section>
+
+      <aside class="card panel">
+        <section class="controls">
+          <h2 class="section-title">Adjustable Controls</h2>
+
+          <div class="control">
+            <div class="row">
+              <label for="sidSlider">SID</label>
+              <output id="sidOut" for="sidSlider"></output>
+            </div>
+            <input id="sidSlider" type="range" min="80" max="180" step="1" value="120" />
+          </div>
+
+          <div class="control">
+            <div class="row">
+              <label for="sodSlider">SOD</label>
+              <output id="sodOut" for="sodSlider"></output>
+            </div>
+            <input id="sodSlider" type="range" min="25" max="165" step="0.5" value="90" />
+          </div>
+
+          <div class="control">
+            <div class="row">
+              <label for="focalSlider">Focal Spot Size</label>
+              <output id="focalOut" for="focalSlider"></output>
+            </div>
+            <input id="focalSlider" type="range" min="0.1" max="2.0" step="0.05" value="1.0" />
+          </div>
+
+        </section>
+
+        <section class="graph-wrap">
+          <h2 class="section-title">SOD vs Magnification</h2>
+          <svg id="graph" viewBox="0 0 420 250" aria-label="Graph of SOD versus magnification">
+            <rect x="0" y="0" width="420" height="250" fill="#10151d"></rect>
+            <g id="graphAxes"></g>
+            <path id="graphCurve" d="" fill="none" stroke="#2f5f93" stroke-width="3" stroke-linecap="round" />
+            <circle id="graphMarker" cx="0" cy="0" r="6" fill="#2f5f93" stroke="#e7edf4" stroke-width="2" />
+            <text x="210" y="240" text-anchor="middle" fill="#98a4b3" font-size="13" font-weight="600">SOD (cm)</text>
+            <text x="18" y="128" text-anchor="middle" fill="#98a4b3" font-size="13" font-weight="600" transform="rotate(-90 18 128)">Magnification (M)</text>
+          </svg>
+          <p class="graph-caption">The marker moves in real time with object position.</p>
+        </section>
+
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const scene = document.getElementById("scene");
+      const beamLayer = document.getElementById("beamLayer");
+      const distanceLayer = document.getElementById("distanceLayer");
+      const sourceGroup = document.getElementById("sourceGroup");
+      const objectGroup = document.getElementById("objectGroup");
+      const objectShape = document.getElementById("objectShape");
+      const objectHit = document.getElementById("objectHit");
+      const objectLabel = document.getElementById("objectLabel");
+      const projectionBlur = document.getElementById("projectionBlur");
+      const projectionCore = document.getElementById("projectionCore");
+      const projectionEdge = document.getElementById("projectionEdge");
+      const focalSpotLine = document.getElementById("focalSpotLine");
+      const edgeBlurStd = document.getElementById("edgeBlurStd");
+
+      const sidSlider = document.getElementById("sidSlider");
+      const sodSlider = document.getElementById("sodSlider");
+      const focalSlider = document.getElementById("focalSlider");
+
+      const sidOut = document.getElementById("sidOut");
+      const sodOut = document.getElementById("sodOut");
+      const focalOut = document.getElementById("focalOut");
+
+      const graphAxes = document.getElementById("graphAxes");
+      const graphCurve = document.getElementById("graphCurve");
+      const graphMarker = document.getElementById("graphMarker");
+
+
+      const SCENE = {
+        sourceBaseX: 120,
+        detectorX: 920,
+        detectorPanelX: 920,
+        detectorPanelW: 80,
+        detectorTop: 115,
+        detectorBottom: 445,
+        sourceY: 280,
+        centerY: 280,
+        pxPerCm: 4,
+        sodMinCm: 25,
+        oddMinCm: 15,
+      };
+
+      const state = {
+        sidCm: 120,
+        sodCm: 90,
+        objectSizeCm: 15,
+        focalSpotMm: 1,
+        dragging: false,
+        dragOffsetX: 0,
+      };
+
+      let rafQueued = false;
+      let objectBounds = { x: 0, y: 0, w: 0, h: 0 };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function mapRange(value, inMin, inMax, outMin, outMax) {
+        const t = (value - inMin) / (inMax - inMin);
+        return outMin + t * (outMax - outMin);
+      }
+
+      function formatFocalMm(value) {
+        const rounded = Math.round(value * 100) / 100;
+        return Number.isInteger(rounded * 10) ? rounded.toFixed(1) : rounded.toFixed(2);
+      }
+
+      function currentSodMax() {
+        return Math.max(SCENE.sodMinCm, state.sidCm - SCENE.oddMinCm);
+      }
+
+      function syncSodSliderBounds() {
+        const maxSod = currentSodMax();
+        sodSlider.min = SCENE.sodMinCm.toFixed(1);
+        sodSlider.max = maxSod.toFixed(1);
+        if (state.sodCm > maxSod) {
+          state.sodCm = maxSod;
+        }
+        if (state.sodCm < SCENE.sodMinCm) {
+          state.sodCm = SCENE.sodMinCm;
+        }
+        sodSlider.value = state.sodCm.toFixed(1);
+      }
+
+      function svgPoint(evt) {
+        const rect = scene.getBoundingClientRect();
+        const x = ((evt.clientX - rect.left) / rect.width) * 1100;
+        const y = ((evt.clientY - rect.top) / rect.height) * 560;
+        return { x, y };
+      }
+
+      function compute() {
+        const sid = state.sidCm;
+        const sod = state.sodCm;
+        const oid = sid - sod;
+        const magnification = sid / sod;
+        const imageSizeCm = state.objectSizeCm * magnification;
+        const unsharpMm = state.focalSpotMm * (oid / sod);
+
+        return {
+          sid,
+          sod,
+          oid,
+          magnification,
+          imageSizeCm,
+          unsharpMm,
+        };
+      }
+
+      function sceneGeometry(physics) {
+        const sourceX = SCENE.detectorX - physics.sid * SCENE.pxPerCm;
+        const objectX = sourceX + physics.sod * SCENE.pxPerCm;
+        const objectHeightPx = state.objectSizeCm * 5.8;
+        const objectWidthPx = clamp(objectHeightPx * 0.33, 24, 58);
+        const objectTopY = SCENE.centerY - objectHeightPx / 2;
+
+        const imageWidthPx = clamp(objectWidthPx * physics.magnification * 0.65, 20, 58);
+        const imageX = SCENE.detectorPanelX + (SCENE.detectorPanelW - imageWidthPx) / 2;
+
+        const focalLineLength = mapRange(state.focalSpotMm, 0.1, 2.0, 6, 24);
+        const focalTopY = SCENE.sourceY - focalLineLength / 2;
+        const focalBottomY = SCENE.sourceY + focalLineLength / 2;
+
+        return {
+          sourceX,
+          objectX,
+          objectTopY,
+          objectHeightPx,
+          objectWidthPx,
+          imageWidthPx,
+          imageX,
+          focalTopY,
+          focalBottomY,
+        };
+      }
+
+      function detectorYFromRay(rayStartX, rayStartY, objectX, objectY) {
+        const t = (SCENE.detectorX - rayStartX) / (objectX - rayStartX);
+        return rayStartY + t * (objectY - rayStartY);
+      }
+
+      function computeProjection(geom) {
+        const objTop = geom.objectTopY;
+        const objBottom = geom.objectTopY + geom.objectHeightPx;
+
+        const yTopFromFocalTop = detectorYFromRay(geom.sourceX, geom.focalTopY, geom.objectX, objTop);
+        const yTopFromFocalBottom = detectorYFromRay(geom.sourceX, geom.focalBottomY, geom.objectX, objTop);
+        const yBottomFromFocalTop = detectorYFromRay(geom.sourceX, geom.focalTopY, geom.objectX, objBottom);
+        const yBottomFromFocalBottom = detectorYFromRay(geom.sourceX, geom.focalBottomY, geom.objectX, objBottom);
+
+        const topOuter = Math.min(yTopFromFocalTop, yTopFromFocalBottom);
+        const topInner = Math.max(yTopFromFocalTop, yTopFromFocalBottom);
+        const bottomInner = Math.min(yBottomFromFocalTop, yBottomFromFocalBottom);
+        const bottomOuter = Math.max(yBottomFromFocalTop, yBottomFromFocalBottom);
+
+        return {
+          objTop,
+          objBottom,
+          yTopFromFocalTop,
+          yTopFromFocalBottom,
+          yBottomFromFocalTop,
+          yBottomFromFocalBottom,
+          topOuter,
+          topInner,
+          bottomInner,
+          bottomOuter,
+        };
+      }
+
+      function drawBeams(geom, projection) {
+        let markup = "";
+        const penumbraColor = "#8a949f";
+
+        const penumbraRays = [
+          { sy: geom.focalTopY, oy: projection.objTop, dy: projection.yTopFromFocalTop },
+          { sy: geom.focalBottomY, oy: projection.objTop, dy: projection.yTopFromFocalBottom },
+          { sy: geom.focalTopY, oy: projection.objBottom, dy: projection.yBottomFromFocalTop },
+          { sy: geom.focalBottomY, oy: projection.objBottom, dy: projection.yBottomFromFocalBottom },
+        ];
+
+        for (const ray of penumbraRays) {
+          markup += `<line x1="${geom.sourceX}" y1="${ray.sy}" x2="${geom.objectX}" y2="${ray.oy}" stroke="${penumbraColor}" stroke-opacity="0.95" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="1 8" />`;
+          markup += `<line x1="${geom.objectX}" y1="${ray.oy}" x2="${SCENE.detectorX}" y2="${ray.dy}" stroke="${penumbraColor}" stroke-opacity="0.95" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="1 8" />`;
+        }
+
+        markup += `<line x1="${SCENE.detectorX - 12}" y1="${projection.topOuter}" x2="${SCENE.detectorX + 14}" y2="${projection.topOuter}" stroke="${penumbraColor}" stroke-width="2.9" stroke-linecap="round" stroke-dasharray="1 7" />`;
+        markup += `<line x1="${SCENE.detectorX - 12}" y1="${projection.bottomOuter}" x2="${SCENE.detectorX + 14}" y2="${projection.bottomOuter}" stroke="${penumbraColor}" stroke-width="2.9" stroke-linecap="round" stroke-dasharray="1 7" />`;
+
+        beamLayer.innerHTML = markup;
+      }
+
+      function drawDistances(geom, physics) {
+        const sidColor = "#2f5f93";
+        const sodColor = "#b8c2ce";
+        const oddColor = "#818d9b";
+        const sidY = 506;
+        const sodY = 525;
+        const oddY = 544;
+        const tick = 6;
+        const mainLineWidth = 4.2;
+        const tickLineWidth = 3.2;
+        const sidMid = (geom.sourceX + SCENE.detectorX) / 2;
+        const sodMid = (geom.sourceX + geom.objectX) / 2;
+        const oddMid = (geom.objectX + SCENE.detectorX) / 2;
+
+        distanceLayer.innerHTML = `
+          <line x1="${geom.sourceX}" y1="${sidY}" x2="${SCENE.detectorX}" y2="${sidY}" stroke="${sidColor}" stroke-width="${mainLineWidth}"/>
+          <line x1="${geom.sourceX}" y1="${sidY - tick}" x2="${geom.sourceX}" y2="${sidY + tick}" stroke="${sidColor}" stroke-width="${tickLineWidth}"/>
+          <line x1="${SCENE.detectorX}" y1="${sidY - tick}" x2="${SCENE.detectorX}" y2="${sidY + tick}" stroke="${sidColor}" stroke-width="${tickLineWidth}"/>
+          <text x="${sidMid}" y="${sidY - 12}" text-anchor="middle" fill="${sidColor}" font-size="20" font-weight="800">SID</text>
+
+          <line x1="${geom.sourceX}" y1="${sodY}" x2="${geom.objectX}" y2="${sodY}" stroke="${sodColor}" stroke-width="${mainLineWidth}"/>
+          <line x1="${geom.sourceX}" y1="${sodY - tick}" x2="${geom.sourceX}" y2="${sodY + tick}" stroke="${sodColor}" stroke-width="${tickLineWidth}"/>
+          <line x1="${geom.objectX}" y1="${sodY - tick}" x2="${geom.objectX}" y2="${sodY + tick}" stroke="${sodColor}" stroke-width="${tickLineWidth}"/>
+          <text x="${sodMid}" y="${sodY - 12}" text-anchor="middle" fill="${sodColor}" font-size="20" font-weight="800">SOD</text>
+
+          <line x1="${geom.objectX}" y1="${oddY}" x2="${SCENE.detectorX}" y2="${oddY}" stroke="${oddColor}" stroke-width="2"/>
+          <line x1="${geom.objectX}" y1="${oddY - tick}" x2="${geom.objectX}" y2="${oddY + tick}" stroke="${oddColor}" stroke-width="2"/>
+          <line x1="${SCENE.detectorX}" y1="${oddY - tick}" x2="${SCENE.detectorX}" y2="${oddY + tick}" stroke="${oddColor}" stroke-width="2"/>
+          <text x="${oddMid}" y="${oddY - 8}" text-anchor="middle" fill="${oddColor}" font-size="12" font-weight="700">ODD ${physics.oid.toFixed(1)} cm</text>
+        `;
+      }
+
+      function updateScene(physics) {
+        const geom = sceneGeometry(physics);
+        const projection = computeProjection(geom);
+        sourceGroup.setAttribute("transform", `translate(${(geom.sourceX - SCENE.sourceBaseX).toFixed(2)} 0)`);
+
+        const objectX = geom.objectX - geom.objectWidthPx / 2;
+        const objectY = geom.objectTopY;
+        const objectHeight = geom.objectHeightPx;
+
+        objectShape.setAttribute("x", objectX.toFixed(2));
+        objectShape.setAttribute("y", objectY.toFixed(2));
+        objectShape.setAttribute("width", geom.objectWidthPx.toFixed(2));
+        objectShape.setAttribute("height", objectHeight.toFixed(2));
+        objectShape.setAttribute("rx", clamp(geom.objectWidthPx * 0.22, 8, 14).toFixed(2));
+
+        objectHit.setAttribute("x", (objectX - 14).toFixed(2));
+        objectHit.setAttribute("y", (objectY - 12).toFixed(2));
+        objectHit.setAttribute("width", (geom.objectWidthPx + 28).toFixed(2));
+        objectHit.setAttribute("height", (objectHeight + 24).toFixed(2));
+
+        objectLabel.setAttribute("x", geom.objectX.toFixed(2));
+
+        objectBounds = {
+          x: objectX - 14,
+          y: objectY - 12,
+          w: geom.objectWidthPx + 28,
+          h: objectHeight + 24,
+        };
+
+        const blurTop = clamp(projection.topOuter, SCENE.detectorTop, SCENE.detectorBottom);
+        const blurBottom = clamp(projection.bottomOuter, SCENE.detectorTop, SCENE.detectorBottom);
+        const coreTop = clamp(projection.topInner, SCENE.detectorTop, SCENE.detectorBottom);
+        const coreBottom = clamp(projection.bottomInner, SCENE.detectorTop, SCENE.detectorBottom);
+        const blurHeight = Math.max(4, blurBottom - blurTop);
+        const coreHeight = Math.max(4, coreBottom - coreTop);
+        const blurWidth = clamp(geom.imageWidthPx + 18, 26, SCENE.detectorPanelW);
+        const blurX = SCENE.detectorPanelX + (SCENE.detectorPanelW - blurWidth) / 2;
+
+        projectionBlur.setAttribute("x", blurX.toFixed(2));
+        projectionBlur.setAttribute("y", blurTop.toFixed(2));
+        projectionBlur.setAttribute("width", blurWidth.toFixed(2));
+        projectionBlur.setAttribute("height", blurHeight.toFixed(2));
+        projectionBlur.setAttribute("rx", clamp(blurWidth * 0.24, 6, 14).toFixed(2));
+
+        projectionCore.setAttribute("x", geom.imageX.toFixed(2));
+        projectionCore.setAttribute("y", coreTop.toFixed(2));
+        projectionCore.setAttribute("width", geom.imageWidthPx.toFixed(2));
+        projectionCore.setAttribute("height", coreHeight.toFixed(2));
+        projectionCore.setAttribute("rx", clamp(geom.imageWidthPx * 0.48, 8, 18).toFixed(2));
+
+        projectionEdge.setAttribute("x", geom.imageX.toFixed(2));
+        projectionEdge.setAttribute("y", coreTop.toFixed(2));
+        projectionEdge.setAttribute("width", geom.imageWidthPx.toFixed(2));
+        projectionEdge.setAttribute("height", coreHeight.toFixed(2));
+        projectionEdge.setAttribute("rx", clamp(geom.imageWidthPx * 0.48, 8, 18).toFixed(2));
+
+        const blurPx = clamp(physics.unsharpMm * 5, 1.2, 26);
+        projectionEdge.setAttribute("stroke-width", (blurPx * 1.8).toFixed(2));
+        edgeBlurStd.setAttribute("stdDeviation", (blurPx * 0.35).toFixed(2));
+        projectionBlur.setAttribute("fill-opacity", clamp(0.18 + physics.unsharpMm * 0.08, 0.2, 0.56).toFixed(2));
+
+        focalSpotLine.setAttribute("y1", geom.focalTopY.toFixed(2));
+        focalSpotLine.setAttribute("y2", geom.focalBottomY.toFixed(2));
+
+        drawBeams(geom, projection);
+        drawDistances(geom, physics);
+      }
+
+      function buildGraphAxes(xMin, xMax, yMin, yMax, chart) {
+        const xTicks = 4;
+        const yTicks = 4;
+        let html = "";
+
+        html += `<line x1="${chart.left}" y1="${chart.top + chart.height}" x2="${chart.left + chart.width}" y2="${chart.top + chart.height}" stroke="#5f6a78" stroke-width="1.6"/>`;
+        html += `<line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.top + chart.height}" stroke="#5f6a78" stroke-width="1.6"/>`;
+
+        for (let i = 0; i <= xTicks; i += 1) {
+          const t = i / xTicks;
+          const x = chart.left + t * chart.width;
+          const value = xMin + t * (xMax - xMin);
+          html += `<line x1="${x}" y1="${chart.top}" x2="${x}" y2="${chart.top + chart.height}" stroke="#323b47" stroke-width="1"/>`;
+          html += `<text x="${x}" y="${chart.top + chart.height + 16}" text-anchor="middle" fill="#98a4b3" font-size="11" font-family="var(--sans)">${value.toFixed(0)}</text>`;
+        }
+
+        for (let i = 0; i <= yTicks; i += 1) {
+          const t = i / yTicks;
+          const y = chart.top + chart.height - t * chart.height;
+          const value = yMin + t * (yMax - yMin);
+          html += `<line x1="${chart.left}" y1="${y}" x2="${chart.left + chart.width}" y2="${y}" stroke="#323b47" stroke-width="1"/>`;
+          html += `<text x="${chart.left - 8}" y="${y + 4}" text-anchor="end" fill="#98a4b3" font-size="11" font-family="var(--sans)">${value.toFixed(2)}</text>`;
+        }
+
+        graphAxes.innerHTML = html;
+      }
+
+      function updateGraph(physics) {
+        const chart = { left: 56, top: 20, width: 338, height: 175 };
+        const xMin = SCENE.sodMinCm;
+        const xMax = currentSodMax();
+        const yMin = state.sidCm / xMax;
+        const yMax = state.sidCm / xMin;
+
+        const xScale = (value) => mapRange(value, xMin, xMax, chart.left, chart.left + chart.width);
+        const yScale = (value) => mapRange(value, yMin, yMax, chart.top + chart.height, chart.top);
+
+        const points = [];
+        const steps = 120;
+        for (let i = 0; i <= steps; i += 1) {
+          const sod = xMin + (i / steps) * (xMax - xMin);
+          const m = state.sidCm / sod;
+          points.push(`${xScale(sod).toFixed(2)},${yScale(m).toFixed(2)}`);
+        }
+
+        graphCurve.setAttribute("d", `M ${points.join(" L ")}`);
+        graphMarker.setAttribute("cx", xScale(physics.sod).toFixed(2));
+        graphMarker.setAttribute("cy", yScale(physics.magnification).toFixed(2));
+
+        buildGraphAxes(xMin, xMax, yMin, yMax, chart);
+      }
+
+      function updateControlLabels() {
+        sidOut.textContent = `${state.sidCm.toFixed(1)} cm`;
+        sodOut.textContent = `${state.sodCm.toFixed(1)} cm`;
+        focalOut.textContent = `${formatFocalMm(state.focalSpotMm)} mm`;
+      }
+
+      function render() {
+        rafQueued = false;
+        const physics = compute();
+        updateControlLabels();
+        updateScene(physics);
+        updateGraph(physics);
+      }
+
+      function queueRender() {
+        if (rafQueued) {
+          return;
+        }
+        rafQueued = true;
+        requestAnimationFrame(render);
+      }
+
+      function bindControls() {
+        sidSlider.addEventListener("input", function () {
+          state.sidCm = parseFloat(sidSlider.value);
+          syncSodSliderBounds();
+          queueRender();
+        });
+
+        sodSlider.addEventListener("input", function () {
+          state.sodCm = clamp(parseFloat(sodSlider.value), SCENE.sodMinCm, currentSodMax());
+          sodSlider.value = state.sodCm.toFixed(1);
+          queueRender();
+        });
+
+        focalSlider.addEventListener("input", function () {
+          state.focalSpotMm = parseFloat(focalSlider.value);
+          queueRender();
+        });
+      }
+
+      function bindDrag() {
+        function startDrag(evt) {
+          const point = svgPoint(evt);
+          const inside =
+            point.x >= objectBounds.x &&
+            point.x <= objectBounds.x + objectBounds.w &&
+            point.y >= objectBounds.y &&
+            point.y <= objectBounds.y + objectBounds.h;
+
+          if (!inside) {
+            return;
+          }
+
+          state.dragging = true;
+          objectGroup.setAttribute("cursor", "grabbing");
+          const geom = sceneGeometry(compute());
+          state.dragOffsetX = point.x - geom.objectX;
+          scene.setPointerCapture(evt.pointerId);
+        }
+
+        function moveDrag(evt) {
+          if (!state.dragging) {
+            return;
+          }
+
+          const point = svgPoint(evt);
+          const geom = sceneGeometry(compute());
+          const minX = geom.sourceX + SCENE.sodMinCm * SCENE.pxPerCm;
+          const maxX = SCENE.detectorX - SCENE.oddMinCm * SCENE.pxPerCm;
+          const nextX = clamp(point.x - state.dragOffsetX, minX, maxX);
+          const nextSod = (nextX - geom.sourceX) / SCENE.pxPerCm;
+          const clampedSod = clamp(nextSod, SCENE.sodMinCm, currentSodMax());
+
+          state.sodCm = clampedSod;
+          sodSlider.value = state.sodCm.toFixed(1);
+          queueRender();
+        }
+
+        function stopDrag(evt) {
+          if (!state.dragging) {
+            return;
+          }
+
+          state.dragging = false;
+          objectGroup.setAttribute("cursor", "grab");
+
+          if (scene.hasPointerCapture(evt.pointerId)) {
+            scene.releasePointerCapture(evt.pointerId);
+          }
+
+        }
+
+        scene.addEventListener("pointerdown", startDrag);
+        scene.addEventListener("pointermove", moveDrag);
+        scene.addEventListener("pointerup", stopDrag);
+        scene.addEventListener("pointercancel", stopDrag);
+        scene.addEventListener("pointerleave", function (evt) {
+          if (state.dragging && evt.pointerType === "mouse") {
+            stopDrag(evt);
+          }
+        });
+      }
+
+      function initFromControls() {
+        state.sidCm = parseFloat(sidSlider.value);
+        state.sodCm = parseFloat(sodSlider.value);
+        state.focalSpotMm = parseFloat(focalSlider.value);
+        syncSodSliderBounds();
+      }
+
+      initFromControls();
+      bindControls();
+      bindDrag();
+      render();
+    })();
+  </script>
+</body>
+</html>

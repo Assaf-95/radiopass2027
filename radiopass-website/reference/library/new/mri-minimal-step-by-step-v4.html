@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Step-by-Step Version 4: Slice Selection</title>
+  <style>
+    :root {
+      --bg: #f4f7fc;
+      --panel: #ffffff;
+      --line: #d8e0ec;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #1d4ed8;
+      --axis-x: #b91c1c;
+      --axis-y: #047857;
+      --axis-z: #2563eb;
+      --water: #1d4ed8;
+      --fat: #16a34a;
+      --net: #111827;
+      --b0: #2563eb;
+      --rf: #ea580c;
+      --gz: #0f766e;
+      --slice: rgba(59, 130, 246, 0.18);
+      --slice-line: rgba(29, 78, 216, 0.6);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      aspect-ratio: 16 / 10;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #f8fafc;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    #stepText {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      white-space: pre-line;
+      min-height: 62px;
+    }
+
+    #equation {
+      margin: 0;
+      min-height: 22px;
+      color: #1e3a8a;
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+      white-space: pre-line;
+    }
+
+    #status {
+      margin: 0;
+      color: #0f172a;
+      font-size: 0.84rem;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      white-space: pre-line;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 0.92rem;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .option-row {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .option-line {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input[type="range"] {
+      width: 200px;
+      accent-color: #1d4ed8;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 12px; }
+      .panel { padding: 12px; }
+      #stepText { min-height: 88px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="top">
+        <h1>MRI Step-by-Step (Version 4): Slice Selection</h1>
+        <div id="stepPill" class="pill">Step 1 of 5</div>
+      </div>
+      <p class="sub">Focus only on slice selection: B0, Gz, RF bandwidth, selective flip, and optional slice refocusing lobe.</p>
+    </section>
+
+    <section class="panel">
+      <canvas id="scene" width="1280" height="800" aria-label="Bloch sphere and slice selection diagram"></canvas>
+      <div class="legend">
+        <span class="key"><span class="dot" style="background: var(--water);"></span>Water</span>
+        <span class="key"><span class="dot" style="background: var(--fat);"></span>Fat</span>
+        <span class="key"><span class="dot" style="background: var(--net);"></span>Net (selected slice)</span>
+        <span class="key"><span class="dot" style="background: var(--b0);"></span>B0</span>
+        <span class="key"><span class="dot" style="background: var(--gz);"></span>Gz (slice-select)</span>
+        <span class="key"><span class="dot" style="background: var(--rf);"></span>RF pulse</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="stepTitle"></h2>
+      <p id="stepText"></p>
+      <p id="equation"></p>
+      <p id="status"></p>
+
+      <div class="controls">
+        <button id="backBtn">Back</button>
+        <button id="nextBtn" class="primary">Next</button>
+      </div>
+
+      <div class="option-row">
+        <div class="option-line">
+          <label for="sliceSlider">Slice thickness</label>
+          <input id="sliceSlider" type="range" min="1" max="9" step="2" value="3" />
+          <strong id="sliceVal">3 dots</strong>
+        </div>
+        <label class="option-line">
+          <input id="refocusToggle" type="checkbox" checked />
+          Show slice refocusing lobe
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TAU = Math.PI * 2;
+
+    const positions = Array.from({ length: 9 }, (_, i) => i - 4);
+
+    const steps = [
+      {
+        title: "Step 1 - Apply B0 (All Spins Align)",
+        text: "B0 aligns spins along Z.\nNo transverse signal.",
+        equation: "",
+        target: {
+          b0Alpha: 1,
+          gzLevel: 0,
+          rfAlpha: 0,
+          inSliceFlipDeg: 0,
+          phaseTwist: 0,
+          cursorU: 0.08,
+          signalHint: 0
+        }
+      },
+      {
+        title: "Step 2 - Slice Selection Gradient On (Gz)",
+        text: "Gz makes Larmor frequency depend on position.",
+        equation: "ω(z) = γ(B0 + Gz·z)",
+        target: {
+          b0Alpha: 1,
+          gzLevel: 0.9,
+          rfAlpha: 0,
+          inSliceFlipDeg: 0,
+          phaseTwist: 0,
+          cursorU: 0.23,
+          signalHint: 0
+        }
+      },
+      {
+        title: "Step 3 - Apply RF Pulse With Bandwidth (Selective Excitation)",
+        text: "RF + Gz excites only a slice.\nOutside the slice remains unexcited.",
+        equation: "RF bandwidth Δf selects spins with ω(z) inside band",
+        target: {
+          b0Alpha: 1,
+          gzLevel: 0.9,
+          rfAlpha: 1,
+          inSliceFlipDeg: 90,
+          phaseTwist: 1.05,
+          cursorU: 0.43,
+          signalHint: 0.55
+        }
+      },
+      {
+        title: "Step 4 - Slice Selection Gradient Off",
+        text: "After RF ends and Gz turns off, only the slice contributes to signal.",
+        equation: "",
+        target: {
+          b0Alpha: 1,
+          gzLevel: 0,
+          rfAlpha: 0,
+          inSliceFlipDeg: 90,
+          phaseTwist: 1.05,
+          cursorU: 0.70,
+          signalHint: 0.55
+        }
+      },
+      {
+        title: "Step 5 - Slice Refocusing Lobe (Optional)",
+        text: "Slice refocusing gradient compensates phase dispersion introduced during slice selection.",
+        equation: "",
+        target: {
+          b0Alpha: 1,
+          gzLevel: -0.52,
+          rfAlpha: 0,
+          inSliceFlipDeg: 90,
+          phaseTwist: 0.2,
+          cursorU: 0.84,
+          signalHint: 0.88
+        }
+      }
+    ];
+
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+
+    const stepPill = document.getElementById("stepPill");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepText = document.getElementById("stepText");
+    const equationEl = document.getElementById("equation");
+    const statusEl = document.getElementById("status");
+
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const sliceSlider = document.getElementById("sliceSlider");
+    const sliceVal = document.getElementById("sliceVal");
+    const refocusToggle = document.getElementById("refocusToggle");
+
+    let stepIndex = 0;
+    let transition = null;
+
+    const state = {
+      ...steps[0].target
+    };
+
+    const view = {
+      yaw: degToRad(35),
+      pitch: degToRad(-22),
+      radiusPx: 175
+    };
+
+    function snapshotState() {
+      return {
+        b0Alpha: state.b0Alpha,
+        gzLevel: state.gzLevel,
+        rfAlpha: state.rfAlpha,
+        inSliceFlipDeg: state.inSliceFlipDeg,
+        phaseTwist: state.phaseTwist,
+        cursorU: state.cursorU,
+        signalHint: state.signalHint
+      };
+    }
+
+    function getStepTarget(i) {
+      const base = { ...steps[i].target };
+      if (i === 5 - 1 && !refocusToggle.checked) {
+        base.gzLevel = 0;
+        base.phaseTwist = steps[3].target.phaseTwist;
+        base.signalHint = steps[3].target.signalHint;
+      }
+      return base;
+    }
+
+    function setStep(index) {
+      stepIndex = clamp(index, 0, steps.length - 1);
+      const to = getStepTarget(stepIndex);
+      transition = {
+        startMs: performance.now(),
+        durationMs: 950,
+        from: snapshotState(),
+        to
+      };
+      renderStepText();
+      updateButtons();
+    }
+
+    function renderStepText() {
+      const s = steps[stepIndex];
+      stepPill.textContent = `Step ${stepIndex + 1} of ${steps.length}`;
+      stepTitle.textContent = s.title;
+      stepText.textContent = s.text;
+
+      let eq = s.equation;
+      if (stepIndex === 4 && !refocusToggle.checked) {
+        eq = "Refocusing lobe is OFF. Phase twist remains.";
+      }
+      equationEl.textContent = eq;
+    }
+
+    function updateButtons() {
+      backBtn.disabled = stepIndex === 0;
+      nextBtn.disabled = stepIndex === steps.length - 1;
+    }
+
+    function applyTransition(nowMs) {
+      if (!transition) return;
+      const raw = clamp((nowMs - transition.startMs) / transition.durationMs, 0, 1);
+      const p = smooth01(raw);
+      state.b0Alpha = lerp(transition.from.b0Alpha, transition.to.b0Alpha, p);
+      state.gzLevel = lerp(transition.from.gzLevel, transition.to.gzLevel, p);
+      state.rfAlpha = lerp(transition.from.rfAlpha, transition.to.rfAlpha, p);
+      state.inSliceFlipDeg = lerp(transition.from.inSliceFlipDeg, transition.to.inSliceFlipDeg, p);
+      state.phaseTwist = lerp(transition.from.phaseTwist, transition.to.phaseTwist, p);
+      state.cursorU = lerp(transition.from.cursorU, transition.to.cursorU, p);
+      state.signalHint = lerp(transition.from.signalHint, transition.to.signalHint, p);
+
+      if (raw >= 1) {
+        Object.assign(state, transition.to);
+        transition = null;
+      }
+    }
+
+    function getSliceHalfDots() {
+      return (Number(sliceSlider.value) - 1) * 0.5;
+    }
+
+    function inSlice(pos) {
+      return Math.abs(pos) <= getSliceHalfDots() + 1e-6;
+    }
+
+    function getIsochromatVector(pos, tissueOffset) {
+      const inside = inSlice(pos);
+      const flip = inside ? state.inSliceFlipDeg : 0;
+      const flipRad = degToRad(flip);
+      const zNorm = pos / 4;
+      const phi = inside ? state.phaseTwist * zNorm + tissueOffset : 0;
+
+      return {
+        x: Math.sin(flipRad) * Math.cos(phi),
+        y: Math.sin(flipRad) * Math.sin(phi),
+        z: Math.cos(flipRad)
+      };
+    }
+
+    function getSliceAverage(tissueOffset) {
+      const idx = positions.filter((p) => {
+        if (stepIndex >= 2) return inSlice(p);
+        return true;
+      });
+      const use = idx.length ? idx : positions;
+
+      let sx = 0;
+      let sy = 0;
+      let sz = 0;
+      for (const p of use) {
+        const v = getIsochromatVector(p, tissueOffset);
+        sx += v.x;
+        sy += v.y;
+        sz += v.z;
+      }
+
+      const n = use.length || 1;
+      return { x: sx / n, y: sy / n, z: sz / n };
+    }
+
+    function project(v, cx, cy, zoom) {
+      const cyaw = Math.cos(view.yaw);
+      const syaw = Math.sin(view.yaw);
+      const cp = Math.cos(view.pitch);
+      const sp = Math.sin(view.pitch);
+
+      const x1 = v.x * cyaw + v.z * syaw;
+      const z1 = -v.x * syaw + v.z * cyaw;
+      const y2 = v.y * cp - z1 * sp;
+
+      return {
+        x: cx + x1 * view.radiusPx * zoom,
+        y: cy - y2 * view.radiusPx * zoom
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const blochX = canvas.width * 0.30;
+      const blochY = 220;
+      drawBlochSphere(blochX, blochY);
+      drawAxes(blochX, blochY);
+      drawB0(blochX, blochY);
+      drawB1(blochX, blochY);
+
+      const water = getSliceAverage(0.08);
+      const fat = getSliceAverage(-0.08);
+      const net = {
+        x: 0.5 * (water.x + fat.x),
+        y: 0.5 * (water.y + fat.y),
+        z: 0.5 * (water.z + fat.z)
+      };
+
+      drawVector(blochX, blochY, water, getCss("--water"), 3, "Water");
+      drawVector(blochX, blochY, fat, getCss("--fat"), 3, "Fat");
+      drawVector(blochX, blochY, net, getCss("--net"), 4, "Net");
+
+      drawPatientColumn();
+      drawSignalGraph(net);
+      drawMiniTimeline();
+      drawOverlayText();
+
+      updateStatus(water, fat, net);
+    }
+
+    function drawBlochSphere(cx, cy) {
+      const r = view.radiusPx;
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#dbe3ee";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 0.38, 0, 0, TAU);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Bloch sphere", cx - 44, cy + r + 24);
+    }
+
+    function drawAxes(cx, cy) {
+      drawAxis(cx, cy, { x: -1.08, y: 0, z: 0 }, { x: 1.08, y: 0, z: 0 }, getCss("--axis-x"), "X");
+      drawAxis(cx, cy, { x: 0, y: -1.08, z: 0 }, { x: 0, y: 1.08, z: 0 }, getCss("--axis-y"), "Y");
+      drawAxis(cx, cy, { x: 0, y: 0, z: -1.20 }, { x: 0, y: 0, z: 1.20 }, getCss("--axis-z"), "Z");
+    }
+
+    function drawAxis(cx, cy, a, b, color, label) {
+      const p1 = project(a, cx, cy, 1);
+      const p2 = project(b, cx, cy, 1);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      drawArrowHead(p1, p2, color, 10);
+      ctx.fillStyle = color;
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText(label, p2.x + 6, p2.y - 6);
+    }
+
+    function drawB0(cx, cy) {
+      if (state.b0Alpha < 0.01) return;
+      const a = project({ x: 0, y: 0, z: -1.25 }, cx, cy, 1);
+      const b = project({ x: 0, y: 0, z: 1.25 }, cx, cy, 1);
+
+      ctx.save();
+      ctx.globalAlpha = state.b0Alpha;
+      ctx.strokeStyle = getCss("--b0");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--b0"), 13);
+      ctx.fillStyle = getCss("--b0");
+      ctx.font = "bold 15px Segoe UI";
+      ctx.fillText("B0", b.x + 10, b.y - 8);
+      ctx.restore();
+    }
+
+    function drawB1(cx, cy) {
+      if (state.rfAlpha < 0.01) return;
+      const a = project({ x: -1.2, y: 0, z: 0 }, cx, cy, 1);
+      const b = project({ x: 1.2, y: 0, z: 0 }, cx, cy, 1);
+
+      ctx.save();
+      ctx.globalAlpha = state.rfAlpha;
+      ctx.strokeStyle = getCss("--rf");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--rf"), 13);
+      ctx.fillStyle = getCss("--rf");
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("RF (Δf)", b.x + 10, b.y + 12);
+      ctx.fillText(`Flip inside slice: ${state.inSliceFlipDeg.toFixed(0)}°`, b.x + 10, b.y + 32);
+      ctx.restore();
+    }
+
+    function drawVector(cx, cy, v, color, width, label) {
+      const p0 = project({ x: 0, y: 0, z: 0 }, cx, cy, 1);
+      const p1 = project(v, cx, cy, 1);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+      drawArrowHead(p0, p1, color, width >= 4 ? 13 : 11);
+      ctx.fillStyle = color;
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText(label, p1.x + 8, p1.y - 3);
+    }
+
+    function drawPatientColumn() {
+      const xMid = canvas.width * 0.72;
+      const yTop = 120;
+      const yBottom = 420;
+      const rowH = (yBottom - yTop) / (positions.length - 1);
+
+      // Slice highlight band
+      const half = getSliceHalfDots();
+      const yHigh = yTop + (4 - half) * rowH;
+      const yLow = yTop + (4 + half) * rowH;
+
+      ctx.save();
+      ctx.globalAlpha = stepIndex >= 1 ? 1 : 0.35;
+      ctx.fillStyle = getCss("--slice");
+      ctx.fillRect(xMid - 70, yHigh - rowH * 0.45, 140, (yLow - yHigh) + rowH * 0.9);
+      ctx.strokeStyle = getCss("--slice-line");
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(xMid - 70, yHigh - rowH * 0.45, 140, (yLow - yHigh) + rowH * 0.9);
+      ctx.restore();
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(xMid, yTop - 18);
+      ctx.lineTo(xMid, yBottom + 18);
+      ctx.stroke();
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("Patient Z positions (isochromat groups)", xMid - 138, yTop - 34);
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("+Z", xMid + 16, yTop - 10);
+      ctx.fillText("-Z", xMid + 16, yBottom + 18);
+
+      if (Math.abs(state.gzLevel) > 0.05) {
+        ctx.fillStyle = getCss("--gz");
+        ctx.font = "bold 13px Segoe UI";
+        if (state.gzLevel > 0) {
+          ctx.fillText("Gz ON: higher ω at +Z", xMid - 75, yTop - 12);
+        } else {
+          ctx.fillText("Refocusing lobe: opposite Gz", xMid - 75, yTop - 12);
+        }
+      }
+
+      for (let i = 0; i < positions.length; i += 1) {
+        const p = positions[i];
+        const y = yTop + i * rowH;
+        const inside = inSlice(p);
+
+        ctx.fillStyle = inside && stepIndex >= 2 ? "#dbeafe" : "#e2e8f0";
+        ctx.beginPath();
+        ctx.arc(xMid, y, 6.5, 0, TAU);
+        ctx.fill();
+
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(xMid, y, 6.5, 0, TAU);
+        ctx.stroke();
+
+        const water = getIsochromatVector(p, 0.08);
+        const fat = getIsochromatVector(p, -0.08);
+
+        drawMiniVec(xMid - 14, y, water, getCss("--water"));
+        drawMiniVec(xMid + 14, y, fat, getCss("--fat"));
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px Segoe UI";
+        const freqText = (state.gzLevel !== 0)
+          ? `ω${p >= 0 ? "+" : ""}${p}`
+          : `${p}`;
+        ctx.fillText(freqText, xMid + 28, y + 4);
+      }
+
+      ctx.fillStyle = "#1e3a8a";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("Selected slice", xMid - 42, yHigh - rowH * 0.56);
+    }
+
+    function drawMiniVec(cx, cy, v, color) {
+      const len = 10;
+      const x2 = cx + v.x * len;
+      const y2 = cy - v.z * len;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      drawArrowHead({ x: cx, y: cy }, { x: x2, y: y2 }, color, 4.5);
+    }
+
+    function drawSignalGraph(net) {
+      const x0 = 90;
+      const y0 = 470;
+      const w = 500;
+      const h = 125;
+      const yBottom = y0 + h - 20;
+      const yTop = y0 + 18;
+
+      ctx.strokeStyle = "#d6deea";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Slice signal (selected slice only)", x0 + 8, y0 + 16);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x0 + 30, yBottom);
+      ctx.lineTo(x0 + w - 10, yBottom);
+      ctx.moveTo(x0 + 30, yBottom);
+      ctx.lineTo(x0 + 30, yTop);
+      ctx.stroke();
+
+      const points = [
+        { u: 0.08, a: 0.00 },
+        { u: 0.23, a: 0.00 },
+        { u: 0.43, a: 0.55 },
+        { u: 0.70, a: 0.55 },
+        { u: 0.84, a: refocusToggle.checked ? 0.88 : 0.55 }
+      ];
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      for (let i = 0; i < points.length; i += 1) {
+        const px = x0 + 30 + points[i].u * (w - 40);
+        const py = yBottom - points[i].a * (yBottom - yTop);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      const curAmp = Math.hypot(net.x, net.y);
+      const curX = x0 + 30 + state.cursorU * (w - 40);
+      const curY = yBottom - clamp(curAmp, 0, 1) * (yBottom - yTop);
+
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i <= 130; i += 1) {
+        const u = i / 130;
+        if (u > state.cursorU) break;
+        const interp = interpolateSignalHint(u);
+        const px = x0 + 30 + u * (w - 40);
+        const py = yBottom - interp * (yBottom - yTop);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.beginPath();
+      ctx.arc(curX, curY, 4, 0, TAU);
+      ctx.fill();
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(`Current net transverse = ${curAmp.toFixed(2)}`, x0 + w - 180, y0 + 16);
+    }
+
+    function interpolateSignalHint(u) {
+      const pts = [
+        { u: 0.08, a: 0.00 },
+        { u: 0.23, a: 0.00 },
+        { u: 0.43, a: 0.55 },
+        { u: 0.70, a: 0.55 },
+        { u: 0.84, a: refocusToggle.checked ? 0.88 : 0.55 }
+      ];
+
+      if (u <= pts[0].u) return pts[0].a;
+      for (let i = 0; i < pts.length - 1; i += 1) {
+        const a = pts[i];
+        const b = pts[i + 1];
+        if (u >= a.u && u <= b.u) {
+          const t = (u - a.u) / (b.u - a.u || 1);
+          return lerp(a.a, b.a, t);
+        }
+      }
+      return pts[pts.length - 1].a;
+    }
+
+    function drawMiniTimeline() {
+      const x0 = 700;
+      const y0 = 500;
+      const w = 500;
+      const rowH = 42;
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText("Mini timeline", x0, y0 - 18);
+
+      drawTimelineRow(x0, y0, w, rowH, "RF", getCss("--rf"), [
+        { s: 0.30, e: 0.50, amp: 1 }
+      ]);
+
+      const gzSegments = [
+        { s: 0.20, e: 0.62, amp: 0.9 }
+      ];
+      if (refocusToggle.checked) {
+        gzSegments.push({ s: 0.64, e: 0.73, amp: -0.55 });
+      }
+      drawTimelineRow(x0, y0 + rowH, w, rowH, "Gz", getCss("--gz"), gzSegments);
+
+      const xCur = x0 + state.cursorU * w;
+      ctx.strokeStyle = "#1d4ed8";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(xCur, y0 - 2);
+      ctx.lineTo(xCur, y0 + rowH * 2 + 4);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawTimelineRow(x0, y0, w, h, label, color, segments) {
+      const mid = y0 + h * 0.5;
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(label, x0 - 28, mid + 4);
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.beginPath();
+      ctx.moveTo(x0, mid);
+      ctx.lineTo(x0 + w, mid);
+      ctx.stroke();
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 8;
+      for (const seg of segments) {
+        const x1 = x0 + seg.s * w;
+        const x2 = x0 + seg.e * w;
+        const y = mid - seg.amp * (h * 0.32);
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawOverlayText() {
+      const x = canvas.width * 0.08;
+      const y = 72;
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 19px Segoe UI";
+      ctx.fillText(steps[stepIndex].title.replace(/^Step\s\d+\s-\s/, ""), x, y);
+
+      if (stepIndex === 1 || stepIndex === 2) {
+        ctx.fillStyle = "#1e3a8a";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText("ω(z) increases with z while Gz is on.", x, y + 22);
+      }
+
+      if (stepIndex === 2) {
+        ctx.fillStyle = "#ea580c";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText("Only frequencies within RF bandwidth Δf are excited.", x, y + 42);
+      }
+
+      if (stepIndex === 4) {
+        ctx.fillStyle = refocusToggle.checked ? "#0f766e" : "#7c2d12";
+        ctx.font = "13px Segoe UI";
+        ctx.fillText(
+          refocusToggle.checked
+            ? "Refocusing lobe reduces slice phase twist."
+            : "Refocusing lobe hidden: phase twist remains.",
+          x,
+          y + 22
+        );
+      }
+    }
+
+    function updateStatus(water, fat, net) {
+      const mxyW = Math.hypot(water.x, water.y);
+      const mxyF = Math.hypot(fat.x, fat.y);
+      const mxyN = Math.hypot(net.x, net.y);
+      const active = positions.filter((p) => inSlice(p)).length;
+
+      statusEl.textContent =
+        `Excited positions: ${active}/9\n` +
+        `Water Mxy=${mxyW.toFixed(2)}  Fat Mxy=${mxyF.toFixed(2)}  Net Mxy=${mxyN.toFixed(2)}\n` +
+        `Gz=${state.gzLevel.toFixed(2)}  RF=${state.rfAlpha.toFixed(2)}  Slice thickness=${sliceSlider.value} dots`;
+    }
+
+    function drawArrowHead(a, b, color, size) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const left = {
+        x: b.x - ux * size - uy * (size * 0.45),
+        y: b.y - uy * size + ux * (size * 0.45)
+      };
+      const right = {
+        x: b.x - ux * size + uy * (size * 0.45),
+        y: b.y - uy * size - ux * (size * 0.45)
+      };
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function updateSliceLabel() {
+      sliceVal.textContent = `${sliceSlider.value} dots`;
+    }
+
+    function refreshCurrentStep() {
+      if (stepIndex === 4) {
+        setStep(stepIndex);
+      } else {
+        renderStepText();
+      }
+      updateSliceLabel();
+    }
+
+    backBtn.addEventListener("click", () => setStep(stepIndex - 1));
+    nextBtn.addEventListener("click", () => setStep(stepIndex + 1));
+    sliceSlider.addEventListener("input", refreshCurrentStep);
+    refocusToggle.addEventListener("change", refreshCurrentStep);
+
+    function tick(nowMs) {
+      applyTransition(nowMs);
+      draw();
+      requestAnimationFrame(tick);
+    }
+
+    function getCss(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function smooth01(t) {
+      const c = clamp(t, 0, 1);
+      return c * c * (3 - 2 * c);
+    }
+
+    function degToRad(d) {
+      return (d * Math.PI) / 180;
+    }
+
+    renderStepText();
+    updateButtons();
+    updateSliceLabel();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

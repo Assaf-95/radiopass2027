@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MRI Dephasing Export Steps 04-10</title>
+  <style>
+    :root {
+      --bg: #eef4f9;
+      --panel: #ffffff;
+      --ink: #132337;
+      --muted: #53687e;
+      --line: #bfd0df;
+      --accent: #173b61;
+      --shadow: 0 14px 34px rgba(23, 50, 77, 0.11);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(140deg, #f8fbff 0%, var(--bg) 58%, #e5eef6 100%);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+      display: grid;
+      gap: 14px;
+    }
+
+    header {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 3vw, 2.5rem);
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.42;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+    }
+
+    a.card {
+      min-height: 132px;
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      text-decoration: none;
+      padding: 14px;
+    }
+
+    a.card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .num {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 9px;
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+
+    strong {
+      display: block;
+      font-size: 1.05rem;
+    }
+
+    span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .back {
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 9px 12px;
+      font-weight: 850;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="../lessons.html">Back to lessons</a>
+    <header>
+      <h1>MRI Dephasing Export Steps 04-10</h1>
+      <p>Standalone pages for the practical MRI sequence: B0, slice selection, 90 degree RF, phase encoding, T2* dephasing, frequency readout and 180 degree refocusing.</p>
+    </header>
+    <section class="grid" aria-label="Exported MRI dephasing step pages">
+      <a class="card" href="dephasing_step_04_apply_b0.html"><div class="num">04</div><strong>Apply B0</strong><span>Main field creates longitudinal magnetisation.</span></a>
+      <a class="card" href="dephasing_step_05_slice_select_gz.html"><div class="num">05</div><strong>Slice Select Gz</strong><span>Gradient and RF bandwidth choose a slice.</span></a>
+      <a class="card" href="dephasing_step_06_apply_90_rf.html"><div class="num">06</div><strong>Apply 90 RF</strong><span>Excitation creates coherent Mxy.</span></a>
+      <a class="card" href="dephasing_step_07_phase_encode_gy.html"><div class="num">07</div><strong>Phase Encode Gy</strong><span>Rows retain different phase offsets.</span></a>
+      <a class="card" href="dephasing_step_08_rf_off_t2star.html"><div class="num">08</div><strong>RF Off T2star</strong><span>Inhomogeneity causes rapid dephasing.</span></a>
+      <a class="card" href="dephasing_step_09_frequency_encode_gx.html"><div class="num">09</div><strong>Frequency Encode Gx</strong><span>Columns are read out as different frequencies.</span></a>
+      <a class="card" href="dephasing_step_10_apply_180_rf.html"><div class="num">10</div><strong>Apply 180 RF</strong><span>Refocusing reverses static phase dispersion.</span></a>
+    </section>
+  </main>
+</body>
+</html>

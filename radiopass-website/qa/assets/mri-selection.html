@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Selection - Spin & Precession</title>
+  <style>
+    :root { --bg:#050A14; --card:#0B1221; --text:#cbd5e1; --muted:#94a3b8; --blue:#3b82f6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width:1100px; margin:0 auto; padding:48px 20px; }
+    h1 { margin:10px 0 8px; font-size:clamp(30px,6vw,56px); color:#fff; }
+    .kicker { display:inline-block; padding:6px 10px; border:1px solid #1d4ed8; border-radius:999px; color:#60a5fa; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+    .grid { display:grid; gap:20px; grid-template-columns:1fr; margin-top:28px; }
+    @media (min-width:980px){ .grid{grid-template-columns:2fr 1fr;} }
+    .card { background:var(--card); border:1px solid #1f2937; border-radius:20px; padding:18px; }
+    .controls { display:flex; gap:10px; justify-content:flex-end; margin-bottom:10px; }
+    button { background:#2563eb; color:#fff; border:0; border-radius:999px; padding:8px 14px; cursor:pointer; }
+    .note { color:var(--muted); line-height:1.6; }
+    .small { font-size:12px; color:#94a3b8; }
+    .toggle { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .dot { width:9px; height:9px; border-radius:50%; background:#60a5fa; display:inline-block; }
+    svg { width:100%; max-width:620px; height:auto; display:block; margin:0 auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="kicker">MRI Physics Fundamentals</span>
+    <h1>Spin &amp; Precession</h1>
+    <p class="note">The quantum mechanical basis of the MRI signal.</p>
+
+    <div class="grid">
+      <section class="card">
+        <div class="controls">
+          <button id="playBtn">Pause</button>
+        </div>
+        <div class="toggle">
+          <input id="b0" type="checkbox" />
+          <label for="b0">Apply B0 Field</label>
+        </div>
+        <svg viewBox="0 0 400 400" aria-label="Precession diagram">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#60a5fa"></polygon>
+            </marker>
+          </defs>
+          <line x1="200" y1="350" x2="200" y2="50" stroke="#334155" stroke-width="2" stroke-dasharray="5 5"></line>
+          <line x1="200" y1="300" x2="200" y2="70" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowhead)" opacity="0.6"></line>
+          <ellipse id="cone" cx="200" cy="144" rx="90" ry="27" fill="none" stroke="rgba(96,165,250,.35)" stroke-width="2"></ellipse>
+          <line id="vec" x1="200" y1="300" x2="290" y2="144" stroke="#fff" stroke-width="4" stroke-linecap="round"></line>
+          <circle id="tip" cx="290" cy="144" r="4" fill="#60a5fa"></circle>
+          <text x="208" y="62" fill="#60a5fa" font-size="18">B0</text>
+          <text id="lblL" x="300" y="145" fill="#fff" font-size="16">L</text>
+        </svg>
+      </section>
+
+      <aside class="card">
+        <h3 style="margin-top:0;color:#fff;">Proton Magnetic Dipole</h3>
+        <p class="note">In an external field B0, protons align in low-energy parallel and high-energy anti-parallel states.</p>
+        <p class="small"><span class="dot"></span> Larmor relation: w = gamma * B0</p>
+        <p class="small" id="stateText">State: Random spin (B0 off)</p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const vec = document.getElementById("vec");
+    const tip = document.getElementById("tip");
+    const lblL = document.getElementById("lblL");
+    const playBtn = document.getElementById("playBtn");
+    const b0 = document.getElementById("b0");
+    const stateText = document.getElementById("stateText");
+    let playing = true;
+    let phi = 0;
+    const cx = 200, cy = 300, len = 180, theta = Math.PI / 6, tilt = 0.3;
+    const r = len * Math.sin(theta), h = len * Math.cos(theta);
+
+    function draw() {
+      const x = cx + r * Math.cos(phi);
+      const y = (cy - h) + (r * Math.sin(phi) * tilt);
+      vec.setAttribute("x2", x);
+      vec.setAttribute("y2", y);
+      tip.setAttribute("cx", x);
+      tip.setAttribute("cy", y);
+      lblL.setAttribute("x", x + 10);
+      lblL.setAttribute("y", y);
+    }
+    function tick() {
+      if (playing) { phi = (phi + 0.02) % (Math.PI * 2); draw(); }
+      requestAnimationFrame(tick);
+    }
+    playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; };
+    b0.onchange = () => { stateText.textContent = b0.checked ? "State: Parallel + anti-parallel split (B0 on)" : "State: Random spin (B0 off)"; };
+    draw(); tick();
+  </script>
+</body>
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>X ray tube and geometric unsharpness interactive</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --ink:#e9ecff;
+      --muted:#b7c0ff;
+      --accent:#7aa2ff;
+      --accent2:#ff7a7a;
+      --good:#7affb2;
+      --warn:#ffd27a;
+      --line:#263056;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:16px;
+      display:grid;
+      gap:16px;
+    }
+    h1{
+      margin:0 0 4px 0;
+      font-size:22px;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .sub{
+      margin:0 0 12px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.35;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:16px;
+      font-weight:700;
+      color:var(--ink);
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      display:block;
+      background: #0f1730;
+      border:1px solid var(--line);
+      border-radius:12px;
+    }
+    .controls{
+      display:grid;
+      gap:10px;
+    }
+    .ctrl{
+      display:grid;
+      gap:6px;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .label{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .value{
+      font-size:13px;
+      font-weight:650;
+      color:var(--ink);
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--accent);
+    }
+    .toggles{
+      display:grid;
+      gap:8px;
+    }
+    .toggle{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(255,255,255,0.02);
+      user-select:none;
+    }
+    .toggle input{ transform: scale(1.1); }
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .readout{
+      margin-top:10px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(0,0,0,0.18);
+      display:grid;
+      gap:6px;
+      font-size:13px;
+    }
+    .k{
+      color:var(--muted);
+      margin-right:8px;
+    }
+    .pill{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h1>Interactive x ray tube and geometric unsharpness</h1>
+      <p class="sub">
+        Diagram one shows the tube, electron beam, anode angle, window, and line focus principle.
+        Diagram two shows magnification and penumbra with a fixed detector size. Drag the object or use sliders.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Diagram 1. X ray tube and line focus principle</h2>
+        <canvas id="tubeCanvas" width="1000" height="420"></canvas>
+      </div>
+
+      <div class="card">
+        <h2>Controls for diagram 1</h2>
+        <div class="controls">
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Anode angle θ</div>
+              <div class="value"><span id="anodeAngleVal"></span>°</div>
+            </div>
+            <input id="anodeAngle" type="range" min="6" max="25" step="1" value="14" />
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Actual focal spot length</div>
+              <div class="value"><span id="focalActualVal"></span> mm</div>
+            </div>
+            <input id="focalActual" type="range" min="0.6" max="3.0" step="0.1" value="1.6" />
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Electron beam width</div>
+              <div class="value"><span id="eWidthVal"></span> mm</div>
+            </div>
+            <input id="eWidth" type="range" min="0.5" max="6.0" step="0.1" value="2.2" />
+          </div>
+
+          <div class="toggles">
+            <label class="toggle">
+              <input id="showProjection" type="checkbox" checked />
+              <span>Show effective focal spot projection</span>
+              <span class="pill">F effective = F actual × sin θ</span>
+            </label>
+            <label class="toggle">
+              <input id="showWindowBeam" type="checkbox" checked />
+              <span>Show emerging x ray beam and window</span>
+            </label>
+          </div>
+
+          <div class="readout" id="tubeReadout"></div>
+
+          <div class="note">
+            Effective focal spot reduces when the anode angle reduces, while actual focal spot on the target stays the same.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Diagram 2. Magnification and geometric unsharpness</h2>
+        <canvas id="geoCanvas" width="1000" height="520"></canvas>
+        <div class="note">
+          Drag the object rectangle left or right. Detector size stays fixed. Blur width represents geometric unsharpness.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Controls for diagram 2</h2>
+        <div class="controls">
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Object position</div>
+              <div class="value"><span id="objPosVal"></span> percent</div>
+            </div>
+            <input id="objPos" type="range" min="10" max="85" step="1" value="45" />
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Focal spot size F</div>
+              <div class="value"><span id="focalSizeVal"></span> mm</div>
+            </div>
+            <input id="focalSize" type="range" min="0.2" max="2.0" step="0.1" value="1.0" />
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Source to detector distance SID</div>
+              <div class="value"><span id="sidVal"></span> cm</div>
+            </div>
+            <input id="sid" type="range" min="80" max="200" step="5" value="120" />
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Object height</div>
+              <div class="value"><span id="objHVal"></span> mm</div>
+            </div>
+            <input id="objH" type="range" min="5" max="60" step="1" value="25" />
+          </div>
+
+          <div class="toggles">
+            <label class="toggle">
+              <input id="showRays" type="checkbox" checked />
+              <span>Show limiting rays and penumbra geometry</span>
+            </label>
+            <label class="toggle">
+              <input id="showNumbers" type="checkbox" checked />
+              <span>Show numeric readouts</span>
+            </label>
+          </div>
+
+          <div class="readout" id="geoReadout"></div>
+
+          <div class="note">
+            Magnification M = SID / SOD. Geometric unsharpness U = F × (OID / SOD).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tubeCanvas = document.getElementById("tubeCanvas");
+    const tctx = tubeCanvas.getContext("2d");
+
+    const geoCanvas = document.getElementById("geoCanvas");
+    const gctx = geoCanvas.getContext("2d");
+
+    const ui = {
+      anodeAngle: document.getElementById("anodeAngle"),
+      focalActual: document.getElementById("focalActual"),
+      eWidth: document.getElementById("eWidth"),
+      showProjection: document.getElementById("showProjection"),
+      showWindowBeam: document.getElementById("showWindowBeam"),
+
+      objPos: document.getElementById("objPos"),
+      focalSize: document.getElementById("focalSize"),
+      sid: document.getElementById("sid"),
+      objH: document.getElementById("objH"),
+      showRays: document.getElementById("showRays"),
+      showNumbers: document.getElementById("showNumbers"),
+    };
+
+    const out = {
+      anodeAngleVal: document.getElementById("anodeAngleVal"),
+      focalActualVal: document.getElementById("focalActualVal"),
+      eWidthVal: document.getElementById("eWidthVal"),
+      tubeReadout: document.getElementById("tubeReadout"),
+
+      objPosVal: document.getElementById("objPosVal"),
+      focalSizeVal: document.getElementById("focalSizeVal"),
+      sidVal: document.getElementById("sidVal"),
+      objHVal: document.getElementById("objHVal"),
+      geoReadout: document.getElementById("geoReadout"),
+    };
+
+    function rad(deg){ return deg * Math.PI / 180; }
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    function clear(ctx, w, h){
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "#0f1730";
+      ctx.fillRect(0,0,w,h);
+    }
+
+    function line(ctx, x1,y1,x2,y2, color, width=2, alpha=1){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function arrow(ctx, x1,y1,x2,y2, color, width=2, alpha=1){
+      const head = 10;
+      const ang = Math.atan2(y2-y1, x2-x1);
+      line(ctx, x1,y1,x2,y2, color, width, alpha);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head*Math.cos(ang - Math.PI/7), y2 - head*Math.sin(ang - Math.PI/7));
+      ctx.lineTo(x2 - head*Math.cos(ang + Math.PI/7), y2 - head*Math.sin(ang + Math.PI/7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function roundedRect(ctx, x,y,w,h,r, fill, stroke){
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+      if(fill){
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if(stroke){
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function text(ctx, s, x, y, color="#e9ecff", size=14, weight=600, align="left"){
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = `${weight} ${size}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+      ctx.textAlign = align;
+      ctx.fillText(s, x, y);
+      ctx.restore();
+    }
+
+    function drawTube(){
+      const W = tubeCanvas.width;
+      const H = tubeCanvas.height;
+      clear(tctx, W, H);
+
+      const thetaDeg = parseFloat(ui.anodeAngle.value);
+      const theta = rad(thetaDeg);
+      const focalActualMm = parseFloat(ui.focalActual.value);
+      const eWidthMm = parseFloat(ui.eWidth.value);
+
+      const effectiveFocalMm = focalActualMm * Math.sin(theta);
+
+      const pad = 40;
+
+      // Housing
+      roundedRect(tctx, pad, 30, W - 2*pad, H - 70, 28, "rgba(255,255,255,0.02)", "#263056");
+      // Glass envelope
+      roundedRect(tctx, pad + 55, 70, W - 2*(pad + 55), H - 150, 28, "rgba(255,255,255,0.02)", "rgba(183,192,255,0.28)");
+
+      // Cathode and focusing cup (right)
+      const cathX = W - pad - 120;
+      const cathY = H/2;
+      roundedRect(tctx, cathX, cathY - 70, 90, 140, 18, "rgba(122,162,255,0.08)", "rgba(122,162,255,0.35)");
+      text(tctx, "cathode", cathX + 45, cathY - 85, "#b7c0ff", 12, 650, "center");
+
+      // Filament
+      tctx.save();
+      tctx.strokeStyle = "rgba(255,122,122,0.95)";
+      tctx.lineWidth = 3;
+      tctx.beginPath();
+      const fx = cathX + 18;
+      const fy = cathY;
+      for(let i=0;i<20;i++){
+        const x = fx + i*3.0;
+        const y = fy + Math.sin(i*0.8)*7;
+        if(i===0) tctx.moveTo(x,y);
+        else tctx.lineTo(x,y);
+      }
+      tctx.stroke();
+      tctx.restore();
+      text(tctx, "filament", cathX + 45, cathY + 90, "#b7c0ff", 12, 650, "center");
+
+      // Focusing cup outline
+      tctx.save();
+      tctx.strokeStyle = "rgba(122,162,255,0.55)";
+      tctx.lineWidth = 2.5;
+      tctx.beginPath();
+      tctx.moveTo(cathX + 10, cathY - 55);
+      tctx.quadraticCurveTo(cathX + 85, cathY - 35, cathX + 90, cathY);
+      tctx.quadraticCurveTo(cathX + 85, cathY + 35, cathX + 10, cathY + 55);
+      tctx.stroke();
+      tctx.restore();
+      text(tctx, "focusing cup", cathX + 45, cathY + 115, "#b7c0ff", 12, 650, "center");
+
+      // Anode block and target (left)
+      const anX = pad + 130;
+      const anY = H/2;
+
+      // Anode stem
+      roundedRect(tctx, pad + 60, anY - 22, 90, 44, 14, "rgba(122,162,255,0.18)", "rgba(122,162,255,0.35)");
+      text(tctx, "anode", pad + 105, anY + 52, "#b7c0ff", 12, 650, "center");
+
+      // Anode target plate rotated
+      const plateW = 150;
+      const plateH = 120;
+      const plateCx = anX + 115;
+      const plateCy = anY;
+
+      tctx.save();
+      tctx.translate(plateCx, plateCy);
+      tctx.rotate(-theta); // anode surface slopes down toward cathode
+      roundedRect(tctx, -plateW/2, -plateH/2, plateW, plateH, 14, "rgba(122,162,255,0.25)", "rgba(122,162,255,0.55)");
+      // target strip at top edge (impact area)
+      tctx.fillStyle = "rgba(233,236,255,0.18)";
+      tctx.fillRect(-plateW/2 + 18, -plateH/2 + 10, plateW - 36, 14);
+      tctx.restore();
+
+      text(tctx, "target", plateCx, plateCy - 90, "#b7c0ff", 12, 650, "center");
+
+      // Electron beam arrows from cathode to target
+      const beamStartX = cathX + 5;
+      const beamStartY = cathY;
+      const beamEndX = plateCx + 35;
+      const beamEndY = plateCy - 15;
+
+      const eWidthPx = eWidthMm * 7.5;
+      for(let k=-2;k<=2;k++){
+        const dy = k * (eWidthPx/5);
+        arrow(tctx, beamStartX, beamStartY + dy, beamEndX, beamEndY + dy*0.4, "rgba(233,236,255,0.75)", 2, 0.95);
+      }
+      text(tctx, "electron beam", (beamStartX + beamEndX)/2, beamStartY - 85, "#b7c0ff", 12, 650, "center");
+
+      // Focal spot drawn on anode surface (actual)
+      const spotLenPx = focalActualMm * 40;
+      const spotThickPx = 8;
+
+      // Draw spot centered near the top strip of the anode, oriented along the surface
+      const spotCenterX = plateCx - 5;
+      const spotCenterY = plateCy - 40;
+
+      tctx.save();
+      tctx.translate(spotCenterX, spotCenterY);
+      tctx.rotate(-theta);
+      tctx.fillStyle = "rgba(255,210,122,0.95)";
+      tctx.fillRect(-spotLenPx/2, -spotThickPx/2, spotLenPx, spotThickPx);
+      tctx.restore();
+      text(tctx, "actual focal spot", spotCenterX, spotCenterY - 14, "#ffd27a", 12, 750, "center");
+
+      // Effective focal spot projection (perpendicular to central ray)
+      if(ui.showProjection.checked){
+        const effLenPx = effectiveFocalMm * 40;
+
+        // Project onto a plane perpendicular to beam direction (approx horizontal for this schematic)
+        const projX = spotCenterX - 10;
+        const projY = spotCenterY + 50;
+
+        tctx.save();
+        tctx.fillStyle = "rgba(122,255,178,0.95)";
+        tctx.fillRect(projX - effLenPx/2, projY - 5, effLenPx, 10);
+        tctx.restore();
+
+        line(tctx, spotCenterX, spotCenterY, projX, projY, "rgba(183,192,255,0.35)", 1.5, 1);
+        text(tctx, "effective focal spot", projX, projY + 24, "#7affb2", 12, 750, "center");
+      }
+
+      // Window and emerging x ray beam
+      if(ui.showWindowBeam.checked){
+        const winX = plateCx + 55;
+        const winY = H - 120;
+        const winW = 130;
+        const winH = 26;
+        roundedRect(tctx, winX, winY, winW, winH, 10, "rgba(233,236,255,0.06)", "rgba(183,192,255,0.35)");
+        text(tctx, "window", winX + winW/2, winY - 8, "#b7c0ff", 12, 650, "center");
+
+        // Cone beam emerging from focal spot toward window
+        const srcX = spotCenterX - 10;
+        const srcY = spotCenterY + 4;
+
+        const leftEdgeX = winX + 10;
+        const leftEdgeY = winY + winH/2;
+
+        const rightEdgeX = winX + winW - 10;
+        const rightEdgeY = winY + winH/2;
+
+        line(tctx, srcX, srcY, leftEdgeX, leftEdgeY, "rgba(122,162,255,0.65)", 2, 0.9);
+        line(tctx, srcX, srcY, rightEdgeX, rightEdgeY, "rgba(122,162,255,0.65)", 2, 0.9);
+
+        // A few rays
+        for(let i=0;i<6;i++){
+          const f = i/5;
+          const x = leftEdgeX + (rightEdgeX - leftEdgeX)*f;
+          const y = leftEdgeY + (rightEdgeY - leftEdgeY)*f;
+          line(tctx, srcX, srcY, x, y, "rgba(122,162,255,0.35)", 1.5, 0.8);
+        }
+        text(tctx, "x ray beam", winX + winW/2, winY + winH + 20, "#7aa2ff", 12, 750, "center");
+      }
+
+      // Angle indicator
+      const ax = plateCx + 10;
+      const ay = plateCy + 105;
+      tctx.save();
+      tctx.strokeStyle = "rgba(255,255,255,0.25)";
+      tctx.lineWidth = 2;
+      tctx.beginPath();
+      tctx.arc(ax, ay, 22, Math.PI, Math.PI - theta, true);
+      tctx.stroke();
+      tctx.restore();
+      text(tctx, `θ ${thetaDeg}°`, ax + 42, ay + 5, "#e9ecff", 12, 750, "left");
+
+      // Labels
+      text(tctx, "glass envelope with vacuum", W/2, 92, "#b7c0ff", 12, 650, "center");
+      text(tctx, "lead casing and oil for cooling", W/2, 42, "#b7c0ff", 12, 650, "center");
+
+      // Readout
+      out.tubeReadout.innerHTML = `
+        <div><span class="k">θ</span>${thetaDeg.toFixed(0)} degrees</div>
+        <div><span class="k">F actual</span>${focalActualMm.toFixed(1)} mm</div>
+        <div><span class="k">F effective</span>${effectiveFocalMm.toFixed(2)} mm</div>
+        <div><span class="k">Electron beam width</span>${eWidthMm.toFixed(1)} mm</div>
+      `;
+    }
+
+    // Diagram 2 interactive geometry
+    const geoState = {
+      dragging: false,
+      objPos01: 0.45, // 0 to 1 fraction across from source to detector
+      mouseOffsetX: 0,
+    };
+
+    function mmToPx(mm){ return mm * 3.2; } // for drawing only
+
+    function drawGeo(){
+      const W = geoCanvas.width;
+      const H = geoCanvas.height;
+      clear(gctx, W, H);
+
+      const SIDcm = parseFloat(ui.sid.value);
+      const Fmm = parseFloat(ui.focalSize.value);
+      const objHmm = parseFloat(ui.objH.value);
+
+      // Layout coordinates
+      const margin = 70;
+      const srcX = margin;
+      const detX = W - margin;
+      const axisY = Math.floor(H*0.62);
+
+      // Convert slider percent to normalized 0 to 1 and clamp
+      const posPercent = parseFloat(ui.objPos.value) / 100;
+      geoState.objPos01 = clamp(posPercent, 0.10, 0.85);
+
+      const objX = srcX + (detX - srcX) * geoState.objPos01;
+
+      // World distances in cm along axis
+      const SID = SIDcm;
+      const SOD = SID * geoState.objPos01;
+      const OID = SID - SOD;
+
+      // Physics
+      const M = SID / SOD;                   // magnification
+      const Umm = Fmm * (OID / SOD);         // penumbra in mm
+
+      // Object drawn upright
+      const objHpx = mmToPx(objHmm);
+      const objTopY = axisY - objHpx;
+      const objWpx = 18;
+
+      // Detector drawn fixed size
+      const detHpx = 240;
+      const detTopY = axisY - detHpx;
+      const detWpx = 18;
+
+      // Source focal spot as a segment (finite source size)
+      const Fpx = mmToPx(Fmm);
+      const srcTopY = axisY - Fpx/2;
+      const srcBotY = axisY + Fpx/2;
+
+      // Draw baseline
+      line(gctx, srcX, axisY, detX, axisY, "rgba(183,192,255,0.20)", 2, 1);
+
+      // Draw source
+      roundedRect(gctx, srcX - 12, axisY - 60, 24, 120, 10, "rgba(255,210,122,0.10)", "rgba(255,210,122,0.45)");
+      line(gctx, srcX, srcTopY, srcX, srcBotY, "rgba(255,210,122,0.95)", 6, 1);
+      text(gctx, "source", srcX, axisY + 78, "#ffd27a", 12, 750, "center");
+
+      // Draw detector
+      roundedRect(gctx, detX - detWpx/2, detTopY, detWpx, detHpx, 10, "rgba(122,162,255,0.10)", "rgba(122,162,255,0.55)");
+      text(gctx, "detector", detX, detTopY - 10, "#7aa2ff", 12, 750, "center");
+
+      // Draw object
+      roundedRect(gctx, objX - objWpx/2, objTopY, objWpx, objHpx, 8, "rgba(233,236,255,0.10)", "rgba(233,236,255,0.55)");
+      text(gctx, "object", objX, objTopY - 10, "#e9ecff", 12, 750, "center");
+
+      // Rays and penumbra geometry
+      const showRays = ui.showRays.checked;
+
+      // Object top and bottom points
+      const objTop = { x: objX, y: objTopY };
+      const objBot = { x: objX, y: axisY };
+
+      // Map to detector plane using similar triangles for top point
+      // Image height = M * object height
+      const imgHpx = objHpx * M;
+      const imgTopY = axisY - imgHpx;
+      const imgBotY = axisY;
+
+      // Penumbra width at detector for that edge, in px
+      const UmmPx = mmToPx(Umm);
+
+      // Draw ideal sharp image edge positions
+      // Represent the image as a vertical bar on detector axis with blur
+      const imgX = detX;
+
+      // Umbra core (ideal)
+      const coreW = 8;
+      gctx.save();
+      gctx.fillStyle = "rgba(122,255,178,0.55)";
+      gctx.fillRect(imgX - coreW/2, imgTopY, coreW, imgHpx);
+      gctx.restore();
+
+      // Penumbra blur as a wider translucent band centered on edge
+      // The blur width is UmmPx
+      const blurW = Math.max(2, UmmPx);
+      gctx.save();
+      gctx.fillStyle = "rgba(255,122,122,0.25)";
+      gctx.fillRect(imgX - blurW/2, imgTopY, blurW, imgHpx);
+      gctx.restore();
+
+      text(gctx, "image on detector", imgX - 2, detTopY + detHpx + 24, "#b7c0ff", 12, 650, "right");
+
+      if(showRays){
+        // Draw limiting rays for the top of object
+        // From top of focal spot to top of object to detector plane
+        const rayColor = "rgba(183,192,255,0.35)";
+
+        // Two extreme source points
+        const srcA = { x: srcX, y: srcTopY };
+        const srcB = { x: srcX, y: srcBotY };
+
+        // Intersections on detector for top point from srcA and srcB
+        // Line through (src, objTop) extended to x=detX
+        function yAtDetector(srcPt, objPt){
+          const t = (detX - srcPt.x) / (objPt.x - srcPt.x);
+          return srcPt.y + t * (objPt.y - srcPt.y);
+        }
+
+        const yTopA = yAtDetector(srcA, objTop);
+        const yTopB = yAtDetector(srcB, objTop);
+
+        const yBotA = yAtDetector(srcA, objBot);
+        const yBotB = yAtDetector(srcB, objBot);
+
+        // Draw rays for top and bottom
+        line(gctx, srcA.x, srcA.y, objTop.x, objTop.y, rayColor, 2, 1);
+        line(gctx, objTop.x, objTop.y, detX, yTopA, rayColor, 2, 1);
+
+        line(gctx, srcB.x, srcB.y, objTop.x, objTop.y, rayColor, 2, 1);
+        line(gctx, objTop.x, objTop.y, detX, yTopB, rayColor, 2, 1);
+
+        line(gctx, srcA.x, srcA.y, objBot.x, objBot.y, rayColor, 2, 0.85);
+        line(gctx, objBot.x, objBot.y, detX, yBotA, rayColor, 2, 0.85);
+
+        line(gctx, srcB.x, srcB.y, objBot.x, objBot.y, rayColor, 2, 0.85);
+        line(gctx, objBot.x, objBot.y, detX, yBotB, rayColor, 2, 0.85);
+
+        // Visualize penumbra extent on detector at top edge
+        const yHi = Math.min(yTopA, yTopB);
+        const yLo = Math.max(yTopA, yTopB);
+        line(gctx, detX - 22, yHi, detX + 22, yHi, "rgba(255,122,122,0.55)", 2, 1);
+        line(gctx, detX - 22, yLo, detX + 22, yLo, "rgba(255,122,122,0.55)", 2, 1);
+        text(gctx, "penumbra edges", detX - 28, (yHi + yLo)/2 + 4, "#ff7a7a", 12, 750, "right");
+      }
+
+      // Distance markers
+      const yMark = axisY + 40;
+      line(gctx, srcX, yMark, objX, yMark, "rgba(183,192,255,0.25)", 2, 1);
+      line(gctx, objX, yMark, detX, yMark, "rgba(183,192,255,0.25)", 2, 1);
+      text(gctx, "SOD", (srcX + objX)/2, yMark + 18, "#b7c0ff", 12, 650, "center");
+      text(gctx, "OID", (objX + detX)/2, yMark + 18, "#b7c0ff", 12, 650, "center");
+
+      // Object handle hint
+      gctx.save();
+      gctx.fillStyle = "rgba(233,236,255,0.18)";
+      gctx.beginPath();
+      gctx.arc(objX, objTopY + objHpx/2, 7, 0, Math.PI*2);
+      gctx.fill();
+      gctx.restore();
+
+      // Readouts
+      const showNumbers = ui.showNumbers.checked;
+      if(showNumbers){
+        out.geoReadout.innerHTML = `
+          <div><span class="k">SID</span>${SID.toFixed(1)} cm</div>
+          <div><span class="k">SOD</span>${SOD.toFixed(1)} cm</div>
+          <div><span class="k">OID</span>${OID.toFixed(1)} cm</div>
+          <div><span class="k">Magnification M</span>${M.toFixed(3)} times</div>
+          <div><span class="k">Penumbra U</span>${Umm.toFixed(3)} mm</div>
+        `;
+      } else {
+        out.geoReadout.innerHTML = `<div><span class="k">Readouts</span>off</div>`;
+      }
+    }
+
+    function syncLabels(){
+      out.anodeAngleVal.textContent = parseFloat(ui.anodeAngle.value).toFixed(0);
+      out.focalActualVal.textContent = parseFloat(ui.focalActual.value).toFixed(1);
+      out.eWidthVal.textContent = parseFloat(ui.eWidth.value).toFixed(1);
+
+      out.objPosVal.textContent = parseFloat(ui.objPos.value).toFixed(0);
+      out.focalSizeVal.textContent = parseFloat(ui.focalSize.value).toFixed(1);
+      out.sidVal.textContent = parseFloat(ui.sid.value).toFixed(0);
+      out.objHVal.textContent = parseFloat(ui.objH.value).toFixed(0);
+    }
+
+    function render(){
+      syncLabels();
+      drawTube();
+      drawGeo();
+    }
+
+    // Wire UI
+    Object.values(ui).forEach(el => {
+      el.addEventListener("input", render);
+      el.addEventListener("change", render);
+    });
+
+    // Drag object in diagram 2
+    function canvasPoint(evt, canvas){
+      const rect = canvas.getBoundingClientRect();
+      const x = (evt.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (evt.clientY - rect.top) * (canvas.height / rect.height);
+      return {x,y};
+    }
+
+    geoCanvas.addEventListener("mousedown", (evt) => {
+      const p = canvasPoint(evt, geoCanvas);
+
+      const W = geoCanvas.width;
+      const H = geoCanvas.height;
+      const margin = 70;
+      const srcX = margin;
+      const detX = W - margin;
+      const axisY = Math.floor(H*0.62);
+
+      const objX = srcX + (detX - srcX) * geoState.objPos01;
+
+      const objHmm = parseFloat(ui.objH.value);
+      const objHpx = mmToPx(objHmm);
+      const objTopY = axisY - objHpx;
+      const objWpx = 18;
+
+      const hit =
+        p.x >= objX - objWpx &&
+        p.x <= objX + objWpx &&
+        p.y >= objTopY - 12 &&
+        p.y <= axisY + 12;
+
+      if(hit){
+        geoState.dragging = true;
+        geoState.mouseOffsetX = p.x - objX;
+      }
+    });
+
+    window.addEventListener("mousemove", (evt) => {
+      if(!geoState.dragging) return;
+      const p = canvasPoint(evt, geoCanvas);
+
+      const W = geoCanvas.width;
+      const margin = 70;
+      const srcX = margin;
+      const detX = W - margin;
+
+      let newObjX = p.x - geoState.mouseOffsetX;
+      newObjX = clamp(newObjX, srcX + (detX - srcX)*0.10, srcX + (detX - srcX)*0.85);
+
+      const frac = (newObjX - srcX) / (detX - srcX);
+      const percent = Math.round(frac * 100);
+
+      ui.objPos.value = percent.toString();
+      render();
+    });
+
+    window.addEventListener("mouseup", () => {
+      geoState.dragging = false;
+    });
+
+    // Initial
+    render();
+  </script>
+</body>
+</html>

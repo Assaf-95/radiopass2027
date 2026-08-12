@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>B0, Precession & RF Recovery — Simple — Radiopass</title>
+<meta name="description" content="From a spinning top to a detectable MR signal, in the simplest possible steps." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/simple-slides.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="ss-header">
+  <div class="shell">
+    <div class="ss-header-top">
+      <div>
+        <span class="eyebrow">MRI · B0, Precession & RF Recovery · Simple version</span>
+        <h1 class="ss-title">From a spinning top to a signal.</h1>
+        <p class="lede ss-subtitle">The whole early MRI story, one small idea at a time.</p>
+      </div>
+      <div class="ss-count-pill" id="ss-count">SLIDE 1 / 8</div>
+    </div>
+    <div class="ss-progress-track"><div class="ss-progress-fill" id="ss-progress-fill"></div></div>
+    <a href="mri-b0-precession-rf-recovery-overview-detailed.html" class="btn btn-ghost ss-more-link">want more detail? open the full page</a>
+  </div>
+</header>
+
+<div class="shell ss-layout">
+  <div class="card glass ss-stage-card">
+    <svg id="ss-stage" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card glass ss-teach-card">
+    <div class="ss-slide-title" id="ss-slide-title"></div>
+    <ul class="ss-bullets" id="ss-bullets"></ul>
+    <div class="ss-caption" id="ss-caption"></div>
+    <div class="ss-control" id="ss-control">
+      <label id="ss-control-label"></label>
+      <input type="range" id="ss-control-input" />
+      <span class="ss-readout" id="ss-control-readout"></span>
+    </div>
+    <div class="ss-nav">
+      <button type="button" class="btn btn-ghost" id="ss-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="ss-next">Next</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/simple-slides.js"></script>
+<script>
+(function () {
+  var cx = 350, cy = 220;
+  function txt(x, y, s, colour, size) { return '<text x="' + x + '" y="' + y + '" fill="' + colour + '" font-size="' + (size || 15) + '" font-family="Inter,sans-serif" font-weight="700" text-anchor="middle">' + s + '</text>'; }
+  function dot(x, y, r, colour) { return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="' + colour + '"/>'; }
+
+  function wobblingTop(t) {
+    var wobble = Math.sin(t * 1.2) * 0.25;
+    var tipX = cx + Math.sin(wobble) * 90, tipY = cy - 120 + Math.cos(wobble) * 10;
+    return '<line x1="' + cx + '" y1="' + (cy + 10) + '" x2="' + tipX.toFixed(1) + '" y2="' + tipY.toFixed(1) + '" stroke="#5FE3F2" stroke-width="5" stroke-linecap="round"/>' +
+      '<ellipse cx="' + cx + '" cy="' + (cy + 20) + '" rx="60" ry="16" fill="#8FA3BB" opacity="0.25"/>' +
+      dot(cx, cy + 10, 8, '#5FE3F2') +
+      '<line x1="' + cx + '" y1="' + (cy + 10) + '" x2="' + cx + '" y2="' + (cy - 130) + '" stroke="rgba(148,197,224,0.2)" stroke-width="1" stroke-dasharray="3 5"/>' +
+      txt(cx + 40, cy - 135, 'gravity', '#8FA3BB', 13);
+  }
+
+  function tinyMagnet(t) {
+    var spin = t * 2;
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="50" fill="rgba(95,227,242,0.10)" stroke="#5FE3F2" stroke-width="2"/>' +
+      '<line x1="' + (cx - 40 * Math.cos(spin)).toFixed(1) + '" y1="' + (cy - 40 * Math.sin(spin)).toFixed(1) + '" x2="' + (cx + 40 * Math.cos(spin)).toFixed(1) + '" y2="' + (cy + 40 * Math.sin(spin)).toFixed(1) + '" stroke="#F2B84B" stroke-width="4" marker-end="url(#ssArrow2)"/>' +
+      txt(cx, cy + 90, 'spin + charge = tiny magnet', '#8FA3BB', 13);
+  }
+
+  function populations() {
+    var out = '';
+    for (var i = 0; i < 5; i++) out += '<line x1="' + (200 + i * 20) + '" y1="240" x2="' + (200 + i * 20) + '" y2="180" stroke="#5FE3F2" stroke-width="3" marker-end="url(#ssArrow2)"/>';
+    for (var j = 0; j < 3; j++) out += '<line x1="' + (450 + j * 20) + '" y1="180" x2="' + (450 + j * 20) + '" y2="240" stroke="#F2B84B" stroke-width="3" marker-end="url(#ssArrow2)"/>';
+    return out + txt(240, 270, 'parallel (more, low energy)', '#5FE3F2', 13) + txt(480, 270, 'anti-parallel (fewer)', '#F2B84B', 13);
+  }
+
+  function larmor() {
+    return txt(cx, cy - 10, 'F = γ × B0', '#5FE3F2', 40) + txt(cx, cy + 40, 'γ fixed for hydrogen · B0 = field strength', '#8FA3BB', 14);
+  }
+
+  function tipVector(frac) {
+    var angle = -Math.PI / 2 + frac * (Math.PI / 2);
+    var x = cx + Math.cos(angle) * 100, y = cy + Math.sin(angle) * 100;
+    return '<line x1="' + cx + '" y1="' + (cy + 100) + '" x2="' + cx + '" y2="' + (cy - 100) + '" stroke="rgba(148,197,224,0.2)" stroke-width="1" stroke-dasharray="3 5"/>' +
+      '<line x1="' + cx + '" y1="' + cy + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#F2B84B" stroke-width="4" marker-end="url(#ssArrow2)"/>' +
+      dot(cx, cy, 5, '#F2B84B') + txt(cx, cy - 130, frac > 0.5 ? '90° RF pulse' : '', '#F2B84B', 15);
+  }
+
+  function coil(t) {
+    var wave = '';
+    for (var x = 0; x <= 300; x += 6) {
+      var y = 240 + Math.sin((x / 300) * Math.PI * 4 + t * 3) * 30 * Math.exp(-x / 300);
+      wave += (x + 250) + ',' + y.toFixed(1) + ' ';
+    }
+    return '<rect x="80" y="180" width="90" height="120" rx="10" fill="rgba(95,227,242,0.12)" stroke="#5FE3F2"/>' + txt(125, 320, 'coil', '#5FE3F2', 13) +
+      '<polyline points="' + wave + '" fill="none" stroke="#5FE3F2" stroke-width="3"/>';
+  }
+
+  function twoBars(t) {
+    var mzFrac = Math.min(1, t * 0.15), mxyFrac = Math.max(0, 1 - t * 0.2);
+    return '<rect x="260" y="' + (350 - 160 * mzFrac) + '" width="40" height="' + (160 * mzFrac) + '" rx="8" fill="#A78BFA"/>' + txt(280, 375, 'Mz (T1)', '#A78BFA', 13) +
+      '<rect x="400" y="' + (350 - 160 * mxyFrac) + '" width="40" height="' + (160 * mxyFrac) + '" rx="8" fill="#F2B84B"/>' + txt(420, 375, 'Mxy (T2)', '#F2B84B', 13);
+  }
+
+  var SLIDES = [
+    {
+      title: 'Precession, not rotation',
+      bullets: ['A gyroscope under gravity doesn’t simply topple — its axis traces a cone. That motion is precession.', 'A magnetic field does the same to a nuclear spin.', 'The nucleus keeps spinning; it’s the axis itself that sweeps around B0.'],
+      caption: '<strong>Precession</strong> is the axis moving, not the spin rate changing.',
+      draw: function (t) { return wobblingTop(t); }
+    },
+    {
+      title: 'A nuclear magnetic moment',
+      bullets: ['Hydrogen-1 has a single proton: charge, plus intrinsic spin.', 'Moving charge generates a magnetic field.', 'The result is a magnetic moment — the quantity B0 actually acts on.'],
+      caption: '<strong>Magnetic moment</strong> — the property that makes MRI possible at all.',
+      draw: function (t) { return tinyMagnet(t); }
+    },
+    {
+      title: 'Parallel and anti-parallel populations',
+      bullets: ['In B0, spins occupy two energy states: parallel (low energy) and anti-parallel (high energy).', 'Boltzmann distribution favours parallel — but only slightly, at body temperature and clinical field strengths.', 'That small population excess is the entire source of net magnetisation, M0.'],
+      caption: '<strong>M0</strong> exists only because of a tiny population imbalance — often just a few per million.',
+      draw: function () { return populations(); }
+    },
+    {
+      title: 'The Larmor equation',
+      bullets: ['ω0 = γB0 — angular precessional frequency is directly proportional to field strength.', 'γ, the gyromagnetic ratio, is fixed for a given nucleus (42.58 MHz/T for hydrogen).', 'Double B0 and you double the Larmor frequency — nothing else changes it.'],
+      caption: '<strong>ω0 = γB0</strong> — the frequency any RF pulse must match to excite these spins.',
+      draw: function () { return larmor(); }
+    },
+    {
+      title: 'RF excitation tips M0',
+      bullets: ['An RF pulse at the Larmor frequency is the resonance condition — off-frequency pulses don’t couple to the spin system.', 'A 90° pulse rotates M0 fully from the longitudinal (Z) axis into the transverse (XY) plane.', 'Flip angle is set by B1 amplitude and pulse duration — not by B0.'],
+      caption: '<strong>Mxy</strong> only exists once RF excitation has tipped M0 off-axis.',
+      draw: function (t) { return tipVector(Math.min(1, t * 0.5)); }
+    },
+    {
+      title: 'Signal by electromagnetic induction',
+      bullets: ['Mxy is a rotating magnetic vector — precessing at ω0, same as before excitation.', 'A rotating magnetic field through a coil induces an EMF: Faraday’s law, nothing exotic.', 'That induced EMF, oscillating at the Larmor frequency, is the raw MR signal.'],
+      caption: '<strong>The MR signal is Faraday induction</strong> — driven by Mxy, at the Larmor frequency.',
+      draw: function (t) { return coil(t); }
+    },
+    {
+      title: 'T1 and T2 are independent',
+      bullets: ['T1: longitudinal relaxation — Mz regrows toward M0 via spin-lattice energy exchange.', 'T2: transverse relaxation — Mxy decays via spin-spin dephasing.', 'Both run from the moment of excitation, on separate physical mechanisms, not one causing the other.'],
+      caption: '<strong>T1 recovery and T2 decay</strong> proceed simultaneously but independently.',
+      draw: function (t) { return twoBars(t); }
+    },
+    {
+      title: 'That was the short version',
+      bullets: ['This covered the gyroscope analogy through to induced signal, at full technical depth.', 'The full page has all four sections live, plus a 7-step interactive build of Section 4.', 'Same physics, same terminology — with sliders for B0 and animation speed.'],
+      caption: '<strong>Ready for more?</strong> The detailed page is one click away, above.',
+      draw: function () {
+        return '<rect x="120" y="140" width="460" height="180" rx="24" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+          txt(350, 220, 'Full 4-section page available', '#5FE3F2', 20) +
+          txt(350, 255, 'gyroscope · precession · RF · relaxation, all interactive', '#8FA3BB', 14);
+      }
+    }
+  ];
+
+  var defs = '<defs><marker id="ssArrow2" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>';
+  SLIDES.forEach(function (s) {
+    var d = s.draw;
+    s.draw = function (t, v) { return defs + '<g color="#5FE3F2">' + d(t, v) + '</g>'; };
+  });
+
+  window.SimpleSlides.init({ slides: SLIDES });
+})();
+</script>
+</body>
+</html>

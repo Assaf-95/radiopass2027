@@ -1,0 +1,33 @@
+{
+  "name": "frcr-anatomy",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "./node_modules/.bin/vite",
+    "predev": "node scripts/build-hero-frames.mjs",
+    "build": "./node_modules/.bin/tsc -b && ./node_modules/.bin/vite build",
+    "prebuild": "node scripts/build-hero-frames.mjs",
+    "frames": "node scripts/build-hero-frames.mjs",
+    "stills": "python3 tools/skull/prepare_frames.py",
+    "lint": "./node_modules/.bin/oxlint",
+    "preview": "./node_modules/.bin/vite preview",
+    "atlas:report": "node --import ./scripts/ts-register.mjs scripts/atlas-report.ts",
+    "atlas:validate": "node --import ./scripts/ts-register.mjs scripts/atlas-validate.ts",
+    "serve": "node server/server.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}

@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI T2 Dephasing Visualizer</title>
+  <style>
+    :root {
+      --bg0: #0b1220;
+      --bg1: #111c2e;
+      --panel: #121b2c;
+      --ink: #e6efff;
+      --muted: #a6b6d1;
+      --accent: #4cc3ff;
+      --accent-2: #ff9b4a;
+      --accent-3: #7bffb8;
+      --accent-4: #ffd76b;
+      --line: rgba(120, 150, 190, 0.25);
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(76, 195, 255, 0.15), transparent 40%),
+        radial-gradient(circle at 88% 86%, rgba(255, 155, 74, 0.12), transparent 44%),
+        linear-gradient(150deg, var(--bg0), var(--bg1));
+      padding: 1rem;
+    }
+
+    .app {
+      width: min(1400px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    header {
+      padding: 0.9rem 1.1rem;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(18, 28, 46, 0.96), rgba(13, 22, 38, 0.94));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 0.3rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.55fr 0.75fr;
+      gap: 0.9rem;
+      align-items: stretch;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(16, 27, 45, 0.96), rgba(12, 21, 36, 0.95));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .viz {
+      padding: 0.8rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .plots {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(76, 195, 255, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(255, 155, 74, 0.12), transparent 40%),
+        linear-gradient(160deg, #0d1625, #0a1220);
+      border: 1px solid rgba(96, 132, 176, 0.25);
+    }
+
+    #spinCanvas { height: 390px; }
+    #mxyCanvas { height: 180px; }
+    #mzCanvas { height: 140px; }
+
+    .controls {
+      padding: 0.9rem;
+      display: grid;
+      gap: 0.7rem;
+      align-content: start;
+      max-height: calc(100vh - 3rem);
+      overflow: auto;
+    }
+
+    .controls h2 {
+      margin: 0;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ec6f2;
+    }
+
+    .group {
+      border: 1px solid rgba(96, 132, 176, 0.3);
+      border-radius: 12px;
+      padding: 0.6rem;
+      background: rgba(18, 28, 46, 0.7);
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.45rem;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .value {
+      font-size: 0.78rem;
+      color: #d9e6ff;
+      min-width: 70px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    button {
+      border: 1px solid rgba(96, 132, 176, 0.45);
+      background: linear-gradient(180deg, #16273f, #0f1f35);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.83rem;
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    button:hover { box-shadow: 0 6px 18px rgba(76, 195, 255, 0.2); }
+
+    .btn-row {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .toggle {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .jump-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.35rem;
+    }
+
+    .jump-grid button {
+      border-radius: 9px;
+      padding: 0.4rem 0.3rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+
+    select {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid rgba(96, 132, 176, 0.45);
+      background: rgba(10, 18, 32, 0.9);
+      color: var(--ink);
+      padding: 0.35rem 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    .stage-readout {
+      font-size: 0.78rem;
+      color: #d9e6ff;
+      line-height: 1.3;
+    }
+
+    .info-box {
+      border-radius: 10px;
+      border: 1px solid rgba(96, 132, 176, 0.3);
+      background: rgba(12, 20, 34, 0.9);
+      padding: 0.6rem;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: #c6d6f0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(96, 132, 176, 0.4);
+      font-size: 0.72rem;
+      color: #cfe1ff;
+      margin-right: 0.35rem;
+    }
+
+    @media (max-width: 1020px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { max-height: none; }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>MRI T2 Dephasing and Spin Echo Build-Up</h1>
+      <p>Staged timeline: no net magnetization, B0 alignment, 90° pulse, dephasing (T2 or T2*), and concurrent T1 recovery.</p>
+    </header>
+
+    <section class="layout">
+      <div class="panel viz">
+        <canvas id="spinCanvas" aria-label="Transverse plane spins and Mz indicator"></canvas>
+        <div class="plots">
+          <canvas id="mxyCanvas" aria-label="Mxy magnitude vs time"></canvas>
+          <canvas id="mzCanvas" aria-label="Mz recovery vs time"></canvas>
+        </div>
+      </div>
+
+      <aside class="panel controls">
+        <h2>Teaching timeline</h2>
+        <div class="group">
+          <div class="btn-row">
+            <button id="prevStageBtn">Previous step</button>
+            <button id="nextStageBtn">Next step</button>
+            <button id="playSeqBtn">Play sequence</button>
+          </div>
+          <div class="jump-grid">
+            <button data-jump="0">0 No net</button>
+            <button data-jump="1">1 B0 align</button>
+            <button data-jump="2">2 RF 90</button>
+            <button data-jump="3">3 Dephase</button>
+            <button data-jump="4">4 Recovery</button>
+            <button id="jumpAllBtn">All continuous</button>
+          </div>
+          <div class="toggle"><input id="modeStep" type="radio" name="teachMode" checked /> Step mode</div>
+          <div class="toggle"><input id="modeContinuous" type="radio" name="teachMode" /> All continuous mode</div>
+          <div class="stage-readout" id="stageReadout"></div>
+        </div>
+
+        <h2>Playback</h2>
+        <div class="group">
+          <div class="btn-row">
+            <button id="playBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+            <button id="step180Btn">Step to 180°</button>
+          </div>
+          <div class="row"><label>Reset to stage</label><span class="value">0/1/2</span></div>
+          <select id="resetStage">
+            <option value="0" selected>Stage 0: No net magnetization</option>
+            <option value="1">Stage 1: B0 alignment</option>
+            <option value="2">Stage 2: RF 90° pulse</option>
+          </select>
+          <div class="toggle"><input id="showEcho" type="checkbox" checked /> Show 180° pulse</div>
+          <div class="toggle"><input id="showTrails" type="checkbox" /> Show individual spin trails</div>
+          <div class="toggle"><input id="showGrid" type="checkbox" checked /> Show grid in transverse plane</div>
+        </div>
+
+        <h2>Physics mode</h2>
+        <div class="group">
+          <div class="toggle"><input id="modeT2" type="radio" name="mode" checked /> Show T2 only (irreversible)</div>
+          <div class="toggle"><input id="modeT2star" type="radio" name="mode" /> Show T2* (T2 + static inhomogeneity)</div>
+          <div class="row"><label>T2 (ms)</label><span class="value" id="t2Val">80</span></div>
+          <input id="t2" type="range" min="10" max="300" step="1" value="80" />
+          <div class="row"><label>T2′ (ms)</label><span class="value" id="t2pVal">40</span></div>
+          <input id="t2p" type="range" min="5" max="200" step="1" value="40" />
+          <div class="row"><label>T1 (ms)</label><span class="value" id="t1Val">1500</span></div>
+          <input id="t1" type="range" min="200" max="2000" step="10" value="1500" />
+        </div>
+
+        <h2>Simulation</h2>
+        <div class="group">
+          <div class="row"><label>Number of spins (N)</label><span class="value" id="nVal">128</span></div>
+          <input id="n" type="range" min="16" max="512" step="16" value="128" />
+          <div class="row"><label>Delta f spread (Hz)</label><span class="value" id="dfVal">30</span></div>
+          <input id="df" type="range" min="0" max="80" step="1" value="30" />
+          <div class="row"><label>Noise / diffusion</label><span class="value" id="noiseVal">0.40</span></div>
+          <input id="noise" type="range" min="0" max="1" step="0.01" value="0.40" />
+          <div class="row"><label>Time scale</label><span class="value" id="speedVal">0.75x</span></div>
+          <input id="speed" type="range" min="0.25" max="8" step="0.25" value="0.75" />
+        </div>
+
+        <div class="group">
+          <div class="info-box">
+            <div><span class="badge">T2</span>T2 is irreversible spin-spin dephasing</div>
+            <div><span class="badge">T2*</span>T2 star includes T2 plus static field inhomogeneity</div>
+            <div><span class="badge">Echo</span>Spin echo refocuses static inhomogeneity, not true T2</div>
+            <div style="margin-top:0.4rem;">1/T2* = 1/T2 + 1/T2prime</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      // setup
+      const spinCanvas = document.getElementById("spinCanvas");
+      const mxyCanvas = document.getElementById("mxyCanvas");
+      const mzCanvas = document.getElementById("mzCanvas");
+      const sCtx = spinCanvas.getContext("2d");
+      const mxyCtx = mxyCanvas.getContext("2d");
+      const mzCtx = mzCanvas.getContext("2d");
+
+      const els = {
+        playBtn: document.getElementById("playBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        step180Btn: document.getElementById("step180Btn"),
+        resetStage: document.getElementById("resetStage"),
+        showEcho: document.getElementById("showEcho"),
+        showTrails: document.getElementById("showTrails"),
+        showGrid: document.getElementById("showGrid"),
+        modeT2: document.getElementById("modeT2"),
+        modeT2star: document.getElementById("modeT2star"),
+        t1: document.getElementById("t1"),
+        t2: document.getElementById("t2"),
+        t2p: document.getElementById("t2p"),
+        n: document.getElementById("n"),
+        df: document.getElementById("df"),
+        noise: document.getElementById("noise"),
+        speed: document.getElementById("speed"),
+        prevStageBtn: document.getElementById("prevStageBtn"),
+        nextStageBtn: document.getElementById("nextStageBtn"),
+        playSeqBtn: document.getElementById("playSeqBtn"),
+        modeStep: document.getElementById("modeStep"),
+        modeContinuous: document.getElementById("modeContinuous"),
+        jumpAllBtn: document.getElementById("jumpAllBtn"),
+        stageReadout: document.getElementById("stageReadout"),
+        t1Val: document.getElementById("t1Val"),
+        t2Val: document.getElementById("t2Val"),
+        t2pVal: document.getElementById("t2pVal"),
+        nVal: document.getElementById("nVal"),
+        dfVal: document.getElementById("dfVal"),
+        noiseVal: document.getElementById("noiseVal"),
+        speedVal: document.getElementById("speedVal")
+      };
+
+      const stageNames = [
+        "Stage 0: No net magnetization",
+        "Stage 1: B0 alignment",
+        "Stage 2: 90 degree RF pulse",
+        "Stage 3: Dephasing",
+        "Stage 4: Recovery"
+      ];
+
+      const stageLabels = [
+        "Thermal equilibrium without B0: random, net 0",
+        "B0 on: moments stay out of phase while net Mz builds",
+        "90 degree pulse: moments become in phase in the transverse plane",
+        "Dephasing: Mxy falls while Mz starts regrowing",
+        "Recovery: Mxy decay and Mz regrowth continue together"
+      ];
+
+      const stageDur = {
+        0: 1.5,
+        1: 2.2,
+        2: 0.7,
+        3: 2.2,
+        4: 4.0
+      };
+
+      const state = {
+        running: true,
+        simTime: 0,
+        last: performance.now(),
+        stage: 0,
+        stageTime: 0,
+        stageProgress: 0,
+        teachMode: "step",
+        seqPlaying: false,
+        spins: [],
+        trails: [],
+        trailLen: 30,
+        mxyHistory: [],
+        mzHistory: [],
+        rfTime: null,
+        echoApplied: false,
+        spinEchoAt: null,
+        mz: 0,
+        net: { mxy: 0, sx: 0, sy: 0 }
+      };
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function randNorm() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function resizeCanvas(canvas, ctx) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function syncLabels() {
+        els.t1Val.textContent = Math.round(parseFloat(els.t1.value));
+        els.t2Val.textContent = Math.round(parseFloat(els.t2.value));
+        els.t2pVal.textContent = Math.round(parseFloat(els.t2p.value));
+        els.nVal.textContent = parseInt(els.n.value, 10);
+        els.dfVal.textContent = Math.round(parseFloat(els.df.value));
+        els.noiseVal.textContent = parseFloat(els.noise.value).toFixed(2);
+        els.speedVal.textContent = `${parseFloat(els.speed.value).toFixed(2)}x`;
+      }
+
+      function initSpins(phased = "random") {
+        const n = parseInt(els.n.value, 10);
+        const df = parseFloat(els.df.value);
+        state.spins = [];
+        for (let i = 0; i < n; i += 1) {
+          state.spins.push({
+            phase: phased === "coherent" ? 0 : Math.random() * Math.PI * 2,
+            staticHz: randNorm() * df * 0.5
+          });
+        }
+        state.trails = new Array(n).fill(0).map(() => []);
+      }
+
+      function teSec() {
+        return Math.max(0.08, (parseFloat(els.t2.value) / 1000) * 1.4);
+      }
+
+      function t2StarSec() {
+        const t2 = Math.max(0.001, parseFloat(els.t2.value) / 1000);
+        const t2p = Math.max(0.001, parseFloat(els.t2p.value) / 1000);
+        return 1 / (1 / t2 + 1 / t2p);
+      }
+
+      function gotoStage(next, clearHistory = false) {
+        state.stage = clamp(next, 0, 4);
+        state.stageTime = 0;
+        state.stageProgress = 0;
+
+        if (state.stage === 0) {
+          state.rfTime = null;
+          state.echoApplied = false;
+          state.spinEchoAt = null;
+          initSpins("random");
+          state.mz = 0;
+        }
+
+        if (state.stage === 1) {
+          state.rfTime = null;
+          state.echoApplied = false;
+          state.spinEchoAt = null;
+          initSpins("random");
+        }
+
+        if (state.stage === 2) {
+          initSpins("coherent");
+          state.echoApplied = false;
+          state.spinEchoAt = null;
+          state.rfTime = state.simTime;
+          for (const s of state.spins) s.phase = 0;
+        }
+
+        if (state.stage === 3 && state.rfTime === null) {
+          initSpins("coherent");
+          state.rfTime = state.simTime;
+          state.echoApplied = false;
+          state.spinEchoAt = null;
+        }
+
+        if (state.stage === 4 && state.rfTime === null) {
+          initSpins("coherent");
+          state.rfTime = state.simTime;
+          state.echoApplied = false;
+          state.spinEchoAt = null;
+        }
+
+        if (clearHistory) {
+          state.mxyHistory = [];
+          state.mzHistory = [];
+        }
+      }
+
+      function resetAll(toStage = 0) {
+        state.simTime = 0;
+        state.stage = 0;
+        state.stageTime = 0;
+        state.stageProgress = 0;
+        state.rfTime = null;
+        state.echoApplied = false;
+        state.spinEchoAt = null;
+        state.mxyHistory = [];
+        state.mzHistory = [];
+        state.seqPlaying = false;
+        els.playSeqBtn.textContent = "Play sequence";
+        initSpins("random");
+        state.net = { mxy: 0, sx: 0, sy: 0 };
+        state.mz = 0;
+        gotoStage(toStage, false);
+      }
+
+      function applyEcho() {
+        if (state.echoApplied || !els.showEcho.checked) return;
+        state.echoApplied = true;
+        state.spinEchoAt = state.simTime;
+        for (const s of state.spins) {
+          s.phase = -s.phase;
+        }
+      }
+
+      function currentTauRF() {
+        if (state.rfTime === null) return 0;
+        return Math.max(0, state.simTime - state.rfTime);
+      }
+
+      function stageAdvanceLogic() {
+        if (state.teachMode === "continuous" || state.seqPlaying) {
+          const dur = stageDur[state.stage] || 1;
+          if (state.stageTime >= dur) {
+            if (state.stage < 4) {
+              gotoStage(state.stage + 1, false);
+            } else {
+              resetAll(0);
+              if (state.teachMode === "continuous" || state.seqPlaying) {
+                state.seqPlaying = true;
+                els.playSeqBtn.textContent = "Stop sequence";
+              }
+            }
+          }
+        }
+      }
+
+      function computeMxy(transScale) {
+        let sx = 0;
+        let sy = 0;
+        const n = Math.max(1, state.spins.length);
+        for (const s of state.spins) {
+          sx += Math.cos(s.phase);
+          sy += Math.sin(s.phase);
+        }
+        sx = (sx / n) * transScale;
+        sy = (sy / n) * transScale;
+        return { mxy: Math.sqrt(sx * sx + sy * sy), sx, sy };
+      }
+
+      function updateSpinsDephase(dtSec) {
+        const noise = parseFloat(els.noise.value);
+        const useT2star = els.modeT2star.checked;
+
+        for (let i = 0; i < state.spins.length; i += 1) {
+          const s = state.spins[i];
+          let dPhase = 0;
+
+          if (useT2star) {
+            dPhase += 2 * Math.PI * s.staticHz * dtSec;
+          }
+
+          const t2 = Math.max(0.001, parseFloat(els.t2.value) / 1000);
+          const diffusionSigma = noise * Math.sqrt(dtSec / t2) * 0.26;
+          dPhase += randNorm() * diffusionSigma;
+
+          s.phase += dPhase;
+          if (s.phase > Math.PI) s.phase -= Math.PI * 2;
+          if (s.phase < -Math.PI) s.phase += Math.PI * 2;
+
+          if (els.showTrails.checked) {
+            const tr = state.trails[i];
+            tr.push(s.phase);
+            if (tr.length > state.trailLen) tr.shift();
+          } else {
+            state.trails[i].length = 0;
+          }
+        }
+      }
+
+      // physics update
+      function update(dtMs) {
+        const speed = parseFloat(els.speed.value);
+        const dtSec = (dtMs / 1000) * speed;
+        state.simTime += dtSec;
+        state.stageTime += dtSec;
+        const sDur = stageDur[state.stage] || 1;
+        state.stageProgress = clamp(state.stageTime / sDur, 0, 1);
+
+        const t2 = Math.max(0.001, parseFloat(els.t2.value) / 1000);
+        const t1 = Math.max(0.05, parseFloat(els.t1.value) / 1000);
+        const tauRF = currentTauRF();
+
+        let transScale = 0;
+        let mz = 0;
+
+        if (state.stage === 0) {
+          transScale = 1;
+          mz = 0;
+          for (const s of state.spins) {
+            s.phase += dtSec * 0.7;
+          }
+        }
+
+        if (state.stage === 1) {
+          transScale = 1 - state.stageProgress;
+          mz = state.stageProgress;
+          for (const s of state.spins) {
+            s.phase += dtSec * 0.2;
+          }
+        }
+
+        if (state.stage === 2) {
+          const p = state.stageProgress;
+          transScale = p;
+          mz = 1 - p;
+          if (state.rfTime === null) state.rfTime = state.simTime - state.stageTime;
+          for (const s of state.spins) s.phase = 0;
+        }
+
+        if (state.stage === 3 || state.stage === 4) {
+          if (state.rfTime === null) state.rfTime = state.simTime;
+          const te = teSec();
+          const te2 = te * 0.5;
+          if (els.showEcho.checked && !state.echoApplied && tauRF >= te2) {
+            applyEcho();
+          }
+
+          updateSpinsDephase(dtSec);
+
+          const decay = Math.exp(-tauRF / t2);
+          transScale = decay;
+
+          mz = 1 - Math.exp(-tauRF / t1);
+        }
+
+        state.mz = clamp(mz, 0, 1);
+        state.net = computeMxy(transScale);
+
+        state.mxyHistory.push({
+          t: state.simTime,
+          tauRF,
+          mxy: state.net.mxy,
+          stage: state.stage
+        });
+
+        state.mzHistory.push({
+          t: state.simTime,
+          tauRF,
+          mz: state.mz,
+          stage: state.stage
+        });
+
+        const maxPoints = 1400;
+        if (state.mxyHistory.length > maxPoints) state.mxyHistory.shift();
+        if (state.mzHistory.length > maxPoints) state.mzHistory.shift();
+
+        stageAdvanceLogic();
+      }
+
+      function drawArrow(ctx, x1, y1, x2, y2, color, width) {
+        const ang = Math.atan2(y2 - y1, x2 - x1);
+        const head = 8 + width;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - head * Math.cos(ang - 0.34), y2 - head * Math.sin(ang - 0.34));
+        ctx.lineTo(x2 - head * Math.cos(ang + 0.34), y2 - head * Math.sin(ang + 0.34));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // render spin view
+      function drawSpinView() {
+        const w = spinCanvas.clientWidth;
+        const h = spinCanvas.clientHeight;
+        sCtx.clearRect(0, 0, w, h);
+
+        const cx = w * 0.44;
+        const cy = h * 0.55;
+        const r = Math.min(w * 0.36, h * 0.34);
+
+        if (els.showGrid.checked) {
+          sCtx.strokeStyle = "rgba(120, 150, 190, 0.22)";
+          sCtx.lineWidth = 1;
+          sCtx.beginPath();
+          sCtx.arc(cx, cy, r, 0, Math.PI * 2);
+          sCtx.stroke();
+          sCtx.setLineDash([5, 5]);
+          sCtx.beginPath();
+          sCtx.moveTo(cx - r - 14, cy);
+          sCtx.lineTo(cx + r + 14, cy);
+          sCtx.moveTo(cx, cy - r - 14);
+          sCtx.lineTo(cx, cy + r + 14);
+          sCtx.stroke();
+          sCtx.setLineDash([]);
+        }
+
+        if (els.showTrails.checked) {
+          for (let i = 0; i < state.spins.length; i += 1) {
+            const trail = state.trails[i];
+            if (trail.length < 2) continue;
+            sCtx.strokeStyle = "rgba(76, 195, 255, 0.11)";
+            sCtx.lineWidth = 1.1;
+            sCtx.beginPath();
+            for (let j = 0; j < trail.length; j += 1) {
+              const p = trail[j];
+              const x = cx + Math.cos(p) * r;
+              const y = cy - Math.sin(p) * r;
+              if (j === 0) sCtx.moveTo(x, y);
+              else sCtx.lineTo(x, y);
+            }
+            sCtx.stroke();
+          }
+        }
+
+        const spinAlpha = state.stage === 1 ? (1 - state.stageProgress) : 1;
+        const spinScale = state.stage >= 3 ? Math.max(0.16, state.net.mxy) : (state.stage === 2 ? state.stageProgress : (state.stage === 1 ? (1 - state.stageProgress) : 1));
+
+        for (const s of state.spins) {
+          const len = r * spinScale;
+          const px = cx + Math.cos(s.phase) * len;
+          const py = cy - Math.sin(s.phase) * len;
+          sCtx.strokeStyle = `rgba(76,195,255,${0.22 + 0.45 * spinAlpha})`;
+          sCtx.lineWidth = 1.05;
+          sCtx.beginPath();
+          sCtx.moveTo(cx, cy);
+          sCtx.lineTo(px, py);
+          sCtx.stroke();
+          sCtx.fillStyle = `rgba(76,195,255,${0.4 + 0.4 * spinAlpha})`;
+          sCtx.beginPath();
+          sCtx.arc(px, py, 2, 0, Math.PI * 2);
+          sCtx.fill();
+        }
+
+        const nx = cx + state.net.sx * r * 1.2;
+        const ny = cy - state.net.sy * r * 1.2;
+        drawArrow(sCtx, cx, cy, nx, ny, "rgba(123,255,184,0.95)", 4);
+        sCtx.fillStyle = "rgba(123,255,184,0.95)";
+        sCtx.font = "700 13px Avenir Next";
+        sCtx.fillText("Mxy", nx + 8, ny - 6);
+
+        // Mz side indicator
+        const mx = w * 0.86;
+        const yTop = h * 0.2;
+        const yBot = h * 0.82;
+        sCtx.strokeStyle = "rgba(160, 185, 220, 0.55)";
+        sCtx.lineWidth = 2;
+        sCtx.beginPath();
+        sCtx.moveTo(mx, yBot);
+        sCtx.lineTo(mx, yTop);
+        sCtx.stroke();
+        sCtx.fillStyle = "rgba(190, 210, 240, 0.9)";
+        sCtx.font = "700 13px Avenir Next";
+        sCtx.fillText("Mz", mx + 10, yTop + 4);
+
+        const y0 = yBot - (yBot - yTop) * state.mz;
+        drawArrow(sCtx, mx, yBot, mx, y0, "rgba(255,215,107,0.95)", 4);
+
+        // X-Z recovery inset: shows smooth tilt from transverse (X) back to longitudinal (Z)
+        const bx = w * 0.74;
+        const by = h * 0.2;
+        const bLen = Math.min(w, h) * 0.16;
+        sCtx.strokeStyle = "rgba(160, 185, 220, 0.45)";
+        sCtx.lineWidth = 1.5;
+        sCtx.beginPath();
+        sCtx.moveTo(bx, by + bLen);
+        sCtx.lineTo(bx + bLen, by + bLen);
+        sCtx.moveTo(bx, by + bLen);
+        sCtx.lineTo(bx, by);
+        sCtx.stroke();
+
+        sCtx.fillStyle = "rgba(190, 210, 240, 0.9)";
+        sCtx.font = "600 11px Avenir Next";
+        sCtx.fillText("X", bx + bLen + 6, by + bLen + 4);
+        sCtx.fillText("Z", bx - 10, by - 4);
+        sCtx.fillText("X to Z recovery", bx - 8, by + bLen + 18);
+
+        const xComp = clamp(state.net.mxy, 0, 1);
+        const zComp = clamp(state.mz, 0, 1);
+        const vx = bx + xComp * bLen;
+        const vy = by + bLen - zComp * bLen;
+        drawArrow(sCtx, bx, by + bLen, vx, vy, "rgba(255,230,130,0.95)", 3.5);
+
+        // coherence guide
+        if (state.stage >= 3) {
+          sCtx.setLineDash([5, 4]);
+          sCtx.strokeStyle = "rgba(123,255,184,0.25)";
+          sCtx.lineWidth = 1;
+          sCtx.beginPath();
+          sCtx.arc(cx, cy, r * Math.max(0.1, state.net.mxy), 0, Math.PI * 2);
+          sCtx.stroke();
+          sCtx.setLineDash([]);
+        }
+
+        sCtx.fillStyle = "rgba(210, 225, 248, 0.95)";
+        sCtx.font = "600 12px Avenir Next";
+        sCtx.fillText(stageLabels[state.stage], 12, 20);
+        sCtx.fillText("90 degree pulse at t = 0", 12, 38);
+
+        if (state.stage === 1) {
+          sCtx.fillStyle = "rgba(255, 155, 74, 0.92)";
+          sCtx.font = "700 12px Avenir Next";
+          sCtx.fillText("Out of phase", 12, 56);
+        }
+        if (state.stage === 2) {
+          sCtx.fillStyle = "rgba(123, 255, 184, 0.95)";
+          sCtx.font = "700 12px Avenir Next";
+          sCtx.fillText("In phase", 12, 56);
+        }
+
+        if (els.showEcho.checked && state.rfTime !== null) {
+          sCtx.fillText("180 degree pulse at t = TE/2", 12, 56);
+          sCtx.fillText("Echo at t = TE", 12, 74);
+        }
+
+        if (state.stage === 2) {
+          sCtx.fillStyle = "rgba(255,155,74,0.95)";
+          sCtx.font = "700 13px Avenir Next";
+          sCtx.fillText("90 degree pulse", w * 0.5 - 48, h * 0.12);
+        }
+        if (state.echoApplied) {
+          sCtx.fillStyle = "rgba(255,155,74,0.95)";
+          sCtx.font = "700 13px Avenir Next";
+          sCtx.fillText("180 degree pulse", w * 0.5 - 54, h * 0.16);
+        }
+      }
+
+      function drawAxes(ctx, w, h, padL, padR, padT, padB) {
+        const pw = w - padL - padR;
+        const ph = h - padT - padB;
+        ctx.strokeStyle = "rgba(120,150,190,0.22)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(padL, padT, pw, ph);
+        return { pw, ph };
+      }
+
+      // render Mxy plot
+      function drawMxyPlot() {
+        const w = mxyCanvas.clientWidth;
+        const h = mxyCanvas.clientHeight;
+        mxyCtx.clearRect(0, 0, w, h);
+
+        const padL = 46;
+        const padR = 12;
+        const padT = 18;
+        const padB = 24;
+        const { pw, ph } = drawAxes(mxyCtx, w, h, padL, padR, padT, padB);
+
+        const tWindow = 7.5;
+        const t0 = Math.max(0, state.simTime - tWindow);
+        const xOf = (t) => padL + ((t - t0) / tWindow) * pw;
+        const yOf = (v) => padT + (1 - clamp(v, 0, 1)) * ph;
+
+        const t2 = Math.max(0.001, parseFloat(els.t2.value) / 1000);
+        const t2s = t2StarSec();
+
+        // envelope T2
+        mxyCtx.strokeStyle = "rgba(123,255,184,0.42)";
+        mxyCtx.lineWidth = 1.2;
+        mxyCtx.beginPath();
+        for (let i = 0; i <= 180; i += 1) {
+          const t = t0 + (i / 180) * tWindow;
+          const tau = state.rfTime === null ? -1 : (t - state.rfTime);
+          const v = tau < 0 ? 0 : Math.exp(-tau / t2);
+          const x = xOf(t);
+          const y = yOf(v);
+          if (i === 0) mxyCtx.moveTo(x, y); else mxyCtx.lineTo(x, y);
+        }
+        mxyCtx.stroke();
+
+        // envelope T2*
+        mxyCtx.strokeStyle = "rgba(255,155,74,0.55)";
+        mxyCtx.lineWidth = 1.2;
+        mxyCtx.beginPath();
+        for (let i = 0; i <= 180; i += 1) {
+          const t = t0 + (i / 180) * tWindow;
+          const tau = state.rfTime === null ? -1 : (t - state.rfTime);
+          const v = tau < 0 ? 0 : Math.exp(-tau / t2s);
+          const x = xOf(t);
+          const y = yOf(v);
+          if (i === 0) mxyCtx.moveTo(x, y); else mxyCtx.lineTo(x, y);
+        }
+        mxyCtx.stroke();
+
+        // measured Mxy
+        mxyCtx.strokeStyle = "rgba(76,195,255,0.96)";
+        mxyCtx.lineWidth = 2.2;
+        mxyCtx.beginPath();
+        let started = false;
+        for (const p of state.mxyHistory) {
+          if (p.t < t0) continue;
+          const x = xOf(p.t);
+          const y = yOf(p.mxy);
+          if (!started) {
+            mxyCtx.moveTo(x, y);
+            started = true;
+          } else {
+            mxyCtx.lineTo(x, y);
+          }
+        }
+        mxyCtx.stroke();
+
+        // event markers
+        if (state.rfTime !== null) {
+          const x90 = xOf(state.rfTime);
+          if (x90 >= padL && x90 <= padL + pw) {
+            mxyCtx.strokeStyle = "rgba(190,210,240,0.55)";
+            mxyCtx.beginPath();
+            mxyCtx.moveTo(x90, padT);
+            mxyCtx.lineTo(x90, padT + ph);
+            mxyCtx.stroke();
+            mxyCtx.fillStyle = "rgba(210,225,248,0.9)";
+            mxyCtx.font = "600 11px Avenir Next";
+            mxyCtx.fillText("90", x90 + 3, padT + 12);
+          }
+
+          const te = teSec();
+          const te2 = state.rfTime + te * 0.5;
+          const teFull = state.rfTime + te;
+
+          if (els.showEcho.checked) {
+            const x180 = xOf(te2);
+            if (x180 >= padL && x180 <= padL + pw) {
+              mxyCtx.strokeStyle = "rgba(255,155,74,0.68)";
+              mxyCtx.beginPath();
+              mxyCtx.moveTo(x180, padT);
+              mxyCtx.lineTo(x180, padT + ph);
+              mxyCtx.stroke();
+              mxyCtx.fillStyle = "rgba(255,155,74,0.9)";
+              mxyCtx.fillText("180", x180 + 3, padT + 12);
+            }
+          }
+
+          const xEcho = xOf(teFull);
+          if (xEcho >= padL && xEcho <= padL + pw) {
+            mxyCtx.strokeStyle = "rgba(255,215,107,0.7)";
+            mxyCtx.beginPath();
+            mxyCtx.moveTo(xEcho, padT);
+            mxyCtx.lineTo(xEcho, padT + ph);
+            mxyCtx.stroke();
+            mxyCtx.fillStyle = "rgba(255,215,107,0.95)";
+            mxyCtx.fillText("Echo", xEcho + 3, padT + 12);
+          }
+        }
+
+        mxyCtx.fillStyle = "rgba(210,225,248,0.9)";
+        mxyCtx.font = "600 11px Avenir Next";
+        mxyCtx.fillText("|Mxy|", 10, padT + 12);
+        mxyCtx.fillText("T2", padL + 12, padT + 12);
+        mxyCtx.fillStyle = "rgba(255,155,74,0.95)";
+        mxyCtx.fillText("T2*", padL + 34, padT + 12);
+      }
+
+      // render Mz plot
+      function drawMzPlot() {
+        const w = mzCanvas.clientWidth;
+        const h = mzCanvas.clientHeight;
+        mzCtx.clearRect(0, 0, w, h);
+
+        const padL = 46;
+        const padR = 12;
+        const padT = 14;
+        const padB = 24;
+        const { pw, ph } = drawAxes(mzCtx, w, h, padL, padR, padT, padB);
+
+        const tWindow = 7.5;
+        const t0 = Math.max(0, state.simTime - tWindow);
+        const xOf = (t) => padL + ((t - t0) / tWindow) * pw;
+        const yOf = (v) => padT + (1 - clamp(v, 0, 1)) * ph;
+
+        const t1 = Math.max(0.05, parseFloat(els.t1.value) / 1000);
+
+        // T1 guide
+        mzCtx.strokeStyle = "rgba(255,215,107,0.45)";
+        mzCtx.lineWidth = 1.2;
+        mzCtx.beginPath();
+        for (let i = 0; i <= 180; i += 1) {
+          const t = t0 + (i / 180) * tWindow;
+          const tau = state.rfTime === null ? -1 : (t - state.rfTime);
+          const v = tau < 0 ? 0 : (1 - Math.exp(-tau / t1));
+          const x = xOf(t);
+          const y = yOf(v);
+          if (i === 0) mzCtx.moveTo(x, y); else mzCtx.lineTo(x, y);
+        }
+        mzCtx.stroke();
+
+        // measured Mz
+        mzCtx.strokeStyle = "rgba(255,230,130,0.96)";
+        mzCtx.lineWidth = 2;
+        mzCtx.beginPath();
+        let started = false;
+        for (const p of state.mzHistory) {
+          if (p.t < t0) continue;
+          const x = xOf(p.t);
+          const y = yOf(p.mz);
+          if (!started) {
+            mzCtx.moveTo(x, y);
+            started = true;
+          } else {
+            mzCtx.lineTo(x, y);
+          }
+        }
+        mzCtx.stroke();
+
+        if (state.rfTime !== null) {
+          const x90 = xOf(state.rfTime);
+          if (x90 >= padL && x90 <= padL + pw) {
+            mzCtx.strokeStyle = "rgba(190,210,240,0.5)";
+            mzCtx.beginPath();
+            mzCtx.moveTo(x90, padT);
+            mzCtx.lineTo(x90, padT + ph);
+            mzCtx.stroke();
+          }
+        }
+
+        mzCtx.fillStyle = "rgba(210,225,248,0.9)";
+        mzCtx.font = "600 11px Avenir Next";
+        mzCtx.fillText("Mz", 14, padT + 12);
+        mzCtx.fillText("T1 guide", padL + 10, padT + 12);
+      }
+
+      // UI wiring
+      function refreshStageReadout() {
+        const modeText = state.teachMode === "continuous" ? "All continuous mode" : "Step mode";
+        const seqText = state.seqPlaying ? "Auto sequence running" : "Manual stage control";
+        els.stageReadout.textContent = `${stageNames[state.stage]} | ${modeText} | ${seqText}`;
+      }
+
+      function frame(now) {
+        const dtMs = Math.min(60, now - state.last);
+        state.last = now;
+        if (state.running) update(dtMs);
+        drawSpinView();
+        drawMxyPlot();
+        drawMzPlot();
+        refreshStageReadout();
+        requestAnimationFrame(frame);
+      }
+
+      els.playBtn.addEventListener("click", () => {
+        state.running = !state.running;
+        els.playBtn.textContent = state.running ? "Pause" : "Play";
+      });
+
+      els.resetBtn.addEventListener("click", () => {
+        resetAll(parseInt(els.resetStage.value, 10));
+      });
+
+      els.step180Btn.addEventListener("click", () => {
+        if (state.stage < 3) {
+          if (state.rfTime === null) gotoStage(2, false);
+          gotoStage(3, false);
+        }
+        if (state.rfTime === null) {
+          gotoStage(2, false);
+        }
+        const target = state.rfTime + teSec() * 0.5;
+        if (state.simTime < target) {
+          state.simTime = target;
+        }
+        applyEcho();
+      });
+
+      els.prevStageBtn.addEventListener("click", () => {
+        state.seqPlaying = false;
+        els.playSeqBtn.textContent = "Play sequence";
+        gotoStage(state.stage - 1, false);
+      });
+
+      els.nextStageBtn.addEventListener("click", () => {
+        state.seqPlaying = false;
+        els.playSeqBtn.textContent = "Play sequence";
+        gotoStage(state.stage + 1, false);
+      });
+
+      els.playSeqBtn.addEventListener("click", () => {
+        state.seqPlaying = !state.seqPlaying;
+        els.playSeqBtn.textContent = state.seqPlaying ? "Stop sequence" : "Play sequence";
+        if (state.seqPlaying && state.stage === 4) {
+          resetAll(0);
+          state.seqPlaying = true;
+          els.playSeqBtn.textContent = "Stop sequence";
+        }
+      });
+
+      document.querySelectorAll("[data-jump]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.seqPlaying = false;
+          els.playSeqBtn.textContent = "Play sequence";
+          gotoStage(parseInt(btn.dataset.jump, 10), false);
+        });
+      });
+
+      els.jumpAllBtn.addEventListener("click", () => {
+        els.modeContinuous.checked = true;
+        state.teachMode = "continuous";
+        state.seqPlaying = true;
+        els.playSeqBtn.textContent = "Stop sequence";
+        resetAll(0);
+        state.seqPlaying = true;
+        els.playSeqBtn.textContent = "Stop sequence";
+      });
+
+      els.modeStep.addEventListener("change", () => {
+        if (els.modeStep.checked) {
+          state.teachMode = "step";
+          state.seqPlaying = false;
+          els.playSeqBtn.textContent = "Play sequence";
+        }
+      });
+
+      els.modeContinuous.addEventListener("change", () => {
+        if (els.modeContinuous.checked) {
+          state.teachMode = "continuous";
+          state.seqPlaying = true;
+          els.playSeqBtn.textContent = "Stop sequence";
+        }
+      });
+
+      [els.t1, els.t2, els.t2p, els.n, els.df, els.noise, els.speed].forEach((el) => {
+        el.addEventListener("input", () => {
+          syncLabels();
+          if (el === els.n || el === els.df) {
+            if (state.stage <= 1) initSpins("random");
+            else initSpins("coherent");
+          }
+        });
+      });
+
+      [els.modeT2, els.modeT2star, els.showEcho, els.showTrails, els.showGrid].forEach((el) => {
+        el.addEventListener("change", () => {
+          if (el === els.showEcho && !els.showEcho.checked) {
+            state.echoApplied = false;
+            state.spinEchoAt = null;
+          }
+          if (el === els.modeT2 || el === els.modeT2star) {
+            state.echoApplied = false;
+            state.spinEchoAt = null;
+          }
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        resizeCanvas(spinCanvas, sCtx);
+        resizeCanvas(mxyCanvas, mxyCtx);
+        resizeCanvas(mzCanvas, mzCtx);
+      });
+
+      resizeCanvas(spinCanvas, sCtx);
+      resizeCanvas(mxyCanvas, mxyCtx);
+      resizeCanvas(mzCanvas, mzCtx);
+      syncLabels();
+      resetAll(0);
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

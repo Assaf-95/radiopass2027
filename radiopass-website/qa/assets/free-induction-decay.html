@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Free Induction Decay — Radiopass</title>
+<meta name="description" content="Free induction decay and T2* explained one step at a time — Radiopass visual lab." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/guided-steps.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="gs-header">
+  <div class="shell">
+    <div class="gs-header-top">
+      <div>
+        <span class="eyebrow">MRI · Free Induction Decay</span>
+        <h1 class="gs-title">Watching a signal decay.</h1>
+        <p class="lede gs-subtitle">After a 90° pulse, the signal doesn't just fade — it fades in a very specific, very testable way. One idea at a time.</p>
+      </div>
+      <div class="gs-progress-pill" id="gs-progress">STEP 1 / 9</div>
+    </div>
+    <a href="free-induction-decay-full.html" class="btn btn-ghost gs-full-link">open the full simulator</a>
+  </div>
+</header>
+
+<div class="shell gs-layout">
+  <div class="card glass gs-stage-card">
+    <div class="gs-stage-head">
+      <span id="gs-chip"></span>
+      <div class="gs-timeline" id="gs-timeline"></div>
+    </div>
+    <div class="gs-stage-svg-wrap">
+      <svg id="gs-stage" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="card glass gs-teach-card">
+    <h2 class="gs-step-title" id="gs-step-title"></h2>
+    <p class="gs-step-text" id="gs-step-text"></p>
+    <ul class="gs-notes" id="gs-notes"></ul>
+    <div class="gs-nav">
+      <button type="button" class="btn btn-ghost" id="gs-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="gs-next">Next</button>
+    </div>
+    <div class="gs-reset-row"><button type="button" id="gs-reset">restart from step 1</button></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/mri-vector-kit.js"></script>
+<script src="../../assets/js/guided-steps.js"></script>
+<script>
+(function () {
+  var K = window.MriVectorKit;
+
+  var STEPS = [
+    {
+      title: "After the 90° pulse",
+      chip: "Free induction decay",
+      text: "A 90° RF pulse tips net magnetisation from along B0 into the transverse plane. The spins now precess at the Larmor frequency, inducing an oscillating signal in the receiver coil.",
+      notes: ["This is the starting point for FID — nothing has decayed yet.", "The signal exists because there's coherent transverse magnetisation.", "No 180° pulse yet — this is FID, not spin echo."]
+    },
+    {
+      title: "The signal decays — fast",
+      chip: "T2* decay",
+      text: "The signal's amplitude falls away exponentially. Two things cause this: true spin-spin interaction (T2), and static field inhomogeneity. Together, this observed decay is called T2*.",
+      notes: ["T2* is always shorter than true T2 when inhomogeneity is present.", "1/T2* = 1/T2 + 1/T2′ — the two decay sources add.", "This fast decay is what you'd see with no 180° pulse at all."]
+    },
+    {
+      title: "A 180° pulse flips the spins",
+      chip: "Refocusing pulse",
+      text: "Applied at TE/2, the 180° pulse reverses the phase order of the spins — the ones running ahead due to field inhomogeneity are now behind, and vice versa.",
+      notes: ["This targets only the static-inhomogeneity part of dephasing (T2′).", "It cannot undo true spin-spin relaxation (T2) — that's irreversible.", "This is the one intervention that turns FID into spin echo."]
+    },
+    {
+      title: "The echo forms — but lower",
+      chip: "Echo at TE",
+      text: "As the static dephasing unwinds, the signal rises back up, peaking at echo time TE. But the echo doesn't reach the original height — true T2 decay was still happening in the background the whole time.",
+      notes: ["The echo peak always sits on the true T2 envelope, not the T2* one.", "Longer TE means the echo peak is lower — more true T2 decay has occurred.", "This is why spin echo can measure real T2, and FID alone can't."]
+    },
+    {
+      title: "Connect the echoes — that's T2",
+      chip: "True T2 envelope",
+      text: "If you repeat this with a longer and longer TE and mark each echo peak, those peaks trace out the true T2 decay curve — free of the static field's influence.",
+      notes: ["This is the whole point of spin echo: isolating true T2 from T2*.", "T2* the fast dashed curve; T2 the true, slower envelope.", "Multi-echo sequences exploit exactly this idea."]
+    },
+    {
+      title: "TR repeats the whole thing",
+      chip: "TR and k-space",
+      text: "One full 90°–180°–echo cycle fills one line of k-space. TR is the time between successive 90° pulses — the sequence repeats once per line until k-space is full.",
+      notes: ["Longer TR gives more time for longitudinal magnetisation to recover before the next excitation.", "TR is a per-repetition timer; TE is a per-echo timer — they answer different questions.", "This is where an image is actually built, line by line."]
+    },
+    {
+      title: "Two relaxations, at the same time",
+      chip: "T1 and T2 together",
+      text: "While transverse magnetisation is decaying (giving you the signal you're measuring), longitudinal magnetisation is simultaneously recovering back toward B0. Both processes run throughout every TR.",
+      notes: ["T2 relaxation: transverse signal fades.", "T1 relaxation: longitudinal magnetisation recovers.", "They're independent physical processes, just happening in the same window of time."]
+    },
+    {
+      title: "TR and TE set the weighting",
+      chip: "Exam weighting rules",
+      text: "In spin echo, TR mainly controls T1 weighting, and TE mainly controls T2 weighting. Short TR + short TE gives T1 weighting; long TR + long TE gives T2 weighting; long TR + short TE gives proton density weighting.",
+      notes: ["Short TR, short TE → T1 weighted.", "Long TR, long TE → T2 weighted.", "Long TR, short TE → proton density weighted."]
+    },
+    {
+      title: "Ready for the full simulator",
+      chip: "Full simulator available",
+      text: "This guided walkthrough deliberately hid the sliders. The full simulator has live TR, TE, T1, T2 and field-inhomogeneity controls, playback, and weighting presets — open it once the sequence itself makes sense.",
+      notes: ["The full view is built for exploring, not for a first pass.", "Come back here any time to re-walk the sequence from scratch.", "Everything in the full simulator maps directly onto what you just saw."]
+    }
+  ];
+
+  function renderScene(i, svg) {
+    var step = i + 1;
+    var cx = 430, cy = 200;
+
+    // vector precession panel — steps 1-3
+    var vectorPanel = '';
+    if (step <= 4) {
+      var angle = step === 1 ? -0.15 : (step === 2 ? 0.35 : (step === 3 ? 2.7 : 1.4));
+      var vecColour = step === 3 ? '#F2B84B' : '#5FE3F2';
+      vectorPanel =
+        '<circle cx="' + cx + '" cy="' + cy + '" r="118" fill="rgba(15,23,42,0.4)" stroke="rgba(148,197,224,0.16)" stroke-width="2"/>' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="78" fill="none" stroke="rgba(148,197,224,0.12)" stroke-width="1.5"/>' +
+        '<line x1="' + (cx - 118) + '" y1="' + cy + '" x2="' + (cx + 118) + '" y2="' + cy + '" stroke="rgba(148,197,224,0.18)"/>' +
+        '<line x1="' + cx + '" y1="' + (cy - 118) + '" x2="' + cx + '" y2="' + (cy + 118) + '" stroke="rgba(148,197,224,0.18)"/>' +
+        K.phaseVector(cx, cy, angle, 95, vecColour, step === 3 ? '180°' : 'Mxy') +
+        (step === 3 ? K.label(cx, cy - 140, '180° RF pulse', '#F2B84B') : '') +
+        (step === 4 ? K.label(cx, cy - 140, 'echo at TE', '#5FE3F2') : '');
+    }
+
+    // signal curve panel — steps 2-8
+    var curvePanel = '';
+    if (step >= 2) {
+      var showEcho = step >= 4;
+      var t2StarPath = 'M100 468 C150 420, 205 430, 250 458 C300 492, 346 498, 390 502';
+      var t2Path = 'M100 468 C245 405, 430 415, 640 492';
+      curvePanel =
+        '<g transform="translate(0,10)">' +
+        '<line x1="80" y1="500" x2="780" y2="500" stroke="rgba(226,232,240,0.28)" stroke-width="2"/>' +
+        '<line x1="80" y1="380" x2="80" y2="500" stroke="rgba(226,232,240,0.28)" stroke-width="2"/>' +
+        '<path d="' + t2StarPath + '" fill="none" stroke="#EAF3FB" stroke-width="4" opacity="0.9"/>' +
+        (step >= 5 ? '<path d="' + t2Path + '" fill="none" stroke="rgba(167,139,250,0.9)" stroke-width="3" stroke-dasharray="8 8"/>' : '') +
+        (showEcho ? '<path d="M390 502 C440 438, 490 438, 540 502" fill="none" stroke="#5FE3F2" stroke-width="5"/>' : '') +
+        (showEcho ? '<circle cx="465" cy="438" r="9" fill="#5FE3F2"/>' : '') +
+        (showEcho ? K.label(465, 420, 'TE', '#5FE3F2', 'middle', 15) : '') +
+        K.label(247, 415, 'T2*', '#EAF3FB', 'middle', 14) +
+        (step >= 5 ? K.label(620, 478, 'T2', '#A78BFA', 'middle', 14) : '') +
+        K.label(102, 528, 'time', 'rgba(203,213,225,0.78)', 'start', 13) +
+        K.label(54, 386, 'signal', 'rgba(203,213,225,0.78)', 'middle', 13) +
+        '</g>';
+    }
+
+    // TR / k-space repetition panel — step 6
+    var trPanel = '';
+    if (step === 6) {
+      trPanel = '<g transform="translate(0,-40)">';
+      for (var r = 0; r < 4; r++) {
+        var x = 110 + r * 170;
+        trPanel += '<rect x="' + x + '" y="380" width="140" height="46" rx="8" fill="rgba(95,227,242,' + (0.10 + r * 0.05) + ')" stroke="rgba(95,227,242,0.4)"/>';
+        trPanel += K.label(x + 70, 408, 'line ' + (r + 1), '#EAF3FB', 'middle', 12);
+      }
+      trPanel += K.label(430, 460, 'TR — one repetition per k-space line', '#8FA3BB', 'middle', 14);
+      trPanel += '</g>';
+    }
+
+    // simultaneous T1/T2 panel — step 7
+    var dualPanel = '';
+    if (step === 7) {
+      dualPanel =
+        '<g>' +
+        '<rect x="90" y="330" width="300" height="110" rx="16" fill="rgba(95,227,242,0.08)" stroke="rgba(95,227,242,0.35)"/>' +
+        K.label(240, 365, 'Mxy — decaying (T2)', '#5FE3F2', 'middle', 14) +
+        '<path d="M110 410 C180 380, 260 420, 370 405" fill="none" stroke="#5FE3F2" stroke-width="3"/>' +
+        '<rect x="470" y="330" width="300" height="110" rx="16" fill="rgba(167,139,250,0.08)" stroke="rgba(167,139,250,0.35)"/>' +
+        K.label(620, 365, 'Mz — recovering (T1)', '#A78BFA', 'middle', 14) +
+        '<path d="M490 425 C560 415, 640 385, 750 375" fill="none" stroke="#A78BFA" stroke-width="3"/>' +
+        '</g>';
+    }
+
+    // weighting summary — step 8
+    var weightPanel = '';
+    if (step === 8) {
+      weightPanel =
+        '<g>' +
+        '<rect x="90" y="150" width="210" height="150" rx="20" fill="rgba(95,227,242,0.10)" stroke="rgba(95,227,242,0.5)"/>' +
+        '<rect x="325" y="150" width="210" height="150" rx="20" fill="rgba(167,139,250,0.10)" stroke="rgba(167,139,250,0.5)"/>' +
+        '<rect x="560" y="150" width="210" height="150" rx="20" fill="rgba(242,184,75,0.10)" stroke="rgba(242,184,75,0.5)"/>' +
+        K.label(195, 190, 'T1 weighted', '#5FE3F2') + K.label(195, 230, 'Short TR', '#EAF3FB') + K.label(195, 260, 'Short TE', '#EAF3FB') +
+        K.label(430, 190, 'T2 weighted', '#A78BFA') + K.label(430, 230, 'Long TR', '#EAF3FB') + K.label(430, 260, 'Long TE', '#EAF3FB') +
+        K.label(665, 190, 'Proton density', '#F2B84B') + K.label(665, 230, 'Long TR', '#EAF3FB') + K.label(665, 260, 'Short TE', '#EAF3FB') +
+        '</g>';
+    }
+
+    // full-simulator bridge — step 9
+    var bridgePanel = '';
+    if (step === 9) {
+      bridgePanel =
+        '<g>' +
+        '<rect x="90" y="120" width="680" height="260" rx="28" fill="rgba(6,11,20,0.6)" stroke="rgba(95,227,242,0.35)"/>' +
+        K.label(430, 175, 'Full simulator preserved', '#5FE3F2', 'middle', 24) +
+        K.label(430, 215, 'TR / TE / T1 / T2 / T2′ sliders  ·  playback  ·  weighting presets', '#EAF3FB', 'middle', 15) +
+        '<rect x="148" y="260" width="120" height="70" rx="14" fill="rgba(95,227,242,0.14)" stroke="#5FE3F2"/>' +
+        '<rect x="306" y="260" width="120" height="70" rx="14" fill="rgba(167,139,250,0.14)" stroke="#A78BFA"/>' +
+        '<rect x="464" y="260" width="120" height="70" rx="14" fill="rgba(242,184,75,0.14)" stroke="#F2B84B"/>' +
+        '<rect x="622" y="260" width="120" height="70" rx="14" fill="rgba(22,191,166,0.14)" stroke="#16BFA6"/>' +
+        K.label(208, 300, 'TR / TE', '#AFF3FF') + K.label(366, 300, 'T1 / T2', '#D9CBFF') + K.label(524, 300, 'T2′', '#FBE3B0') + K.label(682, 300, 'weighting', '#9DEAD9') +
+        '</g>';
+    }
+
+    svg.innerHTML = K.frame(vectorPanel + curvePanel + trPanel + dualPanel + weightPanel + bridgePanel);
+  }
+
+  window.GuidedSteps.init({ steps: STEPS, renderScene: renderScene });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+/**
+ * The question bank's styles.
+ *
+ * The bank used to carry its own type scale — 46 hard-coded font sizes, 26 of
+ * them under 16px — which is how the metadata ended up shouting louder than
+ * the question. A stem the candidate has to weigh word by word was set at
+ * 15px while the flag button, the source tag and the progress read-out all
+ * sat within a point or two of it, so nothing on the card told the eye where
+ * to start.
+ *
+ * The fix is not new colours. It is that every size now comes from
+ * design/tokens.css, and the card is built to one rule: THE QUESTION IS THE
+ * LARGEST THING ON THE SCREEN, and the score, the tags, the counters and the
+ * navigation are all quieter than the stems they belong to.
+ *
+ * The --qb-* names are kept and re-pointed at the global tokens rather than
+ * renamed. Several hundred declarations reference them; swapping the values
+ * underneath gets the whole bank onto one palette without a rename diff that
+ * no candidate could see.
+ *
+ * Anything below 16px in this file is metadata — a count, a question number,
+ * a provenance tag — and nothing a candidate has to read to answer.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap');
+
+.qb-root {
+  --qb-bg: var(--bg-base);
+  --qb-surface: var(--bg-elevated);
+  --qb-surface-2: var(--bg-interactive);
+  --qb-ink: var(--text-primary);
+  --qb-mut: var(--text-tertiary);
+  --qb-line: var(--border);
+  --qb-line-strong: var(--border-strong);
+  --qb-amber: var(--accent);
+  --qb-xray: var(--hue-xray);
+  --qb-us: var(--hue-us);
+  --qb-mri: var(--hue-mri);
+  --qb-green: var(--success);
+  --qb-red: var(--error);
+  --qb-serif: var(--display);
+  --qb-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  background: var(--qb-bg);
+  color: var(--qb-ink);
+  font-family: var(--qb-sans);
+  /* The bank's inherited size. Everything that does not say otherwise is
+     reading text, so the default is reading size, not interface size. */
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.qb-root ::selection { background: rgba(217, 168, 78, 0.32); }
+.qb-root :focus-visible { outline: 2px solid var(--qb-amber); outline-offset: 3px; border-radius: 2px; }
+
+/* One width for the bank. Wide enough for a five-stem question, narrow enough
+   that a stem never runs past the measure at which the eye loses its place. */
+.qb-wrap { width: 100%; max-width: var(--container-main); margin-inline: auto; padding-inline: var(--gutter); }
+
+/* ---------- shell ---------- */
+
+.qb-nav {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(11, 13, 16, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(242, 238, 230, 0.07);
+}
+
+.qb-nav-inner {
+  width: 100%; max-width: var(--container-wide);
+  margin-inline: auto; padding-inline: var(--gutter);
+  height: 64px;
+  display: flex; align-items: center; gap: var(--sp-5);
+}
+
+.qb-nav-brand {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.42em;
+  color: var(--qb-ink); text-decoration: none; flex: none;
+}
+
+.qb-nav-links {
+  display: flex; gap: var(--sp-5); flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none;
+  /* The scrollbar is hidden and there's no arrow, so on narrower desktop
+     widths (subject list wider than the space left by the login link and
+     CTA) the last item — Mock exam — scrolls out with zero visual hint
+     that anything is cut off. The fade signals "there's more" the way a
+     visible scrollbar normally would. */
+  mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+}
+.qb-nav-links::-webkit-scrollbar { display: none; }
+.qb-nav-links a {
+  font-size: var(--fs-support); font-weight: 500; color: var(--qb-mut);
+  text-decoration: none; white-space: nowrap; transition: color var(--dur) var(--ease);
+}
+.qb-nav-links a:hover, .qb-nav-links a.is-on { color: var(--qb-ink); }
+
+.qb-nav-cta {
+  flex: none;
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  font-size: var(--fs-support); font-weight: 600;
+  background: var(--qb-ink); color: var(--bg-base);
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-sm); text-decoration: none;
+  transition: background var(--dur) var(--ease);
+}
+.qb-nav-cta:hover { background: #fff; }
+
+.qb-nav-account {
+  flex: none; border: 0; background: transparent; cursor: pointer;
+  font-size: var(--fs-support); font-weight: 500; color: var(--qb-mut); text-decoration: none;
+  white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+  transition: color var(--dur) var(--ease);
+}
+.qb-nav-account:hover { color: var(--qb-ink); }
+.qb-nav-account.is-cta { color: var(--qb-amber); font-weight: 600; }
+@media (max-width: 900px) { .qb-nav-account { display: none; } }
+
+/* A dot, not a sentence — the tooltip carries the explanation. */
+.qb-sync-warn { color: var(--warning); font-size: var(--fs-meta); margin-right: var(--sp-1); vertical-align: 1px; }
+
+/* ---------- typography ---------- */
+
+.qb-display {
+  font-family: var(--qb-serif);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-page);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+
+.qb-display em { font-style: italic; color: var(--qb-amber); }
+
+.qb-eyebrow {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--qb-mut); margin: 0 0 var(--sp-3);
+}
+.qb-eyebrow::before {
+  content: ''; display: inline-block; width: 22px; height: 1px;
+  background: var(--qb-amber); vertical-align: middle; margin-right: var(--sp-3);
+}
+
+.qb-lede { font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-secondary); max-width: var(--measure); margin: 0; }
+
+.qb-serif-h {
+  font-family: var(--qb-serif); font-weight: 380;
+  font-size: var(--fs-section); letter-spacing: -0.01em;
+  line-height: var(--lh-heading); margin: 0 0 var(--gap-heading-desc);
+}
+
+/* ---------- hero ---------- */
+
+/* Laptop viewports give roughly 660-780px of page. A front door that spends
+   190px on air before the first word costs the visitor the whole subject list. */
+.qb-hero { padding: var(--sp-7) 0 var(--sp-6); border-bottom: 1px solid var(--qb-line); }
+
+.qb-hero-stats { display: flex; gap: var(--sp-7); margin-top: var(--sp-6); flex-wrap: wrap; }
+.qb-hero-stats div { min-width: 0; }
+.qb-hero-stats strong {
+  display: block; font-family: var(--qb-serif); font-weight: 340;
+  font-size: var(--fs-section); line-height: var(--lh-tight); font-variant-numeric: tabular-nums;
+}
+.qb-hero-stats span { font-size: var(--fs-meta); letter-spacing: 0.18em; text-transform: uppercase; color: var(--qb-mut); }
+
+/* ---------- subject index ---------- */
+
+/* padding-block, not the padding shorthand: this grid is itself a .qb-wrap,
+   and a shorthand here silently resets the wrap's inline gutter to zero — the
+   subject cards then run edge to edge against a phone's bezel while the hero
+   copy above them keeps its margin. Whenever a rule below .qb-wrap in this
+   file targets an element that also carries .qb-wrap, it must only ever set
+   the block axis. */
+.qb-subjects { padding-block: var(--gap-section) var(--gap-page); display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--gap-cards); }
+
+.qb-subject-card {
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  background: var(--qb-surface);
+  border: 1px solid var(--qb-line);
+  border-radius: var(--radius);
+  padding: var(--card-pad);
+  text-decoration: none; color: var(--qb-ink);
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  position: relative; overflow: hidden;
+}
+.qb-subject-card::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+  background: var(--qb-accent, var(--qb-amber)); opacity: 0.75;
+}
+.qb-subject-card:hover { border-color: var(--qb-line-strong); transform: translateY(-2px); background: var(--qb-surface-2); }
+
+.qb-subject-card h3 { font-family: var(--qb-serif); font-weight: 380; font-size: var(--fs-card); margin: 0; letter-spacing: -0.01em; }
+.qb-subject-card p { margin: 0; font-size: var(--fs-support); color: var(--text-secondary); line-height: var(--lh-body); }
+
+.qb-subject-meta { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); margin-top: auto; padding-top: var(--sp-3); }
+.qb-subject-count { font-size: var(--fs-meta); letter-spacing: 0.16em; text-transform: uppercase; color: var(--qb-mut); }
+.qb-subject-count b { color: var(--qb-ink); font-weight: 600; }
+.qb-subject-go { font-size: var(--fs-support); font-weight: 600; color: var(--qb-amber); }
+
+/* How far through each subject you are, shown on the card itself. */
+.qb-subject-progress {
+  margin-top: var(--sp-3);
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(242, 238, 230, 0.1);
+  overflow: hidden;
+}
+.qb-subject-progress i { display: block; height: 100%; background: var(--qb-amber); border-radius: 999px; }
+
+/* The review lists: your record across every subject, not inside one. */
+.qb-review { margin-top: var(--gap-section); }
+.qb-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--gap-cards);
+  margin-top: var(--sp-5);
+}
+.qb-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--card-pad);
+  border: 1px solid var(--qb-line);
+  border-radius: var(--radius);
+  background: var(--qb-panel, var(--bg-elevated));
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.qb-review-card:hover { border-color: var(--qb-line-strong); transform: translateY(-2px); }
+.qb-review-card strong {
+  font-family: var(--qb-serif);
+  font-weight: 340;
+  font-size: var(--fs-section);
+  line-height: var(--lh-tight);
+  color: var(--qb-ink);
+  font-variant-numeric: tabular-nums;
+}
+.qb-review-card span { font-size: var(--fs-support); font-weight: 600; color: var(--qb-ink); }
+.qb-review-card small { font-size: var(--fs-support); color: var(--qb-mut); }
+
+.qb-subject-sections { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.qb-subject-sections span {
+  font-size: var(--fs-meta); color: var(--qb-mut);
+  border: 1px solid var(--qb-line); border-radius: 20px; padding: 3px var(--sp-3);
+}
+
+.qb-accent-xray { --qb-accent: var(--qb-xray); }
+.qb-accent-us { --qb-accent: var(--qb-us); }
+.qb-accent-mri { --qb-accent: var(--qb-mri); }
+.qb-accent-amber { --qb-accent: var(--qb-amber); }
+
+/* ---------- practice page ---------- */
+
+/* Block axis only — see .qb-subjects. This element is a .qb-wrap too, and the
+   shorthand was dropping the gutter, so the subject's own H1 sat hard against
+   the left bezel on a phone and 32px out of line with the question card
+   beneath it on a laptop. */
+.qb-practice-head { padding-block: var(--sp-5) 0; }
+
+/* A breadcrumb is orientation, but it is also the way back, so it stays a
+   legible control. Setting case and colour rather than size is what keeps it
+   quiet: uppercase 16px above an H1 would have shouted. */
+.qb-crumb {
+  font-size: var(--fs-support); letter-spacing: 0; color: var(--qb-mut);
+  display: flex; gap: var(--sp-2); align-items: center; margin: 0 0 var(--sp-3);
+}
+.qb-crumb a { color: var(--qb-mut); text-decoration: none; }
+.qb-crumb a:hover { color: var(--qb-ink); }
+.qb-crumb em { font-style: normal; color: var(--qb-amber); }
+
+/* The section chips.
+   X-ray carries five of them. Allowed to wrap, they took three lines on a
+   phone and two on anything from a tablet up to a 1024-wide window — and
+   because the bar is sticky that rack of navigation then pinned itself over
+   225px, which with the header is 42% of a 664px phone viewport, for the
+   whole time the candidate was reading a stem. Navigation is level 5; it does
+   not get to hold two fifths of the screen above the question it exists to
+   lead to. So the chips never wrap: they scroll in one row, the pattern the
+   bank's own subject nav and the fact bank's topic nav already use.
+   The scrolling and the fade that signals "there is more to the right" sit on
+   an inner track rather than on the bar itself, because masking the bar would
+   also fade its background and border and let the question bleed through the
+   top-right corner as it scrolled underneath. */
+.qb-sections-bar {
+  padding: var(--sp-3) 0; margin-bottom: var(--sp-1);
+  border-bottom: 1px solid var(--qb-line);
+  position: sticky; top: 64px; z-index: 40;
+  background: linear-gradient(180deg, var(--qb-bg) 78%, transparent);
+}
+.qb-sections-track {
+  display: flex; gap: var(--sp-2); flex-wrap: nowrap;
+  overflow-x: auto; scrollbar-width: none;
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+}
+.qb-sections-track::-webkit-scrollbar { display: none; }
+.qb-sections-track .qb-chip { flex: none; white-space: nowrap; }
+
+.qb-chip {
+  font-family: var(--qb-sans); font-size: var(--fs-support); font-weight: 500;
+  color: var(--qb-mut); background: transparent;
+  border: 1px solid var(--qb-line); border-radius: 20px;
+  padding: var(--sp-2) var(--sp-4); cursor: pointer;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.qb-chip:hover { color: var(--qb-ink); border-color: var(--qb-line-strong); }
+.qb-chip.is-on { color: var(--bg-base); background: var(--qb-ink); border-color: var(--qb-ink); font-weight: 600; }
+.qb-chip b { font-weight: 600; opacity: 0.65; margin-left: var(--sp-1); font-variant-numeric: tabular-nums; }
+
+/* Progress is orientation, not teaching: it stays at metadata weight so it
+   cannot compete with the question sitting directly beneath it. */
+.qb-progressline { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0 var(--sp-1); color: var(--qb-mut); font-size: var(--fs-meta); }
+.qb-progressline .track { flex: 1; height: 2px; background: var(--qb-line); border-radius: 1px; overflow: hidden; }
+.qb-progressline .track i { display: block; height: 100%; background: var(--qb-amber); transition: width var(--dur-reveal) var(--ease); }
+.qb-progressline b { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+/* ---------- question card ----------
+   Reading order down the card: where am I (quiet) → the question (loudest) →
+   the statements → submit → the marking → what to take away → next. */
+
+.qb-question { padding: var(--sp-4) 0 var(--gap-page); }
+
+.qb-qcard {
+  background: var(--qb-surface);
+  border: 1px solid var(--qb-line);
+  border-radius: var(--radius);
+  padding: var(--card-pad-lg);
+}
+
+.qb-qmeta { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-3); }
+.qb-qnumber { font-size: var(--fs-meta); letter-spacing: 0.2em; text-transform: uppercase; color: var(--qb-mut); font-variant-numeric: tabular-nums; }
+.qb-qsource {
+  font-size: var(--fs-meta); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--qb-mut); border: 1px solid var(--qb-line); border-radius: 20px; padding: 3px var(--sp-3);
+}
+.qb-qsource.is-recall { color: var(--qb-amber); border-color: rgba(217, 168, 78, 0.4); }
+
+/* Flag and favourite are controls, so they are legible; they are not the
+   lesson, so they are grey and they sit after the question, not above it. */
+.qb-qmarks { display: flex; gap: var(--sp-2); margin-left: auto; }
+.qb-mark {
+  font-family: var(--qb-sans); font-size: var(--fs-support); font-weight: 500;
+  color: var(--qb-mut); background: transparent;
+  border: 1px solid var(--qb-line); border-radius: 20px;
+  padding: var(--sp-2) var(--sp-3); cursor: pointer;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.qb-mark:hover { color: var(--qb-ink); border-color: var(--qb-line-strong); }
+.qb-mark.is-on { color: var(--qb-amber); border-color: rgba(217, 168, 78, 0.5); background: var(--accent-soft); }
+
+/* LEVEL 1. Nothing else on this card is allowed to reach this size. */
+.qb-qtitle {
+  font-family: var(--qb-serif); font-weight: 380;
+  font-size: var(--fs-concept); line-height: var(--lh-heading); letter-spacing: -0.012em;
+  color: var(--text-primary);
+  margin: 0 0 var(--gap-desc-main); max-width: var(--measure);
+}
+
+.qb-stems { display: flex; flex-direction: column; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+
+.qb-stem {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: var(--sp-3); align-items: center;
+  border: 1px solid var(--qb-line); border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.qb-stem:hover { border-color: var(--qb-line-strong); }
+
+.qb-stem-label {
+  font-family: var(--qb-serif); font-size: var(--fs-support); font-weight: 380; color: var(--qb-mut);
+  width: 34px; height: 34px; border: 1px solid var(--qb-line); border-radius: 50%;
+  display: grid; place-items: center; flex: none;
+}
+
+/* The statement the candidate has to weigh word by word. It was 15px. */
+.qb-stem-text { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-primary); margin: 0; }
+
+.qb-tf { display: flex; gap: var(--sp-1); flex: none; }
+.qb-tf button {
+  font-family: var(--qb-sans); font-size: var(--fs-support); font-weight: 600;
+  color: var(--qb-mut); background: transparent;
+  border: 1px solid var(--qb-line); border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-4); cursor: pointer; min-width: 76px; min-height: 44px;
+  transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.qb-tf button:hover { color: var(--qb-ink); border-color: var(--qb-line-strong); }
+.qb-tf button.is-picked { color: var(--bg-base); background: var(--qb-ink); border-color: var(--qb-ink); }
+
+/* After submission. An incorrect stem is unmistakably surrounded in red. */
+.qb-stem.is-right { border-color: rgba(127, 200, 169, 0.55); background: rgba(127, 200, 169, 0.05); }
+.qb-stem.is-wrong {
+  border-color: var(--qb-red);
+  background: rgba(201, 119, 107, 0.08);
+  box-shadow: 0 0 0 1px var(--qb-red), 0 0 18px rgba(201, 119, 107, 0.18);
+}
+.qb-stem.is-right .qb-stem-label { border-color: rgba(127, 200, 169, 0.6); color: var(--qb-green); }
+.qb-stem.is-wrong .qb-stem-label { border-color: rgba(201, 119, 107, 0.6); color: var(--qb-red); }
+
+.qb-verdict { font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.02em; flex: none; text-align: right; }
+.qb-verdict.is-right { color: var(--qb-green); }
+.qb-verdict.is-wrong { color: var(--qb-red); }
+.qb-verdict small { display: block; font-size: var(--fs-support); font-weight: 500; color: var(--qb-mut); letter-spacing: 0; }
+
+/* LEVEL 3, and the reason the candidate came back to a question they got
+   wrong. It sits inside the stem's own box: the correction and the statement
+   it corrects are one object. */
+.qb-stem-explain {
+  grid-column: 1 / -1;
+  font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary);
+  border-top: 1px solid var(--qb-line);
+  padding-top: var(--sp-3); margin: var(--sp-1) 0 0; max-width: var(--measure);
+}
+.qb-stem-explain b, .qb-stem-explain strong { color: var(--qb-ink); font-weight: 600; }
+
+/* ---------- actions and results ---------- */
+
+.qb-actions { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--gap-desc-main); flex-wrap: wrap; }
+
+.qb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font-family: var(--qb-sans); font-size: var(--fs-support); font-weight: 600;
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-sm); border: 1px solid transparent;
+  cursor: pointer; text-decoration: none; min-height: 44px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.qb-btn:hover { transform: translateY(-1px); }
+.qb-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.qb-btn-solid { background: var(--qb-ink); color: var(--bg-base); }
+.qb-btn-solid:hover:not(:disabled) { background: #fff; }
+.qb-btn-ghost { border-color: var(--qb-line-strong); color: var(--qb-ink); background: transparent; }
+.qb-btn-ghost:hover { border-color: var(--text-tertiary); }
+
+/* An instruction — "two statements left to mark" — so it is read, not squinted at. */
+.qb-unanswered { font-size: var(--fs-support); color: var(--text-secondary); }
+
+/* The score is a result, not the lesson. It is deliberately smaller than the
+   question: a candidate who has just been told 2 / 5 should be looking at the
+   corrections, not at the number. */
+.qb-score {
+  display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap;
+  margin: var(--gap-desc-main) 0 0; padding-top: var(--sp-4); border-top: 1px solid var(--qb-line);
+}
+.qb-score strong {
+  font-family: var(--qb-serif); font-weight: 340; font-size: var(--fs-card); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.qb-score.is-good strong { color: var(--qb-green); }
+.qb-score.is-mid strong { color: var(--qb-amber); }
+.qb-score.is-poor strong { color: var(--qb-red); }
+.qb-score span { color: var(--text-secondary); font-size: var(--fs-support); }
+
+/* ---------- after the marking ---------- */
+
+/* The take-home point now uses the site-wide <HighYield>, so a candidate
+   learns that shape once and finds it in the labs, the fact bank and here.
+   Only its spacing inside the card is set locally. */
+.qb-takeaway { margin-top: var(--gap-desc-main); }
+
+.qb-lablink {
+  margin-top: var(--sp-4); display: inline-flex; align-items: center; gap: var(--sp-2);
+  font-size: var(--fs-support); font-weight: 600; color: var(--qb-amber); text-decoration: none;
+  border-bottom: 1px solid rgba(217, 168, 78, 0.4); padding-bottom: 2px;
+}
+.qb-lablink:hover { border-bottom-color: var(--qb-amber); }
+
+/* Submission is final. Said once, last, quietly — it is housekeeping, but it
+   is still a sentence someone has to read, so it is not shrunk below the floor. */
+.qb-saved-note {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--qb-mut);
+  max-width: var(--measure);
+}
+
+/* ---------- pager ---------- */
+
+.qb-pager { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-top: var(--sp-5); }
+.qb-pager-mid { font-size: var(--fs-meta); color: var(--qb-mut); font-variant-numeric: tabular-nums; }
+
+/* ---------- mock page ---------- */
+
+.qb-mock-panel {
+  background: var(--qb-surface); border: 1px solid var(--qb-line); border-radius: var(--radius);
+  padding: var(--card-pad-lg); margin-bottom: var(--sp-4);
+}
+.qb-mock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-4); margin: var(--sp-5) 0; }
+.qb-field label { display: block; font-size: var(--fs-support); font-weight: 600; color: var(--text-secondary); margin-bottom: var(--sp-2); }
+/* On a paper card the <label> is the paper's name — a card title, not a
+   field caption, and it was rendering smaller than its own description. */
+.qb-paper-card label { font-family: var(--display); font-weight: 380; font-size: var(--fs-card); color: var(--text-primary); text-transform: none; letter-spacing: 0; }
+.qb-field select, .qb-field input[type='number'] {
+  width: 100%; background: var(--qb-surface-2); color: var(--qb-ink);
+  border: 1px solid var(--qb-line); border-radius: var(--radius-sm); padding: var(--sp-3);
+  font-family: var(--qb-sans); font-size: var(--fs-support); min-height: 44px;
+}
+/* A paper's own description is content, not a form label. */
+.qb-paper-card p { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); }
+.qb-paper-card p.qb-paper-spec { font-size: var(--fs-meta); color: var(--qb-mut); }
+
+.qb-timer {
+  font-family: var(--qb-serif); font-weight: 340; font-size: var(--fs-section);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.qb-timer.is-low { color: var(--qb-red); }
+
+.qb-mockbar {
+  position: sticky; top: 64px; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  padding: var(--sp-3) 0; border-bottom: 1px solid var(--qb-line);
+  background: linear-gradient(180deg, var(--qb-bg) 82%, transparent);
+}
+
+/* ---------- footer ---------- */
+
+.qb-foot {
+  border-top: 1px solid var(--qb-line);
+  padding: var(--sp-6) 0 var(--sp-7); margin-top: var(--sp-7);
+  display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap;
+  color: var(--qb-mut); font-size: var(--fs-support);
+}
+.qb-foot a { color: var(--qb-mut); text-decoration: none; }
+.qb-foot a:hover { color: var(--qb-ink); }
+
+/* ---------- responsive ----------
+   Below the tablet breakpoint the True/False pair drops under the statement
+   rather than squeezing it: the statement keeps the full width, which is the
+   only thing on the row that has to be read carefully. */
+
+@media (max-width: 860px) {
+  .qb-stem { grid-template-columns: 30px minmax(0, 1fr); }
+  .qb-stem-label { width: 30px; height: 30px; }
+  .qb-tf { grid-column: 2; justify-self: start; }
+  .qb-verdict { grid-column: 2; text-align: left; }
+}
+
+@media (max-width: 720px) {
+  .qb-hero { padding-top: var(--sp-6); }
+  .qb-nav-inner { height: 56px; }
+  .qb-sections-bar { top: 56px; }
+
+  .qb-qcard { padding: var(--card-pad); }
+  .qb-pager { flex-wrap: wrap; }
+  .qb-pager-mid { order: -1; flex-basis: 100%; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qb-root * { transition-duration: 0.01ms !important; }
+}

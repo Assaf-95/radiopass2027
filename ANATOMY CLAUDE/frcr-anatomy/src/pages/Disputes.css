@@ -1,0 +1,24 @@
+.disp {
+  max-width: 800px;
+  margin: 0 auto;
+  /* .app-header is fixed at --header-h tall and goes opaque past 24px of
+     scroll — 24px of top padding alone leaves the h1 rendering under it. */
+  padding: calc(var(--header-h) + 24px) 24px 80px;
+  width: 100%;
+}
+
+.disp h1 { margin-bottom: 18px; font-size: 26px; }
+
+.disp-list { display: flex; flex-direction: column; gap: 14px; }
+
+.disp-card { padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+
+.disp-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+
+.disp-source { font-size: 11.5px; color: var(--text-faint); margin-left: auto; }
+
+.disp-note { color: var(--text-dim); }
+
+.disp-override { color: var(--accent); font-size: 12.5px; }
+
+.disp-actions { display: flex; gap: 8px; margin-top: 6px; }

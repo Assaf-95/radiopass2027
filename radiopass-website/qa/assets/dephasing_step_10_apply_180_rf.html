@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MRI Dephasing Step 10 - Apply 180 RF</title>
+  <style>
+    :root {
+      --bg: #eef4f9;
+      --panel: #ffffff;
+      --ink: #132337;
+      --muted: #4f6278;
+      --line: #bfd0df;
+      --b0: #1d5f9f;
+      --rf: #b65b2a;
+      --gz: #26784f;
+      --gy: #7352aa;
+      --gx: #1d7995;
+      --signal: #b9334b;
+      --slice: #e8f6ee;
+      --shadow: 0 10px 24px rgba(23, 50, 77, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(140deg, #f7fbff 0%, var(--bg) 58%, #e5eef6 100%);
+    }
+
+    .page {
+      width: min(1360px, 100%);
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+
+    .kicker {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.36;
+      max-width: 74ch;
+    }
+
+    .badge {
+      justify-self: end;
+      min-width: 118px;
+      border: 1px solid rgba(70, 102, 134, 0.25);
+      border-radius: 8px;
+      background: #f5f9fd;
+      padding: 9px 10px;
+      display: grid;
+      gap: 2px;
+      text-align: right;
+    }
+
+    .badge strong {
+      display: block;
+      color: #10243a;
+      font-size: 1.22rem;
+      line-height: 1;
+    }
+
+    .badge span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+
+    .step-rail {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .step-rail a {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.80);
+      color: #213a55;
+      text-decoration: none;
+      display: grid;
+      place-items: center;
+      padding: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .step-rail a.current {
+      background: #173b61;
+      border-color: #173b61;
+      color: #ffffff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.58fr) minmax(300px, 0.72fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .scene-panel,
+    .info-panel,
+    .strip-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .scene-panel {
+      padding: 8px;
+      min-height: 520px;
+      display: grid;
+    }
+
+    #scene {
+      width: 100%;
+      height: 100%;
+      min-height: 502px;
+      display: block;
+      border: 1px solid #c8d7e5;
+      border-radius: 8px;
+      background: linear-gradient(160deg, #fbfdff 0%, #edf5fb 100%);
+    }
+
+    .info-panel {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .status {
+      border: 1px solid #c7d9e6;
+      border-radius: 8px;
+      background: #f5f9fc;
+      padding: 8px;
+      color: #24405d;
+      font-size: 0.84rem;
+      line-height: 1.32;
+      font-weight: 650;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .metric {
+      border: 1px solid #d3e0ea;
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 8px;
+      min-height: 58px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 1.02rem;
+      color: #152d48;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .copy-block {
+      border: 1px solid #d3e0ea;
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 9px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .copy-block h2 {
+      margin: 0;
+      font-size: 0.78rem;
+      color: #284b6f;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .copy-block p,
+    .copy-block li {
+      color: #2c4762;
+      font-size: 0.84rem;
+      line-height: 1.34;
+    }
+
+    .copy-block p {
+      margin: 0;
+    }
+
+    .copy-block ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .strip-panel {
+      padding: 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+      gap: 8px;
+    }
+
+    .strip-card {
+      border: 1px solid #d3e0ea;
+      border-radius: 8px;
+      background: #fbfdff;
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+      min-height: 190px;
+    }
+
+    .strip-card h2 {
+      margin: 0;
+      font-size: 0.78rem;
+      color: #284b6f;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    #timeline,
+    #signal {
+      width: 100%;
+      height: 150px;
+      display: block;
+      border: 1px solid #d7e2ea;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff 0%, #f0f6fb 100%);
+    }
+
+    .bottom-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bottom-nav a,
+    .bottom-nav span {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      color: #213a55;
+      text-decoration: none;
+      padding: 8px 10px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .bottom-nav span {
+      color: #789;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1040px) {
+      .layout,
+      .strip-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .scene-panel {
+        min-height: 440px;
+      }
+
+      #scene {
+        min-height: 424px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 10px;
+      }
+
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .badge {
+        justify-self: stretch;
+        text-align: left;
+      }
+
+      .step-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sequence-home {
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      padding: 8px 11px;
+      text-decoration: none;
+    }
+
+    .sequence-home:hover { border-color: var(--accent); }
+  </style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="page">
+    <a class="sequence-home" href="index.html">← Sequence index</a>
+    <header>
+      <div>
+        <p class="kicker">MRI dephasing sequence</p>
+        <h1>Step 10: Apply 180 RF</h1>
+        <p class="summary">A 180 deg RF pulse flips transverse phase relationships so static dephasing reverses and a spin echo can form.</p>
+      </div>
+      <div class="badge">
+        <strong>10</strong>
+        <span>Refocusing</span>
+      </div>
+    </header>
+
+    <nav class="step-rail" aria-label="MRI dephasing steps" id="stepRail"></nav>
+
+    <section class="layout">
+      <div class="scene-panel">
+        <canvas id="scene" aria-label="MRI spin grid at this step"></canvas>
+      </div>
+
+      <aside class="info-panel">
+        <div class="status" id="statusText">180 RF: rephasing toward spin echo.</div>
+
+        <section class="metrics" aria-label="Current MRI state">
+          <div class="metric"><span>Mz</span><strong id="mzMetric">-0.05</strong></div>
+          <div class="metric"><span>Mxy</span><strong id="mxyMetric">0.74</strong></div>
+          <div class="metric"><span>Coherence</span><strong id="coherenceMetric">78%</strong></div>
+          <div class="metric"><span>T1 / T2</span><strong>recovering / T2 echo</strong></div>
+        </section>
+
+        <section class="copy-block">
+          <h2>What is happening</h2>
+          <ul id="whatList"></ul>
+        </section>
+
+        <section class="copy-block">
+          <h2>FRCR hook</h2>
+          <p>Spin echo refocuses reversible T2* dephasing, leaving signal governed mainly by true T2 at TE.</p>
+        </section>
+      </aside>
+    </section>
+
+    <section class="strip-panel">
+      <div class="strip-card">
+        <h2>RF and gradient timing</h2>
+        <canvas id="timeline" aria-label="RF and gradient timeline"></canvas>
+      </div>
+      <div class="strip-card">
+        <h2>Receiver signal</h2>
+        <canvas id="signal" aria-label="MRI receiver signal"></canvas>
+      </div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Previous and next steps">
+      <div id="prevSlot"></div>
+      <div id="nextSlot"></div>
+    </nav>
+  </main>
+
+  <script>
+    const config = {"number": "10", "filename": "dephasing_step_10_apply_180_rf.html", "title": "Apply 180 RF", "tag": "Refocusing", "summary": "A 180 deg RF pulse flips transverse phase relationships so static dephasing reverses and a spin echo can form.", "what": ["Spins that were ahead become behind after the 180 deg pulse.", "Static field inhomogeneity is refocused as the spins reconverge.", "True T2 decay remains, so the echo is smaller than the original Mxy."], "frcr": "Spin echo refocuses reversible T2* dephasing, leaving signal governed mainly by true T2 at TE.", "status": "180 RF: rephasing toward spin echo.", "phaseKey": "rf180", "b0On": true, "sliceOn": true, "rf90On": true, "phaseEncodeOn": true, "t2starOn": true, "freqOn": true, "rf180On": true, "mz": -0.05, "mxy": 0.74, "coherence": 0.78, "t1": "recovering", "t2": "T2 echo", "sequenceProgress": 0.8, "activeTrack": "RF 180", "signalLabel": "Spin echo forming", "prev": "dephasing_step_09_frequency_encode_gx.html", "next": ""};
+    const navSteps = [{"number": "04", "filename": "dephasing_step_04_apply_b0.html", "title": "Apply B0"}, {"number": "05", "filename": "dephasing_step_05_slice_select_gz.html", "title": "Slice Select Gz"}, {"number": "06", "filename": "dephasing_step_06_apply_90_rf.html", "title": "Apply 90 RF"}, {"number": "07", "filename": "dephasing_step_07_phase_encode_gy.html", "title": "Phase Encode Gy"}, {"number": "08", "filename": "dephasing_step_08_rf_off_t2star.html", "title": "RF Off T2star"}, {"number": "09", "filename": "dephasing_step_09_frequency_encode_gx.html", "title": "Frequency Encode Gx"}, {"number": "10", "filename": "dephasing_step_10_apply_180_rf.html", "title": "Apply 180 RF"}];
+
+    const scene = document.getElementById("scene");
+    const ctx = scene.getContext("2d");
+    const timeline = document.getElementById("timeline");
+    const timelineCtx = timeline.getContext("2d");
+    const signal = document.getElementById("signal");
+    const signalCtx = signal.getContext("2d");
+
+    const colors = {
+      b0: "#1d5f9f",
+      rf: "#b65b2a",
+      gz: "#26784f",
+      gy: "#7352aa",
+      gx: "#1d7995",
+      signal: "#b9334b",
+      selected: "#e4f7ee",
+      muted: "#8ca1b4"
+    };
+
+    let startMs = performance.now();
+    let lastSizeKey = "";
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function setupCanvas(canvas, context, minW, minH) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(minW, Math.floor(rect.width));
+      const h = Math.max(minH, Math.floor(rect.height));
+      const sizeKey = canvas.id + ":" + w + "x" + h + "@" + dpr;
+      if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+      }
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { w: w, h: h, sizeKey: sizeKey };
+    }
+
+    function drawArrow(g, x1, y1, x2, y2, color, width) {
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const head = 8 + width;
+      g.save();
+      g.strokeStyle = color;
+      g.fillStyle = color;
+      g.lineWidth = width;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x1, y1);
+      g.lineTo(x2, y2);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x2, y2);
+      g.lineTo(x2 - Math.cos(angle - 0.55) * head, y2 - Math.sin(angle - 0.55) * head);
+      g.lineTo(x2 - Math.cos(angle + 0.55) * head, y2 - Math.sin(angle + 0.55) * head);
+      g.closePath();
+      g.fill();
+      g.restore();
+    }
+
+    function drawLabel(g, text, x, y, color) {
+      g.save();
+      g.font = "700 12px Avenir Next, Segoe UI, Arial";
+      g.fillStyle = color || "#2b4968";
+      g.fillText(text, x, y);
+      g.restore();
+    }
+
+    function roundedRectPath(g, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      g.beginPath();
+      g.moveTo(x + radius, y);
+      g.lineTo(x + w - radius, y);
+      g.quadraticCurveTo(x + w, y, x + w, y + radius);
+      g.lineTo(x + w, y + h - radius);
+      g.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      g.lineTo(x + radius, y + h);
+      g.quadraticCurveTo(x, y + h, x, y + h - radius);
+      g.lineTo(x, y + radius);
+      g.quadraticCurveTo(x, y, x + radius, y);
+      g.closePath();
+    }
+
+    function phaseColor(phase, active) {
+      if (!active) return "#375f86";
+      const hue = 205 + Math.sin(phase) * 45 + Math.cos(phase * 0.5) * 25;
+      return "hsl(" + hue.toFixed(0) + " 58% 42%)";
+    }
+
+    function rowSelected(r, rows) {
+      if (!config.sliceOn) return true;
+      const center = (rows - 1) / 2;
+      return Math.abs(r - center) <= 1.05;
+    }
+
+    function spinPhase(r, c, rows, cols, t) {
+      const rowNorm = (r - (rows - 1) / 2) / ((rows - 1) / 2);
+      const colNorm = (c - (cols - 1) / 2) / ((cols - 1) / 2);
+      let phase = t * 2.2 + r * 0.44 + c * 0.28;
+
+      if (config.phaseKey === "b0") {
+        phase += rowNorm * 0.22 + colNorm * 0.12;
+      }
+
+      if (config.phaseKey === "slice") {
+        phase += rowNorm * 0.18 + Math.sin(t + c) * 0.08;
+      }
+
+      if (config.phaseKey === "rf90") {
+        phase = t * 2.4 + rowNorm * 0.08 + colNorm * 0.05;
+      }
+
+      if (config.phaseKey === "gy") {
+        phase = t * 2.35 + rowNorm * 1.55 + colNorm * 0.08;
+      }
+
+      if (config.phaseKey === "t2star") {
+        phase = t * (2.05 + colNorm * 0.28) + rowNorm * 1.95 + colNorm * 1.25 + Math.sin(t * 0.7 + c) * 0.25;
+      }
+
+      if (config.phaseKey === "gx") {
+        phase = t * (2.15 + colNorm * 0.75) + rowNorm * 1.2 + colNorm * 2.05;
+      }
+
+      if (config.phaseKey === "rf180") {
+        const rephase = (Math.sin(t * 1.2) + 1) * 0.5;
+        const spread = 1 - rephase * 0.72;
+        phase = t * 2.25 + (rowNorm * 1.35 + colNorm * 1.3) * spread;
+      }
+
+      return phase;
+    }
+
+    function drawScene(now) {
+      const t = (now - startMs) / 1000;
+      const dim = setupCanvas(scene, ctx, 320, 360);
+      const w = dim.w;
+      const h = dim.h;
+
+      ctx.clearRect(0, 0, w, h);
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, "#fbfdff");
+      bg.addColorStop(1, "#edf5fb");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const rows = 6;
+      const cols = 8;
+      const gridW = Math.min(w * 0.72, 580);
+      const spacing = Math.min(gridW / (cols - 1), h * 0.105, 56);
+      const x0 = w * 0.50 - spacing * (cols - 1) / 2;
+      const y0 = h * 0.58 - spacing * (rows - 1) / 2;
+      const gridLeft = x0 - spacing * 0.62;
+      const gridRight = x0 + spacing * (cols - 1) + spacing * 0.62;
+      const gridTop = y0 - spacing * 0.70;
+      const gridBottom = y0 + spacing * (rows - 1) + spacing * 0.70;
+
+      ctx.save();
+      ctx.strokeStyle = "#d5e1ea";
+      ctx.lineWidth = 1;
+      for (let r = 0; r < rows; r += 1) {
+        const y = y0 + r * spacing;
+        ctx.beginPath();
+        ctx.moveTo(gridLeft, y);
+        ctx.lineTo(gridRight, y);
+        ctx.stroke();
+      }
+      for (let c = 0; c < cols; c += 1) {
+        const x = x0 + c * spacing;
+        ctx.beginPath();
+        ctx.moveTo(x, gridTop);
+        ctx.lineTo(x, gridBottom);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      if (config.sliceOn) {
+        const sliceTop = y0 + 1.45 * spacing;
+        const sliceBottom = y0 + 3.55 * spacing;
+        ctx.save();
+        ctx.fillStyle = "rgba(38, 120, 79, 0.10)";
+        ctx.strokeStyle = "rgba(38, 120, 79, 0.45)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.rect(gridLeft, sliceTop - spacing * 0.45, gridRight - gridLeft, sliceBottom - sliceTop + spacing * 0.9);
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        drawLabel(ctx, "selected slice", gridLeft + 10, sliceTop - spacing * 0.55, colors.gz);
+        ctx.restore();
+      }
+
+      if (config.b0On) {
+        drawArrow(ctx, w * 0.08, h * 0.17, w * 0.08, h * 0.43, colors.b0, 3);
+        drawLabel(ctx, "B0 / z", w * 0.055, h * 0.15, colors.b0);
+      }
+
+      if (config.sliceOn) {
+        ctx.save();
+        for (let i = 0; i < 5; i += 1) {
+          const yy = gridTop + (gridBottom - gridTop) * (i / 4);
+          const len = 20 + i * 11;
+          drawArrow(ctx, w * 0.15, yy + 5, w * 0.15, yy - len, colors.gz, 2);
+        }
+        drawLabel(ctx, "Gz gradient", w * 0.12, gridBottom + 28, colors.gz);
+        ctx.restore();
+      }
+
+      if (config.phaseEncodeOn) {
+        ctx.save();
+        for (let r = 0; r < rows; r += 1) {
+          const rowNorm = (r - (rows - 1) / 2) / ((rows - 1) / 2);
+          const y = y0 + r * spacing;
+          const xA = gridRight + 18;
+          const len = rowNorm * 34;
+          drawArrow(ctx, xA, y, xA + len, y, colors.gy, 2);
+        }
+        drawLabel(ctx, "Gy stored phase", gridRight - 4, gridTop - 18, colors.gy);
+        ctx.restore();
+      }
+
+      if (config.freqOn) {
+        ctx.save();
+        for (let c = 0; c < cols; c += 1) {
+          const colNorm = (c - (cols - 1) / 2) / ((cols - 1) / 2);
+          const x = x0 + c * spacing;
+          const height = 10 + Math.abs(colNorm) * 22;
+          ctx.fillStyle = colNorm < 0 ? "rgba(29, 121, 149, 0.30)" : "rgba(29, 121, 149, 0.52)";
+          ctx.fillRect(x - spacing * 0.18, gridBottom + 18, spacing * 0.36, height);
+        }
+        drawArrow(ctx, gridLeft, gridBottom + 64, gridRight, gridBottom + 64, colors.gx, 3);
+        drawLabel(ctx, "Gx frequency readout", gridLeft, gridBottom + 88, colors.gx);
+        ctx.restore();
+      }
+
+      if (config.rf90On || config.rf180On) {
+        ctx.save();
+        const rfY = h * 0.16;
+        ctx.strokeStyle = colors.rf;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < 160; i += 1) {
+          const x = w * 0.25 + i * 2.0;
+          const amp = config.rf180On ? 18 : 12;
+          const y = rfY + Math.sin(i * 0.22 + t * 5.2) * amp;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        drawLabel(ctx, config.rf180On ? "180 deg RF refocusing pulse" : "90 deg RF excitation pulse", w * 0.25, rfY - 28, colors.rf);
+        ctx.restore();
+      }
+
+      if (config.t2starOn && !config.rf180On) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(179, 51, 75, 0.30)";
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 8; i += 1) {
+          const y = gridTop + i * (gridBottom - gridTop) / 7;
+          ctx.beginPath();
+          ctx.moveTo(gridLeft - 28, y);
+          ctx.bezierCurveTo(w * 0.30, y - 22, w * 0.62, y + 28, gridRight + 28, y - 12);
+          ctx.stroke();
+        }
+        drawLabel(ctx, "T2* phase spread", gridLeft - 26, gridTop - 20, colors.signal);
+        ctx.restore();
+      }
+
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
+          const x = x0 + c * spacing;
+          const y = y0 + r * spacing;
+          const selected = rowSelected(r, rows);
+          const phase = spinPhase(r, c, rows, cols, t);
+          const active = selected || !config.sliceOn;
+          const mxy = config.mxy * (active ? 1 : 0.20);
+          const mz = config.mz * (active ? 1 : 0.35);
+          const armX = Math.cos(phase) * mxy * spacing * 0.54;
+          const armY = -mz * spacing * 0.55 + Math.sin(phase) * mxy * spacing * 0.18;
+          const protonR = clamp(spacing * 0.15, 7, 11);
+          const spinColor = phaseColor(phase, config.phaseEncodeOn || config.t2starOn || config.freqOn || config.rf180On);
+
+          ctx.save();
+          ctx.globalAlpha = active ? 1 : 0.28;
+          ctx.fillStyle = active ? "#ffffff" : "#edf3f8";
+          ctx.strokeStyle = active ? "#8aa5bd" : "#c2cfda";
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.arc(x, y, protonR, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          drawArrow(ctx, x, y, x + armX, y + armY, spinColor, active ? 2.4 : 1.5);
+          ctx.restore();
+        }
+      }
+
+      const netX = w * 0.82;
+      const netY = h * 0.25;
+      ctx.save();
+      ctx.strokeStyle = "#ccd9e4";
+      ctx.fillStyle = "#f9fcff";
+      ctx.lineWidth = 1;
+      roundedRectPath(ctx, netX - 54, netY - 58, 108, 116, 8);
+      ctx.fill();
+      ctx.stroke();
+      drawLabel(ctx, "Net vector", netX - 38, netY - 38, "#284b6f");
+      drawArrow(ctx, netX, netY + 32, netX + config.mxy * 34, netY + 32 - config.mz * 42, "#173b61", 4);
+      drawLabel(ctx, "Mz " + config.mz.toFixed(2), netX - 40, netY + 50, "#284b6f");
+      drawLabel(ctx, "Mxy " + config.mxy.toFixed(2), netX - 40, netY + 66, "#284b6f");
+      ctx.restore();
+
+      if (config.freqOn || config.rf180On) {
+        const coilX = w * 0.86;
+        const coilY = h * 0.62;
+        ctx.save();
+        ctx.strokeStyle = colors.signal;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(coilX, coilY, 34, 52, 0.10, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < 100; i += 1) {
+          const x = coilX - 50 + i;
+          const y = coilY + 74 + Math.sin(i * 0.25 + t * 6) * (config.mxy * 10);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        drawLabel(ctx, "receiver", coilX - 30, coilY - 62, colors.signal);
+        ctx.restore();
+      }
+
+      drawLabel(ctx, config.status, 14, h - 16, "#284b6f");
+    }
+
+    function drawTimeline() {
+      const dim = setupCanvas(timeline, timelineCtx, 320, 130);
+      const w = dim.w;
+      const h = dim.h;
+      const g = timelineCtx;
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = "#fbfdff";
+      g.fillRect(0, 0, w, h);
+
+      const tracks = [
+        { name: "RF", color: colors.rf, points: [[0.18, 0], [0.22, 1], [0.30, 0], [0.78, 0], [0.82, config.rf180On ? 1 : 0], [0.90, 0]] },
+        { name: "Gz", color: colors.gz, points: [[0.12, 0], [0.18, 0.85], [0.31, 0], [0.36, -0.45], [0.42, 0]] },
+        { name: "Gy", color: colors.gy, points: [[0.40, 0], [0.46, 0.75], [0.54, 0], [0.58, -0.35], [0.63, 0]] },
+        { name: "Gx", color: colors.gx, points: [[0.58, 0], [0.64, -0.65], [0.70, 0.95], [0.88, 0.95], [0.94, 0]] },
+        { name: "ADC", color: colors.signal, points: [[0.68, 0], [0.72, 0.70], [0.90, 0.70], [0.94, 0]] }
+      ];
+
+      const left = 44;
+      const right = 12;
+      const top = 18;
+      const rowGap = (h - 32) / (tracks.length - 1);
+      const mapX = (v) => left + v * (w - left - right);
+
+      g.font = "700 11px Avenir Next, Segoe UI, Arial";
+      for (let i = 0; i < tracks.length; i += 1) {
+        const tr = tracks[i];
+        const y = top + i * rowGap;
+        g.fillStyle = "#49647d";
+        g.fillText(tr.name, 8, y + 4);
+        g.strokeStyle = "#d6e2eb";
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(left, y);
+        g.lineTo(w - right, y);
+        g.stroke();
+
+        g.strokeStyle = tr.color;
+        g.lineWidth = 2.5;
+        g.beginPath();
+        for (let p = 0; p < tr.points.length; p += 1) {
+          const point = tr.points[p];
+          const x = mapX(point[0]);
+          const yy = y - point[1] * 20;
+          if (p === 0) g.moveTo(x, yy);
+          else g.lineTo(x, yy);
+        }
+        g.stroke();
+      }
+
+      const nowX = mapX(config.sequenceProgress);
+      g.strokeStyle = "#172b43";
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(nowX, 8);
+      g.lineTo(nowX, h - 8);
+      g.stroke();
+      g.fillStyle = "#172b43";
+      g.fillText(config.activeTrack, clamp(nowX - 24, left, w - 86), 14);
+    }
+
+    function drawSignal() {
+      const dim = setupCanvas(signal, signalCtx, 260, 130);
+      const w = dim.w;
+      const h = dim.h;
+      const g = signalCtx;
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = "#fbfdff";
+      g.fillRect(0, 0, w, h);
+
+      const left = 24;
+      const right = 12;
+      const mid = h * 0.55;
+      const amp = 44 * config.mxy;
+      const decay = config.t2starOn ? 2.2 : 0.7;
+      const echoBoost = config.rf180On ? 0.8 : 0.0;
+
+      g.strokeStyle = "#d6e2eb";
+      g.lineWidth = 1;
+      g.beginPath();
+      g.moveTo(left, mid);
+      g.lineTo(w - right, mid);
+      g.stroke();
+
+      g.strokeStyle = colors.signal;
+      g.lineWidth = 2.5;
+      g.beginPath();
+      for (let i = 0; i <= 180; i += 1) {
+        const u = i / 180;
+        const x = left + u * (w - left - right);
+        let env = Math.exp(-u * decay);
+        if (config.rf180On) {
+          env = Math.max(env * 0.45, Math.exp(-Math.pow((u - 0.68) / 0.18, 2)) * echoBoost);
+        }
+        if (!config.rf90On) env *= 0.12;
+        const y = mid + Math.sin(u * 54) * amp * env;
+        if (i === 0) g.moveTo(x, y);
+        else g.lineTo(x, y);
+      }
+      g.stroke();
+
+      if (config.freqOn) {
+        g.fillStyle = "rgba(179, 51, 75, 0.12)";
+        g.fillRect(left + (w - left - right) * 0.58, 18, (w - left - right) * 0.28, h - 40);
+        g.fillStyle = colors.signal;
+        g.font = "700 11px Avenir Next, Segoe UI, Arial";
+        g.fillText("ADC window", left + (w - left - right) * 0.60, 31);
+      }
+
+      g.fillStyle = "#49647d";
+      g.font = "700 12px Avenir Next, Segoe UI, Arial";
+      g.fillText(config.signalLabel, 12, h - 13);
+    }
+
+    function buildText() {
+      const list = document.getElementById("whatList");
+      config.what.forEach(function (item) {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+
+      const rail = document.getElementById("stepRail");
+      navSteps.forEach(function (item) {
+        const a = document.createElement("a");
+        a.href = item.filename;
+        a.textContent = item.number + " " + item.title;
+        if (item.number === config.number) a.className = "current";
+        rail.appendChild(a);
+      });
+
+      const prevSlot = document.getElementById("prevSlot");
+      const nextSlot = document.getElementById("nextSlot");
+      if (config.prev) {
+        const a = document.createElement("a");
+        a.href = config.prev;
+        a.textContent = "Previous step";
+        prevSlot.appendChild(a);
+      } else {
+        const span = document.createElement("span");
+        span.textContent = "Previous step";
+        prevSlot.appendChild(span);
+      }
+      if (config.next) {
+        const a = document.createElement("a");
+        a.href = config.next;
+        a.textContent = "Next step";
+        nextSlot.appendChild(a);
+      } else {
+        const span = document.createElement("span");
+        span.textContent = "Next step";
+        nextSlot.appendChild(span);
+      }
+    }
+
+    function frame(now) {
+      drawScene(now);
+      drawTimeline();
+      drawSignal();
+      requestAnimationFrame(frame);
+    }
+
+    buildText();
+    requestAnimationFrame(frame);
+    window.addEventListener("resize", function () {
+      lastSizeKey = "";
+    });
+  </script>
+</body>
+</html>

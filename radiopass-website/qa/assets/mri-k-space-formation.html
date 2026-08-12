@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How k space is formed</title>
+  <style>
+    :root {
+      --bg: #f6f9ff;
+      --panel: #ffffff;
+      --line: #d8e4f8;
+      --ink: #0f172a;
+      --muted: #475569;
+      --active: #f59e0b;
+      --filled: #2563eb;
+      --empty: #e5edf9;
+      --gx: #0369a1;
+      --gy: #d97706;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 14px;
+      background: radial-gradient(circle at 12% 8%, #ffffff, var(--bg));
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    .app {
+      max-width: 1360px;
+      margin: 0 auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .title {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.18rem;
+      letter-spacing: 0.01em;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.06);
+    }
+
+    .panel-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    #objectCanvas { aspect-ratio: 1 / 1; }
+    #kspaceCanvas { aspect-ratio: 1 / 1; }
+
+    .explain {
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 110px;
+      white-space: pre-line;
+      line-height: 1.35;
+      color: #334155;
+      font-size: 0.92rem;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(100px, 1fr));
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-weight: 650;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+      font-size: 0.85rem;
+    }
+
+    button.secondary { background: linear-gradient(120deg, #475569, #334155); }
+    button.warn { background: linear-gradient(120deg, #b45309, #d97706); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    input[type="range"] { width: min(340px, 100%); }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #c8d9f6;
+      background: #edf3ff;
+      color: #1e3a8a;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .eq {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef4ff;
+      padding: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.83rem;
+      color: #113f82;
+      display: none;
+      white-space: pre-line;
+    }
+
+    .eq.show { display: block; }
+
+    @media (max-width: 1100px) {
+      .main { grid-template-columns: 1fr; }
+      .btn-row { grid-template-columns: repeat(3, minmax(100px, 1fr)); }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <div class="app">
+    <div class="title">
+      <h1>How k space is formed</h1>
+    </div>
+
+    <div class="main">
+      <section class="panel">
+        <div class="panel-title">Image space</div>
+        <canvas id="objectCanvas" width="620" height="620"></canvas>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">k space</div>
+        <canvas id="kspaceCanvas" width="620" height="620"></canvas>
+      </section>
+    </div>
+
+    <div class="explain" id="explainBox"></div>
+
+    <section class="controls">
+      <div class="row">
+        <span class="chip" id="progressChip">Step 1 of 6</span>
+        <span class="chip" id="linesChip">Lines acquired 0</span>
+        <span class="chip" id="fillChip">Filling Cartesian</span>
+      </div>
+
+      <div class="btn-row">
+        <button id="backBtn" class="secondary">Back</button>
+        <button id="nextBtn">Next</button>
+        <button id="playBtn">Play</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+        <button id="readoutBtn" class="warn">Frequency encode readout</button>
+        <button id="fillModeBtn" class="secondary">Switch to centric</button>
+      </div>
+
+      <div class="row">
+        <label for="phaseSlider">Phase encode step</label>
+        <input id="phaseSlider" type="range" min="0" max="31" step="1" value="16" />
+        <strong id="phaseVal">ky 0</strong>
+      </div>
+
+      <div class="row">
+        <label for="matrixSlider">Matrix size</label>
+        <input id="matrixSlider" type="range" min="32" max="64" step="16" value="32" />
+        <strong id="matrixVal">32 by 32</strong>
+      </div>
+
+      <div class="row">
+        <label><input id="noiseToggle" type="checkbox" /> Noise and undersampling</label>
+        <label><input id="advancedToggle" type="checkbox" /> Advanced mode</label>
+      </div>
+
+      <div id="equationBox" class="eq"></div>
+    </section>
+  </div>
+
+  <script>
+    const objectCanvas = document.getElementById("objectCanvas");
+    const kspaceCanvas = document.getElementById("kspaceCanvas");
+    const octx = objectCanvas.getContext("2d");
+    const kctx = kspaceCanvas.getContext("2d");
+
+    const ui = {
+      explainBox: document.getElementById("explainBox"),
+      progressChip: document.getElementById("progressChip"),
+      linesChip: document.getElementById("linesChip"),
+      fillChip: document.getElementById("fillChip"),
+      backBtn: document.getElementById("backBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      playBtn: document.getElementById("playBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      readoutBtn: document.getElementById("readoutBtn"),
+      fillModeBtn: document.getElementById("fillModeBtn"),
+      phaseSlider: document.getElementById("phaseSlider"),
+      phaseVal: document.getElementById("phaseVal"),
+      matrixSlider: document.getElementById("matrixSlider"),
+      matrixVal: document.getElementById("matrixVal"),
+      noiseToggle: document.getElementById("noiseToggle"),
+      advancedToggle: document.getElementById("advancedToggle"),
+      equationBox: document.getElementById("equationBox")
+    };
+
+    const steps = [
+      {
+        title: "Step 1",
+        bullets: [
+          "• MRI signal is collected in frequency domain",
+          "• Raw data is stored in k space not directly as an image"
+        ]
+      },
+      {
+        title: "Step 2",
+        bullets: [
+          "• During readout we traverse kx",
+          "• Each echo fills one horizontal line in k space"
+        ]
+      },
+      {
+        title: "Step 3",
+        bullets: [
+          "• Each phase encode step changes ky position",
+          "• Each TR fills one line in k space"
+        ]
+      },
+      {
+        title: "Step 4",
+        bullets: [
+          "• k space is filled sequentially",
+          "• Full matrix is required for full resolution image",
+          "• Center contains low spatial frequency information",
+          "• Edges contain high spatial frequency information",
+          "• Image is obtained by inverse Fourier transform"
+        ]
+      },
+      {
+        title: "Step 5",
+        bullets: [
+          "• Central k space determines contrast and signal intensity",
+          "• Outer lines hidden gives a blurred reconstruction"
+        ]
+      },
+      {
+        title: "Step 6",
+        bullets: [
+          "• Outer k space determines spatial resolution and edge detail",
+          "• Central lines hidden gives edge emphasis"
+        ]
+      }
+    ];
+
+    const state = {
+      step: 1,
+      totalSteps: 6,
+      matrixSize: 32,
+      fillMode: "cartesian",
+      acquiredRows: new Set(),
+      phaseIndex: 16,
+      activeReadout: null,
+      gyPulse: 0,
+      gySign: 0,
+      playing: false,
+      noise: false,
+      advanced: false,
+      lineCursor: 0,
+      autoPhaseOffset: 0,
+      lastTs: performance.now()
+    };
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function centerIndex() {
+      return Math.floor(state.matrixSize / 2);
+    }
+
+    function kyFromRow(row) {
+      return row - centerIndex();
+    }
+
+    function rowFromPhaseIndex(idx) {
+      return clamp(idx, 0, state.matrixSize - 1);
+    }
+
+    function phaseLabel() {
+      return `ky ${formatSigned(kyFromRow(state.phaseIndex))}`;
+    }
+
+    function formatSigned(v) {
+      if (v < 0) return `\u2212${Math.abs(v)}`;
+      return String(v);
+    }
+
+    function lineOrder() {
+      const n = state.matrixSize;
+      const c = centerIndex();
+      if (state.fillMode === "cartesian") {
+        return Array.from({ length: n }, (_, i) => i);
+      }
+      const out = [c];
+      for (let d = 1; d <= c; d += 1) {
+        if (c + d < n) out.push(c + d);
+        if (c - d >= 0) out.push(c - d);
+      }
+      return out;
+    }
+
+    function nextUnacquiredRow() {
+      const order = lineOrder();
+      for (let i = 0; i < order.length; i += 1) {
+        const idx = (state.lineCursor + i) % order.length;
+        const row = order[idx];
+        if (!state.acquiredRows.has(row)) {
+          state.lineCursor = idx + 1;
+          return row;
+        }
+      }
+      return null;
+    }
+
+    function resetAcquisition() {
+      state.acquiredRows.clear();
+      state.activeReadout = null;
+      state.gyPulse = 0;
+      state.gySign = 0;
+      state.lineCursor = 0;
+      state.autoPhaseOffset = 0;
+    }
+
+    function resetAll() {
+      state.step = 1;
+      state.playing = false;
+      resetAcquisition();
+      syncUi();
+      drawAll(0);
+    }
+
+    function setMatrixSize(n) {
+      state.matrixSize = n;
+      state.phaseIndex = centerIndex();
+      ui.phaseSlider.max = String(n - 1);
+      ui.phaseSlider.value = String(state.phaseIndex);
+      resetAcquisition();
+      syncUi();
+    }
+
+    function startReadout(row) {
+      if (state.activeReadout) return;
+      state.phaseIndex = row;
+      ui.phaseSlider.value = String(row);
+      state.gySign = Math.sign(kyFromRow(row));
+      state.gyPulse = 1;
+      state.activeReadout = { row, progress: 0 };
+      syncUi();
+    }
+
+    function completeReadout() {
+      if (!state.activeReadout) return;
+      const row = state.activeReadout.row;
+      const miss = state.noise && Math.random() < 0.24;
+      if (!miss) state.acquiredRows.add(row);
+      state.activeReadout = null;
+      syncUi();
+    }
+
+    function updateAuto(dt) {
+      if (state.activeReadout) {
+        state.activeReadout.progress += dt * 1.25;
+        if (state.activeReadout.progress >= 1) {
+          completeReadout();
+        }
+      }
+
+      if (state.gyPulse > 0) {
+        state.gyPulse = Math.max(0, state.gyPulse - dt * 2.1);
+      }
+
+      if (!state.playing || state.activeReadout) return;
+
+      if (state.step === 2) {
+        startReadout(centerIndex());
+        return;
+      }
+
+      if (state.step === 3) {
+        const c = centerIndex();
+        const offsets = [0, 1, -1, 2, -2, 3, -3];
+        const off = offsets[state.autoPhaseOffset % offsets.length];
+        state.autoPhaseOffset += 1;
+        startReadout(clamp(c + off, 0, state.matrixSize - 1));
+        return;
+      }
+
+      if (state.step === 4) {
+        const row = nextUnacquiredRow();
+        if (row === null) {
+          state.playing = false;
+          syncUi();
+          return;
+        }
+        startReadout(row);
+      }
+    }
+
+    function drawArrow(ctx, x0, y0, x1, y1, color, width) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const L = Math.hypot(dx, dy) || 1;
+      const ux = dx / L;
+      const uy = dy / L;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - ux * 10 - uy * 5, y1 - uy * 10 + ux * 5);
+      ctx.lineTo(x1 - ux * 10 + uy * 5, y1 - uy * 10 - ux * 5);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawObjectPanel(tSec) {
+      const ctx = octx;
+      const { width: w, height: h } = objectCanvas;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#0b1220";
+      ctx.fillRect(0, 0, w, h);
+
+      const cx = w * 0.5;
+      const cy = h * 0.52;
+      const base = w * 0.34;
+
+      ctx.strokeStyle = "rgba(255,255,255,0.20)";
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(cx - base, cy - base, base * 2, base * 2);
+
+      if (state.step <= 4) {
+        ctx.fillStyle = "rgba(255,255,255,0.94)";
+        ctx.fillRect(cx - base * 0.58, cy - base * 0.58, base * 1.16, base * 1.16);
+        ctx.fillStyle = "rgba(220,232,255,0.92)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, base * 0.30, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (state.step === 5) {
+        const blurPulse = 5 + 2 * Math.sin(tSec * 1.2);
+        ctx.filter = `blur(${blurPulse.toFixed(2)}px)`;
+        ctx.fillStyle = "rgba(255,255,255,0.94)";
+        ctx.fillRect(cx - base * 0.58, cy - base * 0.58, base * 1.16, base * 1.16);
+        ctx.fillStyle = "rgba(226,238,255,0.92)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, base * 0.30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.filter = "none";
+      }
+
+      if (state.step === 6) {
+        const pulse = 1 + 0.15 * Math.sin(tSec * 2.1);
+        ctx.strokeStyle = "rgba(255,255,255,0.95)";
+        ctx.lineWidth = 4.5 * pulse;
+        ctx.strokeRect(cx - base * 0.58, cy - base * 0.58, base * 1.16, base * 1.16);
+        ctx.strokeStyle = "rgba(160,204,255,0.95)";
+        ctx.lineWidth = 4 * pulse;
+        ctx.beginPath();
+        ctx.arc(cx, cy, base * 0.30, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = "700 14px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("Image space", 14, 24);
+
+      const stepLabel = state.step === 5
+        ? "Reconstruction with central k space"
+        : state.step === 6
+          ? "Reconstruction with outer k space"
+          : "Phantom circle inside square";
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText(stepLabel, 14, 44);
+    }
+
+    function cellIntensity(col, row) {
+      const n = state.matrixSize;
+      const uc = (col - n / 2) / (n / 2);
+      const vr = (row - n / 2) / (n / 2);
+      const r2 = uc * uc + vr * vr;
+      const low = Math.exp(-r2 * 2.8);
+      const ring = 0.5 + 0.5 * Math.cos(7.2 * uc) * Math.cos(6.1 * vr);
+      return clamp(low * (0.35 + 0.65 * ring), 0, 1);
+    }
+
+    function rowVisibleInStep(row) {
+      const n = state.matrixSize;
+      const c = centerIndex();
+      const dist = Math.abs(row - c);
+      const centralBand = Math.floor(n * 0.18);
+      if (state.step === 5) return dist <= centralBand;
+      if (state.step === 6) return dist > centralBand;
+      return true;
+    }
+
+    function drawKSpacePanel(tSec) {
+      const ctx = kctx;
+      const { width: w, height: h } = kspaceCanvas;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+
+      const pad = { left: 64, right: 26, top: 28, bottom: 52 };
+      const gw = w - pad.left - pad.right;
+      const gh = h - pad.top - pad.bottom;
+      const n = state.matrixSize;
+      const cw = gw / n;
+      const ch = gh / n;
+      const c = centerIndex();
+
+      const activeRow = state.activeReadout ? state.activeReadout.row : null;
+
+      for (let r = 0; r < n; r += 1) {
+        for (let col = 0; col < n; col += 1) {
+          const x = pad.left + col * cw;
+          const y = pad.top + r * ch;
+
+          let fill = "#e9f0fb";
+          let alpha = 0.55;
+          const acquired = state.acquiredRows.has(r) && rowVisibleInStep(r);
+
+          if (acquired) {
+            const amp = cellIntensity(col, r);
+            const b = Math.floor(120 + amp * 120);
+            fill = `rgb(${40}, ${90 + Math.floor(amp * 70)}, ${b})`;
+            alpha = 0.92;
+            if (state.noise && Math.random() < 0.015) {
+              fill = "rgb(230, 80, 80)";
+            }
+          }
+
+          if (state.step === 1) {
+            fill = "#eef3fb";
+            alpha = 0.42;
+          }
+
+          if (activeRow !== null && r === activeRow && state.step >= 2 && state.step <= 4) {
+            fill = "#f59e0b";
+            alpha = 0.75;
+          }
+
+          if (!rowVisibleInStep(r) && state.step >= 5) {
+            fill = "#eff4fb";
+            alpha = 0.35;
+          }
+
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = fill;
+          ctx.fillRect(x, y, cw - 0.6, ch - 0.6);
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      if (state.activeReadout && state.step >= 2 && state.step <= 4) {
+        const r = state.activeReadout.row;
+        const px = pad.left + state.activeReadout.progress * gw;
+        const py = pad.top + (r + 0.5) * ch;
+        ctx.fillStyle = "#111827";
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(3, cw * 0.35), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const cx = pad.left + (c + 0.5) * cw;
+      const cy = pad.top + (c + 0.5) * ch;
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx - 9, cy);
+      ctx.lineTo(cx + 9, cy);
+      ctx.moveTo(cx, cy - 9);
+      ctx.lineTo(cx, cy + 9);
+      ctx.stroke();
+      ctx.fillStyle = "#111827";
+      ctx.font = "11px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("center", cx + 10, cy - 10);
+
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(pad.left, pad.top, gw, gh);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "700 12px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("kx", pad.left + gw + 8, pad.top + gh + 4);
+      ctx.fillText("ky", pad.left - 22, pad.top - 6);
+
+      if (state.step >= 2) {
+        const gxOn = !!state.activeReadout;
+        const gyOn = state.step >= 3 && (state.gyPulse > 0.01 || state.activeReadout);
+
+        const gxY = h - 24;
+        const gxX0 = pad.left + 30;
+        const gxX1 = gxX0 + 88;
+        drawArrow(ctx, gxX0, gxY, gxX1, gxY, gxOn ? "#0369a1" : "#94a3b8", 2.3);
+        ctx.fillStyle = gxOn ? "#0369a1" : "#64748b";
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Gx", gxX1 + 8, gxY + 4);
+
+        const gyX = pad.left - 34;
+        const gyY0 = pad.top + gh * 0.70;
+        const gyLen = 70 * (0.45 + 0.55 * state.gyPulse);
+        const sign = state.gySign === 0 ? 1 : -state.gySign;
+        const gyY1 = gyY0 + sign * gyLen;
+        drawArrow(ctx, gyX, gyY0, gyX, gyY1, gyOn ? "#d97706" : "#94a3b8", 2.3);
+        ctx.fillStyle = gyOn ? "#d97706" : "#64748b";
+        ctx.fillText("Gy", gyX - 12, gyY1 - 8);
+      }
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "700 13px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("k space", 14, 20);
+    }
+
+    function drawAll(tSec) {
+      drawObjectPanel(tSec);
+      drawKSpacePanel(tSec);
+    }
+
+    function acquiredCountVisible() {
+      if (state.step <= 4) return state.acquiredRows.size;
+      let c = 0;
+      state.acquiredRows.forEach((r) => { if (rowVisibleInStep(r)) c += 1; });
+      return c;
+    }
+
+    function syncUi() {
+      ui.progressChip.textContent = `Step ${state.step} of ${state.totalSteps}`;
+      ui.linesChip.textContent = `Lines acquired ${acquiredCountVisible()} of ${state.matrixSize}`;
+      ui.fillChip.textContent = `Filling ${state.fillMode === "cartesian" ? "Cartesian" : "Centric"}`;
+      ui.phaseVal.textContent = phaseLabel();
+      ui.matrixVal.textContent = `${state.matrixSize} by ${state.matrixSize}`;
+      ui.playBtn.textContent = state.playing ? "Pause" : "Play";
+      ui.fillModeBtn.textContent = state.fillMode === "cartesian" ? "Switch to centric" : "Switch to Cartesian";
+
+      ui.backBtn.disabled = state.step <= 1;
+      ui.nextBtn.disabled = state.step >= state.totalSteps;
+
+      const s = steps[state.step - 1];
+      ui.explainBox.textContent = `${s.title}\n${s.bullets.join("\n")}`;
+
+      ui.equationBox.classList.toggle("show", state.advanced);
+      if (state.advanced) {
+        const gy = kyFromRow(state.phaseIndex);
+        const gamma = 42.58;
+        const dt = 1.0;
+        const gAmp = gy / Math.max(1, state.matrixSize / 10);
+        const kval = (gamma * gAmp * dt).toFixed(2);
+        ui.equationBox.textContent = [
+          "k = gamma times integral of G dt",
+          `gamma 42.58 MHz per T`,
+          `Selected ky ${formatSigned(gy)}`,
+          `Estimated k position ${kval.replace("-", "\u2212")}`
+        ].join("\n");
+      }
+    }
+
+    ui.backBtn.addEventListener("click", () => {
+      state.step = clamp(state.step - 1, 1, state.totalSteps);
+      state.playing = false;
+      syncUi();
+    });
+
+    ui.nextBtn.addEventListener("click", () => {
+      state.step = clamp(state.step + 1, 1, state.totalSteps);
+      state.playing = false;
+      syncUi();
+    });
+
+    ui.playBtn.addEventListener("click", () => {
+      state.playing = !state.playing;
+      syncUi();
+    });
+
+    ui.resetBtn.addEventListener("click", () => {
+      resetAll();
+    });
+
+    ui.readoutBtn.addEventListener("click", () => {
+      const row = rowFromPhaseIndex(state.phaseIndex);
+      startReadout(row);
+    });
+
+    ui.phaseSlider.addEventListener("input", () => {
+      state.phaseIndex = Number(ui.phaseSlider.value);
+      state.gySign = Math.sign(kyFromRow(state.phaseIndex));
+      state.gyPulse = 1;
+      syncUi();
+    });
+
+    ui.matrixSlider.addEventListener("input", () => {
+      const n = Number(ui.matrixSlider.value);
+      setMatrixSize(n);
+    });
+
+    ui.fillModeBtn.addEventListener("click", () => {
+      state.fillMode = state.fillMode === "cartesian" ? "centric" : "cartesian";
+      state.lineCursor = 0;
+      syncUi();
+    });
+
+    ui.noiseToggle.addEventListener("change", () => {
+      state.noise = ui.noiseToggle.checked;
+      syncUi();
+    });
+
+    ui.advancedToggle.addEventListener("change", () => {
+      state.advanced = ui.advancedToggle.checked;
+      syncUi();
+    });
+
+    function animate(ts) {
+      const dt = Math.min(0.05, (ts - state.lastTs) / 1000);
+      state.lastTs = ts;
+      updateAuto(dt);
+      drawAll(ts * 0.001);
+      requestAnimationFrame(animate);
+    }
+
+    setMatrixSize(32);
+    resetAll();
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+.dash {
+  max-width: 1000px;
+  margin: 0 auto;
+  /* .app-header is fixed at --header-h tall and goes opaque past 24px of
+     scroll — 24px of top padding alone leaves the h1 rendering under it. */
+  padding: calc(var(--header-h) + 24px) 24px 80px;
+  width: 100%;
+}
+
+.dash h1 { margin-bottom: 18px; font-size: 26px; }
+
+.dash-overall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.dash-overall-item { display: flex; flex-direction: column; gap: 4px; }
+.dash-value { font-size: 26px; font-weight: 700; }
+.dash-label { font-size: 12px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  margin-bottom: 30px;
+}
+
+.dash-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.dash-section-name { font-weight: 600; }
+
+.dash-danger { margin-top: 20px; }
+
+/* Who this progress belongs to — the dashboard is personal, so it says so. */
+.dash-who {
+  margin: -6px 0 22px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}

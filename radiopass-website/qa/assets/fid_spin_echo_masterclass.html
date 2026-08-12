@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minimal Spin Echo Diagram</title>
+  <style>
+    :root {
+      --bg0: #050a12;
+      --bg1: #0a1220;
+      --panel: #0e1827;
+      --edge: rgba(118, 171, 210, 0.26);
+      --ink: #e4f3ff;
+      --muted: #a7c0d7;
+      --axis: #8fb3cf;
+      --grid: rgba(147, 183, 210, 0.16);
+      --fid: #ffffff;
+      --t2: #73e9ff;
+      --peak: #38dfff;
+      --pulse90: #ffd688;
+      --pulse180: #ff9fbc;
+      --shadow: 0 20px 38px rgba(0, 0, 0, 0.45);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(76, 193, 241, 0.2), transparent 34%),
+        radial-gradient(circle at 88% 88%, rgba(95, 154, 255, 0.14), transparent 32%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+      padding: 1rem;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .card {
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      background: linear-gradient(170deg, rgba(14, 24, 39, 0.95), rgba(11, 20, 31, 0.96));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 0.95rem 1.05rem;
+      display: grid;
+      gap: 0.32rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2.6vw, 1.7rem);
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+      color: #d8ecff;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .viz {
+      padding: 0.72rem;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .svg-wrap {
+      border: 1px solid rgba(116, 168, 205, 0.32);
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(165deg, rgba(223, 234, 244, 0.98), rgba(205, 220, 234, 0.99));
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .x-axis, .y-axis {
+      stroke: var(--axis);
+      stroke-width: 2;
+    }
+
+    .grid-line {
+      stroke: var(--grid);
+      stroke-width: 1;
+      stroke-dasharray: 4 6;
+    }
+
+    .signal {
+      fill: none;
+      stroke: var(--fid);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+    }
+
+    .t2-envelope {
+      fill: none;
+      stroke: var(--t2);
+      stroke-width: 2.6;
+      stroke-dasharray: 9 6;
+    }
+
+    .pulse90 {
+      stroke: var(--pulse90);
+      stroke-width: 4;
+    }
+
+    .pulse180 {
+      stroke: var(--pulse180);
+      stroke-width: 4;
+    }
+
+    .peak {
+      fill: var(--peak);
+      stroke: #0e7390;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 9px rgba(56, 223, 255, 0.7));
+    }
+
+    .label {
+      fill: #2d617f;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .small {
+      fill: #3a6986;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1rem;
+      color: #c3dbec;
+      font-size: 0.79rem;
+      padding: 0 0.2rem 0.25rem;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.35rem;
+      vertical-align: middle;
+    }
+
+    .controls {
+      display: grid;
+      gap: 0.55rem;
+      padding: 0.8rem 0.9rem 0.9rem;
+      border-top: 1px solid rgba(111, 167, 207, 0.25);
+      background: rgba(8, 15, 24, 0.72);
+    }
+
+    .control-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      color: #d3ebff;
+      font-size: 0.86rem;
+    }
+
+    .control-head output {
+      color: #8be8ff;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #62dbff;
+      cursor: pointer;
+    }
+
+    .exam-note {
+      font-size: 0.8rem;
+      color: #b6cee0;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .exam-note strong {
+      color: #cfefff;
+    }
+  </style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+  <main class="app">
+    <section class="card hero">
+      <h1>Minimal Spin Echo Diagram</h1>
+      <p>One 90° pulse, one 180° pulse, FID (T2*), one echo at TE, and a true T2 envelope through the echo peak.</p>
+    </section>
+
+    <section class="card viz">
+      <div class="svg-wrap">
+        <svg id="svg" viewBox="0 0 1100 520" aria-label="Minimal spin echo signal diagram">
+          <g id="grid"></g>
+
+          <line class="x-axis" x1="90" y1="320" x2="1020" y2="320"></line>
+          <line class="y-axis" x1="90" y1="70" x2="90" y2="460"></line>
+
+          <text class="label" x="985" y="347">Time</text>
+          <text class="label" x="36" y="67">Signal</text>
+
+          <g id="pulses"></g>
+          <path id="fidPath" class="signal" d=""></path>
+          <path id="t2Path" class="t2-envelope" d=""></path>
+
+          <line id="teLine" x1="0" y1="0" x2="0" y2="0" stroke="#68dfff" stroke-width="2.5" stroke-dasharray="7 6"></line>
+          <text id="teLabel" class="label" x="0" y="0">TE</text>
+
+          <circle id="echoPeak" class="peak" cx="0" cy="0" r="8"></circle>
+          <text id="echoText" class="label" x="0" y="0">Echo peak</text>
+
+          <text id="t2sLabel" class="label" x="250" y="120">T2*</text>
+          <text id="t2Label" class="label" x="640" y="110">T2</text>
+
+          <text class="small" x="92" y="486">Increasing field inhomogeneity shortens T2* (faster FID decay) but does not move the true T2 echo peak.</text>
+        </svg>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:#ffffff"></span>FID decay curve (T2*)</span>
+        <span><span class="dot" style="background:#73e9ff"></span>True T2 envelope</span>
+        <span><span class="dot" style="background:#38dfff"></span>Echo peak at TE</span>
+      </div>
+
+      <div class="controls">
+        <div class="control-head">
+          <span>Field inhomogeneity</span>
+          <output id="inhOut">0.50</output>
+        </div>
+        <input id="inh" type="range" min="0" max="1" step="0.01" value="0.50" />
+        <p class="exam-note"><strong>Exam focus:</strong> T2* includes intrinsic dephasing + B0 inhomogeneity. The 180° pulse refocuses static inhomogeneity effects, so the echo peak follows the true T2 envelope.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const svg = document.getElementById("svg");
+    const grid = document.getElementById("grid");
+    const pulses = document.getElementById("pulses");
+    const fidPath = document.getElementById("fidPath");
+    const t2Path = document.getElementById("t2Path");
+    const teLine = document.getElementById("teLine");
+    const teLabel = document.getElementById("teLabel");
+    const echoPeak = document.getElementById("echoPeak");
+    const echoText = document.getElementById("echoText");
+    const t2sLabel = document.getElementById("t2sLabel");
+    const t2Label = document.getElementById("t2Label");
+    const inh = document.getElementById("inh");
+    const inhOut = document.getElementById("inhOut");
+
+    const x0 = 90;
+    const x1 = 1020;
+    const y0 = 320;
+    const ampPx = 148;
+
+    const TE = 100;      // fixed echo time
+    const T2 = 120;      // fixed true T2
+    const tMax = 230;
+
+    function mapX(t) {
+      return x0 + (t / tMax) * (x1 - x0);
+    }
+
+    function makePath(points) {
+      if (!points.length) return "";
+      return points.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(" ");
+    }
+
+    function drawGrid() {
+      const lines = [];
+      for (let i = 1; i < 10; i += 1) {
+        const x = x0 + ((x1 - x0) * i) / 10;
+        lines.push(`<line class="grid-line" x1="${x}" y1="90" x2="${x}" y2="450"></line>`);
+      }
+      for (let i = 1; i < 6; i += 1) {
+        const y = 90 + ((450 - 90) * i) / 6;
+        lines.push(`<line class="grid-line" x1="${x0}" y1="${y}" x2="${x1}" y2="${y}"></line>`);
+      }
+      lines.push(`<text class="small" x="${mapX(0) - 6}" y="346">0</text>`);
+      lines.push(`<text class="small" x="${mapX(TE) - 12}" y="346">TE</text>`);
+      grid.innerHTML = lines.join("");
+    }
+
+    function drawPulses() {
+      const x90 = mapX(0);
+      const x180 = mapX(TE / 2);
+      pulses.innerHTML = [
+        `<line class="pulse90" x1="${x90}" y1="82" x2="${x90}" y2="162"></line>`,
+        `<text class="small" x="${x90 - 14}" y="72">90°</text>`,
+        `<line class="pulse180" x1="${x180}" y1="82" x2="${x180}" y2="176"></line>`,
+        `<text class="small" x="${x180 - 17}" y="72">180°</text>`
+      ].join("");
+    }
+
+    function render() {
+      const inhVal = Number(inh.value);
+      inhOut.value = inhVal.toFixed(2);
+
+      // T2* always shorter than true T2, and decreases with inhomogeneity.
+      const T2star = T2 / (1.15 + 1.9 * inhVal);
+
+      const pointsSignal = [];
+      const pointsT2 = [];
+      const steps = 1200;
+
+      const omega = 2 * Math.PI / 22;
+      const sigma = 10;
+
+      const echoAmp = 0.88 * Math.exp(-TE / T2); // fixed by true T2, independent of inhom slider
+
+      for (let i = 0; i <= steps; i += 1) {
+        const t = (tMax * i) / steps;
+        const x = mapX(t);
+
+        const fade = 1 / (1 + Math.exp((t - (TE - 10)) / 2.2));
+        const fid = fade * Math.exp(-t / T2star) * Math.cos(omega * t);
+        const echo = echoAmp * Math.exp(-Math.pow((t - TE) / sigma, 2)) * Math.cos(omega * (t - TE));
+        const signal = fid + echo;
+
+        pointsSignal.push([x, y0 - signal * ampPx * 0.62]);
+
+        const t2Env = 0.88 * Math.exp(-t / T2);
+        pointsT2.push([x, y0 - t2Env * ampPx * 0.62]);
+      }
+
+      fidPath.setAttribute("d", makePath(pointsSignal));
+      t2Path.setAttribute("d", makePath(pointsT2));
+
+      const xTE = mapX(TE);
+      const yEcho = y0 - echoAmp * ampPx * 0.62;
+
+      teLine.setAttribute("x1", xTE);
+      teLine.setAttribute("x2", xTE);
+      teLine.setAttribute("y1", 95);
+      teLine.setAttribute("y2", 448);
+      teLabel.setAttribute("x", xTE + 7);
+      teLabel.setAttribute("y", 110);
+
+      echoPeak.setAttribute("cx", xTE);
+      echoPeak.setAttribute("cy", yEcho);
+      echoText.setAttribute("x", xTE + 11);
+      echoText.setAttribute("y", yEcho - 10);
+
+      t2sLabel.setAttribute("x", mapX(30));
+      t2sLabel.setAttribute("y", y0 - Math.exp(-30 / T2star) * ampPx * 0.62 - 24);
+
+      t2Label.setAttribute("x", mapX(138));
+      t2Label.setAttribute("y", y0 - 0.88 * Math.exp(-138 / T2) * ampPx * 0.62 - 16);
+    }
+
+    drawGrid();
+    drawPulses();
+    render();
+    inh.addEventListener("input", render);
+  </script>
+</body>
+</html>

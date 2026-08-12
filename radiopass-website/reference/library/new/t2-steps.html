@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>T2 and T2* Signal Step by Step</title>
+  <style>
+    :root {
+      --bg: #0a1422;
+      --panel: #13253b;
+      --text: #e8f3ff;
+      --muted: #b9cce0;
+      --line: #2c4d6f;
+      --accent: #ff9e57;
+      --accent2: #c66cff;
+      --ok: #63d07f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 88% 10%, rgba(198,108,255,.16), transparent 35%), linear-gradient(160deg, #07101b, var(--bg));
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .app { max-width: 1100px; margin: 0 auto; display: grid; gap: 14px; }
+    .card {
+      background: linear-gradient(180deg, rgba(19,37,59,.96), rgba(12,27,43,.96));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    h1, h2, h3 { margin: 0 0 8px; }
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.05rem; color: #ffbf93; }
+    h3 { font-size: 0.95rem; color: #ffd8b9; }
+    p, li { color: var(--muted); line-height: 1.45; }
+    .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .step-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    button {
+      border: 1px solid #5f7fa2;
+      background: linear-gradient(180deg, #2a4566, #1b3552);
+      color: #eff7ff;
+      padding: 8px 11px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { border-color: #ffb47b; }
+    .step-pill {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid #91636e;
+      background: rgba(255,158,87,.14);
+      font-size: 0.78rem;
+      color: #ffe0ca;
+      margin-bottom: 8px;
+    }
+    .canvas-wrap { border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(180deg, #132942, #0f2238); padding: 8px; }
+    canvas { width: 100%; height: 300px; display: block; }
+    .note { border-left: 4px solid var(--ok); padding-left: 10px; color: #cdebd5; }
+    .mini { font-size: 0.87rem; }
+    .top-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .top-links a { color: #ffd9b6; text-decoration: none; border: 1px solid #6e718f; border-radius: 8px; padding: 6px 9px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <h1>T2 and T2* Signal - Step by Step</h1>
+      <div class="top-links">
+        <a href="/Users/User1/Desktop/FRCR1/physics/t1-steps.html">Go to T1 Page</a>
+        <a href="/Users/User1/Desktop/FRCR1/physics/t2-steps.html">T2 Page</a>
+      </div>
+      <p class="mini">One-page teaching layout for T2 decay and T2* effects using your same structure and wording style.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="step-nav">
+          <button id="prevBtn">Previous</button>
+          <button id="nextBtn">Next</button>
+        </div>
+        <span class="step-pill" id="stepPill">Step 1</span>
+        <h2 id="stepTitle"></h2>
+        <p id="stepBody"></p>
+      </article>
+
+      <article class="card canvas-wrap">
+        <h3>T2 and T2* Decay Curves (Mxy)</h3>
+        <canvas id="curve"></canvas>
+        <p class="mini">Orange = ideal T2 decay. Purple = faster T2* decay. T2 point is 37% remaining transverse signal.</p>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>2. Spin-Spin Relaxation</h2>
+      <h3>Free Induction Decay</h3>
+      <p>Once the RF pulse stops, each nucleus slightly alters the local magnetic field.</p>
+      <p>As a result, some nuclei precess slightly faster and others slightly slower.</p>
+      <p>Since precessional frequency depends on magnetic field strength, these small variations cause nuclei to gradually lose phase coherence.</p>
+      <p>As coherence is lost, the net transverse magnetisation decreases exponentially to zero.</p>
+      <p>This decay is called the <strong>Free Induction Decay</strong>.</p>
+
+      <h3>T2 Constant</h3>
+      <p>The rate of transverse magnetisation loss is determined by magnetic interactions between neighbouring spins.</p>
+      <p>This process is known as <strong>spin-spin relaxation</strong> or <strong>transverse decay</strong>.</p>
+      <p>The time constant governing this decay is called <strong>T2</strong>.</p>
+
+      <h3>Definition of T2</h3>
+      <p>T2 is the time required for transverse magnetisation to decay to <strong>37 percent</strong> of its original value. In other words, it has lost 63 percent of its maximum signal.</p>
+      <p>T2 depends on the local magnetic field environment.</p>
+    </section>
+
+    <section class="card">
+      <h3>Factors Affecting T2</h3>
+      <p><strong>Bone, calcium, and metal</strong><br/>Have short T2 values. Rigid solids produce large local magnetic field variations.</p>
+      <p><strong>Fat</strong><br/>Has a short T2.</p>
+      <p><strong>Water</strong><br/>Has a very long T2. Rapid molecular motion smooths local magnetic field variations, prolonging coherence.</p>
+    </section>
+
+    <section class="card">
+      <h2>T2 Star (T2*) and Free Induction Decay</h2>
+      <p>The previously described T2 decay represents the ideal exponential transverse decay.</p>
+      <p>In reality, transverse magnetisation decays faster than expected.</p>
+      <p>This accelerated decay is called <strong>T2 star (T2*)</strong>.</p>
+      <p>T2* includes the effects of:</p>
+      <ul>
+        <li>Local magnetic field variations</li>
+        <li>External magnetic field inhomogeneities</li>
+      </ul>
+      <p>Although the main magnetic field (B0) is highly uniform, it is not perfectly homogeneous. Tissue differences and materials within the scanner further distort the field.</p>
+      <p>These inhomogeneities cause faster dephasing of nuclei.</p>
+
+      <h2>Spin Echo and Correction of T2*</h2>
+      <p class="note">The spin-echo sequence removes the effects of magnetic field inhomogeneities. This allows measurement of the true tissue-specific T2 relaxation rather than T2* effects.</p>
+    </section>
+  </main>
+
+  <script>
+    const steps = [
+      { title: "Step 1 - Immediately After RF Off", body: "Spins begin to lose phase coherence in the transverse plane, starting Free Induction Decay.", t: 0.05 },
+      { title: "Step 2 - Dephasing Builds", body: "Local spin-spin interactions cause neighboring spins to precess at slightly different rates.", t: 0.4 },
+      { title: "Step 3 - Exponential T2 Decay", body: "Net Mxy decays exponentially as phase coherence is lost.", t: 0.8 },
+      { title: "Step 4 - T2 Definition Point", body: "At time T2, transverse magnetisation has fallen to 37% of original amplitude.", t: 1.0 },
+      { title: "Step 5 - Real Scanner Behavior", body: "In practice, additional field inhomogeneity causes faster decay, known as T2*.", t: 1.25 },
+      { title: "Step 6 - Spin Echo Correction", body: "A 180° refocusing pulse can cancel static inhomogeneity effects, revealing true T2 behavior.", t: 2.0 }
+    ];
+
+    let stepIdx = 0;
+    const stepTitle = document.getElementById('stepTitle');
+    const stepBody = document.getElementById('stepBody');
+    const stepPill = document.getElementById('stepPill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const canvas = document.getElementById('curve');
+    const g = canvas.getContext('2d');
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.floor(canvas.clientWidth);
+      const h = Math.floor(canvas.clientHeight);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+
+    function draw() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      g.clearRect(0, 0, w, h);
+      const pad = { l: 42, r: 18, t: 20, b: 34 };
+      const x0 = pad.l, y0 = h - pad.b;
+      const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+
+      g.strokeStyle = 'rgba(180,210,235,0.35)';
+      g.lineWidth = 1;
+      g.beginPath();
+      g.moveTo(x0, y0); g.lineTo(x0 + plotW, y0);
+      g.moveTo(x0, y0); g.lineTo(x0, y0 - plotH);
+      g.stroke();
+
+      g.strokeStyle = '#ff9e57';
+      g.lineWidth = 2.5;
+      g.beginPath();
+      for (let i = 0; i <= 240; i++) {
+        const tn = i / 240;
+        const t = tn * 3;
+        const mxy = Math.exp(-t / 1);
+        const x = x0 + tn * plotW;
+        const y = y0 - mxy * plotH;
+        if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.stroke();
+
+      g.strokeStyle = '#c66cff';
+      g.lineWidth = 2;
+      g.beginPath();
+      for (let i = 0; i <= 240; i++) {
+        const tn = i / 240;
+        const t = tn * 3;
+        const mxy = Math.exp(-t / 0.7);
+        const x = x0 + tn * plotW;
+        const y = y0 - mxy * plotH;
+        if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.stroke();
+
+      const y37 = y0 - 0.37 * plotH;
+      const xT2 = x0 + (1 / 3) * plotW;
+      g.strokeStyle = 'rgba(255,220,120,0.8)';
+      g.setLineDash([5,4]);
+      g.beginPath();
+      g.moveTo(x0, y37); g.lineTo(x0 + plotW, y37);
+      g.moveTo(xT2, y0); g.lineTo(xT2, y0 - plotH);
+      g.stroke();
+      g.setLineDash([]);
+
+      const tMark = steps[stepIdx].t;
+      const xM = x0 + (Math.min(3, tMark) / 3) * plotW;
+      const yM = y0 - Math.exp(-Math.min(3, tMark) / 1) * plotH;
+      g.fillStyle = '#ffe0c6';
+      g.beginPath(); g.arc(xM, yM, 5, 0, Math.PI * 2); g.fill();
+
+      g.fillStyle = '#d8e9f9';
+      g.font = '12px Segoe UI';
+      g.fillText('Mxy', 12, y0 - plotH + 10);
+      g.fillText('Time', x0 + plotW - 30, h - 10);
+      g.fillText('37%', x0 + 4, y37 - 6);
+      g.fillText('T2', xT2 + 4, y0 - 8);
+      g.fillStyle = '#ffb67b'; g.fillText('T2', x0 + plotW - 56, pad.t + 16);
+      g.fillStyle = '#d995ff'; g.fillText('T2*', x0 + plotW - 56, pad.t + 32);
+    }
+
+    function renderStep() {
+      const s = steps[stepIdx];
+      stepPill.textContent = `Step ${stepIdx + 1} of ${steps.length}`;
+      stepTitle.textContent = s.title;
+      stepBody.textContent = s.body;
+      draw();
+    }
+
+    prevBtn.addEventListener('click', () => { stepIdx = Math.max(0, stepIdx - 1); renderStep(); });
+    nextBtn.addEventListener('click', () => { stepIdx = Math.min(steps.length - 1, stepIdx + 1); renderStep(); });
+
+    window.addEventListener('resize', resize);
+    resize();
+    renderStep();
+  </script>
+</body>
+</html>

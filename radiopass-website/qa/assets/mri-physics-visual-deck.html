@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MRI Physics Visual Deck | FRCR Part 1</title>
+  <style>
+    :root {
+      --bg: #f6fafc;
+      --paper: #ffffff;
+      --ink: #102033;
+      --muted: #506276;
+      --line: #d8e4ee;
+      --soft: #edf5fa;
+      --b0: #2563eb;
+      --mxy: #16a34a;
+      --rf: #f97316;
+      --t2: #dc2626;
+      --grad: #7c3aed;
+      --signal: #d9a600;
+      --dephase: #ea580c;
+      --cyan: #0891b2;
+      --shadow: 0 18px 45px rgba(16, 32, 51, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(14, 165, 233, 0.12), transparent 34%),
+        radial-gradient(circle at 100% 10%, rgba(124, 58, 237, 0.08), transparent 30%),
+        linear-gradient(180deg, #fbfdff, var(--bg));
+      min-height: 100vh;
+    }
+
+    button, a { font: inherit; }
+
+    .shell {
+      width: min(1440px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.6rem);
+      line-height: 0.94;
+      letter-spacing: -0.055em;
+      max-width: 900px;
+    }
+
+    .subtitle {
+      max-width: 880px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 1.04rem;
+      margin: 12px 0 0;
+    }
+
+    .hero-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+    .btn,
+    .nav-btn,
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .btn,
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .btn.primary,
+    .nav-btn.primary {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .btn:hover,
+    .nav-btn:hover,
+    .chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(16, 32, 51, 0.12);
+      border-color: #9bb5ca;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.88);
+      padding: 14px 16px;
+      min-height: 86px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 850;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 8px;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 30px rgba(16, 32, 51, 0.08);
+      margin-bottom: 14px;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e5eef5;
+    }
+
+    .progress > div {
+      width: 5%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--b0), var(--mxy), var(--grad));
+      transition: width 180ms ease;
+    }
+
+    .deck {
+      display: grid;
+      gap: 14px;
+    }
+
+    .slide {
+      display: none;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 0.36fr);
+      gap: 16px;
+      align-items: stretch;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      padding: clamp(14px, 2vw, 24px);
+      min-height: 720px;
+    }
+
+    .slide.active { display: grid; }
+
+    body.poster .slide {
+      display: grid;
+      min-height: 0;
+      grid-template-columns: 1fr;
+      break-inside: avoid;
+    }
+
+    body.poster .deck { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.poster .toolbar { position: static; }
+    body.poster .notes { min-height: 0; }
+
+    .visual-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(180deg, #ffffff, #f8fbfd);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .diagram {
+      width: 100%;
+      min-height: 620px;
+      display: block;
+      background: #fff;
+    }
+
+    .notes {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      min-height: 620px;
+    }
+
+    .slide-num {
+      width: fit-content;
+      border: 1px solid #bdd2e4;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: var(--cyan);
+      background: #f2f9fc;
+      font-weight: 900;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .notes h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 3.1rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .caption {
+      border-left: 5px solid var(--cyan);
+      background: #eef8fb;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 1.05rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .key-list {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .key-list li {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfdff;
+      color: #24364a;
+      line-height: 1.35;
+      font-size: 0.98rem;
+    }
+
+    .trap {
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      background: #fff7ed;
+      color: #7c2d12;
+      padding: 12px 14px;
+      line-height: 1.35;
+      font-size: 0.98rem;
+    }
+
+    .trap strong { color: #9a3412; }
+
+    .thumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      font-weight: 850;
+      color: #496074;
+    }
+
+    .chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .deck-footer {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    svg text { font-family: "Avenir Next", "Segoe UI", sans-serif; }
+    .svg-title { font-size: 28px; font-weight: 900; fill: var(--ink); }
+    .svg-label { font-size: 22px; font-weight: 900; fill: var(--ink); }
+    .svg-small { font-size: 17px; font-weight: 800; fill: var(--muted); }
+    .axis { stroke: #34495f; stroke-width: 4; }
+    .b0 { stroke: var(--b0); fill: var(--b0); }
+    .mz { stroke: var(--b0); fill: var(--b0); }
+    .mxy { stroke: var(--mxy); fill: var(--mxy); }
+    .rf { stroke: var(--rf); fill: var(--rf); }
+    .t2 { stroke: var(--t2); fill: var(--t2); }
+    .grad { stroke: var(--grad); fill: var(--grad); }
+    .signal { stroke: var(--signal); fill: var(--signal); }
+    .dephase { stroke: var(--dephase); fill: var(--dephase); }
+    .soft-blue { fill: rgba(37, 99, 235, 0.08); stroke: rgba(37, 99, 235, 0.25); }
+    .soft-green { fill: rgba(22, 163, 74, 0.1); stroke: rgba(22, 163, 74, 0.32); }
+    .soft-purple { fill: rgba(124, 58, 237, 0.09); stroke: rgba(124, 58, 237, 0.28); }
+    .thin { stroke: #aec3d4; stroke-width: 2; fill: none; }
+    .thick { stroke-width: 7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .dashed { stroke-dasharray: 9 8; }
+    .faint { opacity: 0.35; }
+
+
+    .export-strip {
+      display: grid;
+      grid-template-columns: minmax(230px, 0.42fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.90);
+      box-shadow: 0 12px 30px rgba(16, 32, 51, 0.08);
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+
+    .export-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .export-copy strong {
+      color: var(--ink);
+      font-size: 0.88rem;
+    }
+
+    .export-copy span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+
+    .export-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .export-links a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      text-decoration: none;
+      padding: 7px 10px;
+      font-size: 0.74rem;
+      font-weight: 850;
+    }
+
+    .export-links a:hover {
+      border-color: #9bb5ca;
+      box-shadow: 0 8px 18px rgba(16, 32, 51, 0.10);
+    }
+
+    @media (max-width: 1050px) {
+      .hero, .toolbar, .slide { grid-template-columns: 1fr; }
+      .hero-actions { justify-content: flex-start; }
+      .slide { min-height: 0; }
+      .diagram, .notes { min-height: 0; }
+      body.poster .deck { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 16px, 1440px); padding-top: 12px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero, .slide { border-radius: 18px; }
+      .diagram { height: 62vh; min-height: 430px; }
+      .btn, .nav-btn { width: 100%; }
+      .deck-footer { display: grid; grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .toolbar, .hero-actions, .deck-footer, .thumbs { display: none !important; }
+      .shell { width: 100%; padding: 0; }
+      .hero, .slide { box-shadow: none; border-radius: 0; page-break-after: always; }
+      body.poster .deck { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">FRCR Part 1 MRI Physics</div>
+        <h1>Visual MRI Physics Teaching Deck</h1>
+        <p class="subtitle">Twenty clean, pale-background panels for B0, RF excitation, T1/T2 relaxation, spin echo, gradients and k-space. Built for fast revision without walls of text.</p>
+      </div>
+      <nav class="hero-actions" aria-label="Page links">
+        <a class="btn" href="index.html">Back to Lessons</a>
+        <a class="btn" href="../question-bank.html">Question Bank</a>
+        <button id="posterBtn" class="btn primary" type="button">Poster View</button>
+      </nav>
+    </header>
+
+    <section class="stats" aria-label="Deck statistics">
+      <div class="stat"><strong>20</strong><span>visual slides</span></div>
+      <div class="stat"><strong>B0 / RF</strong><span>signal origin</span></div>
+      <div class="stat"><strong>T1 / T2</strong><span>exam weighting</span></div>
+      <div class="stat"><strong>Gradients</strong><span>spatial encoding</span></div>
+    </section>
+
+    <section class="export-strip" aria-label="MRI dephasing exported steps">
+      <div class="export-copy">
+        <strong>Dephasing exports 04-10</strong>
+        <span>Standalone pages for B0, Gz, 90 RF, Gy, T2*, Gx and 180 RF.</span>
+      </div>
+      <nav class="export-links" aria-label="Open dephasing export step">
+        <a href="mri-html-export/dephasing_step_04_apply_b0.html">04 B0</a>
+        <a href="mri-html-export/dephasing_step_05_slice_select_gz.html">05 Gz</a>
+        <a href="mri-html-export/dephasing_step_06_apply_90_rf.html">06 90 RF</a>
+        <a href="mri-html-export/dephasing_step_07_phase_encode_gy.html">07 Gy</a>
+        <a href="mri-html-export/dephasing_step_08_rf_off_t2star.html">08 T2*</a>
+        <a href="mri-html-export/dephasing_step_09_frequency_encode_gx.html">09 Gx</a>
+        <a href="mri-html-export/dephasing_step_10_apply_180_rf.html">10 180 RF</a>
+      </nav>
+    </section>
+
+    <section class="export-strip" aria-label="Watch a real sequence run">
+      <div class="export-copy">
+        <strong>Watch it happen, then play it yourself</strong>
+        <span>Click a weighting to build the real pulse sequence in the full simulator — RF, Gz, Gy, Gx, ADC and flip angle, all live.</span>
+      </div>
+      <nav class="export-links" aria-label="Open a sequence preset in the simulator">
+        <a href="mri-interactive-simulator-v7.html?preset=t1w">T1-weighted</a>
+        <a href="mri-interactive-simulator-v7.html?preset=t2w">T2-weighted</a>
+        <a href="mri-interactive-simulator-v7.html?preset=stir">STIR</a>
+        <a href="mri-interactive-simulator-v7.html?preset=flair">FLAIR</a>
+      </nav>
+    </section>
+
+    <section class="toolbar" aria-label="Slide controls">
+      <button id="prevBtn" class="nav-btn" type="button">Previous</button>
+      <div class="progress" aria-label="Slide progress"><div id="progressBar"></div></div>
+      <button id="nextBtn" class="nav-btn primary" type="button">Next</button>
+    </section>
+
+    <section id="deck" class="deck" aria-live="polite"></section>
+    <nav id="thumbs" class="thumbs" aria-label="Slide quick navigation"></nav>
+
+    <footer class="deck-footer">
+      <button id="firstBtn" class="nav-btn" type="button">First Slide</button>
+      <button id="lastBtn" class="nav-btn" type="button">Final Summary</button>
+      <button class="nav-btn" type="button" onclick="window.print()">Print / Save PDF</button>
+    </footer>
+  </main>
+
+  <script>
+    const C = {
+      b0: "#2563eb",
+      mxy: "#16a34a",
+      rf: "#f97316",
+      t2: "#dc2626",
+      grad: "#7c3aed",
+      signal: "#d9a600",
+      dephase: "#ea580c",
+      cyan: "#0891b2",
+      ink: "#102033",
+      muted: "#506276",
+      line: "#d8e4ee"
+    };
+
+    function esc(text) {
+      return String(text).replace(/[&<>]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]));
+    }
+
+    function boldLabel(x, y, key, rest, color = C.ink, size = 22) {
+      return `<text x="${x}" y="${y}" font-size="${size}" fill="${color}"><tspan font-weight="900">${esc(key)}</tspan><tspan font-weight="700">${esc(rest ? " " + rest : "")}</tspan></text>`;
+    }
+
+    function line(x1, y1, x2, y2, cls = "axis", extra = "") {
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}" ${extra}/>`;
+    }
+
+    function arrow(x1, y1, x2, y2, color, width = 7, label = "", lx = x2 + 12, ly = y2 - 10) {
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      const head = 17 + width;
+      const p1 = `${x2},${y2}`;
+      const p2 = `${x2 - Math.cos(a - 0.42) * head},${y2 - Math.sin(a - 0.42) * head}`;
+      const p3 = `${x2 - Math.cos(a + 0.42) * head},${y2 - Math.sin(a + 0.42) * head}`;
+      return `<g><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}" stroke-linecap="round"/><polygon points="${p1} ${p2} ${p3}" fill="${color}"/>${label ? boldLabel(lx, ly, label, "", color, 20) : ""}</g>`;
+    }
+
+    function box(x, y, w, h, title, fill = "#fbfdff", stroke = C.line) {
+      return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="24" fill="${fill}" stroke="${stroke}" stroke-width="3"/>${title ? boldLabel(x + 24, y + 42, title, "", C.ink, 24) : ""}</g>`;
+    }
+
+    function pill(x, y, key, rest, color) {
+      return `<g><rect x="${x}" y="${y}" width="310" height="54" rx="18" fill="white" stroke="${color}" stroke-width="3"/>${boldLabel(x + 18, y + 35, key, rest, color, 20)}</g>`;
+    }
+
+    function svg(content) {
+      return `<svg class="diagram" viewBox="0 0 1200 720" role="img" preserveAspectRatio="xMidYMid meet">${content}</svg>`;
+    }
+
+    function axes3D(cx = 470, cy = 380, s = 1) {
+      return `
+        <g>
+          ${arrow(cx, cy, cx + 240 * s, cy, C.ink, 4, "X-axis", cx + 248 * s, cy + 7)}
+          ${arrow(cx, cy, cx - 155 * s, cy + 105 * s, C.ink, 4, "Y-axis", cx - 252 * s, cy + 128 * s)}
+          ${arrow(cx, cy, cx, cy - 260 * s, C.b0, 6, "Z-axis", cx + 16, cy - 262 * s)}
+          <ellipse cx="${cx}" cy="${cy}" rx="250" ry="100" fill="rgba(22,163,74,0.08)" stroke="${C.mxy}" stroke-width="3" stroke-dasharray="10 8"/>
+          ${boldLabel(cx - 230, cy + 140, "XY plane", " transverse plane", C.mxy, 21)}
+        </g>`;
+    }
+
+    function spinArrow(x, y, angle, color = C.ink, len = 54, w = 4) {
+      return arrow(x, y, x + Math.cos(angle) * len, y + Math.sin(angle) * len, color, w);
+    }
+
+    function randomSpins(x, y, w, h, aligned = false) {
+      let out = "";
+      for (let i = 0; i < 24; i++) {
+        const px = x + 36 + (i % 6) * (w - 72) / 5;
+        const py = y + 56 + Math.floor(i / 6) * (h - 112) / 3;
+        let a = aligned ? (-Math.PI / 2 + ((i % 7 === 0 || i % 11 === 0) ? Math.PI : 0) + (i % 3 - 1) * 0.16) : (i * 1.73) % (Math.PI * 2);
+        out += spinArrow(px, py, a, aligned && (i % 7 === 0 || i % 11 === 0) ? C.rf : C.ink, 38, 3);
+      }
+      return out;
+    }
+
+    function graphAxes(x, y, w, h, xlabel, ylabel) {
+      return `<g>${line(x, y + h, x + w, y + h, "axis")}${line(x, y, x, y + h, "axis")}${boldLabel(x + w - 70, y + h + 42, xlabel, "", C.muted, 18)}<text x="${x - 48}" y="${y + h / 2}" transform="rotate(-90 ${x - 48} ${y + h / 2})" font-size="18" font-weight="900" fill="${C.muted}">${esc(ylabel)}</text></g>`;
+    }
+
+    function curve(points, color, width = 7, dash = "") {
+      return `<path d="${points}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${dash ? `stroke-dasharray="${dash}"` : ""}/>`;
+    }
+
+    function recoveryPath(x, y, w, h, tau = 1.4) {
+      let d = "";
+      for (let i = 0; i <= 80; i++) {
+        const t = i / 80;
+        const val = 1 - Math.exp(-t * tau);
+        const px = x + t * w;
+        const py = y + h - val * h;
+        d += `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)} `;
+      }
+      return d;
+    }
+
+    function decayPath(x, y, w, h, tau = 2.0) {
+      let d = "";
+      for (let i = 0; i <= 80; i++) {
+        const t = i / 80;
+        const val = Math.exp(-t * tau);
+        const px = x + t * w;
+        const py = y + h - val * h;
+        d += `${i ? "L" : "M"}${px.toFixed(1)} ${py.toFixed(1)} `;
+      }
+      return d;
+    }
+
+    function xyPlane(cx, cy, r, label = "XY plane") {
+      return `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(22,163,74,0.07)" stroke="${C.mxy}" stroke-width="3"/><line x1="${cx - r - 25}" y1="${cy}" x2="${cx + r + 25}" y2="${cy}" stroke="${C.ink}" stroke-width="3"/><line x1="${cx}" y1="${cy + r + 25}" x2="${cx}" y2="${cy - r - 25}" stroke="${C.ink}" stroke-width="3"/>${boldLabel(cx + r + 20, cy + 6, "X", "", C.ink, 18)}${boldLabel(cx + 10, cy - r - 18, "Y", "", C.ink, 18)}${boldLabel(cx - r, cy - r - 34, label, "", C.mxy, 20)}</g>`;
+    }
+
+    function kspaceGrid(x, y, w, h, activeRows = 6) {
+      let out = `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="#f8fdff" stroke="${C.cyan}" stroke-width="3"/>`;
+      for (let i = 1; i < 8; i++) {
+        out += line(x + i * w / 8, y + 18, x + i * w / 8, y + h - 18, "thin faint") + line(x + 18, y + i * h / 8, x + w - 18, y + i * h / 8, "thin faint");
+      }
+      for (let r = 0; r < activeRows; r++) {
+        const yy = y + (r + 1.5) * h / 9;
+        out += `<line x1="${x + 24}" y1="${yy}" x2="${x + w - 24}" y2="${yy}" stroke="${C.cyan}" stroke-width="6" stroke-linecap="round" opacity="${0.28 + r * 0.08}"/>`;
+      }
+      out += `<circle cx="${x + w / 2}" cy="${y + h / 2}" r="34" fill="rgba(8,145,178,0.18)" stroke="${C.cyan}" stroke-width="3"/>${boldLabel(x + w - 70, y + h / 2 - 14, "kx", "", C.cyan, 18)}${boldLabel(x + w / 2 + 12, y + 34, "ky", "", C.cyan, 18)}</g>`;
+      return out;
+    }
+
+    function slide1() {
+      return svg(`${axes3D(505, 415, 1)}${arrow(505, 415, 505, 118, C.b0, 10, "B0 main magnetic field", 525, 120)}${arrow(505, 415, 505, 210, C.b0, 8, "Longitudinal Mz", 525, 240)}${arrow(505, 415, 720, 340, C.mxy, 8, "Transverse Mxy", 732, 340)}<path d="M610 356 C655 310 725 318 746 370" fill="none" stroke="${C.mxy}" stroke-width="5" stroke-linecap="round"/><path d="M744 370 l-28 -4 l18 -22" fill="${C.mxy}"/>${pill(70,90,"B0"," = Z-axis",C.b0)}${pill(70,160,"Signal"," comes from rotating Mxy",C.mxy)}`);
+    }
+
+    function slide2() {
+      return svg(`${box(55, 80, 510, 520, "Outside magnetic field")}${randomSpins(90, 150, 440, 330, false)}${boldLabel(130, 540, "Net magnetisation", " tiny / absent", C.muted, 20)}${box(635, 80, 510, 520, "Inside B0")}${arrow(890, 560, 890, 160, C.b0, 9, "M0", 910, 180)}${randomSpins(675, 150, 430, 330, true)}${boldLabel(690, 540, "Parallel", " low energy", C.b0, 20)}${boldLabel(920, 540, "Anti-parallel", " high energy", C.rf, 20)}`);
+    }
+
+    function slide3() {
+      return svg(`${axes3D(520, 420, 0.95)}${arrow(520, 420, 520, 132, C.b0, 9, "B0", 544, 150)}<ellipse cx="520" cy="286" rx="160" ry="54" fill="none" stroke="${C.dephase}" stroke-width="5" stroke-dasharray="12 8"/>${arrow(520, 420, 648, 248, C.ink, 8, "Tilted spin", 660, 248)}<path d="M645 286 C690 250 690 320 647 286" fill="none" stroke="${C.dephase}" stroke-width="5"/><path d="M647 286 l24 -4 l-10 22" fill="${C.dephase}"/>${boldLabel(760, 160, "Larmor", " precession", C.dephase, 26)}<text x="760" y="225" font-size="34" font-weight="900" fill="${C.ink}">ω0 = γB0</text><text x="760" y="275" font-size="30" font-weight="900" fill="${C.ink}">f0 = γB0 / 2π</text>${pill(750, 330,"Higher B0", " = higher frequency", C.b0)}`);
+    }
+
+    function slide4() {
+      let spokes = "";
+      for (let i = 0; i < 18; i++) {
+        const a = i * Math.PI * 2 / 18;
+        spokes += spinArrow(760 + Math.cos(a) * 122, 390 + Math.sin(a) * 122, a, C.mxy, 45, 3);
+      }
+      return svg(`${axes3D(400, 430, 0.82)}${arrow(400,430,400,190,C.b0,10,"M0 / Mz",420,205)}${xyPlane(760,390,165,"Out-of-phase XY components")}${spokes}${boldLabel(660,610,"Net Mxy", " = zero", C.mxy, 26)}${pill(70,85,"Before RF", " magnetisation is longitudinal", C.b0)}`);
+    }
+
+    function slide5() {
+      return svg(`${box(55,95,315,430,"Before RF")}${axes3D(215,390,0.55)}${arrow(215,390,215,205,C.b0,8,"M0",235,210)}${box(445,95,315,430,"During RF")}${axes3D(605,390,0.55)}${drawWave(485,255,210,C.rf)}${arrow(515,355,640,290,C.rf,7,"B1 RF",655,290)}${arrow(605,390,690,292,C.rf,8,"Flip angle",705,305)}${box(835,95,315,430,"After 90° RF")}${axes3D(995,390,0.55)}${arrow(995,390,1150,390,C.mxy,9,"Mxy maximum",1008,565)}${boldLabel(870,565,"Mz", " approx zero", C.b0,20)}${boldLabel(84,625,"RF pulse", " creates transverse magnetisation and MR signal", C.rf,28)}`);
+    }
+
+    function drawWave(x, y, w, color) {
+      let d = "";
+      for (let i = 0; i <= w; i += 6) {
+        const yy = y + Math.sin(i * 0.12) * 28;
+        d += `${i ? "L" : "M"}${x+i} ${yy} `;
+      }
+      return `<path d="${d}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"/>`;
+    }
+
+    function flipMini(x, y, angle, title, note, color = C.mxy) {
+      const r = 92;
+      const rad = (angle - 90) * Math.PI / 180;
+      const endX = x + Math.sin(angle * Math.PI / 180) * r;
+      const endY = y - Math.cos(angle * Math.PI / 180) * r;
+      return `<g>${box(x-145,y-160,290,320,title)}${line(x,y+105,x,y-120,"axis")}${line(x-105,y,x+115,y,"axis")}<ellipse cx="${x}" cy="${y}" rx="105" ry="40" fill="rgba(22,163,74,0.08)" stroke="${C.mxy}" stroke-width="3"/>${arrow(x,y,endX,endY,color,8,"M",endX+8,endY-6)}${boldLabel(x-105,y+138,note,"",C.muted,17)}</g>`;
+    }
+
+    function slide6() {
+      return svg(`${flipMini(250,370,30,"30° pulse","partial excitation",C.mxy)}${flipMini(600,370,90,"90° pulse","maximum Mxy",C.mxy)}${flipMini(950,370,180,"180° pulse","inversion / refocusing",C.b0)}${boldLabel(135,650,"Flip angle", " controls Mz converted to Mxy", C.rf, 30)}`);
+    }
+
+    function slide7() {
+      return svg(`${graphAxes(95,110,560,390,"time","Mz")} ${curve(recoveryPath(95,110,560,390,4.3), C.b0)}${curve(recoveryPath(95,110,560,390,1.45), "#60a5fa", 6, "10 9")}${boldLabel(360,210,"Fat", " short T1", C.b0,22)}${boldLabel(420,365,"Water/CSF", " long T1", "#60a5fa",22)}${line(95,110,95,500,"axis")}${boldLabel(720,120,"Mz grows", " back along Z", C.b0,28)}${axes3D(895,460,0.55)}${arrow(790,500,790,425,C.b0,5,"early",755,420)}${arrow(900,500,900,330,C.b0,8,"later",920,345)}${arrow(1015,500,1015,245,C.b0,11,"near M0",1035,255)}${pill(730,610,"T1", " = longitudinal recovery", C.b0)}`);
+    }
+
+    function slide8() {
+      return svg(`${box(80,100,455,480,"Short TR: recovery before next RF")}${bar(210,505,70,250,C.b0,"Fat Mz high")}${bar(395,505,70,110,C.b0,"Water Mz low")} ${box(665,100,455,480,"After next RF pulse")}${arrow(790,405,940,405,C.mxy,16,"Fat large Mxy",755,470)}${arrow(790,505,855,505,C.mxy,10,"Water small Mxy",750,555)}${boldLabel(230,630,"T1-weighted", " = short TR highlights recovery differences", C.b0,28)}`);
+    }
+
+    function bar(x, base, w, h, color, label) {
+      return `<g><rect x="${x-w/2}" y="${base-h}" width="${w}" height="${h}" rx="16" fill="${color}" opacity="0.9"/><text x="${x}" y="${base+34}" text-anchor="middle" font-size="19" font-weight="900" fill="${color}">${esc(label)}</text></g>`;
+    }
+
+    function slide9() {
+      const xs = [230, 600, 970];
+      const labels = ["In phase", "Partly dephased", "Very dephased"];
+      let planes = "";
+      xs.forEach((x, idx) => {
+        planes += xyPlane(x,235,105,labels[idx]);
+        const spread = idx * 0.55;
+        for (let i = 0; i < 14; i++) {
+          const loc = i * Math.PI * 2 / 14;
+          const a = idx === 0 ? 0 : loc * spread;
+          planes += spinArrow(x + Math.cos(loc)*48, 235 + Math.sin(loc)*48, a, idx ? C.dephase : C.mxy, 34, 3);
+        }
+        planes += arrow(x,235,x + (idx === 0 ? 100 : idx === 1 ? 55 : 15),235, C.mxy, idx === 2 ? 5 : 8, "Mxy", x-45, 372);
+      });
+      return svg(`${planes}${graphAxes(175,450,850,170,"time after RF","Mxy")}${curve(decayPath(175,450,850,170,1.2), C.t2)}${curve(decayPath(175,450,850,170,3.0), "#ef4444", 6, "10 8")}${boldLabel(725,505,"Water/CSF", " long T2", "#ef4444",20)}${boldLabel(520,575,"Fat/solid", " shorter T2", C.t2,20)}`);
+    }
+
+    function slide10() {
+      return svg(`${graphAxes(135,120,880,410,"time after RF","Mxy signal")} ${curve(decayPath(135,120,880,410,0.95), C.t2)}${curve(decayPath(135,120,880,410,3.2), "#ef4444", 7)}${line(760,120,760,530,"thin dashed")}${boldLabel(770,155,"TE", " long", C.ink,24)}${boldLabel(760,300,"Water/CSF", " still high = bright", "#ef4444",24)}${boldLabel(430,500,"Fat/soft tissue", " low = darker", C.t2,24)}${pill(150,610,"T2-weighted", " = long TE shows decay differences", C.t2)}`);
+    }
+
+    function slide11() {
+      return svg(`${box(55,70,520,560,"T1: longitudinal recovery")}${axes3D(300,390,0.48)}${arrow(300,430,300,220,C.b0,10,"Mz returns",322,245)}${graphAxes(95,460,420,105,"time","Mz")}${curve(recoveryPath(95,460,420,105,3.1),C.b0,5)}${box(625,70,520,560,"T2: transverse dephasing")}${xyPlane(885,310,120,"XY plane")}${arrow(885,310,1010,310,C.mxy,8,"Mxy",1018,318)}${graphAxes(665,460,420,105,"time","Mxy")}${curve(decayPath(665,460,420,105,2.2),C.t2,5)}${table(350,145)}${table(930,145,true)}`);
+    }
+
+    function table(x, y, t2 = false) {
+      const rows = t2 ? [["Direction","XY plane"],["Process","decay"],["Magnetisation","Mxy"],["Controlled by","TE"],["Bright tissue","long T2"]] : [["Direction","Z-axis"],["Process","recovery"],["Magnetisation","Mz"],["Controlled by","TR"],["Bright tissue","short T1"]];
+      let out = `<g>`;
+      rows.forEach((r,i)=>{ out += `<text x="${x}" y="${y+i*32}" font-size="17" fill="${C.ink}"><tspan font-weight="900">${r[0]}:</tspan><tspan font-weight="700"> ${r[1]}</tspan></text>`; });
+      return out + `</g>`;
+    }
+
+    function slide12() {
+      return svg(`${graphAxes(120,110,880,430,"time","transverse signal")} ${curve(decayPath(120,110,880,430,1.4), C.t2)}${curve(decayPath(120,110,880,430,3.1), C.dephase, 7, "12 10")}${boldLabel(700,310,"T2", " true spin-spin decay", C.t2,24)}${boldLabel(430,445,"T2*", " faster: T2 + field inhomogeneity", C.dephase,24)}${pill(145,610,"Gradient echo", " sensitive to T2*", C.dephase)}${pill(520,610,"Spin echo", " refocuses much static dephasing", C.b0)}`);
+    }
+
+    function slide13() {
+      const steps = [["90° excitation",C.rf],["Dephasing",C.dephase],["180° refocus",C.rf],["Spin echo at TE",C.signal]];
+      let out = "";
+      steps.forEach((s,i)=>{ const x=80+i*280; out += box(x,120,230,390,s[0]); out += xyPlane(x+115,300,78,""); if(i===0) out += arrow(x+115,300,x+205,300,C.mxy,8,"Mxy",x+70,430); if(i===1){ for(let k=0;k<9;k++) out += spinArrow(x+115,300,k*0.7,C.dephase,55,3); } if(i===2) out += drawWave(x+48,430,140,C.rf)+boldLabel(x+60,490,"180°", " pulse", C.rf,22); if(i===3) out += arrow(x+115,300,x+205,300,C.signal,10,"Echo",x+72,430); if(i<3) out += arrow(x+235,315,x+275,315,C.ink,4); });
+      return svg(`${out}${boldLabel(150,630,"Spin echo", " refocuses reversible dephasing and peaks at TE", C.signal,28)}`);
+    }
+
+    function slide14() {
+      return svg(`${box(70,100,1060,420,"Gradient = controlled change in field strength with position")}<defs><linearGradient id="gradRamp" x1="0" x2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs><rect x="150" y="230" width="760" height="170" rx="28" fill="url(#gradRamp)" stroke="${C.b0}" stroke-width="3"/>${boldLabel(170,265,"Low field", " side", C.b0,22)}${boldLabel(720,265,"High field", " side", C.b0,22)}${arrow(170,450,890,450,C.grad,9,"Gradient direction",420,490)}<text x="185" y="170" font-size="34" font-weight="900" fill="${C.ink}">B = B0 + gradient × position</text>${pill(125,585,"Gradients", " localise signal; they do not create signal", C.grad)}`);
+    }
+
+    function slide15() {
+      let slices=""; for(let i=0;i<7;i++){ const y=135+i*58; const sel=i===3; slices += `<rect x="250" y="${y}" width="430" height="42" rx="10" fill="${sel?'rgba(22,163,74,0.18)':'#f8fbfd'}" stroke="${sel?C.mxy:C.line}" stroke-width="${sel?5:2}"/>${boldLabel(270,y+28,sel?'Selected slice':'Non-selected slice','',sel?C.mxy:C.muted,18)}`; }
+      return svg(`${box(80,80,1040,520,"Slice selection gradient Gz")}${slices}${arrow(740,540,740,125,C.grad,9,"Gz",760,155)}${drawWave(760,365,230,C.rf)}${boldLabel(800,330,"RF bandwidth", " matches one slice", C.rf,22)}${pill(130,625,"Slice selection", " = gradient + RF pulse", C.grad)}${pill(520,625,"Thicker bandwidth", " = thicker slice", C.rf)}${pill(875,625,"Stronger gradient", " = thinner slice", C.grad)}`);
+    }
+
+    function slide16() {
+      let rows=""; for(let r=0;r<5;r++){ const y=160+r*78; rows += `<rect x="210" y="${y}" width="690" height="56" fill="${r%2?'#fbfdff':'#f1f7fb'}" stroke="${C.line}"/>`; for(let c=0;c<6;c++){ rows += spinArrow(285+c*105,y+28,(r-2)*0.45,C.mxy,35,3); } }
+      return svg(`${box(95,95,1010,520,"Phase encoding gradient Gy")}${rows}${arrow(150,545,150,150,C.grad,9,"Gy",170,175)}${boldLabel(245,555,"Gy applied briefly", " before readout", C.grad,24)}${boldLabel(245,605,"Different Y positions", " keep different phase shifts", C.mxy,24)}`);
+    }
+
+    function slide17() {
+      let cols=""; for(let c=0;c<5;c++){ const x=190+c*165; cols += `<rect x="${x}" y="150" width="120" height="310" fill="${c%2?'#fbfdff':'#f1f7fb'}" stroke="${C.line}"/>`; cols += spinArrow(x+60,285,c*0.22,C.mxy,42,3); cols += waveSmall(x+18,500,84,0.06+c*0.035); }
+      return svg(`${box(80,95,1040,520,"Frequency encoding gradient Gx")}${cols}${arrow(165,475,935,475,C.grad,9,"Gx on during readout",405,455)}${boldLabel(170,610,"Different X positions", " produce different frequencies", C.mxy,25)}`);
+    }
+
+    function waveSmall(x,y,w,f) { let d=""; for(let i=0;i<=w;i+=4){ const yy=y+Math.sin(i*f)*20; d += `${i?'L':'M'}${x+i} ${yy} `;} return `<path d="${d}" fill="none" stroke="${C.signal}" stroke-width="4"/>`; }
+
+    function slide18() {
+      const x=[115,470,825], titles=["1. Slice", "2. Phase", "3. Frequency"]; let out="";
+      titles.forEach((t,i)=>{ out+=box(x[i],120,260,360,t); });
+      out += `${arrow(185,400,185,210,C.grad,7,"Gz + RF",200,230)}${drawWave(220,320,100,C.rf)}${xyPlane(600,300,88,"Rows")}${arrow(520,420,680,420,C.grad,6,"Gy",585,460)}${xyPlane(955,300,88,"Columns")}${arrow(875,420,1035,420,C.grad,6,"Gx",940,460)}${arrow(380,300,455,300,C.ink,4)}${arrow(735,300,810,300,C.ink,4)}${boldLabel(180,610,"Slice", " chooses slice", C.grad,22)}${boldLabel(500,610,"Phase", " identifies rows", C.grad,22)}${boldLabel(825,610,"Frequency", " identifies columns", C.grad,22)}`;
+      return svg(out);
+    }
+
+    function slide19() {
+      return svg(`${kspaceGrid(190,115,520,440,7)}${boldLabel(245,90,"K-space", " raw spatial frequency data", C.cyan,30)}${arrow(150,365,730,365,C.mxy,7,"frequency encoding samples along line",250,405)}${arrow(450,590,450,125,C.grad,7,"phase encoding chooses ky line",470,160)}${boldLabel(735,245,"Centre", " contrast and signal strength", C.cyan,24)}${boldLabel(735,315,"Outer k-space", " detail and spatial resolution", C.cyan,24)}${pill(735,420,"Fourier transform", " converts k-space into image", C.ink)}`);
+    }
+
+    function slide20() {
+      const labels=[['Hydrogen spins','in B0',C.b0],['Net M0','along Z',C.b0],['RF pulse','tips into XY',C.rf],['Mxy signal','received by coil',C.mxy],['T1 + T2','relaxation',C.t2],['Gradients','localise signal',C.grad],['K-space','filled',C.cyan],['MRI image','reconstructed',C.signal]];
+      let out=""; labels.forEach((l,i)=>{ const row=i<4?0:1; const col=i%4; const x=65+col*280; const y=135+row*245; out+=`<rect x="${x}" y="${y}" width="220" height="130" rx="24" fill="#fbfdff" stroke="${l[2]}" stroke-width="4"/>${boldLabel(x+22,y+52,l[0],"",l[2],24)}${boldLabel(x+22,y+88,l[1],"",C.muted,18)}`; if(i!==3 && i!==7) out+=arrow(x+224,y+65,x+272,y+65,C.ink,4); if(i===3) out+=arrow(x+110,y+138,x+110,y+224,C.ink,4); });
+      return svg(`${out}${boldLabel(190,635,"MRI signal", " comes from Mxy; location comes from gradients", C.ink,30)}`);
+    }
+
+    const slides = [
+      { title: "MRI Coordinate System", caption: "B0 is along Z. Transverse signal rotates in XY.", trap: "B0 is the Z-axis.", points: ["Blue = B0 / longitudinal magnetisation.", "Green = XY transverse plane / Mxy.", "Signal comes from rotating transverse magnetisation."], diagram: slide1 },
+      { title: "Hydrogen Spins Before B0", caption: "Random spins cancel; B0 creates net M0.", trap: "Net M0 is a small population imbalance.", points: ["Outside B0, spin directions are random.", "In B0, slightly more spins are low-energy parallel.", "This creates longitudinal M0 along Z."], diagram: slide2 },
+      { title: "Precession Around B0", caption: "Spins precess around B0 at the Larmor frequency.", trap: "Spins precess; they do not simply stand still.", points: ["B0 is vertical along Z.", "Higher B0 means higher precession frequency.", "Larmor frequency links field strength to resonance."], diagram: slide3 },
+      { title: "Net Magnetisation Before RF Pulse", caption: "Before RF, net magnetisation is longitudinal.", trap: "No phase coherence means no net Mxy.", points: ["Transverse components cancel.", "M0 points up along Z.", "RF is needed to create transverse magnetisation."], diagram: slide4 },
+      { title: "RF Pulse B1 and Flip Angle", caption: "A 90° RF pulse creates maximum transverse magnetisation.", trap: "RF pulse creates transverse magnetisation.", points: ["B1 is applied in the transverse plane.", "RF must be at the Larmor frequency.", "A 90° pulse tips M0 into XY."], diagram: slide5 },
+      { title: "Different Flip Angles", caption: "Flip angle controls how much Mz becomes Mxy.", trap: "180° may invert or refocus depending on sequence context.", points: ["30° = partial excitation.", "90° = maximum transverse signal.", "180° = inversion or refocusing pulse."], diagram: slide6 },
+      { title: "T1 Recovery: Longitudinal Relaxation", caption: "T1 is regrowth of Mz along Z.", trap: "T1 is recovery, not decay.", points: ["Mz starts low after a 90° pulse.", "Short T1 tissue recovers faster.", "Fat recovers faster than CSF conceptually."], diagram: slide7 },
+      { title: "T1 Weighting", caption: "Short TR shows differences in longitudinal recovery.", trap: "TR mainly controls T1 weighting.", points: ["Fat recovers more Mz before the next pulse.", "More Mz becomes more Mxy after RF.", "Fat is bright on many T1-weighted images."], diagram: slide8 },
+      { title: "T2 Decay: Transverse Relaxation", caption: "T2 is decay of Mxy by dephasing.", trap: "T2 is transverse decay, not longitudinal recovery.", points: ["After RF, spins are initially in phase.", "They spread out in the XY plane.", "Net Mxy shrinks as phases cancel."], diagram: slide9 },
+      { title: "T2 Weighting", caption: "Long TE shows differences in transverse decay.", trap: "TE mainly controls T2 weighting.", points: ["Short-T2 tissues lose signal by long TE.", "Long-T2 tissues retain signal longer.", "Water/CSF is bright on T2-weighted images."], diagram: slide10 },
+      { title: "T1 vs T2 Side-by-Side", caption: "T1 asks Mz recovery; T2 asks Mxy decay.", trap: "Do not swap T1 and T2 directions.", points: ["T1: Z-axis, recovery, Mz, TR.", "T2: XY plane, decay, Mxy, TE.", "Both occur after RF excitation."], diagram: slide11 },
+      { title: "T2* and Magnetic Field Inhomogeneity", caption: "T2* is faster because it adds field inhomogeneity.", trap: "T2* is not the same as T2.", points: ["T2 is true spin-spin transverse decay.", "T2* adds B0 inhomogeneity and susceptibility.", "Spin echo refocuses much static dephasing."], diagram: slide12 },
+      { title: "Spin Echo Refocusing", caption: "The 180° pulse refocuses reversible dephasing.", trap: "Spin echo refocuses static dephasing; gradient echo does not.", points: ["90° pulse creates Mxy.", "Spins dephase in the XY plane.", "180° pulse forms an echo at TE."], diagram: slide13 },
+      { title: "Gradients Basic Concept", caption: "Gradients allow localisation of MRI signal.", trap: "Gradients localise signal; they do not create signal.", points: ["A gradient changes B0 with position.", "Different positions have different frequency or phase.", "This is how the scanner localises signal."], diagram: slide14 },
+      { title: "Slice Selection Gradient", caption: "Slice selection uses Gz plus an RF pulse.", trap: "Slice selection = gradient + RF pulse.", points: ["Gz changes frequency along Z.", "RF bandwidth selects a frequency range.", "Only the matching slice is excited."], diagram: slide15 },
+      { title: "Phase Encoding Gradient", caption: "Phase encoding stores Y-position as phase.", trap: "Phase encoding = phase.", points: ["Gy is applied briefly before readout.", "Rows acquire different phase shifts.", "The gradient is off during readout."], diagram: slide16 },
+      { title: "Frequency Encoding / Readout Gradient", caption: "Frequency encoding stores X-position as frequency.", trap: "Frequency encoding = frequency.", points: ["Gx is on during signal readout.", "Columns precess at different frequencies.", "The recorded signal contains position information."], diagram: slide17 },
+      { title: "How Encoding Works Together", caption: "Slice, phase and frequency encoding identify location.", trap: "Gradients encode position, not image brightness directly.", points: ["Gz + RF chooses the slice.", "Gy identifies rows by phase.", "Gx identifies columns by frequency."], diagram: slide18 },
+      { title: "K-space Simple Explanation", caption: "K-space is raw data before Fourier transform.", trap: "One phase-encoding step fills one k-space line.", points: ["Frequency encoding samples across a line.", "Phase encoding chooses which line.", "Fourier transform reconstructs the image."], diagram: slide19 },
+      { title: "Complete MRI Signal Journey", caption: "Signal comes from Mxy; location comes from gradients.", trap: "Do not confuse signal creation with spatial localisation.", points: ["B0 creates M0 along Z.", "RF tips M0 into XY, creating Mxy.", "Gradients fill k-space before image reconstruction."], diagram: slide20 }
+    ];
+
+    let current = 0;
+    const deck = document.getElementById("deck");
+    const thumbs = document.getElementById("thumbs");
+    const progressBar = document.getElementById("progressBar");
+    const posterBtn = document.getElementById("posterBtn");
+
+    function render() {
+      deck.innerHTML = slides.map((slide, i) => `
+        <article class="slide ${i === current ? "active" : ""}" id="slide-${i + 1}">
+          <div class="visual-card">${slide.diagram()}</div>
+          <aside class="notes">
+            <span class="slide-num">Slide ${i + 1} of ${slides.length}</span>
+            <h2>${esc(slide.title)}</h2>
+            <p class="caption"><strong>${esc(slide.caption.split(" ")[0])}</strong> ${esc(slide.caption.split(" ").slice(1).join(" "))}</p>
+            <ul class="key-list">${slide.points.map(point => `<li>${boldFirst(point)}</li>`).join("")}</ul>
+            <div class="trap"><strong>Exam trap:</strong> ${esc(slide.trap)}</div>
+          </aside>
+        </article>
+      `).join("");
+      thumbs.innerHTML = slides.map((slide, i) => `<button class="chip ${i === current ? "active" : ""}" type="button" data-slide="${i}">${i + 1}. ${esc(slide.title)}</button>`).join("");
+      progressBar.style.width = `${((current + 1) / slides.length) * 100}%`;
+    }
+
+    function boldFirst(text) {
+      const idx = text.indexOf(" ");
+      if (idx === -1) return `<strong>${esc(text)}</strong>`;
+      return `<strong>${esc(text.slice(0, idx))}</strong>${esc(text.slice(idx))}`;
+    }
+
+    function setSlide(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      render();
+      if (!document.body.classList.contains("poster")) window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => setSlide(current - 1));
+    document.getElementById("nextBtn").addEventListener("click", () => setSlide(current + 1));
+    document.getElementById("firstBtn").addEventListener("click", () => setSlide(0));
+    document.getElementById("lastBtn").addEventListener("click", () => setSlide(slides.length - 1));
+    thumbs.addEventListener("click", event => {
+      const btn = event.target.closest("[data-slide]");
+      if (btn) setSlide(Number(btn.dataset.slide));
+    });
+    posterBtn.addEventListener("click", () => {
+      document.body.classList.toggle("poster");
+      posterBtn.textContent = document.body.classList.contains("poster") ? "Slide View" : "Poster View";
+      render();
+    });
+    window.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight") setSlide(current + 1);
+      if (event.key === "ArrowLeft") setSlide(current - 1);
+    });
+
+    render();
+  </script>
+</body>
+</html>

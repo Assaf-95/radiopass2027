@@ -1,0 +1,52 @@
+/* The volume and its console annotations. Positioning of the whole layer is
+   owned by whatever mounts it; this file only lays out the inside. */
+
+.scan-volume {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.scan-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- DICOM corner overlay -------------------------------------------------
+   Real workstations put study identity top-left, the current window preset
+   top-right, technique bottom-left and table position bottom-right. Keeping
+   that arrangement is the point: a radiologist reads it without looking. */
+
+.dcm {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.72;
+}
+
+.dcm-strong {
+  color: var(--text-dim);
+}
+
+.dcm-tl { top: 22px; left: 24px; }
+.dcm-tr { top: 22px; right: 24px; text-align: right; align-items: flex-end; }
+.dcm-bl { bottom: 22px; left: 24px; }
+.dcm-br { bottom: 22px; right: 24px; text-align: right; align-items: flex-end; }
+
+/* Below the breakpoint the copy sits over the volume, so drop the two
+   overlays that would collide with it. */
+@media (max-width: 900px) {
+  .dcm { font-size: 9px; }
+  .dcm-tl, .dcm-bl { display: none; }
+  .dcm-tr { top: 14px; right: 16px; }
+  .dcm-br { bottom: 14px; right: 16px; }
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hydrogen Spins, Pulses and Encoding — Radiopass</title>
+<meta name="description" content="From one hydrogen spin to a full pulse sequence, one idea at a time — Radiopass visual lab." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/guided-steps.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="gs-header">
+  <div class="shell">
+    <div class="gs-header-top">
+      <div>
+        <span class="eyebrow">MRI · Spins, Pulses & Encoding</span>
+        <h1 class="gs-title">From one spin to a full sequence.</h1>
+        <p class="lede gs-subtitle">Every pulse sequence is built from the same handful of ideas, added one at a time. Here they are, in order.</p>
+      </div>
+      <div class="gs-progress-pill" id="gs-progress">STEP 1 / 8</div>
+    </div>
+    <a href="mri-dephasing-full.html" class="btn btn-ghost gs-full-link">open the full simulator</a>
+  </div>
+</header>
+
+<div class="shell gs-layout">
+  <div class="card glass gs-stage-card">
+    <div class="gs-stage-head">
+      <span id="gs-chip"></span>
+      <div class="gs-timeline" id="gs-timeline"></div>
+    </div>
+    <div class="gs-stage-svg-wrap">
+      <svg id="gs-stage" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="card glass gs-teach-card">
+    <h2 class="gs-step-title" id="gs-step-title"></h2>
+    <p class="gs-step-text" id="gs-step-text"></p>
+    <ul class="gs-notes" id="gs-notes"></ul>
+    <div class="gs-nav">
+      <button type="button" class="btn btn-ghost" id="gs-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="gs-next">Next</button>
+    </div>
+    <div class="gs-reset-row"><button type="button" id="gs-reset">restart from step 1</button></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/mri-vector-kit.js"></script>
+<script src="../../assets/js/guided-steps.js"></script>
+<script>
+(function () {
+  var K = window.MriVectorKit;
+  var cx = 430, cy = 200;
+
+  var STEPS = [
+    {
+      title: "One spin, no field",
+      chip: "Before B0",
+      text: "Before any external magnetic field, a hydrogen spin precesses randomly — no preferred direction, no net magnetisation.",
+      notes: ["No strong external field means random local fields dominate.", "Frequency and phase are both random.", "Net magnetisation is essentially zero."]
+    },
+    {
+      title: "Turn on B0",
+      chip: "After B0",
+      text: "In the main field, the spin's precession settles close to the Larmor frequency. Field imperfections still cause slight dephasing, but a net Mz starts to form.",
+      notes: ["The field is mostly homogeneous, with small real-world imperfections.", "Precession is now approximately at the Larmor frequency.", "Mz — longitudinal magnetisation — starts to form."]
+    },
+    {
+      title: "Now a whole array of spins",
+      chip: "Multi-spin array",
+      text: "Real tissue isn't one spin — it's an enormous array of them. Each one sees a very slightly different local field, so they don't all behave identically.",
+      notes: ["This is where dephasing across a population becomes meaningful.", "Small local field differences are the seed of T2* decay.", "The net signal is the sum of every spin in the array."]
+    },
+    {
+      title: "90° RF pulse",
+      chip: "After 90°",
+      text: "The RF pulse tips the array into the transverse plane. B1 field uniformity matters here — it determines how evenly every spin gets tipped.",
+      notes: ["Spins move into phase in the transverse plane.", "Mxy appears; Mz is reduced correspondingly.", "This is the moment a detectable MR signal is created."]
+    },
+    {
+      title: "RF off — dephasing begins",
+      chip: "T2* decay",
+      text: "Once the RF pulse ends, field inhomogeneity takes over. Phase coherence across the array is lost — Mxy decays — while, independently, Mz starts recovering.",
+      notes: ["Inhomogeneity is the main driver of T2* decay.", "Mxy decay and Mz recovery happen at the same time, for different reasons.", "This is the FID you'd see with no refocusing pulse."]
+    },
+    {
+      title: "180° pulse — rephasing",
+      chip: "Spin echo",
+      text: "A 180° pulse refocuses the static-field part of the dephasing. Spins rephase back toward coherence, producing a true spin-echo signal — governed by real T2, not T2*.",
+      notes: ["Static inhomogeneity is refocused; true T2 relaxation isn't.", "This is what separates spin echo from plain FID.", "The echo forms once rephasing peaks."]
+    },
+    {
+      title: "Add the encoding gradients",
+      chip: "Gz · Gy · Gx",
+      text: "Three gradients do three separate jobs: slice-select (Gz) picks which slice gets excited, phase-encode (Gy) and frequency-encode (Gx) tag each spin's position within that slice.",
+      notes: ["Gz — slice select — determines which plane responds to the RF pulse.", "Gy — phase encode — applied once per repetition, encodes one spatial axis.", "Gx — frequency encode — applied during readout, encodes the other axis."]
+    },
+    {
+      title: "Ready for the full simulator",
+      chip: "Full simulator available",
+      text: "The full version lets you trigger each pulse and gradient manually or run them automatically, take snapshots at T2/TE/TR, and see the sequence graph and per-row phase across the whole array.",
+      notes: ["Manual mode: build the sequence pulse by pulse, at your own pace.", "Auto mode: watch the whole sequence run in order.", "The FRCR summary table condenses all five phase states into one reference."]
+    }
+  ];
+
+  function renderScene(i, svg) {
+    var step = i + 1;
+    var showB0 = step >= 2;
+    var showArray = step >= 3;
+    var showRf = step >= 4 && step <= 5;
+    var mxyDecaying = step === 5;
+    var show180 = step === 6;
+    var showGrad = step === 7;
+    var showBridge = step === 8;
+
+    var scene = '';
+
+    if (!showArray) {
+      // single spin
+      scene += K.pool(cx, cy, '#5FE3F2', 'Single hydrogen', 0, 0);
+    } else if (!showGrad && !showBridge) {
+      // grid of small pools representing the array
+      var positions = [[280,150],[430,150],[580,150],[280,260],[430,260],[580,260]];
+      positions.forEach(function (p, idx) {
+        var spread = mxyDecaying ? 2.2 : 0;
+        scene += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="34" fill="#5FE3F2" opacity="0.10" stroke="#5FE3F2" stroke-width="1.2"/>';
+        var ang = idx * 0.9 + (mxyDecaying ? idx * 0.6 : 0);
+        scene += K.phaseVector(p[0], p[1], ang, 26, show180 ? '#16BFA6' : '#5FE3F2');
+      });
+    }
+
+    if (showB0 && !showGrad && !showBridge) {
+      scene += '<line x1="' + cx + '" y1="' + (cy + 170) + '" x2="' + cx + '" y2="' + (cy - 170) + '" stroke="#5FE3F2" stroke-width="4" marker-end="url(#gs-arrow)"/>';
+      scene += K.label(cx + 20, cy - 155, 'B0', '#5FE3F2', 'start', 18);
+    }
+
+    if (showRf) {
+      scene += K.label(cx, cy - 190, '90° RF pulse', '#F2B84B', 'middle', 16);
+    }
+    if (show180) {
+      scene += K.label(cx, cy - 190, '180° refocusing pulse', '#16BFA6', 'middle', 16);
+    }
+
+    if (showGrad) {
+      var grads = [
+        { name: 'Gz — slice select', y: 160, colour: '#5FE3F2' },
+        { name: 'Gy — phase encode', y: 250, colour: '#A78BFA' },
+        { name: 'Gx — frequency encode', y: 340, colour: '#F2B84B' }
+      ];
+      grads.forEach(function (g) {
+        scene += '<rect x="120" y="' + (g.y - 22) + '" width="580" height="44" rx="10" fill="' + g.colour + '" opacity="0.10" stroke="' + g.colour + '" stroke-width="1.4"/>';
+        scene += K.label(430, g.y + 6, g.name, g.colour, 'middle', 16);
+      });
+    }
+
+    if (showBridge) {
+      scene +=
+        '<rect x="90" y="120" width="680" height="260" rx="28" fill="rgba(6,11,20,0.6)" stroke="rgba(95,227,242,0.35)"/>' +
+        K.label(430, 175, 'Full simulator preserved', '#5FE3F2', 'middle', 24) +
+        K.label(430, 215, 'Manual + auto pulses · snapshots · sequence graph · row phase · FRCR summary table', '#EAF3FB', 'middle', 14) +
+        '<rect x="148" y="260" width="120" height="70" rx="14" fill="rgba(95,227,242,0.14)" stroke="#5FE3F2"/>' +
+        '<rect x="306" y="260" width="120" height="70" rx="14" fill="rgba(167,139,250,0.14)" stroke="#A78BFA"/>' +
+        '<rect x="464" y="260" width="120" height="70" rx="14" fill="rgba(242,184,75,0.14)" stroke="#F2B84B"/>' +
+        '<rect x="622" y="260" width="120" height="70" rx="14" fill="rgba(22,191,166,0.14)" stroke="#16BFA6"/>' +
+        K.label(208, 300, 'manual', '#AFF3FF') + K.label(366, 300, 'auto', '#D9CBFF') + K.label(524, 300, 'snapshots', '#FBE3B0') + K.label(682, 300, 'summary', '#9DEAD9');
+    }
+
+    svg.innerHTML = K.frame(scene);
+  }
+
+  window.GuidedSteps.init({ steps: STEPS, renderScene: renderScene });
+})();
+</script>
+</body>
+</html>

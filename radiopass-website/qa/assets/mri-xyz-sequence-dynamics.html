@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI XYZ Magnetisation and Sequence Dynamics</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --panel: #ffffff;
+      --line: #d8e6f7;
+      --ink: #0f172a;
+      --muted: #475569;
+      --water: #0ea5e9;
+      --fat: #16a34a;
+      --rf: #dc2626;
+      --gz: #7c3aed;
+      --gy: #d97706;
+      --gx: #0369a1;
+      --adc: #0f766e;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --warn: #b45309;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 18px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 12% 14%, #fff, var(--bg));
+    }
+
+    .layout {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.11);
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      max-height: calc(100vh - 28px);
+      overflow: auto;
+      position: sticky;
+      top: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .btn2, .btn3 {
+      display: grid;
+      gap: 8px;
+    }
+
+    .btn2 { grid-template-columns: 1fr 1fr; }
+    .btn3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #fff;
+      font-weight: 650;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+      font-size: 0.84rem;
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #475569, #334155);
+    }
+
+    button.warn {
+      background: linear-gradient(120deg, #b45309, #d97706);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .views {
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    #blochCanvas { aspect-ratio: 16 / 8.8; }
+    #timelineCanvas { aspect-ratio: 16 / 2.7; }
+    #signalCanvas { aspect-ratio: 16 / 2.9; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px;
+      background: #f8fbff;
+    }
+
+    .explain {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #f8fbff;
+      font-size: 0.88rem;
+      line-height: 1.38;
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>MRI XYZ Dynamics Simulator</h1>
+      <p class="subtitle">Real-time magnetisation, coherence, RF/gradient effects, dephasing/rephasing, and echo formation for water (blue) and fat (green).</p>
+
+      <section class="section">
+        <div class="btn2">
+          <button id="rf90Btn">Apply 90° RF</button>
+          <button id="rf180Btn" class="warn">Apply 180° RF</button>
+        </div>
+        <div class="btn2">
+          <button id="rfSlice90Btn">Apply 90° RF + Gz Slice</button>
+          <button id="applyRfBtn">Apply RF (Flip)</button>
+        </div>
+        <div class="row"><span>Flip angle</span><strong id="flipVal">90°</strong></div>
+        <input id="flipSlider" type="range" min="0" max="180" step="1" value="90" />
+        <div class="btn2">
+          <button id="resetBtn" class="secondary">Reset</button>
+          <button id="sliceBtn">Slice Select (Gz+RF)</button>
+        </div>
+        <div class="row"><span>RF duration</span><strong id="rfDurVal">3.0 ms</strong></div>
+        <input id="rfDurSlider" type="range" min="0.5" max="10" step="0.1" value="3" />
+        <div class="row"><span>B1 amplitude</span><strong id="b1Val">1.00</strong></div>
+        <input id="b1Slider" type="range" min="0.2" max="2.0" step="0.05" value="1" />
+        <div class="row"><span>RF frequency offset Δf</span><strong id="rfOffVal">0 Hz</strong></div>
+        <input id="rfOffSlider" type="range" min="-400" max="400" step="5" value="0" />
+        <label class="check"><input id="onResToggle" type="checkbox" checked /> On resonance (if off: reduced tip + phase error)</label>
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="showWaterToggle" type="checkbox" checked /> Show water vectors and packet</label>
+        <label class="check"><input id="showFatToggle" type="checkbox" checked /> Show fat vectors and packet</label>
+        <div class="row"><span>T1 water</span><strong id="t1WaterVal">1800 ms</strong></div>
+        <input id="t1WaterSlider" type="range" min="300" max="3500" step="20" value="1800" />
+        <div class="row"><span>T2 water</span><strong id="t2WaterVal">100 ms</strong></div>
+        <input id="t2WaterSlider" type="range" min="20" max="350" step="5" value="100" />
+        <div class="row"><span>T1 fat</span><strong id="t1FatVal">300 ms</strong></div>
+        <input id="t1FatSlider" type="range" min="120" max="900" step="10" value="300" />
+        <div class="row"><span>T2 fat</span><strong id="t2FatVal">80 ms</strong></div>
+        <input id="t2FatSlider" type="range" min="20" max="250" step="5" value="80" />
+        <div class="row"><span>Fat-water chemical shift Δf</span><strong id="chemVal">220 Hz</strong></div>
+        <input id="chemSlider" type="range" min="50" max="500" step="5" value="220" />
+      </section>
+
+      <section class="section">
+        <div class="btn2">
+          <button id="sliceRefocusBtn" class="secondary">Toggle Slice Refocus</button>
+          <button id="clearEventsBtn" class="secondary">Clear Timeline</button>
+        </div>
+        <div class="row"><span>Gz strength</span><strong id="gzVal">5.0</strong></div>
+        <input id="gzSlider" type="range" min="1" max="12" step="0.2" value="5" />
+        <div class="row"><span>RF bandwidth</span><strong id="bwVal">2000 Hz</strong></div>
+        <input id="bwSlider" type="range" min="400" max="5000" step="50" value="2000" />
+        <div class="row"><span>Slice thickness ~ BW/Gz</span><strong id="sliceThickVal">0.40</strong></div>
+      </section>
+
+      <section class="section">
+        <div class="btn3">
+          <button id="gyBtn">Apply Gy</button>
+          <button id="gxReadBtn">Apply Gx+ADC</button>
+          <button id="rf180Btn2" class="warn">Apply 180° RF</button>
+        </div>
+        <div class="row"><span>Gy amplitude</span><strong id="gyAmpVal">3.0</strong></div>
+        <input id="gyAmpSlider" type="range" min="0" max="8" step="0.1" value="3" />
+        <div class="row"><span>Gy duration</span><strong id="gyDurVal">2.0 ms</strong></div>
+        <input id="gyDurSlider" type="range" min="0.2" max="8" step="0.1" value="2" />
+        <div class="row"><span>Gx amplitude</span><strong id="gxAmpVal">4.0</strong></div>
+        <input id="gxAmpSlider" type="range" min="0" max="10" step="0.1" value="4" />
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="inhomToggle" type="checkbox" checked /> Include B0 inhomogeneity (T2*)</label>
+        <label class="check"><input id="pureT2Toggle" type="checkbox" /> Pure T2 only (disable T2* spread)</label>
+        <div class="row"><span>Simulation speed</span><strong id="speedVal">0.50x</strong></div>
+        <input id="speedSlider" type="range" min="0.2" max="1.5" step="0.05" value="0.5" />
+      </section>
+    </aside>
+
+    <section class="card views">
+      <canvas id="blochCanvas" width="1060" height="560"></canvas>
+      <canvas id="timelineCanvas" width="1060" height="180"></canvas>
+      <canvas id="signalCanvas" width="1060" height="200"></canvas>
+
+      <div class="legend">
+        <span><span class="dot" style="background: var(--water);"></span>Water</span>
+        <span><span class="dot" style="background: var(--fat);"></span>Fat</span>
+        <span><span class="dot" style="background: var(--rf);"></span>RF</span>
+        <span><span class="dot" style="background: var(--gz);"></span>Gz</span>
+        <span><span class="dot" style="background: var(--gy);"></span>Gy</span>
+        <span><span class="dot" style="background: var(--gx);"></span>Gx</span>
+        <span><span class="dot" style="background: var(--adc);"></span>ADC</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric" id="waterMetric">Water: Mz=1.000, Mxy=0.000</div>
+        <div class="metric" id="fatMetric">Fat: Mz=1.000, Mxy=0.000</div>
+        <div class="metric" id="phaseMetric">Δphase(w-f)=0.0°</div>
+        <div class="metric" id="cohMetric">Coherence=1.00</div>
+        <div class="metric" id="stateMetric">State: equilibrium</div>
+        <div class="metric" id="echoMetric">Echo: waiting</div>
+      </div>
+
+      <div class="explain" id="explainBox">
+        Press an RF button to start. The simulator will explain each step (in phase, dephasing, rephasing, echo, and T1 recovery) and why it occurs.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Physics assumptions used here:
+    // 1) Bloch relaxation (Euler form each step):
+    //    dMx/dt = -Mx/T2, dMy/dt = -My/T2, dMz/dt = (M0-Mz)/T1
+    // 2) Precession around z: transverse rotation by angle = 2π f dt
+    // 3) Chemical shift modeled as constant fat frequency offset relative to water.
+    // 4) 180° pulse sets a rephasing window for reversible static offsets (inhomogeneity), producing a visible echo.
+
+    const TRACKS = ["RF", "Gz", "Gy", "Gx", "ADC"];
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function wrapPi(a) {
+      while (a > Math.PI) a -= Math.PI * 2;
+      while (a < -Math.PI) a += Math.PI * 2;
+      return a;
+    }
+
+    function rotateXY(mx, my, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx: mx * c - my * s, my: mx * s + my * c };
+    }
+
+    function rotateAroundX(mx, my, mz, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx, my: my * c - mz * s, mz: my * s + mz * c };
+    }
+
+    function makeTissue(name, color, spinCount) {
+      const spins = [];
+      for (let i = 0; i < spinCount; i += 1) {
+        const ring = i % 6;
+        const row = Math.floor(i / 6);
+        spins.push({
+          mx: 0,
+          my: 0,
+          mz: 1,
+          xPos: (ring - 2.5) / 2.5,
+          yPos: (row === 0 ? -1 : 1) * ((ring % 3) - 1),
+          zPos: ((i % 4) - 1.5) / 1.5,
+          inhomHz: (Math.random() - 0.5) * 18
+        });
+      }
+      return { name, color, spins, T1: 1000, T2: 90 };
+    }
+
+    class MRISim {
+      constructor() {
+        this.blochCanvas = document.getElementById("blochCanvas");
+        this.timelineCanvas = document.getElementById("timelineCanvas");
+        this.signalCanvas = document.getElementById("signalCanvas");
+        this.bctx = this.blochCanvas.getContext("2d");
+        this.tctx = this.timelineCanvas.getContext("2d");
+        this.sctx = this.signalCanvas.getContext("2d");
+
+        this.ui = this.bindUI();
+
+        this.tissues = {
+          water: makeTissue("Water", "#0ea5e9", 12),
+          fat: makeTissue("Fat", "#16a34a", 12)
+        };
+
+        this.settings = {
+          showWater: true,
+          showFat: true,
+          flipDeg: 90,
+          rfDurationMs: 3,
+          b1Amp: 1,
+          rfOffsetHz: 0,
+          onResonance: true,
+          chemShiftHz: 220,
+          gzStrength: 5,
+          rfBandwidthHz: 2000,
+          gyAmp: 3,
+          gyDurMs: 2,
+          gxAmp: 4,
+          includeInhom: true,
+          pureT2Only: false,
+          speed: 0.5,
+          includeSliceRefocus: false
+        };
+
+        this.sim = {
+          nowMs: 0,
+          lastTs: performance.now(),
+          pulse: null,
+          readoutUntil: 0,
+          rephaseUntil: 0,
+          echoAt: null,
+          last90At: null,
+          sliceRefocus: null,
+          timelineEvents: [],
+          signal: [],
+          lastSignalSample: 0,
+          phaseState: "equilibrium",
+          explain: "Equilibrium: both tissues aligned with +z due to B0."
+        };
+
+        this.applyDefaults();
+        this.attachHandlers();
+        requestAnimationFrame((ts) => this.tick(ts));
+      }
+
+      bindUI() {
+        const ids = [
+          "rf90Btn","rf180Btn","rf180Btn2","rfSlice90Btn","applyRfBtn","resetBtn","flipSlider","flipVal","rfDurSlider","rfDurVal","b1Slider","b1Val",
+          "rfOffSlider","rfOffVal","onResToggle","t1WaterSlider","t1WaterVal","t2WaterSlider","t2WaterVal","t1FatSlider","t1FatVal",
+          "showWaterToggle","showFatToggle",
+          "t2FatSlider","t2FatVal","chemSlider","chemVal","sliceBtn","sliceRefocusBtn","gzSlider","gzVal","bwSlider","bwVal",
+          "sliceThickVal","gyBtn","gxReadBtn","clearEventsBtn","gyAmpSlider","gyAmpVal","gyDurSlider","gyDurVal","gxAmpSlider",
+          "gxAmpVal","inhomToggle","pureT2Toggle","speedSlider","speedVal","waterMetric","fatMetric","phaseMetric","cohMetric",
+          "stateMetric","echoMetric","explainBox"
+        ];
+        const out = {};
+        ids.forEach((id) => { out[id] = document.getElementById(id); });
+        return out;
+      }
+
+      applyDefaults() {
+        this.tissues.water.T1 = Number(this.ui.t1WaterSlider.value);
+        this.tissues.water.T2 = Number(this.ui.t2WaterSlider.value);
+        this.tissues.fat.T1 = Number(this.ui.t1FatSlider.value);
+        this.tissues.fat.T2 = Number(this.ui.t2FatSlider.value);
+        this.syncLabels();
+      }
+
+      attachHandlers() {
+        this.ui.rf90Btn.addEventListener("click", () => this.startRFPulse(90, false));
+        this.ui.rf180Btn.addEventListener("click", () => this.startRFPulse(180, false));
+        this.ui.rf180Btn2.addEventListener("click", () => this.startRFPulse(180, false));
+        this.ui.rfSlice90Btn.addEventListener("click", () => this.startRFPulse(90, true));
+        this.ui.applyRfBtn.addEventListener("click", () => this.startRFPulse(this.settings.flipDeg, false));
+        this.ui.resetBtn.addEventListener("click", () => this.resetAll());
+
+        this.ui.sliceBtn.addEventListener("click", () => this.startRFPulse(this.settings.flipDeg, true));
+        this.ui.sliceRefocusBtn.addEventListener("click", () => {
+          this.settings.includeSliceRefocus = !this.settings.includeSliceRefocus;
+          this.pushExplain(this.settings.includeSliceRefocus
+            ? "Slice refocusing lobe ON: compensates phase from slice-select gradient." 
+            : "Slice refocusing lobe OFF: residual slice-select phase remains.");
+        });
+
+        this.ui.gyBtn.addEventListener("click", () => this.applyGy());
+        this.ui.gxReadBtn.addEventListener("click", () => this.startReadout());
+        this.ui.clearEventsBtn.addEventListener("click", () => { this.sim.timelineEvents = []; });
+
+        const update = () => {
+          this.settings.flipDeg = Number(this.ui.flipSlider.value);
+          this.settings.rfDurationMs = Number(this.ui.rfDurSlider.value);
+          this.settings.b1Amp = Number(this.ui.b1Slider.value);
+          this.settings.rfOffsetHz = Number(this.ui.rfOffSlider.value);
+          this.settings.onResonance = this.ui.onResToggle.checked;
+          this.settings.showWater = this.ui.showWaterToggle.checked;
+          this.settings.showFat = this.ui.showFatToggle.checked;
+          this.tissues.water.T1 = Number(this.ui.t1WaterSlider.value);
+          this.tissues.water.T2 = Number(this.ui.t2WaterSlider.value);
+          this.tissues.fat.T1 = Number(this.ui.t1FatSlider.value);
+          this.tissues.fat.T2 = Number(this.ui.t2FatSlider.value);
+          this.settings.chemShiftHz = Number(this.ui.chemSlider.value);
+          this.settings.gzStrength = Number(this.ui.gzSlider.value);
+          this.settings.rfBandwidthHz = Number(this.ui.bwSlider.value);
+          this.settings.gyAmp = Number(this.ui.gyAmpSlider.value);
+          this.settings.gyDurMs = Number(this.ui.gyDurSlider.value);
+          this.settings.gxAmp = Number(this.ui.gxAmpSlider.value);
+          this.settings.includeInhom = this.ui.inhomToggle.checked;
+          this.settings.pureT2Only = this.ui.pureT2Toggle.checked;
+          this.settings.speed = Number(this.ui.speedSlider.value);
+          this.syncLabels();
+        };
+
+        [
+          this.ui.flipSlider,this.ui.rfDurSlider,this.ui.b1Slider,this.ui.rfOffSlider,this.ui.onResToggle,this.ui.t1WaterSlider,
+          this.ui.t2WaterSlider,this.ui.t1FatSlider,this.ui.t2FatSlider,this.ui.showWaterToggle,this.ui.showFatToggle,this.ui.chemSlider,this.ui.gzSlider,this.ui.bwSlider,
+          this.ui.gyAmpSlider,this.ui.gyDurSlider,this.ui.gxAmpSlider,this.ui.inhomToggle,this.ui.pureT2Toggle,this.ui.speedSlider
+        ].forEach((el) => el.addEventListener("input", update));
+      }
+
+      resetAll() {
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => {
+            s.mx = 0; s.my = 0; s.mz = 1;
+          });
+        });
+        this.sim.nowMs = 0;
+        this.sim.pulse = null;
+        this.sim.readoutUntil = 0;
+        this.sim.rephaseUntil = 0;
+        this.sim.echoAt = null;
+        this.sim.last90At = null;
+        this.sim.sliceRefocus = null;
+        this.sim.timelineEvents = [];
+        this.sim.signal = [];
+        this.sim.phaseState = "equilibrium";
+        this.pushExplain("System reset. At equilibrium, M aligns with +z. Apply RF to tip into transverse plane.");
+      }
+
+      getSliceThicknessNorm() {
+        const thick = clamp((this.settings.rfBandwidthHz / (this.settings.gzStrength * 1000)), 0.12, 1.8);
+        return thick;
+      }
+
+      pushEvent(track, durationMs, label, color) {
+        this.sim.timelineEvents.push({
+          track,
+          startMs: this.sim.nowMs,
+          durationMs,
+          label,
+          color
+        });
+      }
+
+      pushExplain(text) {
+        this.sim.explain = text;
+      }
+
+      applyImmediateRFPulseKick(pulse, kickFraction) {
+        const kick = pulse.rawFlipRad * kickFraction * this.settings.b1Amp * pulse.effective;
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => {
+            if (!this.selectedBySlice(s, pulse)) return;
+            const r = rotateAroundX(s.mx, s.my, s.mz, kick);
+            s.mx = r.mx;
+            s.my = r.my;
+            s.mz = r.mz;
+          });
+        });
+      }
+
+      renderNow() {
+        const wNet = this.tissueNet(this.tissues.water);
+        const fNet = this.tissueNet(this.tissues.fat);
+        this.updatePhaseState(wNet, fNet);
+        this.drawBloch(wNet, fNet);
+        this.drawTimeline();
+        this.drawSignal();
+        this.updateMetrics(wNet, fNet);
+      }
+
+      startRFPulse(flipDeg, sliceSelect) {
+        const flipRad = (flipDeg * Math.PI) / 180;
+        const duration = this.settings.rfDurationMs;
+        const kickFraction = 0.24;
+        this.sim.pulse = {
+          totalMs: duration,
+          leftMs: duration,
+          rawFlipRad: flipRad,
+          targetFlipRad: flipRad * (1 - kickFraction),
+          sliceSelect,
+          sliceHalf: this.getSliceThicknessNorm() / 2,
+          effective: this.settings.onResonance ? 1 : 1 / Math.sqrt(1 + Math.pow(this.settings.rfOffsetHz / 200, 2))
+        };
+
+        // Make RF response visually immediate when button is clicked.
+        this.applyImmediateRFPulseKick(this.sim.pulse, kickFraction);
+
+        this.pushEvent("RF", duration, `${Math.round(flipDeg)}°`, "#dc2626");
+        if (sliceSelect) {
+          this.pushEvent("Gz", duration, "slice", "#7c3aed");
+          if (this.settings.includeSliceRefocus) {
+            this.sim.timelineEvents.push({
+              track: "Gz",
+              startMs: this.sim.nowMs + duration,
+              durationMs: duration * 0.5,
+              label: "reph",
+              color: "#8b5cf6"
+            });
+            this.sim.sliceRefocus = {
+              startMs: this.sim.nowMs + duration,
+              endMs: this.sim.nowMs + duration * 1.5,
+              sliceHalf: this.getSliceThicknessNorm() / 2,
+              amp: -this.settings.gzStrength * 22
+            };
+          }
+          this.pushExplain("Slice selection: Gz makes resonance position-dependent. RF bandwidth selects a slice, so only spins in that slice tip.");
+        } else {
+          this.pushExplain(`RF pulse applied. Flip = ${Math.round(flipDeg)}°. M rotates away from z; if near 90°, transverse coherence is high.`);
+        }
+
+        if (Math.abs(flipDeg - 90) < 8) {
+          this.sim.last90At = this.sim.nowMs;
+          this.sim.phaseState = "in phase";
+        }
+
+        if (Math.abs(flipDeg - 180) < 8 && this.sim.last90At !== null) {
+          const tau = this.sim.nowMs - this.sim.last90At;
+          if (tau > 0) {
+            this.sim.rephaseUntil = this.sim.nowMs + tau;
+            this.sim.echoAt = this.sim.rephaseUntil;
+            this.pushExplain("180° refocusing: phase dispersion reverses for static offsets. Spins rephase and echo forms at TE = 2τ.");
+          }
+        }
+
+        this.renderNow();
+      }
+
+      applyGy() {
+        const phaseScale = this.settings.gyAmp * this.settings.gyDurMs * 0.08;
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => {
+            const ph = phaseScale * s.yPos;
+            const rot = rotateXY(s.mx, s.my, ph);
+            s.mx = rot.mx;
+            s.my = rot.my;
+          });
+        });
+        this.pushEvent("Gy", this.settings.gyDurMs, "phase", "#d97706");
+        this.pushExplain("Phase encoding (Gy): position-dependent phase offsets are imprinted across y and persist after Gy ends.");
+      }
+
+      startReadout() {
+        const dur = 16;
+        this.sim.readoutUntil = this.sim.nowMs + dur;
+        this.pushEvent("Gx", dur, "read", "#0369a1");
+        this.pushEvent("ADC", dur, "ADC", "#0f766e");
+        this.pushExplain("Frequency encoding + readout: Gx makes frequency position-dependent across x. ADC records summed transverse signal.");
+      }
+
+      applyRelaxation(spin, t1Ms, t2Ms, dtMs) {
+        const dtSec = dtMs / 1000;
+        const e2 = Math.exp(-dtSec / (t2Ms / 1000));
+        spin.mx *= e2;
+        spin.my *= e2;
+        spin.mz = 1 - (1 - spin.mz) * Math.exp(-dtSec / (t1Ms / 1000));
+      }
+
+      selectedBySlice(spin, pulse) {
+        if (!pulse.sliceSelect) return true;
+        return Math.abs(spin.zPos) <= pulse.sliceHalf;
+      }
+
+      precessSpin(spin, tissueName, dtMs) {
+        const dtSec = dtMs / 1000;
+        const chem = tissueName === "fat" ? this.settings.chemShiftHz : 0;
+
+        const rephaseSign = (this.sim.rephaseUntil > this.sim.nowMs) ? -1 : 1;
+        const inhom = (this.settings.includeInhom && !this.settings.pureT2Only) ? spin.inhomHz * rephaseSign : 0;
+
+        let gx = 0;
+        if (this.sim.readoutUntil > this.sim.nowMs) {
+          gx = this.settings.gxAmp * 30 * spin.xPos;
+        }
+
+        let sliceReph = 0;
+        if (this.sim.sliceRefocus && this.sim.nowMs >= this.sim.sliceRefocus.startMs && this.sim.nowMs <= this.sim.sliceRefocus.endMs) {
+          if (Math.abs(spin.zPos) <= this.sim.sliceRefocus.sliceHalf) {
+            sliceReph = this.sim.sliceRefocus.amp * spin.zPos;
+          }
+        }
+
+        const omegaHz = chem + inhom + gx + sliceReph;
+        const ang = omegaHz * Math.PI * 2 * dtSec;
+        const rot = rotateXY(spin.mx, spin.my, ang);
+        spin.mx = rot.mx;
+        spin.my = rot.my;
+      }
+
+      doPulseStep(spin, dtMs, pulse) {
+        if (!this.selectedBySlice(spin, pulse)) return;
+
+        const dFlip = pulse.targetFlipRad * (dtMs / pulse.totalMs) * this.settings.b1Amp * pulse.effective;
+        const r = rotateAroundX(spin.mx, spin.my, spin.mz, dFlip);
+        spin.mx = r.mx;
+        spin.my = r.my;
+        spin.mz = r.mz;
+
+        if (!this.settings.onResonance) {
+          const extra = this.settings.rfOffsetHz * Math.PI * 2 * (dtMs / 1000) * 0.35;
+          const p = rotateXY(spin.mx, spin.my, extra);
+          spin.mx = p.mx;
+          spin.my = p.my;
+        }
+      }
+
+      tissueNet(tissue) {
+        let sx = 0, sy = 0, sz = 0, magSum = 0;
+        tissue.spins.forEach((s) => {
+          sx += s.mx;
+          sy += s.my;
+          sz += s.mz;
+          magSum += Math.hypot(s.mx, s.my);
+        });
+        const n = tissue.spins.length;
+        const mx = sx / n;
+        const my = sy / n;
+        const mz = sz / n;
+        const mxy = Math.hypot(mx, my);
+        const coh = magSum > 1e-6 ? (Math.hypot(sx, sy) / magSum) : 1;
+        return { mx, my, mz, mxy, phase: Math.atan2(my, mx), coherence: clamp(coh, 0, 1) };
+      }
+
+      computeSignalComplex() {
+        let rx = 0;
+        let ry = 0;
+        const useWater = true;
+        const useFat = true;
+
+        if (useWater) this.tissues.water.spins.forEach((s) => { rx += s.mx; ry += s.my; });
+        if (useFat) this.tissues.fat.spins.forEach((s) => { rx += s.mx; ry += s.my; });
+        return { re: rx, im: ry, mag: Math.hypot(rx, ry) };
+      }
+
+      updatePhaseState(wNet, fNet) {
+        const d = wrapPi(wNet.phase - fNet.phase);
+        const dDeg = Math.abs(d * 180 / Math.PI);
+        const coh = (wNet.coherence + fNet.coherence) * 0.5;
+
+        if (this.sim.rephaseUntil > this.sim.nowMs) {
+          this.sim.phaseState = "rephasing";
+          this.pushExplain("Rephasing: after 180°, previously faster spins now lag in phase, so vectors converge toward an echo.");
+        } else if (this.sim.echoAt !== null && Math.abs(this.sim.nowMs - this.sim.echoAt) < 12) {
+          this.sim.phaseState = "echo";
+          this.pushExplain("Echo: transverse vectors converge and signal peaks near TE = 2τ.");
+        } else if (coh > 0.84 && dDeg < 30 && Math.max(wNet.mxy, fNet.mxy) > 0.35) {
+          this.sim.phaseState = "in phase";
+          this.pushExplain("In phase: transverse vectors are aligned, so the net Mxy and detected signal are strong.");
+        } else if (coh < 0.55) {
+          this.sim.phaseState = "out of phase";
+          this.pushExplain("Out of phase (dephasing): phase spread increases (T2/T2* and offsets), reducing net transverse signal.");
+        } else {
+          this.sim.phaseState = "t1 recovery";
+          this.pushExplain("T1 recovery: Mz regrows exponentially toward +z while transverse components decay.");
+        }
+      }
+
+      tick(ts) {
+        const realDt = Math.min(40, ts - this.sim.lastTs);
+        this.sim.lastTs = ts;
+        // Slow the base integration rate so low-speed teaching modes are easier to follow.
+        const dtMs = realDt * this.settings.speed * 0.4;
+        this.sim.nowMs += dtMs;
+
+        if (this.sim.pulse) {
+          this.sim.pulse.leftMs -= dtMs;
+        }
+
+        Object.entries(this.tissues).forEach(([name, t]) => {
+          t.spins.forEach((s) => {
+            if (this.sim.pulse && this.sim.pulse.leftMs > 0) {
+              this.doPulseStep(s, dtMs, this.sim.pulse);
+            }
+            this.precessSpin(s, name, dtMs);
+
+            const t2Eff = this.settings.pureT2Only ? t.T2 : (this.settings.includeInhom ? t.T2 * 0.6 : t.T2);
+            this.applyRelaxation(s, t.T1, t2Eff, dtMs);
+          });
+        });
+
+        if (this.sim.pulse && this.sim.pulse.leftMs <= 0) {
+          this.sim.pulse = null;
+        }
+        if (this.sim.sliceRefocus && this.sim.nowMs > this.sim.sliceRefocus.endMs) {
+          this.sim.sliceRefocus = null;
+        }
+
+        const signal = this.computeSignalComplex();
+        if (this.sim.nowMs - this.sim.lastSignalSample > 5) {
+          this.sim.signal.push({ t: this.sim.nowMs, m: signal.mag });
+          this.sim.lastSignalSample = this.sim.nowMs;
+        }
+        const signalWindow = 1200;
+        this.sim.signal = this.sim.signal.filter((p) => this.sim.nowMs - p.t <= signalWindow);
+
+        const wNet = this.tissueNet(this.tissues.water);
+        const fNet = this.tissueNet(this.tissues.fat);
+        this.updatePhaseState(wNet, fNet);
+
+        this.drawBloch(wNet, fNet);
+        this.drawTimeline();
+        this.drawSignal();
+        this.updateMetrics(wNet, fNet);
+
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      project(x, y, z, c, s) {
+        return {
+          // View orientation requested: x is vertical, y is depth, z is horizontal.
+          x: c.x + z * s + y * s * 0.42,
+          y: c.y - x * s - y * s * 0.33
+        };
+      }
+
+      drawArrow(ctx, a, b, color, width, label) {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const L = Math.hypot(dx, dy) || 1;
+        const ux = dx / L;
+        const uy = dy / L;
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(b.x - ux * 12 - uy * 5, b.y - uy * 12 + ux * 5);
+        ctx.lineTo(b.x - ux * 12 + uy * 5, b.y - uy * 12 - ux * 5);
+        ctx.closePath();
+        ctx.fill();
+
+        if (label) {
+          ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(label, b.x + 7, b.y - 8);
+        }
+      }
+
+      drawBloch(wNet, fNet) {
+        const ctx = this.bctx;
+        const { width, height } = this.blochCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        // Shift Bloch sphere left and enlarge it to keep right-side UI clear.
+        const c = { x: width * 0.34, y: height * 0.67 };
+        const s = 190;
+
+        const xA = this.project(1.35, 0, 0, c, s);
+        const yA = this.project(0, 1.35, 0, c, s);
+        const zA = this.project(0, 0, 1.35, c, s);
+        const zNegA = this.project(0, 0, -1.35, c, s);
+        const o = this.project(0, 0, 0, c, s);
+
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        [xA, yA, zA].forEach((p) => { ctx.moveTo(o.x, o.y); ctx.lineTo(p.x, p.y); });
+        ctx.stroke();
+        ctx.strokeStyle = "#94a3b899";
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(o.x, o.y);
+        ctx.lineTo(zNegA.x, zNegA.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#475569";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("x (vertical)", xA.x + 6, xA.y + 2);
+        ctx.fillText("y (depth)", yA.x + 6, yA.y + 2);
+        ctx.fillText("z (horizontal, B0)", zA.x + 6, zA.y + 2);
+        ctx.fillText("-z", zNegA.x - 18, zNegA.y + 2);
+
+        // Transverse plane outline
+        ctx.strokeStyle = "#dbe5f3";
+        ctx.beginPath();
+        for (let i = 0; i <= 60; i += 1) {
+          const t = (i / 60) * Math.PI * 2;
+          const p = this.project(Math.cos(t), Math.sin(t), 0, c, s);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        const drawTissue = (tissue, net, show) => {
+          if (!show) return;
+
+          // Spin packet arrows showing phase spread.
+          tissue.spins.forEach((sp) => {
+            const tip = this.project(sp.mx, sp.my, sp.mz, c, s);
+            ctx.globalAlpha = 0.28;
+            this.drawArrow(ctx, o, tip, tissue.color, 1.1);
+            ctx.globalAlpha = 1;
+          });
+
+          const nTip = this.project(net.mx, net.my, net.mz, c, s);
+          this.drawArrow(ctx, o, nTip, tissue.color, 4.2, tissue.name);
+
+          const mxyTip = this.project(net.mx, net.my, 0, c, s);
+          this.drawArrow(ctx, o, mxyTip, tissue.color + "88", 2, `${tissue.name} Mxy`);
+          const mzTip = this.project(0, 0, net.mz, c, s);
+          this.drawArrow(ctx, o, mzTip, tissue.color + "99", 2, `${tissue.name} Mz`);
+
+          if (net.coherence > 0.84 && net.mxy > 0.35) {
+            ctx.save();
+            ctx.strokeStyle = tissue.color;
+            ctx.shadowColor = tissue.color;
+            ctx.shadowBlur = 16;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(mxyTip.x, mxyTip.y, 12, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+        };
+
+        drawTissue(this.tissues.water, wNet, this.settings.showWater);
+        drawTissue(this.tissues.fat, fNet, this.settings.showFat);
+        this.drawT1RecoveryArrows(wNet, fNet, c, s);
+
+        if (this.sim.phaseState === "out of phase") {
+          ctx.fillStyle = "rgba(180,83,9,0.12)";
+          ctx.beginPath();
+          ctx.moveTo(o.x, o.y);
+          for (let a = -0.8; a <= 0.8; a += 0.05) {
+            const p = this.project(Math.cos(a), Math.sin(a), 0.02, c, s * 0.85);
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        if (this.sim.phaseState === "echo") {
+          ctx.save();
+          ctx.strokeStyle = "#16a34a";
+          ctx.lineWidth = 3;
+          ctx.setLineDash([5, 4]);
+          ctx.beginPath();
+          ctx.arc(o.x, o.y, 55, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        this.drawXYComponentArrows(wNet, fNet);
+        this.drawXYZComponentMonitor(wNet, fNet);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("3D Bloch view: two tissues with spin packets", 14, 22);
+        ctx.fillText(`Slice refocus: ${this.settings.includeSliceRefocus ? "ON" : "OFF"}`, 14, 42);
+        ctx.fillStyle = "#9a3412";
+        ctx.fillText("T1 arrows show recovery direction toward +z", 14, 62);
+      }
+
+      drawT1RecoveryArrows(wNet, fNet, c, s) {
+        const ctx = this.bctx;
+
+        const drawFor = (net, color, label, visible) => {
+          if (!visible) return;
+          const deficit = 1 - net.mz;
+          if (deficit < 0.02) return;
+
+          const from = this.project(net.mx, net.my, net.mz, c, s);
+          const step = clamp(deficit * 0.33, 0.06, 0.26);
+          const to = this.project(net.mx, net.my, net.mz + step, c, s);
+
+          ctx.save();
+          ctx.globalAlpha = 0.9;
+          this.drawArrow(ctx, from, to, color, 2.6, `${label} T1`);
+          ctx.restore();
+        };
+
+        drawFor(wNet, "#0284c7", "W", this.settings.showWater);
+        drawFor(fNet, "#15803d", "F", this.settings.showFat);
+      }
+
+      drawXYComponentArrows(wNet, fNet) {
+        const ctx = this.bctx;
+        const ox = this.blochCanvas.width * 0.82;
+        const oy = this.blochCanvas.height * 0.70;
+        const scale = 88;
+
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(ox - scale, oy);
+        ctx.lineTo(ox + scale, oy);
+        ctx.moveTo(ox, oy + scale);
+        ctx.lineTo(ox, oy - scale);
+        ctx.stroke();
+
+        ctx.fillStyle = "#334155";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("XY component arrows", ox - 70, oy - scale - 12);
+        ctx.fillText("x", ox + scale + 6, oy + 4);
+        ctx.fillText("y", ox + 6, oy - scale - 6);
+
+        const draw = (net, color, label) => {
+          const tx = ox + net.mx * scale;
+          const ty = oy - net.my * scale;
+          this.drawArrow(ctx, { x: ox, y: oy }, { x: tx, y: ty }, color, 3.2, label);
+
+          ctx.setLineDash([4, 3]);
+          ctx.strokeStyle = color + "88";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(tx, oy);
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(ox, ty);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        };
+
+        if (this.settings.showWater) draw(wNet, "#0ea5e9", "W");
+        if (this.settings.showFat) draw(fNet, "#16a34a", "F");
+      }
+
+      drawXYZComponentMonitor(wNet, fNet) {
+        const ctx = this.bctx;
+        const x0 = this.blochCanvas.width * 0.70;
+        const y0 = this.blochCanvas.height * 0.27;
+        const w = 340;
+        const barW = 108;
+
+        ctx.fillStyle = "rgba(248,251,255,0.94)";
+        ctx.strokeStyle = "#d8e6f7";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(x0 - 12, y0 - 34, w, 146);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#334155";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("XYZ component monitor (live)", x0, y0 - 10);
+
+        const drawAxisRow = (name, y, wVal, fVal, colorW, colorF) => {
+          const center = x0 + 120;
+
+          ctx.fillStyle = "#475569";
+          ctx.fillText(name, x0, y + 4);
+
+          ctx.strokeStyle = "#cbd5e1";
+          ctx.beginPath();
+          ctx.moveTo(center - barW, y);
+          ctx.lineTo(center + barW, y);
+          ctx.stroke();
+
+          const wX = center + clamp(wVal, -1, 1) * barW;
+          const fX = center + clamp(fVal, -1, 1) * barW;
+
+          this.drawArrow(ctx, { x: center, y }, { x: wX, y }, colorW, 2);
+          this.drawArrow(ctx, { x: center, y: y + 7 }, { x: fX, y: y + 7 }, colorF, 2);
+        };
+
+        drawAxisRow("x", y0 + 22, wNet.mx, fNet.mx, "#0ea5e9", "#16a34a");
+        drawAxisRow("y", y0 + 54, wNet.my, fNet.my, "#0ea5e9", "#16a34a");
+        drawAxisRow("z", y0 + 86, wNet.mz, fNet.mz, "#0ea5e9", "#16a34a");
+
+        ctx.fillStyle = "#0ea5e9";
+        ctx.fillText("Water", x0 + 250, y0 + 20);
+        ctx.fillStyle = "#16a34a";
+        ctx.fillText("Fat", x0 + 250, y0 + 38);
+      }
+
+      drawRfLobes(ctx, x, w, yMid, h, color) {
+        const cX = x + w * 0.5;
+        const r = Math.max(3, Math.min(9, h * 0.28));
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.95;
+        [ -w * 0.22, 0, w * 0.22 ].forEach((dx, i) => {
+          const sc = i === 1 ? 1.65 : 1;
+          ctx.beginPath();
+          ctx.ellipse(cX + dx, yMid, r * sc, h * 0.34 * sc, 0, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      drawTrapezoidLobe(ctx, x, w, yMid, amp, color) {
+        const sign = Math.sign(amp) || 1;
+        const a = Math.abs(amp);
+        const yTop = yMid - sign * a;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, yMid);
+        ctx.lineTo(x + w * 0.1, yTop);
+        ctx.lineTo(x + w * 0.9, yTop);
+        ctx.lineTo(x + w, yMid);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      drawGyFan(ctx, x, w, yMid, h) {
+        ctx.strokeStyle = "#5b5568";
+        ctx.lineWidth = 1;
+        const n = 10;
+        for (let i = 0; i < n; i += 1) {
+          const yy = yMid - h * 0.42 + (i / (n - 1)) * h * 0.84;
+          const span = w * (0.28 + 0.45 * (1 - Math.abs((i - (n - 1) * 0.5) / ((n - 1) * 0.5))));
+          ctx.beginPath();
+          ctx.moveTo(x + w * 0.5 - span * 0.5, yy);
+          ctx.lineTo(x + w * 0.5 + span * 0.5, yy);
+          ctx.stroke();
+        }
+      }
+
+      drawAdcEcho(ctx, x, w, yMid, h) {
+        ctx.strokeStyle = "#8b5f9e";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        const n = 80;
+        for (let i = 0; i <= n; i += 1) {
+          const t = i / n;
+          const px = x + t * w;
+          const env = Math.exp(-Math.pow((t - 0.5) * 3.2, 2));
+          const py = yMid + Math.sin(t * Math.PI * 16) * env * h * 0.32;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      drawTimeline() {
+        const ctx = this.tctx;
+        const { width, height } = this.timelineCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { left: 70, right: 14, top: 14, bottom: 20 };
+        const h = height - pad.top - pad.bottom;
+        const trackH = h / TRACKS.length;
+
+        const tNow = this.sim.nowMs;
+        const windowMs = 120;
+
+        TRACKS.forEach((name, idx) => {
+          const y = pad.top + idx * trackH;
+          ctx.strokeStyle = "#e2e8f0";
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y + trackH / 2);
+          ctx.lineTo(width - pad.right, y + trackH / 2);
+          ctx.stroke();
+          ctx.fillStyle = "#334155";
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(name, 14, y + trackH / 2 + 4);
+        });
+
+        this.sim.timelineEvents.forEach((ev) => {
+          const tr = TRACKS.indexOf(ev.track);
+          if (tr < 0) return;
+          const relStart = ev.startMs - (tNow - windowMs);
+          const x = pad.left + (relStart / windowMs) * (width - pad.left - pad.right);
+          const w = Math.max(10, (ev.durationMs / windowMs) * (width - pad.left - pad.right));
+          const yMid = pad.top + tr * trackH + trackH / 2;
+          const amp = trackH * 0.42;
+
+          if (x + w < pad.left || x > width - pad.right) return;
+
+          // Render MRI-like sequence glyphs (similar style to IMG_1495).
+          if (ev.track === "RF") {
+            this.drawRfLobes(ctx, x, w, yMid, trackH, "#7e22ce");
+          } else if (ev.track === "Gz") {
+            const neg = ev.label.toLowerCase().includes("reph");
+            this.drawTrapezoidLobe(ctx, x, w, yMid, neg ? -amp * 0.52 : amp, "#7e22ce");
+          } else if (ev.track === "Gy") {
+            this.drawGyFan(ctx, x, w, yMid, trackH);
+          } else if (ev.track === "Gx") {
+            // Frequency encoding style: small negative prephasing lobe + positive readout lobe.
+            this.drawTrapezoidLobe(ctx, x, w * 0.34, yMid, -amp * 0.95, "#7e22ce");
+            this.drawTrapezoidLobe(ctx, x + w * 0.34, w * 0.66, yMid, amp * 0.72, "#7e22ce");
+          } else if (ev.track === "ADC") {
+            this.drawAdcEcho(ctx, x, w, yMid, trackH);
+          } else {
+            ctx.fillStyle = ev.color;
+            ctx.fillRect(x, yMid - amp * 0.5, w, amp);
+          }
+
+          ctx.fillStyle = "#4b5563";
+          ctx.font = "10px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(ev.label, x + 3, yMid - amp - 2);
+        });
+
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 1.8;
+        const cx = width - pad.right - 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, pad.top);
+        ctx.lineTo(cx, height - pad.bottom);
+        ctx.stroke();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("now", cx - 24, pad.top + 11);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Pulse Sequence Timeline (RF / Gz / Gy / Gx / ADC)", 14, 12);
+      }
+
+      drawSignal() {
+        const ctx = this.sctx;
+        const { width, height } = this.signalCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { left: 54, right: 12, top: 16, bottom: 28 };
+        const w = width - pad.left - pad.right;
+        const h = height - pad.top - pad.bottom;
+
+        ctx.strokeStyle = "#dbe5f3";
+        for (let i = 0; i <= 8; i += 1) {
+          const y = pad.top + (i / 8) * h;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(width - pad.right, y);
+          ctx.stroke();
+        }
+
+        const maxMag = Math.max(1, ...this.sim.signal.map((p) => p.m));
+        const t0 = this.sim.nowMs - 1200;
+
+        ctx.strokeStyle = "#0369a1";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        this.sim.signal.forEach((p, i) => {
+          const x = pad.left + ((p.t - t0) / 1200) * w;
+          const y = pad.top + h - (p.m / maxMag) * h;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        if (this.sim.echoAt !== null && Math.abs(this.sim.nowMs - this.sim.echoAt) < 24) {
+          const ex = pad.left + ((this.sim.echoAt - t0) / 1200) * w;
+          ctx.strokeStyle = "#16a34a";
+          ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(ex, pad.top);
+          ctx.lineTo(ex, pad.top + h);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#15803d";
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText("Echo peak", ex + 6, pad.top + 14);
+        }
+
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top);
+        ctx.lineTo(pad.left, pad.top + h);
+        ctx.lineTo(width - pad.right, pad.top + h);
+        ctx.stroke();
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Detected signal (vector sum of transverse magnetization)", 12, 14);
+      }
+
+      updateMetrics(wNet, fNet) {
+        const d = wrapPi(wNet.phase - fNet.phase);
+        const dDeg = d * 180 / Math.PI;
+        const coh = (wNet.coherence + fNet.coherence) * 0.5;
+
+        this.ui.waterMetric.textContent = `Water: Mx=${wNet.mx.toFixed(3)}, My=${wNet.my.toFixed(3)}, Mz=${wNet.mz.toFixed(3)}, Mxy=${wNet.mxy.toFixed(3)}`;
+        this.ui.fatMetric.textContent = `Fat: Mx=${fNet.mx.toFixed(3)}, My=${fNet.my.toFixed(3)}, Mz=${fNet.mz.toFixed(3)}, Mxy=${fNet.mxy.toFixed(3)}`;
+        this.ui.phaseMetric.textContent = `Δphase(w-f)=${dDeg.toFixed(1)}°`;
+        this.ui.cohMetric.textContent = `Coherence=${coh.toFixed(2)}`;
+        this.ui.stateMetric.textContent = `State: ${this.sim.phaseState}`;
+        this.ui.echoMetric.textContent = this.sim.echoAt ? `Echo target TE at ${this.sim.echoAt.toFixed(1)} ms` : "Echo: waiting";
+        this.ui.explainBox.textContent = this.sim.explain;
+      }
+
+      syncLabels() {
+        this.ui.flipVal.textContent = `${Math.round(this.settings.flipDeg)}°`;
+        this.ui.rfDurVal.textContent = `${this.settings.rfDurationMs.toFixed(1)} ms`;
+        this.ui.b1Val.textContent = `${this.settings.b1Amp.toFixed(2)}`;
+        this.ui.rfOffVal.textContent = `${Math.round(this.settings.rfOffsetHz)} Hz`;
+        this.ui.t1WaterVal.textContent = `${Math.round(this.tissues.water.T1)} ms`;
+        this.ui.t2WaterVal.textContent = `${Math.round(this.tissues.water.T2)} ms`;
+        this.ui.t1FatVal.textContent = `${Math.round(this.tissues.fat.T1)} ms`;
+        this.ui.t2FatVal.textContent = `${Math.round(this.tissues.fat.T2)} ms`;
+        this.ui.chemVal.textContent = `${Math.round(this.settings.chemShiftHz)} Hz`;
+        this.ui.gzVal.textContent = `${this.settings.gzStrength.toFixed(1)}`;
+        this.ui.bwVal.textContent = `${Math.round(this.settings.rfBandwidthHz)} Hz`;
+        this.ui.gyAmpVal.textContent = `${this.settings.gyAmp.toFixed(1)}`;
+        this.ui.gyDurVal.textContent = `${this.settings.gyDurMs.toFixed(1)} ms`;
+        this.ui.gxAmpVal.textContent = `${this.settings.gxAmp.toFixed(1)}`;
+        this.ui.speedVal.textContent = `${this.settings.speed.toFixed(2)}x`;
+        this.ui.sliceThickVal.textContent = `${this.getSliceThicknessNorm().toFixed(2)}`;
+      }
+    }
+
+    new MRISim();
+  </script>
+</body>
+</html>

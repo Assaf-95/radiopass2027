@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Core Physics Step-by-Step Version 2</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d7deea;
+      --ink: #111827;
+      --muted: #4b5563;
+      --accent: #1d4ed8;
+      --axis-x: #b91c1c;
+      --axis-y: #047857;
+      --axis-z: #2563eb;
+      --vector: #111827;
+      --spin: #6b7280;
+      --field: #2563eb;
+      --rf: #ea580c;
+      --signal: #1d4ed8;
+      --signal-muted: #a8b7d6;
+      --good: #047857;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.22rem;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.36;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 4px 10px;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      aspect-ratio: 16 / 10;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.03rem;
+    }
+
+    #stepText {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      min-height: 64px;
+      white-space: pre-line;
+    }
+
+    #equation {
+      margin: 0;
+      min-height: 22px;
+      font-family: "Courier New", monospace;
+      color: #1e3a8a;
+      font-size: 0.96rem;
+    }
+
+    #statusLine {
+      margin: 0;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.83rem;
+      color: #0f172a;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 0.92rem;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    #restartBtn {
+      border-color: var(--good);
+      background: var(--good);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      .panel { padding: 12px; }
+      #stepText { min-height: 88px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="top">
+        <h1>MRI Core Physics: Step-by-Step (Version 2)</h1>
+        <div id="stepPill" class="pill">Step 1 of 9</div>
+      </div>
+      <p class="sub">Minimal spin-echo sequence with one net magnetisation vector. No gradients, no slice selection, no phase encoding.</p>
+    </section>
+
+    <section class="panel">
+      <canvas id="scene" width="1200" height="760" aria-label="MRI Bloch and signal diagram"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2 id="stepTitle"></h2>
+      <p id="stepText"></p>
+      <p id="equation"></p>
+      <p id="statusLine"></p>
+      <div class="controls">
+        <button id="backBtn">Back</button>
+        <button id="nextBtn" class="primary">Next</button>
+        <button id="restartBtn">Restart</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TAU = Math.PI * 2;
+    const TAU_TIME = 1.1;
+    const TE_TIME = TAU_TIME * 2;
+    const MAX_TIME = 3.1;
+
+    const steps = [
+      {
+        title: "Step 1 - No Magnetic Field",
+        text: "No external magnetic field.\nHydrogen nuclei are randomly oriented.\nNo net magnetisation.",
+        equation: "",
+        label: "No B0, random spins",
+        kind: "hold",
+        durationMs: 850,
+        target: {
+          mx: 0.00,
+          my: 0.00,
+          mz: 0.03,
+          phaseSpread: 1.45,
+          phaseParity: 1,
+          b0Alpha: 0,
+          b1Alpha: 0,
+          signalTime: -0.35,
+          precessionAlpha: 0,
+          randomAlpha: 1
+        }
+      },
+      {
+        title: "Step 2 - Apply B0",
+        text: "Spins align with B0 and net Mz forms.\nPrecession is visible around the Z axis.",
+        equation: "f = γ B0",
+        label: "B0 on, net Mz + precession",
+        kind: "hold",
+        durationMs: 1000,
+        target: {
+          mx: 0.06,
+          my: 0.00,
+          mz: 0.88,
+          phaseSpread: 0.50,
+          phaseParity: 1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: -0.08,
+          precessionAlpha: 1,
+          randomAlpha: 0.18
+        }
+      },
+      {
+        title: "Step 3 - Apply 90\u00b0 RF Pulse",
+        text: "B1 is applied along X.\nNet magnetisation rotates from +Z toward +X.\nEnds in the transverse plane.",
+        equation: "90\u00b0 flip",
+        label: "90\u00b0 flip",
+        kind: "rf90",
+        durationMs: 1500,
+        target: {
+          mx: 0.95,
+          my: 0.00,
+          mz: 0.02,
+          phaseSpread: 0.05,
+          phaseParity: 1,
+          b0Alpha: 1,
+          b1Alpha: 1,
+          signalTime: 0.12,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 4 - In Phase",
+        text: "Spins are aligned in the transverse plane.\nLarge Mxy produces strong signal.",
+        equation: "Label: Spins in phase",
+        label: "Spins in phase",
+        kind: "hold",
+        durationMs: 850,
+        target: {
+          mx: 0.93,
+          my: 0.00,
+          mz: 0.00,
+          phaseSpread: 0.05,
+          phaseParity: 1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: 0.28,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 5 - Dephasing (T2*)",
+        text: "Spins spread in angle and Mxy falls.\nSignal decays (FID).\nDephasing is becoming visible.",
+        equation: "Label: Spins going out of phase",
+        label: "Spins going out of phase",
+        kind: "hold",
+        durationMs: 1000,
+        target: {
+          mx: 0.33,
+          my: 0.00,
+          mz: 0.02,
+          phaseSpread: 1.30,
+          phaseParity: 1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: 0.95,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 6 - Apply 180\u00b0 RF Pulse",
+        text: "A 180\u00b0 refocusing pulse is applied at time τ.\nPhase spread is mirrored: spins that were ahead become behind.",
+        equation: "Label: 180\u00b0 refocusing pulse",
+        label: "180\u00b0 refocusing pulse",
+        kind: "rf180",
+        durationMs: 1500,
+        target: {
+          mx: -0.33,
+          my: 0.00,
+          mz: 0.02,
+          phaseSpread: 1.30,
+          phaseParity: -1,
+          b0Alpha: 1,
+          b1Alpha: 1,
+          signalTime: TAU_TIME,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 7 - Rephasing",
+        text: "After 180\u00b0, spins come back together.\nPhase spread decreases and Mxy rises again.",
+        equation: "Label: Rephasing",
+        label: "Rephasing",
+        kind: "hold",
+        durationMs: 950,
+        target: {
+          mx: -0.74,
+          my: 0.00,
+          mz: 0.02,
+          phaseSpread: 0.36,
+          phaseParity: -1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: 1.75,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 8 - Spin Echo Formation",
+        text: "Spins re-align at TE.\nTransverse magnetisation is maximal again (echo peak).\nEcho occurs at TE = 2τ.",
+        equation: "Label: Spin Echo (TE)",
+        label: "Spin Echo (TE)",
+        kind: "hold",
+        durationMs: 850,
+        target: {
+          mx: -0.88,
+          my: 0.00,
+          mz: 0.02,
+          phaseSpread: 0.05,
+          phaseParity: -1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: TE_TIME,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      },
+      {
+        title: "Step 9 - Final Decay and T1 Recovery",
+        text: "After echo, spins dephase again.\nMxy decays while longitudinal magnetisation (Mz) regrows along +Z.",
+        equation: "Final: T2* decay + T1 recovery",
+        label: "Post-echo decay and T1 regrowth",
+        kind: "hold",
+        durationMs: 1100,
+        target: {
+          mx: -0.18,
+          my: 0.00,
+          mz: 0.82,
+          phaseSpread: 0.95,
+          phaseParity: 1,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          signalTime: 2.85,
+          precessionAlpha: 0,
+          randomAlpha: 0
+        }
+      }
+    ];
+
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const stepPill = document.getElementById("stepPill");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepText = document.getElementById("stepText");
+    const equationEl = document.getElementById("equation");
+    const statusLine = document.getElementById("statusLine");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const state = { ...steps[0].target };
+    let stepIndex = 0;
+    let transition = null;
+    let lastMs = performance.now();
+
+    const fieldKeys = [
+      "mx", "my", "mz",
+      "phaseSpread", "phaseParity",
+      "b0Alpha", "b1Alpha",
+      "signalTime", "precessionAlpha", "randomAlpha"
+    ];
+
+    const randomSpins = makeRandomSpinCloud(24);
+
+    function makeRandomSpinCloud(count) {
+      const out = [];
+      for (let i = 0; i < count; i += 1) {
+        out.push({
+          pos: randomUnit(),
+          dir: randomUnit(),
+          jitter: 0.7 + Math.random() * 1.3
+        });
+      }
+      return out;
+    }
+
+    function randomUnit() {
+      const u = Math.random() * 2 - 1;
+      const a = Math.random() * TAU;
+      const b = Math.sqrt(Math.max(0, 1 - u * u));
+      return { x: b * Math.cos(a), y: b * Math.sin(a), z: u };
+    }
+
+    function snapshotState() {
+      const s = {};
+      for (const k of fieldKeys) s[k] = state[k];
+      return s;
+    }
+
+    function setStep(index) {
+      const clamped = Math.max(0, Math.min(steps.length - 1, index));
+      stepIndex = clamped;
+
+      const step = steps[stepIndex];
+      const from = snapshotState();
+      const to = { ...step.target };
+
+      if (step.kind === "rf180") {
+        const mag = Math.hypot(from.mx, from.my, from.mz);
+        const unit = normalize3({ x: from.mx, y: from.my, z: from.mz });
+        const rot = rotateAroundY(unit, Math.PI);
+        to.mx = rot.x * mag;
+        to.my = rot.y * mag;
+        to.mz = rot.z * mag;
+        to.phaseSpread = from.phaseSpread;
+        to.signalTime = TAU_TIME;
+        to.phaseParity = -1;
+      }
+
+      transition = {
+        kind: step.kind,
+        startMs: performance.now(),
+        durationMs: step.durationMs,
+        from,
+        to
+      };
+
+      renderStepText();
+      updateButtons();
+    }
+
+    function renderStepText() {
+      const s = steps[stepIndex];
+      stepPill.textContent = "Step " + (stepIndex + 1) + " of " + steps.length;
+      stepTitle.textContent = s.title;
+      stepText.textContent = s.text;
+      equationEl.textContent = s.equation;
+    }
+
+    function updateButtons() {
+      backBtn.disabled = stepIndex === 0;
+      nextBtn.disabled = stepIndex === steps.length - 1;
+    }
+
+    backBtn.addEventListener("click", () => setStep(stepIndex - 1));
+    nextBtn.addEventListener("click", () => setStep(stepIndex + 1));
+    restartBtn.addEventListener("click", () => setStep(0));
+
+    function applyTransition(nowMs) {
+      if (!transition) return { flipShown: 0, flipTarget: 0 };
+
+      const raw = Math.max(0, Math.min(1, (nowMs - transition.startMs) / transition.durationMs));
+      const p = smooth01(raw);
+
+      if (transition.kind === "rf90") {
+        const fromUnit = normalize3({ x: transition.from.mx, y: transition.from.my, z: transition.from.mz });
+        const toUnit = { x: 1, y: 0, z: 0 };
+        const u = slerpUnit(fromUnit, toUnit, p);
+        const m = lerp(Math.hypot(transition.from.mx, transition.from.my, transition.from.mz), 0.95, p);
+        state.mx = u.x * m;
+        state.my = u.y * m;
+        state.mz = u.z * m;
+      } else if (transition.kind === "rf180") {
+        const mag = Math.hypot(transition.from.mx, transition.from.my, transition.from.mz);
+        const fromUnit = normalize3({ x: transition.from.mx, y: transition.from.my, z: transition.from.mz });
+        const u = normalize3(rotateAroundY(fromUnit, Math.PI * p));
+        state.mx = u.x * mag;
+        state.my = u.y * mag;
+        state.mz = u.z * mag;
+      } else {
+        state.mx = lerp(transition.from.mx, transition.to.mx, p);
+        state.my = lerp(transition.from.my, transition.to.my, p);
+        state.mz = lerp(transition.from.mz, transition.to.mz, p);
+      }
+
+      state.phaseSpread = lerp(transition.from.phaseSpread, transition.to.phaseSpread, p);
+      state.phaseParity = lerp(transition.from.phaseParity, transition.to.phaseParity, p);
+      state.b0Alpha = lerp(transition.from.b0Alpha, transition.to.b0Alpha, p);
+      state.b1Alpha = lerp(transition.from.b1Alpha, transition.to.b1Alpha, p);
+      state.signalTime = lerp(transition.from.signalTime, transition.to.signalTime, p);
+      state.precessionAlpha = lerp(transition.from.precessionAlpha, transition.to.precessionAlpha, p);
+      state.randomAlpha = lerp(transition.from.randomAlpha, transition.to.randomAlpha, p);
+
+      if (raw >= 1) {
+        Object.assign(state, transition.to);
+        const doneKind = transition.kind;
+        transition = null;
+        if (doneKind === "rf90") return { flipShown: 90, flipTarget: 90 };
+        if (doneKind === "rf180") return { flipShown: 180, flipTarget: 180 };
+      }
+
+      if (transition && transition.kind === "rf90") return { flipShown: 90 * p, flipTarget: 90 };
+      if (transition && transition.kind === "rf180") return { flipShown: 180 * p, flipTarget: 180 };
+      return { flipShown: 0, flipTarget: 0 };
+    }
+
+    const view = {
+      yaw: degToRad(35),
+      pitch: degToRad(-22),
+      radiusPx: 180
+    };
+
+    function project(v, cx, cy, zoom) {
+      const cyaw = Math.cos(view.yaw);
+      const syaw = Math.sin(view.yaw);
+      const cp = Math.cos(view.pitch);
+      const sp = Math.sin(view.pitch);
+
+      const x1 = v.x * cyaw + v.z * syaw;
+      const z1 = -v.x * syaw + v.z * cyaw;
+      const y2 = v.y * cp - z1 * sp;
+
+      return {
+        x: cx + x1 * view.radiusPx * zoom,
+        y: cy - y2 * view.radiusPx * zoom
+      };
+    }
+
+    function getDisplayedVector(nowSec) {
+      if (state.precessionAlpha < 0.01) return { x: state.mx, y: state.my, z: state.mz };
+
+      const mag = Math.hypot(state.mx, state.my, state.mz);
+      const tilt = 0.17 * state.precessionAlpha;
+      const phase = nowSec * 3.3;
+      return {
+        x: mag * Math.sin(tilt) * Math.cos(phase),
+        y: mag * Math.sin(tilt) * Math.sin(phase),
+        z: mag * Math.cos(tilt)
+      };
+    }
+
+    function draw(nowSec, rfDisplay) {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w * 0.34;
+      const cy = h * 0.34;
+      const zoom = 1;
+
+      const vec = getDisplayedVector(nowSec);
+
+      drawBlochSphere(cx, cy, view.radiusPx * zoom);
+      drawAxes(cx, cy, zoom);
+      drawB0(cx, cy, zoom);
+      drawB1(cx, cy, zoom, rfDisplay);
+      drawRandomSpins(cx, cy, zoom, nowSec);
+      drawPhaseSpokes(cx, cy, zoom, vec);
+      drawNetVector(cx, cy, zoom, vec);
+      drawStepLabel();
+      drawSignalTrace(vec);
+      updateStatus(vec);
+    }
+
+    function drawBlochSphere(cx, cy, r) {
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#dbe3ee";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 0.38, 0, 0, TAU);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawAxes(cx, cy, zoom) {
+      drawAxisLine(cx, cy, { x: -1.06, y: 0, z: 0 }, { x: 1.06, y: 0, z: 0 }, getCss("--axis-x"), "X", zoom);
+      drawAxisLine(cx, cy, { x: 0, y: -1.06, z: 0 }, { x: 0, y: 1.06, z: 0 }, getCss("--axis-y"), "Y", zoom);
+      drawAxisLine(cx, cy, { x: 0, y: 0, z: -1.18 }, { x: 0, y: 0, z: 1.18 }, getCss("--axis-z"), "Z", zoom);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Bloch sphere", cx - 50, cy + view.radiusPx + 24);
+    }
+
+    function drawAxisLine(cx, cy, a, b, color, label, zoom) {
+      const p1 = project(a, cx, cy, zoom);
+      const p2 = project(b, cx, cy, zoom);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      drawArrowHead(p1, p2, color, 10);
+      ctx.fillStyle = color;
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText(label, p2.x + 6, p2.y - 6);
+    }
+
+    function drawB0(cx, cy, zoom) {
+      if (state.b0Alpha < 0.01) return;
+      const a = project({ x: 0, y: 0, z: -1.25 }, cx, cy, zoom);
+      const b = project({ x: 0, y: 0, z: 1.25 }, cx, cy, zoom);
+
+      ctx.save();
+      ctx.globalAlpha = state.b0Alpha;
+      ctx.strokeStyle = getCss("--field");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--field"), 13);
+      ctx.fillStyle = getCss("--field");
+      ctx.font = "bold 15px Segoe UI";
+      ctx.fillText("B0", b.x + 9, b.y - 8);
+      ctx.restore();
+    }
+
+    function drawB1(cx, cy, zoom, rfDisplay) {
+      if (state.b1Alpha < 0.01) return;
+
+      const a = project({ x: -1.22, y: 0, z: 0 }, cx, cy, zoom);
+      const b = project({ x: 1.22, y: 0, z: 0 }, cx, cy, zoom);
+
+      ctx.save();
+      ctx.globalAlpha = state.b1Alpha;
+      ctx.strokeStyle = getCss("--rf");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--rf"), 13);
+
+      ctx.fillStyle = getCss("--rf");
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("B1 (RF along X)", b.x + 8, b.y + 14);
+
+      if (rfDisplay.flipTarget > 0) {
+        ctx.font = "bold 14px Segoe UI";
+        ctx.fillText(
+          `Flip: ${rfDisplay.flipShown.toFixed(0)}° / ${rfDisplay.flipTarget.toFixed(0)}°`,
+          b.x + 8,
+          b.y + 34
+        );
+      }
+      ctx.restore();
+    }
+
+    function drawRandomSpins(cx, cy, zoom, nowSec) {
+      if (state.randomAlpha < 0.01) return;
+      ctx.save();
+      ctx.globalAlpha = state.randomAlpha * 0.8;
+
+      for (const s of randomSpins) {
+        const wobble = 0.11 * Math.sin(nowSec * s.jitter + s.pos.x * 4);
+        const pos = normalize3(add3(scale3(s.pos, 0.78), scale3(s.dir, wobble)));
+        const tip = normalize3(add3(pos, scale3(s.dir, 0.21)));
+        drawSpinArrow3D(cx, cy, zoom, pos, tip, getCss("--spin"), 1.1);
+      }
+
+      ctx.restore();
+    }
+
+    function drawPhaseSpokes(cx, cy, zoom, vec) {
+      const transverse = Math.hypot(vec.x, vec.y);
+      const alpha = Math.max(0, Math.min(1, transverse * 1.6));
+      if (alpha < 0.03) return;
+
+      const centerPhase = Math.atan2(vec.y, vec.x || 1e-6);
+      const spread = state.phaseSpread;
+      const parity = state.phaseParity;
+      const n = 13;
+
+      ctx.save();
+      ctx.globalAlpha = 0.28 + alpha * 0.45;
+
+      for (let i = 0; i < n; i += 1) {
+        const u = n === 1 ? 0.5 : i / (n - 1);
+        const off = (u - 0.5) * spread;
+        const ang = centerPhase + parity * off;
+        const r0 = 0.50;
+        const r1 = 0.82;
+
+        const p0 = { x: Math.cos(ang) * r0, y: Math.sin(ang) * r0, z: 0 };
+        const p1 = { x: Math.cos(ang) * r1, y: Math.sin(ang) * r1, z: 0 };
+        drawSpinArrow3D(cx, cy, zoom, p0, p1, "#64748b", 1.2);
+      }
+
+      ctx.restore();
+    }
+
+    function drawNetVector(cx, cy, zoom, vec) {
+      const p0 = project({ x: 0, y: 0, z: 0 }, cx, cy, zoom);
+      const p1 = project(vec, cx, cy, zoom);
+
+      ctx.strokeStyle = getCss("--vector");
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+      drawArrowHead(p0, p1, getCss("--vector"), 14);
+
+      ctx.fillStyle = getCss("--vector");
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("Net M", p1.x + 10, p1.y - 4);
+    }
+
+    function drawStepLabel() {
+      const label = steps[stepIndex].label;
+      const x = canvas.width * 0.60;
+      const y = 74;
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 20px Segoe UI";
+      ctx.fillText(label, x, y);
+
+      if (stepIndex >= 5) {
+        ctx.font = "13px Segoe UI";
+        ctx.fillStyle = "#334155";
+        ctx.fillText("Dephasing before 180° is mirrored and reversed after 180°.", x, y + 24);
+      }
+    }
+
+    function drawSignalTrace(vec) {
+      const pad = { left: 80, right: 38, top: 430, bottom: 58 };
+      const x0 = pad.left;
+      const y0 = pad.top;
+      const w = canvas.width - pad.left - pad.right;
+      const h = canvas.height - pad.top - pad.bottom;
+      const yMid = y0 + h * 0.52;
+      const ampScale = h * 0.36;
+
+      ctx.strokeStyle = "#d6deea";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Signal trace (below Bloch sphere)", x0 + 8, y0 + 18);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x0, yMid);
+      ctx.lineTo(x0 + w, yMid);
+      ctx.stroke();
+
+      drawSignalCurve(x0, yMid, w, ampScale, "#c5d2ea", MAX_TIME, 1);
+
+      const tCursor = clamp(state.signalTime, 0, MAX_TIME);
+      const progress = MAX_TIME > 0 ? tCursor / MAX_TIME : 0;
+      drawSignalCurve(x0, yMid, w * progress, ampScale, getCss("--signal"), tCursor, 2.2);
+
+      const xTau = x0 + (TAU_TIME / MAX_TIME) * w;
+      const xTe = x0 + (TE_TIME / MAX_TIME) * w;
+      const x90 = x0;
+
+      ctx.setLineDash([5, 5]);
+      drawMarkerLine(x90, y0, h, "#8aa4d4");
+      drawMarkerLine(xTau, y0, h, "#f59e0b");
+      drawMarkerLine(xTe, y0, h, "#16a34a");
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("90°", x90 + 4, y0 + h + 16);
+      ctx.fillText("180° at τ", xTau + 4, y0 + h + 16);
+      ctx.fillText("Echo at TE = 2τ", xTe + 4, y0 + h + 16);
+
+      const xCur = x0 + (tCursor / MAX_TIME) * w;
+      const yCur = yMid - signalWave(tCursor) * ampScale;
+      ctx.strokeStyle = "#1d4ed8";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(xCur, y0);
+      ctx.lineTo(xCur, y0 + h);
+      ctx.stroke();
+      ctx.fillStyle = "#1d4ed8";
+      ctx.beginPath();
+      ctx.arc(xCur, yCur, 4, 0, TAU);
+      ctx.fill();
+
+      if (stepIndex >= 6) {
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 12px Segoe UI";
+        ctx.fillText("Rephasing window: τ → TE", xTau + 8, y0 + 36);
+      }
+      if (stepIndex === 7) {
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 12px Segoe UI";
+        ctx.fillText("Echo peak", xTe + 8, y0 + 52);
+      }
+
+      // Visual link to current transverse signal strength.
+      const mxy = Math.hypot(vec.x, vec.y);
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText(`Current |Mxy| ≈ ${mxy.toFixed(2)}`, x0 + w - 148, y0 + 18);
+    }
+
+    function drawSignalCurve(x0, yMid, widthPx, ampScale, color, tMax, lineWidth) {
+      if (widthPx <= 0) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.beginPath();
+
+      const samples = Math.max(2, Math.floor(widthPx / 2));
+      for (let i = 0; i <= samples; i += 1) {
+        const u = samples === 0 ? 0 : i / samples;
+        const x = x0 + u * widthPx;
+        const t = u * tMax;
+        const y = yMid - signalWave(t) * ampScale;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function drawMarkerLine(x, y, h, color) {
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + h);
+      ctx.stroke();
+    }
+
+    function signalWave(t) {
+      if (t < 0) return 0;
+      const env = signalEnvelope(t);
+      return env * Math.sin(24 * t);
+    }
+
+    function signalEnvelope(t) {
+      if (t < 0) return 0;
+      const t2 = 5.5;
+      const t2s = 0.78;
+
+      const irreversible = Math.exp(-t / t2);
+      let reversible;
+
+      if (t <= TAU_TIME) {
+        reversible = Math.exp(-t / t2s);
+      } else if (t <= TE_TIME) {
+        reversible = Math.exp(-(TE_TIME - t) / t2s);
+      } else {
+        reversible = Math.exp(-(t - TE_TIME) / t2s);
+      }
+
+      return irreversible * reversible;
+    }
+
+    function updateStatus(vec) {
+      const mxy = Math.hypot(vec.x, vec.y);
+      const mz = vec.z;
+      const spreadDeg = Math.abs(state.phaseSpread) * (180 / Math.PI);
+      const seqTau = Math.max(0, state.signalTime / TAU_TIME);
+
+      statusLine.textContent =
+        `Mz=${mz.toFixed(2)}  Mxy=${mxy.toFixed(2)}  Spread=${spreadDeg.toFixed(0)}°  ` +
+        `Sequence time=${seqTau.toFixed(2)}τ  (Echo at TE=2τ)`;
+    }
+
+    function tick(nowMs) {
+      const nowSec = nowMs / 1000;
+      lastMs = nowMs;
+
+      let rfDisplay = { flipShown: 0, flipTarget: 0 };
+      if (transition) {
+        rfDisplay = applyTransition(nowMs);
+      } else {
+        const stepKind = steps[stepIndex].kind;
+        if (stepKind === "rf90") rfDisplay = { flipShown: 90, flipTarget: 90 };
+        if (stepKind === "rf180") rfDisplay = { flipShown: 180, flipTarget: 180 };
+      }
+
+      draw(nowSec, rfDisplay);
+      requestAnimationFrame(tick);
+    }
+
+    function drawSpinArrow3D(cx, cy, zoom, from, to, color, width) {
+      const p0 = project(from, cx, cy, zoom);
+      const p1 = project(to, cx, cy, zoom);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+      drawArrowHead(p0, p1, color, 6);
+    }
+
+    function drawArrowHead(a, b, color, size) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const left = {
+        x: b.x - ux * size - uy * (size * 0.45),
+        y: b.y - uy * size + ux * (size * 0.45)
+      };
+      const right = {
+        x: b.x - ux * size + uy * (size * 0.45),
+        y: b.y - uy * size - ux * (size * 0.45)
+      };
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function rotateAroundY(v, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return {
+        x: v.x * c + v.z * s,
+        y: v.y,
+        z: -v.x * s + v.z * c
+      };
+    }
+
+    function slerpUnit(a, b, t) {
+      let dot = clamp(a.x * b.x + a.y * b.y + a.z * b.z, -1, 1);
+      if (dot > 0.9995) {
+        return normalize3({
+          x: lerp(a.x, b.x, t),
+          y: lerp(a.y, b.y, t),
+          z: lerp(a.z, b.z, t)
+        });
+      }
+
+      const theta = Math.acos(dot);
+      const s = Math.sin(theta) || 1;
+      const w1 = Math.sin((1 - t) * theta) / s;
+      const w2 = Math.sin(t * theta) / s;
+      return normalize3({
+        x: a.x * w1 + b.x * w2,
+        y: a.y * w1 + b.y * w2,
+        z: a.z * w1 + b.z * w2
+      });
+    }
+
+    function add3(a, b) {
+      return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z };
+    }
+
+    function scale3(v, s) {
+      return { x: v.x * s, y: v.y * s, z: v.z * s };
+    }
+
+    function normalize3(v) {
+      const m = Math.hypot(v.x, v.y, v.z);
+      if (!m || m < 1e-8) return { x: 0, y: 0, z: 1 };
+      return { x: v.x / m, y: v.y / m, z: v.z / m };
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function smooth01(t) {
+      const c = clamp(t, 0, 1);
+      return c * c * (3 - 2 * c);
+    }
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function degToRad(d) {
+      return (d * Math.PI) / 180;
+    }
+
+    function getCss(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    renderStepText();
+    updateButtons();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

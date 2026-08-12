@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frcr-anatomy",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd frcr-anatomy && npm run dev"],
+      "port": 3000
+    },
+    {
+      "name": "mrcp-stack",
+      "url": "http://localhost:8934"
+    }
+  ]
+}

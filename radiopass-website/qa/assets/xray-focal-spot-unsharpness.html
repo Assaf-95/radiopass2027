@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Focal Spot & Geometric Unsharpness — Radiopass</title>
+<meta name="description" content="Anode angle, effective focal spot, magnification and penumbra — one idea at a time." />
+<link rel="stylesheet" href="../../assets/css/site.css?v=3" />
+<link rel="stylesheet" href="../../assets/css/guided-steps.css?v=3" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="shell flex-between">
+    <a href="../../index.html" class="brand"><span class="brand-mark"></span>Radiopass</a>
+    <div class="nav-links">
+      <a href="../index.html">Visual Lab</a>
+      <a href="../../question-bank.html">Question Bank</a>
+      <a href="../../about.html">About</a>
+      <a href="../../trial.html">Pricing</a>
+    </div>
+    <a href="../../trial.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 13.5px;">Start free trial</a>
+  </div>
+</nav>
+
+<header class="gs-header">
+  <div class="shell">
+    <div class="gs-header-top">
+      <div>
+        <span class="eyebrow">X-ray · Focal Spot & Unsharpness</span>
+        <h1 class="gs-title">Why the image blurs at the edges.</h1>
+        <p class="lede gs-subtitle">One geometry problem, two formulas. Both come straight from the shape of the beam.</p>
+      </div>
+      <div class="gs-progress-pill" id="gs-progress">STEP 1 / 7</div>
+    </div>
+    <a href="xray-focal-spot-unsharpness-full.html" class="btn btn-ghost gs-full-link">open the full simulator</a>
+  </div>
+</header>
+
+<div class="shell gs-layout">
+  <div class="card glass gs-stage-card">
+    <div class="gs-stage-head">
+      <span id="gs-chip"></span>
+      <div class="gs-timeline" id="gs-timeline"></div>
+    </div>
+    <div class="gs-stage-svg-wrap">
+      <svg id="gs-stage" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <div class="card glass gs-teach-card">
+    <h2 class="gs-step-title" id="gs-step-title"></h2>
+    <p class="gs-step-text" id="gs-step-text"></p>
+    <ul class="gs-notes" id="gs-notes"></ul>
+    <div class="gs-nav">
+      <button type="button" class="btn btn-ghost" id="gs-prev">Back</button>
+      <button type="button" class="btn btn-primary" id="gs-next">Next</button>
+    </div>
+    <div class="gs-reset-row"><button type="button" id="gs-reset">restart from step 1</button></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="shell flex-between" style="flex-wrap: wrap; gap: var(--space-4);">
+    <span>© 2026 Radiopass · radiopass.co.uk · independent, not affiliated with the Royal College of Radiologists</span>
+    <div class="flex gap-5">
+      <a href="../../about.html">About</a>
+      <a href="../../contact.html">Contact</a>
+      <a href="../../faq.html">FAQ</a>
+      <a href="../../terms.html">Terms</a>
+      <a href="../../privacy.html">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/js/mri-vector-kit.js"></script>
+<script src="../../assets/js/guided-steps.js"></script>
+<script>
+(function () {
+  var K = window.MriVectorKit;
+
+  var STEPS = [
+    {
+      title: "Inside the tube",
+      chip: "Tube geometry",
+      text: "Electrons boil off the heated cathode filament and accelerate across the tube, striking the anode target at an angle — not head-on.",
+      notes: ["The angled target is deliberate, not incidental.", "Where the beam actually lands is the 'actual' focal spot.", "Everything about focal spot size traces back to this geometry."]
+    },
+    {
+      title: "Actual vs effective focal spot",
+      chip: "Line focus principle",
+      text: "The actual focal spot — where electrons really land on the target — is bigger than the effective focal spot, which is what the emerging beam 'sees' from below, foreshortened by the anode angle θ.",
+      notes: ["F(effective) = F(actual) × sin(θ).", "This is the line focus principle.", "The two numbers describe the same spot from two different viewpoints."]
+    },
+    {
+      title: "Smaller angle, smaller image spot",
+      chip: "Anode angle trade-off",
+      text: "Reduce the anode angle and the effective focal spot shrinks — sharper images — without changing the actual target area electrons strike, which is what limits heat loading.",
+      notes: ["Smaller angle → smaller effective spot → better spatial resolution.", "The actual target area doesn't shrink, so heat capacity is unaffected.", "This is why anode angle is a genuine engineering trade-off, not free."]
+    },
+    {
+      title: "Now think about the image",
+      chip: "Projection geometry",
+      text: "Once the beam leaves the tube, three distances matter: source-to-object (SOD), source-to-detector (SID), and object-to-detector (OID). Everything about magnification and blur comes from these three numbers.",
+      notes: ["SOD — source to object distance.", "SID — source to detector distance.", "OID — object to detector distance = SID − SOD."]
+    },
+    {
+      title: "Magnification",
+      chip: "M = SID / SOD",
+      text: "Every object is magnified on the detector by a factor of SID divided by SOD. Move the object closer to the detector (or the detector closer to the object), and magnification drops toward 1.",
+      notes: ["Object touching the detector → minimal magnification.", "Object far from the detector, close to the source → high magnification.", "This is pure projection geometry — nothing to do with focal spot size."]
+    },
+    {
+      title: "Geometric unsharpness — the penumbra",
+      chip: "U = F × (OID / SOD)",
+      text: "Blur at the object's edge — the penumbra — grows with focal spot size F and with OID, and shrinks as SOD increases. A point source would cast a perfectly sharp edge; a real focal spot never does.",
+      notes: ["Bigger focal spot → more blur.", "Object far from the detector (large OID) → more blur.", "Object close to the source (large SOD) → less blur, for a fixed geometry."]
+    },
+    {
+      title: "Ready for the full simulator",
+      chip: "Full simulator available",
+      text: "The full version lets you drag the object, adjust focal spot size, SID and anode angle directly, and read live magnification and unsharpness numbers as you go.",
+      notes: ["Diagram 1: anode angle and the line focus principle, live.", "Diagram 2: drag the object and watch magnification and penumbra update.", "Both diagrams share the same underlying geometry you just walked through."]
+    }
+  ];
+
+  function renderScene(i, svg) {
+    var step = i + 1;
+    var scene = '';
+    var srcX = 160, srcY = 90, detX = 160, detY = 460, objX = 430;
+
+    if (step <= 3) {
+      // tube / anode geometry
+      var cx = 430, cy = 180;
+      var angle = step === 3 ? 0.28 : 0.5;
+      scene += '<rect x="' + (cx - 160) + '" y="' + (cy - 60) + '" width="320" height="18" fill="#8FA3BB" opacity="0.15"/>';
+      scene += K.label(cx, cy - 78, 'cathode (filament)', '#8FA3BB', 'middle', 13);
+      scene += K.arrow(cx - 140, cy - 40, cx, cy + 40, '#5FE3F2', 3);
+      scene += K.arrow(cx + 140, cy - 40, cx, cy + 40, '#5FE3F2', 3);
+      scene += K.label(cx, cy - 10, 'electrons', '#5FE3F2', 'middle', 12);
+      // anode wedge
+      var wedgeLen = 90;
+      var ax2 = cx + wedgeLen * Math.cos(angle), ay2 = cy + 40 + wedgeLen * Math.sin(angle);
+      scene += '<polygon points="' + (cx - 20) + ',' + (cy + 40) + ' ' + (cx + 20) + ',' + (cy + 40) + ' ' + ax2 + ',' + ay2 + '" fill="#F2B84B" opacity="0.5" stroke="#F2B84B"/>';
+      scene += K.label(cx + 60, cy + 100, 'anode target (θ)', '#F2B84B', 'middle', 13);
+      if (step >= 2) {
+        scene += '<rect x="' + (cx - 4) + '" y="' + (cy + 36) + '" width="8" height="14" fill="#EAF3FB"/>';
+        scene += K.label(cx, cy + 130, 'actual focal spot', '#EAF3FB', 'middle', 12);
+        var effWidth = step === 3 ? 4 : 8;
+        scene += '<rect x="' + (cx - effWidth / 2) + '" y="' + (cy + 190) + '" width="' + effWidth + '" height="10" fill="#5FE3F2"/>';
+        scene += K.label(cx, cy + 220, 'effective focal spot (seen from below)', '#5FE3F2', 'middle', 12);
+        scene += K.label(cx, cy + 245, step === 3 ? 'smaller θ → smaller effective spot' : 'F(eff) = F(actual) × sin θ', '#8FA3BB', 'middle', 13);
+      }
+    } else {
+      // projection geometry: source -> object -> detector
+      var oid = step === 6 ? 220 : 120;
+      var objY = detY - oid;
+      scene += K.label(srcX, srcY - 20, 'source', '#5FE3F2', 'middle', 14);
+      scene += '<circle cx="' + srcX + '" cy="' + srcY + '" r="7" fill="#5FE3F2"/>';
+      scene += '<line x1="' + srcX + '" y1="' + srcY + '" x2="' + detX + '" y2="' + detY + '" stroke="rgba(148,197,224,0.25)" stroke-width="1"/>';
+      scene += '<rect x="60" y="' + (objY - 30) + '" width="20" height="60" fill="#F2B84B" opacity="0.7"/>';
+      scene += K.label(90, objY, 'object', '#F2B84B', 'start', 13);
+      scene += '<rect x="60" y="' + (detY - 4) + '" width="640" height="8" fill="#EAF3FB" opacity="0.6"/>';
+      scene += K.label(400, detY + 30, 'detector', '#EAF3FB', 'middle', 13);
+
+      if (step === 5) {
+        scene += K.label(650, (srcY + objY) / 2, 'SOD', '#5FE3F2', 'start', 13);
+        scene += K.label(650, (objY + detY) / 2 + 20, 'SID (full)', '#8FA3BB', 'start', 13);
+        scene += K.label(430, 60, 'M = SID / SOD', '#F2B84B', 'middle', 22);
+      }
+      if (step === 6) {
+        scene += '<path d="M ' + srcX + ' ' + srcY + ' L 80 ' + (objY - 30) + ' L 100 ' + (detY - 4) + ' Z" fill="#5FE3F2" opacity="0.10"/>';
+        scene += '<path d="M ' + srcX + ' ' + srcY + ' L 80 ' + (objY + 30) + ' L 60 ' + (detY - 4) + ' Z" fill="#5FE3F2" opacity="0.10"/>';
+        scene += K.label(430, 60, 'U = F × (OID / SOD)', '#F2B84B', 'middle', 22);
+        scene += K.label(140, detY + 55, 'penumbra (blur)', '#5FE3F2', 'middle', 13);
+      }
+    }
+
+    if (step === 7) {
+      scene =
+        '<rect x="90" y="120" width="680" height="260" rx="28" fill="rgba(6,11,20,0.6)" stroke="rgba(95,227,242,0.35)"/>' +
+        K.label(430, 175, 'Full simulator preserved', '#5FE3F2', 'middle', 24) +
+        K.label(430, 215, 'Diagram 1: tube + line focus  ·  Diagram 2: drag-to-explore magnification & blur', '#EAF3FB', 'middle', 14) +
+        '<rect x="188" y="260" width="180" height="70" rx="14" fill="rgba(95,227,242,0.14)" stroke="#5FE3F2"/>' +
+        '<rect x="492" y="260" width="180" height="70" rx="14" fill="rgba(242,184,75,0.14)" stroke="#F2B84B"/>' +
+        K.label(278, 300, 'tube & anode angle', '#AFF3FF') + K.label(582, 300, 'drag object · readouts', '#FBE3B0');
+    }
+
+    svg.innerHTML = K.frame(scene);
+  }
+
+  window.GuidedSteps.init({ steps: STEPS, renderScene: renderScene });
+})();
+</script>
+</body>
+</html>

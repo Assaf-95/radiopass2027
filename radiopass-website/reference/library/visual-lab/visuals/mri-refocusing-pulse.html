@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI 180 Pulse Trainer</title>
+  <style>
+    :root {
+      --bg1: #f6f8ff;
+      --bg2: #e8f7ff;
+      --ink: #14213d;
+      --muted: #3c4a63;
+      --panel: #ffffffee;
+      --accent: #0f766e;
+      --accent-2: #0369a1;
+      --b0: #2563eb;
+      --b1: #d97706;
+      --m0: #dc2626;
+      --coil: #7c3aed;
+      --gz: #0ea5a4;
+      --gx: #f59e0b;
+      --gy: #9333ea;
+      --grid: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 20%, #ffffff 0%, #f7fbff 35%, transparent 60%),
+        radial-gradient(circle at 85% 80%, #dcf5ff 0%, #eaf8ff 30%, transparent 60%),
+        linear-gradient(130deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 350px 1fr;
+      align-items: start;
+    }
+
+    .panel,
+    .stage-card {
+      background: var(--panel);
+      border: 1px solid #dbe7ff;
+      border-radius: 16px;
+      box-shadow: 0 14px 36px rgba(30, 55, 90, 0.13);
+    }
+
+    .panel {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      position: sticky;
+      top: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .control {
+      background: #f7fbff;
+      border: 1px solid #d8e6ff;
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+
+    .control strong { color: var(--accent-2); }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(120deg, #0d9488, #0369a1);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(3, 105, 161, 0.25);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .button-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .button-secondary {
+      background: linear-gradient(120deg, #334155, #0f172a);
+    }
+
+    .checkline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .metrics {
+      background: #f7fbff;
+      border: 1px solid #d8e6ff;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      color: #0f172a;
+      display: grid;
+      gap: 6px;
+    }
+
+    .stage-card {
+      padding: 12px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #d8e6ff;
+      background:
+        linear-gradient(180deg, #ffffff, #f8fcff);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      background: #f9fbff;
+      border: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .eq {
+      font-family: "STIX Two Text", Georgia, serif;
+      background: #fff;
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      padding: 8px;
+      color: #1e3a8a;
+      font-size: 0.94rem;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        position: static;
+      }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <h1>MRI 180 Pulse Trainer</h1>
+      <p class="subtitle">Interactive model focused on inversion behavior after a 180 degree RF pulse with relaxation and gradient effects.</p>
+
+      <div class="control">
+        <div class="control-row"><span>Main Field <strong>B0</strong></span><strong id="b0Value">1.5 T</strong></div>
+        <input id="b0Slider" type="range" min="1" max="3" step="0.1" value="1.5" />
+        <div class="control-row"><span>Larmor frequency <strong>f0</strong></span><strong id="larmorValue">63.87 MHz</strong></div>
+      </div>
+
+      <div class="control">
+        <div class="control-row"><span>RF Flip Angle (fixed)</span><strong id="flipValue">180°</strong></div>
+        <input id="flipSlider" type="range" min="180" max="180" step="1" value="180" disabled />
+        <div class="button-row">
+          <button id="pulseBtn">Apply 180° Pulse (B1)</button>
+          <button id="resetBtn" class="button-secondary">Reset</button>
+        </div>
+      </div>
+
+      <label class="checkline"><input id="t1Toggle" type="checkbox" checked /> Enable T1 recovery (Mz regrowth)</label>
+      <label class="checkline"><input id="t2Toggle" type="checkbox" checked /> Enable T2 decay (Mxy dephasing)</label>
+
+      <div class="control">
+        <label class="checkline"><input id="showGradientsToggle" type="checkbox" checked /> Show gradients (Gz, Gx, Gy)</label>
+        <div class="button-row-3">
+          <button id="applyGzBtn">Apply Gz</button>
+          <button id="applyGxBtn">Apply Gx</button>
+          <button id="applyGyBtn">Apply Gy</button>
+        </div>
+      </div>
+
+      <div class="eq">
+        <div><strong>Larmor equation:</strong> ω = γB0</div>
+        <div>f0 = (γ/2π) · B0</div>
+        <div>For hydrogen: γ/2π = 42.58 MHz/T</div>
+      </div>
+
+      <div class="metrics">
+        <div id="mzMetric">Longitudinal magnetization Mz: 1.00</div>
+        <div id="mxyMetric">Transverse magnetization Mxy: 0.00</div>
+        <div id="signalMetric">Receiver coil signal: 0.00</div>
+        <div id="gradientMetric">Gradients: none active</div>
+      </div>
+    </aside>
+
+    <section class="stage-card">
+      <div class="canvas-wrap">
+        <canvas id="scene" width="900" height="560"></canvas>
+      </div>
+      <div class="legend">
+        <span class="key"><span class="dot" style="background: var(--b0);"></span> B0 (z-axis)</span>
+        <span class="key"><span class="dot" style="background: var(--b1);"></span> B1 RF pulse (x-axis)</span>
+        <span class="key"><span class="dot" style="background: var(--gz);"></span> Gz slice-select</span>
+        <span class="key"><span class="dot" style="background: var(--gx);"></span> Gx frequency-encode</span>
+        <span class="key"><span class="dot" style="background: var(--gy);"></span> Gy phase-encode</span>
+        <span class="key"><span class="dot" style="background: var(--m0);"></span> Net magnetization M</span>
+        <span class="key"><span class="dot" style="background: var(--coil);"></span> Receiver coil / signal</span>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+
+    const b0Slider = document.getElementById("b0Slider");
+    const flipSlider = document.getElementById("flipSlider");
+    const pulseBtn = document.getElementById("pulseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const t1Toggle = document.getElementById("t1Toggle");
+    const t2Toggle = document.getElementById("t2Toggle");
+    const showGradientsToggle = document.getElementById("showGradientsToggle");
+    const applyGzBtn = document.getElementById("applyGzBtn");
+    const applyGxBtn = document.getElementById("applyGxBtn");
+    const applyGyBtn = document.getElementById("applyGyBtn");
+
+    const b0Value = document.getElementById("b0Value");
+    const larmorValue = document.getElementById("larmorValue");
+    const flipValue = document.getElementById("flipValue");
+    const mzMetric = document.getElementById("mzMetric");
+    const mxyMetric = document.getElementById("mxyMetric");
+    const signalMetric = document.getElementById("signalMetric");
+    const gradientMetric = document.getElementById("gradientMetric");
+
+    const gammaMHzPerT = 42.58;
+
+    const center = { x: canvas.width * 0.55, y: canvas.height * 0.55 };
+    const axisScale = 180;
+    const zHorizScale = 1.0;
+    const xDepthScale = 0.42;
+    const xDepthDrop = 0.35;
+
+    const protonCount = 20;
+    const protons = [];
+
+    let state = {
+      b0: Number(b0Slider.value),
+      flipDeg: Number(flipSlider.value),
+      phase: 0,
+      pulseFlash: 0,
+      lastTime: performance.now(),
+      isPulsing: false,
+      pulseElapsed: 0,
+      pulseDuration: 1100,
+      startTheta: 0,
+      targetTheta: Math.PI / 2,
+      theta: 0,
+      mxyAmp: 0,
+      t1Seconds: 4.5,
+      t2Seconds: 3.2,
+      targetPrecessionHz: 0,
+      currentPrecessionHz: 0,
+      gzPulse: 0,
+      gxPulse: 0,
+      gyPulse: 0,
+      gxDephase: 0,
+      phaseEncodeStrength: 0,
+      coherence: 1,
+      signalNow: 0
+    };
+
+    function getVisualPrecessionHz() {
+      // Map real Larmor scaling into a slower educational display rate.
+      return calcLarmorMHz() * 0.03;
+    }
+
+    function initializeProtons() {
+      protons.length = 0;
+      for (let i = 0; i < protonCount; i += 1) {
+        const angle = (Math.random() - 0.5) * 0.35;
+        const isParallel = i % 4 !== 0;
+        const length = isParallel ? 0.55 + Math.random() * 0.25 : -0.25 - Math.random() * 0.2;
+        protons.push({
+          angle,
+          wobble: 0.12 + Math.random() * 0.05,
+          zBase: length,
+          posX: (Math.random() - 0.5) * 1.2,
+          posY: (Math.random() - 0.5) * 1.2,
+          phaseOffset: (Math.random() - 0.5) * 0.18
+        });
+      }
+    }
+
+    function calcLarmorMHz() {
+      return gammaMHzPerT * state.b0;
+    }
+
+    function updateReadouts() {
+      const larmor = calcLarmorMHz();
+      b0Value.textContent = `${state.b0.toFixed(1)} T`;
+      larmorValue.textContent = `${larmor.toFixed(2)} MHz`;
+      flipValue.textContent = `${state.flipDeg.toFixed(0)}°`;
+
+      const mz = Math.cos(state.theta);
+      const mxy = state.mxyAmp * state.coherence;
+      const signal = state.signalNow;
+      const active = [];
+      if (state.gzPulse > 0.08) active.push("Gz");
+      if (state.gxPulse > 0.08) active.push("Gx");
+      if (state.gyPulse > 0.08) active.push("Gy");
+
+      mzMetric.textContent = `Longitudinal magnetization Mz: ${mz.toFixed(2)}`;
+      mxyMetric.textContent = `Transverse magnetization Mxy: ${mxy.toFixed(2)}`;
+      signalMetric.textContent = `Receiver coil signal: ${signal.toFixed(2)}`;
+      gradientMetric.textContent = active.length ? `Gradients active: ${active.join(", ")}` : "Gradients: none active";
+    }
+
+    function applyPulse() {
+      state.isPulsing = true;
+      state.pulseElapsed = 0;
+      state.startTheta = state.theta;
+      state.targetTheta = (state.flipDeg * Math.PI) / 180;
+      state.pulseFlash = 1;
+    }
+
+    function resetSystem() {
+      state.theta = 0;
+      state.mxyAmp = 0;
+      state.phase = 0;
+      state.isPulsing = false;
+      state.pulseElapsed = 0;
+      state.pulseFlash = 0;
+      state.gzPulse = 0;
+      state.gxPulse = 0;
+      state.gyPulse = 0;
+      state.gxDephase = 0;
+      state.phaseEncodeStrength = 0;
+      initializeProtons();
+      state.coherence = computeCoherence();
+      state.signalNow = 0;
+      updateReadouts();
+    }
+
+    function applySliceGradient() {
+      state.gzPulse = 1;
+    }
+
+    function applyFrequencyGradient() {
+      state.gxPulse = 1;
+    }
+
+    function applyPhaseGradient() {
+      state.gyPulse = 1;
+      state.phaseEncodeStrength += 0.95;
+    }
+
+    function toScreen(x, y, z) {
+      return {
+        // Re-oriented view: z is horizontal, xy plane appears vertical.
+        x: center.x + z * axisScale * zHorizScale + x * axisScale * xDepthScale,
+        y: center.y - y * axisScale - x * axisScale * xDepthDrop
+      };
+    }
+
+    function getProtonPhase(p) {
+      return state.phase + p.phaseOffset + state.gxDephase * p.posX + state.phaseEncodeStrength * p.posY;
+    }
+
+    function computeCoherence() {
+      let sumX = 0;
+      let sumY = 0;
+      for (let i = 0; i < protons.length; i += 1) {
+        const ph = getProtonPhase(protons[i]);
+        sumX += Math.cos(ph);
+        sumY += Math.sin(ph);
+      }
+      return Math.hypot(sumX, sumY) / protons.length;
+    }
+
+    function drawArrow(from, to, color, width, label) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.stroke();
+
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+
+      ctx.beginPath();
+      ctx.moveTo(to.x, to.y);
+      ctx.lineTo(to.x - ux * 14 - uy * 6, to.y - uy * 14 + ux * 6);
+      ctx.lineTo(to.x - ux * 14 + uy * 6, to.y - uy * 14 - ux * 6);
+      ctx.closePath();
+      ctx.fill();
+
+      if (label) {
+        ctx.font = "bold 15px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText(label, to.x + 8, to.y - 8);
+      }
+    }
+
+    function drawAxes() {
+      ctx.save();
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 1.2;
+
+      const xStart = toScreen(-1.2, 0, 0);
+      const xEnd = toScreen(1.2, 0, 0);
+      const yStart = toScreen(0, -1.2, 0);
+      const yEnd = toScreen(0, 1.2, 0);
+      const zStart = toScreen(0, 0, -1.3);
+      const zEnd = toScreen(0, 0, 1.3);
+
+      ctx.beginPath();
+      ctx.moveTo(xStart.x, xStart.y);
+      ctx.lineTo(xEnd.x, xEnd.y);
+      ctx.moveTo(yStart.x, yStart.y);
+      ctx.lineTo(yEnd.x, yEnd.y);
+      ctx.moveTo(zStart.x, zStart.y);
+      ctx.lineTo(zEnd.x, zEnd.y);
+      ctx.stroke();
+
+      ctx.fillStyle = "#475569";
+      ctx.font = "13px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("x-axis", xEnd.x - 12, xEnd.y + 18);
+      ctx.fillText("y-axis", yEnd.x + 10, yEnd.y + 4);
+      ctx.fillText("z-axis (longitudinal, horizontal)", zEnd.x - 35, zEnd.y - 10);
+
+      const ellipsePoints = 60;
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      for (let i = 0; i <= ellipsePoints; i += 1) {
+        const t = (i / ellipsePoints) * Math.PI * 2;
+        const p = toScreen(Math.cos(t), Math.sin(t), 0);
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = "#64748b";
+      ctx.fillText("Transverse plane (xy, vertical view)", center.x - 115, center.y + axisScale * 0.78);
+
+      ctx.restore();
+    }
+
+    function drawB0() {
+      const base = toScreen(0, 0, -0.2);
+      const tip = toScreen(0, 0, 1.05);
+      drawArrow(base, tip, getComputedStyle(document.documentElement).getPropertyValue("--b0"), 5, "B0");
+    }
+
+    function drawB1() {
+      if (state.pulseFlash <= 0.01) return;
+      const color = getComputedStyle(document.documentElement).getPropertyValue("--b1");
+      const base = toScreen(-0.55, 0, 0.1);
+      const tip = toScreen(0.55, 0, 0.1);
+      ctx.globalAlpha = 0.35 + 0.65 * state.pulseFlash;
+      drawArrow(base, tip, color, 5, "B1 (RF)");
+      ctx.globalAlpha = 1;
+    }
+
+    function drawProtons() {
+      ctx.save();
+      for (let i = 0; i < protons.length; i += 1) {
+        const p = protons[i];
+        const localPhase = getProtonPhase(p) + p.angle;
+        const wobbleX = Math.cos(localPhase) * p.wobble * state.mxyAmp;
+        const wobbleY = Math.sin(localPhase) * p.wobble * state.mxyAmp;
+
+        const from = toScreen(0, 0, 0);
+        const to = toScreen(wobbleX, wobbleY, p.zBase);
+
+        const aligned = p.zBase > 0;
+        const color = aligned ? "#16a34a" : "#ef4444";
+        ctx.globalAlpha = aligned ? 0.65 : 0.55;
+        drawArrow(from, to, color, 1.5);
+      }
+      ctx.restore();
+    }
+
+    function drawMagnetizationVector() {
+      const phi = state.phase;
+      const mz = Math.cos(state.theta);
+      const transverse = state.mxyAmp * state.coherence;
+      const mx = transverse * Math.cos(phi);
+      const my = transverse * Math.sin(phi);
+
+      const from = toScreen(0, 0, 0);
+      const to = toScreen(mx, my, mz);
+      drawArrow(from, to, getComputedStyle(document.documentElement).getPropertyValue("--m0"), 6, "M");
+
+      if (transverse > 0.01) {
+        const tipXY = toScreen(mx, my, 0);
+        drawArrow(from, tipXY, "#ef4444aa", 3, "Mxy");
+      }
+
+      const zTip = toScreen(0, 0, mz);
+      drawArrow(from, zTip, "#ef444488", 2, "Mz");
+    }
+
+    function drawGradients() {
+      if (!showGradientsToggle.checked) return;
+
+      const gzColor = getComputedStyle(document.documentElement).getPropertyValue("--gz");
+      const gxColor = getComputedStyle(document.documentElement).getPropertyValue("--gx");
+      const gyColor = getComputedStyle(document.documentElement).getPropertyValue("--gy");
+
+      if (state.gzPulse > 0.03) {
+        ctx.save();
+        ctx.globalAlpha = 0.25 + 0.45 * state.gzPulse;
+        ctx.fillStyle = gzColor;
+        const bandX = center.x - 20;
+        ctx.fillRect(bandX, 40, 40, canvas.height - 80);
+        ctx.restore();
+        drawArrow(toScreen(0, 0, -0.65), toScreen(0, 0, 0.75), gzColor, 4, "Gz slice-select");
+      }
+
+      if (state.gxPulse > 0.03) {
+        ctx.globalAlpha = 0.45 + 0.45 * state.gxPulse;
+        drawArrow(toScreen(-0.9, 0, -0.2), toScreen(0.9, 0, -0.2), gxColor, 4, "Gx freq-encode");
+        ctx.globalAlpha = 1;
+      }
+
+      if (state.gyPulse > 0.03) {
+        ctx.globalAlpha = 0.45 + 0.45 * state.gyPulse;
+        drawArrow(toScreen(0, -0.9, -0.18), toScreen(0, 0.9, -0.18), gyColor, 4, "Gy phase-encode");
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function drawReceiverCoil() {
+      const coilColor = getComputedStyle(document.documentElement).getPropertyValue("--coil");
+      const radius = 40;
+      const x = center.x - axisScale * 1.25;
+      const y = center.y + 20;
+
+      ctx.save();
+      ctx.strokeStyle = coilColor;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(x, y, radius, radius * 0.62, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const signal = state.signalNow;
+      const bars = 7;
+      for (let i = 0; i < bars; i += 1) {
+        const h = (4 + signal * 24) * (0.6 + i / (bars * 1.7));
+        const bx = x + radius + 16 + i * 8;
+        const by = y + 16;
+        ctx.fillStyle = `rgba(124,58,237,${0.25 + 0.1 * i})`;
+        ctx.fillRect(bx, by - h, 5, h);
+      }
+
+      ctx.fillStyle = "#4c1d95";
+      ctx.font = "bold 14px Avenir Next, Segoe UI, sans-serif";
+      ctx.fillText("Receiver coil", x - 45, y + 58);
+      ctx.restore();
+    }
+
+    function drawEquationText() {
+      ctx.save();
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "15px SF Mono, Menlo, Consolas, monospace";
+      ctx.fillText(`B0 = ${state.b0.toFixed(1)} T`, 20, 32);
+      ctx.fillText(`f0 = 42.58 * B0 = ${calcLarmorMHz().toFixed(2)} MHz`, 20, 56);
+      ctx.fillText(`Flip angle = ${state.flipDeg.toFixed(0)} degrees`, 20, 80);
+      ctx.fillText("Display orientation: z horizontal, xy vertical", 20, 104);
+
+      if (state.isPulsing || state.pulseFlash > 0.06) {
+        ctx.fillStyle = "#b45309";
+        ctx.fillText("RF pulse at Larmor frequency applied: resonance achieved", 20, 128);
+      }
+      ctx.restore();
+    }
+
+    function updatePhysics(dt) {
+      const gradientHzShift = 0.4 * state.gzPulse;
+      const speedTau = 1.3;
+      state.currentPrecessionHz += ((state.targetPrecessionHz - state.currentPrecessionHz) * dt) / speedTau;
+      state.phase += dt * (state.currentPrecessionHz + gradientHzShift) * Math.PI * 2;
+
+      if (state.isPulsing) {
+        state.pulseElapsed += dt * 1000;
+        const p = Math.min(1, state.pulseElapsed / state.pulseDuration);
+        state.theta = state.startTheta + (state.targetTheta - state.startTheta) * (1 - Math.cos(p * Math.PI)) * 0.5;
+        state.mxyAmp = Math.sin(state.theta);
+        if (p >= 1) {
+          state.isPulsing = false;
+        }
+      } else {
+        if (t1Toggle.checked) {
+          const mz = Math.cos(state.theta);
+          const mzNext = mz + ((1 - mz) * dt) / state.t1Seconds;
+          state.theta = Math.acos(Math.max(-1, Math.min(1, mzNext)));
+        }
+
+        if (t2Toggle.checked) {
+          state.mxyAmp += ((Math.sin(state.theta) - state.mxyAmp) * dt) / 0.45;
+          state.mxyAmp *= Math.exp(-dt / state.t2Seconds);
+        } else {
+          state.mxyAmp = Math.sin(state.theta);
+        }
+      }
+
+      state.gxDephase += dt * 3.2 * state.gxPulse;
+      state.gxDephase *= Math.exp(-dt * 0.25);
+
+      state.gzPulse *= Math.exp(-dt * 1.6);
+      state.gxPulse *= Math.exp(-dt * 1.4);
+      state.gyPulse *= Math.exp(-dt * 1.6);
+      state.pulseFlash *= Math.exp(-dt * 4.4);
+      state.phase %= Math.PI * 2;
+      state.coherence = computeCoherence();
+      state.signalNow = Math.abs(state.mxyAmp * state.coherence * Math.sin(state.phase));
+      updateReadouts();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      grd.addColorStop(0, "#f9fcff");
+      grd.addColorStop(1, "#edf5ff");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.strokeStyle = "rgba(148,163,184,0.14)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      drawAxes();
+      drawB0();
+      drawB1();
+      drawGradients();
+      drawProtons();
+      drawMagnetizationVector();
+      drawReceiverCoil();
+      drawEquationText();
+    }
+
+    function animate(now) {
+      const dt = Math.min(0.04, (now - state.lastTime) / 1000);
+      state.lastTime = now;
+      updatePhysics(dt);
+      render();
+      requestAnimationFrame(animate);
+    }
+
+    b0Slider.addEventListener("input", () => {
+      state.b0 = Number(b0Slider.value);
+      state.targetPrecessionHz = getVisualPrecessionHz();
+      updateReadouts();
+    });
+
+    flipSlider.addEventListener("input", () => {
+      state.flipDeg = Number(flipSlider.value);
+      updateReadouts();
+    });
+
+    pulseBtn.addEventListener("click", applyPulse);
+    resetBtn.addEventListener("click", resetSystem);
+    applyGzBtn.addEventListener("click", applySliceGradient);
+    applyGxBtn.addEventListener("click", applyFrequencyGradient);
+    applyGyBtn.addEventListener("click", applyPhaseGradient);
+
+    initializeProtons();
+    state.targetPrecessionHz = getVisualPrecessionHz();
+    state.currentPrecessionHz = state.targetPrecessionHz;
+    updateReadouts();
+    requestAnimationFrame((t) => {
+      state.lastTime = t;
+      animate(t);
+    });
+  </script>
+</body>
+</html>

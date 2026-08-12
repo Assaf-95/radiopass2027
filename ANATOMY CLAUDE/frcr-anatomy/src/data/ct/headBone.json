@@ -1,0 +1,794 @@
+{
+ "id": "head-bone",
+ "title": "CT head — bone window",
+ "plane": "axial",
+ "weighting": "Bone algorithm, high resolution",
+ "region": "Skull vault, skull base and paranasal sinuses",
+ "side": null,
+ "sideNote": "Conventional axial display: the patient's right is on the viewer's left. No side marker is burned into the image, and the source PACS annotation carrying patient identifiers has been cropped away entirely.",
+ "markers": [
+  "Axial · patient right on viewer left"
+ ],
+ "sliceCount": 33,
+ "width": 970,
+ "height": 974,
+ "imagePattern": "/ct/head-bone/s{index}.webp",
+ "provenance": "Reconstructed from a screen recording of a PACS session. 827 frames collapsed to 55 distinct images, deduplicated across the reader's two scroll passes to 33 unique levels, ordered by spectral seriation of the slice-similarity graph with 2-opt and or-opt refinement, then cropped to the image itself. Every burned-in patient identifier — name, date of birth, accession number, institution — lies outside the crop, verified by counting coloured pixels in the published slices: zero.",
+ "levels": [
+  {
+   "from": 0,
+   "to": 6,
+   "label": "Vertex and high parietal vault"
+  },
+  {
+   "from": 7,
+   "to": 11,
+   "label": "Centrum semiovale level vault"
+  },
+  {
+   "from": 12,
+   "to": 15,
+   "label": "Frontal sinuses and orbital roofs"
+  },
+  {
+   "from": 16,
+   "to": 18,
+   "label": "Orbits, ethmoids and anterior fossa"
+  },
+  {
+   "from": 19,
+   "to": 21,
+   "label": "Sella, sphenoid sinus and petrous apex"
+  },
+  {
+   "from": 22,
+   "to": 25,
+   "label": "Internal acoustic meatus and skull base foramina"
+  },
+  {
+   "from": 26,
+   "to": 28,
+   "label": "Maxillary sinuses and pterygoid plates"
+  },
+  {
+   "from": 29,
+   "to": 32,
+   "label": "Foramen magnum, nasal cavity and C1"
+  }
+ ],
+ "structures": [
+  {
+   "structureId": "frontal-sinus",
+   "name": "Frontal sinus",
+   "category": "other",
+   "firstSlice": 9,
+   "lastSlice": 15,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "10": {
+     "targetX": 0.5,
+     "targetY": 0.075,
+     "labelSide": "right",
+     "labelY": 0.06
+    },
+    "12": {
+     "targetX": 0.5,
+     "targetY": 0.09,
+     "labelSide": "right",
+     "labelY": 0.07
+    },
+    "15": {
+     "targetX": 0.5,
+     "targetY": 0.1,
+     "labelSide": "right",
+     "labelY": 0.08
+    }
+   },
+   "recognition": "Air-filled cavity in the frontal bone above the orbits, often asymmetrical with a bony septum off the midline. It is the most superior of the paranasal sinuses and is absent in small children.",
+   "synonyms": [
+    "frontal air sinus"
+   ]
+  },
+  {
+   "structureId": "ethmoid-air-cells",
+   "name": "Ethmoid air cells",
+   "category": "other",
+   "firstSlice": 14,
+   "lastSlice": 19,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "15": {
+     "targetX": 0.5,
+     "targetY": 0.16,
+     "labelSide": "right",
+     "labelY": 0.14
+    },
+    "17": {
+     "targetX": 0.5,
+     "targetY": 0.18,
+     "labelSide": "right",
+     "labelY": 0.15
+    },
+    "19": {
+     "targetX": 0.5,
+     "targetY": 0.16,
+     "labelSide": "right",
+     "labelY": 0.15
+    }
+   },
+   "recognition": "A honeycomb of small air cells between the orbits, bounded laterally by the paper-thin lamina papyracea. Divided into anterior, middle and posterior groups.",
+   "synonyms": [
+    "ethmoid sinus",
+    "ethmoidal air cells"
+   ]
+  },
+  {
+   "structureId": "sphenoid-sinus",
+   "name": "Sphenoid sinus",
+   "category": "other",
+   "firstSlice": 16,
+   "lastSlice": 26,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "17": {
+     "targetX": 0.51,
+     "targetY": 0.33,
+     "labelSide": "right",
+     "labelY": 0.3
+    },
+    "19": {
+     "targetX": 0.5,
+     "targetY": 0.27,
+     "labelSide": "right",
+     "labelY": 0.26
+    },
+    "22": {
+     "targetX": 0.5,
+     "targetY": 0.24,
+     "labelSide": "right",
+     "labelY": 0.24
+    },
+    "25": {
+     "targetX": 0.5,
+     "targetY": 0.26,
+     "labelSide": "right",
+     "labelY": 0.26
+    }
+   },
+   "recognition": "Single large midline air space in the body of the sphenoid, directly below the sella turcica and in front of the clivus. It is the surgical route to the pituitary.",
+   "synonyms": [
+    "sphenoidal sinus"
+   ]
+  },
+  {
+   "structureId": "maxillary-sinus",
+   "name": "Maxillary sinus",
+   "category": "other",
+   "firstSlice": 26,
+   "lastSlice": 32,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "27": {
+     "targetX": 0.33,
+     "targetY": 0.24,
+     "labelSide": "left",
+     "labelY": 0.22
+    },
+    "30": {
+     "targetX": 0.32,
+     "targetY": 0.26,
+     "labelSide": "left",
+     "labelY": 0.24
+    },
+    "32": {
+     "targetX": 0.33,
+     "targetY": 0.28,
+     "labelSide": "left",
+     "labelY": 0.26
+    }
+   },
+   "recognition": "The largest paranasal sinus, a pyramid in the maxilla lateral to the nasal cavity. Its ostium sits high on the medial wall, which is why it drains poorly when the patient is upright.",
+   "synonyms": [
+    "antrum",
+    "antrum of highmore",
+    "maxillary antrum"
+   ]
+  },
+  {
+   "structureId": "mastoid-air-cells",
+   "name": "Mastoid air cells",
+   "category": "other",
+   "firstSlice": 15,
+   "lastSlice": 27,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "16": {
+     "targetX": 0.8,
+     "targetY": 0.54,
+     "labelSide": "right",
+     "labelY": 0.52
+    },
+    "19": {
+     "targetX": 0.81,
+     "targetY": 0.56,
+     "labelSide": "right",
+     "labelY": 0.54
+    },
+    "22": {
+     "targetX": 0.79,
+     "targetY": 0.57,
+     "labelSide": "right",
+     "labelY": 0.55
+    },
+    "25": {
+     "targetX": 0.78,
+     "targetY": 0.56,
+     "labelSide": "right",
+     "labelY": 0.55
+    }
+   },
+   "recognition": "Lucent honeycomb in the mastoid process behind the external auditory canal, continuous with the middle ear through the aditus and antrum — which is why otitis media spreads here.",
+   "synonyms": [
+    "mastoid air cell",
+    "mastoid cells",
+    "mastoid"
+   ]
+  },
+  {
+   "structureId": "petrous-temporal",
+   "name": "Petrous temporal bone",
+   "category": "bone",
+   "firstSlice": 16,
+   "lastSlice": 26,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "17": {
+     "targetX": 0.3,
+     "targetY": 0.5,
+     "labelSide": "left",
+     "labelY": 0.48
+    },
+    "20": {
+     "targetX": 0.3,
+     "targetY": 0.51,
+     "labelSide": "left",
+     "labelY": 0.49
+    },
+    "24": {
+     "targetX": 0.31,
+     "targetY": 0.52,
+     "labelSide": "left",
+     "labelY": 0.5
+    }
+   },
+   "recognition": "The dense wedge of bone pointing anteromedially towards the sella, separating middle from posterior cranial fossa and containing the inner ear.",
+   "synonyms": [
+    "petrous bone",
+    "petrous part of temporal bone",
+    "petrous pyramid"
+   ]
+  },
+  {
+   "structureId": "internal-acoustic-meatus",
+   "name": "Internal acoustic meatus",
+   "category": "other",
+   "firstSlice": 19,
+   "lastSlice": 24,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "20": {
+     "targetX": 0.37,
+     "targetY": 0.47,
+     "labelSide": "left",
+     "labelY": 0.44
+    },
+    "22": {
+     "targetX": 0.36,
+     "targetY": 0.47,
+     "labelSide": "left",
+     "labelY": 0.45
+    },
+    "24": {
+     "targetX": 0.36,
+     "targetY": 0.48,
+     "labelSide": "left",
+     "labelY": 0.46
+    }
+   },
+   "recognition": "A short horizontal canal running laterally from the posterior surface of the petrous bone into it, carrying the facial and vestibulocochlear nerves. Look for a paired, symmetrical tube pointing at the internal ear.",
+   "synonyms": [
+    "internal auditory meatus",
+    "internal auditory canal",
+    "IAM",
+    "IAC"
+   ]
+  },
+  {
+   "structureId": "carotid-canal",
+   "name": "Carotid canal",
+   "category": "other",
+   "firstSlice": 21,
+   "lastSlice": 27,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "22": {
+     "targetX": 0.41,
+     "targetY": 0.44,
+     "labelSide": "left",
+     "labelY": 0.41
+    },
+    "25": {
+     "targetX": 0.41,
+     "targetY": 0.45,
+     "labelSide": "left",
+     "labelY": 0.42
+    }
+   },
+   "recognition": "Round lucency in the petrous bone anteromedial to the middle ear, turning from vertical to horizontal as it carries the internal carotid artery towards the cavernous sinus.",
+   "synonyms": [
+    "carotid foramen"
+   ]
+  },
+  {
+   "structureId": "jugular-foramen",
+   "name": "Jugular foramen",
+   "category": "other",
+   "firstSlice": 23,
+   "lastSlice": 28,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "24": {
+     "targetX": 0.37,
+     "targetY": 0.55,
+     "labelSide": "left",
+     "labelY": 0.56
+    },
+    "27": {
+     "targetX": 0.37,
+     "targetY": 0.56,
+     "labelSide": "left",
+     "labelY": 0.57
+    }
+   },
+   "recognition": "Larger, more posterior and usually right-dominant opening behind the carotid canal, transmitting the internal jugular vein with cranial nerves IX, X and XI.",
+   "synonyms": [
+    "foramen jugulare"
+   ]
+  },
+  {
+   "structureId": "foramen-ovale",
+   "name": "Foramen ovale",
+   "category": "other",
+   "firstSlice": 20,
+   "lastSlice": 25,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "21": {
+     "targetX": 0.38,
+     "targetY": 0.42,
+     "labelSide": "left",
+     "labelY": 0.38
+    },
+    "24": {
+     "targetX": 0.38,
+     "targetY": 0.43,
+     "labelSide": "left",
+     "labelY": 0.39
+    }
+   },
+   "recognition": "Oval lucency in the greater wing of the sphenoid carrying the mandibular division of the trigeminal nerve. Foramen spinosum sits just posterolateral to it and is smaller and rounder.",
+   "synonyms": [
+    "oval foramen"
+   ]
+  },
+  {
+   "structureId": "foramen-spinosum",
+   "name": "Foramen spinosum",
+   "category": "other",
+   "firstSlice": 21,
+   "lastSlice": 25,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "22": {
+     "targetX": 0.35,
+     "targetY": 0.45,
+     "labelSide": "left",
+     "labelY": 0.42
+    },
+    "25": {
+     "targetX": 0.35,
+     "targetY": 0.46,
+     "labelSide": "left",
+     "labelY": 0.43
+    }
+   },
+   "recognition": "Small round hole posterolateral to foramen ovale, transmitting the middle meningeal artery — the vessel torn in an extradural haematoma.",
+   "synonyms": [
+    "spinous foramen"
+   ]
+  },
+  {
+   "structureId": "foramen-magnum",
+   "name": "Foramen magnum",
+   "category": "other",
+   "firstSlice": 29,
+   "lastSlice": 32,
+   "confidence": "high",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "30": {
+     "targetX": 0.5,
+     "targetY": 0.6,
+     "labelSide": "right",
+     "labelY": 0.6
+    },
+    "32": {
+     "targetX": 0.5,
+     "targetY": 0.58,
+     "labelSide": "right",
+     "labelY": 0.58
+    }
+   },
+   "recognition": "The largest opening in the skull base, bounded by the occipital bone, transmitting the medulla, vertebral arteries and the spinal roots of the accessory nerve.",
+   "synonyms": [
+    "great foramen"
+   ]
+  },
+  {
+   "structureId": "sella-turcica",
+   "name": "Sella turcica",
+   "category": "bone",
+   "firstSlice": 18,
+   "lastSlice": 22,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "19": {
+     "targetX": 0.5,
+     "targetY": 0.38,
+     "labelSide": "right",
+     "labelY": 0.38
+    },
+    "21": {
+     "targetX": 0.5,
+     "targetY": 0.36,
+     "labelSide": "right",
+     "labelY": 0.37
+    }
+   },
+   "recognition": "The saddle-shaped hollow on the upper surface of the sphenoid body holding the pituitary, with the anterior and posterior clinoid processes at its corners and the sphenoid sinus directly beneath.",
+   "synonyms": [
+    "pituitary fossa",
+    "hypophyseal fossa"
+   ]
+  },
+  {
+   "structureId": "clivus",
+   "name": "Clivus",
+   "category": "bone",
+   "firstSlice": 20,
+   "lastSlice": 28,
+   "confidence": "high",
+   "verified": false,
+   "annotations": {
+    "21": {
+     "targetX": 0.5,
+     "targetY": 0.45,
+     "labelSide": "right",
+     "labelY": 0.45
+    },
+    "25": {
+     "targetX": 0.5,
+     "targetY": 0.47,
+     "labelSide": "right",
+     "labelY": 0.47
+    }
+   },
+   "recognition": "The sloping bony ramp behind the sphenoid sinus formed by the fused basisphenoid and basiocciput, running down to the foramen magnum with the brainstem lying against it.",
+   "synonyms": []
+  },
+  {
+   "structureId": "crista-galli",
+   "name": "Crista galli",
+   "category": "bone",
+   "firstSlice": 15,
+   "lastSlice": 18,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "16": {
+     "targetX": 0.5,
+     "targetY": 0.13,
+     "labelSide": "right",
+     "labelY": 0.11
+    },
+    "18": {
+     "targetX": 0.5,
+     "targetY": 0.12,
+     "labelSide": "right",
+     "labelY": 0.11
+    }
+   },
+   "recognition": "Midline bony ridge of the ethmoid projecting up into the anterior cranial fossa, the anchor for the falx cerebri, with the cribriform plate on either side of it.",
+   "synonyms": [
+    "crista gali"
+   ]
+  },
+  {
+   "structureId": "nasal-septum",
+   "name": "Nasal septum",
+   "category": "bone",
+   "firstSlice": 20,
+   "lastSlice": 32,
+   "confidence": "high",
+   "verified": false,
+   "annotations": {
+    "22": {
+     "targetX": 0.5,
+     "targetY": 0.13,
+     "labelSide": "right",
+     "labelY": 0.1
+    },
+    "27": {
+     "targetX": 0.5,
+     "targetY": 0.14,
+     "labelSide": "right",
+     "labelY": 0.11
+    },
+    "31": {
+     "targetX": 0.5,
+     "targetY": 0.15,
+     "labelSide": "right",
+     "labelY": 0.12
+    }
+   },
+   "recognition": "Midline partition of the perpendicular plate of the ethmoid above and the vomer below, with the septal cartilage anteriorly. Deviation is extremely common and usually of no consequence.",
+   "synonyms": [
+    "septum"
+   ]
+  },
+  {
+   "structureId": "external-acoustic-meatus",
+   "name": "External acoustic meatus",
+   "category": "other",
+   "firstSlice": 21,
+   "lastSlice": 26,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "22": {
+     "targetX": 0.27,
+     "targetY": 0.53,
+     "labelSide": "left",
+     "labelY": 0.53
+    },
+    "25": {
+     "targetX": 0.27,
+     "targetY": 0.54,
+     "labelSide": "left",
+     "labelY": 0.54
+    }
+   },
+   "recognition": "Air-filled canal running laterally to the skin surface, in line with the middle ear. Distinguish it from the internal acoustic meatus, which points medially into the petrous bone.",
+   "synonyms": [
+    "external auditory canal",
+    "external auditory meatus",
+    "EAM",
+    "EAC"
+   ]
+  },
+  {
+   "structureId": "coronal-suture",
+   "name": "Coronal suture",
+   "category": "joint",
+   "firstSlice": 2,
+   "lastSlice": 13,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "4": {
+     "targetX": 0.36,
+     "targetY": 0.22,
+     "labelSide": "left",
+     "labelY": 0.2
+    },
+    "8": {
+     "targetX": 0.33,
+     "targetY": 0.24,
+     "labelSide": "left",
+     "labelY": 0.22
+    },
+    "12": {
+     "targetX": 0.3,
+     "targetY": 0.26,
+     "labelSide": "left",
+     "labelY": 0.24
+    }
+   },
+   "recognition": "Runs transversely between frontal and parietal bones. On axial slices it appears as a symmetrical pair of oblique lucencies in the anterior vault, sloping backwards as you move down the stack.",
+   "synonyms": [
+    "sutura coronalis"
+   ]
+  },
+  {
+   "structureId": "lambdoid-suture",
+   "name": "Lambdoid suture",
+   "category": "joint",
+   "firstSlice": 2,
+   "lastSlice": 16,
+   "confidence": "moderate",
+   "verified": false,
+   "major": true,
+   "annotations": {
+    "4": {
+     "targetX": 0.38,
+     "targetY": 0.82,
+     "labelSide": "left",
+     "labelY": 0.84
+    },
+    "8": {
+     "targetX": 0.36,
+     "targetY": 0.84,
+     "labelSide": "left",
+     "labelY": 0.86
+    },
+    "13": {
+     "targetX": 0.37,
+     "targetY": 0.83,
+     "labelSide": "left",
+     "labelY": 0.85
+    }
+   },
+   "recognition": "Between the parietal bones and the occipital bone posteriorly, forming an inverted V. More serrated than the coronal suture and often contains wormian bones.",
+   "synonyms": [
+    "lambdoidal suture",
+    "sutura lambdoidea"
+   ]
+  },
+  {
+   "structureId": "sagittal-suture",
+   "name": "Sagittal suture",
+   "category": "joint",
+   "firstSlice": 0,
+   "lastSlice": 6,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "1": {
+     "targetX": 0.5,
+     "targetY": 0.1,
+     "labelSide": "right",
+     "labelY": 0.08
+    },
+    "4": {
+     "targetX": 0.5,
+     "targetY": 0.09,
+     "labelSide": "right",
+     "labelY": 0.08
+    }
+   },
+   "recognition": "Strictly midline between the two parietal bones, seen only on the highest slices. Do not confuse it with a fracture: a suture is serrated, symmetrical and has sclerotic margins.",
+   "synonyms": [
+    "sutura sagittalis"
+   ]
+  },
+  {
+   "structureId": "squamosal-suture",
+   "name": "Squamosal suture",
+   "category": "joint",
+   "firstSlice": 13,
+   "lastSlice": 20,
+   "confidence": "moderate",
+   "verified": false,
+   "annotations": {
+    "15": {
+     "targetX": 0.19,
+     "targetY": 0.44,
+     "labelSide": "left",
+     "labelY": 0.4
+    },
+    "19": {
+     "targetX": 0.19,
+     "targetY": 0.45,
+     "labelSide": "left",
+     "labelY": 0.42
+    }
+   },
+   "recognition": "Arches over the squamous temporal bone where it overlaps the parietal, a shallow bevelled joint on the lateral vault rather than a serrated one.",
+   "synonyms": [
+    "squamous suture"
+   ]
+  },
+  {
+   "structureId": "orbit",
+   "name": "Orbit",
+   "category": "bone",
+   "firstSlice": 12,
+   "lastSlice": 18,
+   "confidence": "high",
+   "verified": false,
+   "annotations": {
+    "13": {
+     "targetX": 0.35,
+     "targetY": 0.13,
+     "labelSide": "left",
+     "labelY": 0.12
+    },
+    "16": {
+     "targetX": 0.35,
+     "targetY": 0.13,
+     "labelSide": "left",
+     "labelY": 0.12
+    },
+    "18": {
+     "targetX": 0.35,
+     "targetY": 0.15,
+     "labelSide": "left",
+     "labelY": 0.13
+    }
+   },
+   "recognition": "Bony pyramid with its apex at the optic canal. The medial wall is the paper-thin lamina papyracea against the ethmoid, the floor is the roof of the maxillary sinus — the two walls that blow out.",
+   "synonyms": [
+    "orbital cavity",
+    "bony orbit"
+   ]
+  },
+  {
+   "structureId": "calvarium",
+   "name": "Calvarium",
+   "category": "bone",
+   "firstSlice": 0,
+   "lastSlice": 16,
+   "confidence": "high",
+   "verified": false,
+   "annotations": {
+    "2": {
+     "targetX": 0.5,
+     "targetY": 0.06,
+     "labelSide": "right",
+     "labelY": 0.05
+    },
+    "8": {
+     "targetX": 0.13,
+     "targetY": 0.45,
+     "labelSide": "left",
+     "labelY": 0.3
+    },
+    "14": {
+     "targetX": 0.14,
+     "targetY": 0.5,
+     "labelSide": "left",
+     "labelY": 0.34
+    }
+   },
+   "recognition": "Inner and outer tables of dense cortical bone with the diploic space of marrow between them. Losing the distinction between the three layers is what makes a lytic lesion visible.",
+   "synonyms": [
+    "skull vault",
+    "calvaria",
+    "cranial vault"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interactive Physics Lessons | FRCR Physics Visual Lab</title>
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="nav shell">
+    <a class="brand" href="index.html">FRCR Physics Visual Lab</a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="physics-question-bank.html">Question Bank</a>
+      <a href="xray-tube-physics-canvas.html">Canvas X-ray Tube</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <section class="hero" style="grid-template-columns: minmax(0, 1fr) minmax(280px, .55fr);">
+      <div>
+        <p class="kicker">Lesson Library</p>
+        <h1>Interactive physics lessons</h1>
+        <p>Only the physics: MRI, X-ray, CT, ultrasound, mammography and nuclear medicine visuals from the recovered project.</p>
+      </div>
+      <div class="stats-strip">
+        <span><strong id="totalLessons">0</strong> total</span>
+        <span><strong id="completeLessons">0</strong> completed</span>
+        <span><strong id="percentLessons">0%</strong> progress</span>
+      </div>
+    </section>
+
+    <section class="filter-bar" aria-label="Lesson filters">
+      <input id="search" type="search" placeholder="Search MRI, CT, Compton, Doppler..." aria-label="Search lessons">
+      <div class="topic-pills" id="topicPills"></div>
+    </section>
+
+    <div id="lessonSections"></div>
+  </main>
+
+  <script src="assets/site-data.js"></script>
+  <script>
+    const lessons = window.FRCR_PHYSICS_LESSONS || [];
+    const topics = [...new Set(lessons.map(l => l.topic))];
+    const statusKey = title => `frcr-physics-lesson-status:${title}`;
+    const slug = value => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const search = document.getElementById('search');
+    const sections = document.getElementById('lessonSections');
+    const pills = document.getElementById('topicPills');
+    topics.forEach(topic => {
+      const a = document.createElement('a');
+      a.href = `#${slug(topic)}`;
+      a.textContent = topic;
+      pills.appendChild(a);
+    });
+    function getStatus(lesson) { return localStorage.getItem(statusKey(lesson.title)) || 'Not Started'; }
+    function setStatus(lesson, status) { localStorage.setItem(statusKey(lesson.title), status); render(); }
+    function updateStats() {
+      document.getElementById('totalLessons').textContent = lessons.length;
+      const complete = lessons.filter(l => getStatus(l) === 'Completed').length;
+      document.getElementById('completeLessons').textContent = complete;
+      document.getElementById('percentLessons').textContent = `${Math.round((complete / Math.max(lessons.length, 1)) * 100)}%`;
+    }
+    function card(lesson) {
+      const status = getStatus(lesson);
+      const article = document.createElement('article');
+      article.className = 'card';
+      article.innerHTML = `
+        <div class="topline"><span>${lesson.badge}</span><small>${lesson.topic}</small></div>
+        <h3>${lesson.title}</h3>
+        <p>${lesson.description}</p>
+        <div class="progress-row" aria-label="Lesson progress">
+          ${['Not Started', 'In Progress', 'Completed'].map(s => `<button type="button" class="${status === s ? 'active' : ''}" data-status="${s}">${s}</button>`).join('')}
+        </div>
+        <a class="open" href="${lesson.href}">Open Lesson</a>`;
+      article.querySelectorAll('button[data-status]').forEach(button => {
+        button.addEventListener('click', () => setStatus(lesson, button.dataset.status));
+      });
+      return article;
+    }
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      sections.innerHTML = '';
+      const filtered = lessons.filter(l => !q || [l.title, l.topic, l.description, l.badge, l.keywords].join(' ').toLowerCase().includes(q));
+      topics.forEach(topic => {
+        const list = filtered.filter(l => l.topic === topic);
+        if (!list.length) return;
+        const section = document.createElement('section');
+        section.className = 'section';
+        section.id = slug(topic);
+        section.innerHTML = `<div class="section-head"><div><p class="kicker">${list.length} lesson${list.length === 1 ? '' : 's'}</p><h2>${topic}</h2></div></div><div class="grid lesson-grid"></div>`;
+        const grid = section.querySelector('.lesson-grid');
+        list.forEach(lesson => grid.appendChild(card(lesson)));
+        sections.appendChild(section);
+      });
+      updateStats();
+    }
+    search.addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>

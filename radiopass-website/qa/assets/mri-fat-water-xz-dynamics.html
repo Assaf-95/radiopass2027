@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Fat/Water X-Z Relaxation Diagram</title>
+  <style>
+    :root {
+      --bg: #f3f8ff;
+      --panel: #ffffff;
+      --line: #d8e4f4;
+      --ink: #0f172a;
+      --muted: #475569;
+      --fat: #f59e0b;
+      --water: #0ea5e9;
+      --axis: #334155;
+      --accent: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 15% 10%, #fff, var(--bg));
+    }
+
+    .layout {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+    }
+
+    .controls {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: sticky;
+      top: 12px;
+      max-height: calc(100vh - 28px);
+      overflow: auto;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    h1 { margin: 0; font-size: 1.1rem; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.35; }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 9px 10px;
+      color: #fff;
+      font-weight: 650;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+    }
+
+    button.secondary { background: linear-gradient(120deg, #475569, #334155); }
+
+    .stage {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      display: block;
+      background: #fff;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px;
+      background: #f8fbff;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>Fat/Water X-Z Relaxation Diagram</h1>
+      <p class="subtitle">X-axis = transverse magnetization (Mxy), Z-axis = longitudinal magnetization (Mz). Water and fat recovery speed shown with realistic relative timing.</p>
+
+      <section class="section">
+        <div class="btn-row">
+          <button id="apply90Btn">Apply 90° Pulse</button>
+          <button id="resetBtn" class="secondary">Reset</button>
+        </div>
+        <div class="row"><span>Elapsed</span><strong id="elapsedValue">0 ms</strong></div>
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="showFat" type="checkbox" checked /> Show Fat</label>
+        <label class="check"><input id="showWater" type="checkbox" checked /> Show Water</label>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Playback speed</span><strong id="speedValue">1.0x</strong></div>
+        <input id="speedSlider" type="range" min="0.25" max="2" step="0.05" value="1" />
+        <p class="subtitle">1.0x means 1000 ms of physiology per 1 second of animation. Relative T1/T2 differences remain physically correct.</p>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>T1 Fat</span><strong id="fatT1Val">250 ms</strong></div>
+        <input id="fatT1" type="range" min="100" max="900" step="10" value="250" />
+        <div class="row"><span>T2 Fat</span><strong id="fatT2Val">70 ms</strong></div>
+        <input id="fatT2" type="range" min="30" max="220" step="5" value="70" />
+      </section>
+
+      <section class="section">
+        <div class="row"><span>T1 Water</span><strong id="waterT1Val">2000 ms</strong></div>
+        <input id="waterT1" type="range" min="500" max="4200" step="20" value="2000" />
+        <div class="row"><span>T2 Water</span><strong id="waterT2Val">120 ms</strong></div>
+        <input id="waterT2" type="range" min="40" max="400" step="5" value="120" />
+      </section>
+
+      <section class="section">
+        <p class="subtitle">Model after 90° pulse at t=0:</p>
+        <p class="subtitle">Mz(t)=M0(1-e<sup>-t/T1</sup>)</p>
+        <p class="subtitle">Mxy(t)=M0e<sup>-t/T2</sup></p>
+      </section>
+    </aside>
+
+    <section class="card stage">
+      <canvas id="xzCanvas" width="980" height="620"></canvas>
+      <div class="legend">
+        <span><span class="dot" style="background: var(--fat);"></span>Fat vector/path</span>
+        <span><span class="dot" style="background: var(--water);"></span>Water vector/path</span>
+        <span><span class="dot" style="background: #64748b;"></span>X-axis (Mxy)</span>
+        <span><span class="dot" style="background: #334155;"></span>Z-axis (Mz)</span>
+      </div>
+      <div class="stats">
+        <div class="stat" id="fatReadout">Fat: Mxy=1.000, Mz=0.000</div>
+        <div class="stat" id="waterReadout">Water: Mxy=1.000, Mz=0.000</div>
+        <div class="stat" id="fatSpeed">Fat dynamics: fast recovery / fast decay</div>
+        <div class="stat" id="waterSpeed">Water dynamics: slow recovery / slower decay</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    class RelaxationPhysics {
+      static mzAfter90(tMs, t1Ms, m0 = 1) {
+        return m0 * (1 - Math.exp(-tMs / t1Ms));
+      }
+
+      static mxyAfter90(tMs, t2Ms, m0 = 1) {
+        return m0 * Math.exp(-tMs / t2Ms);
+      }
+
+      static recoveryRate(tMs, t1Ms, m0 = 1) {
+        return (m0 / t1Ms) * Math.exp(-tMs / t1Ms);
+      }
+    }
+
+    class XZRenderer {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
+        this.pad = { left: 80, right: 30, top: 40, bottom: 64 };
+      }
+
+      x(v) {
+        const w = this.canvas.width - this.pad.left - this.pad.right;
+        return this.pad.left + v * w;
+      }
+
+      z(v) {
+        const h = this.canvas.height - this.pad.top - this.pad.bottom;
+        return this.canvas.height - this.pad.bottom - v * h;
+      }
+
+      draw(model) {
+        const ctx = this.ctx;
+        const { width, height } = this.canvas;
+        ctx.clearRect(0, 0, width, height);
+
+        this.drawGrid();
+        this.drawAxes();
+
+        if (model.showFat) {
+          this.drawTrajectory(model.elapsedMs, model.maxTimeMs, model.fatT1Ms, model.fatT2Ms, "#f59e0b");
+          this.drawVector(model.elapsedMs, model.fatT1Ms, model.fatT2Ms, "#f59e0b", "Fat");
+        }
+
+        if (model.showWater) {
+          this.drawTrajectory(model.elapsedMs, model.maxTimeMs, model.waterT1Ms, model.waterT2Ms, "#0ea5e9");
+          this.drawVector(model.elapsedMs, model.waterT1Ms, model.waterT2Ms, "#0ea5e9", "Water");
+        }
+
+        this.drawTimeInfo(model.elapsedMs);
+      }
+
+      drawGrid() {
+        const ctx = this.ctx;
+        ctx.strokeStyle = "#dbe6f5";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 10; i += 1) {
+          const t = i / 10;
+          const x = this.x(t);
+          ctx.beginPath();
+          ctx.moveTo(x, this.pad.top);
+          ctx.lineTo(x, this.canvas.height - this.pad.bottom);
+          ctx.stroke();
+
+          const z = this.z(t);
+          ctx.beginPath();
+          ctx.moveTo(this.pad.left, z);
+          ctx.lineTo(this.canvas.width - this.pad.right, z);
+          ctx.stroke();
+        }
+      }
+
+      drawAxes() {
+        const ctx = this.ctx;
+        const x0 = this.x(0);
+        const x1 = this.x(1.02);
+        const z0 = this.z(0);
+        const z1 = this.z(1.03);
+
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(x0, z0);
+        ctx.lineTo(x1, z0);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x0, z0);
+        ctx.lineTo(x0, z1);
+        ctx.stroke();
+
+        this.drawArrowHead(x1, z0, 1, 0);
+        this.drawArrowHead(x0, z1, 0, -1);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("X-axis: Mxy (transverse)", x1 - 180, z0 + 28);
+        ctx.fillText("Z-axis: Mz (longitudinal)", x0 + 10, z1 - 10);
+
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillStyle = "#475569";
+        ctx.fillText("0", x0 - 10, z0 + 16);
+        ctx.fillText("1.0", this.x(1) - 8, z0 + 16);
+        ctx.fillText("1.0", x0 - 28, this.z(1) + 4);
+      }
+
+      drawArrowHead(x, y, dx, dy) {
+        const ctx = this.ctx;
+        const len = 12;
+        const w = 5;
+        const px = -dy;
+        const py = dx;
+
+        ctx.fillStyle = "#334155";
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - dx * len + px * w, y - dy * len + py * w);
+        ctx.lineTo(x - dx * len - px * w, y - dy * len - py * w);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      drawTrajectory(elapsedMs, maxTimeMs, t1Ms, t2Ms, color) {
+        const ctx = this.ctx;
+        const n = 260;
+        const visT = Math.min(elapsedMs, maxTimeMs);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        for (let i = 0; i <= n; i += 1) {
+          const t = (maxTimeMs * i) / n;
+          const x = RelaxationPhysics.mxyAfter90(t, t2Ms);
+          const z = RelaxationPhysics.mzAfter90(t, t1Ms);
+          const sx = this.x(x);
+          const sy = this.z(z);
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        for (let i = 0; i <= n; i += 1) {
+          const t = (visT * i) / n;
+          const x = RelaxationPhysics.mxyAfter90(t, t2Ms);
+          const z = RelaxationPhysics.mzAfter90(t, t1Ms);
+          const sx = this.x(x);
+          const sy = this.z(z);
+          if (i === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+      }
+
+      drawVector(t, t1Ms, t2Ms, color, label) {
+        const ctx = this.ctx;
+        const xVal = RelaxationPhysics.mxyAfter90(t, t2Ms);
+        const zVal = RelaxationPhysics.mzAfter90(t, t1Ms);
+
+        const ox = this.x(0);
+        const oy = this.z(0);
+        const tx = this.x(xVal);
+        const ty = this.z(zVal);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.2;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+
+        const dx = tx - ox;
+        const dy = ty - oy;
+        const L = Math.hypot(dx, dy) || 1;
+        const ux = dx / L;
+        const uy = dy / L;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(tx - ux * 14 - uy * 6, ty - uy * 14 + ux * 6);
+        ctx.lineTo(tx - ux * 14 + uy * 6, ty - uy * 14 - ux * 6);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText(label, tx + 8, ty - 8);
+      }
+
+      drawTimeInfo(tMs) {
+        const ctx = this.ctx;
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText(`t = ${Math.round(tMs)} ms`, this.pad.left + 8, this.pad.top - 12);
+      }
+    }
+
+    class XZRelaxationSimulator {
+      constructor() {
+        this.ui = {
+          apply90Btn: document.getElementById("apply90Btn"),
+          resetBtn: document.getElementById("resetBtn"),
+          showFat: document.getElementById("showFat"),
+          showWater: document.getElementById("showWater"),
+          speedSlider: document.getElementById("speedSlider"),
+          speedValue: document.getElementById("speedValue"),
+          fatT1: document.getElementById("fatT1"),
+          fatT2: document.getElementById("fatT2"),
+          waterT1: document.getElementById("waterT1"),
+          waterT2: document.getElementById("waterT2"),
+          fatT1Val: document.getElementById("fatT1Val"),
+          fatT2Val: document.getElementById("fatT2Val"),
+          waterT1Val: document.getElementById("waterT1Val"),
+          waterT2Val: document.getElementById("waterT2Val"),
+          elapsedValue: document.getElementById("elapsedValue"),
+          fatReadout: document.getElementById("fatReadout"),
+          waterReadout: document.getElementById("waterReadout"),
+          fatSpeed: document.getElementById("fatSpeed"),
+          waterSpeed: document.getElementById("waterSpeed")
+        };
+
+        this.renderer = new XZRenderer(document.getElementById("xzCanvas"));
+
+        this.state = {
+          showFat: true,
+          showWater: true,
+          speed: 1,
+          fatT1Ms: 250,
+          fatT2Ms: 70,
+          waterT1Ms: 2000,
+          waterT2Ms: 120,
+          elapsedMs: 0,
+          maxTimeMs: 4500,
+          isAnimating: false,
+          lastTs: performance.now()
+        };
+
+        this.bind();
+        this.updateUI();
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      bind() {
+        this.ui.apply90Btn.addEventListener("click", () => {
+          this.state.elapsedMs = 0;
+          this.state.isAnimating = true;
+        });
+
+        this.ui.resetBtn.addEventListener("click", () => {
+          this.state.elapsedMs = 0;
+          this.state.isAnimating = false;
+          this.updateUI();
+        });
+
+        this.ui.showFat.addEventListener("change", () => {
+          this.state.showFat = this.ui.showFat.checked;
+        });
+
+        this.ui.showWater.addEventListener("change", () => {
+          this.state.showWater = this.ui.showWater.checked;
+        });
+
+        this.ui.speedSlider.addEventListener("input", () => {
+          this.state.speed = Number(this.ui.speedSlider.value);
+          this.updateUI();
+        });
+
+        this.ui.fatT1.addEventListener("input", () => {
+          this.state.fatT1Ms = Number(this.ui.fatT1.value);
+          this.recomputeMaxTime();
+          this.updateUI();
+        });
+
+        this.ui.fatT2.addEventListener("input", () => {
+          this.state.fatT2Ms = Number(this.ui.fatT2.value);
+          this.recomputeMaxTime();
+          this.updateUI();
+        });
+
+        this.ui.waterT1.addEventListener("input", () => {
+          this.state.waterT1Ms = Number(this.ui.waterT1.value);
+          this.recomputeMaxTime();
+          this.updateUI();
+        });
+
+        this.ui.waterT2.addEventListener("input", () => {
+          this.state.waterT2Ms = Number(this.ui.waterT2.value);
+          this.recomputeMaxTime();
+          this.updateUI();
+        });
+      }
+
+      recomputeMaxTime() {
+        const dominant = Math.max(this.state.fatT1Ms, this.state.waterT1Ms, this.state.fatT2Ms * 8, this.state.waterT2Ms * 8);
+        this.state.maxTimeMs = Math.ceil((dominant * 2.2) / 100) * 100;
+        this.state.elapsedMs = Math.min(this.state.elapsedMs, this.state.maxTimeMs);
+      }
+
+      updateUI() {
+        this.ui.speedValue.textContent = `${this.state.speed.toFixed(2)}x`;
+        this.ui.fatT1Val.textContent = `${this.state.fatT1Ms} ms`;
+        this.ui.fatT2Val.textContent = `${this.state.fatT2Ms} ms`;
+        this.ui.waterT1Val.textContent = `${this.state.waterT1Ms} ms`;
+        this.ui.waterT2Val.textContent = `${this.state.waterT2Ms} ms`;
+        this.ui.elapsedValue.textContent = `${Math.round(this.state.elapsedMs)} ms`;
+
+        const fatX = RelaxationPhysics.mxyAfter90(this.state.elapsedMs, this.state.fatT2Ms);
+        const fatZ = RelaxationPhysics.mzAfter90(this.state.elapsedMs, this.state.fatT1Ms);
+        const waterX = RelaxationPhysics.mxyAfter90(this.state.elapsedMs, this.state.waterT2Ms);
+        const waterZ = RelaxationPhysics.mzAfter90(this.state.elapsedMs, this.state.waterT1Ms);
+        const fatRate = RelaxationPhysics.recoveryRate(this.state.elapsedMs, this.state.fatT1Ms);
+        const waterRate = RelaxationPhysics.recoveryRate(this.state.elapsedMs, this.state.waterT1Ms);
+
+        this.ui.fatReadout.textContent = `Fat: Mxy=${fatX.toFixed(3)}, Mz=${fatZ.toFixed(3)}`;
+        this.ui.waterReadout.textContent = `Water: Mxy=${waterX.toFixed(3)}, Mz=${waterZ.toFixed(3)}`;
+        this.ui.fatSpeed.textContent = `Fat recovery rate dMz/dt: ${fatRate.toFixed(5)} per ms`;
+        this.ui.waterSpeed.textContent = `Water recovery rate dMz/dt: ${waterRate.toFixed(5)} per ms`;
+      }
+
+      tick(ts) {
+        const dt = Math.min(45, ts - this.state.lastTs);
+        this.state.lastTs = ts;
+
+        if (this.state.isAnimating) {
+          // 1.0x = 1000 ms physiologic time per second of animation.
+          this.state.elapsedMs += dt * this.state.speed;
+          if (this.state.elapsedMs >= this.state.maxTimeMs) {
+            this.state.elapsedMs = this.state.maxTimeMs;
+            this.state.isAnimating = false;
+          }
+        }
+
+        this.updateUI();
+
+        this.renderer.draw({
+          showFat: this.state.showFat,
+          showWater: this.state.showWater,
+          fatT1Ms: this.state.fatT1Ms,
+          fatT2Ms: this.state.fatT2Ms,
+          waterT1Ms: this.state.waterT1Ms,
+          waterT2Ms: this.state.waterT2Ms,
+          elapsedMs: this.state.elapsedMs,
+          maxTimeMs: this.state.maxTimeMs
+        });
+
+        requestAnimationFrame((t) => this.tick(t));
+      }
+    }
+
+    new XZRelaxationSimulator();
+  </script>
+</body>
+</html>

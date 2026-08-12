@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hydrogen Precession 3D MRI Animation</title>
+  <style>
+    :root {
+      --bg0: #f4f8ff;
+      --bg1: #dfe9f8;
+      --panel: #ffffff;
+      --ink: #12253d;
+      --muted: #4d647f;
+      --line: #c9d8ea;
+      --b0: #2f6fb1;
+      --rf: #b45f23;
+      --net: #1d5f9f;
+      --spin: #6e879f;
+      --cone: rgba(74, 117, 170, 0.28);
+      --shadow: 0 14px 34px rgba(14, 34, 61, 0.13);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 1rem;
+      font-family: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.9), transparent 46%),
+        radial-gradient(circle at 90% 92%, rgba(170, 200, 235, 0.34), transparent 42%),
+        linear-gradient(150deg, var(--bg0), var(--bg1));
+    }
+
+    .app {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.8rem;
+      animation: rise 360ms ease-out;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel {
+      border: 1px solid rgba(153, 182, 212, 0.45);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 251, 255, 0.93));
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 0.85rem 1rem;
+      display: grid;
+      gap: 0.34rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.1vw, 1.55rem);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .controls {
+      padding: 0.7rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid rgba(43, 81, 125, 0.4);
+      border-radius: 999px;
+      padding: 0.46rem 0.88rem;
+      background: linear-gradient(180deg, #fbfdff, #eaf3ff);
+      color: #173551;
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      box-shadow: 0 6px 14px rgba(22, 51, 84, 0.16);
+    }
+
+    button.active {
+      border-color: rgba(31, 94, 157, 0.52);
+      background: linear-gradient(180deg, #e7f3ff, #d4e8ff);
+      color: #12395f;
+    }
+
+    .chip {
+      border: 1px solid rgba(108, 137, 167, 0.36);
+      border-radius: 999px;
+      padding: 0.32rem 0.68rem;
+      background: rgba(232, 243, 255, 0.74);
+      color: #24486b;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 0.8rem;
+      align-items: stretch;
+    }
+
+    .canvas-wrap {
+      padding: 0.75rem;
+      min-height: 560px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid rgba(142, 172, 203, 0.42);
+      background:
+        radial-gradient(circle at 16% 16%, rgba(204, 224, 246, 0.42), transparent 44%),
+        radial-gradient(circle at 84% 86%, rgba(182, 209, 240, 0.34), transparent 40%),
+        linear-gradient(160deg, #f8fcff, #edf5ff);
+    }
+
+    .side {
+      padding: 0.75rem;
+      display: grid;
+      gap: 0.55rem;
+      align-content: start;
+    }
+
+    .card {
+      border: 1px solid rgba(145, 174, 204, 0.38);
+      border-radius: 11px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(237, 246, 255, 0.9));
+      box-shadow: 0 7px 18px rgba(25, 50, 82, 0.08);
+      padding: 0.58rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.4rem;
+      font-size: 0.79rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2f557b;
+    }
+
+    .card p {
+      margin: 0;
+      color: #264567;
+      font-size: 0.85rem;
+      line-height: 1.34;
+    }
+
+    .steps {
+      display: grid;
+      gap: 0.36rem;
+    }
+
+    .step {
+      border: 1px solid rgba(137, 165, 194, 0.36);
+      border-radius: 10px;
+      padding: 0.4rem 0.48rem;
+      font-size: 0.78rem;
+      color: #2b4d71;
+      background: rgba(246, 251, 255, 0.88);
+    }
+
+    .step.active {
+      border-color: rgba(44, 106, 168, 0.52);
+      background: linear-gradient(180deg, rgba(229, 243, 255, 0.92), rgba(214, 234, 255, 0.86));
+      color: #183d63;
+      font-weight: 600;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.42rem;
+      margin-top: 0.48rem;
+    }
+
+    .metric {
+      border: 1px solid rgba(130, 160, 190, 0.36);
+      border-radius: 10px;
+      padding: 0.38rem;
+      background: rgba(248, 252, 255, 0.88);
+      color: #2a4d73;
+      font-size: 0.77rem;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 0.18rem;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-wrap {
+        min-height: 430px;
+      }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <div class="app">
+    <section class="panel header">
+      <h1>Hydrogen Precession and RF Tipping (3D)</h1>
+      <p>Fresh animation. Vertical B0 axis with a central origin and a faint precession cone. Spins are rendered as 3D-style spheres with magnetic moment arrows.</p>
+      <p>Use steps in order: one spin, many out-of-phase spins, apply B1 RF pulse, then observe transverse rotating magnetisation.</p>
+    </section>
+
+    <section class="panel controls">
+      <button id="step1Btn" class="active">Step 1</button>
+      <button id="step2Btn">Step 2</button>
+      <button id="step3Btn">Step 3</button>
+      <button id="step4Btn">Step 4</button>
+      <button id="resetBtn">Reset</button>
+      <button id="playBtn">Pause</button>
+      <span id="statusChip" class="chip">Hydrogen spin precesses about B0</span>
+    </section>
+
+    <section class="layout">
+      <div class="panel canvas-wrap">
+        <canvas id="scene" aria-label="3D hydrogen spin precession animation"></canvas>
+      </div>
+
+      <aside class="panel side">
+        <article class="card">
+          <h2>Label</h2>
+          <p id="stepLabel">Hydrogen spin precesses about B0</p>
+        </article>
+
+        <article class="card">
+          <h2>Sequence</h2>
+          <div class="steps" id="stepList">
+            <div class="step active" data-step="1">Step 1: Hydrogen spin precesses about B0</div>
+            <div class="step" data-step="2">Step 2: Many spins precess with different phases</div>
+            <div class="step" data-step="3">Step 3: RF pulse tips net magnetisation</div>
+            <div class="step" data-step="4">Step 4: Transverse magnetisation rotates in the transverse plane</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Readout</h2>
+          <p>Net magnetisation components:</p>
+          <div class="metrics">
+            <div class="metric">Mz<strong id="mzVal">0.94</strong></div>
+            <div class="metric">Mxy<strong id="mxyVal">0.34</strong></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("scene");
+      const ctx = canvas.getContext("2d");
+
+      const els = {
+        step1Btn: document.getElementById("step1Btn"),
+        step2Btn: document.getElementById("step2Btn"),
+        step3Btn: document.getElementById("step3Btn"),
+        step4Btn: document.getElementById("step4Btn"),
+        resetBtn: document.getElementById("resetBtn"),
+        playBtn: document.getElementById("playBtn"),
+        stepLabel: document.getElementById("stepLabel"),
+        statusChip: document.getElementById("statusChip"),
+        stepList: document.getElementById("stepList"),
+        mzVal: document.getElementById("mzVal"),
+        mxyVal: document.getElementById("mxyVal")
+      };
+
+      const state = {
+        step: 1,
+        running: true,
+        time: 0,
+        stepStart: 0,
+        lastFrameMs: performance.now(),
+        totalSpins: 9,
+        startPhases: [],
+        baseTilt: degToRad(24)
+      };
+
+      const OMEGA = 1.55;
+      const SPIN_RADIUS = 1.45;
+
+      for (let i = 0; i < state.totalSpins; i += 1) {
+        state.startPhases.push(Math.random() * Math.PI * 2);
+      }
+
+      function degToRad(d) {
+        return (d * Math.PI) / 180;
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function lerpAngle(a, b, t) {
+        const d = Math.atan2(Math.sin(b - a), Math.cos(b - a));
+        return a + d * t;
+      }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(280, Math.floor(rect.width));
+        const h = Math.max(280, Math.floor(rect.height));
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function project3D(x, y, z, camera, focal) {
+        const denom = camera.z - z;
+        const k = focal / Math.max(0.2, denom);
+        return {
+          x: camera.cx + x * k,
+          y: camera.cy - y * k,
+          k,
+          depth: z
+        };
+      }
+
+      function spinVector(phase, tilt) {
+        const s = Math.sin(tilt);
+        const c = Math.cos(tilt);
+        return {
+          x: SPIN_RADIUS * s * Math.cos(phase),
+          y: SPIN_RADIUS * c,
+          z: SPIN_RADIUS * s * Math.sin(phase)
+        };
+      }
+
+      function activeSpinCount() {
+        if (state.step === 1) return 1;
+        if (state.step === 2) {
+          const elapsed = Math.max(0, state.time - state.stepStart);
+          return clamp(1 + Math.floor(elapsed / 0.7), 1, state.totalSpins);
+        }
+        return state.totalSpins;
+      }
+
+      function model() {
+        const count = activeSpinCount();
+        const phases = [];
+        const vectors = [];
+
+        const t = state.time;
+        const basePhase = OMEGA * t;
+
+        let tilt = state.baseTilt;
+        let lock = 0;
+
+        if (state.step === 3) {
+          const p = clamp((t - state.stepStart) / 2.1, 0, 1);
+          tilt = lerp(state.baseTilt, Math.PI / 2, p);
+          lock = p;
+        }
+
+        if (state.step === 4) {
+          tilt = Math.PI / 2;
+          lock = 1;
+        }
+
+        for (let i = 0; i < count; i += 1) {
+          let phase = basePhase + state.startPhases[i];
+
+          if (state.step >= 3) {
+            phase = lerpAngle(basePhase + state.startPhases[i], basePhase, lock);
+            if (state.step === 4) {
+              phase = basePhase + state.startPhases[i] * 0.08;
+            }
+          }
+
+          phases.push(phase);
+          vectors.push(spinVector(phase, tilt));
+        }
+
+        let sx = 0;
+        let sy = 0;
+        let sz = 0;
+        for (let i = 0; i < vectors.length; i += 1) {
+          sx += vectors[i].x;
+          sy += vectors[i].y;
+          sz += vectors[i].z;
+        }
+
+        const inv = 1 / Math.max(1, vectors.length);
+        const net = {
+          x: sx * inv,
+          y: sy * inv,
+          z: sz * inv
+        };
+
+        const netMag = Math.sqrt(net.x * net.x + net.y * net.y + net.z * net.z);
+        const mxy = Math.sqrt(net.x * net.x + net.z * net.z) / Math.max(0.001, SPIN_RADIUS);
+        const mz = net.y / Math.max(0.001, SPIN_RADIUS);
+
+        return { count, vectors, net, netMag, mxy, mz, tilt };
+      }
+
+      function drawLine3D(a, b, camera, focal, stroke, width, dash) {
+        const pa = project3D(a.x, a.y, a.z, camera, focal);
+        const pb = project3D(b.x, b.y, b.z, camera, focal);
+        ctx.save();
+        if (dash) ctx.setLineDash(dash);
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawArrowHead2D(from, to, color, width) {
+        const ang = Math.atan2(to.y - from.y, to.x - from.x);
+        const h = 8 + width * 0.7;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(to.x, to.y);
+        ctx.lineTo(to.x - h * Math.cos(ang - 0.34), to.y - h * Math.sin(ang - 0.34));
+        ctx.lineTo(to.x - h * Math.cos(ang + 0.34), to.y - h * Math.sin(ang + 0.34));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawSphere3D(pos, worldRadius, camera, focal, baseColor) {
+        const p = project3D(pos.x, pos.y, pos.z, camera, focal);
+        const pr = Math.max(4, worldRadius * p.k);
+        const g = ctx.createRadialGradient(p.x - pr * 0.35, p.y - pr * 0.4, pr * 0.12, p.x, p.y, pr);
+        g.addColorStop(0, "#f8fbff");
+        g.addColorStop(1, baseColor);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, pr, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(58, 89, 122, 0.36)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      function drawSpinArrowThroughSphere(v, camera, focal) {
+        const u = {
+          x: v.x / SPIN_RADIUS,
+          y: v.y / SPIN_RADIUS,
+          z: v.z / SPIN_RADIUS
+        };
+
+        const a = {
+          x: v.x - u.x * 0.22,
+          y: v.y - u.y * 0.22,
+          z: v.z - u.z * 0.22
+        };
+        const b = {
+          x: v.x + u.x * 0.3,
+          y: v.y + u.y * 0.3,
+          z: v.z + u.z * 0.3
+        };
+
+        const pa = project3D(a.x, a.y, a.z, camera, focal);
+        const pb = project3D(b.x, b.y, b.z, camera, focal);
+
+        ctx.strokeStyle = "#294f7b";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+
+        drawArrowHead2D(pa, pb, "#294f7b", 1.8);
+      }
+
+      function drawCone(camera, focal, tilt) {
+        const yCone = SPIN_RADIUS * Math.cos(tilt);
+        const rCone = SPIN_RADIUS * Math.sin(tilt);
+
+        const apex = { x: 0, y: 0, z: 0 };
+        const ringA = { x: rCone, y: yCone, z: 0 };
+        const ringB = { x: -rCone, y: yCone, z: 0 };
+
+        drawLine3D(apex, ringA, camera, focal, "rgba(70, 116, 170, 0.22)", 1.2);
+        drawLine3D(apex, ringB, camera, focal, "rgba(70, 116, 170, 0.22)", 1.2);
+
+        const n = 90;
+        ctx.save();
+        ctx.strokeStyle = "rgba(70, 116, 170, 0.3)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        for (let i = 0; i <= n; i += 1) {
+          const a = (i / n) * Math.PI * 2;
+          const p3 = {
+            x: rCone * Math.cos(a),
+            y: yCone,
+            z: rCone * Math.sin(a)
+          };
+          const p2 = project3D(p3.x, p3.y, p3.z, camera, focal);
+          if (i === 0) ctx.moveTo(p2.x, p2.y);
+          else ctx.lineTo(p2.x, p2.y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawAxisAndOrigin(camera, focal) {
+        drawLine3D({ x: 0, y: -1.1, z: 0 }, { x: 0, y: 2.2, z: 0 }, camera, focal, "#2f6fb1", 2.2);
+
+        const p0 = project3D(0, 0, 0, camera, focal);
+        const pTop = project3D(0, 2.2, 0, camera, focal);
+
+        drawArrowHead2D({ x: p0.x, y: p0.y }, { x: pTop.x, y: pTop.y }, "#2f6fb1", 2.2);
+
+        ctx.fillStyle = "#275079";
+        ctx.font = "700 13px Avenir Next";
+        ctx.fillText("B0", pTop.x + 8, pTop.y - 6);
+
+        ctx.fillStyle = "#1b3f62";
+        ctx.beginPath();
+        ctx.arc(p0.x, p0.y, 3.7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Origin", p0.x + 8, p0.y + 14);
+      }
+
+      function drawNetVector(net, camera, focal) {
+        const p0 = project3D(0, 0, 0, camera, focal);
+        const p1 = project3D(net.x, net.y, net.z, camera, focal);
+
+        ctx.strokeStyle = "#1d5f9f";
+        ctx.lineWidth = 4.2;
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
+        drawArrowHead2D(p0, p1, "#1d5f9f", 4.2);
+
+        ctx.fillStyle = "#164874";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText("M", p1.x + 7, p1.y - 6);
+      }
+
+      function drawRF(camera, focal, show) {
+        if (!show) return;
+
+        const xStart = -2.2;
+        const y = 1.45;
+        const z = -0.6;
+        const segments = 120;
+
+        ctx.strokeStyle = "#b45f23";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i <= segments; i += 1) {
+          const t = i / segments;
+          const x = xStart + t * 4.4;
+          const zW = z + Math.sin(t * 14 + state.time * 2.4) * 0.06;
+          const p = project3D(x, y, zW, camera, focal);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        const pLabel = project3D(xStart, y + 0.2, z, camera, focal);
+        ctx.fillStyle = "#7a451a";
+        ctx.font = "700 12px Avenir Next";
+        ctx.fillText("B1 RF pulse", pLabel.x, pLabel.y);
+      }
+
+      function drawScene() {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        const camera = {
+          cx: w * 0.5,
+          cy: h * 0.63,
+          z: 5.8
+        };
+        const focal = Math.min(w, h) * 1.08;
+
+        const m = model();
+
+        drawAxisAndOrigin(camera, focal);
+        drawCone(camera, focal, m.tilt);
+
+        const items = [];
+        for (let i = 0; i < m.vectors.length; i += 1) {
+          const v = m.vectors[i];
+          const p = project3D(v.x, v.y, v.z, camera, focal);
+          items.push({ v, p });
+        }
+
+        items.sort((a, b) => a.p.depth - b.p.depth);
+
+        for (let i = 0; i < items.length; i += 1) {
+          const it = items[i];
+          drawLine3D({ x: 0, y: 0, z: 0 }, it.v, camera, focal, "rgba(53, 95, 143, 0.42)", 1.3, [3, 4]);
+          drawSphere3D(it.v, 0.1, camera, focal, "#6e879f");
+          drawSpinArrowThroughSphere(it.v, camera, focal);
+        }
+
+        drawNetVector(m.net, camera, focal);
+        drawRF(camera, focal, state.step === 3);
+
+        ctx.fillStyle = "#4a627f";
+        ctx.font = "600 12px Avenir Next";
+        ctx.fillText("Precession means rotation around B0. Transverse means perpendicular to B0.", 16, h - 16);
+
+        els.mzVal.textContent = m.mz.toFixed(2);
+        els.mxyVal.textContent = m.mxy.toFixed(2);
+      }
+
+      function syncStepUi() {
+        const btns = [els.step1Btn, els.step2Btn, els.step3Btn, els.step4Btn];
+        btns.forEach((b, idx) => {
+          b.classList.toggle("active", idx + 1 === state.step);
+        });
+
+        const steps = els.stepList.querySelectorAll(".step");
+        steps.forEach((el) => {
+          const n = Number(el.getAttribute("data-step"));
+          el.classList.toggle("active", n === state.step);
+        });
+
+        if (state.step === 1) {
+          els.stepLabel.textContent = "Hydrogen spin precesses about B0";
+          els.statusChip.textContent = "Hydrogen spin precesses about B0";
+        }
+
+        if (state.step === 2) {
+          els.stepLabel.textContent = "Many spins precess with different phases";
+          els.statusChip.textContent = "Many spins precess with different phases";
+        }
+
+        if (state.step === 3) {
+          els.stepLabel.textContent = "RF pulse tips net magnetisation";
+          els.statusChip.textContent = "RF pulse tips net magnetisation";
+        }
+
+        if (state.step === 4) {
+          els.stepLabel.textContent = "Transverse magnetisation rotates in the transverse plane";
+          els.statusChip.textContent = "Transverse magnetisation rotates in the transverse plane";
+        }
+      }
+
+      function setStep(step) {
+        state.step = step;
+        state.stepStart = state.time;
+        syncStepUi();
+      }
+
+      function reset() {
+        state.time = 0;
+        state.stepStart = 0;
+        state.startPhases = [];
+        for (let i = 0; i < state.totalSpins; i += 1) {
+          state.startPhases.push(Math.random() * Math.PI * 2);
+        }
+        setStep(1);
+      }
+
+      els.step1Btn.addEventListener("click", () => setStep(1));
+      els.step2Btn.addEventListener("click", () => setStep(2));
+      els.step3Btn.addEventListener("click", () => setStep(3));
+      els.step4Btn.addEventListener("click", () => setStep(4));
+      els.resetBtn.addEventListener("click", reset);
+
+      els.playBtn.addEventListener("click", () => {
+        state.running = !state.running;
+        els.playBtn.textContent = state.running ? "Pause" : "Play";
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      reset();
+
+      function frame(nowMs) {
+        const dt = clamp((nowMs - state.lastFrameMs) / 1000, 0, 0.05);
+        state.lastFrameMs = nowMs;
+        if (state.running) {
+          state.time += dt;
+        }
+        drawScene();
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

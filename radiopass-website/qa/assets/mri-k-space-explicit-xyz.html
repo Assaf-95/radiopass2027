@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How k space is formed with explicit phase encoding in XYZ space</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --line: #d8e2ef;
+    --ink: #0f172a;
+    --muted: #475569;
+    --accent: #2563eb;
+    --active: #f59e0b;
+    --filled: #1d4ed8;
+    --empty: #e8eef7;
+    --gx: #0284c7;
+    --gy: #d97706;
+    --gz: #16a34a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: radial-gradient(circle at 10% 8%, #ffffff, var(--bg));
+    color: var(--ink);
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    padding: 14px;
+  }
+
+  .app {
+    max-width: 1480px;
+    margin: 0 auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  .title {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.08);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+  }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    display: grid;
+    gap: 6px;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.06);
+  }
+
+  .panelTitle {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1e3a8a;
+  }
+
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    aspect-ratio: 1 / 1;
+  }
+
+  .explain {
+    background: #f8fbff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    min-height: 118px;
+    padding: 10px;
+    white-space: pre-line;
+    line-height: 1.35;
+    color: #334155;
+    font-size: 0.92rem;
+  }
+
+  .controls {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.08);
+    display: grid;
+    gap: 10px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btnRow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  button,
+  select {
+    font: inherit;
+  }
+
+  input[type="range"] {
+    width: min(220px, 100%);
+  }
+
+  button {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #fff;
+    font-weight: 650;
+    font-size: 0.86rem;
+    cursor: pointer;
+    background: linear-gradient(120deg, #1d4ed8, #0369a1);
+  }
+
+  button.secondary {
+    background: linear-gradient(120deg, #475569, #334155);
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .chip {
+    border: 1px solid #c8d8f1;
+    border-radius: 999px;
+    background: #ecf3ff;
+    color: #1e3a8a;
+    padding: 3px 8px;
+    font-size: 0.79rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .small {
+    font-size: 0.84rem;
+    color: #334155;
+  }
+
+  @media (max-width: 1180px) {
+    .panels { grid-template-columns: 1fr; }
+  }
+</style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <div class="app">
+    <section class="title">
+      <h1>How k space is formed with explicit phase encoding in XYZ space</h1>
+    </section>
+
+    <section class="panels">
+      <article class="panel">
+        <div class="panelTitle">Image space</div>
+        <svg id="objectSvg" viewBox="0 0 420 420" aria-label="Image space"></svg>
+      </article>
+
+      <article class="panel">
+        <div class="panelTitle">XYZ gradients</div>
+        <svg id="xyzSvg" viewBox="0 0 420 420" aria-label="XYZ gradients"></svg>
+      </article>
+
+      <article class="panel">
+        <div class="panelTitle">k space</div>
+        <svg id="kspaceSvg" viewBox="0 0 420 420" aria-label="k space"></svg>
+      </article>
+    </section>
+
+    <section class="explain" id="explainBox"></section>
+
+    <section class="controls">
+      <div class="row">
+        <span class="chip" id="stepChip">Phase signal origin</span>
+        <span class="chip" id="lineChip">0 of 16 lines acquired</span>
+        <span class="chip" id="kyChip">ky 0</span>
+        <span class="chip" id="trChip">TR 600 ms</span>
+        <span class="chip" id="teChip">TE 80 ms</span>
+        <span class="chip" id="seqChip">Sequence idle</span>
+      </div>
+
+      <div class="btnRow">
+        <button id="backBtn" class="secondary">Back</button>
+        <button id="nextBtn">Next</button>
+        <button id="playBtn">Play</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+      </div>
+
+      <div class="row small">
+        <label for="matrixSelect">Matrix size</label>
+        <select id="matrixSelect">
+          <option value="16">16 by 16</option>
+          <option value="32">32 by 32</option>
+        </select>
+        <span>k position equals gamma × integral of gradient over time</span>
+      </div>
+
+      <div class="row small">
+        <label for="trSlider">TR ms</label>
+        <input id="trSlider" type="range" min="300" max="3000" step="10" value="600" />
+        <strong id="trVal">600</strong>
+        <label for="teSlider">TE ms</label>
+        <input id="teSlider" type="range" min="40" max="300" step="5" value="80" />
+        <strong id="teVal">80</strong>
+      </div>
+    </section>
+  </div>
+
+<script>
+(function () {
+  const ns = "http://www.w3.org/2000/svg";
+
+  const objectSvg = document.getElementById("objectSvg");
+  const xyzSvg = document.getElementById("xyzSvg");
+  const kspaceSvg = document.getElementById("kspaceSvg");
+
+  const ui = {
+    explainBox: document.getElementById("explainBox"),
+    stepChip: document.getElementById("stepChip"),
+    lineChip: document.getElementById("lineChip"),
+    kyChip: document.getElementById("kyChip"),
+    trChip: document.getElementById("trChip"),
+    teChip: document.getElementById("teChip"),
+    seqChip: document.getElementById("seqChip"),
+    backBtn: document.getElementById("backBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    playBtn: document.getElementById("playBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    matrixSelect: document.getElementById("matrixSelect"),
+    trSlider: document.getElementById("trSlider"),
+    teSlider: document.getElementById("teSlider"),
+    trVal: document.getElementById("trVal"),
+    teVal: document.getElementById("teVal")
+  };
+
+  const steps = [
+    {
+      title: "Signal origin before gradients",
+      bullets: [
+        "• First observe the object as the signal source",
+        "• No gradient is active yet",
+        "• k space remains empty before encoding starts"
+      ]
+    },
+    {
+      title: "Slice select with RF 90",
+      bullets: [
+        "• First apply slice select along Z",
+        "• Then apply RF 90 to rotate magnetization from plus Z toward plus X",
+        "• This prepares transverse magnetization for encoding",
+        "• k space is still not filled at this stage"
+      ]
+    },
+    {
+      title: "Phase encode before readout",
+      bullets: [
+        "• Next apply phase encoding along Y",
+        "• Gradient pulse height sets the selected ky position",
+        "• The highlighted ky row moves proportionally with Gy amplitude",
+        "• Readout has not started yet so no k space line is filled"
+      ]
+    },
+    {
+      title: "Refocus and frequency encode",
+      bullets: [
+        "• Then apply RF 180 to refocus dephasing",
+        "• Next apply frequency encoding along X with dephase then rephase",
+        "• During readout the trajectory traverses kx left to right",
+        "• One TR acquires one ky line"
+      ]
+    },
+    {
+      title: "Repeat spin echo line acquisition",
+      bullets: [
+        "• Repeat the sequence in this order",
+        "• RF 90 then phase encode then RF 180 then frequency readout",
+        "• RF 180 occurs at TE divided by 2 and echo forms at TE",
+        "• Each new Gy amplitude selects the next ky line",
+        "• k space fills line by line from negative ky toward positive ky"
+      ]
+    },
+    {
+      title: "Central ky emphasis",
+      bullets: [
+        "• When Gy amplitude is near zero the acquisition is near central ky",
+        "• Central lines dominate signal intensity and image contrast"
+      ]
+    },
+    {
+      title: "Complete matrix and reconstruction",
+      bullets: [
+        "• Continue until the full matrix is filled",
+        "• Then apply inverse Fourier transform to reconstruct the image"
+      ]
+    }
+  ];
+
+  const state = {
+    step: 1,
+    totalSteps: 7,
+    matrixSize: 16,
+    acquiredRows: new Set(),
+    phaseOrder: [],
+    phasePointer: 0,
+    selectedRow: 0,
+    readoutActive: false,
+    readoutProgress: 0,
+    readoutRate: 0.45,
+    showReconstruction: false,
+    gxOn: 0,
+    gyOn: 0,
+    gzOn: 0,
+    phasePulseActive: false,
+    phasePulseProgress: 0,
+    phasePulseDurationSec: 0.4,
+    phasePulseQueuedReadout: false,
+    phasePulseShownStep3: false,
+    feDephaseActive: false,
+    feDephaseProgress: 0,
+    feDephaseDurationSec: 0.35,
+    trCycleActive: false,
+    trCycleTime: 0,
+    trCycleEvents: {
+      rf90: false,
+      phase: false,
+      rf180: false,
+      fe: false,
+      readout: false
+    },
+    trMs: 600,
+    teMs: 80,
+    timeScaleSecPerMs: 0.04,
+    liveSentence: "Before gradients are applied then signal remains at equilibrium after this k space stays empty with TR 600 ms and TE 80 ms.",
+    rf90Done: false,
+    rf180Done: false,
+    rf: {
+      active: false,
+      kind: "",
+      label: "",
+      axis: "y",
+      angleDeg: 0,
+      duration: 0,
+      elapsed: 0,
+      start: { x: 0, y: 0, z: 1 }
+    },
+    m: { x: 0, y: 0, z: 1 },
+    flipAngleNow: 0,
+    play: false,
+    playClock: 0,
+    reconClock: 0,
+    loopClock: 0,
+    lastTs: performance.now()
+  };
+
+  function resetPhaseOrder() {
+    state.phaseOrder = Array.from({ length: state.matrixSize }, (_, i) => i);
+    state.phasePointer = 0;
+    state.selectedRow = state.phaseOrder[0];
+  }
+
+  function centerRow() {
+    return Math.floor(state.matrixSize / 2);
+  }
+
+  function kyOfRow(row) {
+    return row - centerRow();
+  }
+
+  function step5StopPointer() {
+    return Math.min(state.phaseOrder.length - 1, centerRow() + 1);
+  }
+
+  function formatSigned(v) {
+    if (v < 0) return "−" + Math.abs(v);
+    return String(v);
+  }
+
+  function secFromMs(ms) {
+    return ms * state.timeScaleSecPerMs;
+  }
+
+  function sequenceTiming() {
+    const trSec = secFromMs(state.trMs);
+    const teSec = secFromMs(state.teMs);
+    const rf90Dur = Math.max(0.040, teSec * 0.18);
+    const rf180Dur = Math.max(0.045, teSec * 0.20);
+    const phaseTime = Math.max(rf90Dur * 0.65, teSec * 0.14);
+    const rf180Time = teSec * 0.5;
+    const feTime = Math.max(rf180Time + rf180Dur * 0.45, teSec * 0.52);
+    const readoutDur = Math.max(0.09, Math.min(trSec * 0.36, teSec * 0.65));
+    const readoutStart = Math.max(feTime + 0.028, teSec - readoutDur * 0.5);
+    return { trSec, teSec, rf90Dur, rf180Dur, phaseTime, rf180Time, feTime, readoutStart, readoutDur };
+  }
+
+  function setTransitionSentence(beforeText, thenText, afterText) {
+    state.liveSentence =
+      "Before " + beforeText +
+      " then " + thenText +
+      " after " + afterText +
+      " with TR " + state.trMs + " ms and TE " + state.teMs + " ms.";
+  }
+
+  function normalizeVec(v) {
+    const L = Math.hypot(v.x, v.y, v.z) || 1;
+    return { x: v.x / L, y: v.y / L, z: v.z / L };
+  }
+
+  function rotateAroundY(v, ang) {
+    const c = Math.cos(ang);
+    const s = Math.sin(ang);
+    return {
+      x: v.x * c + v.z * s,
+      y: v.y,
+      z: -v.x * s + v.z * c
+    };
+  }
+
+  function rotateVector(v, axis, ang) {
+    if (axis === "y") return rotateAroundY(v, ang);
+    return { x: v.x, y: v.y, z: v.z };
+  }
+
+  function beginRfPulse(kind, label, angleDeg, axis, durationSec) {
+    if (state.rf.active) return;
+    state.rf.active = true;
+    state.rf.kind = kind;
+    state.rf.label = label;
+    state.rf.angleDeg = angleDeg;
+    state.rf.axis = axis;
+    state.rf.duration = Math.max(0.2, durationSec);
+    state.rf.elapsed = 0;
+    state.rf.start = { x: state.m.x, y: state.m.y, z: state.m.z };
+    state.flipAngleNow = 0;
+    if (kind === "rf90") {
+      setTransitionSentence(
+        "magnetization is mostly along plus Z",
+        "RF 90 rotates magnetization into transverse plane",
+        "phase encoding can choose ky for the next line"
+      );
+    } else if (kind === "rf180") {
+      setTransitionSentence(
+        "transverse spins have phase spread",
+        "RF 180 inverts phase ordering",
+        "spins can rephase and form echo at TE"
+      );
+    }
+  }
+
+  function triggerPhasePulse(queueReadout, durationSec) {
+    state.phasePulseActive = true;
+    state.phasePulseProgress = 0;
+    if (typeof durationSec === "number" && durationSec > 0) {
+      state.phasePulseDurationSec = durationSec;
+    }
+    state.phasePulseQueuedReadout = !!queueReadout;
+    setTransitionSentence(
+      "frequency readout has not started",
+      "Gy phase encoding applies a controlled phase shift",
+      "the selected ky row is defined for acquisition"
+    );
+  }
+
+  function startFeDephase(durationSec) {
+    if (state.feDephaseActive || state.readoutActive) return;
+    state.feDephaseActive = true;
+    state.feDephaseProgress = 0;
+    if (typeof durationSec === "number" && durationSec > 0) {
+      state.feDephaseDurationSec = durationSec;
+    }
+    setTransitionSentence(
+      "phase encoded spins are ready for frequency mapping",
+      "Gx prephase spreads frequency based phase",
+      "readout rephasing can produce echo centered near TE"
+    );
+  }
+
+  function startTrCycle() {
+    if (state.trCycleActive || state.readoutActive || state.phasePulseActive || state.feDephaseActive || state.rf.active) return;
+    state.trCycleActive = true;
+    state.trCycleTime = 0;
+    state.trCycleEvents.rf90 = false;
+    state.trCycleEvents.phase = false;
+    state.trCycleEvents.rf180 = false;
+    state.trCycleEvents.fe = false;
+    state.trCycleEvents.readout = false;
+    setTransitionSentence(
+      "the previous line is completed",
+      "a new TR cycle starts with RF and gradient order",
+      "the next ky line will be filled"
+    );
+  }
+
+  function startLineAcquisition() {
+    if (state.showReconstruction) return;
+    if (state.step === 5) {
+      startTrCycle();
+      return;
+    }
+    if (state.readoutActive || state.phasePulseActive || state.rf.active || state.feDephaseActive) return;
+    triggerPhasePulse(true, 0.35);
+  }
+
+  function clearStateForReset() {
+    state.step = 1;
+    state.play = false;
+    state.readoutActive = false;
+    state.readoutProgress = 0;
+    state.showReconstruction = false;
+    state.phasePulseActive = false;
+    state.phasePulseProgress = 0;
+    state.phasePulseDurationSec = 0.4;
+    state.phasePulseQueuedReadout = false;
+    state.phasePulseShownStep3 = false;
+    state.feDephaseActive = false;
+    state.feDephaseProgress = 0;
+    state.feDephaseDurationSec = 0.35;
+    state.trCycleActive = false;
+    state.trCycleTime = 0;
+    state.trCycleEvents.rf90 = false;
+    state.trCycleEvents.phase = false;
+    state.trCycleEvents.rf180 = false;
+    state.trCycleEvents.fe = false;
+    state.trCycleEvents.readout = false;
+    state.rf90Done = false;
+    state.rf180Done = false;
+    state.rf.active = false;
+    state.rf.kind = "";
+    state.rf.label = "";
+    state.rf.axis = "y";
+    state.rf.angleDeg = 0;
+    state.rf.duration = 0;
+    state.rf.elapsed = 0;
+    state.rf.start = { x: 0, y: 0, z: 1 };
+    state.m = { x: 0, y: 0, z: 1 };
+    state.flipAngleNow = 0;
+    state.acquiredRows.clear();
+    state.gxOn = 0;
+    state.gyOn = 0;
+    state.gzOn = 0;
+    state.playClock = 0;
+    state.reconClock = 0;
+    state.loopClock = 0;
+    resetPhaseOrder();
+    setTransitionSentence(
+      "the sequence has been reset",
+      "all gradients and pulses return to idle",
+      "a fresh acquisition can begin from equilibrium"
+    );
+  }
+
+  function setMatrixSize(n) {
+    state.matrixSize = n;
+    clearStateForReset();
+    syncUi();
+  }
+
+  function setTrMs(v) {
+    state.trMs = Math.max(300, Math.min(3000, Math.round(v)));
+    const maxTe = Math.max(40, Math.min(300, state.trMs - 20));
+    ui.teSlider.max = String(maxTe);
+    if (state.teMs > maxTe) state.teMs = maxTe;
+    ui.trSlider.value = String(state.trMs);
+    ui.teSlider.value = String(state.teMs);
+    setTransitionSentence(
+      "sequence timing is being configured",
+      "TR is adjusted for repetition spacing",
+      "all following transitions use the new TR and TE"
+    );
+  }
+
+  function setTeMs(v) {
+    const maxTe = Math.max(40, Math.min(300, state.trMs - 20));
+    state.teMs = Math.max(40, Math.min(maxTe, Math.round(v)));
+    ui.teSlider.value = String(state.teMs);
+    setTransitionSentence(
+      "sequence timing is being configured",
+      "TE is adjusted for echo timing",
+      "RF 180 at TE divided by 2 and echo at TE update accordingly"
+    );
+  }
+
+  function updateSelectedRowFromPointer() {
+    const idx = Math.max(0, Math.min(state.phasePointer, state.phaseOrder.length - 1));
+    state.selectedRow = state.phaseOrder[idx];
+  }
+
+  function advancePhaseStep() {
+    if (state.phasePointer < state.phaseOrder.length - 1) {
+      state.phasePointer += 1;
+    }
+    updateSelectedRowFromPointer();
+  }
+
+  function startReadout(ratePerSec) {
+    if (state.readoutActive || state.showReconstruction) return;
+    state.readoutActive = true;
+    state.readoutProgress = 0;
+    if (typeof ratePerSec === "number" && ratePerSec > 0) {
+      state.readoutRate = ratePerSec;
+    }
+    state.gxOn = 1;
+    setTransitionSentence(
+      "prephase has completed",
+      "readout gradient traverses kx while spins rephase",
+      "one ky line is sampled into k space"
+    );
+  }
+
+  function completeReadout() {
+    state.readoutActive = false;
+    state.readoutProgress = 0;
+    state.acquiredRows.add(state.selectedRow);
+    setTransitionSentence(
+      "kx traversal reached the line end",
+      "the sampled signal is committed to the selected ky row",
+      "the sequence can proceed to the next transition"
+    );
+  }
+
+  function allRowsAcquired() {
+    return state.acquiredRows.size >= state.matrixSize;
+  }
+
+  function enterStep(stepNo) {
+    state.step = Math.max(1, Math.min(state.totalSteps, stepNo));
+    const timing = sequenceTiming();
+
+    state.gxOn = 0;
+    state.gyOn = 0;
+    state.gzOn = 0;
+    state.reconClock = 0;
+    state.phasePulseActive = false;
+    state.phasePulseProgress = 0;
+    state.phasePulseDurationSec = 0.4;
+    state.phasePulseQueuedReadout = false;
+    state.feDephaseActive = false;
+    state.feDephaseProgress = 0;
+    state.feDephaseDurationSec = 0.35;
+    state.trCycleActive = false;
+    state.trCycleTime = 0;
+    state.trCycleEvents.rf90 = false;
+    state.trCycleEvents.phase = false;
+    state.trCycleEvents.rf180 = false;
+    state.trCycleEvents.fe = false;
+    state.trCycleEvents.readout = false;
+
+    if (state.step === 1) {
+      state.readoutActive = false;
+      state.showReconstruction = false;
+      state.rf.active = false;
+      state.rf90Done = false;
+      state.rf180Done = false;
+      state.phasePulseShownStep3 = false;
+      state.m = { x: 0, y: 0, z: 1 };
+      state.flipAngleNow = 0;
+      setTransitionSentence(
+        "no encoding gradients are active",
+        "the system remains at equilibrium",
+        "k space is still empty"
+      );
+    } else if (state.step === 2) {
+      state.gzOn = 1;
+      if (!state.rf90Done) {
+        beginRfPulse("rf90", "RF 90", 90, "y", timing.rf90Dur);
+      }
+      setTransitionSentence(
+        "signal is at equilibrium",
+        "slice select with RF excitation prepares the slice",
+        "transverse magnetization becomes available for encoding"
+      );
+    } else if (state.step === 3) {
+      updateSelectedRowFromPointer();
+      if (!state.rf90Done && !state.rf.active) {
+        beginRfPulse("rf90", "RF 90", 90, "y", timing.rf90Dur);
+      }
+      if (state.rf90Done && !state.phasePulseShownStep3) {
+        triggerPhasePulse(false, Math.max(0.090, timing.teSec * 0.22));
+        state.phasePulseShownStep3 = true;
+      }
+      state.gyOn = state.phasePulseActive ? 1 : 0.5;
+      setTransitionSentence(
+        "transverse magnetization is present",
+        "phase encoding pulse sets ky by Gy amplitude",
+        "the chosen ky row is highlighted before readout"
+      );
+    } else if (state.step === 4) {
+      updateSelectedRowFromPointer();
+      if (!state.rf180Done) {
+        beginRfPulse("rf180", "RF 180", 180, "y", timing.rf180Dur);
+      } else if (!state.readoutActive) {
+        startReadout(1 / timing.readoutDur);
+      }
+      state.gyOn = 0.35;
+      state.gxOn = state.readoutActive ? 1 : 0.4;
+      setTransitionSentence(
+        "phase encoded spins are ready for echo formation",
+        "RF 180 then Gx dephase and readout rephase are applied",
+        "one ky line is acquired during this TR"
+      );
+    } else if (state.step === 5) {
+      updateSelectedRowFromPointer();
+      state.gyOn = state.phasePulseActive ? 1 : 0.42;
+      state.gxOn = state.readoutActive ? 1 : 0;
+      setTransitionSentence(
+        "one line has been acquired",
+        "the full spin echo order repeats for the next Gy level",
+        "k space fills line by line"
+      );
+    } else if (state.step === 6) {
+      state.gyOn = 0.25;
+      state.selectedRow = centerRow();
+      setTransitionSentence(
+        "outer ky lines have begun filling",
+        "Gy moves near zero to target central ky",
+        "contrast dominant central data is emphasized"
+      );
+    } else if (state.step === 7) {
+      state.gyOn = 0.2;
+      state.gxOn = 0.5;
+      setTransitionSentence(
+        "line acquisition is nearly complete",
+        "the matrix is filled across remaining ky rows",
+        "inverse Fourier reconstruction becomes possible"
+      );
+    }
+
+    syncUi();
+  }
+
+  function stepForward() {
+    if (state.step === 5) {
+      if (!state.readoutActive && !state.phasePulseActive && !state.feDephaseActive && !state.rf.active && !state.trCycleActive) {
+        if (allRowsAcquired()) {
+          enterStep(6);
+          return;
+        }
+
+        if (state.phasePointer >= step5StopPointer()) {
+          enterStep(6);
+          return;
+        }
+
+        if (state.phasePointer < state.phaseOrder.length - 1) {
+          advancePhaseStep();
+        }
+
+        startLineAcquisition();
+      }
+      syncUi();
+      return;
+    }
+
+    if (state.step === 7) return;
+    enterStep(state.step + 1);
+  }
+
+  function stepBack() {
+    if (state.step === 5) {
+      if (!state.readoutActive && !state.phasePulseActive && !state.feDephaseActive && !state.rf.active && !state.trCycleActive && state.phasePointer > 0) {
+        state.phasePointer -= 1;
+        updateSelectedRowFromPointer();
+        syncUi();
+        return;
+      }
+    }
+
+    if (state.step > 1) {
+      enterStep(state.step - 1);
+    }
+  }
+
+  function smoothTowards(current, target, rate) {
+    return current + (target - current) * rate;
+  }
+
+  function updatePhysics(dt) {
+    state.loopClock += dt;
+    const timing = sequenceTiming();
+
+    if (state.rf.active) {
+      state.rf.elapsed += dt;
+      const t = Math.max(0, Math.min(1, state.rf.elapsed / state.rf.duration));
+      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const ang = (state.rf.angleDeg * Math.PI / 180) * eased;
+      state.m = normalizeVec(rotateVector(state.rf.start, state.rf.axis, ang));
+      state.flipAngleNow = state.rf.angleDeg * eased;
+
+      if (t >= 1) {
+        const finalAng = state.rf.angleDeg * Math.PI / 180;
+        state.m = normalizeVec(rotateVector(state.rf.start, state.rf.axis, finalAng));
+        state.flipAngleNow = state.rf.angleDeg;
+        state.rf.active = false;
+        if (state.rf.kind === "rf90") state.rf90Done = true;
+        if (state.rf.kind === "rf180") state.rf180Done = true;
+      }
+    } else {
+      state.flipAngleNow = 0;
+    }
+
+    if (state.trCycleActive) {
+      state.trCycleTime += dt;
+      const t = state.trCycleTime;
+
+      if (!state.trCycleEvents.rf90) {
+        beginRfPulse("rf90", "RF 90", 90, "y", timing.rf90Dur);
+        state.trCycleEvents.rf90 = true;
+      }
+
+      if (!state.trCycleEvents.phase && t >= timing.phaseTime) {
+        triggerPhasePulse(false, Math.max(0.090, timing.teSec * 0.22));
+        state.trCycleEvents.phase = true;
+      }
+
+      if (!state.trCycleEvents.rf180 && t >= timing.rf180Time && !state.rf.active) {
+        beginRfPulse("rf180", "RF 180", 180, "y", timing.rf180Dur);
+        state.trCycleEvents.rf180 = true;
+      }
+
+      if (!state.trCycleEvents.fe && t >= timing.feTime) {
+        startFeDephase(Math.max(0.090, timing.teSec * 0.22));
+        state.trCycleEvents.fe = true;
+      }
+
+      if (!state.trCycleEvents.readout && t >= timing.readoutStart && !state.feDephaseActive && !state.readoutActive && !state.rf.active) {
+        startReadout(1 / timing.readoutDur);
+        state.trCycleEvents.readout = true;
+      }
+    }
+
+    if (state.step === 3 && state.rf90Done && !state.phasePulseShownStep3 && !state.phasePulseActive) {
+      triggerPhasePulse(false, Math.max(0.090, timing.teSec * 0.22));
+      state.phasePulseShownStep3 = true;
+    }
+
+    if (state.phasePulseActive) {
+      state.phasePulseProgress += dt / Math.max(0.015, state.phasePulseDurationSec);
+      if (state.phasePulseProgress >= 1) {
+        state.phasePulseActive = false;
+        state.phasePulseProgress = 1;
+        const queuedReadout = state.phasePulseQueuedReadout;
+        state.phasePulseQueuedReadout = false;
+        if (queuedReadout && !state.rf.active) {
+          startFeDephase(Math.max(0.090, timing.teSec * 0.22));
+        }
+      }
+    }
+
+    if (state.feDephaseActive) {
+      state.feDephaseProgress += dt / Math.max(0.015, state.feDephaseDurationSec);
+      if (state.feDephaseProgress >= 1) {
+        state.feDephaseActive = false;
+        state.feDephaseProgress = 1;
+        if (!state.rf.active && !state.trCycleActive) startReadout(1 / timing.readoutDur);
+      }
+    }
+
+    if (state.step === 4 && !state.trCycleActive && state.rf180Done && !state.rf.active && !state.readoutActive && !state.phasePulseActive && !state.feDephaseActive) {
+      startFeDephase(Math.max(0.090, timing.teSec * 0.22));
+    }
+
+    const targetGz = state.step === 2 ? 1 : (state.step === 3 ? 0.25 : 0);
+    const targetGy = state.phasePulseActive
+      ? 1
+      : (state.step === 3 ? 0.45 : state.step === 4 ? 0.35 : state.step === 5 ? 0.42 : state.step >= 6 ? 0.2 : 0);
+    const targetGx = state.readoutActive ? 1 : state.feDephaseActive ? 0.78 : (state.step === 4 ? 0.35 : state.step === 7 ? 0.35 : 0);
+
+    state.gzOn = smoothTowards(state.gzOn, targetGz, Math.min(1, dt * 0.6));
+    state.gyOn = smoothTowards(state.gyOn, targetGy, Math.min(1, dt * 0.6));
+    state.gxOn = smoothTowards(state.gxOn, targetGx, Math.min(1, dt * 0.6));
+
+    if (state.readoutActive) {
+      state.readoutProgress += dt * state.readoutRate;
+      if (state.readoutProgress >= 1) {
+        completeReadout();
+
+        if (state.step === 4) {
+          enterStep(5);
+        } else if (state.step === 5) {
+          if (state.trCycleActive) {
+            const cycleDone = state.trCycleTime >= timing.trSec;
+            const cycleSettled = !state.rf.active && !state.phasePulseActive && !state.feDephaseActive;
+            if (cycleDone && cycleSettled) {
+              state.trCycleActive = false;
+              state.trCycleTime = 0;
+            }
+          }
+          if ((allRowsAcquired() || state.phasePointer >= step5StopPointer()) && !state.trCycleActive) {
+            enterStep(6);
+          }
+        }
+      }
+    }
+
+    if (state.trCycleActive && state.step === 5) {
+      const cycleDone = state.trCycleTime >= timing.trSec;
+      const noEventsRunning = !state.rf.active && !state.phasePulseActive && !state.feDephaseActive && !state.readoutActive;
+      if (cycleDone && noEventsRunning) {
+        state.trCycleActive = false;
+        state.trCycleTime = 0;
+        if (allRowsAcquired() || state.phasePointer >= step5StopPointer()) {
+          enterStep(6);
+        }
+      }
+    }
+
+    if (state.step === 7 && !state.showReconstruction) {
+      if (!allRowsAcquired()) {
+        state.reconClock += dt;
+        if (state.reconClock > 0.08) {
+          state.reconClock = 0;
+          let added = false;
+          for (let i = 0; i < state.phaseOrder.length; i += 1) {
+            const row = state.phaseOrder[i];
+            if (!state.acquiredRows.has(row)) {
+              state.acquiredRows.add(row);
+              added = true;
+              break;
+            }
+          }
+          if (!added) {
+            state.showReconstruction = true;
+          }
+        }
+      } else {
+        state.reconClock += dt;
+        if (state.reconClock > 0.7) state.showReconstruction = true;
+      }
+    }
+
+    if (state.play) {
+      state.playClock += dt;
+      const busy = state.rf.active || state.phasePulseActive || state.feDephaseActive || state.readoutActive || state.trCycleActive;
+      if (busy) {
+        state.playClock = 0;
+      } else if (state.playClock > 1.35) {
+        state.playClock = 0;
+        if (state.step < 7) {
+          stepForward();
+        } else {
+          state.play = false;
+          syncUi();
+        }
+      }
+    }
+  }
+
+  function el(name, attrs) {
+    const node = document.createElementNS(ns, name);
+    Object.keys(attrs).forEach((k) => node.setAttribute(k, attrs[k]));
+    return node;
+  }
+
+  function clearSvg(svg) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+  }
+
+  function drawObjectPanel() {
+    clearSvg(objectSvg);
+
+    objectSvg.appendChild(el("rect", { x: 0, y: 0, width: 420, height: 420, fill: "#0b1220" }));
+
+    const cx = 210;
+    const cy = 220;
+    const side = 250;
+
+    objectSvg.appendChild(el("rect", {
+      x: cx - side / 2,
+      y: cy - side / 2,
+      width: side,
+      height: side,
+      fill: "rgba(255,255,255,0.95)",
+      stroke: "rgba(255,255,255,0.25)",
+      "stroke-width": 2
+    }));
+
+    const text1 = el("text", { x: 16, y: 24, fill: "#e2e8f0", "font-size": 14, "font-weight": 700 });
+    text1.textContent = "Image space";
+    objectSvg.appendChild(text1);
+
+    const text2 = el("text", { x: 16, y: 42, fill: "#94a3b8", "font-size": 12 });
+    text2.textContent = state.step === 7 && state.showReconstruction ? "Reconstructed view" : "Object signal source square phantom";
+    objectSvg.appendChild(text2);
+  }
+
+  function addArrow(svg, x1, y1, x2, y2, color, width, opacity) {
+    const line = el("line", {
+      x1, y1, x2, y2,
+      stroke: color,
+      "stroke-width": width,
+      "stroke-linecap": "round",
+      opacity
+    });
+    svg.appendChild(line);
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const L = Math.hypot(dx, dy) || 1;
+    const ux = dx / L;
+    const uy = dy / L;
+    const leftX = x2 - ux * 12 - uy * 6;
+    const leftY = y2 - uy * 12 + ux * 6;
+    const rightX = x2 - ux * 12 + uy * 6;
+    const rightY = y2 - uy * 12 - ux * 6;
+
+    const head = el("polygon", {
+      points: `${x2},${y2} ${leftX},${leftY} ${rightX},${rightY}`,
+      fill: color,
+      opacity
+    });
+    svg.appendChild(head);
+  }
+
+  function drawCoilPair(svg, x, y, angle, color) {
+    const g = el("g", { transform: `translate(${x} ${y}) rotate(${angle})` });
+    const c1 = el("circle", { cx: -24, cy: 0, r: 9, fill: "none", stroke: color, "stroke-width": 2, opacity: 0.55 });
+    const c2 = el("circle", { cx: 24, cy: 0, r: 9, fill: "none", stroke: color, "stroke-width": 2, opacity: 0.55 });
+    g.appendChild(c1);
+    g.appendChild(c2);
+    svg.appendChild(g);
+  }
+
+  function drawXyzPanel() {
+    clearSvg(xyzSvg);
+    xyzSvg.appendChild(el("rect", { x: 0, y: 0, width: 420, height: 420, fill: "#fbfdff" }));
+
+    const origin = { x: 175, y: 230 };
+    const xEnd = { x: 305, y: 230 };
+    const yEnd = { x: 105, y: 145 };
+    const zEnd = { x: 175, y: 95 };
+    const zNeg = { x: 175, y: 365 };
+
+    const ky = kyOfRow(state.selectedRow);
+    const maxKy = Math.max(1, centerRow());
+    const phaseAmp = Math.max(-1, Math.min(1, ky / maxKy));
+
+    addArrow(xyzSvg, origin.x, origin.y, xEnd.x, xEnd.y, "#64748b", 2, 0.9);
+    addArrow(xyzSvg, origin.x, origin.y, yEnd.x, yEnd.y, "#64748b", 2, 0.9);
+    addArrow(xyzSvg, origin.x, origin.y, zEnd.x, zEnd.y, "#64748b", 2, 0.9);
+    xyzSvg.appendChild(el("line", {
+      x1: origin.x, y1: origin.y, x2: zNeg.x, y2: zNeg.y,
+      stroke: "#94a3b8", "stroke-width": 1.6, "stroke-dasharray": "4 4", opacity: 0.9
+    }));
+
+    const xLabel = el("text", { x: xEnd.x + 8, y: xEnd.y + 4, fill: "#334155", "font-size": 12, "font-weight": 700 });
+    xLabel.textContent = "X";
+    xyzSvg.appendChild(xLabel);
+
+    const yLabel = el("text", { x: yEnd.x - 16, y: yEnd.y - 6, fill: "#334155", "font-size": 12, "font-weight": 700 });
+    yLabel.textContent = "Y";
+    xyzSvg.appendChild(yLabel);
+
+    const zLabel = el("text", { x: zEnd.x - 8, y: zEnd.y - 8, fill: "#334155", "font-size": 12, "font-weight": 700 });
+    zLabel.textContent = "Z";
+    xyzSvg.appendChild(zLabel);
+    const zNegLabel = el("text", { x: zNeg.x + 8, y: zNeg.y + 4, fill: "#64748b", "font-size": 11, "font-weight": 700 });
+    zNegLabel.textContent = "minus Z";
+    xyzSvg.appendChild(zNegLabel);
+
+    drawCoilPair(xyzSvg, 240, 230, 0, "#94a3b8");
+    drawCoilPair(xyzSvg, 140, 185, -50, "#94a3b8");
+    drawCoilPair(xyzSvg, 175, 160, -90, "#94a3b8");
+
+    const gxIntensity = 0.25 + 0.75 * state.gxOn;
+    const gyIntensity = 0.25 + 0.75 * state.gyOn;
+    const gzIntensity = 0.25 + 0.75 * state.gzOn;
+
+    addArrow(xyzSvg, origin.x, origin.y + 16, xEnd.x, xEnd.y + 16, "#0284c7", 4, gxIntensity);
+
+    const yTargetX = origin.x + (yEnd.x - origin.x) * 0.95;
+    const yTargetY = origin.y + (yEnd.y - origin.y) * 0.95;
+    addArrow(xyzSvg, origin.x - 10, origin.y + 5, yTargetX - 10, yTargetY + 5, "#d97706", 4, gyIntensity);
+
+    addArrow(xyzSvg, origin.x + 14, origin.y, zEnd.x + 14, zEnd.y, "#16a34a", 4, gzIntensity);
+
+    const tx1 = el("text", { x: 288, y: 258, fill: "#0369a1", "font-size": 11, "font-weight": 700, opacity: gxIntensity });
+    tx1.textContent = "Frequency encode";
+    xyzSvg.appendChild(tx1);
+
+    const tx2 = el("text", { x: 34, y: 140, fill: "#b45309", "font-size": 11, "font-weight": 700, opacity: gyIntensity });
+    tx2.textContent = "Phase encode pulse";
+    xyzSvg.appendChild(tx2);
+
+    const tx3 = el("text", { x: 188, y: 92, fill: "#15803d", "font-size": 11, "font-weight": 700, opacity: gzIntensity });
+    tx3.textContent = "Slice select";
+    xyzSvg.appendChild(tx3);
+
+    const ux = { x: xEnd.x - origin.x, y: xEnd.y - origin.y };
+    const uy = { x: yEnd.x - origin.x, y: yEnd.y - origin.y };
+    const uz = { x: zEnd.x - origin.x, y: zEnd.y - origin.y };
+    const lux = Math.hypot(ux.x, ux.y) || 1;
+    const luy = Math.hypot(uy.x, uy.y) || 1;
+    const luz = Math.hypot(uz.x, uz.y) || 1;
+    const bx = { x: ux.x / lux, y: ux.y / lux };
+    const by = { x: uy.x / luy, y: uy.y / luy };
+    const bz = { x: uz.x / luz, y: uz.y / luz };
+
+    const mScale = 82;
+    const mTip = {
+      x: origin.x + mScale * (state.m.x * bx.x + state.m.y * by.x + state.m.z * bz.x),
+      y: origin.y + mScale * (state.m.x * bx.y + state.m.y * by.y + state.m.z * bz.y)
+    };
+
+    addArrow(xyzSvg, origin.x + 4, origin.y + 4, mTip.x + 4, mTip.y + 4, "rgba(15,23,42,0.25)", 6, 0.95);
+    addArrow(xyzSvg, origin.x, origin.y, mTip.x, mTip.y, "#be185d", 4.6, 1);
+    xyzSvg.appendChild(el("circle", { cx: mTip.x, cy: mTip.y, r: 4.4, fill: "#be185d", stroke: "#831843", "stroke-width": 1.2 }));
+    const mLabel = el("text", { x: mTip.x + 8, y: mTip.y - 6, fill: "#9d174d", "font-size": 12, "font-weight": 700 });
+    mLabel.textContent = "M";
+    xyzSvg.appendChild(mLabel);
+
+    const mText = el("text", { x: 18, y: 40, fill: "#9d174d", "font-size": 11, "font-weight": 700 });
+    mText.textContent = "Magnetization x " + state.m.x.toFixed(2) + " y " + state.m.y.toFixed(2) + " z " + state.m.z.toFixed(2);
+    xyzSvg.appendChild(mText);
+
+    if (state.rf.active) {
+      const flipText = el("text", { x: 18, y: 56, fill: "#7e22ce", "font-size": 11, "font-weight": 700 });
+      flipText.textContent = state.rf.label + " flip " + state.flipAngleNow.toFixed(1) + " degrees";
+      xyzSvg.appendChild(flipText);
+    }
+
+    const timing = sequenceTiming();
+    const waveBox = { x: 20, y: 260, w: 378, h: 142 };
+    const timelineX0 = 72;
+    const timelineX1 = 390;
+    const msToX = (ms) => timelineX0 + (ms / state.trMs) * (timelineX1 - timelineX0);
+    const secToX = (sec) => msToX(sec / state.timeScaleSecPerMs);
+    const x90 = msToX(0) + 8;
+    const x180 = msToX(state.teMs * 0.5);
+    const xTE = msToX(state.teMs);
+    const xTR = msToX(state.trMs);
+
+    xyzSvg.appendChild(el("rect", {
+      x: waveBox.x, y: waveBox.y, width: waveBox.w, height: waveBox.h,
+      fill: "#ffffff", stroke: "#d8e2ef", "stroke-width": 1
+    }));
+
+    const labels = ["RF", "Gz", "Gy", "Gx"];
+    const yRows = [278, 310, 342, 374];
+    for (let i = 0; i < labels.length; i += 1) {
+      xyzSvg.appendChild(el("line", {
+        x1: 50, y1: yRows[i], x2: 390, y2: yRows[i],
+        stroke: "#cfd9e7", "stroke-width": 1
+      }));
+      const t = el("text", { x: 30, y: yRows[i] + 4, fill: "#475569", "font-size": 11, "font-weight": 700 });
+      t.textContent = labels[i];
+      xyzSvg.appendChild(t);
+    }
+
+    xyzSvg.appendChild(el("line", {
+      x1: x180, y1: waveBox.y + 2, x2: x180, y2: waveBox.y + waveBox.h - 2,
+      stroke: "rgba(107,114,128,0.65)", "stroke-width": 1, "stroke-dasharray": "3 3"
+    }));
+    xyzSvg.appendChild(el("line", {
+      x1: xTE, y1: waveBox.y + 2, x2: xTE, y2: waveBox.y + waveBox.h - 2,
+      stroke: "rgba(30,58,138,0.65)", "stroke-width": 1, "stroke-dasharray": "4 3"
+    }));
+    xyzSvg.appendChild(el("line", {
+      x1: xTR, y1: waveBox.y + 2, x2: xTR, y2: waveBox.y + waveBox.h - 2,
+      stroke: "rgba(20,83,45,0.65)", "stroke-width": 1, "stroke-dasharray": "4 3"
+    }));
+    const teLabel = el("text", { x: xTE + 4, y: waveBox.y + 12, fill: "#1e3a8a", "font-size": 10, "font-weight": 700 });
+    teLabel.textContent = "TE";
+    xyzSvg.appendChild(teLabel);
+    const teValueLabel = el("text", { x: xTE + 4, y: waveBox.y + 24, fill: "#1e3a8a", "font-size": 9, "font-weight": 700 });
+    teValueLabel.textContent = state.teMs + " ms";
+    xyzSvg.appendChild(teValueLabel);
+    const trLabel = el("text", { x: xTR - 16, y: waveBox.y + 12, fill: "#166534", "font-size": 10, "font-weight": 700 });
+    trLabel.textContent = "TR";
+    xyzSvg.appendChild(trLabel);
+    const trValueLabel = el("text", { x: xTR - 34, y: waveBox.y + 24, fill: "#166534", "font-size": 9, "font-weight": 700 });
+    trValueLabel.textContent = state.trMs + " ms";
+    xyzSvg.appendChild(trValueLabel);
+
+    if (state.trCycleActive) {
+      const cycleMs = Math.max(0, Math.min(state.trMs, state.trCycleTime / state.timeScaleSecPerMs));
+      const xNow = msToX(cycleMs);
+      xyzSvg.appendChild(el("line", {
+        x1: xNow, y1: waveBox.y + 4, x2: xNow, y2: waveBox.y + waveBox.h - 4,
+        stroke: "#dc2626", "stroke-width": 1.4
+      }));
+    }
+
+    const rfRow = yRows[0];
+    const rfPulseY = rfRow - (state.rf.active ? (10 + 10 * Math.sin(Math.PI * Math.min(1, state.rf.elapsed / Math.max(0.1, state.rf.duration)))) : 0);
+    if (state.rf.active) {
+      const rfCenterX = state.rf.kind === "rf180" ? x180 : x90;
+      xyzSvg.appendChild(el("ellipse", {
+        cx: rfCenterX - 10, cy: rfPulseY, rx: 6, ry: 8, fill: "rgba(168,85,247,0.75)"
+      }));
+      xyzSvg.appendChild(el("ellipse", {
+        cx: rfCenterX, cy: rfPulseY, rx: 10, ry: 14, fill: "rgba(126,34,206,0.85)"
+      }));
+      xyzSvg.appendChild(el("ellipse", {
+        cx: rfCenterX + 10, cy: rfPulseY, rx: 6, ry: 8, fill: "rgba(168,85,247,0.75)"
+      }));
+      const rfLive = el("text", { x: rfCenterX + 16, y: rfRow - 12, fill: "#6b21a8", "font-size": 11, "font-weight": 700 });
+      rfLive.textContent = state.rf.label;
+      xyzSvg.appendChild(rfLive);
+    }
+    if (state.rf90Done) {
+      xyzSvg.appendChild(el("ellipse", { cx: x90, cy: rfRow, rx: 9, ry: 4, fill: "rgba(126,34,206,0.35)" }));
+      const t90 = el("text", { x: x90 + 10, y: rfRow - 8, fill: "#6b21a8", "font-size": 10, "font-weight": 700 });
+      t90.textContent = "90";
+      xyzSvg.appendChild(t90);
+    }
+    if (state.rf180Done) {
+      xyzSvg.appendChild(el("ellipse", { cx: x180, cy: rfRow, rx: 9, ry: 4, fill: "rgba(126,34,206,0.35)" }));
+      const t180 = el("text", { x: x180 + 10, y: rfRow - 8, fill: "#6b21a8", "font-size": 10, "font-weight": 700 });
+      t180.textContent = "180";
+      xyzSvg.appendChild(t180);
+    }
+
+    const sliceActive = state.step >= 2 && state.step <= 3;
+    if (sliceActive) {
+      xyzSvg.appendChild(el("rect", {
+        x: 80, y: yRows[1] - 11, width: 70, height: 14, fill: "rgba(22,163,74,0.75)", stroke: "#15803d", "stroke-width": 1
+      }));
+    }
+
+    const gyHeight = 6 + Math.abs(phaseAmp) * 16;
+    if (state.step >= 3 && state.step <= 6) {
+      const gyPulseShape = state.phasePulseActive
+        ? (0.2 + 0.8 * Math.sin(Math.PI * Math.min(1, state.phasePulseProgress)))
+        : 0.28;
+      const gyDraw = gyHeight * gyPulseShape;
+      const gyY = phaseAmp >= 0 ? yRows[2] - gyDraw : yRows[2];
+      xyzSvg.appendChild(el("rect", {
+        x: 136, y: gyY, width: 42, height: gyDraw,
+        fill: "rgba(217,119,6,0.82)", stroke: "#b45309", "stroke-width": 1
+      }));
+      const ampText = el("text", { x: 184, y: yRows[2] - 14, fill: "#92400e", "font-size": 11, "font-weight": 700 });
+      ampText.textContent = "Amplitude " + formatSigned(ky);
+      xyzSvg.appendChild(ampText);
+    }
+
+    const feShown = state.step >= 4;
+    if (feShown) {
+      const feX = secToX(timing.feTime);
+      const readoutX0 = secToX(timing.readoutStart);
+      const readoutX1 = secToX(timing.readoutStart + timing.readoutDur);
+      const dephaseH = state.feDephaseActive ? 16 * Math.min(1, state.feDephaseProgress) : 16;
+      const dephaseOpacity = state.feDephaseActive ? 0.88 : (state.step >= 6 ? 0.35 : 0.55);
+      xyzSvg.appendChild(el("rect", {
+        x: feX, y: yRows[3], width: 28, height: dephaseH,
+        fill: "rgba(2,132,199,0.72)", stroke: "#0369a1", "stroke-width": 1, opacity: dephaseOpacity
+      }));
+      const dephaseTxt = el("text", { x: feX - 20, y: yRows[3] + 26, fill: "#0c4a6e", "font-size": 10, "font-weight": 700, opacity: dephaseOpacity });
+      dephaseTxt.textContent = "dephase";
+      xyzSvg.appendChild(dephaseTxt);
+
+      const readoutWTotal = Math.max(0, readoutX1 - readoutX0);
+      const readoutW = state.readoutActive ? readoutWTotal * state.readoutProgress : (state.step >= 6 ? readoutWTotal : 0);
+      if (readoutW > 0.1) {
+        xyzSvg.appendChild(el("rect", {
+          x: readoutX0, y: yRows[3] - 9, width: readoutW, height: 16,
+          fill: "rgba(2,132,199,0.78)", stroke: "#0369a1", "stroke-width": 1
+        }));
+      }
+      if (state.readoutActive || state.step >= 6) {
+        const rephaseTxt = el("text", { x: readoutX0 + 24, y: yRows[3] - 14, fill: "#0c4a6e", "font-size": 10, "font-weight": 700, opacity: 0.88 });
+        rephaseTxt.textContent = "rephase readout";
+        xyzSvg.appendChild(rephaseTxt);
+      }
+
+      const echoText = el("text", { x: xTE + 4, y: yRows[3] - 14, fill: "#1d4ed8", "font-size": 10, "font-weight": 700, opacity: 0.9 });
+      echoText.textContent = "echo";
+      xyzSvg.appendChild(echoText);
+    }
+
+    const caption = el("text", { x: 18, y: 20, fill: "#0f172a", "font-size": 13, "font-weight": 700 });
+    caption.textContent = "XYZ gradient mapping";
+    xyzSvg.appendChild(caption);
+  }
+
+  function cellIntensity(col, row, n) {
+    const u = (col - n / 2) / (n / 2);
+    const v = (row - n / 2) / (n / 2);
+    const r2 = u * u + v * v;
+    return Math.max(0, Math.min(1, Math.exp(-r2 * 3.2) * (0.55 + 0.45 * Math.cos(6 * u) * Math.cos(6 * v))));
+  }
+
+  function drawKspacePanel() {
+    clearSvg(kspaceSvg);
+
+    kspaceSvg.appendChild(el("rect", { x: 0, y: 0, width: 420, height: 420, fill: "#ffffff" }));
+
+    const pad = { left: 58, right: 30, top: 28, bottom: 54 };
+    const gridW = 420 - pad.left - pad.right;
+    const gridH = 420 - pad.top - pad.bottom;
+    const n = state.matrixSize;
+    const cw = gridW / n;
+    const ch = gridH / n;
+
+    if (state.step === 7 && state.showReconstruction) {
+      const title = el("text", { x: 16, y: 22, fill: "#0f172a", "font-size": 13, "font-weight": 700 });
+      title.textContent = "Reconstructed image";
+      kspaceSvg.appendChild(title);
+
+      const box = el("rect", {
+        x: 84, y: 84, width: 250, height: 250,
+        fill: "rgba(255,255,255,0.96)", stroke: "#c9d7ea", "stroke-width": 2
+      });
+      kspaceSvg.appendChild(box);
+
+      const text = el("text", { x: 80, y: 362, fill: "#334155", "font-size": 12 });
+      text.textContent = "Inverse Fourier transform of full k space";
+      kspaceSvg.appendChild(text);
+      return;
+    }
+
+    for (let row = 0; row < n; row += 1) {
+      for (let col = 0; col < n; col += 1) {
+        const x = pad.left + col * cw;
+        const y = pad.top + row * ch;
+
+        let fill = "#e8eef7";
+        let opacity = 0.6;
+
+        if (state.acquiredRows.has(row)) {
+          const amp = cellIntensity(col, row, n);
+          const b = Math.floor(165 + 80 * amp);
+          fill = `rgb(${33}, ${95 + Math.floor(75 * amp)}, ${b})`;
+          opacity = 0.95;
+        }
+
+        if (state.step <= 2) {
+          fill = "#eff4fb";
+          opacity = 0.5;
+        }
+
+        if ((state.step === 3 || state.step === 4 || state.step === 5 || state.step === 6) && row === state.selectedRow) {
+          fill = "#f59e0b";
+          opacity = row === centerRow() && state.step >= 6 ? 0.95 : 0.8;
+        }
+
+        kspaceSvg.appendChild(el("rect", {
+          x, y, width: Math.max(0.5, cw - 0.6), height: Math.max(0.5, ch - 0.6),
+          fill,
+          opacity
+        }));
+
+        const showPhaseSpins = state.step >= 3 && state.step <= 6 && row === state.selectedRow;
+        if (showPhaseSpins) {
+          const cxSpin = x + cw * 0.5;
+          const cySpin = y + ch * 0.5;
+          const rSpin = Math.max(1.6, Math.min(cw, ch) * 0.28);
+          const colNorm = n <= 1 ? 0 : (col / (n - 1) - 0.5);
+          let spread = 0;
+          if (state.feDephaseActive) {
+            spread = 2.1 * Math.PI * Math.min(1, state.feDephaseProgress);
+          } else if (state.readoutActive) {
+            spread = 2.1 * Math.PI * Math.abs(1 - 2 * state.readoutProgress);
+          }
+          const spinAngle = state.loopClock * 0.32 + colNorm * spread;
+          const tx = cxSpin + rSpin * Math.cos(spinAngle);
+          const ty = cySpin + rSpin * Math.sin(spinAngle);
+          kspaceSvg.appendChild(el("line", {
+            x1: cxSpin, y1: cySpin, x2: tx, y2: ty,
+            stroke: "#0f172a",
+            "stroke-width": Math.max(0.8, Math.min(cw, ch) * 0.12),
+            opacity: 0.9,
+            "stroke-linecap": "round"
+          }));
+          kspaceSvg.appendChild(el("circle", {
+            cx: tx, cy: ty,
+            r: Math.max(0.7, Math.min(cw, ch) * 0.10),
+            fill: "#0f172a",
+            opacity: 0.92
+          }));
+        }
+      }
+    }
+
+    if (state.step >= 3 && state.step <= 6) {
+      const phaseText = el("text", { x: 258, y: 20, fill: "#0f172a", "font-size": 11, "font-weight": 700 });
+      if (state.feDephaseActive) {
+        phaseText.textContent = "FE dephasing";
+      } else if (state.readoutActive && Math.abs(state.readoutProgress - 0.5) < 0.12) {
+        phaseText.textContent = "FE rephasing echo";
+      } else if (state.readoutActive) {
+        phaseText.textContent = "FE rephasing";
+      } else {
+        phaseText.textContent = "Spins in phase";
+      }
+      kspaceSvg.appendChild(phaseText);
+    }
+
+    if (state.readoutActive && state.step >= 4) {
+      const dotX = pad.left + state.readoutProgress * gridW;
+      const dotY = pad.top + (state.selectedRow + 0.5) * ch;
+      kspaceSvg.appendChild(el("circle", { cx: dotX, cy: dotY, r: Math.max(2.4, cw * 0.35), fill: "#111827" }));
+    }
+
+    const c = centerRow();
+    const cx = pad.left + (c + 0.5) * cw;
+    const cy = pad.top + (c + 0.5) * ch;
+    kspaceSvg.appendChild(el("line", { x1: cx - 8, y1: cy, x2: cx + 8, y2: cy, stroke: "#111827", "stroke-width": 1.4 }));
+    kspaceSvg.appendChild(el("line", { x1: cx, y1: cy - 8, x2: cx, y2: cy + 8, stroke: "#111827", "stroke-width": 1.4 }));
+
+    const centerLabel = el("text", { x: cx + 10, y: cy - 10, fill: "#111827", "font-size": 11 });
+    centerLabel.textContent = "center";
+    kspaceSvg.appendChild(centerLabel);
+
+    kspaceSvg.appendChild(el("rect", {
+      x: pad.left,
+      y: pad.top,
+      width: gridW,
+      height: gridH,
+      fill: "none",
+      stroke: "#94a3b8",
+      "stroke-width": 1.2
+    }));
+
+    const kxLabel = el("text", { x: pad.left + gridW + 8, y: pad.top + gridH + 4, fill: "#334155", "font-size": 12, "font-weight": 700 });
+    kxLabel.textContent = "kx";
+    kspaceSvg.appendChild(kxLabel);
+
+    const kyLabel = el("text", { x: pad.left - 24, y: pad.top - 6, fill: "#334155", "font-size": 12, "font-weight": 700 });
+    kyLabel.textContent = "ky";
+    kspaceSvg.appendChild(kyLabel);
+
+    const title = el("text", { x: 14, y: 20, fill: "#0f172a", "font-size": 13, "font-weight": 700 });
+    title.textContent = "k space filling";
+    kspaceSvg.appendChild(title);
+  }
+
+  function renderAll() {
+    drawObjectPanel();
+    drawXyzPanel();
+    drawKspacePanel();
+  }
+
+  function syncUi() {
+    const info = steps[state.step - 1];
+    ui.stepChip.textContent = "Phase " + info.title;
+    ui.lineChip.textContent = state.acquiredRows.size + " of " + state.matrixSize + " lines acquired";
+    ui.kyChip.textContent = "ky " + formatSigned(kyOfRow(state.selectedRow));
+    ui.trChip.textContent = "TR " + state.trMs + " ms";
+    ui.teChip.textContent = "TE " + state.teMs + " ms";
+    ui.trVal.textContent = String(state.trMs);
+    ui.teVal.textContent = String(state.teMs);
+    let eventText = "Sequence idle";
+    if (state.rf.active) eventText = state.rf.label + " rotating magnetization";
+    else if (state.phasePulseActive) eventText = "Phase encoding Gy active";
+    else if (state.feDephaseActive) eventText = "Frequency encoding dephasing";
+    else if (state.readoutActive) eventText = "Readout rephasing and sampling";
+    else if (state.trCycleActive) eventText = "TR cycle waiting for next transition";
+    if (state.trCycleActive) {
+      const cycleMs = Math.max(0, Math.min(state.trMs, state.trCycleTime / state.timeScaleSecPerMs));
+      ui.seqChip.textContent = eventText + " | TR cycle " + cycleMs.toFixed(0) + " ms";
+    } else {
+      ui.seqChip.textContent = eventText;
+    }
+    ui.playBtn.textContent = state.play ? "Pause" : "Play";
+
+    const busy = state.rf.active || state.phasePulseActive || state.feDephaseActive || state.trCycleActive || (state.readoutActive && state.step >= 4 && state.step <= 5);
+    ui.backBtn.disabled = state.step === 1 || busy;
+    ui.nextBtn.disabled = (state.step === 7 && state.showReconstruction) || busy;
+
+    ui.explainBox.textContent = state.liveSentence;
+  }
+
+  function animate(ts) {
+    const dt = Math.min(0.05, (ts - state.lastTs) / 1000);
+    state.lastTs = ts;
+
+    updatePhysics(dt);
+    syncUi();
+    renderAll();
+
+    requestAnimationFrame(animate);
+  }
+
+  ui.nextBtn.addEventListener("click", () => {
+    stepForward();
+  });
+
+  ui.backBtn.addEventListener("click", () => {
+    stepBack();
+  });
+
+  ui.playBtn.addEventListener("click", () => {
+    state.play = !state.play;
+    state.playClock = 0;
+    syncUi();
+  });
+
+  ui.resetBtn.addEventListener("click", () => {
+    clearStateForReset();
+    syncUi();
+    renderAll();
+  });
+
+  ui.matrixSelect.addEventListener("change", (e) => {
+    const n = Number(e.target.value);
+    setMatrixSize(n);
+    renderAll();
+  });
+
+  ui.trSlider.addEventListener("input", (e) => {
+    setTrMs(Number(e.target.value));
+    syncUi();
+  });
+
+  ui.teSlider.addEventListener("input", (e) => {
+    setTeMs(Number(e.target.value));
+    syncUi();
+  });
+
+  setTrMs(state.trMs);
+  setTeMs(state.teMs);
+  setMatrixSize(16);
+  enterStep(1);
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

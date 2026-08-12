@@ -1,0 +1,74 @@
+/**
+ * The rail is metadata, and is set at metadata weight — it orients, it never
+ * teaches. If it ever becomes the most legible thing on a learning screen,
+ * the hierarchy has been inverted and the rail is the first thing to quieten.
+ */
+
+.rp-rail {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  padding: var(--sp-2) 0 var(--sp-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.rp-rail::-webkit-scrollbar { display: none; }
+
+.rp-rail-subject {
+  flex: 0 0 auto;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.rp-rail-stops {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.rp-rail-stops li { flex: 0 0 auto; }
+.rp-rail-stops a,
+.rp-rail-stops span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  text-decoration: none;
+  color: var(--text-disabled);
+  font-size: var(--fs-meta);
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease);
+}
+.rp-rail-stops a:hover { color: var(--text-secondary); }
+
+.rp-rail-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  transform: translateY(-2px);
+}
+
+/* Done: legible but finished. Now: the only stop with full contrast, and the
+   only one carrying the accent — one signal, so the eye finds it instantly. */
+.rp-rail-stops .is-done a,
+.rp-rail-stops .is-done span { color: var(--text-tertiary); }
+.rp-rail-stops .is-now span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.rp-rail-stops .is-now .rp-rail-dot { background: var(--accent); opacity: 1; }
+
+@media (max-width: 700px) {
+  /* On a phone the rail keeps the subject and the current stop only: the rest
+     is scrollable, and a reader on a small screen should not have to swipe a
+     progress indicator to find out where they are. */
+  .rp-rail-stops li:not(.is-now):not(.is-done) { display: none; }
+}

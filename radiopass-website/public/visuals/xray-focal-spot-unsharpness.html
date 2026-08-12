@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<!--
+  The line focus principle, drawn in the tube's real geometry.
+
+  Electrons cross the tube along its axis and the useful beam leaves through the
+  window at a right angle to them — so here the electron path is horizontal, the
+  central ray drops straight down from the focal point, and the two angle marks
+  at that point (a square for the 90 degrees, an arc for theta) are both drawn
+  where they are actually subtended rather than parked in a caption. Theta is the
+  angle between the anode face and the central ray, which is the angle that
+  foreshortens the burn, so it can only be marked against the central ray.
+
+  Everything on the drawing is millimetres at one single scale. That is the whole
+  reason the picture can be trusted: the strip burned along the face, the width of
+  the electron bundle that burns it, and the projected spot below are all the same
+  ruler, so the dashed drop lines really are the projection and not an illustration
+  of one.
+
+  Filament length and F actual are two handles on one quantity and are wired to
+  each other, so the causal chain still reads either way round: a longer filament
+  makes a longer strip, a longer strip needs a longer filament.
+
+  Magnification and geometric unsharpness are not taught here; they live in
+  radiographic-magnification.html, which does the job properly.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>X ray tube and the line focus principle</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --ink:#e9ecff;
+      --muted:#b7c0ff;
+      --accent:#7aa2ff;
+      --accent2:#ff7a7a;
+      --good:#7affb2;
+      --warn:#ffd27a;
+      --line:#263056;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+    }
+    /* The page is a column the exact height of the viewport: heading, stage,
+       one closing line. Nothing below the fold, because a learner watching an
+       animation should never have to scroll to read what it means. */
+    .wrap{
+      height:100dvh;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding:12px 14px 10px;
+    }
+    h1{
+      margin:0 0 2px 0;
+      font-size:17px;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.35;
+    }
+    /* min-height:0 on every link of the chain, or the canvas box refuses to
+       give height back and the closing line is pushed off screen. */
+    .grid{
+      flex:1 1 auto;
+      min-height:0;
+      display:grid;
+      grid-template-columns: minmax(0,1fr) clamp(288px, 23vw, 336px);
+      gap:12px;
+    }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .card h2{
+      margin:0 0 8px 0;
+      font-size:13px;
+      font-weight:700;
+      color:var(--muted);
+      letter-spacing:0.3px;
+      text-transform:uppercase;
+    }
+    /* The canvas is absolutely placed so that it can be sized FROM its box
+       without its own size feeding back into the layout. */
+    .canvasbox{
+      position:relative;
+      flex:1 1 auto;
+      min-height:0;
+      background:#0f1730;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      touch-action:none;
+    }
+    .panel{ overflow-y:auto; }
+    .controls{
+      display:grid;
+      gap:8px;
+      align-content:start;
+    }
+    .ctrl{
+      display:grid;
+      gap:5px;
+      padding:8px 9px;
+      border-radius:11px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .label{
+      font-size:12.5px;
+      color:var(--muted);
+    }
+    .value{
+      font-size:12.5px;
+      font-weight:650;
+      color:var(--ink);
+    }
+    .hint{
+      font-size:11px;
+      color:var(--muted);
+      opacity:0.75;
+      line-height:1.25;
+    }
+    input[type="range"]{
+      width:100%;
+      margin:0;
+      accent-color: var(--accent);
+    }
+    /* The two size sliders are one quantity, so the tie between them is drawn
+       between them rather than explained somewhere else. */
+    .link{
+      font-size:11px;
+      color:var(--muted);
+      opacity:0.8;
+      margin:-1px 0 1px;
+    }
+    .toggles{
+      display:grid;
+      gap:6px;
+    }
+    .toggle{
+      display:flex;
+      gap:9px;
+      align-items:center;
+      padding:7px 9px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      background: rgba(255,255,255,0.02);
+      user-select:none;
+      font-size:12.5px;
+    }
+    .toggle input{ transform: scale(1.05); }
+    .readout{
+      padding:9px 10px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      background: rgba(0,0,0,0.18);
+      display:grid;
+      gap:4px;
+      font-size:12.5px;
+    }
+    .rrow{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:8px;
+    }
+    .k{ color:var(--muted); }
+    /* The readout is a causal chain, not a list, so the steps between the
+       quantities are set back and quieter than the quantities themselves. */
+    .step{
+      color:var(--muted);
+      font-size:11px;
+      opacity:0.75;
+      padding-left:2px;
+    }
+    .sub-row{
+      color:var(--muted);
+      font-size:11px;
+      opacity:0.75;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      padding-left:2px;
+    }
+    .v-act{ color:var(--warn); font-weight:700; }
+    .v-eff{ color:var(--good); font-weight:700; }
+    .foot{
+      margin:0;
+      font-size:12px;
+      line-height:1.35;
+      color:var(--muted);
+    }
+    .foot b{ color:var(--ink); font-weight:650; }
+    a{ color:var(--accent); }
+    .pill{
+      display:inline-block;
+      padding:1px 7px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* Short viewports buy their room back from the chrome, never from the
+       diagram: the point of the page is the drawing. */
+    @media (max-height: 800px){
+      h1{ font-size:15.5px; }
+      .sub{ font-size:11.5px; }
+      .wrap{ gap:8px; padding:10px 12px 8px; }
+      .card{ padding:8px 10px 10px; }
+      .ctrl{ padding:6px 9px; }
+      .readout{ font-size:12px; }
+      .foot{ font-size:11.5px; }
+    }
+    /* Stacked, the diagram and the controls cannot both hold a full screen, and
+       squeezing the flex chain hands the whole shortfall to the canvas — which is
+       the one thing that must never shrink to a line. Below this width the page
+       is allowed to grow instead, and the canvas keeps a shape of its own. */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .wrap{ height:auto; min-height:100dvh; }
+      .canvasbox{ flex:0 0 auto; aspect-ratio: 25 / 16; min-height:260px; }
+      .panel{ overflow:visible; }
+    }
+
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <h1>Interactive x ray tube and the line focus principle</h1>
+      <p class="sub">
+        Electrons cross the tube horizontally; the useful beam leaves through the window at a right angle to
+        them. The anode face is tilted θ to that central ray, so the strip the electrons burn is seen
+        foreshortened from below. Set the anode angle and the size of the burn — by the filament or by dragging
+        F actual itself — and watch both spots redraw.
+        Magnification and geometric unsharpness are covered in the
+        <a href="radiographic-magnification.html">magnification simulator</a>.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card stage">
+        <h2>X ray tube, seen along the anode track</h2>
+        <div class="canvasbox">
+          <canvas id="tubeCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <h2>Controls</h2>
+        <div class="controls">
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Anode angle θ</div>
+              <div class="value"><span id="anodeAngleVal"></span>°</div>
+            </div>
+            <input id="anodeAngle" type="range" min="6" max="25" step="1" value="14" />
+            <div class="hint">Between the anode face and the central ray. Real tubes: 7–20°.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="row">
+              <div class="label">Filament length</div>
+              <div class="value"><span id="filamentSizeVal"></span> mm</div>
+            </div>
+            <input id="filamentSize" type="range" min="1.2" max="6.4" step="0.2" value="3.2" />
+          </div>
+
+          <div class="ctrl">
+            <!-- The tie between the two sliders lives inside the second one, so a
+                 lesson that lights a single control takes the caption with it
+                 rather than leaving it bright over a dimmed panel. -->
+            <div class="link">↕ one quantity, two handles — focusing cup concentration ×0.50</div>
+            <div class="row">
+              <div class="label">F actual, the burn on the face</div>
+              <div class="value"><span id="focalActualNum"></span> mm</div>
+            </div>
+            <input id="focalActual" type="range" min="0.6" max="3.2" step="0.1" value="1.6" />
+            <div class="hint">Drag this, or drag either amber handle on the anode face.</div>
+          </div>
+
+          <div class="toggles">
+            <label class="toggle">
+              <input id="showProjection" type="checkbox" checked />
+              <span>Show the projection down the central ray</span>
+              <span class="pill">F eff = F act × sin θ</span>
+            </label>
+            <label class="toggle">
+              <input id="showWindowBeam" type="checkbox" checked />
+              <span>Show the window and the emerging beam</span>
+            </label>
+          </div>
+
+          <div class="readout" id="tubeReadout">
+            <div class="rrow"><span class="k">Filament length</span><span id="filamentOutVal">3.2 mm</span></div>
+            <div class="step">↓ the focusing cup concentrates the emitted line, ×0.50</div>
+            <div class="rrow"><span class="k">F actual, along the face</span><span id="focalActualVal" class="v-act">1.60 mm</span></div>
+            <div class="sub-row"><span>electron bundle across the axis</span><span id="beamWidthVal">1.55 mm</span></div>
+            <div class="step" id="sinStep">↓ seen down the central ray, × sin 14° = 0.242</div>
+            <div class="rrow"><span class="k">F effective</span><span id="focalEffectiveVal" class="v-eff">0.39 mm</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="foot">
+      <b>Line focus principle.</b> The anode angle moves the effective spot alone: the burn on the target stays
+      exactly where it was, but a steeper face turns less of it towards the patient. The filament, and F actual
+      with it, moves both — it decides how much face the electrons cover in the first place. That is the bargain
+      a tilted anode strikes: a large heated area for the heat, a small apparent source for the image.
+    </p>
+  </div>
+
+  <script>
+    const tubeCanvas = document.getElementById("tubeCanvas");
+    const tctx = tubeCanvas.getContext("2d");
+
+    const ui = {
+      anodeAngle: document.getElementById("anodeAngle"),
+      filamentSize: document.getElementById("filamentSize"),
+      focalActual: document.getElementById("focalActual"),
+      showProjection: document.getElementById("showProjection"),
+      showWindowBeam: document.getElementById("showWindowBeam"),
+    };
+
+    const out = {
+      anodeAngleVal: document.getElementById("anodeAngleVal"),
+      filamentSizeVal: document.getElementById("filamentSizeVal"),
+      focalActualNum: document.getElementById("focalActualNum"),
+      filamentOutVal: document.getElementById("filamentOutVal"),
+      focalActualVal: document.getElementById("focalActualVal"),
+      beamWidthVal: document.getElementById("beamWidthVal"),
+      sinStep: document.getElementById("sinStep"),
+      focalEffectiveVal: document.getElementById("focalEffectiveVal"),
+    };
+
+    function rad(deg){ return deg * Math.PI / 180; }
+
+    // The focusing cup's negative bias squeezes the emitted cloud on the way
+    // across, so the line the electrons land on is shorter than the filament that
+    // emitted it. Real tubes land near a half; a half exactly is used here, and is
+    // stated on screen, so the arithmetic in the readout can be followed in the
+    // head and the two size sliders map onto each other step for step.
+    const CUP_CONCENTRATION = 0.5;
+
+    // Design space. The drawing is composed at this size and scaled uniformly into
+    // whatever box the layout leaves, so the diagram grows with the window without
+    // any of the composition drifting.
+    const DW = 1000, DH = 640;
+
+    // One ruler for every millimetre on the drawing. The strip on the face, the
+    // electron bundle that burns it and the projected spot below are all drawn at
+    // this scale, which is what makes the dashed drop lines an actual projection.
+    const SCALE = 46;
+
+    const AXIS_Y = 240;              // the electron path, and the tube's own axis
+    const P = { x: 665, y: AXIS_Y }; // where the electrons land: the focal point
+    const CATH_X = 246;              // where the electron bundle leaves the cup
+    const FACE_UP = -108, FACE_DOWN = 104;   // extent of the target track, along the face
+    const BLOCK_DEPTH = 148;                 // anode metal behind the face
+    const EFF_Y = 372;               // the projected spot, on the central ray
+    const WIN_Y = 458;               // the window, square across the central ray
+    const BEAM_END_Y = 612;
+
+    const view = { s: 1, ox: 0, oy: 0 };
+
+    // Both size sliders are live handles on the same millimetres, so each writes
+    // the other's value directly and deliberately does NOT dispatch an input event
+    // on it: an echo would come straight back and pin whichever slider the reader
+    // is holding.
+    function syncFromFilament(){
+      ui.focalActual.value = (parseFloat(ui.filamentSize.value) * CUP_CONCENTRATION).toFixed(1);
+    }
+    function syncFromActual(){
+      ui.filamentSize.value = (parseFloat(ui.focalActual.value) / CUP_CONCENTRATION).toFixed(1);
+    }
+
+    // The whole physics of the page, in one place.
+    function model(){
+      const thetaDeg = parseFloat(ui.anodeAngle.value);
+      const theta = rad(thetaDeg);
+      const actualMm = parseFloat(ui.focalActual.value);
+      const filamentMm = actualMm / CUP_CONCENTRATION;
+
+      // F actual is the length of the burn measured ALONG the inclined face, which
+      // is why the anode angle cannot touch it. What the angle changes is how much
+      // of that length survives the view down the central ray.
+      const effectiveMm = actualMm * Math.sin(theta);
+
+      // The bundle arrives along the tube axis, so its transverse width is the same
+      // strip resolved across the axis rather than along the face. It moves with the
+      // angle only through cos θ, which is a few percent — the projection that
+      // matters, and the one that collapses, is the sin θ one drawn below.
+      const beamWidthMm = actualMm * Math.cos(theta);
+
+      return { thetaDeg, theta, filamentMm, actualMm, effectiveMm, beamWidthMm };
+    }
+
+    function line(ctx, x1,y1,x2,y2, color, width=2, alpha=1){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function dashedLine(ctx, x1,y1,x2,y2, color, width=1.5, alpha=1, dash=[6,5]){
+      ctx.save();
+      ctx.setLineDash(dash);
+      line(ctx, x1,y1,x2,y2, color, width, alpha);
+      ctx.restore();
+    }
+
+    function arrow(ctx, x1,y1,x2,y2, color, width=2, alpha=1){
+      const head = 10;
+      const ang = Math.atan2(y2-y1, x2-x1);
+      line(ctx, x1,y1,x2,y2, color, width, alpha);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head*Math.cos(ang - Math.PI/7), y2 - head*Math.sin(ang - Math.PI/7));
+      ctx.lineTo(x2 - head*Math.cos(ang + Math.PI/7), y2 - head*Math.sin(ang + Math.PI/7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function roundedRect(ctx, x,y,w,h,r, fill, stroke, lw=2){
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+      if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+      if(stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+      ctx.restore();
+    }
+
+    function polygon(ctx, pts, fill, stroke, lw=2){
+      ctx.save();
+      ctx.beginPath();
+      pts.forEach((p,i) => i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]));
+      ctx.closePath();
+      if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+      if(stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+      ctx.restore();
+    }
+
+    // Labels sit over the tube, the beam and the metal, so each one carries a little
+    // of the background out with it rather than relying on empty space existing.
+    function text(ctx, s, x, y, color="#e9ecff", size=13, weight=600, align="left", halo=true){
+      ctx.save();
+      ctx.font = `${weight} ${size}px system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+      ctx.textAlign = align;
+      if(halo){
+        ctx.lineWidth = 3.5;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(11,16,32,0.85)";
+        ctx.strokeText(s, x, y);
+      }
+      ctx.fillStyle = color;
+      ctx.fillText(s, x, y);
+      ctx.restore();
+    }
+
+    function drawTube(){
+      const m = model();
+      const theta = m.theta;
+      const sin = Math.sin(theta), cos = Math.cos(theta);
+
+      // Down the face, and into the metal behind it. The face leans its top edge
+      // towards the cathode, which is what lets the rays leave downwards without
+      // cutting back through the anode.
+      const dx = sin,  dy = cos;
+      const nx = cos,  ny = -sin;
+
+      const halfFace = (m.actualMm * SCALE) / 2;   // half the burn, along the face
+      const filHalf  = (m.filamentMm * SCALE) / 2; // half the filament, across the axis
+      const beamHalf = halfFace * cos;             // half the bundle, across the axis
+      const effHalf  = halfFace * sin;             // half the burn, seen from below
+
+      const faceP = (u, v=0) => [P.x + u*dx + v*nx, P.y + u*dy + v*ny];
+      const stripTop = faceP(-halfFace);
+      const stripBot = faceP(+halfFace);
+
+      const ctx = tctx;
+      ctx.fillStyle = "#0f1730";
+      ctx.fillRect(0, 0, DW, DH);
+
+      // Housing and envelope
+      roundedRect(ctx, 26, 26, 948, 432, 26, "rgba(255,255,255,0.02)", "#263056");
+      roundedRect(ctx, 66, 56, 868, 372, 24, "rgba(255,255,255,0.02)", "rgba(183,192,255,0.26)");
+      // Set well clear of the cathode end: a 6.4 mm filament reaches almost the
+      // full height of the envelope and takes its own labels up there with it.
+      text(ctx, "lead housing, oil cooled", 452, 46, "#b7c0ff", 12, 650, "center");
+      text(ctx, "glass envelope, vacuum", 452, 78, "#b7c0ff", 12, 650, "center");
+
+      // The tube axis and the central ray, drawn as the two reference lines the
+      // angle marks are taken against. They are the claim the diagram is making.
+      dashedLine(ctx, 96, AXIS_Y, 950, AXIS_Y, "rgba(183,192,255,0.35)", 1.4, 1, [7,6]);
+      dashedLine(ctx, P.x, P.y, P.x, BEAM_END_Y, "rgba(122,162,255,0.5)", 1.4, 1, [7,6]);
+
+      // ---- Anode -------------------------------------------------------------
+      const blockPts = [
+        faceP(FACE_UP, 0), faceP(FACE_DOWN, 0),
+        faceP(FACE_DOWN, BLOCK_DEPTH), faceP(FACE_UP, BLOCK_DEPTH),
+      ];
+      polygon(ctx, blockPts, "rgba(122,162,255,0.22)", "rgba(122,162,255,0.55)", 2);
+
+      // The target track: the whole band the focal spot could sit on, so the burn
+      // reads as part of it rather than as a floating bar.
+      polygon(ctx, [faceP(FACE_UP+8, 0), faceP(FACE_DOWN-8, 0), faceP(FACE_DOWN-8, 13), faceP(FACE_UP+8, 13)],
+              "rgba(233,236,255,0.16)", null);
+
+      const stemMid = faceP((FACE_UP+FACE_DOWN)/2, BLOCK_DEPTH);
+      line(ctx, stemMid[0], stemMid[1], 946, AXIS_Y, "rgba(122,162,255,0.45)", 12, 1);
+      const blockMid = faceP((FACE_UP+FACE_DOWN)/2, BLOCK_DEPTH*0.62);
+      text(ctx, "anode", blockMid[0], blockMid[1] - 6, "#b7c0ff", 12, 650, "center");
+      text(ctx, "target", blockMid[0], blockMid[1] + 12, "#b7c0ff", 12, 650, "center");
+
+      // ---- Cathode -----------------------------------------------------------
+      // The coil is drawn standing across the tube axis, because it is its LENGTH
+      // that is imaged onto the face: the line of emission becomes the line of the
+      // burn, and everything downstream is that line seen from a different angle.
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,122,122,0.95)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      const fx = 166;
+      for(let i=0;i<=26;i++){
+        const x = fx + Math.sin(i*0.85)*9;
+        const y = (AXIS_Y - filHalf) + i*(2*filHalf/26);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // Focusing cup: two jaws that close on the ends of the coil, so the squeeze
+      // the constant stands for is something the eye can see happening.
+      ctx.save();
+      ctx.strokeStyle = "rgba(122,162,255,0.6)";
+      ctx.lineWidth = 3;
+      for(const s of [-1, 1]){
+        ctx.beginPath();
+        ctx.moveTo(112, AXIS_Y + s*(filHalf + 26));
+        ctx.lineTo(112, AXIS_Y + s*(filHalf + 2));
+        ctx.quadraticCurveTo(190, AXIS_Y + s*(filHalf + 2), CATH_X, AXIS_Y + s*(filHalf*0.62 + 6));
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // The cathode labels track the coil, but only as far as the envelope: a long
+      // filament fills the tube end to end and the names must stay inside it.
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+      text(ctx, "cathode, focusing cup", fx + 6, clamp(AXIS_Y - filHalf - 18, 88, 212), "#b7c0ff", 12, 650, "center");
+      text(ctx, `filament ${m.filamentMm.toFixed(1)} mm`, fx + 6, clamp(AXIS_Y + filHalf + 26, 292, 416), "#ff7a7a", 12, 700, "center");
+
+      // ---- Electron bundle ---------------------------------------------------
+      // It leaves as long as the filament and lands as wide as the burn resolved
+      // across the axis, so its edges finish exactly on the ends of the strip.
+      polygon(ctx, [
+        [CATH_X, AXIS_Y - filHalf], stripTop, stripBot, [CATH_X, AXIS_Y + filHalf],
+      ], "rgba(233,236,255,0.07)", null);
+
+      for(let k=-2;k<=2;k++){
+        const f = k/2;
+        const end = faceP(f*halfFace);
+        arrow(ctx, CATH_X, AXIS_Y + f*filHalf, end[0], end[1], "rgba(233,236,255,0.7)", 1.8, 0.95);
+      }
+      text(ctx, "electron beam", 452, clamp(AXIS_Y + Math.max(filHalf, 44) + 30, 300, 418), "#b7c0ff", 12, 650, "center");
+
+      // ---- The projection, down the central ray ------------------------------
+      if(ui.showProjection.checked){
+        // The column between the two drop lines IS the beam's footprint as it is
+        // seen from below. Steepen the face and it closes; that is the mechanism,
+        // and the green bar is only where it is read off.
+        polygon(ctx, [
+          [stripTop[0], stripTop[1]], [stripBot[0], stripBot[1]],
+          [P.x + effHalf, EFF_Y], [P.x - effHalf, EFF_Y],
+        ], "rgba(122,255,178,0.14)", null);
+        dashedLine(ctx, stripTop[0], stripTop[1], P.x - effHalf, EFF_Y, "rgba(122,255,178,0.55)", 1.5);
+        dashedLine(ctx, stripBot[0], stripBot[1], P.x + effHalf, EFF_Y, "rgba(122,255,178,0.55)", 1.5);
+      }
+
+      // ---- The burn on the face ---------------------------------------------
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,210,122,0.98)";
+      ctx.lineWidth = 9;
+      ctx.lineCap = "butt";
+      ctx.beginPath();
+      ctx.moveTo(stripTop[0], stripTop[1]);
+      ctx.lineTo(stripBot[0], stripBot[1]);
+      ctx.stroke();
+      ctx.restore();
+
+      // Handles, so the burn is visibly something to take hold of. They shrink with
+      // a short burn rather than swallowing it, but never below a grabbable size.
+      const grip = Math.max(4.6, Math.min(7.5, halfFace * 0.55));
+      for(const end of [stripTop, stripBot]){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(end[0], end[1], grip, 0, Math.PI*2);
+        ctx.fillStyle = "#ffd27a";
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "rgba(11,16,32,0.9)";
+        ctx.stroke();
+        ctx.restore();
+      }
+      // High enough to clear the top edge of the bundle even at a 6.4 mm filament,
+      // which reaches this far up the tube.
+      text(ctx, `F actual ${m.actualMm.toFixed(2)} mm`, 556, 112, "#ffd27a", 13, 750, "right");
+      text(ctx, "the burn, along the face", 556, 129, "#b7c0ff", 11, 600, "right");
+      line(ctx, 562, 108, stripTop[0] - 10, stripTop[1] - 6, "rgba(255,210,122,0.45)", 1.2, 1);
+
+      if(ui.showProjection.checked){
+        ctx.save();
+        ctx.fillStyle = "rgba(122,255,178,0.98)";
+        ctx.fillRect(P.x - Math.max(effHalf, 1.6), EFF_Y - 5, Math.max(2*effHalf, 3.2), 10);
+        ctx.restore();
+        text(ctx, `F effective ${m.effectiveMm.toFixed(2)} mm`, P.x - effHalf - 18, EFF_Y - 2, "#7affb2", 13, 750, "right");
+        text(ctx, "the source the patient sees", P.x - effHalf - 18, EFF_Y + 15, "#b7c0ff", 11, 600, "right");
+      }
+
+      // ---- Window and useful beam -------------------------------------------
+      if(ui.showWindowBeam.checked){
+        // Square across the central ray, and centred on it: the window is cut where
+        // the beam already goes, not the other way round.
+        roundedRect(ctx, P.x - 88, WIN_Y - 11, 176, 22, 8, "rgba(233,236,255,0.07)", "rgba(183,192,255,0.4)", 2);
+        text(ctx, "window", P.x - 100, WIN_Y + 5, "#b7c0ff", 12, 650, "right");
+
+        const spread = 96;
+        line(ctx, P.x - effHalf, EFF_Y, P.x - spread, BEAM_END_Y, "rgba(122,162,255,0.7)", 2, 0.9);
+        line(ctx, P.x + effHalf, EFF_Y, P.x + spread, BEAM_END_Y, "rgba(122,162,255,0.7)", 2, 0.9);
+        for(let i=1;i<5;i++){
+          const f = i/5;
+          line(ctx, P.x - effHalf + 2*effHalf*f, EFF_Y, P.x - spread + 2*spread*f, BEAM_END_Y, "rgba(122,162,255,0.3)", 1.4, 0.8);
+        }
+        text(ctx, "useful beam", P.x + spread + 16, BEAM_END_Y - 6, "#7aa2ff", 12, 700, "left");
+      }
+      text(ctx, "central ray", P.x - 12, BEAM_END_Y - 6, "#7aa2ff", 12, 700, "right");
+
+      // ---- The two angles, marked where they are subtended -------------------
+      // The right angle first: it is the claim the owner could not see before.
+      const q = 26;
+      ctx.save();
+      ctx.strokeStyle = "rgba(233,236,255,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(P.x - q, P.y);
+      ctx.lineTo(P.x - q, P.y + q);
+      ctx.lineTo(P.x, P.y + q);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(233,236,255,0.10)";
+      ctx.fillRect(P.x - q, P.y, q, q);
+      ctx.restore();
+      text(ctx, "90°", P.x - q - 8, P.y + q - 6, "#e9ecff", 12, 750, "right");
+      text(ctx, "electron path ⟂ central ray", P.x - q - 8, P.y + q + 12, "#b7c0ff", 11, 600, "right");
+
+      // Theta: from the central ray round to the face, at the focal point itself.
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,210,122,0.9)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(P.x, P.y, 62, Math.PI/2 - theta, Math.PI/2, false);
+      ctx.stroke();
+      ctx.restore();
+      const arcMid = [P.x + 62*Math.sin(theta/2), P.y + 62*Math.cos(theta/2)];
+      line(ctx, arcMid[0], arcMid[1], P.x + 132, P.y + 112, "rgba(255,210,122,0.45)", 1.2, 1);
+      text(ctx, `θ = ${m.thetaDeg.toFixed(0)}°`, P.x + 138, P.y + 116, "#ffd27a", 13, 750, "left");
+      text(ctx, "anode face to central ray", P.x + 138, P.y + 133, "#b7c0ff", 11, 600, "left");
+
+      // ---- Readout -----------------------------------------------------------
+      out.filamentOutVal.textContent = `${m.filamentMm.toFixed(1)} mm`;
+      out.focalActualVal.textContent = `${m.actualMm.toFixed(2)} mm`;
+      out.beamWidthVal.textContent = `${m.beamWidthMm.toFixed(2)} mm`;
+      out.sinStep.textContent = `↓ seen down the central ray, × sin ${m.thetaDeg.toFixed(0)}° = ${sin.toFixed(3)}`;
+      out.focalEffectiveVal.textContent = `${m.effectiveMm.toFixed(2)} mm`;
+    }
+
+    // The canvas is sized from its box every time the box changes, then the whole
+    // composition is scaled into it. Nothing is laid out in device pixels, so the
+    // diagram simply gets bigger on a bigger screen.
+    function resize(){
+      // Measured on the canvas itself, never on its box: the box carries a border,
+      // so its rect is a couple of pixels larger, and scaling the drawing by one
+      // rect while reading the pointer against the other puts a drag on the burn
+      // steadily out by a step. The backing store is whole device pixels, but the
+      // view transform keeps the exact fractional size for the same reason.
+      const box = tubeCanvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.max(1, box.width);
+      const h = Math.max(1, box.height);
+      tubeCanvas.width = Math.round(w * dpr);
+      tubeCanvas.height = Math.round(h * dpr);
+      view.s = Math.min(w / DW, h / DH);
+      view.ox = (w - DW*view.s) / 2;
+      view.oy = (h - DH*view.s) / 2;
+      view.dpr = dpr;
+      render();
+    }
+
+    function render(){
+      out.anodeAngleVal.textContent = parseFloat(ui.anodeAngle.value).toFixed(0);
+      out.filamentSizeVal.textContent = parseFloat(ui.filamentSize.value).toFixed(1);
+      out.focalActualNum.textContent = parseFloat(ui.focalActual.value).toFixed(1);
+
+      const dpr = view.dpr || 1;
+      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      tctx.clearRect(0, 0, tubeCanvas.width/dpr, tubeCanvas.height/dpr);
+      tctx.fillStyle = "#0f1730";
+      tctx.fillRect(0, 0, tubeCanvas.width/dpr, tubeCanvas.height/dpr);
+      tctx.translate(view.ox, view.oy);
+      tctx.scale(view.s, view.s);
+      drawTube();
+      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    ui.anodeAngle.addEventListener("input", render);
+    ui.showProjection.addEventListener("input", render);
+    ui.showWindowBeam.addEventListener("input", render);
+    ui.showProjection.addEventListener("change", render);
+    ui.showWindowBeam.addEventListener("change", render);
+
+    for(const [el, sync] of [[ui.filamentSize, syncFromFilament], [ui.focalActual, syncFromActual]]){
+      for(const evt of ["input", "change"]){
+        el.addEventListener(evt, () => { sync(); render(); });
+      }
+    }
+
+    // ---- Dragging the burn itself ---------------------------------------------
+    // The amber handles are the same control as the F actual slider; taking hold of
+    // one end sets the half length, which is the only reading of "how big is the
+    // burn" that survives the face being tilted.
+    function toDesign(ev){
+      const r = tubeCanvas.getBoundingClientRect();
+      return {
+        x: (ev.clientX - r.left - view.ox) / view.s,
+        y: (ev.clientY - r.top  - view.oy) / view.s,
+      };
+    }
+
+    function handleEnds(){
+      const m = model();
+      const half = (m.actualMm * SCALE) / 2;
+      const dx = Math.sin(m.theta), dy = Math.cos(m.theta);
+      return [
+        { x: P.x - half*dx, y: P.y - half*dy },
+        { x: P.x + half*dx, y: P.y + half*dy },
+      ];
+    }
+
+    function nearHandle(pt){
+      return handleEnds().some(e => Math.hypot(e.x - pt.x, e.y - pt.y) <= 18);
+    }
+
+    let dragging = false;
+
+    function setActualFrom(pt){
+      const m = model();
+      const dx = Math.sin(m.theta), dy = Math.cos(m.theta);
+      const u = (pt.x - P.x)*dx + (pt.y - P.y)*dy;   // distance along the face
+      const mm = Math.abs(u) * 2 / SCALE;
+      const step = parseFloat(ui.focalActual.step);
+      const lo = parseFloat(ui.focalActual.min), hi = parseFloat(ui.focalActual.max);
+      const snapped = Math.min(hi, Math.max(lo, Math.round(mm/step)*step));
+      if(Math.abs(snapped - parseFloat(ui.focalActual.value)) < 1e-9) return;
+      ui.focalActual.value = snapped.toFixed(1);
+      syncFromActual();
+      render();
+      // Taking hold of the burn moves the same quantity a slider does, so it has
+      // to be as audible as one. A guided lesson that asks the reader to change
+      // the spot waits on an input event reaching the document, and a value set
+      // from script raises none — without this, the reader could drag the face
+      // exactly as the hint tells them to and the lesson would never notice.
+      // Both sliders already carry the new value by this line, so whichever one
+      // a lesson is watching reads the truth; the handler this wakes only syncs
+      // to what is already set and dispatches nothing, so it cannot ring back.
+      ui.focalActual.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    tubeCanvas.addEventListener("pointerdown", (ev) => {
+      const pt = toDesign(ev);
+      if(!nearHandle(pt)) return;
+      dragging = true;
+      tubeCanvas.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+    });
+
+    tubeCanvas.addEventListener("pointermove", (ev) => {
+      const pt = toDesign(ev);
+      if(dragging){ setActualFrom(pt); return; }
+      tubeCanvas.style.cursor = nearHandle(pt) ? "grab" : "default";
+    });
+
+    for(const evt of ["pointerup", "pointercancel"]){
+      tubeCanvas.addEventListener(evt, (ev) => {
+        if(!dragging) return;
+        dragging = false;
+        try{ tubeCanvas.releasePointerCapture(ev.pointerId); }catch(e){}
+      });
+    }
+
+    // A lesson may arrive and drive #filamentSize before the reader touches
+    // anything, so the pair is squared up once at the start too.
+    syncFromFilament();
+    new ResizeObserver(resize).observe(tubeCanvas.parentElement);
+    resize();
+  </script>
+</body>
+</html>

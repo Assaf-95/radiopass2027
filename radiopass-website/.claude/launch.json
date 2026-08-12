@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "radiopass-dev",
+      "url": "http://localhost:5182"
+    },
+    {
+      "name": "radiopass-dev-fresh",
+      "runtimeExecutable": "./node_modules/.bin/vite",
+      "runtimeArgs": [],
+      "autoPort": true
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>T2 FLAIR — MRI Sequence Contrast Walkthrough</title>
+<meta name="description" content="FLAIR uses an inversion pulse and an inversion time chosen to null free CSF, followed by a T2-weighted readout." />
+<link rel="stylesheet" href="../../assets/css/mri-walkthrough.css?v=2" />
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>T2 FLAIR</h1>
+    <p class="subtitle">Inversion Recovery · Long TI to Null CSF · T2-Weighted Readout</p>
+    <p class="core-statement">FLAIR uses an inversion pulse and an inversion time chosen to null free CSF, followed by a T2-weighted readout.</p>
+    <nav class="crumbs" aria-label="Walkthrough sequence">
+      <a href="mri-t1-weighted-walkthrough.html">1. T1-Weighted</a><span class="sep">→</span>
+      <a href="mri-t2-weighted-walkthrough.html">2. T2-Weighted</a><span class="sep">→</span>
+      <span class="current">3. T2 FLAIR</span><span class="sep">→</span>
+      <a href="mri-stir-walkthrough.html">4. STIR</a><span class="sep">→</span>
+      <a href="mri-sequence-contrast-walkthrough.html">5. Summary</a>
+    </nav>
+  </header>
+
+  <section class="panel stage-bar">
+    <span class="stage-progress">Stage <span id="stageNum">1</span> of <span id="stageTotal">14</span></span>
+    <span class="stage-progress" id="stageProgressChip">paused</span>
+    <div class="stage-dots" id="stageDots" role="tablist" aria-label="Stage navigation"></div>
+    <div class="transport">
+      <button id="prevBtn">Previous step</button>
+      <button id="playBtn">Play current step</button>
+      <button id="nextBtn">Next step</button>
+      <button id="replayStepBtn">Replay current step</button>
+      <button id="runFullBtn" class="primary">Run full sequence</button>
+      <button id="resetBtn">Reset</button>
+      <span class="speed-group">
+        <button data-speed="0.5">Slow</button>
+        <button data-speed="1" class="active">Normal</button>
+        <button data-speed="2">Fast</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="panel teach-panel">
+    <p class="teach-stage-title" id="stageTitleBig">Equilibrium</p>
+    <p class="teach-headline" id="whatNow"></p>
+    <p class="notice-label">Notice</p>
+    <ol class="notice-list" id="noticeList"></ol>
+  </section>
+
+  <section class="layout">
+    <div class="panel viz">
+      <canvas id="spinCanvas" aria-label="Individual spins and per-tissue Mz vectors"></canvas>
+      <canvas id="timelineCanvas" aria-label="Pulse sequence timeline, builds progressively"></canvas>
+    </div>
+    <div class="panel viz" id="graphSection">
+      <div class="side-graphs">
+        <div id="mzWrap"><canvas id="mzCanvas" aria-label="Mz vs time by tissue"></canvas></div>
+        <div id="mxyWrap"><canvas id="mxyCanvas" aria-label="Mxy vs time by tissue"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel reveal-section hidden" id="tissueSection" style="padding:0.9rem 1.1rem;">
+    <h2>Tissue Signal Comparison — Fat, Water / CSF, Muscle</h2>
+    <div id="signalBars"></div>
+  </section>
+
+  <section class="panel reveal-section hidden" id="imageSection" style="padding:0.9rem 1.1rem;">
+    <h2>Final FLAIR Image</h2>
+    <div class="image-row">
+      <canvas id="phantomCanvas" aria-label="T1-weighted axial head phantom preview"></canvas>
+      <p id="phantomCaption" style="font-size:0.85rem; color:var(--muted); margin:0;">Free CSF in the ventricles and sulci is now dark, while the T2-weighted readout keeps other high-water tissue relatively bright. The dark CSF is produced by the calculated longitudinal magnetisation at the chosen inversion time — not by darkening it afterwards. Brain parenchyma is rendered from the soft-tissue entry, because white and grey matter are deliberately not modelled on this page; they appear on the <a href="mri-sequence-contrast-walkthrough.html" style="color:var(--accent);">Sequence Summary</a>.</p>
+    </div>
+  </section>
+
+  <section class="panel complete-banner" id="completeBanner">
+    <h3>Guided demonstration complete</h3>
+    <p style="margin:0; color:var(--muted); font-size:0.88rem;">You have seen how this sequence's timing produces its image contrast.</p>
+    <div class="complete-actions">
+      <button id="tryItBtn" class="primary">Try it yourself</button>
+      <button id="replayGuidedBtn">Replay guided demonstration</button>
+      <a href="mri-stir-walkthrough.html"><button type="button">Continue to next sequence</button></a>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="manualPanel" style="padding:0.9rem 1.1rem; display:grid; gap:0.6rem;">
+    <h2 style="margin:0; font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; color:#9ec6f2;">Try it yourself</h2>
+    <p class="locked-note">Adjust TR and TE freely. Vectors, curves, signal bars and the image update immediately.</p>
+    <label style="font-size:0.8rem; color:var(--muted); display:flex; justify-content:space-between;">TR (ms) <span id="trVal">8000</span></label>
+    <input id="trSlider" type="range" min="150" max="9000" step="10" value="8000" />
+    <label style="font-size:0.8rem; color:var(--muted); display:flex; justify-content:space-between;">TE (ms) <span id="teVal">120</span></label>
+    <input id="teSlider" type="range" min="5" max="200" step="1" value="120" />
+    <label style="font-size:0.8rem; color:var(--muted); display:flex; justify-content:space-between;">TI (ms) — inversion time <span id="tiVal">2218</span></label>
+    <input id="tiSlider" type="range" min="50" max="3000" step="10" value="2218" />
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <button id="applyChangesBtn" class="primary">Apply changes</button>
+      <button id="restorePresetBtn">Restore sequence preset</button>
+    </div>
+  </section>
+
+  <p class="disclaimer">Educational approximation — illustrative parameters, not a clinical scanning protocol. Tissue values vary with field strength, sequence, temperature, tissue composition, scanner and vendor.</p>
+</div>
+
+<script src="../../assets/js/mri-walkthrough-engine.js?v=2"></script>
+<script>
+function st(title, phase, what, notices, extra) {
+  return Object.assign({ title: title, phase: phase, what: what, notices: notices }, extra || {});
+}
+MRIWalkthrough.init({
+  family: "irse", suppressed: "csf",
+  defaultTR: 8000, defaultTE: 120,
+  referenceTissue: "csf",
+  realImageSrc: "../../assets/img/mri-flair.jpg",
+  stages: [
+    st("Equilibrium", "equilibrium",
+      "All three tissues sit at equilibrium, magnetisation pointing along B0.",
+      ["All three Mz vectors point fully upward.", "Mxy is zero, so nothing is detectable yet.", "This is the state the inversion pulse is about to disturb."], { graphVisibility: "mz" }),
+    st("180° inversion pulse", "invert",
+      "A 180° inversion pulse rotates the magnetisation of every tissue from +z down toward −z. This is an inversion pulse, not an excitation pulse.",
+      ["All three Mz vectors swing down through zero to point fully negative.", "Nothing has been excited, so there is still no transverse signal.", "This is the defining first event of an inversion-recovery sequence."], { pulse: "inversion", graphVisibility: "mz" }),
+    st("Longitudinal magnetisation inverted", "negMz",
+      "Every tissue now sits at negative longitudinal magnetisation, with no transverse magnetisation at all.",
+      ["Mz is large but negative for all three tissues.", "Mxy is still exactly zero.", "The coil detects only changing transverse magnetisation, so nothing registers."], { graphVisibility: "mz" }),
+    st("Inversion recovery begins", "diffRecovery",
+      "Each tissue begins climbing from −z back toward +z, at a rate governed by its own T1.",
+      ["Fat climbs fastest, because its T1 is shortest.", "Water and CSF lag far behind, because their T1 is very long.", "The tissues separating during this climb is what makes suppression possible."], { graphVisibility: "mz" }),
+    st("Tissues recover at different rates", "diffRecovery",
+      "Fat crosses zero first, muscle follows, and water/CSF is still deeply negative.",
+      ["The three recovery curves are now clearly separated.", "Water and CSF are the furthest from crossing zero.", "Choosing when to excite decides which tissue contributes almost nothing."], { graphVisibility: "mz" }),
+    st("CSF approaches the null point", "approachNull",
+      "Water and CSF magnetisation is now climbing toward zero as the chosen inversion time approaches.",
+      ["The water/CSF vector is shrinking toward the dashed zero line.", "The TI for FLAIR is picked so this crossing coincides with the excitation.", "Fat and muscle have already passed zero and are recovering positively."], { graphVisibility: "mz" }),
+    st("CSF reaches zero longitudinal magnetisation", "correctTI",
+      "At the selected inversion time, water and CSF magnetisation has reached approximately zero.",
+      ["The CSF vector sits right on the zero line.", "A tissue with no longitudinal magnetisation cannot be tipped into the transverse plane.", "So CSF is about to produce almost no signal at all."], { graphVisibility: "mz" }),
+    st("90° excitation pulse at TI", "excite",
+      "The 90° excitation pulse fires at the inversion time, tipping whatever longitudinal magnetisation exists into the transverse plane.",
+      ["Fat and muscle have real Mz to tip, so they generate signal.", "CSF, sitting at zero, generates almost nothing.", "Suppression comes from this timing, not from any filter applied later."], { pulse: "excitation", graphVisibility: "mz" }),
+    st("CSF produces almost no transverse magnetisation", "coherence",
+      "The transverse magnetisation now present comes almost entirely from fat and muscle.",
+      ["The CSF contribution on the Mxy graph is close to nothing.", "Fat and muscle contribute normally.", "This is what fluid suppression actually looks like in the magnetisation."], { graphVisibility: "mxy" }),
+    st("180° refocusing pulse", "refocus",
+      "A separate 180° refocusing pulse fires at TE/2 as part of the spin-echo readout. This is a different pulse from the earlier inversion pulse.",
+      ["This is the second 180° pulse of the sequence.", "The first one inverted; this one refocuses.", "It reverses reversible dispersion but does not undo true T2 decay."], { pulse: "refocus", graphVisibility: "mxy" }),
+    st("T2-weighted spin echo forms", "rephase",
+      "The spins rephase and the echo builds, while true T2 decay continues underneath.",
+      ["The spin fan narrows toward the echo.", "The overall envelope keeps falling as T2 decay proceeds.", "The readout stays T2 weighted throughout."], { graphVisibility: "mxy" }),
+    st("Signal acquisition at long TE", "rephase",
+      "The receiver samples the echo at a long TE, preserving T2 weighting in the readout.",
+      ["The ADC marker arrives only after both TI and a long TE have passed.", "Long TE keeps the sequence sensitive to T2 differences.", "The result combines fluid suppression with T2 contrast."], { graphVisibility: "mxy", showTissueTable: true }),
+    st("Tissue signal comparison", "tissueCompare",
+      "The calculated signal for the three tissues is now compared side by side.",
+      ["Free CSF is dark despite having the longest T2 of the three.", "It is dark because it had almost no Mz available at excitation.", "High-water pathology can still stay bright, because its recovery differs from free CSF."], { graphVisibility: "mxy", showTissueTable: true }),
+    st("Final FLAIR image", "finalImage",
+      "The image is reconstructed from the sampled signal, and every structure's brightness follows its calculated value.",
+      ["The ventricles and sulci are now dark.", "On the T2-weighted image those same spaces were the brightest thing present.", "The readout is still T2 weighted; only free fluid has been removed."], { graphVisibility: "mxy", showTissueTable: true, showImage: true })
+  ]
+});
+</script>
+</body>
+</html>

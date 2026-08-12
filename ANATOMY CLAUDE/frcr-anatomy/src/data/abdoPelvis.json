@@ -1,0 +1,4038 @@
+[
+  {
+    "id": "abdo-pelvis-p0004",
+    "section": "abdo-pelvis",
+    "questionNumber": 1,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 4,
+    "sourcePageAnswer": 5,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "AP X-ray of the abdomen.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Stomach",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left properitoneal fat stripe/line",
+        "acceptedVariants": [
+          "left flank stripe",
+          "left preperitoneal fat stripe",
+          "left properitoneal fat line",
+          "left properitoneal fat pad",
+          "left properitoneal fat stripe"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left pedicle of L1",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Transverse colon",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right psoas shadow/outline",
+        "acceptedVariants": [
+          "right psoas major muscle outline",
+          "right psoas major muscle shadow",
+          "right psoas major outline",
+          "right psoas major shadow",
+          "right psoas muscle outline",
+          "right psoas muscle shadow",
+          "right psoas outline",
+          "right psoas shadow",
+          "right psoas muscle",
+          "right psoas major muscle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The properitoneal fat stripe represents the layer of fat that separates the peritoneum from the muscles of the anterior abdominal wall. Loss of the stripe may indicate pathology within the abdomen, such as peritonitis. The large bowel can be differentiated from the small bowel by its peripheral location and mucosal markings with haustra only crossing two-thirds of the bowel wall. The psoas major originates from the transverse processes, vertebral bodies and intervertebral discs of T12–L5 and is defined on the abdominal radiograph by a thin radiolucent fat line. The line may be [source text is truncated at the bottom of the answer page in the source PDF; the sentence does not continue on the following page, which begins the next question]",
+    "references": [],
+    "regionTags": [
+      "Stomach",
+      "Peritoneum",
+      "Spine",
+      "Colon",
+      "Psoas"
+    ],
+    "structureTags": [
+      "Stomach",
+      "Properitoneal fat stripe",
+      "Pedicle",
+      "Transverse colon",
+      "Psoas major"
+    ],
+    "imagePath": "/images/abdopelvis/p0004.webp",
+    "flagForReview": "Teaching paragraph is cut off mid-sentence (\"The line may be\") at the bottom of source page 5 -- the source page itself ends there and the next page begins an unrelated question (1.16), so the remainder could not be recovered from the supplied PDF.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 57.65,
+        "y": 7.7,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "A",
+        "x": 95.9,
+        "y": 9.9,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "A",
+        "x": 76.62,
+        "y": 27.7,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "B",
+        "x": 76.79,
+        "y": 48.27,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "B",
+        "x": 74.72,
+        "y": 61.24,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "C",
+        "x": 65.28,
+        "y": 29.2,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "D",
+        "x": 69.78,
+        "y": 32.56,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "D",
+        "x": 65.11,
+        "y": 35.75,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "E",
+        "x": 27.07,
+        "y": 31.75,
+        "sizePct": 3.71
+      },
+      {
+        "letter": "E",
+        "x": 23.99,
+        "y": 38.41,
+        "sizePct": 3.71
+      }
+    ],
+    "imageCrop": {
+      "x": 0.23267,
+      "y": 0.11733,
+      "w": 0.59333,
+      "h": 0.76711
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0006",
+    "section": "abdo-pelvis",
+    "questionNumber": 2,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 6,
+    "sourcePageAnswer": 7,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "AP X-ray of the pelvis.",
+    "questionText": "(a-d) Name the structures labelled A to D. (e) What muscle originates from A?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right anterior inferior iliac spine",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right ischial spine",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Spinous process of L5",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right inferior pubic ramus",
+        "acceptedVariants": [
+          "right ischio-pubic ramus",
+          "right ischiopubic ramus"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right rectus femoris muscle",
+        "acceptedVariants": [
+          "right rectus femoris"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The pelvis is formed by the sacrum and coccyx posteriorly and the two hip bones laterally and anteriorly. The hip bones are composed of the pubis, ischium and ilium. The anterior inferior iliac spine is the origin for the rectus femoris and is a recognized site for avulsion fractures. The ischium is situated inferiorly to the ilium and posteriorly to the pubis. The ischial tuberosity is the origin for the hamstring muscles and is another recognized site for avulsion fractures. The ischial spine is a triangular bony eminence to which the levator ani and sacrospinous ligament are attached.",
+    "references": [],
+    "regionTags": [
+      "Pelvis",
+      "Ilium",
+      "Ischium",
+      "Pubis",
+      "Lumbar spine"
+    ],
+    "structureTags": [
+      "Anterior inferior iliac spine",
+      "Ischial spine",
+      "Spinous process",
+      "Pubic ramus",
+      "Rectus femoris"
+    ],
+    "imagePath": "/images/abdopelvis/p0006.webp",
+    "flagForReview": null,
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 9.75,
+        "y": 48.07,
+        "sizePct": 3.5
+      },
+      {
+        "letter": "B",
+        "x": 40.9,
+        "y": 43.42,
+        "sizePct": 3.5
+      },
+      {
+        "letter": "C",
+        "x": 58.85,
+        "y": 3.87,
+        "sizePct": 3.5
+      },
+      {
+        "letter": "C",
+        "x": 58.37,
+        "y": 13.1,
+        "sizePct": 3.5
+      },
+      {
+        "letter": "D",
+        "x": 39.83,
+        "y": 86.39,
+        "sizePct": 3.5
+      }
+    ],
+    "imageCrop": {
+      "x": 0.20133,
+      "y": 0.12267,
+      "w": 0.62933,
+      "h": 0.68889
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0008",
+    "section": "abdo-pelvis",
+    "questionNumber": 3,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 8,
+    "sourcePageAnswer": 9,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Abdominal radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left kidney",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Liver",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right psoas muscle",
+        "acceptedVariants": [
+          "right psoas",
+          "right psoas major",
+          "right psoas major muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Descending colon",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Stomach",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "On plain radiography, the presence of an interface between tissues of differing contrast is required to enable visualization of structures. In the case of the liver, kidney and psoas muscles there is para-renal, peri-renal and retroperitoneal fat to provide this contrast. The descending colon is surrounded on three sides by peritoneum but there is adjacent preperitoneal fat which can give contrast, as in this case. There is often gas within the lumen of the bowel to provide negative contrast as is commonly seen in the stomach and colon.",
+    "references": [],
+    "regionTags": [
+      "Kidneys",
+      "Liver",
+      "Psoas",
+      "Colon",
+      "Stomach"
+    ],
+    "structureTags": [
+      "Kidney",
+      "Liver",
+      "Psoas major",
+      "Descending colon",
+      "Stomach"
+    ],
+    "imagePath": "/images/abdopelvis/p0008.webp",
+    "flagForReview": null,
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 75.89,
+        "y": 44.03,
+        "sizePct": 6.02
+      },
+      {
+        "letter": "B",
+        "x": 18.94,
+        "y": 25.67,
+        "sizePct": 6.02
+      },
+      {
+        "letter": "C",
+        "x": 21.36,
+        "y": 41.04,
+        "sizePct": 6.02
+      },
+      {
+        "letter": "D",
+        "x": 69.73,
+        "y": 63.24,
+        "sizePct": 6.02
+      },
+      {
+        "letter": "E",
+        "x": 80.36,
+        "y": 17.43,
+        "sizePct": 6.02
+      }
+    ],
+    "imageCrop": {
+      "x": 0.14267,
+      "y": 0.00089,
+      "w": 0.71467,
+      "h": 0.99733
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0061",
+    "section": "abdo-pelvis",
+    "questionNumber": 4,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 61,
+    "sourcePageAnswer": 62,
+    "caseLabel": "Case 15.1",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "A Name the structure labelled A.\nB Name the structure labelled B.\nC Name the structure labelled C.\nD Name the structure labelled D.\nE What is the upper limit of normal for the common bile duct diameter?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right liver lobe",
+        "acceptedVariants": [
+          "right hepatic lobe",
+          "right lobe of liver",
+          "right lobe of the liver"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "6 mm",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This example demonstrates the relationship of the portal vein to the inferior vena cava and common hepatic duct, with the portal vein located between those two structures. Note the position of the common bile duct anterior to the portal vein at the porta hepatis. The normal size of the common bile duct in a healthy biliary system is up to 6 mm, but may increase to up to 9 mm in elderly patients and post-cholecystectomy.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Common bile duct",
+      "Portal vein",
+      "Liver",
+      "Inferior vena cava",
+      "Porta hepatis"
+    ],
+    "imagePath": "/images/abdopelvis/p0061.webp",
+    "flagForReview": "Label E is a knowledge question (upper limit of normal common bile duct diameter) rather than an image label - only A-D have arrows on the image. Question page carries a blank 'WRITE YOUR ANSWER HERE' worksheet table (no answers leaked).",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 49.52,
+        "y": 38.11,
+        "sizePct": 4.49
+      },
+      {
+        "letter": "B",
+        "x": 30.69,
+        "y": 56.32,
+        "sizePct": 4.49
+      },
+      {
+        "letter": "C",
+        "x": 12.03,
+        "y": 91.2,
+        "sizePct": 4.49
+      },
+      {
+        "letter": "D",
+        "x": 46.52,
+        "y": 83.69,
+        "sizePct": 4.49
+      }
+    ],
+    "imageCrop": {
+      "x": 0.25533,
+      "y": 0.02667,
+      "w": 0.49,
+      "h": 0.56444
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0063",
+    "section": "abdo-pelvis",
+    "questionNumber": 5,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 63,
+    "sourcePageAnswer": 64,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Abdominal Ultrasound",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Lumbar vertebra",
+        "acceptedVariants": [
+          "body of lumbar vertebra",
+          "lumbar vertebral body"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Pancreas",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left renal cortex",
+        "acceptedVariants": [
+          "left cortex of the kidney",
+          "left kidney cortex"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Retroperitoneum"
+    ],
+    "structureTags": [
+      "Abdominal aorta",
+      "Lumbar vertebra",
+      "Pancreas",
+      "Kidney",
+      "Liver"
+    ],
+    "imagePath": "/images/abdopelvis/p0063.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 91-95 on the image relabelled A-E in printed numeric order (91 to A, 92 to B, 93 to C, 94 to D, 95 to E). Image annotated 'RT TS'.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 40.16,
+        "y": 62.09,
+        "sizePct": 5.07
+      },
+      {
+        "letter": "B",
+        "x": 12.87,
+        "y": 82.44,
+        "sizePct": 5.07
+      },
+      {
+        "letter": "C",
+        "x": 67.74,
+        "y": 19.94,
+        "sizePct": 5.07
+      },
+      {
+        "letter": "D",
+        "x": 71.72,
+        "y": 46.3,
+        "sizePct": 5.07
+      },
+      {
+        "letter": "E",
+        "x": 17.49,
+        "y": 22.17,
+        "sizePct": 5.07
+      }
+    ],
+    "imageCrop": {
+      "x": 0.16467,
+      "y": 0.13511,
+      "w": 0.67067,
+      "h": 0.73156
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0065",
+    "section": "abdo-pelvis",
+    "questionNumber": 6,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 65,
+    "sourcePageAnswer": 66,
+    "caseLabel": "Case 16",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Abdominal ultrasound. Oblique view at the porta hepatis.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Spinal column",
+        "acceptedVariants": [
+          "bony spinal column",
+          "spine",
+          "vertebral column"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Gallbladder",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Hepatic portal vein",
+        "acceptedVariants": [
+          "main portal vein",
+          "portal vein"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Spinal column",
+      "Gallbladder",
+      "Inferior vena cava",
+      "Abdominal aorta",
+      "Portal vein",
+      "Porta hepatis"
+    ],
+    "imagePath": "/images/abdopelvis/p0065.webp",
+    "flagForReview": "Image prints letters A-E but the answer key is numbered 1-5. Mapped in printed order: 1 to A, 2 to B, 3 to C, 4 to D, 5 to E. Labels recorded as the letters shown on the image.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 22.48,
+        "y": 98.13,
+        "sizePct": 4.23
+      },
+      {
+        "letter": "B",
+        "x": 79.4,
+        "y": 53.99,
+        "sizePct": 4.23
+      },
+      {
+        "letter": "C",
+        "x": 30.93,
+        "y": 69.07,
+        "sizePct": 4.23
+      },
+      {
+        "letter": "D",
+        "x": 77.76,
+        "y": 88.74,
+        "sizePct": 4.23
+      },
+      {
+        "letter": "E",
+        "x": 57.8,
+        "y": 21.02,
+        "sizePct": 4.23
+      }
+    ],
+    "imageCrop": {
+      "x": 0.216,
+      "y": 0.24533,
+      "w": 0.568,
+      "h": 0.50133
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0067",
+    "section": "abdo-pelvis",
+    "questionNumber": 7,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 67,
+    "sourcePageAnswer": 68,
+    "caseLabel": "Case 11",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound abdomen. Transverse section at the epigastrium.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Splenic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Body of pancreas",
+        "acceptedVariants": [
+          "pancreatic body"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Vertebral body",
+        "acceptedVariants": [
+          "body of the vertebra",
+          "body of vertebra"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Epigastrium"
+    ],
+    "structureTags": [
+      "Splenic vein",
+      "Pancreas",
+      "Abdominal aorta",
+      "Inferior vena cava",
+      "Vertebral body"
+    ],
+    "imagePath": "/images/abdopelvis/p0067.webp",
+    "flagForReview": "Image prints letters A-E but the answer key is numbered 1-5. Mapped in printed order: 1 to A, 2 to B, 3 to C, 4 to D, 5 to E.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 37.6,
+        "y": 20.04,
+        "sizePct": 3.84
+      },
+      {
+        "letter": "B",
+        "x": 82.06,
+        "y": 16.11,
+        "sizePct": 3.84
+      },
+      {
+        "letter": "C",
+        "x": 78.84,
+        "y": 57.05,
+        "sizePct": 3.84
+      },
+      {
+        "letter": "D",
+        "x": 32,
+        "y": 54.04,
+        "sizePct": 3.84
+      },
+      {
+        "letter": "E",
+        "x": 23.01,
+        "y": 94.8,
+        "sizePct": 3.84
+      }
+    ],
+    "imageCrop": {
+      "x": 0.148,
+      "y": 0.12622,
+      "w": 0.704,
+      "h": 0.72533
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0069",
+    "section": "abdo-pelvis",
+    "questionNumber": 8,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 69,
+    "sourcePageAnswer": 70,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound Abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [
+          "abdominal aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Pyloric canal",
+        "acceptedVariants": [
+          "pyloric channel"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Head of pancreas",
+        "acceptedVariants": [
+          "pancreatic head"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right rectus abdominus",
+        "acceptedVariants": [
+          "right rectus abdominis",
+          "right rectus abdominis muscle",
+          "right rectus abdominus muscle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "Hypertrophic pyloric stenosis is suggested in the presence of a thickened, elongated pylorus (single muscle thickness >3 mm, canal length >17 mm). This may be associated with prominent gastric peristaltic waves and a failure to see opening of the pyloric canal after a test feed.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Upper gastrointestinal tract",
+      "Paediatric"
+    ],
+    "structureTags": [
+      "Pylorus",
+      "Pancreas",
+      "Aorta",
+      "Liver",
+      "Rectus abdominis"
+    ],
+    "imagePath": "/images/abdopelvis/p0069.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 96-100 relabelled A-E in printed numeric order. Answer for 100 printed as 'Right rectus abdominus' (spelling as printed).",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 75,
+        "y": 73.53,
+        "sizePct": 5.06
+      },
+      {
+        "letter": "B",
+        "x": 62.84,
+        "y": 46.75,
+        "sizePct": 5.06
+      },
+      {
+        "letter": "C",
+        "x": 45.79,
+        "y": 68.66,
+        "sizePct": 5.06
+      },
+      {
+        "letter": "D",
+        "x": 65.62,
+        "y": 7.36,
+        "sizePct": 5.06
+      },
+      {
+        "letter": "E",
+        "x": 31.99,
+        "y": 25.78,
+        "sizePct": 5.95
+      }
+    ],
+    "imageCrop": {
+      "x": 0.164,
+      "y": 0.05867,
+      "w": 0.672,
+      "h": 0.888
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0071",
+    "section": "abdo-pelvis",
+    "questionNumber": 9,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 71,
+    "sourcePageAnswer": 72,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound Abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left rectus abdominis muscle",
+        "acceptedVariants": [
+          "left rectus abdominis",
+          "left rectus abdominus",
+          "left rectus abdominus muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Uncinate process/head of pancreas",
+        "acceptedVariants": [
+          "head of pancreas",
+          "head of the pancreas",
+          "pancreatic head",
+          "uncinate process",
+          "uncinate process of pancreas",
+          "uncinate process of the pancreas"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The pancreas lies at L1.\n\nThe dorsal aspect of the head takes the shape of a hook surrounding the right side of the superior mesenteric vein; the sharp left-pointing tip of the hook behind the vein forms the uncinate process. The splenic vein runs from the left along the dorsal border of the tail and body to the superior mesenteric vein, where these veins join to form the portal vein behind the 'neck' of the pancreas.\n\nThe uncinate process is the only part of the pancreas to lie posterior to the superior mesenteric vessels.\n\nThe pancreas tends to be hyperechoic and pancreatic malignancies are hypoechoic.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas"
+    ],
+    "structureTags": [
+      "Inferior vena cava",
+      "Rectus abdominis",
+      "Liver",
+      "Uncinate process of pancreas",
+      "Common bile duct"
+    ],
+    "imagePath": "/images/abdopelvis/p0071.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 51-55 relabelled A-E in printed numeric order. Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E). Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E).",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 23.33,
+        "y": 96.73,
+        "sizePct": 3.78
+      },
+      {
+        "letter": "B",
+        "x": 78.33,
+        "y": 2.69,
+        "sizePct": 4.36
+      },
+      {
+        "letter": "C",
+        "x": 83.5,
+        "y": 19.33,
+        "sizePct": 4.51
+      },
+      {
+        "letter": "D",
+        "x": 63.5,
+        "y": 46,
+        "sizePct": 4.51
+      },
+      {
+        "letter": "E",
+        "x": 13.39,
+        "y": 48.04,
+        "sizePct": 4.51
+      }
+    ],
+    "imageCrop": {
+      "x": 0.168,
+      "y": 0.144,
+      "w": 0.664,
+      "h": 0.67822
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0073",
+    "section": "abdo-pelvis",
+    "questionNumber": 10,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 73,
+    "sourcePageAnswer": 74,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound Abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Middle hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Segment 8 of the liver",
+        "acceptedVariants": [
+          "liver segment 8",
+          "segment 8",
+          "segment viii of the liver"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right dome of diaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right hemi-diaphragm",
+          "right hemidiaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Segment 4 of the liver",
+        "acceptedVariants": [
+          "liver segment 4",
+          "segment 4",
+          "segment iv of the liver"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The hepatic veins divide the liver vertically and portal veins divide the liver horizontally into segments. These are named using the Couinaud classification. The hepatic veins can therefore be used to identify liver segments and allow a precise description of the position of focal lesions.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Middle hepatic vein",
+      "Inferior vena cava",
+      "Liver segments",
+      "Diaphragm",
+      "Couinaud classification"
+    ],
+    "imagePath": "/images/abdopelvis/p0073.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 36-40 relabelled A-E in printed numeric order.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 39.64,
+        "y": 20.48,
+        "sizePct": 5.8
+      },
+      {
+        "letter": "B",
+        "x": 64.02,
+        "y": 67.88,
+        "sizePct": 5.8
+      },
+      {
+        "letter": "C",
+        "x": 24.58,
+        "y": 44.25,
+        "sizePct": 5.8
+      },
+      {
+        "letter": "D",
+        "x": 18.44,
+        "y": 92.37,
+        "sizePct": 5.8
+      },
+      {
+        "letter": "E",
+        "x": 60.9,
+        "y": 24.67,
+        "sizePct": 5.8
+      }
+    ],
+    "imageCrop": {
+      "x": 0.16467,
+      "y": 0.13422,
+      "w": 0.67267,
+      "h": 0.73333
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0075",
+    "section": "abdo-pelvis",
+    "questionNumber": 11,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 75,
+    "sourcePageAnswer": 76,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Abdominal Ultrasound",
+    "questionText": "Identify the structures labelled A to D.\nE Name the opening into the lesser sac whose anterior margin is formed by structures A, C and D.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Epiploic foramen",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Peritoneal cavity",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Portal vein",
+      "Inferior vena cava",
+      "Hepatic artery",
+      "Common bile duct",
+      "Epiploic foramen",
+      "Lesser sac"
+    ],
+    "imagePath": "/images/abdopelvis/p0075.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 46-49 on the image relabelled A-D in printed numeric order; answer 50 (Epiploic foramen) is a bonus question with no arrow on the image and has been mapped to E. Printed bonus question verbatim: 'Name the opening into the lesser sac whose anterior margin is formed by structures 46, 48 and 49.' - label references rewritten to A, C and D to match the relabelling.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 69.03,
+        "y": 54.91,
+        "sizePct": 5.03
+      },
+      {
+        "letter": "B",
+        "x": 34.49,
+        "y": 90.36,
+        "sizePct": 5.03
+      },
+      {
+        "letter": "C",
+        "x": 31.05,
+        "y": 49.94,
+        "sizePct": 5.03
+      },
+      {
+        "letter": "D",
+        "x": 57.95,
+        "y": 30.71,
+        "sizePct": 5.03
+      }
+    ],
+    "imageCrop": {
+      "x": 0.11733,
+      "y": 0.14133,
+      "w": 0.776,
+      "h": 0.75111
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0077",
+    "section": "abdo-pelvis",
+    "questionNumber": 12,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 77,
+    "sourcePageAnswer": 78,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound Abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Diaphragm",
+        "acceptedVariants": [
+          "dome of diaphragm",
+          "dome of the diaphragm",
+          "hemi-diaphragm",
+          "hemidiaphragm"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Right lung",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Caudate lobe of liver",
+        "acceptedVariants": [
+          "caudate lobe",
+          "segment 1 of the liver",
+          "segment i of the liver"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Inferior Vena Cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This is a standard longitudinal (sagittal) view through the upper abdomen showing the caudate lobe between the left lobe of liver and the IVC. The IVC traverses the central tendon of the diaphragm to the right of midline. The diaphragm is echo bright.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Diaphragm",
+      "Lung",
+      "Liver",
+      "Caudate lobe",
+      "Inferior vena cava"
+    ],
+    "imagePath": "/images/abdopelvis/p0077.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 71-75 relabelled A-E in printed numeric order.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 37.51,
+        "y": 33.81,
+        "sizePct": 7.5
+      },
+      {
+        "letter": "B",
+        "x": 22.54,
+        "y": 72.35,
+        "sizePct": 7.5
+      },
+      {
+        "letter": "C",
+        "x": 80.2,
+        "y": 35.47,
+        "sizePct": 7.5
+      },
+      {
+        "letter": "D",
+        "x": 78.77,
+        "y": 62.14,
+        "sizePct": 7.5
+      },
+      {
+        "letter": "E",
+        "x": 68.47,
+        "y": 84.8,
+        "sizePct": 7.5
+      }
+    ],
+    "imageCrop": {
+      "x": 0.23867,
+      "y": 0.00267,
+      "w": 0.52,
+      "h": 0.98844
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0079",
+    "section": "abdo-pelvis",
+    "questionNumber": 13,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 79,
+    "sourcePageAnswer": 80,
+    "caseLabel": "Case 6.15",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse image from an abdominal ultrasound.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Uncinate process of pancreas",
+        "acceptedVariants": [
+          "uncinate process"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Vertebral body",
+        "acceptedVariants": [
+          "body of the vertebra",
+          "body of vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Body of pancreas",
+        "acceptedVariants": [
+          "pancreatic body"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Splenic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left renal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "For further discussion see Chapter 3, Case 3.3.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas"
+    ],
+    "structureTags": [
+      "Uncinate process of pancreas",
+      "Vertebral body",
+      "Pancreas",
+      "Splenic vein",
+      "Left renal vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0079.webp",
+    "flagForReview": null,
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 25.76,
+        "y": 43.24,
+        "sizePct": 4.79
+      },
+      {
+        "letter": "B",
+        "x": 28.92,
+        "y": 78.9,
+        "sizePct": 4.79
+      },
+      {
+        "letter": "C",
+        "x": 74.74,
+        "y": 21.99,
+        "sizePct": 4.79
+      },
+      {
+        "letter": "D",
+        "x": 75.95,
+        "y": 45.61,
+        "sizePct": 4.79
+      },
+      {
+        "letter": "E",
+        "x": 55.86,
+        "y": 64.81,
+        "sizePct": 4.79
+      }
+    ],
+    "imageCrop": {
+      "x": 0.062,
+      "y": 0.06933,
+      "w": 0.876,
+      "h": 0.86133
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0081",
+    "section": "abdo-pelvis",
+    "questionNumber": 14,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 81,
+    "sourcePageAnswer": 82,
+    "caseLabel": "Case 17",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound liver.",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Middle hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Hepatic veins",
+      "Inferior vena cava",
+      "Liver"
+    ],
+    "imagePath": "/images/abdopelvis/p0081-clean.png",
+    "flagForReview": "Image prints letters A-E but the answer key is numbered 1-5; mapped in printed order 1 to A ... 5 to E. The question page also carries a stray worksheet fragment reading '3. Name the lobe of the liver labelled C.' which independently confirms that C corresponds to answer 3 (Left lobe of the liver).",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 69.43,
+        "y": 36.06,
+        "sizePct": 3.97
+      },
+      {
+        "letter": "B",
+        "x": 51.53,
+        "y": 83.08,
+        "sizePct": 3.97
+      },
+      {
+        "letter": "C",
+        "x": 52.75,
+        "y": 24.43,
+        "sizePct": 3.97
+      },
+      {
+        "letter": "D",
+        "x": 35.76,
+        "y": 79.32,
+        "sizePct": 3.97
+      },
+      {
+        "letter": "E",
+        "x": 29.4,
+        "y": 45.4,
+        "sizePct": 3.97
+      }
+    ],
+    "imageCrop": {
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0083",
+    "section": "abdo-pelvis",
+    "questionNumber": 15,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 83,
+    "sourcePageAnswer": 84,
+    "caseLabel": "Case 6.14",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound through the epigastrium",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Common hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Splenic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [
+          "abdominal aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Vertebral body",
+        "acceptedVariants": [
+          "body of the vertebra",
+          "body of vertebra"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "B Common hepatic artery. In normal subjects this may be difficult to see on colour Doppler because of its small diameter and tortuous course.\n\nC Splenic artery. This is the largest branch of the coeliac trunk that follows a tortuous course posterior to omental bursa along the superior border of the pancreas.\n\nE Vertebral body. Typically the coeliac axis arises at the T12/L1 level.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Epigastrium"
+    ],
+    "structureTags": [
+      "Liver",
+      "Common hepatic artery",
+      "Splenic artery",
+      "Coeliac trunk",
+      "Aorta",
+      "Vertebral body"
+    ],
+    "imagePath": "/images/abdopelvis/p0083.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); the image prints uppercase A-E, so mapped directly a to A ... e to E. officialAnswer holds the structure name as printed; the additional explanatory sentences printed alongside labels (b), (c) and (e) are reproduced verbatim in teachingText with the letters upper-cased to match the image.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 81.08,
+        "y": 15.85,
+        "sizePct": 3.55
+      },
+      {
+        "letter": "B",
+        "x": 18.2,
+        "y": 38.46,
+        "sizePct": 3.55
+      },
+      {
+        "letter": "C",
+        "x": 83.85,
+        "y": 38.58,
+        "sizePct": 3.55
+      },
+      {
+        "letter": "D",
+        "x": 82.11,
+        "y": 65.21,
+        "sizePct": 3.55
+      },
+      {
+        "letter": "E",
+        "x": 17.52,
+        "y": 82.2,
+        "sizePct": 3.55
+      }
+    ],
+    "imageCrop": {
+      "x": 0.18267,
+      "y": 0.16,
+      "w": 0.73267,
+      "h": 0.77422
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0085",
+    "section": "abdo-pelvis",
+    "questionNumber": 16,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 85,
+    "sourcePageAnswer": 86,
+    "caseLabel": "Case 7.5",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound liver: oblique image through the porta hepatis",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Inferior vena cava (IVC)",
+        "acceptedVariants": [
+          "inferior vena cava"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "A Left lobe of the liver. The liver is typically a homogeneous mid-grey organ with echogenicity slightly increased when compared to cortex of right kidney.\n\nB Hepatic artery. Generally crosses the anterior aspect of the portal vein with the common duct anterior to this. A common variant is the artery lying anterior to the common duct.\n\nC Portal vein. This enters the liver and is encased by hyperechoic, fibrous walls of the portal tracts.\n\nD Common bile duct. This is best seen with the patient supine in a right anterior oblique position. Typically measures approximately 6 mm or less. However, it is age dependent and can be 8-9 mm in the elderly.\n\nE Inferior vena cava (IVC). The three hepatic veins drain into the IVC just inferior to the diaphragm. The attachment helps hold the liver in position. The IVC runs posteriorly to the liver before passing through the caval opening in the diaphragm at T8 level.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Liver",
+      "Hepatic artery",
+      "Portal vein",
+      "Common bile duct",
+      "Inferior vena cava",
+      "Porta hepatis"
+    ],
+    "imagePath": "/images/abdopelvis/p0085.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly. officialAnswer holds the structure name as printed; the explanatory sentences printed alongside each label are reproduced in teachingText with letters upper-cased.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 94.81,
+        "y": 15.65,
+        "sizePct": 4.01
+      },
+      {
+        "letter": "B",
+        "x": 87.46,
+        "y": 23.21,
+        "sizePct": 4.01
+      },
+      {
+        "letter": "C",
+        "x": 90.44,
+        "y": 44.26,
+        "sizePct": 4.01
+      },
+      {
+        "letter": "D",
+        "x": 97.48,
+        "y": 30.57,
+        "sizePct": 4.01
+      },
+      {
+        "letter": "E",
+        "x": 4.68,
+        "y": 53.18,
+        "sizePct": 4.01
+      }
+    ],
+    "imageCrop": {
+      "x": 0.22067,
+      "y": 0.09067,
+      "w": 0.64867,
+      "h": 0.90578
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0087",
+    "section": "abdo-pelvis",
+    "questionNumber": 17,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 87,
+    "sourcePageAnswer": 88,
+    "caseLabel": "Case 8.1",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound through the porta hepatis",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Gallbladder",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right hemidiaphragm",
+        "acceptedVariants": [
+          "right diaphragm",
+          "right dome of diaphragm",
+          "right dome of the diaphragm",
+          "right hemi-diaphragm"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Common hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "A Gallbladder. The gallbladder stores about 50 ml of bile. Its blood supply is from the cystic artery, a branch of the right hepatic artery. It drains into segment 5 of the liver where it also receives a collateral blood supply. There are folds in the mucous membrane of the cystic duct (spiral valve of Heister) which together with underlying smooth muscle serve to regulate the flow of bile.\n\nB Portal vein. It forms at the confluence of the splenic and superior mesenteric vein at L1/L2 level, posterior to the neck of the pancreas.\n\nThe portal vein provides 75% of the liver's inflow with the common hepatic artery supplying the remainder. Of note however, if there is a malignancy within the liver (primary or secondary) its blood supply is invariably arterial in origin.\n\nC Right hemidiaphragm. The lung above the diaphragm is not seen as air conducts the ultrasound poorly. If there is a plural effusion however, it will be apparent in this region.\n\nD Common hepatic artery. The region of the liver containing the common hepatic artery, common hepatic duct and portal vein is known as the porta hepatis.\n\nE Common bile duct. This becomes the common bile duct (CBD) after the confluence with the cystic duct. The normal diameter of the CBD is variable but more than 8 mm can be pathological, though it dilates with increasing age. Generally 1 mm per decade gives a useful approximation.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Gallbladder",
+      "Portal vein",
+      "Diaphragm",
+      "Common hepatic artery",
+      "Common bile duct",
+      "Porta hepatis"
+    ],
+    "imagePath": "/images/abdopelvis/p0087.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly. Printed text reads 'plural effusion' (sic, for pleural effusion) - transcribed verbatim.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 92.17,
+        "y": 30.74,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "B",
+        "x": 47.09,
+        "y": 86.71,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "C",
+        "x": 13.24,
+        "y": 94.66,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "D",
+        "x": 7.06,
+        "y": 38.89,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "E",
+        "x": 46.99,
+        "y": 8.2,
+        "sizePct": 3.14
+      }
+    ],
+    "imageCrop": {
+      "x": 0.182,
+      "y": 0.18933,
+      "w": 0.73267,
+      "h": 0.71556
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0089",
+    "section": "abdo-pelvis",
+    "questionNumber": 18,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 89,
+    "sourcePageAnswer": 90,
+    "caseLabel": null,
+    "modalitySection": "Special Cases",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound Abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Confluence of splenic vein and superior mesenteric vein/portal vein",
+        "acceptedVariants": [
+          "confluence of splenic vein and superior mesenteric vein",
+          "hepatic portal vein",
+          "main portal vein",
+          "portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left renal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Body of pancreas",
+        "acceptedVariants": [
+          "pancreatic body"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Look for the tadpole shape of the splenic vein (tail) and portal confluence (head). The pancreas is located anteriorly to the 'tadpole'.\n\nTo distinguish the aorta from the IVC: the aorta lies to the left of the IVC, is smaller in diameter and is surrounded by a concentric echo-bright area which represents peri-arterial fat.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas"
+    ],
+    "structureTags": [
+      "Superior mesenteric artery",
+      "Portal venous confluence",
+      "Left renal vein",
+      "Pancreas",
+      "Abdominal aorta"
+    ],
+    "imagePath": "/images/abdopelvis/p0089.webp",
+    "flagForReview": "Special Cases atlas item: continuous atlas numbers 16-20 relabelled A-E in printed numeric order. Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E). Source printed numbered markers; each is covered with the matching A-E badge (ascending number -> A..E).",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 71.56,
+        "y": 60.01,
+        "sizePct": 4
+      },
+      {
+        "letter": "B",
+        "x": 54.9,
+        "y": 28.7,
+        "sizePct": 2.79
+      },
+      {
+        "letter": "C",
+        "x": 22.07,
+        "y": 57.89,
+        "sizePct": 4
+      },
+      {
+        "letter": "D",
+        "x": 83.65,
+        "y": 41.69,
+        "sizePct": 4.25
+      },
+      {
+        "letter": "E",
+        "x": 67.62,
+        "y": 76.15,
+        "sizePct": 4.25
+      }
+    ],
+    "imageCrop": {
+      "x": 0.23933,
+      "y": 0.13333,
+      "w": 0.524,
+      "h": 0.73156
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0091",
+    "section": "abdo-pelvis",
+    "questionNumber": 19,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 91,
+    "sourcePageAnswer": 92,
+    "caseLabel": "Case 6.2",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound through stomach pylorus and upper abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Rectus abdominus muscle",
+        "acceptedVariants": [
+          "rectus abdominis",
+          "rectus abdominis muscle",
+          "rectus abdominus"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [
+          "abdominal aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Pylorus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "In infants pyloric stenosis is diagnosed if the single wall thickness of the pylorus is greater than 3 mm and the pyloric length is greater than 17 mm.\n\nThe stomach will often be distended with feed despite projectile-type vomiting.\n\nThe pylorus is not seen open and there is no passage of stomach contents into the duodenum during scanning. Typically presentation is at about 6 weeks of life.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Upper gastrointestinal tract",
+      "Paediatric"
+    ],
+    "structureTags": [
+      "Rectus abdominis",
+      "Liver",
+      "Portal vein",
+      "Aorta",
+      "Pylorus"
+    ],
+    "imagePath": "/images/abdopelvis/p0091.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly. Teaching text states single wall thickness >6 mm for pyloric stenosis, which conflicts with the >3 mm figure printed elsewhere in this deck (pages 70 and 110) - transcribed verbatim as printed, not corrected.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 59.04,
+        "y": 18.44,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "B",
+        "x": 48.87,
+        "y": 39.93,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "C",
+        "x": 8.55,
+        "y": 45.71,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "D",
+        "x": 67.55,
+        "y": 94.93,
+        "sizePct": 3.14
+      },
+      {
+        "letter": "E",
+        "x": 82.82,
+        "y": 54.94,
+        "sizePct": 3.14
+      }
+    ],
+    "imageCrop": {
+      "x": 0.17933,
+      "y": 0.17067,
+      "w": 0.73333,
+      "h": 0.75467
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0093",
+    "section": "abdo-pelvis",
+    "questionNumber": 20,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 93,
+    "sourcePageAnswer": 94,
+    "caseLabel": "Case 3.17",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound upper abdomen",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Uncinate process of the pancreas",
+        "acceptedVariants": [
+          "uncinate process"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left renal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Splenic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Duodenum (D1/D2)",
+        "acceptedVariants": [
+          "duodenum"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas"
+    ],
+    "structureTags": [
+      "Uncinate process of pancreas",
+      "Inferior vena cava",
+      "Left renal vein",
+      "Splenic vein",
+      "Duodenum"
+    ],
+    "imagePath": "/images/abdopelvis/p0093.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly. Question page shows a paired (two-panel) ultrasound image with labels A-C on the left panel and D-E on the right panel.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 9.03,
+        "y": 35.64,
+        "sizePct": 2.5
+      },
+      {
+        "letter": "B",
+        "x": 14.85,
+        "y": 94.3,
+        "sizePct": 2.5
+      },
+      {
+        "letter": "C",
+        "x": 27.86,
+        "y": 90.68,
+        "sizePct": 2.5
+      },
+      {
+        "letter": "D",
+        "x": 85.36,
+        "y": 29.99,
+        "sizePct": 2.5
+      },
+      {
+        "letter": "E",
+        "x": 66.88,
+        "y": 29.67,
+        "sizePct": 2.5
+      }
+    ],
+    "imageCrop": {
+      "x": 0.04467,
+      "y": 0.14311,
+      "w": 0.92,
+      "h": 0.81067
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0095",
+    "section": "abdo-pelvis",
+    "questionNumber": 21,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 95,
+    "sourcePageAnswer": 96,
+    "caseLabel": "Case 1.19",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound through the porta hepatis",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right renal artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Lumbar vertebral body",
+        "acceptedVariants": [
+          "body of lumbar vertebra",
+          "lumbar vertebra"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left rectus abdominis muscle",
+        "acceptedVariants": [
+          "left rectus abdominis",
+          "left rectus abdominus",
+          "left rectus abdominus muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Splenic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Retroperitoneum"
+    ],
+    "structureTags": [
+      "Right renal artery",
+      "Lumbar vertebral body",
+      "Superior mesenteric artery",
+      "Rectus abdominis",
+      "Splenic vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0095.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 10.28,
+        "y": 77.96,
+        "sizePct": 3.18
+      },
+      {
+        "letter": "B",
+        "x": 71.82,
+        "y": 95.91,
+        "sizePct": 3.18
+      },
+      {
+        "letter": "C",
+        "x": 34.55,
+        "y": 24.44,
+        "sizePct": 3.18
+      },
+      {
+        "letter": "D",
+        "x": 78.69,
+        "y": 18.53,
+        "sizePct": 3.18
+      },
+      {
+        "letter": "E",
+        "x": 79.29,
+        "y": 28.67,
+        "sizePct": 3.18
+      }
+    ],
+    "imageCrop": {
+      "x": 0.186,
+      "y": 0.20533,
+      "w": 0.72267,
+      "h": 0.68356
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0097",
+    "section": "abdo-pelvis",
+    "questionNumber": 22,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 97,
+    "sourcePageAnswer": 98,
+    "caseLabel": "Case 1.14",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Abdominal ultrasound over the right iliac fossa",
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Appendix",
+        "acceptedVariants": [
+          "vermiform appendix"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Right femoral artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right psoas muscle",
+        "acceptedVariants": [
+          "right psoas",
+          "right psoas major",
+          "right psoas major muscle"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right inferior epigastric artery",
+        "acceptedVariants": [
+          "right deep epigastric artery"
+        ],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right femoral nerve",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The normal appendix should measure less than 6 mm in its maximum diameter.\n\nThere is often a trace of free fluid in the right iliac fossa with appendicitis.\n\nCareful exclusion of a faecolith should be undertaken.\n\nThe fat surrounding the appendix should be echogenic and freely compressible.\n\nColour flow Doppler signal should be the same as for the rest of the adjacent bowel.\n\nEnlarged mesenteric lymph nodes may be apparent and may point to the alternative diagnosis of mesenteric adenitis.\n\nA collection in the right iliac fossa or a pelvic collection anterior to the rectum is often appendix related.\n\nCompression over the inflamed appendix will result in pain and rebound tenderness can often be elicited.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Right iliac fossa",
+      "Pelvis"
+    ],
+    "structureTags": [
+      "Appendix",
+      "Femoral artery",
+      "Psoas muscle",
+      "Inferior epigastric artery",
+      "Femoral nerve"
+    ],
+    "imagePath": "/images/abdopelvis/p0097.webp",
+    "flagForReview": "Answer page lists labels as lowercase (a)-(e); image prints uppercase A-E, mapped directly.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 20.72,
+        "y": 50.55,
+        "sizePct": 3.16
+      },
+      {
+        "letter": "B",
+        "x": 91.36,
+        "y": 62.39,
+        "sizePct": 3.16
+      },
+      {
+        "letter": "C",
+        "x": 35.64,
+        "y": 76.72,
+        "sizePct": 3.16
+      },
+      {
+        "letter": "D",
+        "x": 98.81,
+        "y": 34.31,
+        "sizePct": 3.16
+      },
+      {
+        "letter": "E",
+        "x": 43,
+        "y": 63.04,
+        "sizePct": 3.16
+      }
+    ],
+    "imageCrop": {
+      "x": 0.182,
+      "y": 0.09778,
+      "w": 0.72867,
+      "h": 0.88978
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0099",
+    "section": "abdo-pelvis",
+    "questionNumber": 23,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 99,
+    "sourcePageAnswer": 100,
+    "caseLabel": "Case 15.12",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Subarachnoid space",
+        "acceptedVariants": [
+          "csf space",
+          "sub-arachnoid space"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left erector spinae muscle",
+        "acceptedVariants": [
+          "left erector spinae",
+          "left erector spinae muscles",
+          "left sacrospinalis"
+        ],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Left kidney",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Spinal cord",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Vertebral body",
+        "acceptedVariants": [
+          "body of the vertebra",
+          "body of vertebra"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The conus medullaris is the expansion at the caudal end of the spinal cord. In neonates, the tip of the conus medullaris typically lies between L1 and L2. A low-lying conus medullaris (i.e. below the level of L2-3) suggests spinal dysraphism, with associated tethering of an abnormally thickened filum terminale. The filum terminale is a condensation of pia mater that continues caudally from the tip of the conus medullaris to attach to the dorsal aspect of the first coccygeal segment. The central canal of the cord continues within the filum terminale for 5-6 mm. The filum terminale should normally measure no more than 2 mm in thickness.",
+    "references": [],
+    "regionTags": [
+      "Spine",
+      "Lumbar spine",
+      "Paediatric"
+    ],
+    "structureTags": [
+      "Subarachnoid space",
+      "Erector spinae",
+      "Kidney",
+      "Spinal cord",
+      "Vertebral body",
+      "Conus medullaris",
+      "Filum terminale"
+    ],
+    "imagePath": "/images/abdopelvis/p0099.webp",
+    "flagForReview": "Labels C and D each appear twice on the image (two separate arrows per letter). Ultrasound of the neonatal spine appearing within the Ultrasound section of the deck.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 8.23,
+        "y": 23.61,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "B",
+        "x": 56.59,
+        "y": 12.29,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "C",
+        "x": 78.29,
+        "y": 23.61,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "C",
+        "x": 60.63,
+        "y": 51.13,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "D",
+        "x": 41.36,
+        "y": 36.12,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "D",
+        "x": 6.03,
+        "y": 65.52,
+        "sizePct": 4.34
+      },
+      {
+        "letter": "E",
+        "x": 22.75,
+        "y": 93.83,
+        "sizePct": 4.34
+      }
+    ],
+    "imageCrop": {
+      "x": 0.168,
+      "y": 0.10756,
+      "w": 0.668,
+      "h": 0.78489
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0101",
+    "section": "abdo-pelvis",
+    "questionNumber": 24,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 101,
+    "sourcePageAnswer": 102,
+    "caseLabel": "Case 14.1",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Portal venous confluence",
+        "acceptedVariants": [
+          "confluence of the splenic and superior mesenteric veins",
+          "portal confluence",
+          "porto-splenic confluence",
+          "spleno-portal confluence",
+          "splenoportal confluence"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left renal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [
+          "abdominal aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The left lobe of the liver is visualised at the top of the picture (A). The bright streakiness to the right of the image is caused by gas in the gastric lumen.\n\nThe portal venous confluence is formed by the splenic and superior mesenteric veins.\n\nThe course of the left renal vein is clearly demonstrated, running anterior to the abdominal aorta and posterior to the superior mesenteric artery.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Epigastrium"
+    ],
+    "structureTags": [
+      "Liver",
+      "Portal venous confluence",
+      "Superior mesenteric artery",
+      "Left renal vein",
+      "Aorta"
+    ],
+    "imagePath": "/images/abdopelvis/p0101.webp",
+    "flagForReview": null,
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 68.27,
+        "y": 31.87,
+        "sizePct": 4.31
+      },
+      {
+        "letter": "B",
+        "x": 51.44,
+        "y": 51.92,
+        "sizePct": 4.31
+      },
+      {
+        "letter": "C",
+        "x": 56.54,
+        "y": 58.82,
+        "sizePct": 4.31
+      },
+      {
+        "letter": "D",
+        "x": 59.31,
+        "y": 67.09,
+        "sizePct": 4.31
+      },
+      {
+        "letter": "E",
+        "x": 55.09,
+        "y": 74.25,
+        "sizePct": 4.31
+      }
+    ],
+    "imageCrop": {
+      "x": 0.16333,
+      "y": 0.09778,
+      "w": 0.67333,
+      "h": 0.80622
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0103",
+    "section": "abdo-pelvis",
+    "questionNumber": 25,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 103,
+    "sourcePageAnswer": 104,
+    "caseLabel": "Case 12.8",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to D.\nE From what two structures is structure B usually formed?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Gallbladder",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Middle hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Inferior vena cava (IVC)",
+        "acceptedVariants": [
+          "inferior vena cava"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Splenic vein and superior mesenteric vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The portal vein is usually formed by the superior mesenteric vein and splenic vein (which itself usually receives the inferior mesenteric vein). The portal vein, along with the hepatic artery (shown on this image as the circle lying between the portal vein and the neck of the gallbladder), represents the blood supply to the liver. In the normal physiological state, the portal vein exhibits hepatopetal flow, i.e. flow of blood towards the liver. The hepatic veins, of which there are usually three (right, middle and left) converge on the IVC, joining it just below the inferior cavoatrial junction.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Gallbladder",
+      "Portal vein",
+      "Middle hepatic vein",
+      "Inferior vena cava",
+      "Splenic vein",
+      "Superior mesenteric vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0103.webp",
+    "flagForReview": "Label E is a written sub-question printed in a blank worksheet row on the question page ('From what two structures is structure B usually formed?'), not an arrow on the image (only A-D are arrowed). Colour/power Doppler box is present on the image.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 46.28,
+        "y": 20.96,
+        "sizePct": 4.3
+      },
+      {
+        "letter": "B",
+        "x": 29.1,
+        "y": 36.89,
+        "sizePct": 4.3
+      },
+      {
+        "letter": "C",
+        "x": 13.65,
+        "y": 42.36,
+        "sizePct": 4.3
+      },
+      {
+        "letter": "D",
+        "x": 53.27,
+        "y": 91.62,
+        "sizePct": 4.3
+      },
+      {
+        "letter": "E",
+        "x": 12.31,
+        "y": 101.59,
+        "sizePct": 3.22
+      }
+    ],
+    "imageCrop": {
+      "x": 0.12933,
+      "y": 0.10934,
+      "w": 0.74467,
+      "h": 0.77155
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0105",
+    "section": "abdo-pelvis",
+    "questionNumber": 26,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 105,
+    "sourcePageAnswer": 106,
+    "caseLabel": "Case 10.7",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Head of pancreas",
+        "acceptedVariants": [
+          "pancreatic head"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Neck of pancreas",
+        "acceptedVariants": [
+          "pancreatic neck"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Splenic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Portal venous confluence",
+        "acceptedVariants": [
+          "confluence of the splenic and superior mesenteric veins",
+          "portal confluence",
+          "porto-splenic confluence",
+          "spleno-portal confluence",
+          "splenoportal confluence"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The pancreas is a retroperitoneal structure, and as such is often obscured by bowel gas on ultrasound imaging. The pancreas itself is composed of a head (lying to the right of the midline, with the uncinate process lying inferiorly), neck (which passes the midline anterior to the L1/L2 vertebrae), body and tail (both of which lie to the left of the midline). The confluence of the portal vein is seen to the right of the midline, posteromedial to the head of the pancreas, as it is formed from the splenic vein and the superior mesenteric vein. The abdominal aorta is an indirect posterior relation of the pancreas.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas",
+      "Retroperitoneum"
+    ],
+    "structureTags": [
+      "Head of pancreas",
+      "Neck of pancreas",
+      "Splenic vein",
+      "Abdominal aorta",
+      "Portal venous confluence"
+    ],
+    "imagePath": "/images/abdopelvis/p0105.webp",
+    "flagForReview": null,
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 19.95,
+        "y": 50.97,
+        "sizePct": 4.15
+      },
+      {
+        "letter": "B",
+        "x": 45.21,
+        "y": 35.36,
+        "sizePct": 4.15
+      },
+      {
+        "letter": "C",
+        "x": 70.08,
+        "y": 59.23,
+        "sizePct": 4.15
+      },
+      {
+        "letter": "D",
+        "x": 65.93,
+        "y": 84.03,
+        "sizePct": 4.15
+      },
+      {
+        "letter": "E",
+        "x": 29.4,
+        "y": 78.41,
+        "sizePct": 4.15
+      }
+    ],
+    "imageCrop": {
+      "x": 0.106,
+      "y": 0.09333,
+      "w": 0.772,
+      "h": 0.81778
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0107",
+    "section": "abdo-pelvis",
+    "questionNumber": 27,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 107,
+    "sourcePageAnswer": 108,
+    "caseLabel": "Case 8.20",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to D.\nE In what direction does portal venous flow relative to the liver?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right lobe of liver",
+        "acceptedVariants": [
+          "right hepatic lobe",
+          "right liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [
+          "ductus choledochus"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Hepatopetal (towards the liver)",
+        "acceptedVariants": [
+          "hepatopetal",
+          "towards the liver"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This is the classic view used to visualise structures at porta hepatis. The round hepatic artery (visualised in transverse section) is seen to be sandwiched between the portal vein and common bile duct (visualised in longitudinal section).",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Liver",
+      "Portal vein",
+      "Hepatic artery",
+      "Common bile duct",
+      "Porta hepatis"
+    ],
+    "imagePath": "/images/abdopelvis/p0107.webp",
+    "flagForReview": "Label A appears twice on the image (two arrows). Label E is a written sub-question printed in a blank worksheet row ('In what direction does portal venous flow relative to the liver?' - phrasing as printed), not an image arrow.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 7.23,
+        "y": 45.85,
+        "sizePct": 5.14
+      },
+      {
+        "letter": "A",
+        "x": 14.94,
+        "y": 87.57,
+        "sizePct": 5.14
+      },
+      {
+        "letter": "B",
+        "x": 13.97,
+        "y": 72.57,
+        "sizePct": 5.14
+      },
+      {
+        "letter": "C",
+        "x": 36.46,
+        "y": 43.74,
+        "sizePct": 5.14
+      },
+      {
+        "letter": "D",
+        "x": 64.88,
+        "y": 59.09,
+        "sizePct": 5.14
+      },
+      {
+        "letter": "E",
+        "x": 16.7,
+        "y": 103.27,
+        "sizePct": 3.85
+      }
+    ],
+    "imageCrop": {
+      "x": 0.182,
+      "y": 0.01778,
+      "w": 0.62267,
+      "h": 0.85333
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0109",
+    "section": "abdo-pelvis",
+    "questionNumber": 28,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 109,
+    "sourcePageAnswer": 110,
+    "caseLabel": "Case 4.20",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Liver",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Pylorus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Gastric antrum",
+        "acceptedVariants": [
+          "antrum of stomach",
+          "antrum of the stomach",
+          "pyloric antrum"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [
+          "aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Branch of right portal vein",
+        "acceptedVariants": [
+          "right portal vein",
+          "right portal vein branch"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "Ultrasound is the imaging modality of choice when evaluating suspected infantile hypertrophic pyloric stenosis. Normally, the pylorus muscle should not exceed 3 mm in thickness and the pylorus should be no more than 17 mm in length, although this is somewhat contingent on the size of the infant. The muscular layers of the pylorus are hypoechoic with hyperechoity of the mucosa. The stomach itself may appear as a solid structure on ultrasound if distended with milk curd.\n\nPortal vein branches can be differentiated from intrahepatic bile ducts by their increased reflectivity, as shown in this case.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Upper gastrointestinal tract",
+      "Paediatric"
+    ],
+    "structureTags": [
+      "Liver",
+      "Pylorus",
+      "Gastric antrum",
+      "Abdominal aorta",
+      "Portal vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0109.webp",
+    "flagForReview": "Printed teaching text contains 'hyperechoity' (sic) - transcribed verbatim.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 34.22,
+        "y": 20.13,
+        "sizePct": 5.43
+      },
+      {
+        "letter": "B",
+        "x": 63.91,
+        "y": 23.33,
+        "sizePct": 5.43
+      },
+      {
+        "letter": "C",
+        "x": 81.05,
+        "y": 18.46,
+        "sizePct": 5.43
+      },
+      {
+        "letter": "D",
+        "x": 63.75,
+        "y": 59.39,
+        "sizePct": 5.43
+      },
+      {
+        "letter": "E",
+        "x": 11.14,
+        "y": 33.77,
+        "sizePct": 5.43
+      }
+    ],
+    "imageCrop": {
+      "x": 0.20533,
+      "y": 0.14044,
+      "w": 0.58933,
+      "h": 0.71822
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0111",
+    "section": "abdo-pelvis",
+    "questionNumber": 29,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 111,
+    "sourcePageAnswer": 112,
+    "caseLabel": "Case 5.4",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "A Name the structure labelled A.\nB Name the structure labelled B.\nC Name the structure labelled C\nD Name the structure labelled D.\nE What is the normal upper limit of wall thickness of the gallbladder?",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Gallbladder",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "3 mm",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "This image shows the gallbladder in longitudinal section, the fundus evident near the top of the image and the neck in the middle of the image. One of the three hepatic veins is seen coursing towards the inferior vena cava, usually joining it just before the inferior vena cava reaches the right atrium.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Hepatobiliary"
+    ],
+    "structureTags": [
+      "Inferior vena cava",
+      "Portal vein",
+      "Hepatic vein",
+      "Gallbladder"
+    ],
+    "imagePath": "/images/abdopelvis/p0111.webp",
+    "flagForReview": "Label E is a knowledge question (normal upper limit of gallbladder wall thickness), not an image arrow - only A-D are arrowed. Question page carries a blank 'WRITE YOUR ANSWER HERE' worksheet table. Worksheet row C is printed without a full stop, as transcribed.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 29.43,
+        "y": 56.71,
+        "sizePct": 4.29
+      },
+      {
+        "letter": "B",
+        "x": 31.36,
+        "y": 44.46,
+        "sizePct": 4.29
+      },
+      {
+        "letter": "C",
+        "x": 17.21,
+        "y": 39.11,
+        "sizePct": 4.29
+      },
+      {
+        "letter": "D",
+        "x": 56.43,
+        "y": 21.51,
+        "sizePct": 4.29
+      },
+      {
+        "letter": "E",
+        "x": 6.28,
+        "y": 157.82,
+        "sizePct": 3.86
+      }
+    ],
+    "imageCrop": {
+      "x": 0.26667,
+      "y": 0.02133,
+      "w": 0.46667,
+      "h": 0.57956
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0113",
+    "section": "abdo-pelvis",
+    "questionNumber": 30,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 113,
+    "sourcePageAnswer": 114,
+    "caseLabel": "Case 3.9",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left lobe of liver",
+        "acceptedVariants": [
+          "left hepatic lobe",
+          "left liver lobe"
+        ],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [
+          "abdominal aorta",
+          "descending abdominal aorta"
+        ],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Coeliac axis",
+        "acceptedVariants": [
+          "celiac artery",
+          "celiac axis",
+          "celiac trunk",
+          "coeliac artery",
+          "coeliac trunk"
+        ],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [
+          "hepatic portal vein",
+          "main portal vein"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The relation of the portal vein to the aorta and coeliac axis is well seen on this image. The portal vein is located anteriorly and to the right of the aorta. The portal venous confluence is located just inferior and to the right of the coeliac axis. This should become a very familiar view and you should expect to be able to recognise these major structures on MRI, CT, US and angiography.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Epigastrium"
+    ],
+    "structureTags": [
+      "Liver",
+      "Superior mesenteric artery",
+      "Aorta",
+      "Coeliac axis",
+      "Portal vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0113.webp",
+    "flagForReview": "The teaching paragraph is very slightly clipped at the right margin of the slide (the word 'venous' on line 3 is cut to 'venou'); transcribed as 'venous'.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 34.56,
+        "y": 22.13,
+        "sizePct": 4.58
+      },
+      {
+        "letter": "B",
+        "x": 59.87,
+        "y": 63.07,
+        "sizePct": 4.58
+      },
+      {
+        "letter": "C",
+        "x": 57.15,
+        "y": 76.36,
+        "sizePct": 4.58
+      },
+      {
+        "letter": "D",
+        "x": 42.14,
+        "y": 69.66,
+        "sizePct": 4.58
+      },
+      {
+        "letter": "E",
+        "x": 31.7,
+        "y": 72.85,
+        "sizePct": 4.58
+      }
+    ],
+    "imageCrop": {
+      "x": 0.17933,
+      "y": 0.01689,
+      "w": 0.69933,
+      "h": 0.94044
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0115",
+    "section": "abdo-pelvis",
+    "questionNumber": 31,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 115,
+    "sourcePageAnswer": 116,
+    "caseLabel": "Case 1.4",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": null,
+    "questionText": "Identify the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Intrahepatic segment of inferior vena cava",
+        "acceptedVariants": [
+          "intra-hepatic inferior vena cava",
+          "intrahepatic inferior vena cava",
+          "intrahepatic portion of the inferior vena cava"
+        ],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Right hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Branch of right portal vein",
+        "acceptedVariants": [
+          "right portal vein",
+          "right portal vein branch"
+        ],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Middle hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "This ultrasound image clearly shows the three hepatic veins (right, middle and left) converging to join the intrahepatic segment of the inferior vena cava, just before it drains into the right atrium. Other than different directions of flow, branches of the portal vein demonstrate increased echogenicity of the vessel wall as compared to hepatic veins.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Inferior vena cava",
+      "Right hepatic vein",
+      "Portal vein",
+      "Middle hepatic vein",
+      "Left hepatic vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0115.webp",
+    "flagForReview": "Answer page (116) lies just outside the assigned page range 61-115. Label A has two arrow heads on the image.",
+    "labelGlyphs": [
+      {
+        "letter": "A",
+        "x": 31.35,
+        "y": 88.85,
+        "sizePct": 4.57
+      },
+      {
+        "letter": "B",
+        "x": 23.07,
+        "y": 78.45,
+        "sizePct": 4.57
+      },
+      {
+        "letter": "C",
+        "x": 24.36,
+        "y": 29.59,
+        "sizePct": 4.57
+      },
+      {
+        "letter": "D",
+        "x": 47.91,
+        "y": 26.34,
+        "sizePct": 4.57
+      },
+      {
+        "letter": "E",
+        "x": 68.17,
+        "y": 55.9,
+        "sizePct": 4.57
+      }
+    ],
+    "imageCrop": {
+      "x": 0.18533,
+      "y": 0.07378,
+      "w": 0.70067,
+      "h": 0.79822
+    }
+  },
+  {
+    "id": "abdo-pelvis-msk-p0069",
+    "section": "abdo-pelvis",
+    "questionNumber": 32,
+    "sourceFile": "MY MSK NOTES Augest 2026.key",
+    "sourcePageQuestion": 69,
+    "sourcePageAnswer": 69,
+    "caseLabel": null,
+    "modalitySection": "My Revision Deck",
+    "imagingModality": "Radiograph",
+    "projection": null,
+    "questionText": "Identify the structure indicated.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ilioischial line",
+        "acceptedVariants": [
+          "iliioischial line",
+          "ilio-ischial line",
+          "kohler line",
+          "kohlers line"
+        ],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Also called Kohler's line on AP pelvis radiographs.\nIt represents the medial cortical outline of the posterior column of the acetabulum.\nDisruption helps localise acetabular trauma or medial migration/protrusio.",
+    "references": [],
+    "regionTags": [
+      "Pelvis",
+      "Hip"
+    ],
+    "structureTags": [
+      "Ilioischial line",
+      "Acetabulum",
+      "Posterior column"
+    ],
+    "imagePath": "/images/revision/msk-p0069.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.04656,
+      "y": 0.0334,
+      "w": 0.91296,
+      "h": 0.93737
+    }
+  },
+  {
+    "id": "abdo-pelvis-msk-p0071",
+    "section": "abdo-pelvis",
+    "questionNumber": 33,
+    "sourceFile": "MY MSK NOTES Augest 2026.key",
+    "sourcePageQuestion": 71,
+    "sourcePageAnswer": 71,
+    "caseLabel": null,
+    "modalitySection": "My Revision Deck",
+    "imagingModality": "CT",
+    "projection": null,
+    "questionText": "Identify the structure indicated.",
+    "labelStyle": "letter",
+    "labels": [
+      "A"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left quadratus lumborum",
+        "acceptedVariants": [
+          "left quadratus lumborum muscle"
+        ],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "Posterior abdominal wall muscle, lateral to psoas major.\nExtends from the iliac crest to the 12th rib and lumbar transverse processes.\nHow to spot it: on coronal CT, look for a rectangular muscle belly hugging the posterior abdominal wall beside psoas.",
+    "references": [],
+    "regionTags": [
+      "Posterior abdominal wall",
+      "Lumbar region"
+    ],
+    "structureTags": [
+      "Quadratus lumborum",
+      "Psoas major",
+      "Iliac crest"
+    ],
+    "imagePath": "/images/revision/msk-p0071.webp",
+    "flagForReview": null,
+    "imageCrop": {
+      "x": 0.03431,
+      "y": 0.03212,
+      "w": 0.93997,
+      "h": 0.9379
+    }
+  },
+  {
+    "id": "abdo-pelvis-p0117",
+    "section": "abdo-pelvis",
+    "questionNumber": 34,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 117,
+    "sourcePageAnswer": 118,
+    "caseLabel": "Question 9.15",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Longitudinal ultrasound of the abdomen",
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Gallbladder",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right renal artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Common hepatic duct",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Since the aorta lies to the left of the inferior vena cava, the right renal artery is usually longer than the left. The right renal artery arises from the aorta at vertebral level L1 and passes behind the inferior cava, right renal vein, the head of the pancreas and the descending part of the duodenum before reaching the right kidney. There are several normal variants in renal artery anatomy. The most common of these is multiple renal arteries supplying one kidney, which occurs in 25–40% of the population.",
+    "references": [],
+    "regionTags": [
+      "Abdomen"
+    ],
+    "structureTags": [
+      "Gallbladder",
+      "Inferior vena cava",
+      "Right renal artery",
+      "Portal vein",
+      "Common hepatic duct"
+    ],
+    "imagePath": "/images/abdopelvis/p0117.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0119",
+    "section": "abdo-pelvis",
+    "questionNumber": 35,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 119,
+    "sourcePageAnswer": 120,
+    "caseLabel": "Question 7.15",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Longitudinal ultrasound of the liver",
+    "questionText": "This is a longitudinal ultrasound through the abdomen. Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ligamentum venosum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Common bile duct",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Vertebrae",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The ligamentum venosum is the remnant of the ductus venosus of the foetal circulation, and appears as a hyperechoic stripe on ultrasound. It is normally attached to the left branch of the portal vein within the porta hepatis. It lies within a fissure between the caudate lobe and the left lobe of the liver, and serves as a useful landmark for identifying the caudate lobe on ultrasound.\n\nThe common hepatic artery is a short branch of the coeliac artery and typically divides into the left and right hepatic, right gastric and gastroduodenal arteries. The inferior vena cava lies to the right of the aorta and is the primary venous return to the heart.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Ligamentum venosum",
+      "Left lobe of the liver",
+      "Common bile duct",
+      "Portal vein",
+      "Vertebrae"
+    ],
+    "imagePath": "/images/abdopelvis/p0119.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0121",
+    "section": "abdo-pelvis",
+    "questionNumber": 36,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 121,
+    "sourcePageAnswer": 122,
+    "caseLabel": "Question 6.12",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound of the abdomen",
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Head of pancreas",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left lobe of the liver",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Tail of pancreas",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Body of pancreas",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Superior mesenteric artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The pancreas lies transversely across the posterior abdominal wall behind the stomach and with the transverse mesocolon at its anterior margin. The head lies in the curve of the second part of the duodenum and gives rise to an uncinate process. The common bile duct passes posteriorly to the head of the pancreas. The neck of the pancreas is adjacent to the pylorus. The portal vein is formed posteriorly to the neck at the confluence of the splenic vein and superior mesenteric vein. The body of the pancreas curves across the midline and is closely related to the splenic vessels. The tail of the pancreas lies in the splenic hilum, within the splenorenal ligament.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Pancreas"
+    ],
+    "structureTags": [
+      "Head of pancreas",
+      "Left lobe of the liver",
+      "Tail of pancreas",
+      "Body of pancreas",
+      "Superior mesenteric artery"
+    ],
+    "imagePath": "/images/abdopelvis/p0121.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0123",
+    "section": "abdo-pelvis",
+    "questionNumber": 37,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 123,
+    "sourcePageAnswer": 124,
+    "caseLabel": "Question 6.14",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound of the liver",
+    "questionText": "Name the structures labelled A to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Liver capsule",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Middle hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Right hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Inferior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left hepatic vein",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The venous drainage of the liver is principally via the three hepatic veins – right, middle and left. These follow an intrahepatic course and typically join at the inferior vena cava. They are used as some of the landmarks for dividing the liver into segments.\n\nIt is important to assess the hepatic veins during routine liver ultrasound as their appearance and flow characteristics can be indicative of many disease processes. Engorgement of the hepatic veins and inferior vena cava can be a sign of right heart failure. Normal hepatic venous flow is pulsatile and triphasic like the jugular venous pulsation – alteration to this pattern can indicate hepatic venous thrombosis, which is suggestive of Budd–Chiari syndrome.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Liver capsule",
+      "Middle hepatic vein",
+      "Right hepatic vein",
+      "Inferior vena cava",
+      "Left hepatic vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0123.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0125",
+    "section": "abdo-pelvis",
+    "questionNumber": 38,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 125,
+    "sourcePageAnswer": 126,
+    "caseLabel": "Question 4.12",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound of the abdomen",
+    "questionText": "A: What vertebral level is this? Name the structures labelled B to E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "T12",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Common hepatic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Splenic artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Coeliac trunk or axis",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "Radiologists should be comfortable assessing the aorta with ultrasound as it is part of a routine abdominal ultrasound. The aorta and the inferior vena cava can be identified as the two vessels running down the midline anterior to the vertebrae, with the aorta on the patient's left. The coeliac trunk is the first major branch of the abdominal aorta and arises off the aorta at the vertebral level of T12. It can be seen in the transverse plane as a short trunk anteriorly in the midline before dividing into a 'Y'. The fork on the patient's left is the splenic artery and the fork on the right is the common hepatic artery. This classic ultrasound view is called the 'seagull' sign.",
+    "references": [],
+    "regionTags": [
+      "Abdomen"
+    ],
+    "structureTags": [
+      "T12",
+      "Common hepatic artery",
+      "Splenic artery",
+      "Coeliac trunk or axis",
+      "Aorta"
+    ],
+    "imagePath": "/images/abdopelvis/p0125.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0127",
+    "section": "abdo-pelvis",
+    "questionNumber": 39,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 127,
+    "sourcePageAnswer": 128,
+    "caseLabel": "Question 38",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Longitudinal ultrasound of the liver",
+    "questionText": "Name the structure indicated by the arrow.",
+    "labelStyle": "single",
+    "labels": [
+      "Answer"
+    ],
+    "answers": {
+      "Answer": {
+        "officialAnswer": "Portal vein",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The portal vein originates at the confluence of the splenic vein and the superior mesenteric vein.\n\nIt provides the liver with the majority of its blood supply, entering the liver at the porta hepatis together with the hepatic artery and the common bile duct. The portal vein bifurcates and supplies the left and right lobes of the liver.\n\nThe flow in the splenic vein is hepatopetal — toward the liver.\n\nThe portal vein and its branches typically have 'bright' (reflective) walls, which distinguishes them from the hepatic veins, which do not have reflective walls.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Portal vein"
+    ],
+    "imagePath": "/images/abdopelvis/p0127.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0129",
+    "section": "abdo-pelvis",
+    "questionNumber": 40,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 129,
+    "sourcePageAnswer": 130,
+    "caseLabel": "Question 41",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound of the abdomen",
+    "questionText": "Name the structure indicated by the arrow.",
+    "labelStyle": "single",
+    "labels": [
+      "Answer"
+    ],
+    "answers": {
+      "Answer": {
+        "officialAnswer": "Abdominal aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The abdominal aorta can easily be assessed with ultrasound. It may be confused with the inferior vena cava, but only the aorta has anterior branches and lies to the left of the midline.\n\nThe anteroposterior diameter of the normal aorta is < 3 cm.\n\nColour Doppler can be used to assess the pulsatile arterial blood flow.",
+    "references": [],
+    "regionTags": [
+      "Abdomen"
+    ],
+    "structureTags": [
+      "Abdominal aorta"
+    ],
+    "imagePath": "/images/abdopelvis/p0129.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0131",
+    "section": "abdo-pelvis",
+    "questionNumber": 41,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 131,
+    "sourcePageAnswer": 132,
+    "caseLabel": "Question 42",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Transverse ultrasound of the abdomen",
+    "questionText": "Name the structure indicated by the arrow.",
+    "labelStyle": "single",
+    "labels": [
+      "Answer"
+    ],
+    "answers": {
+      "Answer": {
+        "officialAnswer": "Vertebral body",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The vertebral body may be seen on US as a low reflectivity shadow.\n\nIt lies posterior to the aorta and inferior vena cava.\n\nThe spinal cord and theca can be seen as poorly reflective internal structures.\n\nAlthough not usually examined with US, the vertebral body is a common examination question because it is readily visible with US.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Spine"
+    ],
+    "structureTags": [
+      "Vertebral body"
+    ],
+    "imagePath": "/images/abdopelvis/p0131.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "abdo-pelvis-p0133",
+    "section": "abdo-pelvis",
+    "questionNumber": 42,
+    "sourceFile": "Abdo-Pelvis.pdf",
+    "sourcePageQuestion": 133,
+    "sourcePageAnswer": 134,
+    "caseLabel": "Question 46",
+    "modalitySection": "Ultrasound",
+    "imagingModality": "Ultrasound",
+    "projection": "Ultrasound of the liver",
+    "questionText": "Name the structure indicated by the arrow.",
+    "labelStyle": "single",
+    "labels": [
+      "Answer"
+    ],
+    "answers": {
+      "Answer": {
+        "officialAnswer": "Right hemidiaphragm",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The diaphragm is a reflective, linear structure on US. It may be the source of reverberation artefacts on US.\n\nIt is a dome-shaped sheet of muscle with a central membranous part.\n\nIt is innervated by the C3-5 nerves. It separates the thorax from the abdomen and is pierced by the inferior vena cava (level T8), oesophagus (T10), and aorta (T12).\n\nCentrally, the crura of the diaphragm extend inferiorly along the lumbar spine.",
+    "references": [],
+    "regionTags": [
+      "Abdomen",
+      "Liver"
+    ],
+    "structureTags": [
+      "Right hemidiaphragm"
+    ],
+    "imagePath": "/images/abdopelvis/p0133.webp",
+    "flagForReview": null,
+    "labelsBurnedIn": true
+  }
+]

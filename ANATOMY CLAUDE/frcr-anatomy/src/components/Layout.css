@@ -1,0 +1,248 @@
+.app-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* --- Header --------------------------------------------------------------
+   The Physics nav, verbatim: a single 68px row inside min(1280px, 100%-48px),
+   translucent charcoal with a 16px blur and a hairline under it. The wordmark
+   is Inter at 13px with 0.42em tracking — that extreme letterspacing is the
+   signature of the RadioPass mark and is what makes the two sites read as
+   one. Links are 13px, muted, and go ivory on hover. */
+
+/* The mock-ups float the nav over the hero with no bar behind it at all, so
+   the header is transparent at the top of the page and only takes its
+   translucent charcoal once the page has scrolled under it. */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.35s, border-color 0.35s, backdrop-filter 0.35s;
+}
+
+.app-header.is-scrolled {
+  background: rgba(11, 13, 16, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: rgba(242, 238, 230, 0.07);
+}
+
+:root[data-theme='light'] .app-header {
+  background: rgba(246, 244, 239, 0.82);
+  border-bottom-color: var(--line);
+}
+
+.app-header-inner {
+  width: min(1440px, calc(100% - 72px));
+  margin-inline: auto;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.brand-mark {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: #F7F4ED;
+  white-space: nowrap;
+}
+
+.brand-sub {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--amber-accent);
+  white-space: nowrap;
+}
+
+/* The links are centred in the bar, not pushed against the actions. The gap
+   gives way before the words do: at 38px the row outgrew a 1280px laptop once
+   the Atlas link joined it, and the nav slid under the wordmark. */
+.app-nav {
+  display: flex;
+  gap: clamp(16px, 2.1vw, 38px);
+  justify-content: center;
+}
+
+.app-nav a {
+  font-size: 15px;
+  font-weight: 400;
+  color: #C9CDD3;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.app-nav a:hover { color: #ffffff; }
+
+.app-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex: 1; }
+
+/* The cream call-to-action from the mock-ups. */
+.app-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  background: #F3F0E9;
+  color: #0B0D10;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.app-cta:hover { background: #ffffff; transform: translateY(-1px); }
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(242, 238, 230, 0.2);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+:root[data-theme='light'] .theme-toggle { border-color: var(--line-strong); }
+.theme-toggle:hover { color: var(--text); border-color: rgba(242, 238, 230, 0.5); }
+
+.app-main { flex: 1; min-height: 0; }
+
+@media (max-width: 1180px) {
+  .app-nav { display: none; }
+  .brand, .app-header-actions { flex: none; }
+  .app-header-inner { justify-content: space-between; }
+}
+
+@media (max-width: 640px) {
+  .app-header-inner { width: calc(100% - 32px); gap: 10px; }
+  .brand-sub { display: none; }
+  .brand-mark { font-size: 12px; letter-spacing: 0.3em; }
+  .theme-toggle { width: 34px; height: 34px; }
+  .app-cta { padding: 10px 14px; font-size: 13px; }
+  .app-streak { display: none; }
+}
+
+/* --- Account -------------------------------------------------------------
+   The signed-in state is chrome, not decoration: initials, plan, and a menu
+   that answers "is my work safe" without leaving the page. */
+
+.app-streak {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-bg);
+  color: var(--amber-accent);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.app-account { position: relative; }
+
+.account-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid rgba(242, 238, 230, 0.2);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.account-chip:hover { border-color: rgba(242, 238, 230, 0.5); }
+
+.account-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.account-plan { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 60;
+  width: 244px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.account-name { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 380; letter-spacing: -0.01em; }
+.account-email { margin: 2px 0 12px; font-size: 12px; color: var(--text-faint); word-break: break-all; }
+
+.account-facts { display: flex; flex-direction: column; gap: 6px; margin: 0 0 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.account-facts > div { display: flex; justify-content: space-between; gap: 10px; }
+.account-facts dt { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+.account-facts dd { margin: 0; font-size: 12.5px; color: var(--text); }
+
+.account-link {
+  display: block;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-link:hover { background: var(--panel-2); color: var(--text); }
+.account-signout:hover { color: var(--red); }
+.account-note { margin: 10px 0 0; font-size: 11px; line-height: 1.5; color: var(--text-faint); }
+
+@media (max-width: 860px) {
+  .app-streak { display: none; }
+  .account-plan { display: none; }
+}
+
+/* The link that leaves this app for the physics half. Muted and marked with
+   the outward arrow so it reads as a doorway, not another section. */
+.app-nav-physics {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+.app-nav-physics:hover { color: var(--amber-accent); }

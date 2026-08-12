@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chemical shift and receiver bandwidth</title>
+  <style>
+    :root {
+      --ink: #143247;
+      --ink-soft: #355469;
+      --panel: rgba(255, 255, 255, 0.94);
+      --line: #c9dbe6;
+      --accent: #0f7a91;
+      --accent-strong: #065f72;
+      --warm: #f28b3c;
+      --danger: #c43f39;
+      --water: #d4ecff;
+      --fat: #ffe4c4;
+      --shadow: 0 12px 30px rgba(15, 64, 91, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, #d7f0ff 0%, rgba(215, 240, 255, 0.55) 30%, transparent 60%),
+        radial-gradient(circle at 85% 82%, #ffe9d5 0%, rgba(255, 233, 213, 0.45) 28%, transparent 58%),
+        linear-gradient(140deg, #f5fbff 0%, #fffaf5 100%);
+    }
+
+    .app {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+      letter-spacing: 0.01em;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(2px);
+    }
+
+    .diagram-card {
+      padding: 16px;
+      min-height: 560px;
+    }
+
+    .diagram-wrap {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #d6e4ed;
+      background: #fbfdff;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .region-label {
+      font-size: 32px;
+      font-weight: 700;
+      fill: #1b4761;
+      letter-spacing: 0.02em;
+    }
+
+    .diagram-note {
+      font-size: 18px;
+      fill: #234e68;
+      font-weight: 600;
+    }
+
+    .axis-label {
+      font-size: 19px;
+      fill: #2b5972;
+      font-weight: 700;
+    }
+
+    .boundary-label {
+      font-size: 18px;
+      fill: #2d5268;
+      font-weight: 600;
+    }
+
+    .callout-text {
+      font-size: 18px;
+      fill: #173f57;
+      font-weight: 700;
+    }
+
+    #misregisteredGroup,
+    #deltaGroup,
+    #bwGroup,
+    #shiftGroup {
+      transition: opacity 340ms ease;
+    }
+
+    .info-card {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step-title {
+      margin: 0;
+      font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+    }
+
+    .formula-box {
+      border: 1px solid #cce0eb;
+      border-radius: 14px;
+      padding: 12px;
+      background: linear-gradient(160deg, #f5fbff 0%, #fdf6ef 100%);
+    }
+
+    .formula-head {
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 6px;
+      color: #1e4f69;
+    }
+
+    .formula-main {
+      font-size: 1.04rem;
+      font-weight: 700;
+    }
+
+    .formula-sub {
+      margin-top: 5px;
+      color: #365a71;
+      font-size: 0.97rem;
+      line-height: 1.36;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .control-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      color: #224d66;
+      font-size: 0.98rem;
+    }
+
+    .toggle-row,
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button,
+    .preset,
+    .toggle,
+    .nav-btn {
+      border: 1px solid #a9c2d0;
+      border-radius: 12px;
+      background: #ffffff;
+      color: var(--ink);
+      font-weight: 700;
+      padding: 10px 14px;
+      min-height: 44px;
+      min-width: 44px;
+      cursor: pointer;
+      transition: background-color 220ms ease, transform 140ms ease, border-color 220ms ease;
+      font-family: inherit;
+    }
+
+    button:hover,
+    .preset:hover,
+    .toggle:hover,
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      border-color: #7ea9bc;
+      background: #f4fbff;
+    }
+
+    button:active,
+    .preset:active,
+    .toggle:active,
+    .nav-btn:active {
+      transform: translateY(0);
+    }
+
+    button:disabled,
+    .preset:disabled,
+    .toggle:disabled,
+    .nav-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.46;
+      transform: none;
+      background: #f5f7f9;
+    }
+
+    .toggle.active,
+    .preset.active {
+      background: #e2f5fb;
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .range-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      min-height: 36px;
+    }
+
+    .value-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #2b5b74;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .readouts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #d5e5ef;
+      background: #fbfdff;
+      color: #214b65;
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    .bullets {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 7px;
+      color: #1e475f;
+      font-size: 0.99rem;
+      line-height: 1.42;
+    }
+
+    .snr-box {
+      border: 1px solid #f2cfb0;
+      background: #fff7ef;
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .snr-box.hidden {
+      display: none;
+    }
+
+    .snr-title {
+      font-weight: 800;
+      color: #94501a;
+      font-size: 0.95rem;
+    }
+
+    .snr-track {
+      height: 14px;
+      border-radius: 999px;
+      background: #f3d8bf;
+      overflow: hidden;
+    }
+
+    .snr-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #efbb8d 0%, #d87b3b 100%);
+      transition: width 360ms ease;
+    }
+
+    .snr-value {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #8c4916;
+    }
+
+    .bottom {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #1d4962;
+      min-width: 130px;
+    }
+
+    .nav-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      min-width: 86px;
+    }
+
+    .nav-btn.playing {
+      background: #e2f5fb;
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .formula-module {
+      margin-top: 20px;
+      padding: 18px;
+    }
+
+    .module-title {
+      margin: 0 0 14px;
+      font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+      color: #1c4c66;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .module-panel {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .module-box {
+      border: 1px solid #d2e3ee;
+      border-radius: 14px;
+      background: #fbfdff;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .module-bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 6px;
+      color: #1f4a62;
+      font-size: 0.94rem;
+      line-height: 1.36;
+    }
+
+    .field-info {
+      color: #2d5770;
+      font-weight: 700;
+      font-size: 0.92rem;
+      background: #eef7fd;
+      border-radius: 10px;
+      border: 1px solid #cee3f0;
+      padding: 8px 10px;
+    }
+
+    .inline-input {
+      display: grid;
+      gap: 6px;
+      color: #234e67;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .inline-input input[type="number"] {
+      border: 1px solid #aac7d7;
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-height: 44px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: #173f57;
+      background: #ffffff;
+    }
+
+    .inline-input input[type="number"]:focus {
+      outline: 2px solid #8bc4d6;
+      outline-offset: 2px;
+    }
+
+    .module-value-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #2b5b74;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .example-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .example-btn {
+      min-width: 100px;
+    }
+
+    .example-btn.active {
+      background: #e8f8ed;
+      border-color: #80b796;
+      color: #1f5f3a;
+    }
+
+    .module-output-box {
+      background: linear-gradient(160deg, #f7fbff 0%, #fff8ef 100%);
+    }
+
+    .formula-equation {
+      font-size: clamp(1.18rem, 2vw, 1.42rem);
+      font-weight: 800;
+      color: #18455d;
+      line-height: 1.35;
+    }
+
+    .formula-output-value {
+      font-size: clamp(1.45rem, 2.5vw, 2rem);
+      font-weight: 800;
+      color: #0a6176;
+      line-height: 1.2;
+    }
+
+    .equation-detail {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #2a566e;
+    }
+
+    .ruler-wrap {
+      border: 1px solid #d6e6f0;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .ruler-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .module-callout {
+      border: 1px solid #c9e2eb;
+      border-radius: 12px;
+      background: #eff9fc;
+      color: #1f4b63;
+      font-weight: 700;
+      font-size: 0.96rem;
+      line-height: 1.35;
+      padding: 10px 12px;
+    }
+
+    @media (max-width: 980px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .diagram-card {
+        min-height: 450px;
+      }
+
+      .module-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Chemical shift and receiver bandwidth</h1>
+
+    <div class="content">
+      <section class="card diagram-card" aria-label="Diagram panel">
+        <div class="diagram-wrap">
+          <svg viewBox="0 0 980 560" role="img" aria-labelledby="diagramTitle diagramDesc">
+            <title id="diagramTitle">Chemical shift misregistration diagram</title>
+            <desc id="diagramDesc">Two tissue regions with a true boundary and a displayed fat boundary that can shift horizontally in the frequency encode direction.</desc>
+
+            <defs>
+              <linearGradient id="waterFill" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="#c6e6ff" />
+                <stop offset="100%" stop-color="#dff2ff" />
+              </linearGradient>
+              <linearGradient id="fatFill" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="#ffe8cc" />
+                <stop offset="100%" stop-color="#ffe0b7" />
+              </linearGradient>
+              <marker id="axisArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L10,5 L0,10 z" fill="#245a75" />
+              </marker>
+              <marker id="shiftArrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L12,6 L0,12 z" fill="#ba3f39" />
+              </marker>
+            </defs>
+
+            <rect x="24" y="24" width="932" height="512" rx="24" fill="#f8fcff" stroke="#d7e6ef" />
+
+            <rect x="90" y="120" width="365" height="300" fill="url(#waterFill)" stroke="#9dc8e5" />
+            <rect x="455" y="120" width="365" height="300" fill="url(#fatFill)" stroke="#efc698" />
+
+            <text x="230" y="176" text-anchor="middle" class="region-label">Water</text>
+            <text x="640" y="176" text-anchor="middle" class="region-label">Fat</text>
+
+            <line id="trueBoundary" x1="455" x2="455" y1="118" y2="422" stroke="#1f2f3d" stroke-width="5" />
+            <text x="448" y="96" text-anchor="end" class="boundary-label">True boundary</text>
+
+            <g id="misregisteredGroup" opacity="0">
+              <line id="displayBoundary" x1="500" x2="500" y1="118" y2="422" stroke="#ba3f39" stroke-width="5" stroke-dasharray="8 6" />
+              <text id="displayBoundaryLabel" x="510" y="96" class="boundary-label" fill="#a13b36">Displayed fat boundary</text>
+
+              <line id="shiftArrow" x1="455" x2="500" y1="86" y2="86" stroke="#ba3f39" stroke-width="4" marker-end="url(#shiftArrowHead)" />
+              <text id="shiftArrowLabel" x="478" y="66" text-anchor="middle" class="boundary-label" fill="#a13b36">1.76 pixel shift</text>
+            </g>
+
+            <line x1="132" y1="476" x2="316" y2="476" stroke="#245a75" stroke-width="4" marker-end="url(#axisArrow)" />
+            <line x1="132" y1="476" x2="132" y2="340" stroke="#245a75" stroke-width="4" marker-end="url(#axisArrow)" />
+            <text x="222" y="504" text-anchor="middle" class="axis-label">frequency encode</text>
+            <text x="48" y="414" class="axis-label">phase encode</text>
+            <text x="338" y="479" class="diagram-note">Shift appears horizontally only</text>
+
+            <g id="deltaGroup" opacity="0">
+              <rect x="572" y="48" width="334" height="54" rx="12" fill="#e8f6ff" stroke="#b9d8e9" />
+              <text id="diagramDeltaText" x="588" y="82" class="callout-text">Δf = 220 Hz at 1.5T</text>
+            </g>
+
+            <g id="bwGroup" opacity="0">
+              <rect x="572" y="108" width="334" height="54" rx="12" fill="#eafdf6" stroke="#b4e2cc" />
+              <text id="diagramBwText" x="588" y="142" class="callout-text">BW per pixel = 125 Hz</text>
+            </g>
+
+            <g id="shiftGroup" opacity="0">
+              <rect x="572" y="168" width="334" height="54" rx="12" fill="#fff1ed" stroke="#efc2b9" />
+              <text id="diagramShiftText" x="588" y="202" class="callout-text">Pixel shift = 1.76 pixels</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <aside class="card info-card" aria-label="Explanation and controls">
+        <h2 id="stepTitle" class="step-title">Step 1: True boundary</h2>
+
+        <div class="formula-box" aria-live="polite">
+          <div class="formula-head">Live formula</div>
+          <div class="formula-main">Pixel shift = Δf / (BW per pixel)</div>
+          <div id="formulaSub" class="formula-sub">= 220 Hz / 125 Hz per pixel = 1.76 pixels</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label class="control-label">Field strength</label>
+            <div class="toggle-row" id="fieldButtons">
+              <button class="toggle" data-field="1.5" type="button" aria-pressed="true">1.5T</button>
+              <button class="toggle" data-field="3" type="button" aria-pressed="false">3T</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="control-label" for="bwSlider">BW per pixel</label>
+            <div class="range-wrap">
+              <input id="bwSlider" type="range" min="0" max="3" step="1" value="1" aria-label="Bandwidth per pixel" />
+              <div class="value-row">
+                <span id="bwValue">125 Hz per pixel</span>
+                <span id="bwHint">Tap presets for quick values</span>
+              </div>
+            </div>
+            <div class="preset-row" id="bwPresets">
+              <button class="preset" data-bw="62.5" type="button">62.5</button>
+              <button class="preset" data-bw="125" type="button">125</button>
+              <button class="preset" data-bw="250" type="button">250</button>
+              <button class="preset" data-bw="500" type="button">500</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="readouts" aria-live="polite">
+          <div id="deltaReadout">Δf: 220 Hz</div>
+          <div id="shiftReadout">Pixel shift: 1.76 pixels</div>
+        </div>
+
+        <ul id="bullets" class="bullets"></ul>
+
+        <div id="snrBox" class="snr-box hidden" aria-live="polite">
+          <div class="snr-title">Relative SNR gauge</div>
+          <div class="snr-track">
+            <div id="snrFill" class="snr-fill"></div>
+          </div>
+          <div id="snrValue" class="snr-value">71% relative SNR</div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="bottom">
+      <div id="progress" class="progress">Step 1 of 6</div>
+      <div class="nav-row">
+        <button id="backBtn" class="nav-btn" type="button">Back</button>
+        <button id="nextBtn" class="nav-btn" type="button">Next</button>
+        <button id="playBtn" class="nav-btn" type="button" aria-pressed="false">Play</button>
+        <button id="resetBtn" class="nav-btn" type="button">Reset</button>
+      </div>
+    </div>
+
+    <section class="card formula-module" aria-label="Chemical shift in pixels formula module">
+      <h2 class="module-title">Chemical shift in pixels formula</h2>
+
+      <div class="module-grid">
+        <div class="module-panel">
+          <div class="module-box">
+            <label class="control-label">Frequency difference Δf (Hz)</label>
+            <div class="toggle-row" id="formulaFieldButtons">
+              <button class="toggle formula-toggle" data-field="1.5" type="button" aria-pressed="true">1.5T</button>
+              <button class="toggle formula-toggle" data-field="3" type="button" aria-pressed="false">3T</button>
+            </div>
+            <div id="formulaFieldInfo" class="field-info">Reference Δf at 1.5T is 220 Hz</div>
+            <label class="inline-input" for="formulaDeltaInput">
+              <span>Manual Δf override</span>
+              <input id="formulaDeltaInput" type="number" min="1" step="1" value="220" inputmode="decimal">
+            </label>
+          </div>
+
+          <div class="module-box">
+            <label class="control-label" for="formulaBwSlider">Bandwidth per pixel (Hz per pixel)</label>
+            <input id="formulaBwSlider" type="range" min="62.5" max="500" step="0.5" value="125" aria-label="Formula module bandwidth per pixel">
+            <div class="module-value-line">
+              <span id="formulaBwValue">125 Hz per pixel</span>
+            </div>
+            <div class="preset-row" id="formulaBwPresets">
+              <button class="preset formula-preset" data-bw="62.5" type="button">62.5</button>
+              <button class="preset formula-preset" data-bw="125" type="button">125</button>
+              <button class="preset formula-preset" data-bw="250" type="button">250</button>
+              <button class="preset formula-preset" data-bw="500" type="button">500</button>
+            </div>
+          </div>
+
+          <div class="module-box">
+            <label class="control-label">Worked examples</label>
+            <div class="example-row" id="formulaExamples">
+              <button class="example-btn" data-example="A" type="button">Example A</button>
+              <button class="example-btn" data-example="B" type="button">Example B</button>
+              <button class="example-btn" data-example="C" type="button">Example C</button>
+            </div>
+            <ul class="module-bullets">
+              <li>• Example A: 1.5T, Δf 220 Hz, BW 125 gives 1.76 pixels.</li>
+              <li>• Example B: 1.5T, Δf 220 Hz, BW 250 gives 0.88 pixels.</li>
+              <li>• Example C: 3T, Δf 440 Hz, BW 125 gives 3.52 pixels.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="module-panel">
+          <div class="module-box module-output-box">
+            <div class="formula-equation">Chemical shift (pixels) = Δf ÷ (BW per pixel)</div>
+            <div id="formulaShiftMain" class="formula-output-value">Pixel shift = 1.76 pixels</div>
+            <div id="formulaEquationLine" class="equation-detail">220 ÷ 125 = 1.76</div>
+
+            <div class="ruler-wrap">
+              <svg id="formulaRulerSvg" class="ruler-svg" viewBox="0 0 760 220" role="img" aria-labelledby="rulerTitle rulerDesc">
+                <title id="rulerTitle">Pixel ruler for chemical shift</title>
+                <desc id="rulerDesc">A row of square pixels with highlighted shift distance matching calculated pixel shift.</desc>
+                <defs>
+                  <linearGradient id="rulerShiftFill" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#8ed9ea"></stop>
+                    <stop offset="100%" stop-color="#0f7a91"></stop>
+                  </linearGradient>
+                  <marker id="rulerShiftArrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L12,6 L0,12 z" fill="#ba3f39"></path>
+                  </marker>
+                </defs>
+                <rect x="14" y="22" width="732" height="176" rx="18" fill="#f8fcff" stroke="#d4e6f0"></rect>
+                <rect id="rulerHighlight" x="84" y="96" width="0" height="56" rx="8" fill="url(#rulerShiftFill)" opacity="0.88"></rect>
+                <g id="rulerSquares"></g>
+                <line id="rulerShiftArrow" x1="84" y1="78" x2="84" y2="78" stroke="#ba3f39" stroke-width="4" marker-end="url(#rulerShiftArrowHead)"></line>
+                <text id="rulerShiftLabel" x="84" y="58" text-anchor="middle" class="boundary-label" fill="#a13b36">shift</text>
+                <text x="84" y="184" class="diagram-note">0</text>
+                <text x="588" y="184" class="diagram-note">12 pixels</text>
+              </svg>
+            </div>
+
+            <div id="formulaCallout" class="module-callout">• If bandwidth per pixel doubles, pixel shift halves.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const BW_OPTIONS = [62.5, 125, 250, 500];
+      const FIELD_TO_DELTA = {
+        1.5: 220,
+        3: 440
+      };
+
+      const TRUE_BOUNDARY_X = 455;
+      const SHIFT_SCALE = 26;
+      const RULER_PIXEL_COUNT = 12;
+      const RULER_START_X = 84;
+      const RULER_TOP_Y = 96;
+      const RULER_PIXEL_SIZE = 42;
+      const RULER_PIXEL_HEIGHT = 56;
+
+      const FORMULA_EXAMPLES = {
+        A: { field: 1.5, deltaF: 220, bw: 125 },
+        B: { field: 1.5, deltaF: 220, bw: 250 },
+        C: { field: 3, deltaF: 440, bw: 125 }
+      };
+
+      const steps = [
+        {
+          title: "Step 1: True boundary",
+          bullets: () => [
+            "• Water and fat spins precess at different frequencies.",
+            "• The chemical shift between them is about 3.5 ppm.",
+            "• The black line marks the true tissue interface.",
+            "• No displayed positional shift is shown yet."
+          ]
+        },
+        {
+          title: "Step 2: Frequency difference Δf",
+          bullets: (m) => [
+            "• Δf is the fat water frequency difference measured in Hz.",
+            "• At 1.5T, Δf is about 220 Hz.",
+            "• At 3T, Δf is about 440 Hz.",
+            `• Current setting gives Δf = ${m.deltaF.toFixed(0)} Hz.`
+          ]
+        },
+        {
+          title: "Step 3: Bandwidth per pixel",
+          bullets: (m) => [
+            "• BW per pixel means how many Hz are assigned to one pixel along frequency encode.",
+            "• Lower BW per pixel means fewer Hz in each pixel.",
+            "• Higher BW per pixel means more Hz in each pixel.",
+            `• Current BW per pixel is ${formatBw(m.bw)} Hz per pixel.`
+          ]
+        },
+        {
+          title: "Step 4: Misregistered boundary",
+          bullets: () => [
+            "• Misregistration appears only along frequency encode direction.",
+            "• The red dashed line is the displayed fat boundary.",
+            "• Pixel shift = Δf / (BW per pixel).",
+            "• Move BW per pixel and watch the horizontal slide."
+          ]
+        },
+        {
+          title: "Step 5: Worked example",
+          bullets: (m) => [
+            "• Worked example uses 1.5T and BW per pixel 125.",
+            "• Pixel shift = 220 / 125 = 1.76 pixels.",
+            `• Current live value is ${m.deltaF.toFixed(0)} / ${formatBw(m.bw)} = ${m.pixelShift.toFixed(2)} pixels.`,
+            "• Arrow length in the diagram equals the pixel shift value."
+          ]
+        },
+        {
+          title: "Step 6: Key conclusion",
+          bullets: () => [
+            "• Increasing BW per pixel decreases pixel shift.",
+            "• This reduces chemical shift misregistration artifact.",
+            "• Trade off: higher bandwidth lowers SNR.",
+            "• The SNR gauge drops as BW per pixel increases."
+          ]
+        }
+      ];
+
+      const state = {
+        step: 0,
+        field: 1.5,
+        bw: 125,
+        playing: false,
+        playTimerId: null,
+        currentShiftUnits: 0,
+        currentShiftPixels: 0,
+        animationId: null
+      };
+
+      const formulaState = {
+        field: 1.5,
+        deltaF: 220,
+        bw: 125,
+        animationId: null,
+        activeExample: "A"
+      };
+
+      const elements = {
+        stepTitle: document.getElementById("stepTitle"),
+        formulaSub: document.getElementById("formulaSub"),
+        deltaReadout: document.getElementById("deltaReadout"),
+        shiftReadout: document.getElementById("shiftReadout"),
+        bwValue: document.getElementById("bwValue"),
+        bullets: document.getElementById("bullets"),
+        progress: document.getElementById("progress"),
+        fieldButtons: Array.from(document.querySelectorAll("#fieldButtons .toggle")),
+        bwSlider: document.getElementById("bwSlider"),
+        presetButtons: Array.from(document.querySelectorAll("#bwPresets .preset")),
+        backBtn: document.getElementById("backBtn"),
+        nextBtn: document.getElementById("nextBtn"),
+        playBtn: document.getElementById("playBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        snrBox: document.getElementById("snrBox"),
+        snrFill: document.getElementById("snrFill"),
+        snrValue: document.getElementById("snrValue"),
+        misregisteredGroup: document.getElementById("misregisteredGroup"),
+        displayBoundary: document.getElementById("displayBoundary"),
+        displayBoundaryLabel: document.getElementById("displayBoundaryLabel"),
+        shiftArrow: document.getElementById("shiftArrow"),
+        shiftArrowLabel: document.getElementById("shiftArrowLabel"),
+        deltaGroup: document.getElementById("deltaGroup"),
+        bwGroup: document.getElementById("bwGroup"),
+        shiftGroup: document.getElementById("shiftGroup"),
+        diagramDeltaText: document.getElementById("diagramDeltaText"),
+        diagramBwText: document.getElementById("diagramBwText"),
+        diagramShiftText: document.getElementById("diagramShiftText"),
+        formulaFieldButtons: Array.from(document.querySelectorAll("#formulaFieldButtons .formula-toggle")),
+        formulaFieldInfo: document.getElementById("formulaFieldInfo"),
+        formulaDeltaInput: document.getElementById("formulaDeltaInput"),
+        formulaBwSlider: document.getElementById("formulaBwSlider"),
+        formulaBwValue: document.getElementById("formulaBwValue"),
+        formulaPresetButtons: Array.from(document.querySelectorAll("#formulaBwPresets .formula-preset")),
+        formulaExampleButtons: Array.from(document.querySelectorAll("#formulaExamples .example-btn")),
+        formulaShiftMain: document.getElementById("formulaShiftMain"),
+        formulaEquationLine: document.getElementById("formulaEquationLine"),
+        formulaCallout: document.getElementById("formulaCallout"),
+        rulerSquares: document.getElementById("rulerSquares"),
+        rulerHighlight: document.getElementById("rulerHighlight"),
+        rulerShiftArrow: document.getElementById("rulerShiftArrow"),
+        rulerShiftLabel: document.getElementById("rulerShiftLabel")
+      };
+
+      function formatBw(value) {
+        const rounded = Math.round(value * 10) / 10;
+        return Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1);
+      }
+
+      function formatDeltaHz(value) {
+        const rounded = Math.round(value * 10) / 10;
+        return Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1);
+      }
+
+      function getMetrics() {
+        const deltaF = FIELD_TO_DELTA[state.field];
+        const pixelShift = deltaF / state.bw;
+        const snrRatio = Math.sqrt(BW_OPTIONS[0] / state.bw);
+
+        return {
+          deltaF,
+          bw: state.bw,
+          pixelShift,
+          snrRatio
+        };
+      }
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function applyShiftGeometry(shiftUnits, shiftPixels) {
+        const x = TRUE_BOUNDARY_X + shiftUnits;
+
+        elements.displayBoundary.setAttribute("x1", x.toFixed(2));
+        elements.displayBoundary.setAttribute("x2", x.toFixed(2));
+        elements.displayBoundaryLabel.setAttribute("x", (x + 10).toFixed(2));
+
+        elements.shiftArrow.setAttribute("x1", TRUE_BOUNDARY_X.toFixed(2));
+        elements.shiftArrow.setAttribute("x2", x.toFixed(2));
+        elements.shiftArrowLabel.setAttribute("x", (TRUE_BOUNDARY_X + shiftUnits / 2).toFixed(2));
+        elements.shiftArrowLabel.textContent = `${shiftPixels.toFixed(2)} pixel shift`;
+      }
+
+      // Animate horizontal boundary displacement for smooth BW changes.
+      function animateShift(targetUnits, targetPixels, animate) {
+        cancelAnimationFrame(state.animationId);
+
+        if (!animate) {
+          state.currentShiftUnits = targetUnits;
+          state.currentShiftPixels = targetPixels;
+          applyShiftGeometry(targetUnits, targetPixels);
+          return;
+        }
+
+        const startUnits = state.currentShiftUnits;
+        const startPixels = state.currentShiftPixels;
+        const deltaUnits = targetUnits - startUnits;
+        const deltaPixels = targetPixels - startPixels;
+        const duration = 420;
+        const startTime = performance.now();
+
+        function step(now) {
+          const t = Math.min(1, (now - startTime) / duration);
+          const eased = easeInOutCubic(t);
+          const currentUnits = startUnits + deltaUnits * eased;
+          const currentPixels = startPixels + deltaPixels * eased;
+
+          state.currentShiftUnits = currentUnits;
+          state.currentShiftPixels = currentPixels;
+          applyShiftGeometry(currentUnits, currentPixels);
+
+          if (t < 1) {
+            state.animationId = requestAnimationFrame(step);
+          }
+        }
+
+        state.animationId = requestAnimationFrame(step);
+      }
+
+      function renderBullets(metrics) {
+        const stepConfig = steps[state.step];
+        const bulletLines = stepConfig.bullets(metrics);
+
+        elements.bullets.innerHTML = "";
+        bulletLines.forEach((line) => {
+          const li = document.createElement("li");
+          li.textContent = line;
+          elements.bullets.appendChild(li);
+        });
+      }
+
+      function renderControls(metrics) {
+        elements.fieldButtons.forEach((button) => {
+          const buttonField = Number(button.dataset.field);
+          const isActive = buttonField === state.field;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+          button.disabled = state.step < 1;
+        });
+
+        const bwEnabled = state.step >= 2;
+        elements.bwSlider.disabled = !bwEnabled;
+
+        elements.presetButtons.forEach((button) => {
+          const buttonBw = Number(button.dataset.bw);
+          const isActive = buttonBw === state.bw;
+          button.classList.toggle("active", isActive);
+          button.disabled = !bwEnabled;
+        });
+
+        elements.bwValue.textContent = `${formatBw(metrics.bw)} Hz per pixel`;
+      }
+
+      function renderReadouts(metrics) {
+        elements.formulaSub.textContent = `= ${metrics.deltaF.toFixed(0)} Hz / ${formatBw(metrics.bw)} Hz per pixel = ${metrics.pixelShift.toFixed(2)} pixels`;
+        elements.deltaReadout.textContent = `Δf: ${metrics.deltaF.toFixed(0)} Hz`;
+        elements.shiftReadout.textContent = `Pixel shift: ${metrics.pixelShift.toFixed(2)} pixels`;
+
+        elements.diagramDeltaText.textContent = `Δf = ${metrics.deltaF.toFixed(0)} Hz at ${state.field}T`;
+        elements.diagramBwText.textContent = `BW per pixel = ${formatBw(metrics.bw)} Hz`;
+        elements.diagramShiftText.textContent = `Pixel shift = ${metrics.pixelShift.toFixed(2)} pixels`;
+      }
+
+      function renderDiagramVisibility() {
+        elements.deltaGroup.setAttribute("opacity", state.step >= 1 ? "1" : "0");
+        elements.bwGroup.setAttribute("opacity", state.step >= 2 ? "1" : "0");
+        elements.shiftGroup.setAttribute("opacity", state.step >= 3 ? "1" : "0");
+        elements.misregisteredGroup.setAttribute("opacity", state.step >= 3 ? "1" : "0");
+      }
+
+      function renderSNR(metrics) {
+        const snrPercent = metrics.snrRatio * 100;
+        elements.snrFill.style.width = `${Math.max(12, snrPercent)}%`;
+        elements.snrValue.textContent = `${snrPercent.toFixed(0)}% relative SNR`;
+        elements.snrBox.classList.toggle("hidden", state.step < 5);
+      }
+
+      function renderNavigation() {
+        elements.stepTitle.textContent = steps[state.step].title;
+        elements.progress.textContent = `Step ${state.step + 1} of ${steps.length}`;
+        elements.backBtn.disabled = state.step === 0;
+        elements.nextBtn.disabled = state.step === steps.length - 1;
+      }
+
+      function render({ animateShiftLine = false } = {}) {
+        const metrics = getMetrics();
+        const targetUnits = metrics.pixelShift * SHIFT_SCALE;
+
+        renderNavigation();
+        renderControls(metrics);
+        renderReadouts(metrics);
+        renderBullets(metrics);
+        renderDiagramVisibility();
+        renderSNR(metrics);
+
+        animateShift(targetUnits, metrics.pixelShift, animateShiftLine);
+      }
+
+      function getFormulaMetrics() {
+        const deltaF = Math.max(1, formulaState.deltaF);
+        const bw = Math.max(1, formulaState.bw);
+        const pixelShift = deltaF / bw;
+
+        return {
+          deltaF,
+          bw,
+          pixelShift
+        };
+      }
+
+      function syncFormulaExampleSelection() {
+        const entries = Object.entries(FORMULA_EXAMPLES);
+        const active = entries.find(([, example]) => (
+          example.field === formulaState.field
+          && Math.abs(example.deltaF - formulaState.deltaF) < 0.2
+          && Math.abs(example.bw - formulaState.bw) < 0.2
+        ));
+
+        formulaState.activeExample = active ? active[0] : null;
+      }
+
+      function renderFormulaExampleButtons() {
+        elements.formulaExampleButtons.forEach((button) => {
+          const isActive = button.dataset.example === formulaState.activeExample;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+      }
+
+      function initFormulaRuler() {
+        const svgNamespace = "http://www.w3.org/2000/svg";
+        elements.rulerSquares.innerHTML = "";
+
+        for (let i = 0; i < RULER_PIXEL_COUNT; i += 1) {
+          const rect = document.createElementNS(svgNamespace, "rect");
+          rect.setAttribute("x", (RULER_START_X + i * RULER_PIXEL_SIZE).toFixed(2));
+          rect.setAttribute("y", RULER_TOP_Y.toFixed(2));
+          rect.setAttribute("width", RULER_PIXEL_SIZE.toFixed(2));
+          rect.setAttribute("height", RULER_PIXEL_HEIGHT.toFixed(2));
+          rect.setAttribute("fill", "transparent");
+          rect.setAttribute("stroke", "#87aac0");
+          rect.setAttribute("stroke-width", "2");
+          elements.rulerSquares.appendChild(rect);
+        }
+      }
+
+      function renderFormulaRuler(pixelShift) {
+        const clampedShift = Math.max(0, Math.min(RULER_PIXEL_COUNT, pixelShift));
+        const highlightWidth = clampedShift * RULER_PIXEL_SIZE;
+        const endX = RULER_START_X + highlightWidth;
+        const labelX = highlightWidth < 28
+          ? RULER_START_X + 30
+          : RULER_START_X + highlightWidth / 2;
+
+        elements.rulerHighlight.setAttribute("x", RULER_START_X.toFixed(2));
+        elements.rulerHighlight.setAttribute("y", RULER_TOP_Y.toFixed(2));
+        elements.rulerHighlight.setAttribute("width", highlightWidth.toFixed(2));
+        elements.rulerHighlight.setAttribute("height", RULER_PIXEL_HEIGHT.toFixed(2));
+        elements.rulerShiftArrow.setAttribute("x1", RULER_START_X.toFixed(2));
+        elements.rulerShiftArrow.setAttribute("x2", endX.toFixed(2));
+        elements.rulerShiftLabel.setAttribute("x", labelX.toFixed(2));
+        elements.rulerShiftLabel.textContent = "shift";
+      }
+
+      function renderFormulaModule({ keepActiveExample = false } = {}) {
+        const metrics = getFormulaMetrics();
+        const referenceDelta = FIELD_TO_DELTA[formulaState.field];
+        const doubledBw = metrics.bw * 2;
+        const halvedShift = metrics.deltaF / doubledBw;
+
+        elements.formulaFieldButtons.forEach((button) => {
+          const buttonField = Number(button.dataset.field);
+          const isActive = buttonField === formulaState.field;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        elements.formulaFieldInfo.textContent = `Reference Δf at ${formulaState.field}T is ${referenceDelta} Hz. Manual entry can override this value.`;
+        elements.formulaDeltaInput.value = formatDeltaHz(metrics.deltaF);
+        elements.formulaBwSlider.value = metrics.bw.toFixed(1);
+        elements.formulaBwValue.textContent = `${formatBw(metrics.bw)} Hz per pixel`;
+        elements.formulaShiftMain.textContent = `Pixel shift = ${metrics.pixelShift.toFixed(2)} pixels`;
+        elements.formulaEquationLine.textContent = `${formatDeltaHz(metrics.deltaF)} ÷ ${formatBw(metrics.bw)} = ${metrics.pixelShift.toFixed(2)}`;
+        elements.formulaCallout.textContent = `• If bandwidth per pixel doubles to ${formatBw(doubledBw)} Hz per pixel, pixel shift becomes ${halvedShift.toFixed(2)} pixels.`;
+
+        elements.formulaPresetButtons.forEach((button) => {
+          const targetBw = Number(button.dataset.bw);
+          button.classList.toggle("active", Math.abs(targetBw - metrics.bw) < 0.2);
+        });
+
+        if (!keepActiveExample) {
+          syncFormulaExampleSelection();
+        }
+
+        renderFormulaExampleButtons();
+        renderFormulaRuler(metrics.pixelShift);
+      }
+
+      function stopFormulaAnimation() {
+        cancelAnimationFrame(formulaState.animationId);
+        formulaState.animationId = null;
+      }
+
+      function animateFormulaExample(exampleKey) {
+        const target = FORMULA_EXAMPLES[exampleKey];
+
+        if (!target) {
+          return;
+        }
+
+        stopFormulaAnimation();
+
+        formulaState.field = target.field;
+        formulaState.activeExample = exampleKey;
+        renderFormulaExampleButtons();
+
+        const startDelta = formulaState.deltaF;
+        const startBw = formulaState.bw;
+        const deltaDelta = target.deltaF - startDelta;
+        const deltaBw = target.bw - startBw;
+        const duration = 500;
+        const startTime = performance.now();
+
+        function step(now) {
+          const t = Math.min(1, (now - startTime) / duration);
+          const eased = easeInOutCubic(t);
+          formulaState.deltaF = startDelta + deltaDelta * eased;
+          formulaState.bw = startBw + deltaBw * eased;
+          renderFormulaModule({ keepActiveExample: true });
+
+          if (t < 1) {
+            formulaState.animationId = requestAnimationFrame(step);
+          } else {
+            formulaState.animationId = null;
+            formulaState.deltaF = target.deltaF;
+            formulaState.bw = target.bw;
+            renderFormulaModule();
+          }
+        }
+
+        formulaState.animationId = requestAnimationFrame(step);
+      }
+
+      function stopPlay() {
+        state.playing = false;
+        clearTimeout(state.playTimerId);
+        state.playTimerId = null;
+        elements.playBtn.textContent = "Play";
+        elements.playBtn.classList.remove("playing");
+        elements.playBtn.setAttribute("aria-pressed", "false");
+      }
+
+      function schedulePlayTick() {
+        if (!state.playing) {
+          return;
+        }
+
+        clearTimeout(state.playTimerId);
+        state.playTimerId = window.setTimeout(() => {
+          if (state.step < steps.length - 1) {
+            state.step += 1;
+            render({ animateShiftLine: false });
+            schedulePlayTick();
+          } else {
+            stopPlay();
+          }
+        }, 3200);
+      }
+
+      function startPlay() {
+        if (state.playing) {
+          return;
+        }
+
+        state.playing = true;
+        elements.playBtn.textContent = "Pause";
+        elements.playBtn.classList.add("playing");
+        elements.playBtn.setAttribute("aria-pressed", "true");
+        schedulePlayTick();
+      }
+
+      function goToNextStep() {
+        if (state.step >= steps.length - 1) {
+          return;
+        }
+
+        state.step += 1;
+        render({ animateShiftLine: false });
+
+        if (state.playing) {
+          schedulePlayTick();
+        }
+      }
+
+      function goToPreviousStep() {
+        if (state.step <= 0) {
+          return;
+        }
+
+        state.step -= 1;
+        render({ animateShiftLine: false });
+
+        if (state.playing) {
+          schedulePlayTick();
+        }
+      }
+
+      function resetLesson() {
+        stopPlay();
+        state.step = 0;
+        state.field = 1.5;
+        state.bw = 125;
+        elements.bwSlider.value = String(BW_OPTIONS.indexOf(state.bw));
+        render({ animateShiftLine: false });
+      }
+
+      elements.fieldButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.field = Number(button.dataset.field);
+          render({ animateShiftLine: true });
+        });
+      });
+
+      elements.bwSlider.addEventListener("input", () => {
+        const index = Number(elements.bwSlider.value);
+        state.bw = BW_OPTIONS[index];
+        render({ animateShiftLine: true });
+      });
+
+      elements.presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.bw = Number(button.dataset.bw);
+          elements.bwSlider.value = String(BW_OPTIONS.indexOf(state.bw));
+          render({ animateShiftLine: true });
+        });
+      });
+
+      elements.formulaFieldButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          stopFormulaAnimation();
+          formulaState.field = Number(button.dataset.field);
+          formulaState.deltaF = FIELD_TO_DELTA[formulaState.field];
+          renderFormulaModule();
+        });
+      });
+
+      elements.formulaDeltaInput.addEventListener("input", () => {
+        const parsedValue = Number(elements.formulaDeltaInput.value);
+
+        if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+          return;
+        }
+
+        stopFormulaAnimation();
+        formulaState.deltaF = parsedValue;
+        renderFormulaModule();
+      });
+
+      elements.formulaDeltaInput.addEventListener("blur", () => {
+        const parsedValue = Number(elements.formulaDeltaInput.value);
+
+        if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+          elements.formulaDeltaInput.value = formatDeltaHz(formulaState.deltaF);
+        }
+      });
+
+      elements.formulaBwSlider.addEventListener("input", () => {
+        stopFormulaAnimation();
+        formulaState.bw = Number(elements.formulaBwSlider.value);
+        renderFormulaModule();
+      });
+
+      elements.formulaPresetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          stopFormulaAnimation();
+          formulaState.bw = Number(button.dataset.bw);
+          renderFormulaModule();
+        });
+      });
+
+      elements.formulaExampleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          animateFormulaExample(button.dataset.example);
+        });
+      });
+
+      elements.backBtn.addEventListener("click", goToPreviousStep);
+      elements.nextBtn.addEventListener("click", goToNextStep);
+
+      elements.playBtn.addEventListener("click", () => {
+        if (state.playing) {
+          stopPlay();
+        } else {
+          startPlay();
+        }
+      });
+
+      elements.resetBtn.addEventListener("click", resetLesson);
+
+      document.addEventListener("keydown", (event) => {
+        const activeElement = document.activeElement;
+
+        if (activeElement && activeElement.matches("input[type='range'], input[type='number']")) {
+          return;
+        }
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          goToNextStep();
+        }
+
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          goToPreviousStep();
+        }
+      });
+
+      initFormulaRuler();
+      render({ animateShiftLine: false });
+      renderFormulaModule();
+    })();
+  </script>
+</body>
+</html>

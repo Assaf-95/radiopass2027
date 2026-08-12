@@ -1,0 +1,404 @@
+/* ===========================================================================
+   RadioPass Anatomy — the RadioPass house style, taken from the Physics
+   homepage itself (radiopass-website/src/home/home.css) rather than
+   re-invented.
+
+   Its system: near-black ground (#0B0D10), warm ivory type (#F2EEE6), one
+   amber accent (#D9A84E) used sparingly, Fraunces set LIGHT for display and
+   Inter for everything else. Buttons are 4px rectangles — ivory when solid,
+   hairline when ghost. The modality accents (x-ray blue, ultrasound teal,
+   MRI violet) come across too, so the two sites name imaging the same way.
+
+   Monospace survives only in the data layer here, because this site has one
+   — DICOM overlays, window/level readouts, study references.
+   =========================================================================== */
+
+:root {
+  /* Charcoal ramp, verbatim from the Physics homepage. */
+  --void: #07080B;      /* image viewport, deepest */
+  --bg: #0B0D10;        /* --hm-bg */
+  --panel: #101318;     /* --hm-surface */
+  --panel-2: #151A21;   /* --hm-surface-2 */
+  --panel-3: #1D222B;   /* hover */
+
+  --line: rgba(242, 238, 230, 0.1);   /* --hm-line */
+  --line-strong: rgba(242, 238, 230, 0.25);
+
+  --text: #F2EEE6;      /* --hm-ink */
+  --text-dim: #8B929B;  /* --hm-mut */
+  --text-faint: #62686F;
+
+  /* The single amber accent. Kept under the old teal names so every component
+     sheet resolves without edits. */
+  --amber-accent: #D9A84E;
+  --teal: #D9A84E;
+  --teal-bright: #D9A84E;
+  --cyan: #E6C077;
+  --teal-bg: rgba(217, 168, 78, 0.12);
+
+  /* Physics gives each modality its own hue; the same three are used here so
+     a chest film, an ultrasound and an MRI are colour-coded identically
+     across the two sites. */
+  --mod-xray: #A8CBEA;
+  --mod-us: #7BCBC4;
+  --mod-mri: #A99EDB;
+
+  /* Result states. Amber for partial is deliberate: it reads as "adjust",
+     not "fail", which is what a half mark means. */
+  --green: #3fbe83;
+  --green-bg: rgba(63, 190, 131, 0.12);
+  --amber: #e0a33f;
+  --amber-bg: rgba(224, 163, 63, 0.13);
+  --red: #e06a78;
+  --red-bg: rgba(224, 106, 120, 0.12);
+  --purple: #9b8cff;
+  --purple-bg: rgba(155, 140, 255, 0.14);
+  --grey: #5d6c7e;
+  --grey-bg: rgba(93, 108, 126, 0.16);
+
+  --font-display: Fraunces, 'Iowan Old Style', Georgia, serif;
+  --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Physics rounds buttons to 4px and panels to 8-10px. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-md: var(--shadow);
+  --shadow-lg: var(--shadow);
+  /* --hm-wrap is min(1200px, 100% - 96px). */
+  --container: min(1200px, calc(100vw - 96px));
+  --header-h: 104px;
+
+  /* Aliases kept so component CSS written against the old names still resolves. */
+  --bg-elevated: var(--panel-2);
+  --border: var(--line);
+  --border-soft: var(--line);
+  --accent: var(--amber-accent);
+  --accent-strong: var(--amber-accent);
+  --accent-bg: var(--teal-bg);
+  --accent-contrast: #0B0D10;
+  --text-muted: var(--text-dim);
+}
+
+/* Light box — the daytime variant. Not an inverted dark theme: it is the
+   printed-film look, warm paper with the same amber. */
+:root[data-theme='light'] {
+  --void: #0d1218;
+  --bg: #f6f4ef;
+  --panel: #ffffff;
+  --panel-2: #f1ede4;
+  --panel-3: #e8e2d6;
+  --line: rgba(20, 22, 26, 0.12);
+  --line-strong: rgba(20, 22, 26, 0.24);
+  --text: #14161a;
+  --text-dim: #5c6068;
+  --text-faint: #8a8f97;
+  --amber-accent: #9a6f19;
+  --teal: #9a6f19;
+  --teal-bright: #9a6f19;
+  --cyan: #b4862a;
+  --teal-bg: rgba(154, 111, 25, 0.1);
+  --mod-xray: #3a6b96;
+  --mod-us: #2c7d75;
+  --mod-mri: #5d4fa0;
+  --green: #1f9c66;
+  --green-bg: rgba(31, 156, 102, 0.1);
+  --amber: #b9772a;
+  --amber-bg: rgba(185, 119, 42, 0.12);
+  --red: #c8495a;
+  --red-bg: rgba(200, 73, 90, 0.1);
+  --purple: #6b5bd6;
+  --purple-bg: rgba(107, 91, 214, 0.12);
+  --grey: #7d8fa3;
+  --grey-bg: rgba(125, 143, 163, 0.16);
+  --shadow: 0 18px 44px rgba(20, 22, 26, 0.1);
+  --shadow-sm: 0 2px 8px rgba(20, 22, 26, 0.07);
+  --accent-contrast: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fraunces set LIGHT, which is the whole voice of the Physics site: the
+   display face is large and quiet rather than heavy, and optical sizing does
+   the work at size. Physics uses 330 for the hero and 340 elsewhere. */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  margin: 0;
+  color: var(--text);
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Everything focusable shows it. Non-negotiable on a tool driven by keyboard. */
+:focus-visible {
+  outline: 2px solid var(--teal-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --- Data layer -----------------------------------------------------------
+   Monospace is imaging's own voice: it is what a DICOM corner overlay, a
+   window/level readout and a study reference are set in. Used for anything
+   that is data rather than prose. */
+.mono,
+.eyebrow,
+.pill,
+.metric-value,
+.dash-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Physics eyebrow, verbatim: Inter, 11px, very wide tracking, muted —
+   and preceded by a short amber rule, which is the one flourish that site
+   allows itself above a heading. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  margin-right: 12px;
+  background: var(--amber-accent);
+  vertical-align: middle;
+}
+
+/* --- Surfaces ------------------------------------------------------------ */
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* --- Controls ------------------------------------------------------------
+   The Physics button: a 4px rectangle, Inter 14/600, and it lifts a pixel on
+   hover. Solid is ivory on charcoal — NOT amber; the accent is spent on the
+   one italic word in the headline, never on a button. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(242, 238, 230, 0.25);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
+}
+
+.btn:hover:not(:disabled) { border-color: rgba(242, 238, 230, 0.55); transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.btn-primary:hover:not(:disabled) { background: #ffffff; border-color: #ffffff; }
+
+/* The third Physics button: no box at all, an amber underline. */
+.btn-line {
+  border: 0;
+  border-bottom: 1px solid rgba(217, 168, 78, 0.4);
+  border-radius: 0;
+  padding: 10px 2px;
+  color: var(--amber-accent);
+}
+
+.btn-line:hover:not(:disabled) { border-bottom-color: var(--amber-accent); transform: none; }
+
+/* --- Chips --------------------------------------------------------------- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pill-green { background: var(--green-bg); color: var(--green); border-color: transparent; }
+.pill-amber { background: var(--amber-bg); color: var(--amber); border-color: transparent; }
+.pill-red   { background: var(--red-bg);   color: var(--red);   border-color: transparent; }
+.pill-grey  { background: var(--panel-2);  color: var(--text-faint); }
+
+.tone-green { color: var(--green); }
+.tone-amber { color: var(--amber); }
+.tone-red { color: var(--red); }
+.tone-purple { color: var(--purple); }
+
+/* --- Inputs -------------------------------------------------------------- */
+
+/* The Physics field: warm grey fill, soft border, and a four-pixel cyan ring
+   on focus rather than a colour change. */
+input[type='text'],
+input[type='search'],
+input[type='email'],
+input[type='password'],
+select,
+textarea {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
+
+input[type='text']:focus,
+input[type='search']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--amber-accent);
+  background: var(--panel);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.back-link:hover { color: var(--amber-accent); }
+
+/* --- Page furniture ------------------------------------------------------
+   The Physics homepage measure: min(1200px, 100% - 96px), and generous air
+   between bands. */
+
+.band { padding: 96px 0; }
+.measure { width: var(--container); margin: 0 auto; }
+
+/* --- Scrollbars ---------------------------------------------------------- */
+
+* { scrollbar-width: thin; scrollbar-color: var(--panel-3) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--panel-3); border-radius: 8px; border: 3px solid var(--bg); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- Wrong turns ---------------------------------------------------------
+   A stale link, a typo, a URL shared from a different build. Styled so it
+   reads as a signpost rather than a failure. */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 60vh;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state h1 {
+  font-size: clamp(28px, 5vw, 44px);
+}
+
+.empty-state p {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--text-dim);
+}
+
+.empty-state .btn { margin-top: 8px; }
+
+/**
+ * Touch ergonomics.
+ *
+ * The authoring tools and the question player both rely on small controls that
+ * are fine with a mouse and not with a finger: the arrow-geometry sliders are
+ * 4px-tall elements, and the colour swatches are 22px. Nothing is hidden or
+ * removed on a phone — targets only grow, and only where the pointer is coarse.
+ */
+@media (pointer: coarse) {
+  /* Padding plus content-box clipping keeps each slider's own track colour
+     while making the element itself 34px tall to hit. */
+  input[type='range'] {
+    box-sizing: border-box;
+    height: 34px;
+    padding-block: 15px;
+    background-clip: content-box;
+  }
+
+  .cce-swatch {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cce-remove,
+  .cce-arrow-actions .btn,
+  .iv-controls button {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

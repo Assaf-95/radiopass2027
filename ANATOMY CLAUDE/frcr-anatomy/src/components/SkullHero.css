@@ -1,0 +1,89 @@
+/* One still skull beside the copy, one viewport tall, scrolling away like any
+   other section. No pin, no track, no scroll-owned styles — the "jump" the
+   pinned versions produced came from scroll being spent without movement, and
+   the cure is for nothing here to be sticky at all.
+
+   Every selector is prefixed .skull-. This file is emitted BETWEEN
+   AnatomyJourney.css and Home.css, so Home.css wins every same-specificity
+   tie. The shared furniture — .hero-title, .hero-eq, .hero-sub,
+   .hero-actions, .hero-cue, .hero-meta, .journey-modules, .journey-chip,
+   .journey-skip — is reused from those files exactly as it is. */
+
+.skull-hero {
+  position: relative;
+  /* Above Home's fixed chest layer (z 0), which is a LATER sibling and would
+     otherwise paint over this section's black ground. */
+  z-index: 1;
+  background: #000000;
+}
+
+.skull-pin {
+  position: relative;
+  height: 100vh;
+  height: 100svh; /* both, deliberately — small viewports without svh */
+  overflow: hidden;
+  background: #000000;
+}
+
+/* Square, reserved before the image decodes. Seated at 57% so the skull sits
+   right of the copy, as every mock-up arranges it. */
+.skull-stage {
+  position: absolute;
+  top: 50%;
+  left: 57%;
+  translate: -50% -50%;
+  width: min(74vh, 54vw);
+  aspect-ratio: 1;
+  z-index: 2;
+}
+
+.skull-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Legibility wash on the copy side only. */
+.skull-pin::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(0, 0, 0, 0.96) 0%,
+    rgba(0, 0, 0, 0.86) 26%,
+    rgba(0, 0, 0, 0.34) 48%,
+    rgba(0, 0, 0, 0.04) 64%
+  );
+}
+
+.skull-copy {
+  position: absolute;
+  z-index: 5;
+  left: max(4vw, 24px);
+  top: 50%;
+  translate: 0 -50%;
+  max-width: 620px;
+}
+
+.skull-pin .hero-cue { z-index: 6; }
+
+@media (max-width: 900px) {
+  .skull-stage { left: 50%; top: 36%; width: min(58vh, 86vw); }
+  .skull-copy { top: auto; bottom: 14vh; translate: 0 0; }
+  .skull-pin::before {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0.08) 20%,
+      rgba(0, 0, 0, 0.68) 46%,
+      rgba(0, 0, 0, 0.94) 62%,
+      rgba(0, 0, 0, 0.98) 100%
+    );
+  }
+}

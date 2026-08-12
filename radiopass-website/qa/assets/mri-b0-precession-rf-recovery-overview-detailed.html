@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Core Physics: Step-by-Step</title>
+  <style>
+    :root {
+      --bg: #04080f;
+      --bg2: #0a1220;
+      --panel: #0f1c2f;
+      --line: #2a4565;
+      --ink: #f2fbff;
+      --muted: #93acc8;
+      --teal: #2dd4bf;
+      --cyan: #22d3ee;
+      --amber: #f5b942;
+      --orange: #fb923c;
+      --rose: #fb7185;
+      --blue: #60a5fa;
+      --green: #86efac;
+      --violet: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+      background:
+        radial-gradient(1200px 550px at 12% 0%, rgba(13, 58, 86, 0.45), transparent 65%),
+        radial-gradient(1000px 620px at 96% 0%, rgba(49, 78, 124, 0.34), transparent 70%),
+        linear-gradient(150deg, rgba(15, 32, 57, 0.35), rgba(7, 12, 26, 0.1)),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .page {
+      max-width: 1420px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        linear-gradient(130deg, rgba(16, 35, 58, 0.92), rgba(9, 19, 32, 0.93)),
+        radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.14), transparent 30%);
+      box-shadow:
+        0 20px 36px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      backdrop-filter: blur(6px);
+    }
+
+    .heroTop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      border: 1px solid #325a78;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.74rem;
+      letter-spacing: 0.4px;
+      color: #cde8f8;
+      background: linear-gradient(120deg, rgba(10, 53, 76, 0.72), rgba(10, 29, 46, 0.74));
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .liveStep {
+      border: 1px solid #4f4b88;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      color: #e7ddff;
+      background: linear-gradient(120deg, rgba(73, 56, 125, 0.64), rgba(37, 31, 66, 0.7));
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.1vw, 1.72rem);
+      letter-spacing: 0.1px;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid #355571;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      color: #acd2ea;
+      background: rgba(8, 20, 35, 0.74);
+      transition: transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease, color 220ms ease;
+    }
+
+    .chip.active {
+      color: #f7ffff;
+      border-color: #2dd4bf;
+      background: linear-gradient(120deg, rgba(18, 84, 101, 0.85), rgba(11, 40, 56, 0.85));
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.35), 0 8px 20px rgba(45, 212, 191, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .stepCard {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(6, 16, 28, 0.66);
+      display: grid;
+      gap: 8px;
+    }
+
+    .stepHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stepHeader strong {
+      color: #ddf7ff;
+      font-size: 0.92rem;
+    }
+
+    .stepControls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stepBtn {
+      border: 1px solid #355571;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      color: #c7e3fb;
+      background: rgba(10, 24, 42, 0.72);
+      cursor: pointer;
+    }
+
+    .stepBtn.active {
+      color: #f7ffff;
+      border-color: #2dd4bf;
+      background: linear-gradient(120deg, rgba(18, 84, 101, 0.85), rgba(11, 40, 56, 0.85));
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.35);
+    }
+
+    .stepReadout {
+      border: 1px solid #2d4f69;
+      border-radius: 10px;
+      padding: 9px 10px;
+      color: #d4f1ff;
+      font-size: 0.86rem;
+      line-height: 1.38;
+      background: rgba(4, 14, 24, 0.74);
+    }
+
+    .stepReadout strong {
+      color: #ecfbff;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+
+    .stepReadout ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .partsGrid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+
+    .part {
+      border: 1px solid #365477;
+      border-radius: 10px;
+      padding: 8px;
+      background: rgba(7, 18, 33, 0.7);
+      color: #a9cde9;
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .part strong {
+      color: #d5efff;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.81rem;
+    }
+
+    .part.active {
+      border-color: #2dd4bf;
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.3);
+      background: linear-gradient(120deg, rgba(17, 66, 81, 0.8), rgba(11, 35, 51, 0.83));
+      color: #eafcff;
+    }
+
+    .focusText {
+      margin: 0;
+      border: 1px solid #2d4f69;
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: #d4f1ff;
+      font-size: 0.88rem;
+      background: rgba(4, 14, 24, 0.72);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(4, 13, 24, 0.65);
+    }
+
+    .ctl {
+      display: grid;
+      gap: 4px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .ctl strong {
+      color: #ddf7ff;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.86rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal);
+    }
+
+    button {
+      border: 1px solid #2f7164;
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-weight: 680;
+      color: #eafcff;
+      background: linear-gradient(120deg, #147a69, #0f766e);
+      cursor: pointer;
+      transition: transform 140ms ease, filter 160ms ease;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #2d3c50, #1a2435);
+      border-color: #3f5570;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .span2 { grid-column: span 2; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background:
+        linear-gradient(160deg, rgba(12, 30, 52, 0.9), rgba(8, 19, 33, 0.92)),
+        radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.08), transparent 36%);
+      box-shadow:
+        0 16px 30px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      padding: 13px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 760;
+      letter-spacing: 0.15px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid #2f4f6c;
+      border-radius: 11px;
+      background:
+        radial-gradient(circle at 40% 10%, #133453, #07172a 55%),
+        linear-gradient(180deg, #0f2238, #07172b);
+    }
+
+    #gyroCanvas,
+    #hydrogenCanvas { aspect-ratio: 16 / 10; }
+
+    #b0Canvas { aspect-ratio: 16 / 7.4; }
+
+    #sequenceCanvas { aspect-ratio: 16 / 8.2; }
+
+    .eq {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.93rem;
+      color: #d7f8ff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: rgba(3, 18, 26, 0.6);
+      display: inline-grid;
+      gap: 2px;
+      justify-self: start;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 1050px) {
+      .grid { grid-template-columns: 1fr; }
+      .span2 { grid-column: span 1; }
+      .toolbar { grid-template-columns: 1fr; }
+      .heroTop { align-items: flex-start; }
+      .partsGrid { grid-template-columns: 1fr 1fr; }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="heroTop">
+        <span class="tag">MRI Core Physics</span>
+        <span id="stepBadge" class="liveStep">Step 7 of 7</span>
+      </div>
+      <h1>MRI Core Physics: Step-by-Step</h1>
+      <p class="sub">One concept at a time: B0, precession, RF flip, in-phase signal, dephasing, and recovery.</p>
+      <div class="track">
+        <span class="chip active" data-concept="0">1. B0</span>
+        <span class="chip" data-concept="1">2. Precession</span>
+        <span class="chip" data-concept="2">3. RF flip</span>
+        <span class="chip" data-concept="3">4. In-phase signal</span>
+        <span class="chip" data-concept="4">5. Dephasing</span>
+        <span class="chip" data-concept="5">6. Recovery</span>
+      </div>
+      <p class="focusText">Current focus: <strong id="focusLabel">B0 alignment</strong></p>
+      <div class="toolbar">
+        <label class="ctl">
+          <span>Main field strength B0</span>
+          <input id="b0Slider" type="range" min="0.5" max="3.0" step="0.1" value="1.5" />
+          <strong id="b0Val">1.5 T</strong>
+        </label>
+        <label class="ctl">
+          <span>Animation speed</span>
+          <input id="speedSlider" type="range" min="0.4" max="2.0" step="0.1" value="1.0" />
+          <strong id="speedVal">1.0x</strong>
+        </label>
+        <button id="pauseBtn" class="secondary">Pause</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Section 1 - Gyroscope Analogy</h2>
+        <canvas id="gyroCanvas"></canvas>
+        <p>Just as gravity causes a spinning gyroscope to precess, an external magnetic field (B0) causes hydrogen nuclei to precess.</p>
+      </article>
+
+      <article class="card">
+        <h2>Section 2 - Hydrogen Nucleus as a Tiny Magnet</h2>
+        <canvas id="hydrogenCanvas"></canvas>
+        <p>Because hydrogen nuclei have charge and spin, they generate a magnetic field and behave like tiny magnets.</p>
+      </article>
+
+      <article class="card span2">
+        <h2>Section 3 - Application of B0 (Main Field) and Precession</h2>
+        <canvas id="b0Canvas"></canvas>
+        <div class="eq">
+          <span>F = K × B0</span>
+          <span>F = Larmor frequency</span>
+          <span>K = gyro (gyromagnetic ratio)</span>
+        </div>
+        <div class="legend">
+          <span><span class="swatch" style="background:#86efac"></span>Parallel spins: low energy</span>
+          <span><span class="swatch" style="background:#fb923c"></span>Anti-parallel spins: high energy</span>
+          <span><span class="swatch" style="background:#5eead4"></span>Precession around Z-axis</span>
+        </div>
+      </article>
+
+      <article class="card span2">
+        <h2>Section 4 - RF Excitation, Relaxation, and Coil Signal</h2>
+        <canvas id="sequenceCanvas"></canvas>
+        <p>Net longitudinal magnetisation (Mz) is tipped into transverse magnetisation (Mxy) by a 90° RF pulse. Mz then regrows by T1 recovery, Mxy decays by T2 decay, and the rotating transverse component induces detectable signal in RF coils.</p>
+      </article>
+
+      <article class="card span2">
+        <h2>Section 4 (Interactive) - RF Excitation, Relaxation, and Coil Signal in 7 Steps</h2>
+        <p>Use Next to reveal each part of the process (5 teaching parts plus final summary).</p>
+        <section class="stepCard">
+          <div class="stepHeader">
+            <strong id="manualStepLabel">Step 1 of 7 - Equilibrium longitudinal magnetisation forms</strong>
+            <div class="stepControls">
+              <button id="nextStepBtn" class="secondary">Next</button>
+              <button id="resetManualBtn" class="secondary">Reset</button>
+            </div>
+          </div>
+          <div class="stepReadout" id="manualStepText"></div>
+          <div class="partsGrid">
+            <div class="part active" data-part="0"><strong>Part 1</strong>Alignment and precession setup</div>
+            <div class="part" data-part="1"><strong>Part 2</strong>RF excitation and flip</div>
+            <div class="part" data-part="2"><strong>Part 3</strong>Coherent transverse signal</div>
+            <div class="part" data-part="3"><strong>Part 4</strong>Dephasing and relaxation</div>
+            <div class="part" data-part="4"><strong>Part 5</strong>Coil detection and summary</div>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      running: true,
+      speed: 1,
+      time: 0,
+      b0: 1.5,
+      lastFrame: performance.now(),
+      rfAt: 2.7,
+      rfDuration: 0.35,
+      cycle: 9.6,
+      T1: 2.8,
+      T2: 1.4,
+      gammaMHzPerT: 42.58,
+      nuclei: [],
+      activeConcept: -1,
+      manualStep: 0,
+      manualStepStart: performance.now()
+    };
+
+    const gyroCanvas = document.getElementById("gyroCanvas");
+    const hydrogenCanvas = document.getElementById("hydrogenCanvas");
+    const b0Canvas = document.getElementById("b0Canvas");
+    const sequenceCanvas = document.getElementById("sequenceCanvas");
+
+    const b0Slider = document.getElementById("b0Slider");
+    const speedSlider = document.getElementById("speedSlider");
+    const b0Val = document.getElementById("b0Val");
+    const speedVal = document.getElementById("speedVal");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const stepBadge = document.getElementById("stepBadge");
+    const focusLabel = document.getElementById("focusLabel");
+    const chips = Array.from(document.querySelectorAll(".chip"));
+    const manualStepLabel = document.getElementById("manualStepLabel");
+    const manualStepText = document.getElementById("manualStepText");
+    const nextStepBtn = document.getElementById("nextStepBtn");
+    const resetManualBtn = document.getElementById("resetManualBtn");
+    const partCards = Array.from(document.querySelectorAll(".part"));
+
+    const concepts = [
+      { label: "B0 alignment", start: 0.0, end: 1.4, hint: "Strong B0 aligns most spins parallel (+Z)." },
+      { label: "Precession", start: 1.4, end: 2.7, hint: "Spins precess around Z at Larmor frequency." },
+      { label: "RF flip", start: 2.7, end: 3.05, hint: "A 90° RF pulse tips net magnetisation toward the transverse plane." },
+      { label: "In-phase signal", start: 3.05, end: 4.2, hint: "Immediately after RF, spins are coherent, producing strong Mxy signal." },
+      { label: "Dephasing", start: 4.2, end: 6.5, hint: "Transverse spins lose synchrony and Mxy decays (T2/T2*)." },
+      { label: "Recovery", start: 6.5, end: 9.6, hint: "Longitudinal Mz regrows toward equilibrium through T1 recovery." }
+    ];
+
+    const manualSteps = [
+      {
+        title: "Equilibrium longitudinal magnetisation forms",
+        lead: "B0 applied along +Z axis. Hydrogen spins align with B0. Net longitudinal magnetisation Mz forms.",
+        details: [
+          "Larmor frequency: F = γ × B0",
+          "1 Tesla -> 42 MHz (Hydrogen)",
+          "1.5 Tesla -> 63 MHz"
+        ],
+        part: 0
+      },
+      {
+        title: "Precession around B0",
+        lead: "Spins precess around B0 at the Larmor frequency.",
+        details: [
+          "Precession frequency depends only on B0 strength.",
+          "No signal is measured yet at this stage."
+        ],
+        part: 0
+      },
+      {
+        title: "RF excitation (B1 applied)",
+        lead: "Apply RF field B1 in the transverse plane.",
+        details: [
+          "B1 is perpendicular to B0.",
+          "RF frequency must equal the Larmor frequency.",
+          "Net magnetisation tips away from Z axis.",
+          "Flip angle shown: 90°"
+        ],
+        part: 1
+      },
+      {
+        title: "Maximum transverse magnetisation (Mxy)",
+        lead: "Magnetisation now lies in the XY plane.",
+        details: [
+          "Spins are in phase.",
+          "Net transverse magnetisation Mxy is maximal.",
+          "This is the moment of strongest measurable signal."
+        ],
+        part: 2
+      },
+      {
+        title: "Coil signal and why Mz is not measured directly",
+        lead: "Precessing Mxy creates a changing magnetic field.",
+        details: [
+          "This induces a sinusoidal voltage in the receive coil.",
+          "Detected signal = induced voltage.",
+          "Frequency = Larmor frequency.",
+          "Why not measure Mz: Mz is aligned with the strong B0 field.",
+          "Its change is too small compared with B0.",
+          "Only changing transverse magnetisation induces signal."
+        ],
+        part: 4
+      },
+      {
+        title: "Relaxation after RF off",
+        lead: "RF pulse stops. Two independent processes begin.",
+        details: [
+          "T2: Transverse magnetisation decays; Mxy decreases due to spin dephasing.",
+          "T1: Longitudinal magnetisation recovers; Mz regrows toward equilibrium.",
+          "Timing facts: T1 = time for Mz to recover to 63%.",
+          "Timing facts: T2 = time for Mxy to decay to 37%."
+        ],
+        part: 3
+      },
+      {
+        title: "Summary",
+        lead: "B0 creates longitudinal magnetisation Mz. RF B1 tips magnetisation into transverse plane.",
+        details: [
+          "Precessing Mxy induces voltage in the coil.",
+          "After RF off: T2 decay reduces Mxy; T1 recovery restores Mz.",
+          "Do NOT animate Mz as a rotating vector during relaxation.",
+          "T1 recovery is regrowth along Z, not rotation.",
+          "T2 decay is shrinkage of transverse vector, not tilting.",
+          "Gradients are not involved in this section."
+        ],
+        part: 4
+      }
+    ];
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function timeInCycle(t) {
+      const raw = t % state.cycle;
+      return raw < 0 ? raw + state.cycle : raw;
+    }
+
+    function conceptForTime(t) {
+      const tc = timeInCycle(t);
+      for (let i = 0; i < concepts.length; i++) {
+        if (tc >= concepts[i].start && tc < concepts[i].end) {
+          return { index: i, tc, ...concepts[i] };
+        }
+      }
+      return { index: concepts.length - 1, tc, ...concepts[concepts.length - 1] };
+    }
+
+    function updateConceptUI(t) {
+      const current = conceptForTime(t);
+      if (current.index === state.activeConcept) return current;
+      state.activeConcept = current.index;
+      chips.forEach((chip, idx) => chip.classList.toggle("active", idx === current.index));
+      stepBadge.textContent = `Step 7 of 7 • ${current.label}`;
+      focusLabel.textContent = `${current.label} — ${current.hint}`;
+      return current;
+    }
+
+    function renderManualStep() {
+      const i = clamp(state.manualStep, 0, manualSteps.length - 1);
+      state.manualStep = i;
+      manualStepLabel.textContent = `Step ${i + 1} of ${manualSteps.length} - ${manualSteps[i].title}`;
+      manualStepText.innerHTML = `<strong>${manualSteps[i].lead}</strong><ul>${manualSteps[i].details.map((line) => `<li>${line}</li>`).join("")}</ul>`;
+      partCards.forEach((card, idx) => card.classList.toggle("active", idx === manualSteps[i].part));
+    }
+
+    function setManualStep(i) {
+      state.manualStep = clamp(i, 0, manualSteps.length - 1);
+      state.manualStepStart = performance.now();
+      renderManualStep();
+    }
+
+    function prep(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(10, Math.floor(canvas.clientWidth));
+      const h = Math.max(10, Math.floor(canvas.clientHeight));
+      if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w, h };
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, width = 2, head = 9) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const ang = Math.atan2(dy, dx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+      ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawTextBox(ctx, text, x, y, color = "#e8fdff", bg = "rgba(2,15,22,0.6)") {
+      ctx.font = "12px Sora, Avenir Next, Trebuchet MS, sans-serif";
+      const padX = 6;
+      const padY = 4;
+      const width = ctx.measureText(text).width + padX * 2;
+      const height = 20;
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y - height + 2, width, height);
+      ctx.strokeStyle = "rgba(180,230,255,0.2)";
+      ctx.strokeRect(x, y - height + 2, width, height);
+      ctx.fillStyle = color;
+      ctx.fillText(text, x + padX, y - 4);
+    }
+
+    function makeNuclei() {
+      state.nuclei = [];
+      const cols = 7;
+      const rows = 4;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          state.nuclei.push({
+            gx: c,
+            gy: r,
+            parallel: Math.random() > 0.2,
+            phase0: Math.random() * Math.PI * 2,
+            wobble: 0.5 + Math.random() * 0.6
+          });
+        }
+      }
+    }
+
+    function drawGyroscope() {
+      const { ctx, w, h } = prep(gyroCanvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const t = state.time;
+      const pivotX = w * 0.34;
+      const pivotY = h * 0.66;
+      const axisLen = h * 0.29;
+      const tilt = 0.55;
+      const precession = t * 0.9;
+
+      const tipX = pivotX + axisLen * Math.sin(tilt) * Math.cos(precession);
+      const tipY = pivotY - axisLen * Math.cos(tilt) + axisLen * 0.22 * Math.sin(precession);
+
+      ctx.strokeStyle = "rgba(98,180,210,0.35)";
+      ctx.setLineDash([6, 5]);
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.ellipse(
+        pivotX,
+        pivotY - axisLen * Math.cos(tilt),
+        axisLen * Math.sin(tilt),
+        axisLen * 0.25,
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#7ea3b8";
+      ctx.fillRect(pivotX - 8, pivotY - 4, 16, 8);
+      ctx.fillStyle = "#9ad0e5";
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#f5d36f";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(tipX, tipY);
+      ctx.stroke();
+
+      const axisAng = Math.atan2(tipY - pivotY, tipX - pivotX);
+      const spin = t * (10 + state.b0 * 2);
+      const rotorR = Math.min(40, h * 0.15);
+
+      ctx.save();
+      ctx.translate(tipX, tipY);
+      ctx.rotate(axisAng + Math.PI / 2);
+
+      ctx.fillStyle = "#165f7a";
+      ctx.strokeStyle = "#7de3d8";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rotorR, rotorR * 0.33, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(220,255,255,0.9)";
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 6; i++) {
+        const a = spin + i * Math.PI / 3;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(rotorR * Math.cos(a), rotorR * 0.33 * Math.sin(a));
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      drawArrow(ctx, w * 0.79, h * 0.2, w * 0.79, h * 0.48, "#fb7185", 3, 10);
+      drawTextBox(ctx, "External field (gravity)", w * 0.73, h * 0.18, "#ffd4db");
+
+      const px = pivotX + axisLen * Math.sin(tilt) * Math.cos(precession + 0.6);
+      const py = pivotY - axisLen * Math.cos(tilt) + axisLen * 0.22 * Math.sin(precession + 0.6);
+      drawArrow(ctx, px - 14, py + 4, px - 2, py - 2, "#7dd3fc", 2, 7);
+
+      drawTextBox(ctx, "Precession", pivotX + axisLen * 0.75, pivotY - axisLen * 0.7, "#a9ecff");
+      drawTextBox(ctx, "Spin", tipX + 16, tipY - 10, "#ffeead");
+    }
+
+    function drawHydrogen() {
+      const { ctx, w, h } = prep(hydrogenCanvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const t = state.time;
+      const cx = w * 0.3;
+      const cy = h * 0.56;
+      const r = Math.min(h * 0.17, 60);
+
+      ctx.strokeStyle = "rgba(136,226,243,0.5)";
+      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r * 1.9, r * 0.95, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const orb = t * 2.4;
+      const qx = cx + r * 1.9 * Math.cos(orb);
+      const qy = cy + r * 0.95 * Math.sin(orb);
+
+      ctx.fillStyle = "#ffbd9a";
+      ctx.beginPath();
+      ctx.arc(qx, qy, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      drawTextBox(ctx, "moving charge", qx + 10, qy - 8, "#ffe0c4");
+
+      ctx.fillStyle = "#1f7b95";
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#9ff6ea";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = "#e9fdff";
+      ctx.font = "700 26px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("H+", cx - 18, cy + 9);
+      ctx.font = "700 16px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillStyle = "#ffe8a6";
+      ctx.fillText("+1 charge", cx - 35, cy + r + 24);
+
+      ctx.strokeStyle = "#b6ffec";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 17, 0.4, 5.2);
+      ctx.stroke();
+      const sx = cx + (r + 17) * Math.cos(5.2);
+      const sy = cy + (r + 17) * Math.sin(5.2);
+      drawArrow(ctx, sx - 9, sy - 2, sx + 3, sy, "#b6ffec", 2, 7);
+
+      drawArrow(ctx, w * 0.67, h * 0.76, w * 0.67, h * 0.31, "#f9d56b", 4, 11);
+      drawTextBox(ctx, "Magnetic dipole moment (mu)", w * 0.55, h * 0.28, "#fff0be");
+
+      drawArrow(ctx, cx + r + 22, cy - 10, w * 0.61, h * 0.42, "#8af2e6", 2, 8);
+      drawTextBox(ctx, "Intrinsic spin", cx + r + 24, cy - 12, "#b6ffec");
+
+      drawArrow(ctx, qx + 20, qy + 2, w * 0.61, h * 0.58, "#ffb08f", 2, 8);
+      drawTextBox(ctx, "Moving charge -> magnetic moment", w * 0.49, h * 0.62, "#ffd8c6");
+    }
+
+    function drawB0Panel() {
+      const { ctx, w, h } = prep(b0Canvas);
+      ctx.clearRect(0, 0, w, h);
+      const concept = conceptForTime(state.time);
+
+      const larmorMHz = state.gammaMHzPerT * state.b0;
+      const omega = 1.2 + state.b0 * 1.8;
+
+      drawArrow(ctx, w * 0.1, h * 0.86, w * 0.1, h * 0.14, "#60a5fa", 5, 12);
+      drawTextBox(ctx, "B0 (Main field along +Z)", w * 0.03, h * 0.12, "#dbeeff");
+      ctx.fillStyle = "#9fbfce";
+      ctx.font = "600 12px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("Z-axis", w * 0.075, h * 0.9);
+
+      const xMin = w * 0.25;
+      const xMax = w * 0.86;
+      const yMin = h * 0.18;
+      const yMax = h * 0.8;
+      const cols = 7;
+      const rows = 4;
+      const dx = (xMax - xMin) / (cols - 1);
+      const dy = (yMax - yMin) / (rows - 1);
+
+      let parallelCount = 0;
+      let antiCount = 0;
+
+      for (const n of state.nuclei) {
+        const x = xMin + n.gx * dx;
+        const y = yMin + n.gy * dy;
+        const phase = state.time * omega * n.wobble + n.phase0;
+
+        ctx.strokeStyle = "rgba(95, 238, 212, 0.35)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 11, 4.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const px = x + 11 * Math.cos(phase);
+        const py = y + 4.4 * Math.sin(phase);
+        ctx.fillStyle = "#5eead4";
+        ctx.beginPath();
+        ctx.arc(px, py, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (n.parallel) {
+          parallelCount++;
+          drawArrow(ctx, x, y + 9, x, y - 13, "#86efac", 2.2, 7);
+        } else {
+          antiCount++;
+          drawArrow(ctx, x, y - 9, x, y + 13, "#fb923c", 2.2, 7);
+        }
+      }
+
+      drawTextBox(ctx, "Most aligned parallel (low energy state)", w * 0.26, h * 0.12, "#caf9d7");
+      drawTextBox(ctx, "Few anti-parallel (high energy state)", w * 0.54, h * 0.12, "#ffd5bd");
+
+      const netMz = clamp((parallelCount - antiCount) / state.nuclei.length, 0, 1);
+      const mx = w * 0.93;
+      const yBase = h * 0.85;
+      const yTip = yBase - netMz * h * 0.54;
+
+      drawArrow(ctx, mx, yBase, mx, yTip, "#7dd3fc", 4, 10);
+      drawTextBox(ctx, "Net longitudinal magnetisation (Mz)", w * 0.75, yTip - 8, "#c5f0ff");
+
+      ctx.fillStyle = "#deeff8";
+      ctx.font = "600 13px SF Mono, Menlo, Consolas, monospace";
+      ctx.fillText(`F = K × B0  ->  ${larmorMHz.toFixed(2)} MHz`, w * 0.03, h * 0.96);
+      ctx.fillStyle = "#a8d0df";
+      ctx.font = "500 12px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("F: Larmor frequency", w * 0.28, h * 0.96);
+      ctx.fillText("K: gyro (gyromagnetic ratio)", w * 0.44, h * 0.96);
+      drawTextBox(ctx, `Step focus: ${concept.label}`, w * 0.03, h * 0.08, "#d8f6ff");
+    }
+
+    function drawLinesBox(ctx, lines, x, y, textColor = "#d6efff", boxColor = "rgba(2,15,22,0.76)") {
+      if (!lines.length) return;
+      ctx.font = "12px Sora, Avenir Next, Trebuchet MS, sans-serif";
+      const padX = 8;
+      const padY = 8;
+      const lineH = 16;
+      let maxWidth = 0;
+      for (const line of lines) {
+        maxWidth = Math.max(maxWidth, ctx.measureText(line).width);
+      }
+      const boxW = maxWidth + padX * 2;
+      const boxH = lines.length * lineH + padY * 2;
+      ctx.fillStyle = boxColor;
+      ctx.fillRect(x, y, boxW, boxH);
+      ctx.strokeStyle = "rgba(173, 217, 255, 0.28)";
+      ctx.strokeRect(x, y, boxW, boxH);
+      ctx.fillStyle = textColor;
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x + padX, y + padY + 12 + i * lineH);
+      });
+    }
+
+    function drawSignalReadout(ctx, x, y, width, height, signalLevel, phase) {
+      ctx.fillStyle = "rgba(4, 12, 22, 0.82)";
+      ctx.strokeStyle = "rgba(168, 213, 248, 0.35)";
+      ctx.lineWidth = 1.2;
+      ctx.fillRect(x, y, width, height);
+      ctx.strokeRect(x, y, width, height);
+
+      ctx.fillStyle = "#cfe9ff";
+      ctx.font = "11px Sora, Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("Signal readout", x + 8, y + 14);
+
+      const plotX0 = x + 8;
+      const plotX1 = x + width - 8;
+      const midY = y + height * 0.66;
+      const amp = (height * 0.24) * clamp(signalLevel, 0, 1);
+
+      ctx.strokeStyle = "#587188";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(plotX0, midY);
+      ctx.lineTo(plotX1, midY);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#f5c76a";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let i = 0; i <= 96; i++) {
+        const u = i / 96;
+        const x = plotX0 + u * (plotX1 - plotX0);
+        const theta = phase + u * Math.PI * 6;
+        const y = midY - amp * Math.sin(theta);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function mzCurve(tt) {
+      if (tt < state.rfAt) return 1;
+      const rfEnd = state.rfAt + state.rfDuration;
+      if (tt < rfEnd) {
+        return clamp(1 - (tt - state.rfAt) / state.rfDuration, 0, 1);
+      }
+      return 1 - Math.exp(-(tt - rfEnd) / state.T1);
+    }
+
+    function mxyCurve(tt) {
+      if (tt < state.rfAt) return 0;
+      const rfEnd = state.rfAt + state.rfDuration;
+      if (tt < rfEnd) {
+        return clamp((tt - state.rfAt) / state.rfDuration, 0, 1);
+      }
+      return Math.exp(-(tt - rfEnd) / state.T2);
+    }
+
+    function drawSequencePanel() {
+      const { ctx, w, h } = prep(sequenceCanvas);
+      ctx.clearRect(0, 0, w, h);
+      const step = state.manualStep;
+      const elapsed = (performance.now() - state.manualStepStart) / 1000;
+      const larmorMHz = (state.gammaMHzPerT * state.b0).toFixed(2);
+
+      const originX = w * 0.25;
+      const originY = h * 0.58;
+      const axisLen = Math.min(96, h * 0.27);
+
+      drawArrow(ctx, originX - axisLen, originY, originX + axisLen, originY, "#6cc8ff", 2.1, 8);
+      drawArrow(ctx, originX, originY + axisLen, originX, originY - axisLen, "#6cc8ff", 2.1, 8);
+      drawArrow(ctx, originX - axisLen * 0.52, originY + axisLen * 0.52, originX + axisLen * 0.52, originY - axisLen * 0.52, "#6cc8ff", 2.1, 8);
+      drawTextBox(ctx, "x", originX + axisLen + 4, originY - 2, "#d9f2ff", "rgba(2,20,28,0.15)");
+      drawTextBox(ctx, "z", originX + 6, originY - axisLen - 4, "#d9f2ff", "rgba(2,20,28,0.15)");
+      drawTextBox(ctx, "y", originX + axisLen * 0.56 + 4, originY - axisLen * 0.56 - 4, "#d9f2ff", "rgba(2,20,28,0.15)");
+
+      const b0X = originX - axisLen * 1.25;
+      drawArrow(ctx, b0X, originY + axisLen + 18, b0X, originY - axisLen - 28, "#60a5fa", 4, 10);
+      drawTextBox(ctx, "B0 (+z)", b0X - 22, originY - axisLen - 34, "#dbeeff");
+
+      ctx.fillStyle = "rgba(18, 40, 64, 0.55)";
+      ctx.strokeStyle = "rgba(142, 198, 236, 0.4)";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(originX, originY, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      const coilX = originX + axisLen * 1.72;
+      const coilY = originY - 8;
+      ctx.strokeStyle = "#f8d684";
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.ellipse(coilX, coilY, 34, 16, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(coilX, coilY + 12, 34, 16, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      let mz = 1;
+      let mxy = 0;
+      let phase = 0;
+      let rotateTransverse = false;
+      let signalLevel = 0;
+      let coilMode = "Tx/Rx";
+      let vecLabel = "Mz";
+      const captionLines = [];
+
+      if (step === 0) {
+        captionLines.push("B0 applied along +Z axis.");
+        captionLines.push("Hydrogen spins align with B0.");
+        captionLines.push("Net longitudinal magnetisation Mz forms.");
+      } else if (step === 1) {
+        mxy = 0.22;
+        rotateTransverse = true;
+        captionLines.push("Spins precess around B0 at the Larmor frequency.");
+        captionLines.push("Precession frequency depends only on B0 strength.");
+      } else if (step === 2) {
+        const tip = clamp(elapsed / 1.2, 0, 1);
+        mz = 1 - tip;
+        mxy = tip;
+        coilMode = "Tx";
+        vecLabel = "M";
+        captionLines.push("Apply RF field B1 in the transverse plane.");
+        captionLines.push("B1 is perpendicular to B0.");
+        captionLines.push("RF frequency must equal the Larmor frequency.");
+        if (elapsed >= 1) captionLines.push("Net magnetisation tips away from Z axis.");
+        if (elapsed >= 1.8) captionLines.push("Flip angle shown: 90°");
+      } else if (step === 3) {
+        mz = 0;
+        mxy = 1;
+        rotateTransverse = true;
+        signalLevel = 0.28;
+        coilMode = "Rx";
+        vecLabel = "Mxy";
+        captionLines.push("Magnetisation now lies in the XY plane.");
+        captionLines.push("Spins are in phase.");
+        captionLines.push("Net transverse magnetisation Mxy is maximal.");
+        captionLines.push("This is the moment of strongest measurable signal.");
+      } else if (step === 4) {
+        mz = 0.12;
+        mxy = 0.92;
+        rotateTransverse = true;
+        signalLevel = 1;
+        coilMode = "Rx";
+        vecLabel = "M";
+        captionLines.push("Precessing Mxy creates a changing magnetic field.");
+        captionLines.push("This induces a sinusoidal voltage in the receive coil.");
+      } else if (step === 5) {
+        const t2 = Math.exp(-elapsed / 1.8);
+        const t1 = 1 - Math.exp(-elapsed / 2.5);
+        mxy = t2;
+        mz = t1;
+        signalLevel = t2;
+        coilMode = "Rx";
+        vecLabel = "M";
+        captionLines.push("RF pulse stops.");
+        captionLines.push("Two independent processes begin.");
+        if (elapsed >= 1) {
+          captionLines.push("T2: Transverse magnetisation decays.");
+          captionLines.push("Mxy decreases due to spin dephasing.");
+        }
+        if (elapsed >= 2) {
+          captionLines.push("T1: Longitudinal magnetisation recovers.");
+          captionLines.push("Mz regrows toward equilibrium.");
+        }
+      } else {
+        mz = 0.78;
+        mxy = 0.24;
+        signalLevel = 0.22;
+        coilMode = "Rx";
+        vecLabel = "M";
+        captionLines.push("B0 creates longitudinal magnetisation Mz.");
+        captionLines.push("RF B1 tips magnetisation into transverse plane.");
+        captionLines.push("Precessing Mxy induces voltage in the coil.");
+        captionLines.push("After RF off: T2 decay reduces Mxy, T1 recovery restores Mz.");
+      }
+
+      if (rotateTransverse) {
+        phase = state.time * (4 + state.b0 * 1.4);
+      }
+
+      const xComp = mxy * Math.cos(phase);
+      const yComp = mxy * Math.sin(phase);
+      const tipX = originX + axisLen * 0.9 * xComp + axisLen * 0.52 * yComp;
+      const tipY = originY - axisLen * mz - axisLen * 0.42 * yComp;
+
+      if (mxy > 0.03) {
+        ctx.strokeStyle = "rgba(110, 250, 220, 0.3)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(originX, originY, axisLen * mxy, axisLen * 0.38 * mxy, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      drawArrow(ctx, originX, originY, tipX, tipY, "#fef08a", 3.8, 9);
+      drawTextBox(ctx, vecLabel, tipX + 6, tipY - 4, "#fff5bf");
+      if (mxy > 0.12) {
+        drawTextBox(ctx, "Mxy", originX + axisLen * 0.65, originY + 26, "#86efac");
+      }
+      if (mz > 0.12) {
+        drawTextBox(ctx, "Mz", originX + 6, originY - axisLen * mz - 6, "#93c5fd");
+      }
+
+      drawTextBox(ctx, `RF coil (${coilMode})`, coilX - 36, coilY - 24, "#fff1c1", "rgba(2,20,28,0.3)");
+      drawSignalReadout(ctx, coilX - 44, coilY + 36, 130, 58, signalLevel, state.time * 3.2);
+      if (signalLevel > 0.02) {
+        drawTextBox(ctx, "Detected signal = induced voltage", coilX - 74, coilY + 108, "#ffe8ab", "rgba(2,20,28,0.35)");
+        drawTextBox(ctx, "Frequency = Larmor frequency", coilX - 70, coilY + 130, "#ffe8ab", "rgba(2,20,28,0.35)");
+      }
+
+      const gx0 = w * 0.54;
+      const gx1 = w * 0.96;
+      const gy0 = h * 0.18;
+      const gy1 = h * 0.86;
+      const samples = 220;
+      const stepTimes = [0.9, 2.0, 2.85, 3.5, 4.7, 6.8, 8.8];
+
+      ctx.strokeStyle = "#5f8aa0";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(gx0, gy0);
+      ctx.lineTo(gx0, gy1);
+      ctx.lineTo(gx1, gy1);
+      ctx.stroke();
+
+      ctx.fillStyle = "#9bc0cf";
+      ctx.font = "600 12px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("Magnetisation", gx0 - 34, gy0 - 4);
+      ctx.fillText("Time", gx1 - 26, gy1 + 16);
+
+      const xRF = gx0 + (state.rfAt / state.cycle) * (gx1 - gx0);
+      const xRFEnd = gx0 + ((state.rfAt + state.rfDuration) / state.cycle) * (gx1 - gx0);
+      ctx.fillStyle = "rgba(251, 113, 133, 0.2)";
+      ctx.fillRect(xRF, gy0, Math.max(10, xRFEnd - xRF), gy1 - gy0);
+
+      ctx.strokeStyle = "#93c5fd";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i <= samples; i++) {
+        const tt = (i / samples) * state.cycle;
+        const x = gx0 + (i / samples) * (gx1 - gx0);
+        const y = gy1 - mzCurve(tt) * (gy1 - gy0);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = "#86efac";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i <= samples; i++) {
+        const tt = (i / samples) * state.cycle;
+        const x = gx0 + (i / samples) * (gx1 - gx0);
+        const y = gy1 - mxyCurve(tt) * (gy1 - gy0);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      const ttStep = stepTimes[step] ?? stepTimes[stepTimes.length - 1];
+      const xStep = gx0 + (ttStep / state.cycle) * (gx1 - gx0);
+      ctx.strokeStyle = "#fef08a";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(xStep, gy0);
+      ctx.lineTo(xStep, gy1);
+      ctx.stroke();
+
+      drawTextBox(ctx, "Mz", gx1 - 26, gy0 + 14, "#bfdbfe", "rgba(2,20,28,0.3)");
+      drawTextBox(ctx, "Mxy", gx1 - 33, gy1 - 14, "#bbf7d0", "rgba(2,20,28,0.3)");
+      drawTextBox(ctx, "RF 90°", xRF - 16, gy0 - 4, "#ffd8e2", "rgba(2,20,28,0.4)");
+      drawTextBox(ctx, "Step marker", xStep - 34, gy1 + 24, "#fff0bf", "rgba(2,20,28,0.35)");
+
+      drawLinesBox(ctx, captionLines, w * 0.04, h * 0.08, "#dff5ff");
+
+      if (step === 0) {
+        drawLinesBox(
+          ctx,
+          [
+            "Larmor frequency:",
+            "F = γ × B0",
+            "1 Tesla -> 42 MHz (Hydrogen)",
+            "1.5 Tesla -> 63 MHz"
+          ],
+          w * 0.57,
+          h * 0.09,
+          "#d9f6ff"
+        );
+      }
+
+      if (step === 4) {
+        drawLinesBox(
+          ctx,
+          [
+            "Why not measure Mz",
+            "Mz is aligned with the strong B0 field.",
+            "Its change is too small compared to B0.",
+            "Only changing transverse magnetisation induces signal."
+          ],
+          w * 0.56,
+          h * 0.13,
+          "#d9f6ff"
+        );
+      }
+
+      if (step === 5) {
+        drawLinesBox(
+          ctx,
+          [
+            "Timing Facts",
+            "T1 = time for Mz to recover to 63%",
+            "T2 = time for Mxy to decay to 37%"
+          ],
+          w * 0.58,
+          h * 0.1,
+          "#d9f6ff"
+        );
+      }
+
+      if (step === 6) {
+        drawLinesBox(
+          ctx,
+          [
+            "Important reminder:",
+            "Do NOT animate Mz as a rotating vector during relaxation.",
+            "T1 recovery is regrowth along Z, not rotation.",
+            "T2 decay is shrinkage of transverse vector, not tilting.",
+            "Gradients are not involved in this section."
+          ],
+          w * 0.52,
+          h * 0.12,
+          "#ffe4b2",
+          "rgba(37, 26, 8, 0.72)"
+        );
+      }
+
+      drawTextBox(ctx, `Step ${step + 1} of ${manualSteps.length}`, w * 0.04, h * 0.05, "#d9f2ff", "rgba(2,20,28,0.4)");
+      drawTextBox(ctx, `Larmor: ${larmorMHz} MHz`, w * 0.73, h * 0.05, "#d9f2ff", "rgba(2,20,28,0.4)");
+    }
+
+    function updateReadouts() {
+      b0Val.textContent = `${state.b0.toFixed(1)} T (${(state.gammaMHzPerT * state.b0).toFixed(2)} MHz)`;
+      speedVal.textContent = `${state.speed.toFixed(1)}x`;
+    }
+
+    b0Slider.addEventListener("input", () => {
+      state.b0 = parseFloat(b0Slider.value);
+      updateReadouts();
+    });
+
+    speedSlider.addEventListener("input", () => {
+      state.speed = parseFloat(speedSlider.value);
+      updateReadouts();
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      state.running = !state.running;
+      pauseBtn.textContent = state.running ? "Pause" : "Resume";
+      state.lastFrame = performance.now();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      state.time = 0;
+      state.activeConcept = -1;
+      updateConceptUI(state.time);
+      setManualStep(0);
+      state.lastFrame = performance.now();
+    });
+
+    nextStepBtn.addEventListener("click", () => {
+      setManualStep(state.manualStep + 1);
+    });
+    resetManualBtn.addEventListener("click", () => {
+      setManualStep(0);
+    });
+
+    function tick(now) {
+      const dt = (now - state.lastFrame) / 1000;
+      state.lastFrame = now;
+      if (state.running) {
+        state.time += dt * state.speed;
+      }
+
+      updateConceptUI(state.time);
+      drawGyroscope();
+      drawHydrogen();
+      drawB0Panel();
+      drawSequencePanel();
+
+      requestAnimationFrame(tick);
+    }
+
+    makeNuclei();
+    updateReadouts();
+    updateConceptUI(0);
+    renderManualStep();
+    window.addEventListener("resize", () => {
+      drawGyroscope();
+      drawHydrogen();
+      drawB0Panel();
+      drawSequencePanel();
+    });
+    requestAnimationFrame((now) => {
+      state.lastFrame = now;
+      tick(now);
+    });
+  </script>
+</body>
+</html>

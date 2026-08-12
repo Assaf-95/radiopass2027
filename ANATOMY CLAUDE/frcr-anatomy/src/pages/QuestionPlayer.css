@@ -1,0 +1,352 @@
+.qp-root {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  padding: 10px 20px 14px;
+  gap: 8px;
+}
+
+.qp-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.qp-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.qp-progress-text {
+  font-size: 13px;
+  color: var(--text-faint);
+  flex: 1;
+}
+
+.qp-topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.qp-flag, .qp-nav-toggle {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-dim);
+}
+
+.qp-flag.active {
+  background: var(--purple-bg);
+  color: var(--purple);
+  border-color: transparent;
+}
+
+.qp-flag.active-fav {
+  background: var(--red-bg);
+  color: var(--red);
+  border-color: transparent;
+}
+
+.qp-saved {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.qp-saved.show {
+  opacity: 1;
+  color: var(--green);
+}
+
+.qp-image-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0B0D10;
+  color: var(--text-faint);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+}
+
+.qp-progressbar {
+  height: 3px;
+  background: var(--panel-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.qp-progressbar div {
+  height: 100%;
+  background: var(--accent);
+}
+
+.qp-navigator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.nav-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  background: var(--panel-2);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-dim);
+}
+
+.nav-dot.current {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}
+
+.qp-question-text {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.qp-question-text h2 {
+  font-size: 17px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.qp-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  gap: 16px;
+  min-height: 0;
+}
+
+.qp-image-pane {
+  min-height: 0;
+  height: 100%;
+}
+
+.qp-answer-pane {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.answer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answer-row {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  background: var(--panel);
+  border-left: 4px solid var(--border);
+}
+
+.tone-border-green { border-left-color: var(--green); }
+.tone-border-amber { border-left-color: var(--amber); }
+.tone-border-red { border-left-color: var(--red); }
+.tone-border-grey { border-left-color: var(--grey); }
+
+.answer-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.answer-label {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.answer-row-prompt {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  color: var(--text-muted, #8b93a1);
+}
+
+.answer-row input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.answer-row input:disabled {
+  opacity: 0.85;
+  background: var(--panel-2);
+}
+
+.answer-feedback {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-soft);
+}
+
+.feedback-line {
+  font-size: 13px;
+  margin: 0 0 4px;
+}
+
+.feedback-reason {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin: 0 0 6px;
+}
+
+/* The recognition cue. Set off with a rule rather than a box: it appears on
+   every label, including the ones scored full marks, so it has to sit quietly
+   next to a correct answer without reading as a correction. */
+.feedback-teaching {
+  margin: 0 0 8px;
+  padding-left: 10px;
+  border-left: 2px solid var(--teal);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+.feedback-teaching-tag {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+}
+
+.dispute-btn {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.qp-submit {
+  width: 100%;
+  padding: 12px;
+  font-size: 14.5px;
+}
+
+.qp-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.qp-total strong { font-size: 18px; }
+
+.teaching-panel {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teaching-panel h3 {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.teaching-projection {
+  font-style: italic;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.teaching-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.source-explanation summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.source-explanation ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.teaching-source {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.teaching-flag {
+  font-size: 12px;
+  color: var(--amber);
+}
+
+.qp-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.qp-missing {
+  padding: 60px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .qp-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .qp-image-pane {
+    height: 46vh;
+  }
+}
+
+/* An image an editor has taken down. A statement, not a stuck spinner. */
+.qp-image-gone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 32px;
+}
+
+.qp-image-gone p { margin: 0; max-width: 40ch; }

@@ -1,0 +1,148 @@
+/**
+ * The design system. One file decides these numbers; nothing else may invent them.
+ *
+ * The problem this exists to end: six stylesheets carried 500 independent
+ * font-size declarations between them, against four global variables. Every
+ * page therefore chose its own type scale, its own gutters and its own content
+ * width, which is exactly why the site read as a set of separately-designed
+ * pages rather than one product.
+ *
+ * The rules for using it:
+ *   - No px font-size outside this file. Use --fs-*.
+ *   - No arbitrary spacing. Use --sp-* (8px base).
+ *   - No page-specific content width. Use --container-*.
+ *   - Tertiary metadata is the ONLY thing allowed below 16px, and it has its
+ *     own token (--fs-meta) so the exception is visible in review.
+ *
+ * The existing --ink/--muted/--lime/--display names are kept as aliases at the
+ * bottom: several hundred rules reference them, and breaking those to rename a
+ * colour would be churn with no reader-visible benefit.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- type
+     A learner reads this for hours. The floor for anything instructional is
+     16px, and the body default is 18px — the brief's "normal body 17-19px".
+     Every step is clamped so the same token is as large as the screen can
+     hold and no larger: one rule, five viewports, no per-page overrides. */
+  --fs-hero:     clamp(40px, 5.2vw, 72px);
+  --fs-page:     clamp(32px, 3.6vw, 48px);
+  --fs-section:  clamp(26px, 2.6vw, 36px);
+  --fs-concept:  clamp(24px, 2.4vw, 34px);
+  --fs-card:     clamp(18px, 1.5vw, 22px);
+  /* The teaching voice: explanations a learner must actually absorb. */
+  --fs-teach:    clamp(18px, 1.25vw, 21px);
+  --fs-body:     clamp(17px, 1.1vw, 19px);
+  --fs-support:  clamp(16px, 1vw, 17px);
+  /* Tertiary only — chapter numbers, timestamps, counts. Never instructions. */
+  --fs-meta:     clamp(14px, 0.9vw, 15px);
+
+  --lh-tight: 1.08;   /* display and page titles */
+  --lh-heading: 1.18; /* section and card titles */
+  --lh-body: 1.62;    /* prose the learner reads */
+  --lh-loose: 1.7;    /* long-form explanation */
+
+  /* Measure. Prose past ~75 characters loses the reader's place on return. */
+  --measure: 68ch;
+  --measure-tight: 58ch;
+
+  /* ------------------------------------------------------------- spacing
+     8px base. Anything not on this ladder is a mistake, not a nuance. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* Vertical rhythm, named by relationship rather than by size, so a page
+     cannot quietly pick "a bit more" without saying what it means. */
+  --gap-heading-desc: var(--sp-3);
+  --gap-header-content: var(--sp-6);
+  --gap-desc-main: var(--sp-5);
+  --gap-cards: var(--sp-5);
+  --gap-section: var(--sp-7);
+  --gap-page: var(--sp-8);
+
+  /* ----------------------------------------------------------- container */
+  --container-wide: 1400px;
+  --container-main: 1240px;
+  --container-reading: 780px;
+  --container-narrow: 640px;
+  --gutter: clamp(16px, 3vw, 32px);
+
+  /* ------------------------------------------------------ surface levels
+     Three depths, not a gradient per component. */
+  --bg-base: #0B0D10;
+  --bg-elevated: #101318;
+  --bg-interactive: #151A21;
+  --border: rgba(242, 238, 230, 0.1);
+  --border-strong: rgba(242, 238, 230, 0.22);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --card-pad: var(--sp-5);
+  --card-pad-lg: var(--sp-6);
+
+  /* --------------------------------------------------------------- text
+     Four contrast steps. Instructional text never goes below --text-secondary:
+     faint grey on black is where this site was losing readers. */
+  --text-primary: #F2EEE6;
+  --text-secondary: #C3C7CD;
+  --text-tertiary: #8B929B;
+  --text-disabled: #5C626B;
+
+  /* ------------------------------------------------------------ accents
+     Semantic roles, then the modality hues. One colour per modality was
+     already settled; this only gives the roles names. */
+  --accent: #D9A84E;
+  --accent-soft: rgba(217, 168, 78, 0.14);
+  --success: #7FC8A9;
+  --warning: #D9A84E;
+  --error: #C9776B;
+  --hue-xray: #6BA3D6;
+  --hue-ct: #8FB8D8;
+  --hue-mri: #A99EDB;
+  --hue-us: #7BCBC4;
+  --hue-nm: #E0955A;
+
+  /* ------------------------------------------------------------- motion
+     One easing, three durations. Educational animation sets its own timing;
+     interface motion does not get to. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-micro: 150ms;
+  --dur: 220ms;
+  --dur-reveal: 380ms;
+
+  /* ------------------------------------------------------------ shadows */
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --glow-accent: 0 0 0 1px rgba(217, 168, 78, 0.4), 0 0 0 6px rgba(217, 168, 78, 0.08);
+
+  /* ---------------------------------------------- aliases, kept on purpose
+     Several hundred existing rules reference these. Renaming them would be a
+     large diff that changes nothing a learner can see. */
+  --ink: var(--text-primary);
+  --muted: var(--text-tertiary);
+  --line: var(--border);
+  --surface: var(--bg-elevated);
+  --card: var(--bg-elevated);
+  --card-2: var(--bg-interactive);
+  --dark: var(--bg-base);
+  --lime: var(--accent);
+}
+
+/* Breakpoints cannot be custom properties in a media query, so they live here
+   as the single written record of what the numbers mean:
+     1400  wide desktop      1280  desktop      1024  tablet landscape
+      768  tablet             430  large phone   390  phone
+   The site is used on laptops: 1366x768 and 1440x900 are the sizes that must
+   never break, and a "screen" is the browser viewport, not the display — a
+   1512x982 laptop gives a page about 780px once chrome is subtracted. */
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-micro: 0ms; --dur: 0ms; --dur-reveal: 0ms; }
+}

@@ -1,0 +1,61 @@
+/**
+ * Focus Mode's effects.
+ *
+ * Everything here is a hide or a widen — no new layout is invented for focus,
+ * because a mode that rearranges the page teaches the reader a second layout
+ * for the same lesson. The lesson stays where it was and simply gets the room
+ * the chrome was using.
+ */
+
+/* The global furniture goes. Progress, back, next and the exit stay: those are
+   what a reader still needs when they are deep in a sequence. */
+.rp-focus .lx-bar,
+.rp-focus .m5-nav-bar,
+.rp-focus .site-header,
+.rp-focus .us-nav,
+.rp-focus footer,
+.rp-focus .m5-foot,
+.rp-focus .m5-pager,
+.rp-focus .rp-rail {
+  display: none !important;
+}
+
+/* The reclaimed height goes to the lesson, not to margins. */
+.rp-focus .lx-step,
+.rp-focus .m5-section-paged {
+  min-height: 100dvh;
+  height: auto;
+  padding-top: var(--sp-5);
+  padding-bottom: var(--sp-5);
+}
+
+/* A wider frame for the diagram: with the chrome gone there is real width to
+   give, and the visual is the thing worth giving it to. */
+.rp-focus .rp-container,
+.rp-focus .lx-step,
+.rp-focus .m5-section-paged {
+  max-width: var(--container-wide);
+}
+
+/* The escape hatch is the one piece of chrome that must never hide. */
+.rp-focus-toggle {
+  position: fixed;
+  right: var(--sp-4);
+  bottom: var(--sp-4);
+  z-index: 60;
+  padding: var(--sp-2) var(--sp-4);
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: rgba(11, 13, 16, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text-tertiary);
+  font: 600 var(--fs-meta)/1 'Inter', system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.rp-focus-toggle:hover { color: var(--text-primary); border-color: var(--text-tertiary); }
+.rp-focus-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

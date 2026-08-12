@@ -1,0 +1,10 @@
+import { chromium } from 'playwright'
+const b = await chromium.launch()
+const p = await b.newPage({ viewport: { width: 1440, height: 1120 } })
+await p.goto(process.env.BASE + '/mri/gradient-echo', { waitUntil: 'networkidle' })
+await p.waitForTimeout(700)
+await p.screenshot({ path: '/tmp/m5-open.png' })
+await p.locator('.m5-step-nav .m5-btn-solid').first().click()
+await p.waitForTimeout(1600)
+await p.screenshot({ path: '/tmp/m5-concept.png' })
+await b.close(); console.log('ok')

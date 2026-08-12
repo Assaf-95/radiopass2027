@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Section 3 - B0 and Precession (All Gradients + RF Pulses)</title>
+  <style>
+    :root {
+      --bg: #050d1a;
+      --bg2: #091b2f;
+      --line: rgba(148, 192, 216, 0.24);
+      --text: #e7f5ff;
+      --muted: #9cc4d7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 560px at 8% -10%, rgba(56, 189, 248, 0.16), transparent 62%),
+        radial-gradient(900px 520px at 102% 0%, rgba(167, 139, 250, 0.16), transparent 64%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      padding: 18px;
+    }
+    .wrap { max-width: 1140px; margin: 0 auto; display: grid; gap: 14px; }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        linear-gradient(155deg, rgba(16, 29, 52, 0.92), rgba(10, 21, 38, 0.95)),
+        radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.08), transparent 36%);
+      box-shadow: 0 18px 40px rgba(0, 5, 10, 0.45);
+      overflow: hidden;
+    }
+    .top {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+    .ctl {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 192, 216, 0.2);
+      background: rgba(5, 15, 26, 0.5);
+    }
+    .ctl > span {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .ctl strong { font-size: 13px; color: #d8eeff; font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: #38bdf8; }
+
+    .gradBar {
+      padding: 0 14px 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .gradCard {
+      border-radius: 12px;
+      border: 1px solid rgba(148, 192, 216, 0.2);
+      background: rgba(5, 15, 26, 0.5);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .gradHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .chip {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(186, 226, 247, 0.25);
+      background: rgba(3, 11, 18, 0.45);
+      font-size: 11px;
+      color: #c9e7f8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .actions {
+      padding: 0 14px 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      border: 1px solid rgba(157, 212, 234, 0.3);
+      background: linear-gradient(120deg, #155d75, #0d9488);
+      color: #f0fbff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    button.secondary { background: linear-gradient(120deg, #334155, #1f2937); }
+    .status { font-size: 13px; color: #cce9f8; padding: 6px 0; }
+
+    .card { padding: 14px; }
+    h2 { margin: 0 0 10px; font-size: 1.06rem; color: #e5f6ff; letter-spacing: 0.01em; }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: min(58vw, 430px);
+      border-radius: 12px;
+      border: 1px solid rgba(137, 182, 208, 0.25);
+      background:
+        radial-gradient(circle at 40% 10%, #133453, #07172a 55%),
+        linear-gradient(180deg, #0f2238, #07172b);
+    }
+
+    .eq { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .eq span,
+    .legend span {
+      border-radius: 999px;
+      border: 1px solid rgba(180, 223, 246, 0.22);
+      background: rgba(4, 16, 28, 0.42);
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #cfe8f7;
+    }
+    .legend { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 6px;
+      vertical-align: baseline;
+    }
+
+    @media (max-width: 980px) {
+      .top,
+      .gradBar { grid-template-columns: 1fr; }
+      canvas { height: 360px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="top">
+        <label class="ctl">
+          <span>Main field strength B0</span>
+          <input id="b0Slider" type="range" min="0.5" max="3.0" step="0.1" value="1.5" />
+          <strong id="b0Val">1.5 T</strong>
+        </label>
+        <label class="ctl">
+          <span>Animation speed</span>
+          <input id="speedSlider" type="range" min="0.4" max="2.0" step="0.1" value="1.0" />
+          <strong id="speedVal">1.0x</strong>
+        </label>
+        <div class="ctl">
+          <span>Live formula</span>
+          <strong id="formulaVal">F = K × B0</strong>
+          <strong id="larmorVal">F = 63.87 MHz</strong>
+        </div>
+      </div>
+
+      <div class="gradBar">
+        <div class="gradCard">
+          <div class="gradHead">
+            <label><input id="sliceGradOn" type="checkbox" /> Slice-Selection Gradient</label>
+            <span class="chip" id="sliceGradVal">5.0</span>
+          </div>
+          <input id="sliceGradAmp" type="range" min="0" max="10" step="0.1" value="5.0" />
+        </div>
+        <div class="gradCard">
+          <div class="gradHead">
+            <label><input id="phaseGradOn" type="checkbox" /> Phase-Encoding Gradient</label>
+            <span class="chip" id="phaseGradVal">3.0</span>
+          </div>
+          <input id="phaseGradAmp" type="range" min="0" max="10" step="0.1" value="3.0" />
+        </div>
+        <div class="gradCard">
+          <div class="gradHead">
+            <label><input id="freqGradOn" type="checkbox" /> Frequency-Encoding Gradient</label>
+            <span class="chip" id="freqGradVal">4.0</span>
+          </div>
+          <input id="freqGradAmp" type="range" min="0" max="10" step="0.1" value="4.0" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="applyAllBtn" type="button">Apply All Gradients</button>
+        <button id="clearAllBtn" class="secondary" type="button">Clear Gradients</button>
+        <button id="rf90Btn" type="button">Apply 90° RF Pulse</button>
+        <button id="rf180Btn" type="button">Apply 180° RF Pulse</button>
+        <button id="clearPulseBtn" class="secondary" type="button">Clear RF State</button>
+        <button id="pauseBtn" class="secondary" type="button">Pause</button>
+        <button id="resetBtn" class="secondary" type="button">Reset</button>
+        <span class="chip" id="pulseState">RF state: none</span>
+        <div class="status" id="statusText">No gradients + no RF: spins are randomly phased, mostly parallel to B0, with a smaller anti-parallel group.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <article class="card">
+        <h2>Section 3 - Application of B0 (Main Field) and Precession</h2>
+        <canvas id="b0Canvas"></canvas>
+        <div class="eq">
+          <span>F = K × B0</span>
+          <span>F = Larmor frequency</span>
+          <span>K = gyro (gyromagnetic ratio)</span>
+        </div>
+        <div class="legend">
+          <span><span class="swatch" style="background:#86efac"></span>Parallel spins: low energy</span>
+          <span><span class="swatch" style="background:#fb923c"></span>Anti-parallel spins: high energy</span>
+          <span><span class="swatch" style="background:#5eead4"></span>Precession around Z-axis</span>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      running: true,
+      speed: 1,
+      time: 0,
+      b0: 1.5,
+      gammaMHzPerT: 42.58,
+      lastFrame: performance.now(),
+      nuclei: [],
+      sliceGradOn: false,
+      phaseGradOn: false,
+      freqGradOn: false,
+      sliceGradAmp: 5.0,
+      phaseGradAmp: 3.0,
+      freqGradAmp: 4.0,
+      lastPulse: null,
+      pulseHistory: [],
+    };
+
+    const b0Canvas = document.getElementById("b0Canvas");
+    const b0Slider = document.getElementById("b0Slider");
+    const speedSlider = document.getElementById("speedSlider");
+    const b0Val = document.getElementById("b0Val");
+    const speedVal = document.getElementById("speedVal");
+    const formulaVal = document.getElementById("formulaVal");
+    const larmorVal = document.getElementById("larmorVal");
+    const statusText = document.getElementById("statusText");
+    const pulseState = document.getElementById("pulseState");
+
+    const sliceGradOn = document.getElementById("sliceGradOn");
+    const phaseGradOn = document.getElementById("phaseGradOn");
+    const freqGradOn = document.getElementById("freqGradOn");
+    const sliceGradAmp = document.getElementById("sliceGradAmp");
+    const phaseGradAmp = document.getElementById("phaseGradAmp");
+    const freqGradAmp = document.getElementById("freqGradAmp");
+    const sliceGradVal = document.getElementById("sliceGradVal");
+    const phaseGradVal = document.getElementById("phaseGradVal");
+    const freqGradVal = document.getElementById("freqGradVal");
+
+    const applyAllBtn = document.getElementById("applyAllBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+    const rf90Btn = document.getElementById("rf90Btn");
+    const rf180Btn = document.getElementById("rf180Btn");
+    const clearPulseBtn = document.getElementById("clearPulseBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function prep(canvas) {
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(10, Math.floor(canvas.clientWidth));
+      const h = Math.max(10, Math.floor(canvas.clientHeight));
+      if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w, h };
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, width = 2, head = 9) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const ang = Math.atan2(dy, dx);
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+      ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawTextBox(ctx, text, x, y, color = "#e8fdff", bg = "rgba(2,15,22,0.6)") {
+      ctx.font = "12px Sora, Avenir Next, Trebuchet MS, sans-serif";
+      const padX = 6;
+      const width = ctx.measureText(text).width + padX * 2;
+      const height = 20;
+      ctx.fillStyle = bg;
+      ctx.fillRect(x, y - height + 2, width, height);
+      ctx.strokeStyle = "rgba(180,230,255,0.2)";
+      ctx.strokeRect(x, y - height + 2, width, height);
+      ctx.fillStyle = color;
+      ctx.fillText(text, x + padX, y - 4);
+    }
+
+    function makeNuclei() {
+      state.nuclei = [];
+      const cols = 7;
+      const rows = 4;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          state.nuclei.push({
+            gx: c,
+            gy: r,
+            parallel: Math.random() > 0.2,
+            phase0: Math.random() * Math.PI * 2,
+            wobble: 0.5 + Math.random() * 0.6,
+          });
+        }
+      }
+    }
+
+    function applyPulse(type) {
+      state.lastPulse = { type, at: state.time };
+      state.pulseHistory.push({ type, at: state.time });
+      state.pulseHistory = state.pulseHistory.filter((p) => state.time - p.at <= 8.0);
+      updateReadouts();
+    }
+
+    function clearPulseState() {
+      state.lastPulse = null;
+      state.pulseHistory = [];
+      updateReadouts();
+    }
+
+    function rfVectorForNucleus(n, dtPulse) {
+      const eqTheta = n.parallel ? 0 : Math.PI;
+      if (!state.lastPulse || dtPulse < 0) {
+        return { theta: eqTheta, coherence: 0 };
+      }
+
+      if (state.lastPulse.type === 90) {
+        const t2 = 2.2;
+        const theta = eqTheta + (Math.PI * 0.5 - eqTheta) * Math.exp(-dtPulse / t2);
+        const coherence = clamp(1 - dtPulse / 2.0, 0, 1);
+        return { theta, coherence };
+      }
+
+      const t1 = 2.8;
+      const flipped = Math.PI - eqTheta;
+      const theta = eqTheta + (flipped - eqTheta) * Math.exp(-dtPulse / t1);
+      const coherence = clamp(1 - dtPulse / 2.4, 0, 1);
+      return { theta, coherence };
+    }
+
+    function updateReadouts() {
+      const f = state.gammaMHzPerT * state.b0;
+      b0Val.textContent = `${state.b0.toFixed(1)} T`;
+      speedVal.textContent = `${state.speed.toFixed(1)}x`;
+      formulaVal.textContent = `F = ${state.gammaMHzPerT.toFixed(2)} × ${state.b0.toFixed(1)}`;
+      larmorVal.textContent = `F = ${f.toFixed(2)} MHz`;
+      sliceGradVal.textContent = state.sliceGradAmp.toFixed(1);
+      phaseGradVal.textContent = state.phaseGradAmp.toFixed(1);
+      freqGradVal.textContent = state.freqGradAmp.toFixed(1);
+
+      pulseState.textContent = state.lastPulse
+        ? `RF state: ${state.lastPulse.type}° pulse applied`
+        : "RF state: none";
+
+      const active = [];
+      if (state.sliceGradOn) active.push(`Slice-Selection=${state.sliceGradAmp.toFixed(1)}`);
+      if (state.phaseGradOn) active.push(`Phase-Encoding=${state.phaseGradAmp.toFixed(1)}`);
+      if (state.freqGradOn) active.push(`Frequency-Encoding=${state.freqGradAmp.toFixed(1)}`);
+
+      if (!active.length && !state.lastPulse) {
+        statusText.textContent = "No gradients + no RF: spins are randomly phased, mostly parallel to B0, with a smaller anti-parallel group.";
+      } else if (!active.length && state.lastPulse) {
+        statusText.textContent = `RF ${state.lastPulse.type}° pulse active with no gradients: observe pulse-only precession/relaxation under B0.`;
+      } else {
+        statusText.textContent = `Active gradients: ${active.join("  |  ")} • RF pulses can be applied on top of this state.`;
+      }
+    }
+
+    function drawPulseTimeline(ctx, w, h) {
+      const x0 = w * 0.62;
+      const x1 = w * 0.96;
+      const y0 = h * 0.1;
+      const y1 = h * 0.23;
+      ctx.strokeStyle = "rgba(147, 197, 253, 0.6)";
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(x0, y0, x1 - x0, y1 - y0);
+
+      const now = state.time;
+      const windowSec = 8;
+      ctx.beginPath();
+      ctx.moveTo(x0 + 6, y1 - 14);
+      ctx.lineTo(x1 - 6, y1 - 14);
+      ctx.stroke();
+
+      for (const p of state.pulseHistory) {
+        const age = now - p.at;
+        if (age < 0 || age > windowSec) continue;
+        const u = 1 - age / windowSec;
+        const x = x0 + 8 + u * (x1 - x0 - 16);
+        const pulseH = p.type === 180 ? 24 : 18;
+        ctx.strokeStyle = p.type === 180 ? "rgba(251, 146, 60, 0.95)" : "rgba(94, 234, 212, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y1 - 14);
+        ctx.lineTo(x, y1 - 14 - pulseH);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(219, 242, 255, 0.95)";
+        ctx.font = "11px Avenir Next, Trebuchet MS, sans-serif";
+        ctx.fillText(`${p.type}°`, x - 10, y1 - 18 - pulseH);
+      }
+
+      drawTextBox(ctx, "RF pulse timeline", x0 + 8, y0 + 18, "#d8f5ff", "rgba(3,14,26,0.55)");
+    }
+
+    function drawB0Panel() {
+      const { ctx, w, h } = prep(b0Canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const larmorMHz = state.gammaMHzPerT * state.b0;
+      const omega = 1.2 + state.b0 * 1.8;
+
+      drawArrow(ctx, w * 0.1, h * 0.86, w * 0.1, h * 0.14, "#60a5fa", 5, 12);
+      drawTextBox(ctx, "B0 (Main field along +Z)", w * 0.03, h * 0.12, "#dbeeff");
+      ctx.fillStyle = "#9fbfce";
+      ctx.font = "600 12px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("Z-axis", w * 0.075, h * 0.9);
+
+      const xMin = w * 0.25;
+      const xMax = w * 0.86;
+      const yMin = h * 0.18;
+      const yMax = h * 0.8;
+      const cols = 7;
+      const rows = 4;
+      const dx = (xMax - xMin) / (cols - 1);
+      const dy = (yMax - yMin) / (rows - 1);
+
+      let parallelCount = 0;
+      let antiCount = 0;
+      const dtPulse = state.lastPulse ? Math.max(0, state.time - state.lastPulse.at) : Infinity;
+
+      for (const n of state.nuclei) {
+        const x = xMin + n.gx * dx;
+        const y = yMin + n.gy * dy;
+
+        const colNorm = (n.gx - (cols - 1) * 0.5) / Math.max(1, (cols - 1) * 0.5);
+        const rowNorm = (n.gy - (rows - 1) * 0.5) / Math.max(1, (rows - 1) * 0.5);
+
+        const omegaLocal =
+          omega * n.wobble +
+          (state.freqGradOn ? state.freqGradAmp * 0.36 * colNorm : 0) +
+          (state.sliceGradOn ? state.sliceGradAmp * 0.28 * rowNorm : 0);
+
+        const phaseOffsetGrad = state.phaseGradOn ? state.phaseGradAmp * 0.95 * rowNorm : 0;
+        const rf = rfVectorForNucleus(n, dtPulse);
+        const randomPhasePart = n.phase0 * (1 - rf.coherence);
+        const phase = state.time * omegaLocal + phaseOffsetGrad + randomPhasePart;
+
+        ctx.strokeStyle = "rgba(95, 238, 212, 0.35)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 11, 4.4, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const px = x + 11 * Math.cos(phase);
+        const py = y + 4.4 * Math.sin(phase);
+        ctx.fillStyle = "#5eead4";
+        ctx.beginPath();
+        ctx.arc(px, py, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        const vx = 12 * Math.sin(rf.theta) * Math.cos(phase);
+        const vy = -16 * Math.cos(rf.theta);
+
+        const col = n.parallel ? "#86efac" : "#fb923c";
+        drawArrow(ctx, x, y, x + vx, y + vy, col, 2.2, 6);
+
+        if (n.parallel) parallelCount += 1;
+        else antiCount += 1;
+      }
+
+      drawTextBox(ctx, "Most aligned parallel (low energy state)", w * 0.26, h * 0.12, "#caf9d7");
+      drawTextBox(ctx, "Few anti-parallel (high energy state)", w * 0.54, h * 0.12, "#ffd5bd");
+
+      const netMz = clamp((parallelCount - antiCount) / state.nuclei.length, -1, 1);
+      const mx = w * 0.93;
+      const yBase = h * 0.85;
+      const yTip = yBase - netMz * h * 0.54;
+      drawArrow(ctx, mx, yBase, mx, yTip, "#7dd3fc", 4, 10);
+      drawTextBox(ctx, "Net longitudinal magnetisation (Mz)", w * 0.74, Math.min(yBase - 8, yTip - 8), "#c5f0ff");
+
+      ctx.fillStyle = "#deeff8";
+      ctx.font = "600 13px SF Mono, Menlo, Consolas, monospace";
+      ctx.fillText(`F = K × B0  ->  ${larmorMHz.toFixed(2)} MHz`, w * 0.03, h * 0.96);
+      ctx.fillStyle = "#a8d0df";
+      ctx.font = "500 12px Avenir Next, Trebuchet MS, sans-serif";
+      ctx.fillText("F: Larmor frequency", w * 0.28, h * 0.96);
+      ctx.fillText("K: gyro (gyromagnetic ratio)", w * 0.44, h * 0.96);
+
+      const tags = [];
+      if (state.sliceGradOn) tags.push("Slice-Selection");
+      if (state.phaseGradOn) tags.push("Phase-Encoding");
+      if (state.freqGradOn) tags.push("Frequency-Encoding");
+      drawTextBox(ctx, `Gradients: ${tags.length ? tags.join(" + ") : "none"}`, w * 0.03, h * 0.08, "#d8f6ff");
+
+      drawPulseTimeline(ctx, w, h);
+    }
+
+    b0Slider.addEventListener("input", () => {
+      state.b0 = parseFloat(b0Slider.value);
+      updateReadouts();
+    });
+    speedSlider.addEventListener("input", () => {
+      state.speed = parseFloat(speedSlider.value);
+      updateReadouts();
+    });
+
+    sliceGradOn.addEventListener("change", () => { state.sliceGradOn = sliceGradOn.checked; updateReadouts(); });
+    phaseGradOn.addEventListener("change", () => { state.phaseGradOn = phaseGradOn.checked; updateReadouts(); });
+    freqGradOn.addEventListener("change", () => { state.freqGradOn = freqGradOn.checked; updateReadouts(); });
+
+    sliceGradAmp.addEventListener("input", () => { state.sliceGradAmp = parseFloat(sliceGradAmp.value); updateReadouts(); });
+    phaseGradAmp.addEventListener("input", () => { state.phaseGradAmp = parseFloat(phaseGradAmp.value); updateReadouts(); });
+    freqGradAmp.addEventListener("input", () => { state.freqGradAmp = parseFloat(freqGradAmp.value); updateReadouts(); });
+
+    applyAllBtn.addEventListener("click", () => {
+      state.sliceGradOn = true;
+      state.phaseGradOn = true;
+      state.freqGradOn = true;
+      sliceGradOn.checked = true;
+      phaseGradOn.checked = true;
+      freqGradOn.checked = true;
+      updateReadouts();
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+      state.sliceGradOn = false;
+      state.phaseGradOn = false;
+      state.freqGradOn = false;
+      sliceGradOn.checked = false;
+      phaseGradOn.checked = false;
+      freqGradOn.checked = false;
+      updateReadouts();
+    });
+
+    rf90Btn.addEventListener("click", () => applyPulse(90));
+    rf180Btn.addEventListener("click", () => applyPulse(180));
+    clearPulseBtn.addEventListener("click", clearPulseState);
+
+    pauseBtn.addEventListener("click", () => {
+      state.running = !state.running;
+      pauseBtn.textContent = state.running ? "Pause" : "Resume";
+      state.lastPulse = state.lastPulse ? { ...state.lastPulse } : null;
+      state.lastFrame = performance.now();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      state.time = 0;
+      clearPulseState();
+      state.lastFrame = performance.now();
+    });
+
+    function tick(now) {
+      const dt = (now - state.lastFrame) / 1000;
+      state.lastFrame = now;
+      if (state.running) {
+        state.time += dt * state.speed;
+      }
+      drawB0Panel();
+      requestAnimationFrame(tick);
+    }
+
+    makeNuclei();
+    updateReadouts();
+    window.addEventListener("resize", drawB0Panel);
+    requestAnimationFrame((now) => {
+      state.lastFrame = now;
+      tick(now);
+    });
+  </script>
+</body>
+</html>

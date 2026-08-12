@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FRCR1 Physics Lessons</title>
+  <style>
+    :root {
+      --bg: #050a12;
+      --panel: rgba(13, 24, 39, 0.88);
+      --panel-2: #101d2e;
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #edf6ff;
+      --muted: #9fb0c7;
+      --cyan: #40d9f5;
+      --cyan-dark: #0e7490;
+      --amber: #ffb454;
+      --green: #42d392;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(34, 211, 238, 0.18), transparent 28%),
+        radial-gradient(circle at 96% 18%, rgba(255, 180, 84, 0.12), transparent 26%),
+        linear-gradient(145deg, #081321, var(--bg) 58%);
+    }
+
+    button, input, a { font: inherit; }
+
+    .shell {
+      width: min(1480px, calc(100% - 30px));
+      margin: 0 auto;
+      padding: 28px 0 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3.2vw, 3rem);
+      line-height: 1;
+      letter-spacing: -0.045em;
+    }
+
+    .subtitle {
+      max-width: 780px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 8px 0 0;
+      font-size: 0.92rem;
+    }
+
+    .back-link,
+    .open-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #f8fafc;
+      font-weight: 850;
+      text-decoration: none;
+      background: linear-gradient(120deg, #0e7490, #0f766e);
+      white-space: nowrap;
+    }
+
+    .dashboard,
+    .toolbar,
+    .topic-section {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--panel), rgba(7, 15, 27, 0.9));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      padding: 12px 14px;
+      border: 1px solid rgba(64, 217, 245, 0.22);
+      border-radius: 14px;
+      background: rgba(8, 29, 47, 0.72);
+    }
+
+    .stat strong { display: block; color: #dffaff; font-size: 1.3rem; }
+    .stat span { color: var(--muted); font-size: 0.76rem; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      position: sticky;
+      top: 8px;
+      z-index: 20;
+    }
+
+    .search-wrap label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    #lessonSearch {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0a1626;
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    #lessonSearch:focus { border-color: var(--cyan); }
+
+    .topic-nav { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .topic-nav a {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      color: #cbd5e1;
+      background: rgba(15, 39, 60, 0.78);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .topic-nav a:hover { color: #a5f3fc; border-color: rgba(64, 217, 245, 0.5); }
+
+    #lessonSections { display: grid; gap: 18px; }
+
+    .topic-section {
+      border-radius: 24px;
+      padding: clamp(16px, 2.4vw, 26px);
+      scroll-margin-top: 115px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.5vw, 2rem);
+      letter-spacing: -0.03em;
+    }
+
+    .section-head span { color: var(--muted); font-size: 0.78rem; }
+
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .lesson-card {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 245px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(14, 28, 46, 0.72);
+      padding: 16px;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .lesson-card:hover { transform: translateY(-2px); border-color: rgba(64, 217, 245, 0.4); }
+    .lesson-card[data-status="completed"] { border-color: rgba(66, 211, 146, 0.55); background: rgba(13, 70, 53, 0.2); }
+    .lesson-card[data-status="in-progress"] { border-color: rgba(255, 180, 84, 0.48); }
+
+    .topic-pill {
+      width: fit-content;
+      border: 1px solid rgba(64, 217, 245, 0.28);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: #a5f3fc;
+      background: rgba(15, 39, 60, 0.8);
+      font-size: 0.66rem;
+      font-weight: 850;
+    }
+
+    .lesson-card h3 {
+      margin: 12px 0 8px;
+      font-size: 1.02rem;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .lesson-card p {
+      color: var(--muted);
+      line-height: 1.48;
+      font-size: 0.82rem;
+      margin: 0 0 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .card-footer { margin-top: auto; display: grid; gap: 10px; }
+
+    .status-control {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .status-control button {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 7px 5px;
+      color: #9fb0c7;
+      background: #13243a;
+      font-size: 0.65rem;
+      font-weight: 800;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .status-control button.active[data-value="not-started"] { color: #dbeafe; border-color: #64748b; }
+    .status-control button.active[data-value="in-progress"] { color: #fed7aa; border-color: var(--amber); background: rgba(120, 68, 15, 0.32); }
+    .status-control button.active[data-value="completed"] { color: #bbf7d0; border-color: var(--green); background: rgba(6, 95, 70, 0.32); }
+
+    .open-link { width: 100%; padding: 9px 12px; font-size: 0.78rem; }
+
+    .empty {
+      display: none;
+      padding: 60px 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      color: var(--muted);
+      text-align: center;
+      background: var(--panel);
+    }
+
+    .empty.show { display: block; }
+
+    @media (max-width: 1050px) {
+      .lesson-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+      .toolbar { position: static; }
+    }
+
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 18px, 1480px); padding-top: 16px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .dashboard { grid-template-columns: 1fr 1fr 1fr; }
+      .stat { padding: 9px; }
+      .stat strong { font-size: 1.05rem; }
+      .lesson-grid { grid-template-columns: 1fr; }
+      .lesson-card { min-height: 0; }
+      .topic-section { border-radius: 18px; }
+      .status-control button { font-size: 0.72rem; }
+    }
+    /* 2026 visual system: clinical dossier */
+    :root {
+      --bg: #070b0c;
+      --panel: #0d1416;
+      --panel-2: #111b1d;
+      --line: rgba(164, 205, 204, 0.16);
+      --text: #eef5f2;
+      --muted: #8fa4a2;
+      --cyan: #69e4dd;
+      --cyan-dark: #157c78;
+      --amber: #e9b86e;
+      --green: #6bddad;
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      position: relative;
+      background: #070b0c;
+      isolation: isolate;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(105, 228, 221, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 228, 221, 0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, #000 0, transparent 78%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 38vw;
+      height: 2px;
+      top: 0;
+      right: 6vw;
+      z-index: -1;
+      background: var(--cyan);
+      box-shadow: 0 0 32px rgba(105, 228, 221, 0.55);
+    }
+
+    .shell { padding-top: 34px; }
+
+    .topbar {
+      min-height: 118px;
+      padding: 8px 0 24px 22px;
+      border-left: 2px solid var(--cyan);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      font-family: "Avenir Next Condensed", "Avenir Next", sans-serif;
+      letter-spacing: 0.22em;
+    }
+
+    h1 {
+      max-width: 760px;
+      font-family: "Avenir Next Condensed", "Avenir Next", sans-serif;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    .back-link,
+    .open-link {
+      border: 1px solid rgba(105, 228, 221, 0.45);
+      border-radius: 8px;
+      color: #071211;
+      background: var(--cyan);
+      box-shadow: none;
+      transition: transform 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    }
+
+    .back-link:hover,
+    .open-link:hover {
+      transform: translateY(-2px);
+      background: #9af4ee;
+      box-shadow: 0 9px 28px rgba(105, 228, 221, 0.15);
+    }
+
+    .dashboard {
+      gap: 1px;
+      padding: 0;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--line);
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .stat {
+      position: relative;
+      min-height: 82px;
+      padding: 15px 18px;
+      border: 0;
+      border-radius: 0;
+      background: #0d1517;
+    }
+
+    .stat::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 2px;
+      right: 14px;
+      top: 14px;
+      background: var(--cyan);
+      opacity: 0.7;
+    }
+
+    .stat strong { font-family: "Avenir Next Condensed", "Avenir Next", sans-serif; font-size: 1.65rem; font-weight: 500; }
+    .stat span { letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.62rem; }
+
+    .toolbar {
+      top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border-color: rgba(164, 205, 204, 0.2);
+      background: rgba(10, 17, 19, 0.94);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.26);
+      backdrop-filter: blur(18px);
+    }
+
+    #lessonSearch {
+      border-radius: 7px;
+      border-color: rgba(164, 205, 204, 0.2);
+      background: #080e10;
+    }
+
+    .topic-nav a {
+      border-radius: 6px;
+      background: transparent;
+      color: #a9bbb8;
+      transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .topic-nav a:hover { color: #06110f; background: var(--cyan); border-color: var(--cyan); }
+
+    .topic-section {
+      position: relative;
+      padding: 26px 0 34px;
+      border: 0;
+      border-top: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .section-head { margin-bottom: 18px; }
+    .section-head h2 { font-family: "Avenir Next Condensed", "Avenir Next", sans-serif; font-weight: 500; }
+    .section-head span { letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .lesson-grid { grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 10px; }
+
+    .lesson-card {
+      position: relative;
+      min-height: 254px;
+      padding: 18px;
+      border-radius: 11px;
+      border-color: rgba(164, 205, 204, 0.15);
+      background: #0c1416;
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.02);
+      overflow: hidden;
+    }
+
+    .lesson-card::before {
+      content: "";
+      position: absolute;
+      width: 42px;
+      height: 2px;
+      left: 18px;
+      top: 0;
+      background: var(--cyan);
+      transition: width 180ms ease;
+    }
+
+    .lesson-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(105, 228, 221, 0.34);
+      background: #0f191b;
+    }
+
+    .lesson-card:hover::before { width: calc(100% - 36px); }
+    .lesson-card[data-status="completed"] { border-color: rgba(107, 221, 173, 0.42); background: #0d1b18; }
+    .lesson-card[data-status="in-progress"] { border-color: rgba(233, 184, 110, 0.42); }
+
+    .topic-pill {
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      color: var(--cyan);
+      background: transparent;
+      font-size: 0.62rem;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .lesson-card h3 { font-family: "Avenir Next Condensed", "Avenir Next", sans-serif; font-size: 1.12rem; font-weight: 600; }
+
+    .status-control { padding: 3px; border: 1px solid var(--line); border-radius: 8px; background: #080e10; }
+
+    .status-control button {
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+    }
+
+    .status-control button.active[data-value="not-started"] { color: #e4ece9; border: 0; background: #1a2527; }
+    .status-control button.active[data-value="in-progress"] { border: 0; background: rgba(126, 85, 31, 0.5); }
+    .status-control button.active[data-value="completed"] { border: 0; background: rgba(18, 100, 72, 0.55); }
+
+    .empty { border-radius: 10px; background: #0d1517; }
+
+    @media (max-width: 680px) {
+      .topbar { min-height: 0; padding-left: 14px; }
+      .dashboard { grid-template-columns: repeat(3, 1fr); }
+      .stat { min-height: 70px; }
+      .lesson-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">FRCR Physics Visual Lab</div>
+        <h1>Interactive Physics Lessons</h1>
+        <p class="subtitle">Open the recovered animations directly, search by concept and track your revision progress.</p>
+      </div>
+      <a class="back-link" href="physics-question-bank.html">Back to Question Bank</a>
+    </header>
+
+    <section class="dashboard" aria-label="Lesson statistics">
+      <div class="stat"><strong id="totalLessons">0</strong><span>Total lessons</span></div>
+      <div class="stat"><strong id="completedLessons">0</strong><span>Completed lessons</span></div>
+      <div class="stat"><strong id="completionPercent">0%</strong><span>Completion</span></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-wrap">
+        <label for="lessonSearch">Search lessons</label>
+        <input id="lessonSearch" type="search" placeholder="T2, Compton, pitch, Doppler...">
+      </div>
+      <nav class="topic-nav" id="topicNav" aria-label="Lesson topics"></nav>
+    </section>
+
+    <div id="lessonSections"></div>
+    <div class="empty" id="emptyState"><strong>No lessons found.</strong><br>Try a different title, topic or keyword.</div>
+  </main>
+
+  <script src="visual-concept-registry.js"></script>
+  <script src="lessons-data.js"></script>
+  <script>
+    (() => {
+      const lessons = window.FRCR_LESSONS || [];
+      const preferredTopics = window.FRCR_LESSON_TOPICS || [];
+      const storageKey = "frcr-physics-lesson-progress-v1";
+      const progress = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      const search = document.getElementById("lessonSearch");
+      const sections = document.getElementById("lessonSections");
+      const topicNav = document.getElementById("topicNav");
+      const emptyState = document.getElementById("emptyState");
+
+      const slugify = text => text.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const escapeHtml = text => String(text).replace(/[&<>\"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[char]));
+      const topics = [...new Set([...preferredTopics, ...lessons.map(lesson => lesson.topic)])]
+        .filter(topic => lessons.some(lesson => lesson.topic === topic));
+
+      function getStatus(id) {
+        return progress[id] || "not-started";
+      }
+
+      function saveStatus(id, status) {
+        progress[id] = status;
+        localStorage.setItem(storageKey, JSON.stringify(progress));
+        updateStatistics();
+      }
+
+      function updateStatistics() {
+        const completed = lessons.filter(lesson => getStatus(lesson.id) === "completed").length;
+        document.getElementById("totalLessons").textContent = lessons.length;
+        document.getElementById("completedLessons").textContent = completed;
+        document.getElementById("completionPercent").textContent = lessons.length ? `${Math.round(completed / lessons.length * 100)}%` : "0%";
+      }
+
+      function statusButtons(lesson) {
+        const states = [
+          ["not-started", "Not Started"],
+          ["in-progress", "In Progress"],
+          ["completed", "Completed"]
+        ];
+        return states.map(([value, label]) => `<button type="button" data-lesson="${escapeHtml(lesson.id)}" data-value="${value}" class="${getStatus(lesson.id) === value ? "active" : ""}">${label}</button>`).join("");
+      }
+
+      function render(filter = "") {
+        const term = filter.trim().toLowerCase();
+        let visibleCount = 0;
+        sections.innerHTML = topics.map(topic => {
+          const matches = lessons.filter(lesson => lesson.topic === topic && (!term || lesson.keywords.includes(term) || lesson.topic.toLowerCase().includes(term)));
+          if (!matches.length) return "";
+          visibleCount += matches.length;
+          return `
+            <section class="topic-section" id="topic-${slugify(topic)}">
+              <div class="section-head"><h2>${escapeHtml(topic)}</h2><span>${matches.length} ${matches.length === 1 ? "lesson" : "lessons"}</span></div>
+              <div class="lesson-grid">
+                ${matches.map(lesson => `
+                  <article class="lesson-card" data-id="${escapeHtml(lesson.id)}" data-status="${getStatus(lesson.id)}">
+                    <span class="topic-pill">${escapeHtml(lesson.topic)}</span>
+                    <h3>${escapeHtml(lesson.title)}</h3>
+                    <p>${escapeHtml(lesson.description)}</p>
+                    <div class="card-footer">
+                      <div class="status-control" aria-label="Progress for ${escapeHtml(lesson.title)}">${statusButtons(lesson)}</div>
+                      <a class="open-link" href="${escapeHtml(lesson.href)}" target="_blank" rel="noopener">Open Lesson</a>
+                    </div>
+                  </article>
+                `).join("")}
+              </div>
+            </section>
+          `;
+        }).join("");
+        emptyState.classList.toggle("show", visibleCount === 0);
+        bindStatusControls();
+      }
+
+      function bindStatusControls() {
+        document.querySelectorAll(".status-control button").forEach(button => {
+          button.addEventListener("click", () => {
+            const id = button.dataset.lesson;
+            const status = button.dataset.value;
+            saveStatus(id, status);
+            const card = button.closest(".lesson-card");
+            card.dataset.status = status;
+            card.querySelectorAll(".status-control button").forEach(item => item.classList.toggle("active", item === button));
+          });
+        });
+      }
+
+      topicNav.innerHTML = topics.map(topic => `<a href="#topic-${slugify(topic)}">${escapeHtml(topic)}</a>`).join("");
+      search.addEventListener("input", () => render(search.value));
+      render();
+      updateStatistics();
+    })();
+  </script>
+</body>
+</html>

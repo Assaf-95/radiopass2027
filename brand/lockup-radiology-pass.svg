@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 96">
+  <style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&amp;display=swap');
+    text { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; }</style>
+  <g><circle cx="48" cy="47" r="36" fill="none" stroke="#D9A84E" stroke-width="6"/><path fill="#D9A84E" d="M20.5 60H40.5L55.5 34H75.5A30 30 0 0 1 20.5 60Z"/></g>
+  <text x="112" y="62" font-size="44" letter-spacing="0.5" fill="#F2EEE6">Radiology Pass</text>
+</svg>

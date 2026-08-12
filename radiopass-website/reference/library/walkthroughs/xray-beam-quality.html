@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X Ray Beam Quality Simulator</title>
+  <style>
+    :root {
+      --bg-0: #edf2f8;
+      --bg-1: #e4ecf8;
+      --panel: #fbfdff;
+      --panel-soft: #f3f8ff;
+      --ink: #13233a;
+      --muted: #4f607b;
+      --line: #d7dfeb;
+      --line-soft: rgba(15, 40, 74, 0.12);
+      --blue: #1f5fa8;
+      --blue-bright: #2f76cb;
+      --amber: #d49a35;
+      --crimson: #c13f4a;
+      --mean: #a6afbc;
+      --accent: #2d6fbd;
+      --shadow: 0 14px 40px rgba(26, 53, 90, 0.12);
+      --shadow-soft: 0 8px 22px rgba(18, 39, 68, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 50%),
+        radial-gradient(circle at 90% 90%, rgba(207, 225, 245, 0.45) 0%, rgba(207, 225, 245, 0) 46%),
+        linear-gradient(145deg, var(--bg-0), var(--bg-1));
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100%;
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .info-panel {
+      flex: 0 0 40%;
+      max-width: 40%;
+      min-width: 320px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.95));
+      border-radius: 22px;
+      border: 1px solid rgba(170, 191, 216, 0.35);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .info-scroll {
+      flex: 1;
+      overflow: auto;
+      padding: 1.8rem 1.9rem 1.2rem;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: #5f7391;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 2.3vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      color: #0f2037;
+    }
+
+    .subtitle {
+      margin: 0.7rem 0 1.3rem;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.97rem;
+    }
+
+    .explanation-card {
+      background: linear-gradient(180deg, rgba(243, 248, 255, 0.85), rgba(251, 253, 255, 0.95));
+      border: 1px solid rgba(174, 195, 221, 0.4);
+      border-radius: 16px;
+      padding: 1rem 1rem 1rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      font-size: 0.79rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #607390;
+      margin-bottom: 0.65rem;
+    }
+
+    .explanation-content {
+      color: #1a2a42;
+      font-size: 0.96rem;
+      line-height: 1.5;
+      transition: opacity 220ms ease;
+    }
+
+    .explanation-content h2 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    .explanation-content p {
+      margin: 0 0 0.6rem;
+    }
+
+    .explanation-content ul {
+      margin: 0.5rem 0 0;
+      padding-left: 1.1rem;
+    }
+
+    .explanation-content li {
+      margin-bottom: 0.3rem;
+    }
+
+    .physics-box {
+      margin: 0 1.15rem 1.15rem;
+      background: linear-gradient(165deg, rgba(20, 42, 71, 0.97), rgba(18, 36, 61, 0.96));
+      border: 1px solid rgba(123, 157, 195, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 16px 34px rgba(9, 21, 39, 0.34);
+      padding: 0.95rem 1rem 1rem;
+      color: #dbe8ff;
+    }
+
+    .physics-box .section-title {
+      color: rgba(209, 227, 255, 0.86);
+      margin-bottom: 0.8rem;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      row-gap: 0.52rem;
+      column-gap: 0.9rem;
+      align-items: baseline;
+      font-size: 0.91rem;
+    }
+
+    .data-label {
+      color: rgba(218, 231, 252, 0.86);
+    }
+
+    .data-value {
+      color: #ffffff;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .visual-panel {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .mode-bar {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(248, 251, 255, 0.9));
+      border: 1px solid rgba(173, 193, 217, 0.42);
+      border-radius: 14px;
+      box-shadow: var(--shadow-soft);
+      padding: 0.55rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      background: rgba(213, 224, 239, 0.5);
+      border-radius: 999px;
+      padding: 0.2rem;
+      gap: 0.2rem;
+    }
+
+    .mode-btn {
+      border: 0;
+      background: transparent;
+      color: #3d5577;
+      padding: 0.5rem 0.95rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .mode-btn:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: #12335d;
+      box-shadow: 0 4px 12px rgba(40, 72, 114, 0.18);
+    }
+
+    .step-pill {
+      font-size: 0.82rem;
+      color: #2d4668;
+      background: rgba(213, 225, 242, 0.45);
+      border: 1px solid rgba(158, 183, 214, 0.5);
+      border-radius: 999px;
+      padding: 0.35rem 0.72rem;
+      white-space: nowrap;
+    }
+
+    .graph-card {
+      flex: 1;
+      min-height: 390px;
+      background: linear-gradient(180deg, rgba(248, 251, 255, 0.9), rgba(254, 255, 255, 0.94));
+      border: 1px solid rgba(173, 193, 216, 0.45);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 0.7rem;
+    }
+
+    #spectrumSvg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .controls-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(246, 250, 255, 0.9));
+      border: 1px solid rgba(170, 191, 215, 0.42);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      padding: 0.75rem 0.95rem 0.95rem;
+      min-height: 88px;
+    }
+
+    .teaching-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .control-btn {
+      border: 1px solid rgba(102, 134, 173, 0.4);
+      background: linear-gradient(180deg, #f7fbff, #edf4fd);
+      color: #193b64;
+      border-radius: 10px;
+      padding: 0.52rem 0.96rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 180ms ease, opacity 160ms ease;
+      box-shadow: 0 6px 14px rgba(45, 77, 117, 0.11);
+    }
+
+    .control-btn:hover:enabled {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 17px rgba(45, 77, 117, 0.16);
+    }
+
+    .control-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      box-shadow: none;
+    }
+
+    .manual-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      gap: 0.65rem;
+      align-items: center;
+      font-size: 0.91rem;
+      color: #254160;
+    }
+
+    .slider-label {
+      font-weight: 600;
+    }
+
+    .slider-value {
+      min-width: 96px;
+      text-align: right;
+      font-weight: 600;
+      color: #17355a;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(57, 119, 191, 0.45), rgba(47, 95, 157, 0.75));
+      outline: none;
+      appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #2b66ab;
+      box-shadow: 0 3px 8px rgba(26, 63, 106, 0.28);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #2b66ab;
+      box-shadow: 0 3px 8px rgba(26, 63, 106, 0.28);
+      cursor: pointer;
+    }
+
+    .grid-line {
+      stroke: rgba(70, 98, 136, 0.18);
+      stroke-width: 1;
+      shape-rendering: geometricPrecision;
+    }
+
+    .axis-line {
+      stroke: rgba(47, 76, 111, 0.65);
+      stroke-width: 1.25;
+    }
+
+    .axis-text {
+      fill: #3c5678;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .axis-title {
+      fill: #2a4366;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .annotation {
+      fill: #1f3d65;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      pointer-events: none;
+    }
+
+    .annotation-soft {
+      fill: #5d6f88;
+    }
+
+    @media (max-width: 1120px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        height: auto;
+        min-height: 100%;
+        flex-direction: column;
+      }
+
+      .info-panel {
+        max-width: 100%;
+        flex: initial;
+        min-height: 360px;
+      }
+
+      .visual-panel {
+        min-height: 620px;
+      }
+    }
+  
+    /* FRCR responsive text safety */
+    :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
+    :where(img,svg,canvas){max-width:100%}
+    @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="info-panel">
+      <div class="info-scroll">
+        <div class="eyebrow">Radiology Physics</div>
+        <h1>X Ray Beam Quality Simulator</h1>
+        <p class="subtitle">Beam quality, filtration, and exposure quantity visualized as a live spectrum model.</p>
+
+        <section class="explanation-card">
+          <div class="section-title">Dynamic Explanation Area</div>
+          <div id="explanationContent" class="explanation-content"></div>
+        </section>
+      </div>
+
+      <section class="physics-box">
+        <div class="section-title">Live Physics Data</div>
+        <div class="data-grid">
+          <div class="data-label">Current kVp</div>
+          <div id="dataKvp" class="data-value">80.0 kVp</div>
+          <div class="data-label">Current E max</div>
+          <div id="dataEmax" class="data-value">80.0 keV</div>
+          <div class="data-label">Current Mean Energy</div>
+          <div id="dataMean" class="data-value">0.0 keV</div>
+          <div class="data-label">Filtration Level</div>
+          <div id="dataFilter" class="data-value">1.0 mm Al</div>
+          <div class="data-label">Relative Beam Intensity</div>
+          <div id="dataIntensity" class="data-value">0.00 x</div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="visual-panel">
+      <section class="mode-bar">
+        <div class="mode-toggle" role="tablist" aria-label="Mode selection">
+          <button id="modeTeaching" class="mode-btn active" type="button">Teaching Mode</button>
+          <button id="modeManual" class="mode-btn" type="button">Manual Mode</button>
+        </div>
+        <div id="stepPill" class="step-pill">Step 0 / 5</div>
+      </section>
+
+      <section class="graph-card">
+        <svg id="spectrumSvg" viewBox="0 0 1000 620" role="img" aria-label="X ray bremsstrahlung spectrum graph">
+          <defs>
+            <linearGradient id="spectrumFill" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2f76cb" stop-opacity="0.30"></stop>
+              <stop offset="78%" stop-color="#2f76cb" stop-opacity="0.08"></stop>
+              <stop offset="100%" stop-color="#2f76cb" stop-opacity="0.02"></stop>
+            </linearGradient>
+            <linearGradient id="spectrumStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2f76cb"></stop>
+              <stop offset="100%" stop-color="#1e5ca2"></stop>
+            </linearGradient>
+            <filter id="peakGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="2.3" result="blur"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="blur"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <g id="gridLayer"></g>
+          <path id="spectrumArea" fill="url(#spectrumFill)" stroke="none"></path>
+          <path id="overlayCurve" fill="none" stroke="#59c3ff" stroke-width="2.2" stroke-dasharray="8 6" opacity="0"></path>
+          <path id="spectrumCurve" fill="none" stroke="url(#spectrumStroke)" stroke-width="2.8"></path>
+
+          <line id="emaxLine" stroke="#c13f4a" stroke-width="2.4"></line>
+          <line id="meanLine" stroke="#a6afbc" stroke-width="2" stroke-dasharray="8 7"></line>
+
+          <line id="peakA" stroke="#d49a35" stroke-width="2.4" filter="url(#peakGlow)" opacity="0"></line>
+          <line id="peakB" stroke="#d49a35" stroke-width="2.4" filter="url(#peakGlow)" opacity="0"></line>
+
+          <text id="emaxLabel" class="annotation">E max</text>
+          <text id="meanLabel" class="annotation annotation-soft">Mean energy</text>
+          <text id="peakALabel" class="annotation" opacity="0">Kα</text>
+          <text id="peakBLabel" class="annotation" opacity="0">Kβ</text>
+          <text id="overlayLabel" class="annotation" fill="#3ea7e5" opacity="0">mAs x2 (quantity only)</text>
+        </svg>
+      </section>
+
+      <section class="controls-card">
+        <div id="teachingControls" class="teaching-controls">
+          <button id="backBtn" class="control-btn" type="button">BACK</button>
+          <button id="nextBtn" class="control-btn" type="button">NEXT</button>
+        </div>
+
+        <div id="manualControls" class="manual-controls" hidden>
+          <div class="slider-row">
+            <div class="slider-label">kVp</div>
+            <input id="kvpSlider" type="range" min="40" max="140" step="1" value="90" />
+            <div id="kvpValue" class="slider-value">90 kVp</div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-label">mAs</div>
+            <input id="masSlider" type="range" min="20" max="200" step="1" value="100" />
+            <div id="masValue" class="slider-value">100 mAs</div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-label">Filtration</div>
+            <input id="filterSlider" type="range" min="0" max="5" step="0.1" value="1" />
+            <div id="filterValue" class="slider-value">1.0 mm Al</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const X_MAX = 140;
+      const Y_MAX = 8.5;
+      const STEP = 0.5;
+      const K_ALPHA = 59.3;
+      const K_BETA = 67.2;
+
+      const SVG_W = 1000;
+      const SVG_H = 620;
+      const margin = { top: 36, right: 30, bottom: 74, left: 78 };
+      const plot = {
+        x: margin.left,
+        y: margin.top,
+        width: SVG_W - margin.left - margin.right,
+        height: SVG_H - margin.top - margin.bottom
+      };
+      const baselineY = plot.y + plot.height;
+
+      const explanationContent = document.getElementById("explanationContent");
+      const stepPill = document.getElementById("stepPill");
+
+      const dataKvp = document.getElementById("dataKvp");
+      const dataEmax = document.getElementById("dataEmax");
+      const dataMean = document.getElementById("dataMean");
+      const dataFilter = document.getElementById("dataFilter");
+      const dataIntensity = document.getElementById("dataIntensity");
+
+      const modeTeachingBtn = document.getElementById("modeTeaching");
+      const modeManualBtn = document.getElementById("modeManual");
+      const teachingControls = document.getElementById("teachingControls");
+      const manualControls = document.getElementById("manualControls");
+
+      const backBtn = document.getElementById("backBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      const kvpSlider = document.getElementById("kvpSlider");
+      const masSlider = document.getElementById("masSlider");
+      const filterSlider = document.getElementById("filterSlider");
+      const kvpValue = document.getElementById("kvpValue");
+      const masValue = document.getElementById("masValue");
+      const filterValue = document.getElementById("filterValue");
+
+      const gridLayer = document.getElementById("gridLayer");
+      const spectrumArea = document.getElementById("spectrumArea");
+      const spectrumCurve = document.getElementById("spectrumCurve");
+      const overlayCurve = document.getElementById("overlayCurve");
+      const emaxLine = document.getElementById("emaxLine");
+      const meanLine = document.getElementById("meanLine");
+      const peakA = document.getElementById("peakA");
+      const peakB = document.getElementById("peakB");
+      const emaxLabel = document.getElementById("emaxLabel");
+      const meanLabel = document.getElementById("meanLabel");
+      const peakALabel = document.getElementById("peakALabel");
+      const peakBLabel = document.getElementById("peakBLabel");
+      const overlayLabel = document.getElementById("overlayLabel");
+
+      const teachingStates = [
+        { kvp: 80, mAs: 100, filtration: 1.0, visibility: 0.0, overlay: 0.0, emphasis: 0.0 },
+        { kvp: 80, mAs: 100, filtration: 1.0, visibility: 1.0, overlay: 0.0, emphasis: 0.0 },
+        { kvp: 120, mAs: 100, filtration: 1.0, visibility: 1.0, overlay: 0.0, emphasis: 0.0 },
+        { kvp: 120, mAs: 100, filtration: 3.0, visibility: 1.0, overlay: 0.0, emphasis: 0.0 },
+        { kvp: 120, mAs: 100, filtration: 3.0, visibility: 1.0, overlay: 1.0, emphasis: 0.4 },
+        { kvp: 120, mAs: 100, filtration: 3.0, visibility: 1.0, overlay: 1.0, emphasis: 1.0 }
+      ];
+
+      const teachingExplanations = [
+        `
+          <h2>Step 0: What Beam Quality Means</h2>
+          <p>Beam quality is the penetrating power of an X ray beam, mainly determined by photon energy distribution.</p>
+          <p>Higher mean photon energy means a harder beam that penetrates tissue more effectively.</p>
+        `,
+        `
+          <h2>Step 1: Bremsstrahlung Spectrum</h2>
+          <p>The bremsstrahlung spectrum is continuous from low energy up to a maximum set by tube voltage.</p>
+          <p><strong>E max = tube voltage (kVp)</strong>. Mean energy is the intensity-weighted average energy.</p>
+          <p>The <strong>area under the curve</strong> represents beam quantity.</p>
+        `,
+        `
+          <h2>Step 2: Increasing kVp</h2>
+          <p>Raising kVp shifts <strong>E max</strong> to the right and increases mean energy.</p>
+          <p>This produces a more penetrating beam (higher quality), but generally reduces subject contrast.</p>
+        `,
+        `
+          <h2>Step 3: Adding Filtration</h2>
+          <p>Filtration preferentially removes low-energy photons.</p>
+          <p><strong>E max stays unchanged</strong>, while mean energy increases (beam hardening).</p>
+          <p>Result: reduced patient skin dose with improved beam quality.</p>
+        `,
+        `
+          <h2>Step 4: Quantity vs Quality</h2>
+          <p>Beam quality depends on energy distribution (kVp and filtration), while quantity is total photon output.</p>
+          <p>The overlay shows that changing <strong>mAs</strong> scales intensity only, without shifting E max or mean energy.</p>
+        `,
+        `
+          <h2>Step 5: Key Physics Rules</h2>
+          <ul>
+            <li>E max always equals kVp.</li>
+            <li>Increasing kVp raises beam quality and penetration.</li>
+            <li>Increasing mAs changes quantity only (intensity amplitude).</li>
+            <li>Filtration increases mean energy but does not change E max.</li>
+            <li>Characteristic peak energies are fixed for tungsten.</li>
+            <li>Mean energy remains less than E max.</li>
+            <li>Area under the spectrum represents quantity.</li>
+          </ul>
+        `
+      ];
+
+      const manualState = { kvp: 90, mAs: 100, filtration: 1.0 };
+      const animated = { ...teachingStates[0] };
+
+      let mode = "teaching";
+      let stepIndex = 0;
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function lerp(current, target, amount) {
+        return current + (target - current) * amount;
+      }
+
+      function mapX(energy) {
+        return plot.x + (energy / X_MAX) * plot.width;
+      }
+
+      function mapY(intensity) {
+        const safe = clamp(intensity, 0, Y_MAX);
+        return baselineY - (safe / Y_MAX) * plot.height;
+      }
+
+      function makeSvg(tag, attrs) {
+        const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        Object.entries(attrs).forEach(([key, value]) => {
+          element.setAttribute(key, String(value));
+        });
+        return element;
+      }
+
+      function buildGrid() {
+        gridLayer.innerHTML = "";
+
+        for (let x = 0; x <= X_MAX; x += 20) {
+          const xPos = mapX(x);
+          gridLayer.appendChild(makeSvg("line", {
+            x1: xPos,
+            y1: plot.y,
+            x2: xPos,
+            y2: baselineY,
+            class: "grid-line"
+          }));
+          gridLayer.appendChild(makeSvg("text", {
+            x: xPos,
+            y: baselineY + 24,
+            "text-anchor": "middle",
+            class: "axis-text"
+          })).textContent = String(x);
+        }
+
+        for (let y = 0; y <= Y_MAX; y += 1) {
+          const yPos = mapY(y);
+          gridLayer.appendChild(makeSvg("line", {
+            x1: plot.x,
+            y1: yPos,
+            x2: plot.x + plot.width,
+            y2: yPos,
+            class: "grid-line"
+          }));
+          gridLayer.appendChild(makeSvg("text", {
+            x: plot.x - 12,
+            y: yPos + 4,
+            "text-anchor": "end",
+            class: "axis-text"
+          })).textContent = y === 0 ? "0" : String(y);
+        }
+
+        gridLayer.appendChild(makeSvg("line", {
+          x1: plot.x,
+          y1: baselineY,
+          x2: plot.x + plot.width,
+          y2: baselineY,
+          class: "axis-line"
+        }));
+
+        gridLayer.appendChild(makeSvg("line", {
+          x1: plot.x,
+          y1: plot.y,
+          x2: plot.x,
+          y2: baselineY,
+          class: "axis-line"
+        }));
+
+        gridLayer.appendChild(makeSvg("text", {
+          x: plot.x + plot.width / 2,
+          y: SVG_H - 20,
+          "text-anchor": "middle",
+          class: "axis-title"
+        })).textContent = "Photon Energy (keV)";
+
+        const yTitle = makeSvg("text", {
+          x: 26,
+          y: plot.y + plot.height / 2,
+          "text-anchor": "middle",
+          class: "axis-title",
+          transform: `rotate(-90 26 ${plot.y + plot.height / 2})`
+        });
+        yTitle.textContent = "Relative Intensity";
+        gridLayer.appendChild(yTitle);
+      }
+
+      function attenuation(energy, filtration) {
+        return Math.exp(-filtration * (8 / (energy + 10)));
+      }
+
+      function spectrumPoint(energy, kvp, mAs, filtration) {
+        if (energy <= 0 || energy >= kvp) {
+          return { brems: 0, characteristic: 0, total: 0 };
+        }
+
+        const x = energy / kvp;
+        const masFactor = mAs / 100;
+        const kvpYield = Math.pow(kvp / 80, 1.6);
+        const shape = Math.pow(x, 0.85) * Math.pow(1 - x, 1.18) * (1 + 0.16 * Math.sin(Math.PI * x));
+        const atten = attenuation(energy, filtration);
+
+        const brems = 4.6 * shape * kvpYield * masFactor * atten;
+
+        const characteristicGain = Math.max((kvp - 69) / 71, 0);
+        const kAlphaPeak = Math.exp(-0.5 * Math.pow((energy - K_ALPHA) / 0.9, 2));
+        const kBetaPeak = Math.exp(-0.5 * Math.pow((energy - K_BETA) / 1.0, 2));
+        const characteristic = 0.6 * masFactor * atten * Math.pow(characteristicGain, 1.2) * (kAlphaPeak + 0.58 * kBetaPeak);
+
+        return {
+          brems,
+          characteristic,
+          total: brems + characteristic
+        };
+      }
+
+      function buildSpectrum(params) {
+        const samples = [];
+        let area = 0;
+        let weighted = 0;
+        const visibility = params.visibility;
+
+        for (let energy = 0; energy <= X_MAX + 1e-6; energy += STEP) {
+          const point = spectrumPoint(energy, params.kvp, params.mAs, params.filtration);
+          const total = point.total * visibility;
+          const brems = point.brems * visibility;
+          const characteristic = point.characteristic * visibility;
+
+          samples.push({
+            energy,
+            total,
+            brems,
+            characteristic
+          });
+
+          area += total * STEP;
+          weighted += energy * total * STEP;
+        }
+
+        const meanEnergy = area > 1e-9 ? weighted / area : 0;
+        const peakAState = spectrumPoint(K_ALPHA, params.kvp, params.mAs, params.filtration);
+        const peakBState = spectrumPoint(K_BETA, params.kvp, params.mAs, params.filtration);
+
+        return {
+          samples,
+          area,
+          eMax: params.kvp,
+          meanEnergy: clamp(meanEnergy, 0, Math.max(0, params.kvp - 0.01)),
+          peak: {
+            alphaBase: peakAState.brems * visibility,
+            alphaTotal: peakAState.total * visibility,
+            betaBase: peakBState.brems * visibility,
+            betaTotal: peakBState.total * visibility
+          }
+        };
+      }
+
+      function linePath(samples, valueKey) {
+        if (!samples.length) {
+          return "";
+        }
+        let d = `M ${mapX(samples[0].energy).toFixed(2)} ${mapY(samples[0][valueKey]).toFixed(2)}`;
+        for (let i = 1; i < samples.length; i += 1) {
+          const sample = samples[i];
+          d += ` L ${mapX(sample.energy).toFixed(2)} ${mapY(sample[valueKey]).toFixed(2)}`;
+        }
+        return d;
+      }
+
+      function areaPath(samples) {
+        if (!samples.length) {
+          return "";
+        }
+        let d = `M ${mapX(samples[0].energy).toFixed(2)} ${baselineY.toFixed(2)}`;
+        for (let i = 0; i < samples.length; i += 1) {
+          const sample = samples[i];
+          d += ` L ${mapX(sample.energy).toFixed(2)} ${mapY(sample.total).toFixed(2)}`;
+        }
+        const lastEnergy = samples[samples.length - 1].energy;
+        d += ` L ${mapX(lastEnergy).toFixed(2)} ${baselineY.toFixed(2)} Z`;
+        return d;
+      }
+
+      const referenceArea = buildSpectrum({
+        kvp: 80,
+        mAs: 100,
+        filtration: 1.0,
+        visibility: 1.0
+      }).area || 1;
+
+      function renderExplanation() {
+        if (mode === "manual") {
+          explanationContent.innerHTML = `
+            <h2>Manual Mode</h2>
+            <p>Adjust kVp, mAs, and filtration directly. The graph and data box update continuously in real time.</p>
+            <p><strong>kVp</strong> changes E max and beam quality. <strong>mAs</strong> changes quantity only. <strong>Filtration</strong> removes low-energy photons and increases mean energy.</p>
+          `;
+          return;
+        }
+        explanationContent.innerHTML = teachingExplanations[stepIndex];
+      }
+
+      function updateModeUI() {
+        const teachingActive = mode === "teaching";
+        modeTeachingBtn.classList.toggle("active", teachingActive);
+        modeManualBtn.classList.toggle("active", !teachingActive);
+        teachingControls.hidden = !teachingActive;
+        manualControls.hidden = teachingActive;
+        stepPill.textContent = teachingActive ? `Step ${stepIndex} / 5` : "Manual controls active";
+      }
+
+      function updateStepButtons() {
+        backBtn.disabled = stepIndex <= 0;
+        nextBtn.disabled = stepIndex >= teachingStates.length - 1;
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode;
+        updateModeUI();
+        renderExplanation();
+      }
+
+      function setStep(nextStep) {
+        stepIndex = clamp(nextStep, 0, teachingStates.length - 1);
+        updateStepButtons();
+        updateModeUI();
+        renderExplanation();
+      }
+
+      function getTargetState() {
+        if (mode === "manual") {
+          return {
+            kvp: manualState.kvp,
+            mAs: manualState.mAs,
+            filtration: manualState.filtration,
+            visibility: 1,
+            overlay: 0,
+            emphasis: 0
+          };
+        }
+        return teachingStates[stepIndex];
+      }
+
+      function updateDataBox(metrics) {
+        const relative = metrics.area / referenceArea;
+        dataKvp.textContent = `${animated.kvp.toFixed(1)} kVp`;
+        dataEmax.textContent = `${metrics.eMax.toFixed(1)} keV`;
+        dataMean.textContent = `${metrics.meanEnergy.toFixed(1)} keV`;
+        dataFilter.textContent = `${animated.filtration.toFixed(1)} mm Al`;
+        dataIntensity.textContent = `${relative.toFixed(2)} x`;
+      }
+
+      function renderPeakLine(lineEl, labelEl, xEnergy, yBase, yTop, text, opacity) {
+        const x = mapX(xEnergy);
+        const top = Math.min(yBase, yTop);
+        const bottom = Math.max(yBase, yTop);
+        lineEl.setAttribute("x1", x.toFixed(2));
+        lineEl.setAttribute("x2", x.toFixed(2));
+        lineEl.setAttribute("y1", bottom.toFixed(2));
+        lineEl.setAttribute("y2", top.toFixed(2));
+        lineEl.setAttribute("opacity", opacity.toFixed(3));
+
+        const labelY = clamp(top - 8, plot.y + 13, baselineY - 8);
+        labelEl.setAttribute("x", (x + 4).toFixed(2));
+        labelEl.setAttribute("y", labelY.toFixed(2));
+        labelEl.setAttribute("opacity", opacity.toFixed(3));
+        labelEl.textContent = text;
+      }
+
+      function renderSpectrum(metrics) {
+        spectrumArea.setAttribute("d", areaPath(metrics.samples));
+        spectrumArea.setAttribute("opacity", (0.95 * animated.visibility).toFixed(3));
+
+        spectrumCurve.setAttribute("d", linePath(metrics.samples, "total"));
+        spectrumCurve.setAttribute("opacity", (0.12 + 0.88 * animated.visibility).toFixed(3));
+        spectrumCurve.setAttribute("stroke-width", (2.7 + 0.8 * animated.emphasis).toFixed(2));
+
+        const emaxX = mapX(metrics.eMax);
+        emaxLine.setAttribute("x1", emaxX.toFixed(2));
+        emaxLine.setAttribute("x2", emaxX.toFixed(2));
+        emaxLine.setAttribute("y1", plot.y.toFixed(2));
+        emaxLine.setAttribute("y2", baselineY.toFixed(2));
+        const markerVisibility = animated.visibility < 0.05 ? 0 : (0.2 + 0.8 * animated.visibility);
+        emaxLine.setAttribute("opacity", markerVisibility.toFixed(3));
+        emaxLine.setAttribute("stroke-width", (2.2 + 0.75 * animated.emphasis).toFixed(2));
+
+        const meanX = mapX(metrics.meanEnergy);
+        meanLine.setAttribute("x1", meanX.toFixed(2));
+        meanLine.setAttribute("x2", meanX.toFixed(2));
+        meanLine.setAttribute("y1", plot.y.toFixed(2));
+        meanLine.setAttribute("y2", baselineY.toFixed(2));
+        meanLine.setAttribute("opacity", markerVisibility.toFixed(3));
+
+        const emaxLabelX = clamp(emaxX + 7, plot.x + 4, plot.x + plot.width - 98);
+        emaxLabel.setAttribute("x", emaxLabelX.toFixed(2));
+        emaxLabel.setAttribute("y", (plot.y + 15).toFixed(2));
+        emaxLabel.setAttribute("opacity", markerVisibility.toFixed(3));
+        emaxLabel.textContent = `E max ${metrics.eMax.toFixed(0)} keV`;
+
+        const meanLabelX = clamp(meanX + 8, plot.x + 4, plot.x + plot.width - 118);
+        meanLabel.setAttribute("x", meanLabelX.toFixed(2));
+        meanLabel.setAttribute("y", (plot.y + 34).toFixed(2));
+        meanLabel.setAttribute("opacity", markerVisibility.toFixed(3));
+        meanLabel.textContent = `Mean ${metrics.meanEnergy.toFixed(1)} keV`;
+
+        const alphaBaseY = mapY(metrics.peak.alphaBase);
+        const alphaTopY = mapY(metrics.peak.alphaTotal);
+        const betaBaseY = mapY(metrics.peak.betaBase);
+        const betaTopY = mapY(metrics.peak.betaTotal);
+
+        const alphaStrength = clamp((metrics.peak.alphaTotal - metrics.peak.alphaBase) * 3.8, 0, 1) * animated.visibility;
+        const betaStrength = clamp((metrics.peak.betaTotal - metrics.peak.betaBase) * 3.8, 0, 1) * animated.visibility;
+
+        renderPeakLine(peakA, peakALabel, K_ALPHA, alphaBaseY, alphaTopY, "Kα", alphaStrength);
+        renderPeakLine(peakB, peakBLabel, K_BETA, betaBaseY, betaTopY, "Kβ", betaStrength);
+
+        if (animated.overlay > 0.01) {
+          const overlayMetrics = buildSpectrum({
+            kvp: animated.kvp,
+            mAs: animated.mAs * 2,
+            filtration: animated.filtration,
+            visibility: animated.visibility
+          });
+          overlayCurve.setAttribute("d", linePath(overlayMetrics.samples, "total"));
+          overlayCurve.setAttribute("opacity", (0.86 * animated.overlay).toFixed(3));
+          overlayLabel.setAttribute("x", (plot.x + 14).toFixed(2));
+          overlayLabel.setAttribute("y", (plot.y + 18).toFixed(2));
+          overlayLabel.setAttribute("opacity", (0.88 * animated.overlay).toFixed(3));
+        } else {
+          overlayCurve.setAttribute("opacity", "0");
+          overlayLabel.setAttribute("opacity", "0");
+        }
+      }
+
+      function animationLoop() {
+        const target = getTargetState();
+        const easing = mode === "manual" ? 0.18 : 0.09;
+
+        animated.kvp = lerp(animated.kvp, target.kvp, easing);
+        animated.mAs = lerp(animated.mAs, target.mAs, easing);
+        animated.filtration = lerp(animated.filtration, target.filtration, easing);
+        animated.visibility = lerp(animated.visibility, target.visibility, easing);
+        animated.overlay = lerp(animated.overlay, target.overlay, easing);
+        animated.emphasis = lerp(animated.emphasis, target.emphasis, easing);
+
+        if (Math.abs(animated.kvp - target.kvp) < 0.005) animated.kvp = target.kvp;
+        if (Math.abs(animated.mAs - target.mAs) < 0.005) animated.mAs = target.mAs;
+        if (Math.abs(animated.filtration - target.filtration) < 0.001) animated.filtration = target.filtration;
+        if (Math.abs(animated.visibility - target.visibility) < 0.001) animated.visibility = target.visibility;
+        if (Math.abs(animated.overlay - target.overlay) < 0.001) animated.overlay = target.overlay;
+        if (Math.abs(animated.emphasis - target.emphasis) < 0.001) animated.emphasis = target.emphasis;
+
+        const metrics = buildSpectrum(animated);
+        renderSpectrum(metrics);
+        updateDataBox(metrics);
+
+        window.requestAnimationFrame(animationLoop);
+      }
+
+      modeTeachingBtn.addEventListener("click", function () {
+        setMode("teaching");
+      });
+
+      modeManualBtn.addEventListener("click", function () {
+        setMode("manual");
+      });
+
+      backBtn.addEventListener("click", function () {
+        setStep(stepIndex - 1);
+      });
+
+      nextBtn.addEventListener("click", function () {
+        setStep(stepIndex + 1);
+      });
+
+      kvpSlider.addEventListener("input", function () {
+        manualState.kvp = Number(kvpSlider.value);
+        kvpValue.textContent = `${manualState.kvp.toFixed(0)} kVp`;
+      });
+
+      masSlider.addEventListener("input", function () {
+        manualState.mAs = Number(masSlider.value);
+        masValue.textContent = `${manualState.mAs.toFixed(0)} mAs`;
+      });
+
+      filterSlider.addEventListener("input", function () {
+        manualState.filtration = Number(filterSlider.value);
+        filterValue.textContent = `${manualState.filtration.toFixed(1)} mm Al`;
+      });
+
+      buildGrid();
+      updateStepButtons();
+      updateModeUI();
+      renderExplanation();
+      window.requestAnimationFrame(animationLoop);
+    })();
+  </script>
+</body>
+</html>

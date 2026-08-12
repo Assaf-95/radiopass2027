@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MRI 90° RF Excitation | RadioPass FRCR Physics</title>
+<meta name="description" content="A scroll-driven FRCR Physics lesson showing equilibrium magnetisation, resonant B1 excitation, nutation, the rotating frame and transverse MR signal formation.">
+<meta name="theme-color" content="#04070F">
+<link rel="canonical" href="https://radiopass.co.uk/physics/visuals/mri-90-degree-rf-excitation.html">
+<style>
+:root{
+  --void:#04070F; --deep:#080E22;
+  --cyan:#3FE7FF; --mg:#FF3D8B; --am:#FFA23D; --hz:#8DA2CC; --ink:#EAF2FF;
+  --line:rgba(63,231,255,.14);
+  --dsp:"Avenir Next Condensed","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --bd:"Avenir Next","Segoe UI",system-ui,sans-serif;
+  --mn:"SFMono-Regular",Consolas,"Liberation Mono",ui-monospace,monospace;
+  --easeq:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--void);color:var(--ink);font-family:var(--bd);font-weight:300;overflow-x:hidden;cursor:none}
+@media(pointer:coarse){body{cursor:auto}}
+
+/* ───────── preloader ───────── */
+#pre{position:fixed;inset:0;z-index:100;background:var(--void);display:flex;align-items:flex-end;justify-content:space-between;padding:0 6vw 7vh;transition:transform 1.1s var(--easeq);}
+#pre.done{transform:translateY(-101%)}
+#pre .pct{font-family:var(--dsp);font-weight:600;font-size:clamp(4rem,15vw,11rem);line-height:.8;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#pre .lbl{font-family:var(--mn);font-size:10px;letter-spacing:.34em;color:var(--hz);padding-bottom:1.2rem}
+#pre .bar{position:absolute;left:0;bottom:0;height:1px;background:var(--cyan);width:0}
+
+/* ───────── cursor ───────── */
+#cur{position:fixed;top:0;left:0;width:26px;height:26px;border:1px solid rgba(63,231,255,.6);border-radius:50%;z-index:99;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s var(--easeq),height .4s var(--easeq),background .4s,border-color .4s;mix-blend-mode:screen}
+#cur.big{width:52px;height:52px;background:rgba(63,231,255,.08);border-color:rgba(63,231,255,.9)}
+@media(pointer:coarse){#cur{display:none}}
+
+.skip{position:fixed;top:-80px;left:64px;z-index:110;background:var(--cyan);color:var(--void);font-family:var(--mn);font-size:11px;font-weight:700;letter-spacing:.08em;padding:12px 16px;text-decoration:none;transition:top .2s}
+.skip:focus{top:0}
+
+/* ───────── chrome ───────── */
+.hud{position:fixed;inset:0;z-index:20;pointer-events:none}
+.bk{position:absolute;width:30px;height:30px;border:1px solid var(--line)}
+.tl{top:20px;left:20px;border-right:0;border-bottom:0}.tr{top:20px;right:20px;border-left:0;border-bottom:0}
+.bl{bottom:20px;left:20px;border-right:0;border-top:0}.br{bottom:20px;right:20px;border-left:0;border-top:0}
+.mark{position:absolute;top:23px;left:64px;font-family:var(--mn);font-size:9.5px;letter-spacing:.3em;color:rgba(63,231,255,.7)}
+.sub{position:absolute;top:23px;right:64px;font-family:var(--mn);font-size:9.5px;letter-spacing:.3em;color:rgba(141,162,204,.5)}
+#bar{position:absolute;top:0;left:0;height:1.5px;background:linear-gradient(90deg,var(--cyan),var(--mg));width:0}
+.lesson-nav{position:absolute;top:52px;left:64px;display:flex;gap:8px;pointer-events:auto}
+.lesson-nav a{border:1px solid rgba(63,231,255,.18);background:rgba(4,7,15,.66);color:rgba(234,242,255,.72);font-family:var(--mn);font-size:9px;letter-spacing:.12em;padding:8px 10px;text-decoration:none;backdrop-filter:blur(12px);transition:border-color .2s,color .2s,background .2s}
+.lesson-nav a:hover,.lesson-nav a:focus-visible{border-color:rgba(63,231,255,.7);background:rgba(63,231,255,.08);color:var(--ink)}
+
+/* ───────── type reveal ───────── */
+.ln{overflow:hidden;display:block}
+.ln>i{display:block;font-style:normal;transform:translateY(112%);transition:transform 1.15s var(--easeq)}
+.rv.on .ln>i{transform:none}
+.rv .ln:nth-child(1)>i{transition-delay:.02s}
+.rv .ln:nth-child(2)>i{transition-delay:.10s}
+.rv .ln:nth-child(3)>i{transition-delay:.18s}
+.rv .ln:nth-child(4)>i{transition-delay:.26s}
+.fade{opacity:0;transform:translateY(16px);transition:opacity 1s var(--easeq) .34s,transform 1s var(--easeq) .34s}
+.rv.on .fade{opacity:1;transform:none}
+
+/* ───────── hero ───────── */
+.hero{position:relative;z-index:5;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:16vh 6vw 12vh clamp(52px,7vw,110px)}
+.eyebrow{font-family:var(--mn);font-size:10px;letter-spacing:.32em;color:var(--mg);margin-bottom:26px;display:flex;align-items:center;gap:14px}
+.eyebrow::after{content:"";width:min(180px,20vw);height:1px;background:linear-gradient(90deg,rgba(255,61,139,.5),transparent)}
+h1{font-family:var(--dsp);font-weight:700;font-size:clamp(3rem,11vw,9.5rem);line-height:.86;letter-spacing:-.035em}
+h1 em{font-style:normal;color:var(--am);text-shadow:0 0 40px rgba(255,162,61,.45)}
+.lede{margin-top:34px;max-width:36rem;font-size:clamp(1rem,1.35vw,1.15rem);line-height:1.7;color:var(--hz);font-weight:200}
+.lede b{color:var(--ink);font-weight:400}
+.hint{margin-top:44px;font-family:var(--mn);font-size:10px;letter-spacing:.3em;color:rgba(141,162,204,.45);display:flex;align-items:center;gap:10px}
+.hint span{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* ───────── pinned sequence ───────── */
+#seq{position:relative;z-index:5;height:620vh}
+#pin{position:sticky;top:0;height:100vh;display:grid;grid-template-columns:minmax(290px,26rem) 1fr 130px;align-items:center;gap:2vw;padding:0 3vw 0 clamp(52px,7vw,110px)}
+
+.beats{position:relative;height:min(66vh,540px)}
+.beat{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(26px);pointer-events:none;transition:opacity .75s var(--easeq),transform .75s var(--easeq)}
+.beat.on{opacity:1;transform:none;pointer-events:auto}
+.beat .no{font-family:var(--mn);font-size:10px;letter-spacing:.3em;color:var(--cyan);margin-bottom:16px}
+.beat h2{font-family:var(--dsp);font-weight:500;font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.02;letter-spacing:-.018em;margin-bottom:18px}
+.beat p{font-size:clamp(.9rem,1.05vw,1rem);line-height:1.75;color:var(--hz);font-weight:200;max-width:29rem}
+.beat p+p{margin-top:.9em}
+.beat p b{color:var(--ink);font-weight:400}
+.beat .eq{font-family:var(--mn);font-size:11px;letter-spacing:.06em;color:var(--am);margin-top:20px;padding:10px 0 0;border-top:1px solid var(--line)}
+
+.stage{position:relative;width:100%;height:88vh}
+.stage canvas{width:100%;height:100%;display:block}
+
+/* spine */
+.spine{display:flex;flex-direction:column;gap:0;justify-self:end;padding-right:6px}
+.node{display:flex;align-items:center;gap:10px;height:52px;font-family:var(--mn);font-size:9px;letter-spacing:.18em;color:rgba(141,162,204,.32);transition:color .5s var(--easeq);white-space:nowrap;justify-content:flex-end}
+.node i{width:22px;height:1px;background:rgba(141,162,204,.28);transition:all .5s var(--easeq);flex:none}
+.node.on{color:var(--cyan)}
+.node.on i{width:38px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+
+/* readout under copy */
+.live{display:flex;margin-top:28px;border-top:1px solid var(--line)}
+.live div{flex:1;padding:12px 12px 0 0;border-right:1px solid var(--line)}
+.live div:last-child{border-right:0;padding-right:0}
+.live dt{font-family:var(--mn);font-size:8px;letter-spacing:.22em;color:rgba(141,162,204,.45);margin-bottom:7px}
+.live dd{font-family:var(--dsp);font-weight:600;font-size:1.35rem;font-variant-numeric:tabular-nums;color:var(--cyan)}
+.live div:nth-child(2) dd{color:var(--am)}
+.live div:nth-child(3) dd{color:var(--mg)}
+
+/* ───────── closing ───────── */
+.out{position:relative;z-index:5;min-height:100vh;display:flex;align-items:center;padding:14vh 6vw 14vh clamp(52px,7vw,110px)}
+.out h2{font-family:var(--dsp);font-weight:500;font-size:clamp(1.9rem,4.4vw,3.2rem);line-height:1.04;letter-spacing:-.02em;margin-bottom:24px}
+.out p{max-width:34rem;font-size:clamp(.96rem,1.2vw,1.06rem);line-height:1.72;color:var(--hz);font-weight:200}
+.out p+p{margin-top:1em}
+.out p b{color:var(--ink);font-weight:400}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;margin-top:44px;border-top:1px solid var(--line);max-width:46rem}
+.grid3 div{padding:18px 20px 18px 0;border-right:1px solid var(--line)}
+.grid3 div:last-child{border-right:0}
+.grid3 dt{font-family:var(--mn);font-size:9px;letter-spacing:.22em;color:rgba(141,162,204,.45);margin-bottom:8px}
+.grid3 dd{font-size:.92rem;line-height:1.6;color:var(--hz);font-weight:200}
+footer{position:relative;z-index:5;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:0 6vw 54px clamp(52px,7vw,110px);font-family:var(--mn);font-size:9.5px;letter-spacing:.16em;color:rgba(141,162,204,.42)}
+footer a{color:var(--cyan);text-decoration:none}
+
+@media(max-width:960px){
+  #pin{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:0;padding:7vh 6vw 5vh;align-content:center}
+  .beats{height:auto;min-height:210px;order:1}
+  .beat{position:absolute}
+  .stage{height:46vh;order:2}
+  .spine{display:none}
+  .beat p:nth-of-type(2),.beat .eq{display:none}
+  #seq{height:560vh}
+  .lesson-nav{left:20px;top:52px}
+}
+@media(max-width:520px){
+  .sub{display:none}
+  .mark{left:52px;right:20px;letter-spacing:.24em}
+}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+@media(prefers-reduced-motion:reduce){#pre,.ln>i,.fade,.beat{transition:none}}
+</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+
+<a class="skip" href="#seq">Skip to the excitation sequence</a>
+<div id="pre" aria-hidden="true"><div class="pct" id="pct">0</div><div class="lbl">LOADING SEQUENCE</div><div class="bar" id="pbar"></div></div>
+<div id="cur"></div>
+
+<div class="hud">
+  <div id="bar" aria-hidden="true"></div>
+  <div class="bk tl" aria-hidden="true"></div><div class="bk tr" aria-hidden="true"></div><div class="bk bl" aria-hidden="true"></div><div class="bk br" aria-hidden="true"></div>
+  <div class="mark" aria-hidden="true">EXCITATION / 90° PULSE</div>
+  <div class="sub" aria-hidden="true">1.5 T · ¹H</div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="../lessons.html">← MRI LESSONS</a>
+    <a href="../physics-question-bank.html">QUESTION BANK</a>
+  </nav>
+</div>
+
+<main>
+<header class="hero rv" id="hero">
+  <div class="eyebrow ln"><i>SINGLE EVENT · ONE EXCITATION</i></div>
+  <h1>
+    <span class="ln"><i>THE TIP</i></span>
+    <span class="ln"><i>THAT MAKES</i></span>
+    <span class="ln"><i>THE <em>SIGNAL</em></i></span>
+  </h1>
+  <p class="lede fade">MR signal formation begins with a radiofrequency pulse tipping the net magnetisation away from the longitudinal axis. <b>In the laboratory frame it does not swing across. It spirals.</b></p>
+  <div class="hint fade">SCROLL <span>↓</span></div>
+</header>
+
+<section id="seq">
+  <div id="pin">
+
+    <div class="beats">
+      <article class="beat" data-b="0">
+        <div class="no">01 — EQUILIBRIUM</div>
+        <h2>At rest along B₀</h2>
+        <p>Left alone in the bore, the proton population settles. Slightly more spins align with the field than against it, and their vector sum — the <b>net magnetisation M₀</b> — sits quietly along z.</p>
+        <p>This longitudinal component is not directly detectable by the standard receiver coil. The coil detects magnetic flux that is <b>changing</b>, and a vector aligned with z does not sweep through it.</p>
+        <div class="eq">M₀ ∝ N · γ²ℏ²B₀ / 4kT</div>
+      </article>
+
+      <article class="beat" data-b="1">
+        <div class="no">02 — RF ON</div>
+        <h2>A second, smaller field</h2>
+        <p>The transmit coil produces <b>B₁</b>, a field lying in the transverse plane and rotating at exactly the Larmor frequency — 63.87 MHz at 1.5 T.</p>
+        <p>It is tens of thousands of times weaker than B₀. It works because it is <b>resonant</b>: it turns in step with the precession, so its small push accumulates coherently over repeated revolutions.</p>
+        <div class="eq">ω₀ = γB₀ = 42.58 MHz/T × 1.5 T</div>
+      </article>
+
+      <article class="beat" data-b="2">
+        <div class="no">03 — NUTATION</div>
+        <h2>The spiral down</h2>
+        <p>M now precesses about B₀ and tips about B₁ at the same time. The result is not an arc — it is a <b>helix</b>, winding down the surface of a sphere.</p>
+        <p>In a real 1.5 T pulse of a few hundred microseconds it makes tens of thousands of turns on the way down. Slowed here to six, or you would see nothing but a blur.</p>
+        <div class="eq">α = γ · B₁ · τ</div>
+      </article>
+
+      <article class="beat" data-b="3">
+        <div class="no">04 — ROTATING FRAME</div>
+        <h2>Now stop spinning</h2>
+        <p>Step onto a turntable rotating at ω₀ and B₀ vanishes from the maths. What is left is B₁, standing still along x′ — and M simply <b>tips over it like a hinge</b>.</p>
+        <p>Watch the helix unwind. Same physics, same pulse, same 90°. This is why every textbook draws the rotating frame and almost never the lab frame.</p>
+        <div class="eq">B_eff,z = B₀ − ωRF/γ = 0 at resonance</div>
+      </article>
+
+      <article class="beat" data-b="4">
+        <div class="no">05 — SIGNAL</div>
+        <h2>All of it, transverse</h2>
+        <p>At 90° the longitudinal component is gone and the entire magnetisation lies in the transverse plane, sweeping past the receiver coil.</p>
+        <p>That sweep induces a voltage. The voltage decays as the spins dephase, and that decaying oscillation — the <b>free induction decay</b> — is the raw signal underlying MR image formation.</p>
+        <div class="eq">S(t) ∝ M₀ · sin α · e^(−t/T2*)</div>
+      </article>
+
+      <dl class="live">
+        <div><dt>FLIP α</dt><dd data-k="a">0°</dd></div>
+        <div><dt>Mz</dt><dd data-k="b">100%</dd></div>
+        <div><dt>Mxy</dt><dd data-k="c">0%</dd></div>
+      </dl>
+    </div>
+
+    <div class="stage"><canvas id="cv" role="img" aria-label="Computed net magnetisation vector tipping from the longitudinal axis into the transverse plane during a resonant 90 degree RF pulse.">Your browser does not support the canvas used for this MRI excitation diagram.</canvas></div>
+
+    <nav class="spine">
+      <div class="node" data-n="0"><span>EQUILIBRIUM</span><i></i></div>
+      <div class="node" data-n="1"><span>RF ON</span><i></i></div>
+      <div class="node" data-n="2"><span>NUTATION</span><i></i></div>
+      <div class="node" data-n="3"><span>ROT. FRAME</span><i></i></div>
+      <div class="node" data-n="4"><span>SIGNAL</span><i></i></div>
+    </nav>
+
+  </div>
+</section>
+
+<section class="out rv" id="out">
+  <div>
+    <div class="eyebrow ln"><i>ON THE BUILD</i></div>
+    <h2 class="ln"><i>Not a video of physics.</i></h2>
+    <p class="fade">The helix is <b>computed every frame</b> from the current flip angle, not played back. That is why scrolling backwards runs the pulse backwards, why stopping at 43° leaves it at 43°, and why the unwind in beat four is a real change of reference frame rather than a crossfade between two clips.</p>
+    <p class="fade">Everything on screen is arithmetic and a 2D canvas. No video, no WebGL, no animation library.</p>
+    <dl class="grid3 fade">
+      <div><dt>WEIGHT</dt><dd>One HTML file. No dependencies beyond two webfonts.</dd></div>
+      <div><dt>SCROLL</dt><dd>Damped, not raw — position eases toward its target every frame.</dd></div>
+      <div><dt>EDITABLE</dt><dd>Change TURNS, flip angle or field strength by editing one constant.</dd></div>
+    </dl>
+  </div>
+</section>
+</main>
+
+<footer>
+  <span>EXCITATION · VALUES ARE TEXTBOOK APPROXIMATIONS AT 1.5 T</span>
+  <span><a href="mri-refocusing-pulse.html">NEXT: 180° REFOCUSING →</a></span>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var TAU=Math.PI*2, HP=Math.PI/2, TURNS=6;
+var reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function cl(v,a,b){return v<a?a:v>b?b:v}
+function ez(t){t=cl(t,0,1);return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+function ezo(t){return 1-Math.pow(1-cl(t,0,1),3)}
+function rgba(r,g,b,a){return "rgba("+r+","+g+","+b+","+a+")"}
+var CY=[63,231,255], MG=[255,61,139], AM=[255,162,61], HZ=[141,162,204];
+function c(k,a){return rgba(k[0],k[1],k[2],a)}
+
+/* ── preloader ── */
+var pre=document.getElementById("pre"),pct=document.getElementById("pct"),pbar=document.getElementById("pbar");
+var pv=0;
+if(reduced){
+  pct.textContent="100";pbar.style.width="100%";pre.classList.add("done");document.getElementById("hero").classList.add("on");
+}else{
+  var pt=setInterval(function(){
+    pv+=Math.random()*13+5;
+    if(pv>=100){pv=100;clearInterval(pt);
+      setTimeout(function(){pre.classList.add("done");document.getElementById("hero").classList.add("on")},380);}
+    pct.textContent=Math.floor(pv);pbar.style.width=pv+"%";
+  },95);
+}
+
+/* ── cursor ── */
+var cur=document.getElementById("cur"),mx=innerWidth/2,my=innerHeight/2,cxp=mx,cyp=my;
+addEventListener("mousemove",function(e){mx=e.clientX;my=e.clientY});
+addEventListener("mouseover",function(e){
+  var t=e.target;
+  cur.classList.toggle("big", !!(t.closest&&t.closest("a,button,.beat")));
+});
+
+/* ── canvas ── */
+var cv=document.getElementById("cv"),g=cv.getContext("2d"),W=0,H=0;
+function size(){
+  var d=Math.min(devicePixelRatio||1,2);
+  W=cv.clientWidth;H=cv.clientHeight;
+  cv.width=Math.round(W*d);cv.height=Math.round(H*d);
+  g.setTransform(d,0,0,d,0,0);
+}
+addEventListener("resize",size);size();
+
+/* projection: v = [x, z_up, y_depth] */
+function proj(v,yaw,pit,L,ox,oy){
+  var x=v[0]*Math.cos(yaw)+v[2]*Math.sin(yaw);
+  var d=-v[0]*Math.sin(yaw)+v[2]*Math.cos(yaw);
+  var u=v[1]*Math.cos(pit)-d*Math.sin(pit);
+  var z=v[1]*Math.sin(pit)+d*Math.cos(pit);
+  return {x:ox+x*L,y:oy-u*L,z:z};
+}
+function arw(x0,y0,x1,y1,col,w,hs){
+  g.strokeStyle=col;g.lineWidth=w;g.lineCap="round";
+  g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();
+  var a=Math.atan2(y1-y0,x1-x0),h=8*(hs||1);
+  g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);
+  g.lineTo(x1-h*Math.cos(a-.38),y1-h*Math.sin(a-.38));
+  g.lineTo(x1-h*Math.cos(a+.38),y1-h*Math.sin(a+.38));
+  g.closePath();g.fill();
+}
+function lab(t,x,y,col,s,al){
+  g.font="500 "+(s||10)+"px 'IBM Plex Mono',monospace";
+  g.fillStyle=col;g.textAlign=al||"left";g.textBaseline="middle";g.fillText(t,x,y);g.textAlign="left";
+}
+function bloom(x,y,r,k,a){
+  var gr=g.createRadialGradient(x,y,0,x,y,r);
+  gr.addColorStop(0,c(k,a));gr.addColorStop(.45,c(k,a*.25));gr.addColorStop(1,c(k,0));
+  g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();
+}
+
+/* ── scroll state ── */
+var target=0, smooth=0, beat=-1, px2=0, py2=0;
+var nodes=[].slice.call(document.querySelectorAll(".node"));
+var beats=[].slice.call(document.querySelectorAll(".beat"));
+var outs={};[].slice.call(document.querySelectorAll("[data-k]")).forEach(function(n){outs[n.dataset.k]=n});
+var seq=document.getElementById("seq"),bar=document.getElementById("bar");
+
+function setBeat(b){
+  if(b===beat)return;beat=b;
+  beats.forEach(function(e){e.classList.toggle("on",+e.dataset.b===b)});
+  nodes.forEach(function(e){e.classList.toggle("on",+e.dataset.n===b)});
+}
+
+var ioOut=new IntersectionObserver(function(en){
+  en.forEach(function(x){if(x.isIntersecting)x.target.classList.add("on")});
+},{threshold:.3});
+ioOut.observe(document.getElementById("out"));
+
+/* ── main loop ── */
+var last=performance.now();
+function frame(now){
+  var dt=Math.min((now-last)/16.7,3);last=now;
+
+  /* damped scroll — the thing that makes it feel weighted */
+  var r=seq.getBoundingClientRect();
+  var span=Math.max(1,r.height-innerHeight);
+  target=cl(-r.top/span,0,1);
+  smooth+=(target-smooth)*(reduced?1:0.075)*dt;
+
+  bar.style.width=(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)*100)+"%";
+
+  /* cursor easing */
+  cxp+=(mx-cxp)*.18*dt; cyp+=(my-cyp)*.18*dt;
+  cur.style.transform="translate("+(cxp-13)+"px,"+(cyp-13)+"px)";
+
+  if(r.bottom>-200&&r.top<innerHeight+200) draw(smooth,now);
+  requestAnimationFrame(frame);
+}
+
+function draw(p,t){
+  g.clearRect(0,0,W,H);
+  var ox=W*.5, oy=H*.55, L=Math.min(W,H)*.31;
+
+  /* stage envelopes */
+  var s1=ez(cl(p/.15,0,1));
+  var rfOn=ez(cl((p-.17)/.13,0,1));
+  var nut=ez(cl((p-.31)/.32,0,1));
+  var rfr=ez(cl((p-.65)/.19,0,1));
+  var sig=ez(cl((p-.86)/.14,0,1));
+
+  var flip=nut*HP;
+  var drift=reduced?0:t*.00028;
+
+  /* camera: mouse parallax, eases toward pointer */
+  px2+=(((mx/innerWidth)-.5)-px2)*.05;
+  py2+=(((my/innerHeight)-.5)-py2)*.05;
+  var yaw=.62+px2*.30, pit=.34+py2*.16-rfr*.06;
+
+  var O=proj([0,0,0],yaw,pit,L,ox,oy);
+
+  /* ── transverse plane: rings + spokes ── */
+  g.lineWidth=1;
+  for(var ri=1;ri<=4;ri++){
+    var rr=ri/4;
+    g.strokeStyle=c(HZ,.10*s1*(1.15-rr*.5));
+    g.beginPath();
+    for(var a=0;a<=72;a++){var q=proj([Math.cos(a/72*TAU)*rr,0,Math.sin(a/72*TAU)*rr],yaw,pit,L,ox,oy);a?g.lineTo(q.x,q.y):g.moveTo(q.x,q.y)}
+    g.closePath();g.stroke();
+  }
+  for(var sp=0;sp<12;sp++){
+    var an=sp/12*TAU;
+    var e1=proj([Math.cos(an)*.16,0,Math.sin(an)*.16],yaw,pit,L,ox,oy);
+    var e2=proj([Math.cos(an),0,Math.sin(an)],yaw,pit,L,ox,oy);
+    g.strokeStyle=c(HZ,.07*s1);
+    g.beginPath();g.moveTo(e1.x,e1.y);g.lineTo(e2.x,e2.y);g.stroke();
+  }
+
+  /* ── axes ── */
+  var axes=[[[1.22,0,0],"x′"],[[0,0,1.22],"y′"],[[0,1.28,0],"z"]];
+  for(var i=0;i<3;i++){
+    var e=proj(axes[i][0],yaw,pit,L,ox,oy);
+    arw(O.x,O.y,e.x,e.y,c(HZ,.30*s1),1,.85);
+    lab(axes[i][1],e.x+8,e.y-2,c(HZ,.45*s1),10);
+  }
+
+  /* ── B0 ── */
+  var b0=proj([0,1.05,0],yaw,pit,L,ox,oy);
+  arw(O.x,O.y,b0.x,b0.y,c(CY,.5*s1),2,1.2);
+  lab("B₀",b0.x-24,b0.y+4,c(CY,.75*s1),11);
+
+  /* ── transmit coil rings, brighten with RF ── */
+  if(rfOn>.01){
+    var pulse=.55+.45*Math.sin(t*.006);
+    for(var cs=-1;cs<=1;cs+=2){
+      g.strokeStyle=c(MG,(.10+.16*pulse)*rfOn);g.lineWidth=1.4;
+      g.beginPath();
+      for(var a2=0;a2<=48;a2++){
+        var q2=proj([cs*1.5,Math.cos(a2/48*TAU)*.95,Math.sin(a2/48*TAU)*.95],yaw,pit,L,ox,oy);
+        a2?g.lineTo(q2.x,q2.y):g.moveTo(q2.x,q2.y);
+      }
+      g.closePath();g.stroke();
+    }
+    lab("TX COIL",ox-L*1.5,oy+L*1.15,c(MG,.4*rfOn),9,"center");
+  }
+
+  /* ── B1 vector in the transverse plane ── */
+  if(rfOn>.01){
+    var phB=(drift*TURNS)*(1-rfr);
+    var b1=proj([Math.cos(phB)*.48,0,Math.sin(phB)*.48],yaw,pit,L,ox,oy);
+    g.globalCompositeOperation="lighter";
+    bloom(b1.x,b1.y,22,MG,.22*rfOn);
+    g.globalCompositeOperation="source-over";
+    arw(O.x,O.y,b1.x,b1.y,c(MG,.85*rfOn),2.4,1.15);
+    lab("B₁",b1.x+9,b1.y+9,c(MG,.9*rfOn),11);
+  }
+
+  /* ── the helix, computed fresh every frame ── */
+  var N=180, pts=[];
+  for(var k=0;k<=N;k++){
+    var f=flip*(k/N);
+    var ph=(drift+(f/HP)*TURNS*TAU)*(1-rfr);
+    pts.push(proj([Math.sin(f)*Math.cos(ph),Math.cos(f),Math.sin(f)*Math.sin(ph)],yaw,pit,L,ox,oy));
+  }
+  g.globalCompositeOperation="lighter";
+  for(var k2=1;k2<pts.length;k2++){
+    var u=k2/pts.length;
+    g.strokeStyle=c(AM,.05+.30*u);
+    g.lineWidth=.6+2.4*u;
+    g.lineCap="round";
+    g.beginPath();g.moveTo(pts[k2-1].x,pts[k2-1].y);g.lineTo(pts[k2].x,pts[k2].y);g.stroke();
+  }
+  g.globalCompositeOperation="source-over";
+
+  /* ── M and its components ── */
+  var phM=(drift+TURNS*TAU*(flip/HP))*(1-rfr);
+  var vM=[Math.sin(flip)*Math.cos(phM),Math.cos(flip),Math.sin(flip)*Math.sin(phM)];
+  var M=proj(vM,yaw,pit,L,ox,oy);
+  var S=proj([vM[0],0,vM[2]],yaw,pit,L,ox,oy);
+  var Z=proj([0,vM[1],0],yaw,pit,L,ox,oy);
+
+  g.setLineDash([3,4]);g.lineWidth=1;
+  g.strokeStyle=c(HZ,.28);
+  g.beginPath();g.moveTo(M.x,M.y);g.lineTo(S.x,S.y);g.stroke();
+  g.beginPath();g.moveTo(M.x,M.y);g.lineTo(Z.x,Z.y);g.stroke();
+  g.setLineDash([]);
+
+  if(vM[1]>.02){arw(O.x,O.y,Z.x,Z.y,c(CY,.55),1.8,.95);lab("Mz",Z.x-27,Z.y,c(CY,.8),10);}
+  if(Math.sin(flip)>.02){arw(O.x,O.y,S.x,S.y,c(MG,.55),1.8,.95);lab("Mxy",S.x+9,S.y+11,c(MG,.8),10);}
+
+  g.globalCompositeOperation="lighter";
+  bloom(M.x,M.y,34,AM,.28);
+  g.globalCompositeOperation="source-over";
+  arw(O.x,O.y,M.x,M.y,c(AM,1),3.4,1.6);
+  lab("M",M.x+12,M.y-11,c(AM,1),12);
+
+  /* ── frame label crossfade ── */
+  lab("LAB FRAME",18,26,c(HZ,.42*(1-rfr)),10);
+  lab("ROTATING FRAME  ω = ω₀",18,26,c(CY,.75*rfr),10);
+  lab(rfr>.5?"B₀ CANCELLED · ONLY B₁ REMAINS":"PRECESSION + NUTATION",18,44,c(HZ,.30),9);
+
+  /* ── FID trace ── */
+  if(sig>.01){
+    var fx=W*.06,fy=H*.90,fw=W*.88,fh=H*.07;
+    g.strokeStyle=c(HZ,.16*sig);g.lineWidth=1;
+    g.beginPath();g.moveTo(fx,fy);g.lineTo(fx+fw,fy);g.stroke();
+    g.strokeStyle=c(CY,.85*sig);g.lineWidth=1.5;g.beginPath();
+    var run=cl((p-.88)/.12,0,1);
+    for(var xx=0;xx<=fw*run;xx++){
+      var tt=xx/fw*9;
+      g.lineTo(fx+xx,fy-Math.exp(-tt/2.6)*Math.cos(tt*3.4)*fh);
+    }
+    g.stroke();
+    lab("FREE INDUCTION DECAY",fx,fy+22,c(HZ,.38*sig),9);
+  }
+
+  /* ── readouts ── */
+  outs.a.textContent=Math.round(flip*180/Math.PI)+"°";
+  outs.b.textContent=Math.round(Math.cos(flip)*100)+"%";
+  outs.c.textContent=Math.round(Math.sin(flip)*100)+"%";
+
+  setBeat(p<.17?0:p<.31?1:p<.65?2:p<.86?3:4);
+}
+
+setBeat(0);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

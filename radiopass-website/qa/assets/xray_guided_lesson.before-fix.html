@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Ray Interaction Guided Lesson</title>
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --bg-panel: rgba(30, 41, 59, 0.4);
+            --border-panel: rgba(148, 163, 184, 0.1);
+            --accent-cyan: #22d3ee;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-panel);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Header */
+        header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-panel);
+            background: rgba(2, 6, 23, 0.8);
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent-cyan);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Commentary Banner */
+        #commentary-banner {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid var(--border-panel);
+            transition: all 0.3s ease;
+        }
+
+        #commentary-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--accent-cyan);
+            max-width: 800px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #commentary-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Main Split Layout */
+        main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-label {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(2, 6, 23, 0.7);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-panel);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Footer Controls */
+        footer {
+            height: 80px;
+            background: rgba(2, 6, 23, 0.9);
+            border-top: 1px solid var(--border-panel);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 10;
+        }
+
+        .stepper-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        button {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-panel);
+            color: var(--text-main);
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-panel);
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 8px var(--accent-cyan);
+            transform: scale(1.2);
+        }
+
+        .dot.completed {
+            background: var(--accent-cyan);
+            opacity: 0.5;
+        }
+
+        .counters {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .counter-box {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid var(--border-panel);
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .counter-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .counter-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .flash {
+            animation: flash-anim 0.3s ease-out;
+        }
+
+        @keyframes flash-anim {
+            0% { color: #fff; text-shadow: 0 0 10px #fff; transform: scale(1.2); }
+            100% { color: var(--text-main); transform: scale(1); }
+        }
+
+    </style>
+  <script src="../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+
+    <header class="glass-panel">
+        <h1>
+            <span class="badge">Lesson 1</span>
+            X-Ray Interactions Guided Tour
+        </h1>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+            <span id="step-indicator">Step 1 of 10</span>
+        </div>
+    </header>
+
+    <div id="commentary-banner">
+        <div id="commentary-text">Initializing lesson...</div>
+    </div>
+
+    <main>
+        <!-- Left Panel: Atom Scene -->
+        <div class="panel" style="border-right: 1px solid var(--border-panel);">
+            <div class="panel-label">Interaction View</div>
+            <canvas id="atomCanvas"></canvas>
+        </div>
+
+        <!-- Right Panel: Graph -->
+        <div class="panel">
+            <div class="panel-label">Energy Spectrum</div>
+            <div class="counters">
+                <div class="counter-box" id="cnt-absorbed">
+                    <div class="counter-label">Absorbed</div>
+                    <div class="counter-value">0</div>
+                </div>
+                <div class="counter-box" id="cnt-scattered">
+                    <div class="counter-label">Scattered</div>
+                    <div class="counter-value">0</div>
+                </div>
+                <div class="counter-box" id="cnt-transmitted">
+                    <div class="counter-label">Transmitted</div>
+                    <div class="counter-value">0</div>
+                </div>
+            </div>
+            <canvas id="graphCanvas"></canvas>
+        </div>
+    </main>
+
+    <footer>
+        <div class="stepper-controls">
+            <button id="btn-back" disabled>Back</button>
+            <div class="progress-dots" id="dots-container">
+                <!-- Dots generated by JS -->
+            </div>
+            <button id="btn-next">Next</button>
+        </div>
+    </footer>
+
+    <script>
+        // --- Configuration & State ---
+        const STEPS = [
+            {
+                title: "Electron Approach",
+                text: "Electrons are accelerated toward the anode target. Initial kinetic energy is high.",
+                type: "electron_pass"
+            },
+            {
+                title: "Weak Bremsstrahlung",
+                text: "Electron is deflected by the nucleus field. A low-energy bremsstrahlung photon is emitted.",
+                type: "brems_weak"
+            },
+            {
+                title: "Strong Bremsstrahlung",
+                text: "Closer pass to the nucleus results in stronger deflection and higher energy photon emission.",
+                type: "brems_strong"
+            },
+            {
+                title: "Inner Shell Ionization",
+                text: "Incident electron strikes a K-shell electron, ejecting it and creating a vacancy.",
+                type: "ionization_k"
+            },
+            {
+                title: "Characteristic Emission",
+                text: "Outer L-shell electron drops to fill the K-vacancy. A characteristic photon is emitted at discrete energy.",
+                type: "char_emission"
+            },
+            {
+                title: "Multi-Event Interaction",
+                text: "One electron can produce bremsstrahlung and then cause ionization, creating multiple photons.",
+                type: "multi_event"
+            },
+            {
+                title: "Filtration",
+                text: "Filtration preferentially absorbs low-energy photons (soft X-rays), hardening the beam.",
+                type: "filtration"
+            },
+            {
+                title: "Photoelectric Absorption",
+                text: "Incident photon is completely absorbed by an inner shell electron, ejecting a photoelectron.",
+                type: "photoelectric"
+            },
+            {
+                title: "Compton Scatter (Small Angle)",
+                text: "Photon hits outer electron, scatters with small energy loss. Recoil electron is emitted.",
+                type: "compton_small"
+            },
+            {
+                title: "Compton Scatter (Large Angle)",
+                text: "Large angle scatter transfers more energy to the electron. Backscattered photons have lowest energy.",
+                type: "compton_large"
+            }
+        ];
+
+        let state = {
+            stepIndex: 0,
+            histogram: new Array(100).fill(0), // 0-100 keV bins
+            counters: { absorbed: 0, scattered: 0, transmitted: 0 },
+            lastEventTime: 0,
+            simTime: 0
+        };
+
+        // --- Canvas Setup ---
+        const atomCanvas = document.getElementById('atomCanvas');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const atomCtx = atomCanvas.getContext('2d');
+        const graphCtx = graphCanvas.getContext('2d');
+        
+        // --- Resize Logic ---
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            [atomCanvas, graphCanvas].forEach(canvas => {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                canvas.style.width = rect.width + 'px';
+                canvas.style.height = rect.height + 'px';
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+            });
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Simulation Elements ---
+        const particles = [];
+        const atoms = [];
+        let simulationLoopId;
+
+        // --- Step Management ---
+        function setStep(index) {
+            if (index < 0 || index >= STEPS.length) return;
+            state.stepIndex = index;
+            
+            // Update UI
+            document.getElementById('step-indicator').textContent = `Step ${index + 1} of ${STEPS.length}`;
+            updateDots();
+            document.getElementById('btn-back').disabled = index === 0;
+            document.getElementById('btn-next').textContent = index === STEPS.length - 1 ? "Finish" : "Next";
+            
+            // Show commentary
+            const banner = document.getElementById('commentary-text');
+            banner.classList.remove('visible');
+            setTimeout(() => {
+                banner.textContent = STEPS[index].text;
+                banner.classList.add('visible');
+            }, 300);
+
+            // Reset Simulation for this step
+            resetSimulation();
+        }
+
+        function updateDots() {
+            const container = document.getElementById('dots-container');
+            container.innerHTML = '';
+            STEPS.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === state.stepIndex ? 'active' : ''} ${i < state.stepIndex ? 'completed' : ''}`;
+                container.appendChild(dot);
+            });
+        }
+
+        document.getElementById('btn-next').onclick = () => setStep(state.stepIndex + 1);
+        document.getElementById('btn-back').onclick = () => setStep(state.stepIndex - 1);
+
+        // --- Physics Engine ---
+        function resetSimulation() {
+            particles.length = 0;
+            atoms.length = 0;
+            state.counters = { absorbed: 0, scattered: 0, transmitted: 0 };
+            state.histogram.fill(0);
+            updateCountersUI();
+            
+            // Center atom
+            const w = atomCanvas.width / (window.devicePixelRatio||1);
+            const h = atomCanvas.height / (window.devicePixelRatio||1);
+            
+            // Setup scene based on step
+            const type = STEPS[state.stepIndex].type;
+            
+            if (type === 'filtration') {
+                // Draw filter block later
+            } else {
+                atoms.push({ x: w/2, y: h/2, type: 'W', vacancy: false, kShell: 2, lShell: 8 });
+            }
+
+            state.simTime = 0;
+            state.lastEventTime = 0;
+        }
+
+        function spawnParticle(type, props) {
+            particles.push({
+                type: type, // 'electron', 'photon'
+                x: props.x,
+                y: props.y,
+                vx: props.vx,
+                vy: props.vy,
+                energy: props.energy,
+                color: props.color || '#fff',
+                life: 1.0,
+                id: Math.random(),
+                trail: []
+            });
+        }
+
+        // --- Main Loop ---
+        function loop(timestamp) {
+            const dt = 0.016; // Fixed timestep approx
+            state.simTime += dt;
+            
+            updatePhysics(dt);
+            drawScene();
+            drawGraph();
+            
+            requestAnimationFrame(loop);
+        }
+
+        function updatePhysics(dt) {
+            const step = STEPS[state.stepIndex];
+            const w = atomCanvas.width / (window.devicePixelRatio||1);
+            const h = atomCanvas.height / (window.devicePixelRatio||1);
+            const atom = atoms[0];
+
+            // Spawner logic
+            if (state.simTime - state.lastEventTime > 3.0) { // Slow loop every 3.0s
+                state.lastEventTime = state.simTime;
+                
+                // Reset atom state for new cycle
+                if (atom) {
+                    atom.vacancy = false;
+                    atom.kShell = 2;
+                }
+
+                if (step.type.startsWith('brems') || step.type === 'electron_pass' || step.type === 'ionization_k' || step.type === 'multi_event' || step.type === 'char_emission') {
+                    // Spawn Electron
+                    let vy = 0;
+                    if (step.type === 'brems_weak') vy = 15; // Offset to miss nucleus
+                    if (step.type === 'brems_strong') vy = 5; // Closer
+                    if (step.type === 'ionization_k' || step.type === 'char_emission') vy = 0; // Hit center
+                    if (step.type === 'multi_event') vy = 8; 
+
+                    spawnParticle('electron', {
+                        x: 0, y: h/2 + vy,
+                        vx: 300, vy: 0,
+                        energy: 100,
+                        color: '#fbbf24' // Amber
+                    });
+                } else if (step.type === 'filtration') {
+                    // Spawn Photons
+                    spawnParticle('photon', {
+                        x: 0, y: h/2,
+                        vx: 300, vy: 0,
+                        energy: Math.random() > 0.5 ? 80 : 30, // High or Low
+                        color: Math.random() > 0.5 ? '#a855f7' : '#22c55e'
+                    });
+                } else if (step.type.startsWith('photo') || step.type.startsWith('compton')) {
+                    // Spawn Photon
+                    spawnParticle('photon', {
+                        x: 0, y: h/2,
+                        vx: 300, vy: 0,
+                        energy: 80,
+                        color: '#a855f7'
+                    });
+                }
+            }
+
+            // Update Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                
+                // Trail update
+                p.trail.push({x: p.x, y: p.y});
+                if (p.trail.length > 10) p.trail.shift();
+
+                // Interactions
+                if (atom) {
+                    const dx = p.x - atom.x;
+                    const dy = p.y - atom.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+
+                    if (p.type === 'electron' && !p.interacted && !p.isTransition) {
+                        // Bremsstrahlung
+                        if (dist < 80 && dx > -40 && (step.type.startsWith('brems') || step.type === 'multi_event')) {
+                             if (step.type === 'brems_weak' || (step.type === 'multi_event' && !p.multiDone)) {
+                                 const strength = 15000 / (dist * dist + 100); // Inverse square approx
+                                 p.vy += strength * dt * (p.y > atom.y ? 1 : -1); 
+                                 
+                                 if (dx > 0 && !p.emitted && Math.abs(dx) < 10) {
+                                     p.emitted = true;
+                                     p.vx *= 0.9;
+                                     if (step.type === 'multi_event') p.multiDone = true;
+                                     spawnParticle('photon', { x: p.x, y: p.y, vx: p.vx, vy: p.vy + 100, energy: 30, color: '#22c55e' }); // Green low energy
+                                     updateGraph(30, 'brems');
+                                 }
+                             } else if (step.type === 'brems_strong') {
+                                 const strength = 40000 / (dist * dist + 100);
+                                 p.vy += strength * dt * (p.y > atom.y ? 1 : -1);
+                                 
+                                 if (dx > 0 && !p.emitted && Math.abs(dx) < 10) {
+                                     p.emitted = true;
+                                     p.vx *= 0.7;
+                                     spawnParticle('photon', { x: p.x, y: p.y, vx: p.vx, vy: p.vy + 200, energy: 70, color: '#3b82f6' }); // Blue high energy
+                                     updateGraph(70, 'brems');
+                                 }
+                             }
+                        }
+
+                        // Ionization
+                        if (dist < 20 && !p.interacted && (step.type === 'ionization_k' || step.type === 'char_emission' || step.type === 'multi_event')) {
+                            if (step.type === 'multi_event' && !p.multiDone) return; // Wait for brems first
+
+                            p.interacted = true;
+                            atom.vacancy = true;
+                            atom.kShell = 1;
+                            
+                            // Eject K electron
+                            spawnParticle('electron', { x: p.x, y: p.y, vx: 100, vy: -200, energy: 50, color: '#ef4444' }); // Red ejected
+                            
+                            // Original electron leaves
+                            p.vx *= 0.8; 
+                            p.vy += 50;
+
+                            // Char emission animation
+                            if (step.type === 'char_emission' || step.type === 'multi_event') {
+                                setTimeout(() => {
+                                    // Spawn transition electron from L (70) to K (40)
+                                    const angle = -Math.PI/2;
+                                    const lx = atom.x + Math.cos(angle) * 70;
+                                    const ly = atom.y + Math.sin(angle) * 70;
+                                    spawnParticle('electron', { 
+                                        x: lx, y: ly, 
+                                        vx: 0, vy: 50, // Downwards roughly
+                                        energy: 0, color: '#f97316',
+                                        isTransition: true
+                                    });
+                                }, 400);
+                            } else {
+                                updateGraph(0, 'vacancy'); // Just flash
+                            }
+                        }
+                    }
+                    
+                    // Transition Electron Logic
+                    if (p.isTransition) {
+                        const distToCenter = Math.sqrt((p.x - atom.x)**2 + (p.y - atom.y)**2);
+                        if (distToCenter <= 40) {
+                            p.dead = true;
+                            atom.vacancy = false; // Filled
+                            atom.kShell = 2;
+                            spawnParticle('photon', { x: p.x, y: p.y, vx: 200, vy: 100, energy: 60, color: '#a855f7' }); // Purple char
+                            updateGraph(60, 'char');
+                        }
+                    }
+
+                    if (p.type === 'photon' && !p.interacted && dist < 20) {
+                        if (step.type === 'photoelectric') {
+                            p.interacted = true;
+                            p.dead = true; // Absorbed
+                            spawnParticle('electron', { x: p.x, y: p.y, vx: 150, vy: -150, energy: 60, color: '#ef4444' });
+                            updateGraph(0, 'absorbed');
+                            setTimeout(() => { // Char follow up
+                                spawnParticle('photon', { x: p.x, y: p.y, vx: 100, vy: 100, energy: 50, color: '#a855f7' });
+                                updateGraph(50, 'char');
+                            }, 400);
+                        } else if (step.type === 'compton_small') {
+                            p.interacted = true;
+                            p.vy = 100; // Small deflect
+                            p.vx = 250;
+                            p.color = '#22c55e'; // Shift to green (lower energy)
+                            spawnParticle('electron', { x: p.x, y: p.y, vx: 100, vy: -50, energy: 20, color: '#fbbf24' }); // Recoil
+                            updateGraph(50, 'scatter');
+                        } else if (step.type === 'compton_large') {
+                            p.interacted = true;
+                            p.vx = -150; // Backscatter
+                            p.vy = 100;
+                            p.color = '#ef4444'; // Shift to red (lowest energy)
+                            spawnParticle('electron', { x: p.x, y: p.y, vx: 250, vy: -50, energy: 40, color: '#fbbf24' }); // Strong recoil
+                            updateGraph(20, 'scatter');
+                        }
+                    }
+                }
+
+                // Filtration Interaction (Virtual Box)
+                if (step.type === 'filtration' && p.type === 'photon' && p.x > w/2 - 20 && p.x < w/2 + 20 && !p.interacted) {
+                    if (p.energy < 50) { // Low energy absorbed
+                        p.dead = true;
+                        updateGraph(0, 'absorbed');
+                    } else {
+                        p.interacted = true; // Pass through marked
+                        updateGraph(p.energy, 'transmitted');
+                    }
+                }
+
+                // Cleanup
+                if (p.dead || p.x > w + 50 || p.x < -50 || p.y > h + 50 || p.y < -50) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        // --- Drawing ---
+        function drawScene() {
+            const w = atomCanvas.width / (window.devicePixelRatio||1);
+            const h = atomCanvas.height / (window.devicePixelRatio||1);
+            
+            // Clear
+            atomCtx.clearRect(0, 0, w, h);
+
+            // Draw Atom (if exists)
+            if (atoms.length > 0) {
+                const a = atoms[0];
+                // Nucleus
+                atomCtx.fillStyle = '#ef4444';
+                atomCtx.beginPath(); atomCtx.arc(a.x, a.y, 10, 0, Math.PI*2); atomCtx.fill();
+                
+                // Shells
+                atomCtx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+                atomCtx.lineWidth = 1;
+                atomCtx.beginPath(); atomCtx.arc(a.x, a.y, 40, 0, Math.PI*2); atomCtx.stroke(); // K
+                atomCtx.beginPath(); atomCtx.arc(a.x, a.y, 70, 0, Math.PI*2); atomCtx.stroke(); // L
+
+                // Electrons on shells
+                if (a.kShell > 0) drawShellElectron(a.x, a.y, 40, 0);
+                if (a.kShell > 1) drawShellElectron(a.x, a.y, 40, Math.PI);
+                
+                // L-Shell electrons (static for visual)
+                for(let i=0; i<8; i++) drawShellElectron(a.x, a.y, 70, i * Math.PI/4);
+                
+                // Vacancy indicator
+                if (a.vacancy) {
+                    atomCtx.strokeStyle = '#fff';
+                    atomCtx.lineWidth = 2;
+                    atomCtx.setLineDash([2, 2]);
+                    atomCtx.beginPath(); atomCtx.arc(a.x, a.y, 40, 0, Math.PI*2); atomCtx.stroke();
+                    atomCtx.setLineDash([]);
+                }
+            }
+
+            // Draw Filter Block
+            if (STEPS[state.stepIndex].type === 'filtration') {
+                atomCtx.fillStyle = 'rgba(148, 163, 184, 0.2)';
+                atomCtx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                atomCtx.fillRect(w/2 - 20, 50, 40, h-100);
+                atomCtx.strokeRect(w/2 - 20, 50, 40, h-100);
+                atomCtx.fillStyle = '#94a3b8';
+                atomCtx.font = '10px sans-serif';
+                atomCtx.fillText('Filter', w/2 - 12, 40);
+            }
+
+            // Draw Particles
+            particles.forEach(p => {
+                atomCtx.fillStyle = p.color;
+                atomCtx.shadowBlur = 10;
+                atomCtx.shadowColor = p.color;
+                
+                if (p.type === 'photon') {
+                    // Wavy line
+                    const len = 15;
+                    const angle = Math.atan2(p.vy, p.vx);
+                    atomCtx.save();
+                    atomCtx.translate(p.x, p.y);
+                    atomCtx.rotate(angle);
+                    atomCtx.beginPath();
+                    atomCtx.moveTo(-len, 0);
+                    for(let i=0; i<=len; i++) {
+                        atomCtx.lineTo(-len + i, Math.sin(i*0.8)*3);
+                    }
+                    atomCtx.stroke();
+                    atomCtx.strokeStyle = p.color;
+                    atomCtx.lineWidth = 2;
+                    atomCtx.restore();
+                } else {
+                    // Electron Trail
+                    if (p.trail.length > 1) {
+                        atomCtx.beginPath();
+                        atomCtx.moveTo(p.trail[0].x, p.trail[0].y);
+                        for (let t of p.trail) atomCtx.lineTo(t.x, t.y);
+                        atomCtx.strokeStyle = `rgba(251, 191, 36, 0.3)`;
+                        atomCtx.lineWidth = 2;
+                        atomCtx.stroke();
+                    }
+                    
+                    atomCtx.beginPath();
+                    atomCtx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                    atomCtx.fill();
+                }
+                atomCtx.shadowBlur = 0;
+            });
+        }
+
+        function drawShellElectron(cx, cy, r, angleOffset) {
+            const angle = Date.now() * 0.001 + angleOffset;
+            const x = cx + Math.cos(angle) * r;
+            const y = cy + Math.sin(angle) * r;
+            atomCtx.fillStyle = '#3b82f6';
+            atomCtx.beginPath(); atomCtx.arc(x, y, 3, 0, Math.PI*2); atomCtx.fill();
+        }
+
+        function drawGraph() {
+            const w = graphCanvas.width / (window.devicePixelRatio||1);
+            const h = graphCanvas.height / (window.devicePixelRatio||1);
+            
+            // Background Grid
+            graphCtx.fillStyle = '#020617';
+            graphCtx.fillRect(0, 0, w, h);
+            graphCtx.strokeStyle = '#1e293b';
+            graphCtx.lineWidth = 1;
+            graphCtx.beginPath();
+            graphCtx.moveTo(40, h-30); graphCtx.lineTo(w-20, h-30); // X
+            graphCtx.moveTo(40, h-30); graphCtx.lineTo(40, 20); // Y
+            graphCtx.stroke();
+
+            // Labels
+            graphCtx.fillStyle = '#64748b';
+            graphCtx.font = '10px sans-serif';
+            graphCtx.fillText('Energy (keV)', w/2 - 20, h - 10);
+            graphCtx.save();
+            graphCtx.translate(15, h/2);
+            graphCtx.rotate(-Math.PI/2);
+            graphCtx.fillText('Counts', 0, 0);
+            graphCtx.restore();
+
+            // Histogram
+            const barW = (w - 60) / 100;
+            graphCtx.fillStyle = '#22d3ee';
+            state.histogram.forEach((count, i) => {
+                if (count > 0) {
+                    const barH = Math.min(count * 10, h - 60);
+                    graphCtx.fillRect(40 + i*barW, h-30-barH, barW, barH);
+                }
+            });
+        }
+
+        function updateGraph(energy, type) {
+            // Update counters
+            if (type === 'absorbed') flashCounter('cnt-absorbed', ++state.counters.absorbed);
+            if (type === 'scatter') flashCounter('cnt-scattered', ++state.counters.scattered);
+            if (type === 'transmitted') flashCounter('cnt-transmitted', ++state.counters.transmitted);
+
+            // Update Histogram
+            if (energy > 0) {
+                const bin = Math.min(99, Math.floor(energy));
+                state.histogram[bin]++;
+            }
+        }
+
+        function flashCounter(id, value) {
+            const el = document.getElementById(id);
+            const valEl = el.querySelector('.counter-value');
+            valEl.textContent = value;
+            valEl.classList.remove('flash');
+            void valEl.offsetWidth; // trigger reflow
+            valEl.classList.add('flash');
+        }
+
+        // --- Init ---
+        resetSimulation();
+        setStep(0);
+        updateDots();
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>

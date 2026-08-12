@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Auto-Sequence Simulator (Simple Step-by-Step)</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --panel: #ffffff;
+      --line: #dbe7f6;
+      --ink: #0f172a;
+      --muted: #475569;
+      --water: #0ea5e9;
+      --fat: #dc2626;
+      --rf: #dc2626;
+      --gz: #7c3aed;
+      --gy: #d97706;
+      --gx: #0369a1;
+      --adc: #0f766e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 10% 10%, #fff, var(--bg));
+    }
+
+    .layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.1);
+    }
+
+    .controls {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      position: sticky;
+      top: 10px;
+      max-height: calc(100vh - 22px);
+      overflow: auto;
+    }
+
+    h1 { margin: 0; font-size: 1.05rem; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 0.87rem; line-height: 1.35; }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .btn2, .btn3 { display: grid; gap: 8px; }
+    .btn2 { grid-template-columns: 1fr 1fr; }
+    .btn3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-weight: 650;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #1d4ed8, #0284c7);
+      font-size: 0.84rem;
+    }
+
+    button.warn { background: linear-gradient(120deg, #b45309, #d97706); }
+    button.secondary { background: linear-gradient(120deg, #475569, #334155); }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    #advancedPanel { display: none; }
+    #advancedPanel.show { display: grid; }
+    #sideExplain { white-space: pre-line; }
+
+    .views {
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .diag-panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      background: #ffffff;
+      display: grid;
+      gap: 6px;
+    }
+
+    .diag-title {
+      font-size: 0.84rem;
+      color: #334155;
+      font-weight: 650;
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    #blochCanvas { aspect-ratio: 16 / 8.7; }
+    #timelineCanvas { aspect-ratio: 16 / 2.7; }
+    #phaseCanvas { aspect-ratio: 16 / 2.8; }
+    #signalCanvas { aspect-ratio: 16 / 2.8; }
+    #compassCanvas { aspect-ratio: 16 / 2.2; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px;
+      background: #f8fbff;
+    }
+
+    .explain {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #f8fbff;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { position: static; max-height: none; }
+    }
+  </style>
+<style id="radiopass-archive-nav">.radiopass-return{position:fixed;z-index:2147483647;top:14px;left:14px;display:inline-flex;align-items:center;gap:.5rem;padding:.72rem 1rem;border:1px solid rgba(103,232,249,.45);border-radius:999px;background:rgba(2,7,13,.88);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(12px);color:#dff9ff!important;font:800 13px/1.1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none!important}.radiopass-return:hover{border-color:#67e8f9;background:#0b2033}.radiopass-return:focus-visible{outline:3px solid #67e8f9;outline-offset:3px}@media(max-width:600px){.radiopass-return{top:8px;left:8px;padding:.58rem .78rem;font-size:11px}}</style>
+  <script src="../../assets/js/favorites.js" defer data-radiopass-favorites></script>
+  <link rel="stylesheet" href="../../assets/css/radiopass-system.css" data-radiopass-system>
+  <script src="../../assets/js/radiopass-system.js" defer data-radiopass-system></script>
+</head>
+<body>
+<a class="radiopass-return" href="../lessons.html" aria-label="Back to the RadioPass physics library">&#8592; RadioPass library</a>
+  <main class="layout">
+    <aside class="card controls">
+      <h1>MRI Auto-Sequence Simulator (Simple Step-by-Step)</h1>
+      <p class="subtitle">Core controls only. RF automatically drives slice select, phase encode, and frequency/readout gradients in sequence.</p>
+
+      <section class="section">
+        <div class="row"><span>Tutorial Step</span><strong id="stepIndexLabel">1 / 5</strong></div>
+        <div id="stepTitle" class="subtitle">Step 1: Bloch vectors only</div>
+        <div class="btn2">
+          <button id="restartStepsBtn" class="secondary">Restart Steps</button>
+          <button id="nextStepBtn">Next Step</button>
+        </div>
+        <div id="stepExplain" class="subtitle">Start with one diagram only. Use RF 90°/180° and focus on magnetization direction before adding more views.</div>
+      </section>
+
+      <section class="section">
+        <div class="btn2">
+          <button id="rf90Btn">Apply 90° RF Pulse</button>
+          <button id="rf180Btn" class="warn">Apply 180° RF Pulse</button>
+        </div>
+        <div class="btn2">
+          <button id="resetBtn" class="secondary">Reset</button>
+          <button id="pauseBtn" class="secondary">Pause/Resume</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Simulation speed</span><strong id="speedVal">0.45x</strong></div>
+        <input id="speedSlider" type="range" min="0.1" max="2" step="0.05" value="0.45" />
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Main magnetic field B0</span><strong id="b0Val">1.5 T</strong></div>
+        <input id="b0Slider" type="range" min="0.5" max="3.0" step="0.1" value="1.5" />
+        <div class="row"><span>Larmor frequency (1H)</span><strong id="larmorVal">63.87 MHz</strong></div>
+        <div class="subtitle">Fat-water chemical shift scales with B0.</div>
+      </section>
+
+      <section class="section">
+        <div class="btn2">
+          <button id="fullModeBtn" class="secondary">RF-Linked T1+T2 Mode</button>
+        </div>
+        <div class="subtitle">Relaxation is linked to RF pulses (full behavior only).</div>
+      </section>
+
+      <section class="section">
+        <div class="row"><span>Mode</span><strong id="modeLabel">Full</strong></div>
+        <div id="sideExplain" class="subtitle">Full mode: both T1 recovery and T2/T2* decay are active and follow RF pulses automatically.</div>
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="advancedToggle" type="checkbox" /> Advanced Controls</label>
+        <div class="subtitle">Off: gradients are automatic. On: manual gradient buttons are available.</div>
+      </section>
+
+      <section class="section">
+        <label class="check"><input id="shadowToggle" type="checkbox" checked /> Show arrow shadows</label>
+        <div class="subtitle">Shadow = transverse projection of each net magnetization vector.</div>
+      </section>
+
+      <section id="advancedPanel" class="section">
+        <div class="btn3">
+          <button id="manualSliceBtn">Manual Slice (Gz+RF)</button>
+          <button id="manualGyBtn">Manual Gy</button>
+          <button id="manualGxBtn">Manual Gx+ADC</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="subtitle">Built-in physics:</div>
+        <div class="subtitle">• Water and fat precess at different rates (chemical shift)</div>
+        <div class="subtitle">• T1 recovery, T2/T2* decay</div>
+        <div class="subtitle">• In phase, out of phase, rephasing, echo labels</div>
+      </section>
+    </aside>
+
+    <section class="card views">
+      <div id="blochPanel" class="diag-panel">
+        <div class="diag-title">Diagram 1: Bloch vectors (water/fat magnetization)</div>
+        <canvas id="blochCanvas" width="1060" height="560"></canvas>
+      </div>
+      <div id="timelinePanel" class="diag-panel">
+        <div class="diag-title">Diagram 2: Pulse-sequence timeline (RF, Gz, Gy, Gx, ADC)</div>
+        <canvas id="timelineCanvas" width="1060" height="180"></canvas>
+      </div>
+      <div id="phasePanel" class="diag-panel">
+        <div class="diag-title">Diagram 3: Phase encoding gradient (Gy) phase pattern (180° flipped)</div>
+        <canvas id="phaseCanvas" width="1060" height="200"></canvas>
+      </div>
+      <div id="signalPanel" class="diag-panel">
+        <div class="diag-title">Diagram 4: Detected transverse signal</div>
+        <canvas id="signalCanvas" width="1060" height="200"></canvas>
+      </div>
+      <div id="compassPanel" class="diag-panel">
+        <div class="diag-title">Diagram 5: Live transverse phase compass</div>
+        <canvas id="compassCanvas" width="1060" height="180"></canvas>
+      </div>
+
+      <div id="legendPanel" class="legend">
+        <span><span class="dot" style="background: var(--water);"></span>Water</span>
+        <span><span class="dot" style="background: var(--fat);"></span>Fat</span>
+        <span><span class="dot" style="background: var(--rf);"></span>RF</span>
+        <span><span class="dot" style="background: var(--gz);"></span>Gz (slice)</span>
+        <span><span class="dot" style="background: var(--gy);"></span>Gy (phase)</span>
+        <span><span class="dot" style="background: var(--gx);"></span>Gx (freq/readout)</span>
+        <span><span class="dot" style="background: var(--adc);"></span>ADC</span>
+      </div>
+
+      <div id="metricsPanel" class="metrics">
+        <div class="metric" id="waterMetric">Water: Mz=1.000, Mxy=0.000</div>
+        <div class="metric" id="fatMetric">Fat: Mz=1.000, Mxy=0.000</div>
+        <div class="metric" id="phaseMetric">Δphase(w-f)=0.0°</div>
+        <div class="metric" id="cohMetric">Coherence=1.00</div>
+        <div class="metric" id="stateMetric">State: equilibrium</div>
+        <div class="metric" id="echoMetric">Echo: waiting</div>
+      </div>
+
+      <div id="explainBox" class="explain">Press 90° RF to run the automatic sequence: slice select during RF, then phase encode, then frequency encoding with readout.</div>
+    </section>
+  </main>
+
+  <script>
+    const TRACKS = ["RF", "Gz", "Gy", "Gx", "ADC"];
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function wrapPi(a) {
+      while (a > Math.PI) a -= Math.PI * 2;
+      while (a < -Math.PI) a += Math.PI * 2;
+      return a;
+    }
+
+    function rotateXY(mx, my, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx: mx * c - my * s, my: mx * s + my * c };
+    }
+
+    function rotateAroundX(mx, my, mz, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx, my: my * c - mz * s, mz: my * s + mz * c };
+    }
+
+    // RF rotation axis for this teaching view is +y so:
+    // 90° pulse maps +z -> +x.
+    function rotateAroundY(mx, my, mz, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return { mx: mx * c + mz * s, my, mz: -mx * s + mz * c };
+    }
+
+    function makeTissue(name, color, n) {
+      const spins = [];
+      for (let i = 0; i < n; i += 1) {
+        spins.push({
+          mx: 0,
+          my: 0,
+          mz: 1,
+          xPos: ((i % 4) - 1.5) / 1.5,
+          yPos: (Math.floor(i / 4) - 1) / 1,
+          zPos: ((i % 6) - 2.5) / 2.5,
+          inhomHz: (Math.random() - 0.5) * 16
+        });
+      }
+      return { name, color, spins, T1: 1200, T2: 100 };
+    }
+
+    class SimpleMRISim {
+      constructor() {
+        this.blochCanvas = document.getElementById("blochCanvas");
+        this.timelineCanvas = document.getElementById("timelineCanvas");
+        this.phaseCanvas = document.getElementById("phaseCanvas");
+        this.signalCanvas = document.getElementById("signalCanvas");
+        this.compassCanvas = document.getElementById("compassCanvas");
+        this.bctx = this.blochCanvas.getContext("2d");
+        this.tctx = this.timelineCanvas.getContext("2d");
+        this.pctx = this.phaseCanvas.getContext("2d");
+        this.sctx = this.signalCanvas.getContext("2d");
+        this.cctx = this.compassCanvas.getContext("2d");
+
+        this.ui = {
+          rf90Btn: document.getElementById("rf90Btn"),
+          rf180Btn: document.getElementById("rf180Btn"),
+          resetBtn: document.getElementById("resetBtn"),
+          pauseBtn: document.getElementById("pauseBtn"),
+          speedSlider: document.getElementById("speedSlider"),
+          speedVal: document.getElementById("speedVal"),
+          b0Slider: document.getElementById("b0Slider"),
+          b0Val: document.getElementById("b0Val"),
+          larmorVal: document.getElementById("larmorVal"),
+          fullModeBtn: document.getElementById("fullModeBtn"),
+          modeLabel: document.getElementById("modeLabel"),
+          sideExplain: document.getElementById("sideExplain"),
+          stepIndexLabel: document.getElementById("stepIndexLabel"),
+          stepTitle: document.getElementById("stepTitle"),
+          stepExplain: document.getElementById("stepExplain"),
+          restartStepsBtn: document.getElementById("restartStepsBtn"),
+          nextStepBtn: document.getElementById("nextStepBtn"),
+          advancedToggle: document.getElementById("advancedToggle"),
+          shadowToggle: document.getElementById("shadowToggle"),
+          advancedPanel: document.getElementById("advancedPanel"),
+          blochPanel: document.getElementById("blochPanel"),
+          timelinePanel: document.getElementById("timelinePanel"),
+          phasePanel: document.getElementById("phasePanel"),
+          signalPanel: document.getElementById("signalPanel"),
+          compassPanel: document.getElementById("compassPanel"),
+          legendPanel: document.getElementById("legendPanel"),
+          metricsPanel: document.getElementById("metricsPanel"),
+          manualSliceBtn: document.getElementById("manualSliceBtn"),
+          manualGyBtn: document.getElementById("manualGyBtn"),
+          manualGxBtn: document.getElementById("manualGxBtn"),
+          waterMetric: document.getElementById("waterMetric"),
+          fatMetric: document.getElementById("fatMetric"),
+          phaseMetric: document.getElementById("phaseMetric"),
+          cohMetric: document.getElementById("cohMetric"),
+          stateMetric: document.getElementById("stateMetric"),
+          echoMetric: document.getElementById("echoMetric"),
+          explainBox: document.getElementById("explainBox")
+        };
+
+        this.tissues = {
+          water: makeTissue("Water", "#0ea5e9", 12),
+          fat: makeTissue("Fat", "#dc2626", 12)
+        };
+        this.tissues.water.T1 = 1800;
+        this.tissues.water.T2 = 100;
+        this.tissues.fat.T1 = 300;
+        this.tissues.fat.T2 = 80;
+
+        this.settings = {
+          rfDurationMs: 450,
+          chemShiftHz: 220,
+          gzStrength: 5,
+          rfBandwidthHz: 2000,
+          gyAmp: 3,
+          gyDurMs: 2,
+          gyPolarity: -1, // 180° flipped Gy polarity
+          gxAmp: 4,
+          includeInhom: true,
+          b0T: 1.5,
+          speed: 0.45,
+          showShadows: true,
+          recoveryMode: "full",
+          paused: false
+        };
+
+        this.sim = {
+          nowMs: 0,
+          lastTs: performance.now(),
+          pulse: null,
+          readoutUntil: 0,
+          rephaseUntil: 0,
+          echoAt: null,
+          last90At: null,
+          timelineEvents: [],
+          signal: [],
+          lastSignalSample: 0,
+          gyMoment: 0,
+          phaseState: "equilibrium",
+          explain: "Equilibrium: both tissues aligned with +z.",
+          actions: []
+        };
+
+        this.steps = [
+          {
+            visibleCount: 1,
+            title: "Step 1: Bloch vectors only",
+            explain: "Only Diagram 1 is visible. Apply 90°/180° RF and track how the water and fat arrows rotate relative to +z and transverse axes."
+          },
+          {
+            visibleCount: 2,
+            title: "Step 2: Add timeline",
+            explain: "Diagram 2 is now visible. Match vector behavior to event order: RF with slice-select (Gz), then phase encode (Gy), then readout (Gx+ADC)."
+          },
+          {
+            visibleCount: 3,
+            title: "Step 3: Add phase encoding diagram",
+            explain: "Diagram 3 is now visible. It shows how Gy stores a position-dependent phase shift across y-locations after the gradient pulse."
+          },
+          {
+            visibleCount: 4,
+            title: "Step 4: Add signal",
+            explain: "Diagram 4 is added. Connect dephasing/rephasing and Gy-driven phase spread to FID decay and echo behavior in the detected signal."
+          },
+          {
+            visibleCount: 5,
+            title: "Step 5: Full synchronized view",
+            explain: "All diagrams are visible together. Integrate Bloch vectors, timeline, Gy phase pattern, signal, and live phase compass in one sequence view."
+          }
+        ];
+        this.sim.stepIndex = 0;
+
+        this.bind();
+        this.syncFieldReadout();
+        this.setModeExplanation("full");
+        this.updateStepView();
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      bind() {
+        this.ui.rf90Btn.addEventListener("click", () => this.runAuto90());
+        this.ui.rf180Btn.addEventListener("click", () => this.runAuto180());
+        this.ui.resetBtn.addEventListener("click", () => this.resetAll());
+        this.ui.nextStepBtn.addEventListener("click", () => this.nextStep());
+        this.ui.restartStepsBtn.addEventListener("click", () => this.restartSteps());
+        this.ui.pauseBtn.addEventListener("click", () => { this.settings.paused = !this.settings.paused; });
+        this.ui.speedSlider.addEventListener("input", () => {
+          this.settings.speed = Number(this.ui.speedSlider.value);
+          this.ui.speedVal.textContent = `${this.settings.speed.toFixed(2)}x`;
+        });
+        this.ui.b0Slider.addEventListener("input", () => {
+          this.settings.b0T = Number(this.ui.b0Slider.value);
+          this.syncFieldReadout();
+        });
+        this.ui.fullModeBtn.addEventListener("click", () => this.startFullMode());
+
+        this.ui.advancedToggle.addEventListener("change", () => {
+          this.ui.advancedPanel.classList.toggle("show", this.ui.advancedToggle.checked);
+        });
+        this.ui.shadowToggle.addEventListener("change", () => {
+          this.settings.showShadows = this.ui.shadowToggle.checked;
+          this.renderNow();
+        });
+
+        this.ui.manualSliceBtn.addEventListener("click", () => this.startRFPulse(90, true, "Manual slice-select RF"));
+        this.ui.manualGyBtn.addEventListener("click", () => this.applyGy("Manual phase encode"));
+        this.ui.manualGxBtn.addEventListener("click", () => this.startReadout("Manual frequency encode/readout"));
+      }
+
+      nextStep() {
+        if (this.sim.stepIndex >= this.steps.length - 1) return;
+        this.sim.stepIndex += 1;
+        this.updateStepView();
+      }
+
+      restartSteps() {
+        this.sim.stepIndex = 0;
+        this.updateStepView();
+      }
+
+      updateStepView() {
+        const step = this.steps[this.sim.stepIndex];
+        const show = step.visibleCount;
+        const panels = [
+          this.ui.blochPanel,
+          this.ui.timelinePanel,
+          this.ui.phasePanel,
+          this.ui.signalPanel,
+          this.ui.compassPanel
+        ];
+        panels.forEach((panel, i) => panel.classList.toggle("is-hidden", i >= show));
+
+        const isFinal = show >= 5;
+        this.ui.legendPanel.classList.toggle("is-hidden", !isFinal);
+        this.ui.metricsPanel.classList.toggle("is-hidden", !isFinal);
+        this.ui.explainBox.classList.toggle("is-hidden", !isFinal);
+
+        this.ui.stepIndexLabel.textContent = `${this.sim.stepIndex + 1} / ${this.steps.length}`;
+        this.ui.stepTitle.textContent = step.title;
+        this.ui.stepExplain.textContent = step.explain;
+        this.ui.nextStepBtn.disabled = this.sim.stepIndex >= this.steps.length - 1;
+      }
+
+      resetAll() {
+        this.settings.paused = false;
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => { s.mx = 0; s.my = 0; s.mz = 1; });
+        });
+        this.sim.nowMs = 0;
+        this.sim.pulse = null;
+        this.sim.readoutUntil = 0;
+        this.sim.rephaseUntil = 0;
+        this.sim.echoAt = null;
+        this.sim.last90At = null;
+        this.sim.timelineEvents = [];
+        this.sim.signal = [];
+        this.sim.gyMoment = 0;
+        this.sim.actions = [];
+        this.sim.phaseState = "equilibrium";
+        this.settings.recoveryMode = "full";
+        this.sim.explain = "System reset. Press 90° RF for automatic sequence.";
+        this.syncFieldReadout();
+      }
+
+      syncFieldReadout() {
+        const larmorMHz = this.getLarmorMHz();
+        this.ui.b0Val.textContent = `${this.settings.b0T.toFixed(1)} T`;
+        this.ui.larmorVal.textContent = `${larmorMHz.toFixed(2)} MHz`;
+      }
+
+      getLarmorMHz() {
+        return 42.58 * this.settings.b0T;
+      }
+
+      getChemShiftHz() {
+        return this.settings.chemShiftHz * (this.settings.b0T / 1.5);
+      }
+
+      startFullMode() {
+        this.settings.recoveryMode = "full";
+        this.resetAll();
+        this.setModeExplanation("full");
+        this.sim.explain = "Full mode active: T1 + T2/T2* with automatic gradients.";
+      }
+
+      schedule(delayMs, fn) {
+        this.sim.actions.push({ t: this.sim.nowMs + delayMs, fn });
+      }
+
+      getSliceHalf() {
+        return clamp((this.settings.rfBandwidthHz / (this.settings.gzStrength * 1000)) * 0.5, 0.08, 0.6);
+      }
+
+      pushEvent(track, dur, label, color) {
+        this.sim.timelineEvents.push({ track, startMs: this.sim.nowMs, durationMs: dur, label, color });
+      }
+
+      runAuto90() {
+        this.settings.paused = false;
+        this.settings.recoveryMode = "full";
+        this.startRFPulse(90, true, "90° excitation with slice select");
+        this.sim.last90At = this.sim.nowMs;
+
+        const rf = this.settings.rfDurationMs;
+        this.schedule(rf + 1, () => this.applyGy("Auto phase encode (Gy)"));
+        this.schedule(rf + 5, () => this.startReadout("Auto frequency encode/readout (Gx+ADC)"));
+        this.sim.explain = "Automatic sequence: Gz during RF, then Gy, then Gx+ADC readout.";
+      }
+
+      runAuto180() {
+        this.settings.paused = false;
+        this.settings.recoveryMode = "full";
+        this.startRFPulse(180, true, "180° refocusing with slice select");
+        const rf = this.settings.rfDurationMs;
+        this.schedule(rf + 1, () => this.applyGy("Auto phase encode (Gy) after 180°"));
+
+        if (this.sim.last90At !== null) {
+          const tau = this.sim.nowMs - this.sim.last90At;
+          if (tau > 2) {
+            this.sim.rephaseUntil = this.sim.nowMs + tau;
+            this.sim.echoAt = this.sim.nowMs + tau;
+            const readStart = Math.max(0, tau - 8);
+            this.schedule(readStart, () => this.startReadout("Readout around echo"));
+            this.sim.explain = "180° pulse causes rephasing. Echo forms near TE = 2τ.";
+            return;
+          }
+        }
+
+        this.schedule(rf + 5, () => this.startReadout("Auto frequency encode/readout (Gx+ADC) after 180°"));
+        this.sim.explain = "180° inversion applied with automatic Gy then Gx+ADC sequence.";
+      }
+
+      startRFPulse(flipDeg, sliceSelect, note) {
+        // Any RF pulse returns simulator to normal relaxation behavior.
+        this.settings.recoveryMode = "full";
+        this.setModeExplanation("full");
+        this.settings.paused = false;
+
+        const rad = (flipDeg * Math.PI) / 180;
+        this.sim.pulse = {
+          leftMs: this.settings.rfDurationMs,
+          totalMs: this.settings.rfDurationMs,
+          targetFlipRad: rad,
+          appliedFlipRad: 0,
+          flipDeg,
+          sliceSelect,
+          sliceHalf: this.getSliceHalf()
+        };
+
+        this.pushEvent("RF", this.settings.rfDurationMs, `${Math.round(flipDeg)}°`, "#dc2626");
+        if (sliceSelect) {
+          this.pushEvent("Gz", this.settings.rfDurationMs, "slice", "#7c3aed");
+        }
+        this.sim.explain = note;
+        this.renderNow();
+      }
+
+      setModeExplanation(mode) {
+        this.ui.modeLabel.textContent = "Full";
+        this.ui.sideExplain.textContent = [
+          "RF-linked full mode is running.",
+          "What is happening:",
+          "1) T1 recovery is ON: Mz regrows toward +z.",
+          "2) T2/T2* decay is ON: Mxy decays and phase spread increases.",
+          "3) RF pulses control the sequence, and both effects evolve together."
+        ].join("\\n");
+      }
+
+      applyExactRFPulse(pulse, flipRad) {
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => {
+            if (!this.selectedBySlice(s, pulse)) return;
+            const r = rotateAroundY(s.mx, s.my, s.mz, flipRad);
+            s.mx = r.mx;
+            s.my = r.my;
+            s.mz = r.mz;
+          });
+        });
+      }
+
+      applyGy(note) {
+        const phScale = this.settings.gyAmp * this.settings.gyDurMs * 0.08 * this.settings.gyPolarity;
+        this.sim.gyMoment += phScale;
+        Object.values(this.tissues).forEach((t) => {
+          t.spins.forEach((s) => {
+            const ph = phScale * s.yPos;
+            const r = rotateXY(s.mx, s.my, ph);
+            s.mx = r.mx;
+            s.my = r.my;
+          });
+        });
+        this.pushEvent("Gy", this.settings.gyDurMs, "phase 180°", "#d97706");
+        this.sim.explain = note;
+      }
+
+      startReadout(note) {
+        const dur = 16;
+        this.sim.readoutUntil = this.sim.nowMs + dur;
+        this.pushEvent("Gx", dur, "read + chem", "#0369a1");
+        this.pushEvent("ADC", dur, "ADC", "#0f766e");
+        this.sim.explain = note;
+      }
+
+      applyRelax(spin, t1, t2, dtMs) {
+        const dt = dtMs / 1000;
+        if (this.settings.recoveryMode !== "t1") {
+          const e2 = Math.exp(-dt / (t2 / 1000));
+          spin.mx *= e2;
+          spin.my *= e2;
+        }
+        if (this.settings.recoveryMode !== "t2") {
+          spin.mz = 1 - (1 - spin.mz) * Math.exp(-dt / (t1 / 1000));
+        }
+      }
+
+      selectedBySlice(spin, pulse) {
+        if (!pulse.sliceSelect) return true;
+        return Math.abs(spin.zPos) <= pulse.sliceHalf;
+      }
+
+      precess(spin, name, dtMs) {
+        const dt = dtMs / 1000;
+        const chem = name === "fat" ? this.getChemShiftHz() : 0;
+        const inhomSign = (this.sim.rephaseUntil > this.sim.nowMs) ? -1 : 1;
+        const inhom = this.settings.includeInhom ? spin.inhomHz * (this.settings.b0T / 1.5) * inhomSign : 0;
+        const gx = (this.sim.readoutUntil > this.sim.nowMs) ? this.settings.gxAmp * 28 * spin.xPos : 0;
+        const ang = (chem + inhom + gx) * Math.PI * 2 * dt;
+        const r = rotateXY(spin.mx, spin.my, ang);
+        spin.mx = r.mx;
+        spin.my = r.my;
+      }
+
+      pulseStep(spin, dtMs, pulse) {
+        if (!this.selectedBySlice(spin, pulse)) return;
+        const remain = Math.max(0, pulse.targetFlipRad - pulse.appliedFlipRad);
+        if (remain <= 0) return;
+        const dFlipRaw = pulse.targetFlipRad * (dtMs / pulse.totalMs);
+        const dFlip = Math.min(remain, dFlipRaw);
+        const r = rotateAroundY(spin.mx, spin.my, spin.mz, dFlip);
+        spin.mx = r.mx;
+        spin.my = r.my;
+        spin.mz = r.mz;
+      }
+
+      tissueNet(t) {
+        let sx = 0, sy = 0, sz = 0, sumMag = 0;
+        t.spins.forEach((s) => {
+          sx += s.mx;
+          sy += s.my;
+          sz += s.mz;
+          sumMag += Math.hypot(s.mx, s.my);
+        });
+        const n = t.spins.length;
+        const mx = sx / n;
+        const my = sy / n;
+        const mz = sz / n;
+        const mxy = Math.hypot(mx, my);
+        const coherence = sumMag > 1e-6 ? clamp(Math.hypot(sx, sy) / sumMag, 0, 1) : 1;
+        return { mx, my, mz, mxy, phase: Math.atan2(my, mx), coherence };
+      }
+
+      signalMag() {
+        let x = 0, y = 0;
+        Object.values(this.tissues).forEach((t) => t.spins.forEach((s) => { x += s.mx; y += s.my; }));
+        return Math.hypot(x, y);
+      }
+
+      updateState(w, f) {
+        const d = wrapPi(w.phase - f.phase);
+        const dDeg = Math.abs(d * 180 / Math.PI);
+        const coh = (w.coherence + f.coherence) * 0.5;
+
+        if (this.settings.recoveryMode === "t1") {
+          this.sim.phaseState = "t1 recovery";
+          return;
+        }
+
+        if (this.sim.rephaseUntil > this.sim.nowMs) {
+          this.sim.phaseState = "rephasing";
+          this.sim.explain = "Rephasing after 180°: static dephasing is reversed, vectors converge toward echo.";
+        } else if (this.sim.echoAt !== null && Math.abs(this.sim.nowMs - this.sim.echoAt) < 14) {
+          this.sim.phaseState = "echo";
+          this.sim.explain = "Echo: vectors re-align and signal peaks.";
+        } else if (coh > 0.85 && dDeg < 30 && Math.max(w.mxy, f.mxy) > 0.35) {
+          this.sim.phaseState = "in phase";
+        } else if (coh < 0.55) {
+          this.sim.phaseState = "out of phase";
+        } else {
+          this.sim.phaseState = "t1 recovery";
+        }
+      }
+
+      updatePhysicsNarrative(w, f) {
+        const d = wrapPi(w.phase - f.phase);
+        const dDeg = Math.abs(d * 180 / Math.PI);
+        const coh = (w.coherence + f.coherence) * 0.5;
+        const nearEcho = this.sim.echoAt !== null && Math.abs(this.sim.nowMs - this.sim.echoAt) < 14;
+        const inReadout = this.sim.readoutUntil > this.sim.nowMs;
+        const inRF = this.sim.pulse && this.sim.pulse.leftMs > 0;
+
+        if (inRF) {
+          this.sim.explain = [
+            "What you see is magnetization tipping away from the z-axis because the RF B1 field applies torque and rotates M (flip angle behavior).",
+            `Water Mxy=${w.mxy.toFixed(3)}, Fat Mxy=${f.mxy.toFixed(3)} while RF is active.`
+          ].join(" ");
+          return;
+        }
+
+        if (this.settings.recoveryMode === "t1") {
+          this.sim.explain = [
+            "What you see is longitudinal regrowth toward +z because only T1 recovery is enabled (spin-lattice recovery).",
+            "Transverse decay is intentionally disabled in this mode."
+          ].join(" ");
+          return;
+        }
+
+        if (this.settings.recoveryMode === "t2") {
+          this.sim.explain = [
+            "What you see is transverse signal loss because only T2/T2* dephasing is enabled, so spins spread in phase and net Mxy shrinks.",
+            "Longitudinal recovery is intentionally disabled in this mode."
+          ].join(" ");
+          return;
+        }
+
+        if (this.sim.rephaseUntil > this.sim.nowMs) {
+          this.sim.explain = [
+            "What you see is rephasing because the 180° pulse reverses static phase dispersion (spins that were ahead become behind).",
+            "This drives vectors back toward coherence and raises signal."
+          ].join(" ");
+          return;
+        }
+
+        if (nearEcho) {
+          this.sim.explain = [
+            "What you see is an echo peak because rephased transverse vectors are maximally aligned near TE.",
+            "Coherence and net Mxy briefly increase before decay resumes."
+          ].join(" ");
+          return;
+        }
+
+        if (inReadout) {
+          const chemHz = this.getChemShiftHz();
+          const shiftIndex = clamp(chemHz / Math.max(1, this.settings.gxAmp * 260), 0, 1);
+          this.sim.explain = [
+            "What you see is frequency-encoded readout because Gx makes precession frequency position-dependent across x.",
+            `Chemical shift artifact is highlighted now: fat is displaced along frequency-encoding (x) due to Δf=${chemHz.toFixed(0)} Hz (relative shift index ${shiftIndex.toFixed(2)}).`,
+            "ADC samples the summed transverse signal during this window."
+          ].join(" ");
+          return;
+        }
+
+        if (this.sim.phaseState === "out of phase") {
+          this.sim.explain = [
+            `What you see is out-of-phase behavior because fat and water precess at different rates (Δphase=${dDeg.toFixed(1)}°),`,
+            `and coherence is reduced (C=${coh.toFixed(2)}).`
+          ].join(" ");
+          return;
+        }
+
+        if (this.sim.phaseState === "in phase") {
+          this.sim.explain = [
+            `What you see is in-phase alignment because transverse vectors are close in angle (Δphase=${dDeg.toFixed(1)}°),`,
+            `so coherence is high (C=${coh.toFixed(2)}) and signal is stronger.`
+          ].join(" ");
+          return;
+        }
+
+        this.sim.explain = [
+          "What you see is normal relaxation because T1 recovers Mz toward +z while T2/T2* progressively reduces Mxy.",
+          "Both longitudinal recovery and transverse decay are active."
+        ].join(" ");
+      }
+
+      tick(ts) {
+        const realDt = Math.min(40, ts - this.sim.lastTs);
+        this.sim.lastTs = ts;
+
+        if (!this.settings.paused) {
+          // Integrate in small steps to avoid visible end-of-pulse jumps.
+          let remainingMs = realDt * this.settings.speed;
+          while (remainingMs > 1e-6) {
+            const dtMs = Math.min(1, remainingMs);
+            remainingMs -= dtMs;
+            this.sim.nowMs += dtMs;
+
+            this.sim.actions = this.sim.actions.filter((a) => {
+              if (a.t <= this.sim.nowMs) { a.fn(); return false; }
+              return true;
+            });
+
+            let rfStepMs = 0;
+            if (this.sim.pulse && this.sim.pulse.leftMs > 0) {
+              rfStepMs = Math.min(dtMs, this.sim.pulse.leftMs);
+            }
+
+            Object.entries(this.tissues).forEach(([name, t]) => {
+              t.spins.forEach((s) => {
+                if (this.sim.pulse && this.sim.pulse.leftMs > 0) {
+                  // During visualized RF, show clean controlled tipping around B1 (+y axis in this view).
+                  this.pulseStep(s, rfStepMs, this.sim.pulse);
+                  return;
+                }
+                this.precess(s, name, dtMs);
+                const t2Eff = this.settings.includeInhom ? t.T2 * 0.62 : t.T2;
+                this.applyRelax(s, t.T1, t2Eff, dtMs);
+              });
+            });
+
+            if (this.sim.pulse && this.sim.pulse.leftMs > 0) {
+              const dApplied = this.sim.pulse.targetFlipRad * (rfStepMs / this.sim.pulse.totalMs);
+              this.sim.pulse.appliedFlipRad = Math.min(this.sim.pulse.targetFlipRad, this.sim.pulse.appliedFlipRad + dApplied);
+              this.sim.pulse.leftMs -= dtMs;
+            }
+
+            if (this.sim.pulse && this.sim.pulse.leftMs <= 0) {
+              // End RF without a correction snap; sub-step integration already keeps it smooth.
+              this.sim.pulse = null;
+            }
+
+            const m = this.signalMag();
+            if (this.sim.nowMs - this.sim.lastSignalSample > 5) {
+              this.sim.signal.push({ t: this.sim.nowMs, m });
+              this.sim.lastSignalSample = this.sim.nowMs;
+            }
+          }
+          this.sim.signal = this.sim.signal.filter((p) => this.sim.nowMs - p.t <= 1200);
+        }
+
+        const w = this.tissueNet(this.tissues.water);
+        const f = this.tissueNet(this.tissues.fat);
+        this.updateState(w, f);
+        this.updatePhysicsNarrative(w, f);
+
+        this.drawBloch(w, f);
+        this.drawTimeline();
+        this.drawPhaseEncoding();
+        this.drawSignal();
+        this.drawCompass(w, f);
+        this.updateMetrics(w, f);
+
+        requestAnimationFrame((t) => this.tick(t));
+      }
+
+      project(x, y, z, c, s) {
+        return { x: c.x + z * s + y * s * 0.42, y: c.y - x * s - y * s * 0.33 };
+      }
+
+      drawArrow(ctx, a, b, color, width, label) {
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const L = Math.hypot(dx, dy) || 1;
+        const ux = dx / L;
+        const uy = dy / L;
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(b.x - ux * 11 - uy * 5, b.y - uy * 11 + ux * 5);
+        ctx.lineTo(b.x - ux * 11 + uy * 5, b.y - uy * 11 - ux * 5);
+        ctx.closePath();
+        ctx.fill();
+
+        if (label) {
+          ctx.font = "600 12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(label, b.x + 6, b.y - 6);
+        }
+      }
+
+      drawBloch(wNet, fNet) {
+        const ctx = this.bctx;
+        const { width, height } = this.blochCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const c = { x: width * 0.36, y: height * 0.67 };
+        const s = 186;
+        const o = this.project(0, 0, 0, c, s);
+        const xA = this.project(1.32, 0, 0, c, s);
+        const yA = this.project(0, 1.32, 0, c, s);
+        const zA = this.project(0, 0, 1.32, c, s);
+        const zNeg = this.project(0, 0, -1.32, c, s);
+
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.7;
+        ctx.beginPath();
+        [xA, yA, zA].forEach((p) => { ctx.moveTo(o.x, o.y); ctx.lineTo(p.x, p.y); });
+        ctx.stroke();
+        ctx.strokeStyle = "#94a3b8";
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(o.x, o.y);
+        ctx.lineTo(zNeg.x, zNeg.y);
+        ctx.stroke();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = "#64748b";
+        ctx.beginPath();
+        ctx.moveTo(zNeg.x, zNeg.y);
+        ctx.lineTo(zA.x, zA.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#475569";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("x", xA.x + 6, xA.y + 2);
+        ctx.fillText("y", yA.x + 6, yA.y + 2);
+        ctx.fillText("z (B0)", zA.x + 6, zA.y + 2);
+        ctx.fillText("-z", zNeg.x - 18, zNeg.y + 2);
+
+        const drawTissue = (tissue, net) => {
+          const tip = this.project(net.mx, net.my, net.mz, c, s);
+          const shadowTip = this.project(net.mx, net.my, 0, c, s);
+
+          if (this.settings.showShadows) {
+            // Shadow is the transverse projection (Mxy), used to visualize T2/T2* behavior.
+            ctx.globalAlpha = 0.32;
+            this.drawArrow(ctx, o, shadowTip, tissue.color, 2.2);
+            ctx.globalAlpha = 1;
+
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = tissue.color + "99";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(tip.x, tip.y);
+            ctx.lineTo(shadowTip.x, shadowTip.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+
+          this.drawArrow(ctx, o, tip, tissue.color, 4.4, tissue.name);
+        };
+
+        drawTissue(this.tissues.water, wNet);
+        drawTissue(this.tissues.fat, fNet);
+
+        const inReadout = this.sim.readoutUntil > this.sim.nowMs;
+        if (inReadout) {
+          const chemHz = this.getChemShiftHz();
+          const shiftPx = clamp(chemHz / Math.max(1, this.settings.gxAmp * 2.5), 18, 78);
+          const bx = width - 360;
+          const by = 14;
+          const bw = 342;
+          const bh = 84;
+          const axisY = by + 52;
+          const centerX = bx + 118;
+          const fatX = centerX + shiftPx;
+
+          ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+          ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = "#f59e0b";
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(bx, by, bw, bh);
+
+          ctx.fillStyle = "#92400e";
+          ctx.font = "700 12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText("Chemical Shift Artifact (during Gx readout)", bx + 8, by + 16);
+
+          ctx.strokeStyle = "#64748b";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(bx + 16, axisY);
+          ctx.lineTo(bx + bw - 16, axisY);
+          ctx.stroke();
+
+          ctx.fillStyle = "#334155";
+          ctx.font = "600 11px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText("Frequency-encoding axis (x)", bx + 16, by + 72);
+
+          ctx.fillStyle = "#0ea5e9";
+          ctx.beginPath();
+          ctx.arc(centerX, axisY, 4.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillText("Water", centerX - 16, axisY - 10);
+
+          ctx.fillStyle = "#dc2626";
+          ctx.beginPath();
+          ctx.arc(fatX, axisY, 4.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillText("Fat", fatX - 7, axisY - 10);
+
+          ctx.strokeStyle = "#dc2626";
+          ctx.lineWidth = 1.6;
+          ctx.setLineDash([5, 3]);
+          ctx.beginPath();
+          ctx.moveTo(centerX, axisY - 20);
+          ctx.lineTo(fatX, axisY - 20);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#7f1d1d";
+          ctx.fillText(`shift ~ ${Math.abs(fatX - centerX).toFixed(0)} px`, centerX + 8, axisY - 24);
+        }
+
+        if (this.sim.phaseState === "out of phase") {
+          ctx.fillStyle = "rgba(180,83,9,0.12)";
+          ctx.beginPath();
+          ctx.moveTo(o.x, o.y);
+          for (let a = -0.8; a <= 0.8; a += 0.06) {
+            const p = this.project(Math.cos(a), Math.sin(a), 0.03, c, s * 0.85);
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        if (this.sim.phaseState === "echo") {
+          ctx.strokeStyle = "#16a34a";
+          ctx.lineWidth = 2.6;
+          ctx.setLineDash([5, 4]);
+          ctx.beginPath();
+          ctx.arc(o.x, o.y, 58, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        const phaseLabel = this.sim.phaseState === "in phase" ? "In phase" :
+          this.sim.phaseState === "out of phase" ? "Out of phase" :
+          this.sim.phaseState === "rephasing" ? "Rephasing" :
+          this.sim.phaseState === "echo" ? "Echo" : "T1 recovery";
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 14px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText(`State: ${phaseLabel}`, 16, 22);
+        ctx.fillText("Automatic gradients active with RF sequence", 16, 42);
+        if (this.sim.pulse && this.sim.pulse.leftMs > 0) {
+          const flipNow = (this.sim.pulse.appliedFlipRad * 180) / Math.PI;
+          const flipTarget = (this.sim.pulse.targetFlipRad * 180) / Math.PI;
+          ctx.fillText(`RF flip: ${flipNow.toFixed(0)}° / ${flipTarget.toFixed(0)}°`, 16, 62);
+        }
+        if (this.settings.showShadows) {
+          ctx.fillText("Shadow arrows = transverse projection (T2/T2* decay)", 16, this.sim.pulse && this.sim.pulse.leftMs > 0 ? 82 : 62);
+        }
+      }
+
+      drawTimeline() {
+        const ctx = this.tctx;
+        const { width, height } = this.timelineCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { left: 66, right: 14, top: 14, bottom: 20 };
+        const h = height - pad.top - pad.bottom;
+        const trH = h / TRACKS.length;
+        const tNow = this.sim.nowMs;
+        const win = 120;
+
+        TRACKS.forEach((name, i) => {
+          const y = pad.top + i * trH;
+          ctx.strokeStyle = "#e2e8f0";
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y + trH / 2);
+          ctx.lineTo(width - pad.right, y + trH / 2);
+          ctx.stroke();
+          ctx.fillStyle = "#334155";
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(name, 14, y + trH / 2 + 4);
+        });
+
+        this.sim.timelineEvents.forEach((ev) => {
+          const tr = TRACKS.indexOf(ev.track);
+          if (tr < 0) return;
+          const x = pad.left + ((ev.startMs - (tNow - win)) / win) * (width - pad.left - pad.right);
+          const w = Math.max(8, (ev.durationMs / win) * (width - pad.left - pad.right));
+          const y = pad.top + tr * trH + 3;
+          if (x + w < pad.left || x > width - pad.right) return;
+
+          ctx.fillStyle = ev.color;
+          ctx.globalAlpha = 0.84;
+          ctx.fillRect(x, y, w, trH - 6);
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = "#fff";
+          ctx.font = "10px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(ev.label, x + 3, y + trH * 0.52);
+        });
+
+        const nowX = width - pad.right - 2;
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(nowX, pad.top);
+        ctx.lineTo(nowX, height - pad.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Automatic Pulse Sequence Timeline", 12, 12);
+      }
+
+      drawPhaseEncoding() {
+        const ctx = this.pctx;
+        const { width, height } = this.phaseCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { left: 54, right: 16, top: 18, bottom: 28 };
+        const w = width - pad.left - pad.right;
+        const h = height - pad.top - pad.bottom;
+        const cy = pad.top + h * 0.60;
+        const samples = 7;
+
+        const gyActive = this.sim.timelineEvents.some((ev) =>
+          ev.track === "Gy" && this.sim.nowMs >= ev.startMs && this.sim.nowMs <= ev.startMs + ev.durationMs
+        );
+        if (gyActive) {
+          ctx.fillStyle = "rgba(217, 119, 6, 0.14)";
+          ctx.fillRect(pad.left, pad.top, w, h);
+        }
+
+        ctx.strokeStyle = "#dbe5f3";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, cy);
+        ctx.lineTo(width - pad.right, cy);
+        ctx.stroke();
+
+        // Phase after Gy is position dependent and persists after gradient turns off.
+        for (let i = 0; i < samples; i += 1) {
+          const t = i / (samples - 1);
+          const x = pad.left + t * w;
+          const yPos = -1.5 + 3 * t;
+          const phase = wrapPi(this.sim.gyMoment * yPos);
+          const len = 24;
+          const tx = x + Math.cos(phase) * len;
+          const ty = cy - Math.sin(phase) * len;
+
+          ctx.strokeStyle = "#94a3b8";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, cy - 32);
+          ctx.lineTo(x, cy + 32);
+          ctx.stroke();
+
+          this.drawArrow(ctx, { x, y: cy }, { x: tx, y: ty }, "#d97706", 2.2);
+          ctx.fillStyle = "#475569";
+          ctx.font = "11px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(`y${i - 3}`, x - 10, cy + 46);
+        }
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Phase Encoding (Gy, 180° flipped): stored phase offset across y positions", 12, 14);
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillStyle = "#334155";
+        ctx.fillText(`Stored Gy moment: ${this.sim.gyMoment.toFixed(3)} rad per normalized y`, 12, height - 8);
+      }
+
+      drawSignal() {
+        const ctx = this.sctx;
+        const { width, height } = this.signalCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { left: 54, right: 12, top: 16, bottom: 28 };
+        const w = width - pad.left - pad.right;
+        const h = height - pad.top - pad.bottom;
+
+        ctx.strokeStyle = "#dbe5f3";
+        for (let i = 0; i <= 8; i += 1) {
+          const y = pad.top + (i / 8) * h;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(width - pad.right, y);
+          ctx.stroke();
+        }
+
+        const maxMag = Math.max(1, ...this.sim.signal.map((p) => p.m));
+        const t0 = this.sim.nowMs - 1200;
+        const inReadout = this.sim.readoutUntil > this.sim.nowMs;
+
+        if (inReadout) {
+          ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+          ctx.fillRect(pad.left, pad.top, w, h);
+          ctx.fillStyle = "#92400e";
+          ctx.font = "700 12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText("Chemical shift artifact highlighted during frequency encoding (Gx)", pad.left + 8, pad.top + 14);
+        }
+
+        ctx.strokeStyle = "#0369a1";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        this.sim.signal.forEach((p, i) => {
+          const x = pad.left + ((p.t - t0) / 1200) * w;
+          const y = pad.top + h - (p.m / maxMag) * h;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        if (this.sim.echoAt !== null && Math.abs(this.sim.nowMs - this.sim.echoAt) < 24) {
+          const ex = pad.left + ((this.sim.echoAt - t0) / 1200) * w;
+          ctx.strokeStyle = "#16a34a";
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(ex, pad.top);
+          ctx.lineTo(ex, pad.top + h);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#15803d";
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText("Echo", ex + 6, pad.top + 14);
+        }
+
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, pad.top);
+        ctx.lineTo(pad.left, pad.top + h);
+        ctx.lineTo(width - pad.right, pad.top + h);
+        ctx.stroke();
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Signal (sum of transverse magnetization)", 12, 14);
+      }
+
+      drawCompass(w, f) {
+        const ctx = this.cctx;
+        const { width, height } = this.compassCanvas;
+        ctx.clearRect(0, 0, width, height);
+
+        const c = { x: width * 0.5, y: height * 0.58 };
+        const r = Math.min(width, height) * 0.30;
+
+        ctx.strokeStyle = "#dbe5f3";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(c.x - r - 20, c.y);
+        ctx.lineTo(c.x + r + 20, c.y);
+        ctx.moveTo(c.x, c.y - r - 20);
+        ctx.lineTo(c.x, c.y + r + 20);
+        ctx.stroke();
+
+        ctx.fillStyle = "#475569";
+        ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("+x", c.x + r + 24, c.y + 4);
+        ctx.fillText("+y", c.x + 6, c.y - r - 24);
+
+        const drawNeedle = (phase, amp, color, label, line) => {
+          const len = clamp(r * amp, 18, r);
+          const tx = c.x + Math.cos(phase) * len;
+          const ty = c.y - Math.sin(phase) * len;
+          this.drawArrow(ctx, { x: c.x, y: c.y }, { x: tx, y: ty }, color, 2.8, label);
+
+          ctx.fillStyle = color;
+          ctx.font = "12px Avenir Next, Segoe UI, sans-serif";
+          ctx.fillText(`${label} phase ${(phase * 180 / Math.PI).toFixed(1)}°`, 16, 22 + line * 18);
+        };
+
+        drawNeedle(w.phase, w.mxy, "#0ea5e9", "Water", 0);
+        drawNeedle(f.phase, f.mxy, "#dc2626", "Fat", 1);
+
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "600 13px Avenir Next, Segoe UI, sans-serif";
+        ctx.fillText("Live compass (transverse phase)", 12, 14);
+      }
+
+      updateMetrics(w, f) {
+        const d = wrapPi(w.phase - f.phase);
+        const dDeg = d * 180 / Math.PI;
+        const coh = (w.coherence + f.coherence) * 0.5;
+        const inReadout = this.sim.readoutUntil > this.sim.nowMs;
+        const chemHz = this.getChemShiftHz();
+        this.ui.waterMetric.textContent = `Water: Mz=${w.mz.toFixed(3)}, Mxy=${w.mxy.toFixed(3)}`;
+        this.ui.fatMetric.textContent = `Fat: Mz=${f.mz.toFixed(3)}, Mxy=${f.mxy.toFixed(3)}`;
+        this.ui.phaseMetric.textContent = `Δphase(w-f)=${dDeg.toFixed(1)}° | Δf=${chemHz.toFixed(0)} Hz | B0=${this.settings.b0T.toFixed(1)}T`;
+        this.ui.cohMetric.textContent = `Coherence=${coh.toFixed(2)}`;
+        this.ui.stateMetric.textContent = `State: ${this.sim.phaseState} | Mode: ${this.settings.recoveryMode}${inReadout ? " | Chemical shift artifact ON" : ""}`;
+        this.ui.echoMetric.textContent = this.sim.echoAt ? `Echo target at ${this.sim.echoAt.toFixed(1)} ms` : "Echo: waiting";
+        this.ui.explainBox.textContent = this.sim.explain;
+      }
+
+      renderNow() {
+        const w = this.tissueNet(this.tissues.water);
+        const f = this.tissueNet(this.tissues.fat);
+        this.updateState(w, f);
+        this.updatePhysicsNarrative(w, f);
+        this.drawBloch(w, f);
+        this.drawTimeline();
+        this.drawPhaseEncoding();
+        this.drawSignal();
+        this.drawCompass(w, f);
+        this.updateMetrics(w, f);
+      }
+    }
+
+    new SimpleMRISim();
+  </script>
+</body>
+</html>

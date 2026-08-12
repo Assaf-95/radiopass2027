@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Induction Decay and Spin Echo</title>
+  <style>
+    :root {
+      --bg-0: #0a111f;
+      --bg-1: #0f1a2f;
+      --panel: #101b30;
+      --panel-2: #0d1728;
+      --ink: #e6efff;
+      --muted: #a8bbdb;
+      --line: rgba(120, 150, 190, 0.26);
+      --cyan: #47c4ff;
+      --teal: #72ffd0;
+      --amber: #ffb45b;
+      --yellow: #ffe27b;
+      --radius: 14px;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(71, 196, 255, 0.16), transparent 42%),
+        radial-gradient(circle at 92% 85%, rgba(255, 180, 91, 0.13), transparent 44%),
+        linear-gradient(145deg, var(--bg-0), var(--bg-1));
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .app {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .hero {
+      background: linear-gradient(180deg, rgba(17, 29, 49, 0.94), rgba(12, 20, 36, 0.95));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0.95rem 1.1rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero p {
+      margin: 0.32rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.6fr 0.78fr;
+      gap: 0.9rem;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(16, 27, 46, 0.96), rgba(12, 21, 36, 0.95));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-body {
+      padding: 0.85rem;
+      display: grid;
+      gap: 0.68rem;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid rgba(110, 145, 188, 0.28);
+      background:
+        radial-gradient(circle at 16% 12%, rgba(71, 196, 255, 0.11), transparent 42%),
+        radial-gradient(circle at 84% 86%, rgba(255, 180, 91, 0.1), transparent 40%),
+        linear-gradient(160deg, #0d1729, #0a1323);
+    }
+
+    #signalCanvas { height: 320px; }
+    #relaxCanvas { height: 185px; }
+    #sequenceCanvas { height: 132px; }
+
+    .controls {
+      padding: 0.85rem;
+      display: grid;
+      gap: 0.7rem;
+      max-height: calc(100vh - 2.2rem);
+      overflow: auto;
+    }
+
+    .controls h2 {
+      margin: 0;
+      font-size: 0.82rem;
+      color: #9fcbfa;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .group {
+      border: 1px solid rgba(110, 145, 188, 0.33);
+      border-radius: 12px;
+      background: rgba(17, 28, 47, 0.72);
+      padding: 0.58rem;
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    label, .small {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .value {
+      font-size: 0.78rem;
+      min-width: 72px;
+      text-align: right;
+      color: #dce9ff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.42rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid rgba(110, 145, 188, 0.5);
+      color: var(--ink);
+      background: linear-gradient(180deg, #172a44, #112238);
+      border-radius: 999px;
+      padding: 0.43rem 0.84rem;
+      font-size: 0.8rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    button:hover { box-shadow: 0 6px 15px rgba(71, 196, 255, 0.22); }
+
+    .preset button {
+      border-radius: 9px;
+      padding: 0.36rem 0.62rem;
+      font-size: 0.76rem;
+    }
+
+    .stat {
+      border: 1px solid rgba(110, 145, 188, 0.28);
+      border-radius: 10px;
+      background: rgba(12, 20, 35, 0.88);
+      padding: 0.48rem 0.55rem;
+      color: #cee0fb;
+      font-size: 0.76rem;
+      line-height: 1.36;
+    }
+
+    .text-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .text-card {
+      border: 1px solid rgba(110, 145, 188, 0.28);
+      border-radius: 12px;
+      background: rgba(12, 20, 35, 0.82);
+      padding: 0.62rem;
+    }
+
+    .text-card h3 {
+      margin: 0 0 0.28rem;
+      font-size: 0.83rem;
+      color: #cde5ff;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .text-card p {
+      margin: 0;
+      color: #b8cae6;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .controls { max-height: none; }
+      .text-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <h1>Free Induction Decay and Spin Echo Teaching Page</h1>
+      <p>Interactive diagram for FID, T2*, 180° refocusing, TR/TE timing, and image weighting behavior.</p>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <div class="panel-body">
+          <canvas id="signalCanvas" aria-label="FID and Spin Echo signal"></canvas>
+          <canvas id="relaxCanvas" aria-label="Simultaneous relaxation curves"></canvas>
+          <canvas id="sequenceCanvas" aria-label="Spin echo timing sequence"></canvas>
+
+          <div class="text-grid">
+            <article class="text-card">
+              <h3>Free Induction Decay</h3>
+              <p>After a 90° RF pulse, magnetisation tips into the transverse plane. Spins precess at Larmor frequency and induce an oscillating MR signal. Its amplitude decays exponentially due to spin-spin interactions and static field inhomogeneity. This observed decay is T2* (always shorter than true T2 when inhomogeneity is present).</p>
+            </article>
+            <article class="text-card">
+              <h3>Role of 180° Pulse</h3>
+              <p>The 180° refocusing pulse reverses dephasing from static field inhomogeneity (T2′ contribution), but cannot reverse intrinsic spin-spin relaxation. Therefore, echo recovery restores static dephasing losses but still follows true T2 amplitude decay.</p>
+            </article>
+            <article class="text-card">
+              <h3>Spin Echo Timing</h3>
+              <p>A spin echo sequence uses one 90° pulse and one 180° pulse. The 180° is placed at TE/2. Echo maximum occurs at TE. Connecting successive echo peaks produces a true T2 envelope, largely free from static inhomogeneity effects.</p>
+            </article>
+            <article class="text-card">
+              <h3>TR and k-Space Repetition</h3>
+              <p>For spin echo imaging, the pulse sequence is repeated once per k-space line. The interval between successive 90° excitations is TR. Longer TR allows more longitudinal recovery before the next excitation.</p>
+            </article>
+            <article class="text-card">
+              <h3>Simultaneous Relaxation</h3>
+              <p>Transverse relaxation produces measurable MR signal decay, while longitudinal relaxation restores magnetisation along B0. Both occur at the same time throughout the repetition period.</p>
+            </article>
+            <article class="text-card">
+              <h3>Weighting Rules</h3>
+              <p>In spin echo, TR mainly controls T1 weighting and TE mainly controls T2 weighting. Short TR/short TE: T1 weighted. Long TR/long TE: T2 weighted. Long TR/short TE: proton density weighted.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="controls">
+          <h2>Playback</h2>
+          <div class="group">
+            <div class="btn-row">
+              <button id="playBtn">Pause</button>
+              <button id="resetBtn">Reset</button>
+            </div>
+            <div class="toggle"><input id="showFID" type="checkbox" checked /> Show FID (90° only)</div>
+            <div class="toggle"><input id="showEcho" type="checkbox" checked /> Show Spin Echo (90° + 180°)</div>
+            <div class="toggle"><input id="showWave" type="checkbox" checked /> Show oscillating carrier signal</div>
+          </div>
+
+          <h2>Sequence Controls</h2>
+          <div class="group">
+            <div class="row"><label>TR (ms)</label><span class="value" id="trVal">2000</span></div>
+            <input id="tr" type="range" min="200" max="6000" step="50" value="2000" />
+
+            <div class="row"><label>TE (ms)</label><span class="value" id="teVal">100</span></div>
+            <input id="te" type="range" min="5" max="300" step="5" value="100" />
+
+            <div class="row"><label>T1 (ms)</label><span class="value" id="t1Val">900</span></div>
+            <input id="t1" type="range" min="100" max="4000" step="50" value="900" />
+
+            <div class="row"><label>T2 (ms)</label><span class="value" id="t2Val">80</span></div>
+            <input id="t2" type="range" min="10" max="300" step="5" value="80" />
+
+            <div class="row"><label>T2′ inhomogeneity (ms)</label><span class="value" id="t2pVal">55</span></div>
+            <input id="t2p" type="range" min="5" max="300" step="5" value="55" />
+
+            <div class="row"><label>Larmor display freq (Hz)</label><span class="value" id="fVal">8.0</span></div>
+            <input id="freq" type="range" min="1" max="18" step="0.1" value="8" />
+
+            <div class="row"><label>Animation speed</label><span class="value" id="speedVal">1.00x</span></div>
+            <input id="speed" type="range" min="0.25" max="3" step="0.05" value="1" />
+          </div>
+
+          <h2>Weighting Presets</h2>
+          <div class="group preset">
+            <div class="btn-row">
+              <button data-preset="t1w">T1 weighted</button>
+              <button data-preset="t2w">T2 weighted</button>
+              <button data-preset="pdw">Proton density</button>
+            </div>
+          </div>
+
+          <h2>Readout</h2>
+          <div class="group">
+            <div class="stat" id="formulaLine">1/T2* = 1/T2 + 1/T2′</div>
+            <div class="stat">
+              <div>
+                Computed T2*: <span id="t2starReadout"></span><br>
+                TE/2: <span id="teHalfReadout"></span> | Echo at TE: <span id="teReadout"></span>
+              </div>
+            </div>
+            <div class="stat" id="weightLine">Current weighting: --</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const signalCanvas = document.getElementById("signalCanvas");
+      const relaxCanvas = document.getElementById("relaxCanvas");
+      const sequenceCanvas = document.getElementById("sequenceCanvas");
+      const sCtx = signalCanvas.getContext("2d");
+      const rCtx = relaxCanvas.getContext("2d");
+      const qCtx = sequenceCanvas.getContext("2d");
+
+      const els = {
+        playBtn: document.getElementById("playBtn"),
+        resetBtn: document.getElementById("resetBtn"),
+        showFID: document.getElementById("showFID"),
+        showEcho: document.getElementById("showEcho"),
+        showWave: document.getElementById("showWave"),
+        tr: document.getElementById("tr"),
+        te: document.getElementById("te"),
+        t1: document.getElementById("t1"),
+        t2: document.getElementById("t2"),
+        t2p: document.getElementById("t2p"),
+        freq: document.getElementById("freq"),
+        speed: document.getElementById("speed"),
+        trVal: document.getElementById("trVal"),
+        teVal: document.getElementById("teVal"),
+        t1Val: document.getElementById("t1Val"),
+        t2Val: document.getElementById("t2Val"),
+        t2pVal: document.getElementById("t2pVal"),
+        fVal: document.getElementById("fVal"),
+        speedVal: document.getElementById("speedVal"),
+        t2starReadout: document.getElementById("t2starReadout"),
+        teHalfReadout: document.getElementById("teHalfReadout"),
+        teReadout: document.getElementById("teReadout"),
+        weightLine: document.getElementById("weightLine")
+      };
+
+      const state = {
+        running: true,
+        simMs: 0,
+        last: performance.now()
+      };
+
+      const MAX_CYCLES_BEFORE_RESET = 3;
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function expEnv(ms, tConstMs) { return Math.exp(-ms / Math.max(1, tConstMs)); }
+
+      function resizeCanvas(canvas, ctx) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function params() {
+        const p = {
+          TR: parseFloat(els.tr.value),
+          TE: parseFloat(els.te.value),
+          T1: parseFloat(els.t1.value),
+          T2: parseFloat(els.t2.value),
+          T2p: parseFloat(els.t2p.value),
+          freq: parseFloat(els.freq.value),
+          speed: parseFloat(els.speed.value)
+        };
+        p.T2star = 1 / ((1 / Math.max(1, p.T2)) + (1 / Math.max(1, p.T2p)));
+        return p;
+      }
+
+      function recompute() {
+        const TR = Number(els.tr.value);
+        const TE = Number(els.te.value);
+        const T1 = Number(els.t1.value);
+        const T2 = Number(els.t2.value);
+        const T2p = Number(els.t2p.value);
+        const freq = Number(els.freq.value);
+        const speed = Number(els.speed.value);
+
+        const teMax = Math.min(300, Math.max(5, TR));
+        els.te.max = String(teMax);
+        if (TE > teMax) {
+          els.te.value = String(teMax);
+        }
+        const TEclamped = Number(els.te.value);
+
+        els.trVal.textContent = `${TR}`;
+        els.teVal.textContent = `${TEclamped}`;
+        els.t1Val.textContent = `${T1}`;
+        els.t2Val.textContent = `${T2}`;
+        els.t2pVal.textContent = `${T2p}`;
+        els.fVal.textContent = `${freq.toFixed(1)}`;
+        els.speedVal.textContent = `${speed.toFixed(2)}x`;
+
+        const invT2star = (1 / Math.max(1, T2)) + (1 / Math.max(1, T2p));
+        const T2star = 1 / invT2star;
+        els.t2starReadout.textContent = `${T2star.toFixed(1)} ms`;
+        els.teHalfReadout.textContent = `${(TEclamped / 2).toFixed(1)} ms`;
+        els.teReadout.textContent = `${TEclamped.toFixed(1)} ms`;
+
+        let w = "Mixed contrast";
+        if (TR < 800 && TEclamped < 40) w = "T1 weighted";
+        if (TR > 1800 && TEclamped > 80) w = "T2 weighted";
+        if (TR > 1800 && TEclamped < 40) w = "Proton density weighted";
+        els.weightLine.textContent = `Current weighting: ${w}`;
+      }
+
+      function phaseRad(tMs, fHz) {
+        return 2 * Math.PI * fHz * (tMs / 1000);
+      }
+
+      function envelopeFID(tMs, p) {
+        return expEnv(tMs, p.T2star);
+      }
+
+      function envelopeSpinEcho(tMs, p) {
+        const te2 = p.TE * 0.5;
+        const t2Part = expEnv(tMs, p.T2);
+        if (tMs <= te2) return t2Part * expEnv(tMs, p.T2p);
+        if (tMs <= p.TE) return t2Part * expEnv(p.TE - tMs, p.T2p);
+        return t2Part * expEnv(tMs - p.TE, p.T2p);
+      }
+
+      function signalFID(tMs, p) {
+        return envelopeFID(tMs, p) * Math.sin(phaseRad(tMs, p.freq));
+      }
+
+      function signalEcho(tMs, p) {
+        return envelopeSpinEcho(tMs, p) * Math.sin(phaseRad(tMs, p.freq));
+      }
+
+      function drawGrid(ctx, w, h, pad) {
+        const x0 = pad.l;
+        const y0 = pad.t;
+        const pw = w - pad.l - pad.r;
+        const ph = h - pad.t - pad.b;
+        ctx.strokeStyle = "rgba(118,150,188,0.24)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x0, y0, pw, ph);
+        ctx.setLineDash([4, 5]);
+        ctx.beginPath();
+        for (let i = 1; i < 5; i += 1) {
+          const x = x0 + (pw * i) / 5;
+          ctx.moveTo(x, y0);
+          ctx.lineTo(x, y0 + ph);
+        }
+        for (let j = 1; j < 4; j += 1) {
+          const y = y0 + (ph * j) / 4;
+          ctx.moveTo(x0, y);
+          ctx.lineTo(x0 + pw, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+        return { x0, y0, pw, ph };
+      }
+
+      function drawSignalPlot(p, tNow) {
+        const w = signalCanvas.clientWidth;
+        const h = signalCanvas.clientHeight;
+        sCtx.clearRect(0, 0, w, h);
+
+        const pad = { l: 58, r: 14, t: 16, b: 28 };
+        const { x0, y0, pw, ph } = drawGrid(sCtx, w, h, pad);
+        const xOf = (ms) => x0 + (ms / p.TR) * pw;
+        const yMid = y0 + ph * 0.5;
+        const yOf = (v) => yMid - v * ph * 0.44;
+
+        sCtx.strokeStyle = "rgba(164, 190, 226, 0.5)";
+        sCtx.lineWidth = 1.2;
+        sCtx.beginPath();
+        sCtx.moveTo(x0, yMid);
+        sCtx.lineTo(x0 + pw, yMid);
+        sCtx.stroke();
+
+        function drawEnvelope(fn, color) {
+          sCtx.strokeStyle = color;
+          sCtx.lineWidth = 1.15;
+          sCtx.setLineDash([5, 4]);
+          sCtx.beginPath();
+          for (let i = 0; i <= 700; i += 1) {
+            const t = (i / 700) * p.TR;
+            const a = fn(t, p);
+            const x = xOf(t);
+            const y = yOf(a);
+            if (i === 0) sCtx.moveTo(x, y); else sCtx.lineTo(x, y);
+          }
+          sCtx.stroke();
+          sCtx.beginPath();
+          for (let i = 0; i <= 700; i += 1) {
+            const t = (i / 700) * p.TR;
+            const a = -fn(t, p);
+            const x = xOf(t);
+            const y = yOf(a);
+            if (i === 0) sCtx.moveTo(x, y); else sCtx.lineTo(x, y);
+          }
+          sCtx.stroke();
+          sCtx.setLineDash([]);
+        }
+
+        function drawSignal(fn, envFn, color) {
+          sCtx.strokeStyle = color;
+          sCtx.lineWidth = 2.2;
+          sCtx.beginPath();
+          for (let i = 0; i <= 1400; i += 1) {
+            const t = (i / 1400) * p.TR;
+            const s = els.showWave.checked ? fn(t, p) : envFn(t, p);
+            const x = xOf(t);
+            const y = yOf(s);
+            if (i === 0) sCtx.moveTo(x, y); else sCtx.lineTo(x, y);
+          }
+          sCtx.stroke();
+        }
+
+        if (els.showFID.checked) {
+          drawEnvelope(envelopeFID, "rgba(255,180,91,0.55)");
+          drawSignal(signalFID, envelopeFID, "rgba(71,196,255,0.95)");
+        }
+        if (els.showEcho.checked) {
+          drawEnvelope(envelopeSpinEcho, "rgba(255,226,123,0.45)");
+          drawSignal(signalEcho, envelopeSpinEcho, "rgba(114,255,208,0.95)");
+        }
+
+        const x90 = xOf(0);
+        const x180 = xOf(p.TE * 0.5);
+        const xTE = xOf(p.TE);
+        const xTR = xOf(p.TR);
+
+        function drawMarker(x, label, color) {
+          sCtx.strokeStyle = color;
+          sCtx.lineWidth = 1.3;
+          sCtx.beginPath();
+          sCtx.moveTo(x, y0);
+          sCtx.lineTo(x, y0 + ph);
+          sCtx.stroke();
+          sCtx.fillStyle = color;
+          sCtx.font = "600 11px Avenir Next";
+          sCtx.fillText(label, x + 4, y0 + 12);
+        }
+
+        drawMarker(x90, "90°", "rgba(205, 225, 252, 0.92)");
+        if (els.showEcho.checked) drawMarker(x180, "180°", "rgba(255,180,91,0.95)");
+        if (els.showEcho.checked) drawMarker(xTE, "Echo (TE)", "rgba(255,226,123,0.95)");
+        drawMarker(xTR, "Next 90° (TR)", "rgba(188, 211, 246, 0.82)");
+
+        const xNow = xOf(tNow);
+        sCtx.strokeStyle = "rgba(255,255,255,0.72)";
+        sCtx.lineWidth = 1.25;
+        sCtx.beginPath();
+        sCtx.moveTo(xNow, y0);
+        sCtx.lineTo(xNow, y0 + ph);
+        sCtx.stroke();
+
+        sCtx.fillStyle = "rgba(212, 228, 252, 0.94)";
+        sCtx.font = "600 12px Avenir Next";
+        sCtx.fillText("Signal", 12, 18);
+        sCtx.fillText("FID", 12, 34);
+        sCtx.fillStyle = "rgba(114,255,208,0.95)";
+        sCtx.fillText("Spin Echo", 12, 50);
+      }
+
+      function drawRelaxPlot(p, tNow) {
+        const w = relaxCanvas.clientWidth;
+        const h = relaxCanvas.clientHeight;
+        rCtx.clearRect(0, 0, w, h);
+
+        const pad = { l: 58, r: 14, t: 14, b: 24 };
+        const { x0, y0, pw, ph } = drawGrid(rCtx, w, h, pad);
+        const xOf = (ms) => x0 + (ms / p.TR) * pw;
+        const yOf = (v) => y0 + (1 - clamp(v, 0, 1)) * ph;
+
+        function drawCurve(fn, color, lineW) {
+          rCtx.strokeStyle = color;
+          rCtx.lineWidth = lineW;
+          rCtx.beginPath();
+          for (let i = 0; i <= 900; i += 1) {
+            const t = (i / 900) * p.TR;
+            const x = xOf(t);
+            const y = yOf(fn(t));
+            if (i === 0) rCtx.moveTo(x, y); else rCtx.lineTo(x, y);
+          }
+          rCtx.stroke();
+        }
+
+        drawCurve((t) => 1 - expEnv(t, p.T1), "rgba(255,226,123,0.95)", 2.2); // Mz
+        drawCurve((t) => expEnv(t, p.T2), "rgba(114,255,208,0.9)", 1.9);       // true T2
+        drawCurve((t) => expEnv(t, p.T2star), "rgba(255,180,91,0.88)", 1.8);    // T2*
+
+        const xNow = xOf(tNow);
+        rCtx.strokeStyle = "rgba(255,255,255,0.72)";
+        rCtx.lineWidth = 1.2;
+        rCtx.beginPath();
+        rCtx.moveTo(xNow, y0);
+        rCtx.lineTo(xNow, y0 + ph);
+        rCtx.stroke();
+
+        rCtx.fillStyle = "rgba(212,228,252,0.94)";
+        rCtx.font = "600 11px Avenir Next";
+        rCtx.fillText("Mz recovery (T1)", 10, 16);
+        rCtx.fillStyle = "rgba(114,255,208,0.94)";
+        rCtx.fillText("Mxy true T2", 10, 31);
+        rCtx.fillStyle = "rgba(255,180,91,0.95)";
+        rCtx.fillText("Mxy T2*", 10, 46);
+      }
+
+      function drawSequence(p, tNow, cycleNo) {
+        const w = sequenceCanvas.clientWidth;
+        const h = sequenceCanvas.clientHeight;
+        qCtx.clearRect(0, 0, w, h);
+
+        const pad = { l: 56, r: 14, t: 18, b: 20 };
+        const x0 = pad.l;
+        const y0 = pad.t;
+        const pw = w - pad.l - pad.r;
+        const yLine = y0 + 46;
+        const xOf = (ms) => x0 + (ms / p.TR) * pw;
+
+        qCtx.strokeStyle = "rgba(146,176,214,0.5)";
+        qCtx.lineWidth = 2;
+        qCtx.beginPath();
+        qCtx.moveTo(x0, yLine);
+        qCtx.lineTo(x0 + pw, yLine);
+        qCtx.stroke();
+
+        function pulse(x, hgt, color, label) {
+          qCtx.fillStyle = color;
+          qCtx.fillRect(x - 4, yLine - hgt, 8, hgt);
+          qCtx.fillStyle = color;
+          qCtx.font = "700 11px Avenir Next";
+          qCtx.fillText(label, x - 14, yLine - hgt - 6);
+        }
+
+        const x90 = xOf(0);
+        const x180 = xOf(p.TE * 0.5);
+        const xTE = xOf(p.TE);
+        const xTR = xOf(p.TR);
+
+        pulse(x90, 28, "rgba(204,225,252,0.96)", "90°");
+        if (els.showEcho.checked) pulse(x180, 42, "rgba(255,180,91,0.95)", "180°");
+
+        if (els.showEcho.checked) {
+          qCtx.strokeStyle = "rgba(255,226,123,0.94)";
+          qCtx.lineWidth = 2;
+          qCtx.beginPath();
+          qCtx.arc(xTE, yLine - 9, 8, 0, Math.PI * 2);
+          qCtx.stroke();
+          qCtx.fillStyle = "rgba(255,226,123,0.95)";
+          qCtx.font = "600 11px Avenir Next";
+          qCtx.fillText("Echo at TE", xTE + 8, yLine - 10);
+        }
+
+        qCtx.strokeStyle = "rgba(162,192,230,0.72)";
+        qCtx.lineWidth = 1.3;
+        qCtx.beginPath();
+        qCtx.moveTo(x90, yLine + 28);
+        qCtx.lineTo(xTR, yLine + 28);
+        qCtx.stroke();
+        qCtx.fillStyle = "rgba(198,218,246,0.9)";
+        qCtx.font = "600 11px Avenir Next";
+        qCtx.fillText("TR", (x90 + xTR) * 0.5 - 8, yLine + 42);
+        qCtx.fillText("repeat once per k-space line", x0 + 4, h - 6);
+        qCtx.fillText(`Cycle ${cycleNo}/${MAX_CYCLES_BEFORE_RESET} -> then back to Step 1`, x0 + 180, h - 6);
+
+        const xNow = xOf(tNow);
+        qCtx.strokeStyle = "rgba(255,255,255,0.72)";
+        qCtx.lineWidth = 1.2;
+        qCtx.beginPath();
+        qCtx.moveTo(xNow, y0);
+        qCtx.lineTo(xNow, h - pad.b);
+        qCtx.stroke();
+      }
+
+      function frame(now) {
+        const dt = Math.min(64, now - state.last);
+        state.last = now;
+        const p = params();
+        if (state.running) {
+          state.simMs += dt * p.speed;
+          const cycleIndex = Math.floor(state.simMs / p.TR);
+          if (cycleIndex >= MAX_CYCLES_BEFORE_RESET) {
+            state.simMs = 0;
+          }
+        }
+        const cycleNo = Math.floor(state.simMs / p.TR) + 1;
+        const tNow = ((state.simMs % p.TR) + p.TR) % p.TR;
+        drawSignalPlot(p, tNow);
+        drawRelaxPlot(p, tNow);
+        drawSequence(p, tNow, cycleNo);
+        requestAnimationFrame(frame);
+      }
+
+      function handlePreset(type) {
+        if (type === "t1w") {
+          els.tr.value = "500";
+          els.te.value = "20";
+        }
+        if (type === "t2w") {
+          els.tr.value = "2500";
+          els.te.value = "120";
+        }
+        if (type === "pdw") {
+          els.tr.value = "2500";
+          els.te.value = "20";
+        }
+        recompute();
+      }
+
+      function bindUI() {
+        els.playBtn.addEventListener("click", () => {
+          state.running = !state.running;
+          els.playBtn.textContent = state.running ? "Pause" : "Play";
+        });
+
+        els.resetBtn.addEventListener("click", () => {
+          state.simMs = 0;
+        });
+
+        [
+          els.tr, els.te, els.t1, els.t2, els.t2p,
+          els.freq, els.speed, els.showFID, els.showEcho, els.showWave
+        ].forEach((el) => {
+          el.addEventListener("input", recompute);
+          el.addEventListener("change", recompute);
+        });
+
+        document.querySelectorAll("[data-preset]").forEach((btn) => {
+          btn.addEventListener("click", () => handlePreset(btn.dataset.preset));
+        });
+
+        window.addEventListener("resize", () => {
+          resizeCanvas(signalCanvas, sCtx);
+          resizeCanvas(relaxCanvas, rCtx);
+          resizeCanvas(sequenceCanvas, qCtx);
+        });
+      }
+
+      resizeCanvas(signalCanvas, sCtx);
+      resizeCanvas(relaxCanvas, rCtx);
+      resizeCanvas(sequenceCanvas, qCtx);
+      bindUI();
+      recompute();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

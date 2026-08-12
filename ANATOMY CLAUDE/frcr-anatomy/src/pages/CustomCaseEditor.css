@@ -1,0 +1,334 @@
+.cce-root {
+  max-width: 1180px;
+  margin: 0 auto;
+  /* .app-header is fixed at --header-h tall and goes opaque past 24px of
+     scroll — 24px of top padding alone leaves the h1 rendering under it. */
+  padding: calc(var(--header-h) + 24px) 24px 80px;
+  width: 100%;
+}
+
+.cce-root h1 {
+  font-size: 24px;
+  margin: 8px 0 4px;
+}
+
+.cce-sub {
+  color: var(--text-dim);
+  font-size: 13.5px;
+  max-width: 640px;
+  margin-bottom: 20px;
+}
+
+.cce-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-dim);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--panel);
+}
+
+.cce-upload input {
+  display: none;
+}
+
+.cce-upload:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cce-body {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.cce-image-pane {
+  padding: 16px;
+}
+
+.cce-image-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  cursor: crosshair;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #0B0D10;
+}
+
+.cce-image-wrap img {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  user-select: none;
+}
+
+/* Leader lines from each badge to the point that was clicked. Sits under
+   the badges so a line never crosses a letter. */
+.cce-arrow-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Sized as a percentage of the image, exactly as ImageViewer draws it, so the
+   badge in the editor is the badge the candidate will see. It used to be a
+   fixed 24px pill, always white with a rose ring whatever was saved — which
+   is why changing the colour appeared to do nothing and why every badge came
+   out the same size. */
+.cce-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: var(--cce-badge, 3.4%);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--cce-ink, #ffffff);
+  color: var(--cce-text, #14181d);
+  border: 0.1em solid var(--cce-halo, rgba(0, 0, 0, 0.9));
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* The glyph must be a CHILD of the badge: an element cannot container-query
+   itself, so putting `52cqw` on `.cce-marker` resolved against the viewport
+   instead and produced a 780px letter — which is what made every badge a
+   giant circle whose size no slider could change. */
+.cce-marker-glyph {
+  font-size: 52cqw;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cce-hint {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  margin: 10px 0;
+}
+
+.cce-form-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cce-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.cce-field input,
+.cce-field select,
+.cce-field textarea {
+  font-family: inherit;
+  font-weight: 400;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  resize: vertical;
+}
+
+.cce-markers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel-2);
+  border-radius: var(--radius-md);
+}
+
+.cce-empty {
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+.cce-marker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* The arrow controls drop onto their own full-width line beneath the answer
+     field rather than squeezing in beside it. */
+  flex-wrap: wrap;
+}
+
+.cce-marker-label {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cce-marker-row input {
+  flex: 1;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.cce-remove {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cce-existing {
+  margin-top: 40px;
+}
+
+.cce-existing h2 {
+  font-size: 16px;
+  margin-bottom: 14px;
+}
+
+.cce-existing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.cce-existing-card {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cce-existing-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  background: #0B0D10;
+  border-radius: var(--radius-sm);
+}
+
+.cce-existing-card p {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  min-height: 32px;
+}
+
+.cce-existing-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cce-delete {
+  color: var(--red);
+}
+
+@media (max-width: 900px) {
+  .cce-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- arrow editing -------------------------------------------------------
+   The badge is the tail handle (drag to aim and lengthen) and a small ring
+   marks the tip (drag to move the whole arrow). Both are draggable, so both
+   advertise it with a grab cursor. */
+/* The badge was pointer-events:none while it was purely decorative. It is now
+   the handle you drag to aim and lengthen the arrow, so it has to receive
+   pointer events again. */
+.cce-marker { cursor: grab; touch-action: none; pointer-events: auto; }
+.cce-marker:active { cursor: grabbing; }
+.cce-marker.is-selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(217, 168, 78, 0.3); }
+
+.cce-tip {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.25);
+  cursor: grab;
+  touch-action: none;
+}
+.cce-tip:active { cursor: grabbing; }
+.cce-tip.is-selected { border-color: var(--accent); background: rgba(217, 168, 78, 0.25); }
+
+.cce-marker-row.is-selected { outline: 1px solid rgba(217, 168, 78, 0.5); outline-offset: 3px; border-radius: 8px; }
+
+.cce-arrow-controls {
+  flex: 0 0 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border-soft);
+}
+.cce-arrow-controls label {
+  display: grid;
+  grid-template-columns: 78px 1fr 46px;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.cce-arrow-controls label b { font-size: 11.5px; color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+.cce-arrow-controls input[type='range'] { width: 100%; accent-color: var(--accent, #D9A84E); }
+.cce-arrow-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+.cce-arrow-hint { font-size: 11px; line-height: 1.5; color: var(--text-faint); }
+
+/* Colour picker for a marker. Four swatches, each with a real accessible name
+   — colour alone must never be the only way to tell them apart. */
+.cce-colour-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+.cce-colour-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9aa4b2;
+}
+.cce-swatches { display: flex; gap: 6px; }
+.cce-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s;
+}
+.cce-swatch:hover { transform: scale(1.12); border-color: rgba(255, 255, 255, 0.6); }
+.cce-swatch.is-on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(217, 168, 78, 0.3);
+}
+.cce-swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

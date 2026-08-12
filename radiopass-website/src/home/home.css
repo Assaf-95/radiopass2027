@@ -1,0 +1,970 @@
+/* RadioPass homepage — cinematic scroll journey.
+   Scoped: every rule lives under .home-page (or hm- prefixed classes)
+   so nothing leaks into the rest of the site.
+
+   The homepage is allowed to behave differently from a lesson: it sells rather
+   than teaches, so it keeps the pinned scenes, the full-bleed drama and the
+   serif display voice. What it is NOT allowed to do — and what it used to do —
+   is invent its own numbers. It carried seventy-five independent font sizes
+   against the site's four, which is how a page whose hero ran to 88px could
+   describe its own laboratories in 13px grey. Every size, gap, width and
+   interface duration below now comes from design/tokens.css; the only literals
+   left are diagram geometry (SVG user units, hairlines) and the one colour
+   noted beneath, each of which is commented where it sits. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap');
+
+.home-page {
+  /* The hm- names stay: several hundred rules and four scene files reference
+     them, and renaming them would be a large diff a reader could not see. What
+     changed is that they now resolve to tokens instead of restating hex. */
+  --hm-bg: var(--bg-base);
+  --hm-surface: var(--bg-elevated);
+  --hm-surface-2: var(--bg-interactive);
+  --hm-ink: var(--text-primary);
+  --hm-mut: var(--text-tertiary);
+  --hm-line: var(--border);
+  --hm-amber: var(--accent);
+  /* Deliberately NOT --hue-xray. The pinned scenes paint this blue straight
+     onto their canvases as rgba(168,203,234,…), and a canvas cannot read a
+     custom property — aliasing only the CSS side would split one modality
+     colour into two shades that always appear side by side. */
+  --hm-xray: #A8CBEA;
+  --hm-us: var(--hue-us);
+  --hm-mri: var(--hue-mri);
+  --hm-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --hm-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  background: var(--hm-bg);
+  color: var(--hm-ink);
+  font-family: var(--hm-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+.home-page ::selection { background: rgba(217, 168, 78, 0.32); }
+.home-page :focus-visible { outline: 2px solid var(--hm-amber); outline-offset: 3px; border-radius: 2px; }
+
+.hm-skip {
+  position: fixed; left: var(--sp-4); top: -60px; z-index: 200;
+  background: var(--hm-amber); color: var(--bg-base); font-weight: 600; font-size: var(--fs-support);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-sm);
+  transition: top var(--dur) var(--ease);
+}
+.hm-skip:focus { top: var(--sp-3); }
+
+/* One measure for the whole page, written the same way the portal writes it.
+   Width rather than max-width plus padding, because several bands ARE the
+   wrap and carry their own rule — with padding, those rules overhang the text
+   they belong to by a gutter at each end. */
+.hm-wrap {
+  width: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+  margin-inline: auto;
+}
+
+/* ---------- type ---------- */
+
+.hm-display {
+  font-family: var(--hm-serif);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-page);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--gap-heading-desc);
+}
+.hm-eyebrow {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.34em; text-transform: uppercase;
+  color: var(--hm-mut); margin: 0 0 var(--sp-3);
+}
+.hm-eyebrow::before { content: ''; display: inline-block; width: 22px; height: 1px; background: var(--hm-amber); vertical-align: middle; margin-right: var(--sp-3); }
+.hm-acc-xray { color: var(--hm-xray); }
+.hm-acc-us { color: var(--hm-us); }
+.hm-acc-mri { color: var(--hm-mri); }
+/* The sentence under a heading is read, so it is set in the teaching size and
+   the secondary ink — not in the grey the metadata uses. */
+.hm-lede {
+  font-size: var(--fs-teach); line-height: var(--lh-body);
+  color: var(--text-secondary); max-width: var(--measure-tight); margin: 0;
+}
+
+/* ---------- buttons ---------- */
+
+.hm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font-family: var(--hm-sans); font-size: var(--fs-support); font-weight: 600;
+  padding: var(--sp-3) var(--sp-5); border-radius: 4px; border: 1px solid transparent;
+  min-height: 44px; /* touch target, same as the shared primitive */
+  cursor: pointer; text-decoration: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.hm-btn:hover { transform: translateY(-1px); }
+.hm-btn-solid { background: var(--hm-ink); color: var(--bg-base); }
+.hm-btn-solid:hover { background: #fff; }
+.hm-btn-ghost { border-color: var(--border-strong); color: var(--hm-ink); background: transparent; }
+.hm-btn-ghost:hover { border-color: rgba(242, 238, 230, 0.55); }
+.hm-btn-line { border: none; border-radius: 0; padding: var(--sp-3) var(--sp-1); color: var(--hm-amber); border-bottom: 1px solid rgba(217, 168, 78, 0.4); }
+.hm-btn-line:hover { border-bottom-color: var(--hm-amber); transform: none; }
+/* Small is a smaller box, not smaller writing: the label is the same thing to
+   read wherever it appears. */
+.hm-btn-sm { padding: var(--sp-2) var(--sp-4); min-height: 40px; }
+
+/* ---------- navigation ---------- */
+
+.hm-nav { position: fixed; inset: 0 0 auto; z-index: 100; transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), backdrop-filter var(--dur) var(--ease); border-bottom: 1px solid transparent; }
+.hm-nav.is-scrolled { background: rgba(11, 13, 16, 0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: rgba(242, 238, 230, 0.07); }
+/* The bar shares the page's container, so the wordmark sits on the same left
+   edge as every heading below it rather than 40px outside them. */
+.hm-nav-inner {
+  width: min(var(--container-main), calc(100% - 2 * var(--gutter)));
+  margin-inline: auto; height: var(--sp-8);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-5);
+}
+.hm-nav-brand { font-family: var(--hm-sans); font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.42em; color: var(--hm-ink); text-decoration: none; opacity: 0; transition: opacity var(--dur-reveal) var(--ease); }
+.hm-nav-brand.is-on { opacity: 1; }
+.hm-nav-links { display: flex; gap: var(--sp-5); }
+.hm-nav-links a { font-size: var(--fs-support); font-weight: 500; color: var(--hm-mut); text-decoration: none; transition: color var(--dur-micro) var(--ease); }
+.hm-nav-links a:hover { color: var(--hm-ink); }
+.hm-nav-actions { display: flex; align-items: center; gap: var(--sp-4); }
+.hm-nav-burger { display: none; width: 40px; height: 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: transparent; cursor: pointer; position: relative; }
+.hm-nav-burger span { position: absolute; left: 11px; right: 11px; height: 1.5px; background: var(--hm-ink); transition: transform var(--dur) var(--ease), top var(--dur) var(--ease); }
+.hm-nav-burger span:first-child { top: 15px; }
+.hm-nav-burger span:last-child { top: 23px; }
+.is-open .hm-nav-burger span:first-child { top: 19px; transform: rotate(45deg); }
+.is-open .hm-nav-burger span:last-child { top: 19px; transform: rotate(-45deg); }
+
+/* Sized against the viewport explicitly rather than by `inset: 0`.
+   `.hm-nav.is-scrolled` carries a backdrop-filter, and a backdrop-filter other
+   than `none` makes an element the containing block for its position:fixed
+   descendants. So past 24px of scroll this sheet stopped resolving `bottom: 0`
+   against the viewport and collapsed to the 64px header bar: Learn and Practise
+   were painted above the top of the screen, Fact Bank underneath the bar that
+   was intercepting its clicks, and the CTA out over the hero with no backdrop
+   behind it. Stating the height keeps the sheet full-screen either way. */
+.hm-nav-sheet {
+  position: fixed; top: 0; left: 0; right: 0; bottom: auto;
+  height: 100vh; height: 100dvh;
+  z-index: -1; background: rgba(11, 13, 16, 0.96);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--sp-6); padding: 0 8vw;
+  opacity: 0; visibility: hidden; transition: opacity var(--dur) var(--ease), visibility var(--dur) var(--ease);
+}
+.is-open .hm-nav-sheet { opacity: 1; visibility: visible; z-index: -1; }
+.hm-nav-sheet nav { display: flex; flex-direction: column; gap: var(--sp-1); }
+.hm-nav-sheet nav a {
+  font-family: var(--hm-serif); font-size: var(--fs-section); font-weight: 340;
+  color: var(--hm-ink); text-decoration: none; padding: var(--sp-2) 0; border-bottom: 1px solid rgba(242, 238, 230, 0.07);
+}
+.hm-nav-sheet nav a:hover { color: var(--hm-amber); }
+.hm-nav-sheet > .hm-btn { align-self: flex-start; }
+
+/* ---------- pinned scene scaffolding ---------- */
+
+.hm-hero { height: 420vh; position: relative; }
+.hm-hero::after, .hm-stage-xray::after {
+  /* the scene dissolves into the page — no cutoff line at the unpin */
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 24vh;
+  background: linear-gradient(180deg, transparent, var(--hm-bg));
+  pointer-events: none; z-index: 2;
+}
+.hm-stage-xray::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 18vh;
+  background: linear-gradient(0deg, transparent, var(--hm-bg));
+  pointer-events: none; z-index: 2;
+}
+.hm-stage-xray { height: 680vh; position: relative; }
+.hm-stage-us { height: 520vh; position: relative; }
+.hm-stage-mri { height: 560vh; position: relative; }
+
+.hm-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.hm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.hm-fade, .hm-fade-init { will-change: opacity, transform; }
+.hm-fade { opacity: 0; }
+.hm-fade-init { opacity: 1; }
+
+/* Reduced motion / static rendering: everything visible, no scrub. */
+.is-rm { height: auto !important; }
+.is-rm .hm-pin { position: relative; height: auto; min-height: 100vh; overflow: visible; padding: var(--sp-9) 0 var(--sp-8); }
+.is-rm .hm-canvas { height: 100%; z-index: 0; }
+.is-rm .hm-fade, .is-rm .hm-fade-init { opacity: 1 !important; transform: none !important; }
+/* The hero copy is centred in the pin by the pair `top: 50%` + a -50% translate.
+   Under is-rm the pin is a normal-flow block of indefinite height, so the offset
+   resolves to nothing while the translate still fires — which lifted the
+   wordmark clear above the top of the document and cut the first line off the
+   heading, at scrollY 0, with no way to scroll back up to them. Centring has no
+   meaning once the pin grows to its content, so both halves stand down. */
+.is-rm .hm-hero-copy { top: auto; transform: none; }
+
+/* ---------- hero ---------- */
+
+.hm-hero .hm-pin { background:
+  radial-gradient(120% 90% at 68% 40%, rgba(21, 28, 38, 0.65), transparent 60%),
+  var(--hm-bg); }
+.hm-hero-copy {
+  position: absolute; z-index: 2; left: 7vw; top: 50%; transform: translateY(-50%);
+  max-width: 640px; pointer-events: none;
+}
+.hm-wordmark {
+  font-size: var(--fs-card); font-weight: 600; letter-spacing: 0.55em;
+  color: var(--hm-ink); margin: 0 0 var(--sp-5);
+}
+.hm-hero-copy h1 {
+  font-family: var(--hm-serif); font-optical-sizing: auto; font-weight: 330;
+  font-size: var(--fs-hero); line-height: var(--lh-tight); letter-spacing: -0.015em; margin: 0;
+}
+.hm-hero-copy h1 em { font-style: italic; color: var(--hm-amber); }
+.hm-hero-eq { font-family: var(--hm-serif); font-style: italic; font-size: var(--fs-card); color: rgba(242, 238, 230, 0.85); margin: var(--sp-5) 0 0; }
+.hm-hero-sup { font-size: var(--fs-support); color: var(--text-secondary); margin: var(--sp-3) 0 0; }
+.hm-hero-cta { display: flex; gap: var(--sp-3); margin-top: var(--sp-6); pointer-events: none; }
+.hm-hero-cta .hm-btn { pointer-events: inherit; }
+.is-rm .hm-hero-cta, .is-rm .hm-hero-cta .hm-btn { pointer-events: auto !important; }
+
+/* Level 5. A caption on the apparatus and a scroll affordance: both orient,
+   neither teaches, so both sit at metadata size and never above it. */
+.hm-scene-note {
+  position: absolute; right: var(--sp-5); bottom: var(--sp-5); z-index: 2; margin: 0;
+  font-size: var(--fs-meta); letter-spacing: 0.04em; color: var(--text-tertiary);
+  max-width: 34ch; text-align: right;
+}
+.hm-scroll-hint {
+  position: absolute; left: 50%; bottom: var(--sp-5); transform: translateX(-50%); z-index: 2;
+  font-size: var(--fs-meta); letter-spacing: 0.3em; text-transform: uppercase; color: var(--hm-mut);
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
+}
+.hm-scroll-hint span { width: 1px; height: 34px; background: linear-gradient(var(--hm-amber), transparent); display: block; }
+@keyframes hm-hint { 0%, 100% { transform: scaleY(0.6); opacity: 0.5; } 50% { transform: scaleY(1); opacity: 1; } }
+.hm-scroll-hint span { transform-origin: top; animation: hm-hint 2.4s ease-in-out infinite; }
+
+/* ---------- pinned stage copy ---------- */
+
+.hm-stage .hm-pin { background: var(--hm-bg); }
+.hm-stage-copy {
+  position: absolute; z-index: 2; left: 6vw; top: 13vh;
+  width: min(400px, 34vw); pointer-events: none;
+}
+.hm-stage-copy .hm-btn { pointer-events: auto; }
+.hm-copy-right { left: auto; right: 6vw; }
+.hm-stage-head h2 {
+  font-family: var(--hm-serif); font-optical-sizing: auto; font-weight: 340;
+  font-size: var(--fs-section); line-height: var(--lh-heading); letter-spacing: -0.01em; margin: 0 0 var(--gap-heading-desc);
+}
+.hm-stage-sub { font-size: var(--fs-body); color: var(--text-secondary); line-height: var(--lh-body); margin: 0; }
+.hm-stage-copy .hm-eyebrow { margin-bottom: var(--sp-3); }
+
+/* The chapter caption is the sentence that explains the drawing beside it, so
+   it is set at reading size in the secondary ink. Only the chapter number —
+   genuine level-5 metadata — stays small. */
+.hm-chapters { position: relative; margin-top: var(--sp-6); min-height: 190px; }
+.hm-chapter { position: absolute; inset: 0 0 auto; }
+.hm-chapter span { font-size: var(--fs-meta); letter-spacing: 0.22em; color: var(--hm-amber); font-weight: 600; }
+.hm-chapter h3 { font-family: var(--hm-serif); font-weight: 380; font-size: var(--fs-card); margin: var(--sp-2) 0 var(--sp-2); letter-spacing: 0; }
+.hm-chapter p { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-secondary); margin: 0; max-width: var(--measure-tight); }
+
+/* Below 861px the copy block is a normal column, so the call to action simply
+   follows it. It used to be pulled 46vh below the block at every width, which
+   parked it off the bottom of the pinned viewport — invisible — in the band
+   between the phone layout and the wide layout that repositions it properly. */
+.hm-stage-cta { margin-top: var(--sp-6); }
+
+.hm-rail { position: absolute; right: 3vw; top: 50%; transform: translateY(-50%); z-index: 2; display: flex; flex-direction: column; gap: var(--sp-2); }
+.hm-rail i { width: 4px; height: 4px; border-radius: 50%; background: rgba(242, 238, 230, 0.22); transition: background var(--dur) var(--ease), height var(--dur) var(--ease); }
+.hm-rail i.on { background: var(--hm-amber); height: 16px; border-radius: 3px; }
+
+/* Static (reduced-motion) layout for stages: chapters become a list. */
+.is-rm .hm-stage-copy { position: relative; inset: auto; width: min(var(--container-reading), 88vw); margin: 0 auto; }
+.is-rm .hm-chapters { min-height: 0; margin-top: var(--sp-6); display: grid; gap: var(--gap-cards); }
+.is-rm .hm-chapter { position: static; }
+.is-rm .hm-stage-copy .hm-stage-cta { position: static; margin-top: var(--sp-6); }
+.is-rm .hm-rail, .is-rm .hm-scroll-hint { display: none; }
+.is-rm .hm-canvas { position: absolute; opacity: 0.35; }
+
+/* ---------- generic sections ----------
+   One page rhythm. The 150px band was arbitrary; --sp-9 is the top of the
+   spacing ladder and still reads as a full breath between chapters. */
+
+.hm-section { padding: var(--sp-9) 0; position: relative; }
+
+/* ---------- section 1: signals ---------- */
+
+.hm-signals { background: transparent; }
+.hm-signal-grid {
+  list-style: none; margin: var(--gap-header-content) 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--gap-cards);
+}
+.hm-signal-grid li {
+  border-top: 1px solid var(--hm-line); padding-top: var(--sp-5);
+  opacity: 0; transform: translateY(18px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+}
+.in-view .hm-signal-grid li { opacity: 1; transform: none; }
+.hm-signal-grid svg { width: 100%; max-width: 150px; height: 60px; margin-bottom: var(--sp-4); overflow: visible; }
+.hm-signal-grid h3 { font-family: var(--hm-serif); font-weight: 400; font-size: var(--fs-card); margin: 0 0 var(--sp-1); }
+.hm-signal-grid p { font-size: var(--fs-support); color: var(--text-secondary); margin: 0; }
+
+.hm-sig-wave { fill: none; stroke: var(--hm-xray); stroke-width: 1.6; stroke-dasharray: 320; stroke-dashoffset: 320; }
+.in-view .hm-sig-wave { animation: hm-drawin 1.6s ease forwards 0.2s; }
+@keyframes hm-drawin { to { stroke-dashoffset: 0; } }
+.hm-sig-us { stroke: var(--hm-us); stroke-width: 1.6; }
+.in-view .hm-sig-press { animation: hm-pressdrift 5s ease-in-out infinite; }
+@keyframes hm-pressdrift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
+.hm-sig-cone { fill: none; stroke: rgba(169, 158, 219, 0.4); stroke-dasharray: 3 4; }
+.hm-sig-axis { stroke: rgba(242, 238, 230, 0.25); stroke-dasharray: 2 4; }
+.hm-sig-mri { stroke: var(--hm-mri); stroke-width: 1.8; }
+.hm-sig-mri-dot { fill: var(--hm-mri); }
+.hm-sig-spin { transform-origin: 60px 48px; }
+.in-view .hm-sig-spin { animation: hm-precess 5.5s ease-in-out infinite; }
+@keyframes hm-precess { 0%, 100% { transform: rotate(0deg) scaleX(1); } 25% { transform: rotate(-9deg) scaleX(0.45); } 50% { transform: rotate(0deg) scaleX(-1); } 75% { transform: rotate(9deg) scaleX(0.45); } }
+.hm-sig-det { fill: rgba(242, 238, 230, 0.5); }
+.in-view .hm-sig-det { animation: hm-detpulse 3.2s ease-in-out infinite; }
+@keyframes hm-detpulse { 0%, 100% { fill: rgba(242, 238, 230, 0.4); } 50% { fill: rgba(242, 238, 230, 0.85); } }
+
+/* ---------- section 5: modules ---------- */
+
+.hm-modules { background: var(--hm-bg); }
+.hm-modules-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-7); margin-bottom: var(--gap-header-content); }
+.hm-modules-head .hm-lede { max-width: 40ch; padding-bottom: var(--sp-2); }
+.hm-module-list { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--hm-line); }
+.hm-module-list li { opacity: 0; transform: translateY(14px); transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease); }
+.in-view .hm-module-list li { opacity: 1; transform: none; }
+.hm-module-list a {
+  display: grid; grid-template-columns: 64px 84px 1fr 44px; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-5) var(--sp-2); border-top: 1px solid var(--hm-line); text-decoration: none; color: inherit;
+  transition: background var(--dur) var(--ease);
+}
+.hm-module-list a:hover, .hm-module-list a:focus-visible { background: rgba(242, 238, 230, 0.025); }
+.hm-mod-num { font-size: var(--fs-meta); letter-spacing: 0.2em; color: var(--hm-mut); font-variant-numeric: tabular-nums; }
+.hm-mod-glyph { color: rgba(242, 238, 230, 0.5); transition: color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.hm-mod-glyph svg { width: 46px; height: 46px; display: block; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.hm-mod-glyph svg .fill { fill: currentColor; stroke: none; }
+.hm-mod-glyph svg .fill-soft { fill: currentColor; stroke: none; opacity: 0.4; }
+.hm-mod-glyph svg .thin { stroke-width: 1; opacity: 0.65; }
+.hm-module-list a:hover .hm-mod-glyph { color: var(--hm-amber); transform: rotate(-4deg) scale(1.06); }
+.hm-mod-txt h3 { font-family: var(--hm-serif); font-weight: 400; font-size: var(--fs-card); margin: 0 0 var(--sp-1); transition: transform var(--dur) var(--ease); }
+.hm-mod-txt p { font-size: var(--fs-support); color: var(--text-secondary); margin: 0; }
+.hm-module-list a:hover .hm-mod-txt h3 { transform: translateX(6px); }
+.hm-mod-arrow { font-size: var(--fs-card); color: var(--hm-amber); opacity: 0; transform: translateX(-8px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.hm-module-list a:hover .hm-mod-arrow, .hm-module-list a:focus-visible .hm-mod-arrow { opacity: 1; transform: none; }
+
+/* ---------- section 6: interactive demos ---------- */
+
+.hm-demos { background: linear-gradient(180deg, var(--hm-bg), #0B0D10 40%, var(--hm-bg)); }
+.hm-demo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-cards); margin-top: var(--gap-header-content); }
+.hm-demo {
+  background: var(--hm-surface); border: 1px solid rgba(242, 238, 230, 0.08); border-radius: var(--radius-lg);
+  padding: var(--card-pad); display: flex; flex-direction: column; gap: var(--sp-4);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+}
+.in-view .hm-demo { opacity: 1; transform: none; }
+.in-view .hm-demo:nth-child(2) { transition-delay: var(--dur-micro); }
+.in-view .hm-demo:nth-child(3) { transition-delay: calc(var(--dur-micro) * 2); }
+.hm-demo header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); }
+.hm-demo h3 { font-family: var(--hm-serif); font-weight: 400; font-size: var(--fs-card); margin: 0; }
+.hm-demo-tag { font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; }
+.hm-demo-svg { width: 100%; height: auto; background: #0B0D10; border-radius: var(--radius-sm); border: 1px solid rgba(242, 238, 230, 0.06); }
+
+.hm-svg-axis { stroke: rgba(242, 238, 230, 0.22); stroke-width: 1; }
+.hm-svg-line-xray { stroke: var(--hm-xray); stroke-width: 1.7; fill: none; }
+.hm-svg-fill-xray { fill: rgba(168, 203, 234, 0.1); stroke: none; }
+.hm-svg-marker { stroke: var(--hm-amber); stroke-width: 1; stroke-dasharray: 3 3; }
+/* SVG user units, not CSS pixels: this text is inside a scaled viewBox, so the
+   number is diagram geometry — changing it would move the label off its axis
+   rather than make it bigger. Same for every fill-based label below. */
+.hm-svg-note { fill: var(--hm-mut); font-size: 10px; font-family: var(--hm-sans); }
+.hm-svg-note.amber { fill: var(--hm-amber); }
+.hm-svg-ray { stroke: rgba(168, 203, 234, 0.4); stroke-width: 1; }
+.hm-svg-penumbra { fill: rgba(217, 168, 78, 0.22); stroke: none; }
+.hm-svg-umbra { fill: rgba(242, 238, 230, 0.06); stroke: none; }
+.hm-svg-focal { stroke: var(--hm-xray); stroke-width: 5; stroke-linecap: round; }
+.hm-svg-object { fill: rgba(242, 238, 230, 0.75); stroke: none; }
+.hm-svg-detector { stroke: rgba(242, 238, 230, 0.5); stroke-width: 3; }
+
+.hm-demo-reads { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); }
+.hm-demo-reads span { display: block; font-size: var(--fs-meta); letter-spacing: 0.14em; text-transform: uppercase; color: var(--hm-mut); margin-bottom: var(--sp-1); }
+.hm-demo-reads strong { font-family: var(--hm-serif); font-weight: 420; font-size: var(--fs-card); letter-spacing: 0; }
+
+.hm-demo-ctls { display: grid; gap: var(--sp-3); }
+.hm-ctl { display: block; }
+.hm-ctl.is-off { opacity: 0.35; }
+/* A control's own label is instruction, not decoration — you cannot drive the
+   demonstration without reading it. */
+.hm-ctl-row { display: flex; justify-content: space-between; font-size: var(--fs-support); color: var(--text-secondary); margin-bottom: var(--sp-2); }
+.hm-ctl-row strong { color: var(--hm-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.hm-ctl input[type='range'] {
+  width: 100%; appearance: none; -webkit-appearance: none; height: 3px; border-radius: 3px;
+  background: rgba(242, 238, 230, 0.14); outline-offset: 6px;
+}
+.hm-ctl input[type='range']::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+  background: var(--hm-ink); border: 4px solid var(--hm-amber); cursor: pointer;
+}
+.hm-ctl input[type='range']::-moz-range-thumb {
+  width: 13px; height: 13px; border-radius: 50%; background: var(--hm-ink); border: 4px solid var(--hm-amber); cursor: pointer;
+}
+.hm-chip-row { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.hm-chip {
+  font-family: var(--hm-sans); font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.04em;
+  padding: var(--sp-2) var(--sp-3); border-radius: 20px; cursor: pointer;
+  background: transparent; border: 1px solid var(--border-strong); color: var(--text-secondary);
+  transition: border-color var(--dur-micro) var(--ease), color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.hm-chip:hover { border-color: rgba(242, 238, 230, 0.45); color: var(--hm-ink); }
+.hm-chip.on { background: var(--hm-amber); border-color: var(--hm-amber); color: var(--bg-base); }
+
+.hm-demo-note { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); margin: 0; border-left: 2px solid rgba(217, 168, 78, 0.5); padding-left: var(--sp-3); }
+.hm-demo-link { font-size: var(--fs-support); font-weight: 600; color: var(--hm-amber); text-decoration: none; margin-top: auto; }
+.hm-demo-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.hm-mri-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-2); }
+.hm-mri-tiles figure { margin: 0; }
+.hm-mri-tiles figure div { aspect-ratio: 1; border-radius: var(--radius-sm); border: 1px solid rgba(242, 238, 230, 0.12); transition: background var(--dur) var(--ease); }
+.hm-mri-tiles figcaption { font-size: var(--fs-meta); color: var(--hm-mut); margin-top: var(--sp-2); text-align: center; }
+.hm-mri-weight { font-family: var(--hm-serif); font-size: var(--fs-card); font-style: italic; color: var(--hm-mri); margin: 0; text-align: center; }
+
+/* ---------- section 7: question ---------- */
+
+.hm-qbank-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: var(--sp-8); align-items: start; }
+.hm-qbank-copy { position: sticky; top: var(--sp-9); }
+.hm-question {
+  background: var(--hm-surface); border: 1px solid rgba(242, 238, 230, 0.08); border-radius: var(--radius-lg); padding: var(--card-pad-lg);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+}
+.in-view .hm-question { opacity: 1; transform: none; }
+.hm-q-meta { display: flex; justify-content: space-between; font-size: var(--fs-meta); letter-spacing: 0.2em; text-transform: uppercase; color: var(--hm-mut); margin-bottom: var(--sp-5); }
+.hm-q-stem { font-family: var(--hm-serif); font-weight: 400; font-size: var(--fs-card); line-height: var(--lh-heading); margin: 0 0 var(--sp-5); }
+.hm-q-options { display: grid; gap: var(--sp-2); }
+.hm-q-opt {
+  display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: var(--sp-3); text-align: left;
+  background: transparent; border: 1px solid rgba(242, 238, 230, 0.14); border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4); color: var(--hm-ink); cursor: pointer; font-family: var(--hm-sans);
+  transition: border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
+}
+.hm-q-opt:hover:not(:disabled) { border-color: rgba(242, 238, 230, 0.4); }
+.hm-q-opt:disabled { cursor: default; }
+.hm-q-opt span {
+  width: 30px; height: 30px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  display: grid; place-items: center; font-size: var(--fs-support); font-weight: 600;
+}
+.hm-q-opt p { margin: 0; font-size: var(--fs-body); }
+.hm-q-opt.is-correct { border-color: rgba(125, 201, 143, 0.7); background: rgba(125, 201, 143, 0.07); }
+.hm-q-opt.is-correct span { background: rgba(125, 201, 143, 0.85); border-color: transparent; color: #0B0D10; }
+.hm-q-opt.is-wrong { border-color: rgba(217, 128, 110, 0.6); background: rgba(217, 128, 110, 0.06); }
+.hm-q-opt.is-wrong span { background: rgba(217, 128, 110, 0.8); border-color: transparent; color: #0B0D10; }
+.hm-q-explain { margin-top: var(--sp-5); border-left: 2px solid var(--hm-amber); padding-left: var(--sp-4); }
+.hm-q-explain strong { font-size: var(--fs-support); display: block; margin-bottom: var(--sp-1); }
+.hm-q-explain p { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-secondary); margin: 0 0 var(--sp-4); }
+.hm-q-after { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; }
+
+/* ---------- section 8: finale ----------
+   The closing statement takes the same display step as every other section
+   heading. Two hero-sized headings on one page is not emphasis, it is the
+   absence of hierarchy — the hero keeps that size to itself. */
+
+.hm-finale { text-align: center; padding: var(--sp-9) 0; background: radial-gradient(90% 70% at 50% 100%, rgba(21, 26, 33, 0.9), transparent 70%), var(--hm-bg); }
+.hm-finale .hm-lede { margin: 0 auto; }
+.hm-finale-h { margin-top: var(--gap-section); }
+.hm-finale-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); max-width: var(--container-reading); margin: 0 auto; }
+.hm-finale-rail i { display: block; height: 2px; background: linear-gradient(90deg, transparent, var(--band), transparent); transform: scaleX(0); transition: transform var(--dur-reveal) var(--ease); }
+.in-view .hm-finale-rail i { transform: scaleX(1); }
+.hm-finale-rail div:nth-child(2) i { transition-delay: var(--dur-micro); }
+.hm-finale-rail div:nth-child(3) i { transition-delay: calc(var(--dur-micro) * 2); }
+.hm-finale-rail div:nth-child(4) i { transition-delay: calc(var(--dur-micro) * 3); }
+.hm-finale-rail span { display: block; font-size: var(--fs-meta); letter-spacing: 0.26em; text-transform: uppercase; color: var(--hm-mut); margin-top: var(--sp-3); }
+.hm-finale-cta { display: flex; gap: var(--sp-3); justify-content: center; margin-top: var(--gap-section); }
+
+/* ---------- footer ---------- */
+
+.hm-footer { border-top: 1px solid var(--hm-line); padding: var(--sp-8) 0 var(--sp-5); background: var(--bg-base); }
+.hm-footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--sp-7); }
+.hm-footer-mark { font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.42em; color: var(--hm-ink); }
+.hm-footer-brand p { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); max-width: 34ch; margin: var(--sp-4) 0 0; }
+.hm-footer nav { display: flex; flex-direction: column; gap: var(--sp-2); }
+.hm-footer h3 { font-size: var(--fs-meta); letter-spacing: 0.22em; text-transform: uppercase; color: var(--hm-ink); margin: 0 0 var(--sp-2); font-weight: 600; }
+.hm-footer nav a { font-size: var(--fs-support); color: var(--text-secondary); text-decoration: none; }
+.hm-footer nav a:hover { color: var(--hm-ink); }
+.hm-footer-bottom { display: flex; justify-content: space-between; gap: var(--sp-4); border-top: 1px solid var(--hm-line); margin-top: var(--sp-7); padding-top: var(--sp-5); font-size: var(--fs-meta); color: var(--hm-mut); }
+
+/* ---------- responsive ---------- */
+
+/* Responsive.
+   Every font-size override that used to live in these blocks has gone: the
+   type tokens are clamped, so a heading already knows how to be smaller on a
+   phone and there is nothing left for a breakpoint to re-decide. What remains
+   is layout — how many columns, and what is hidden. */
+
+@media (max-width: 1020px) {
+  .hm-signal-grid { grid-template-columns: repeat(2, 1fr); gap: var(--gap-cards); }
+  .hm-demo-grid { grid-template-columns: 1fr; max-width: var(--container-narrow); margin-inline: auto; }
+  .hm-qbank-grid { grid-template-columns: 1fr; gap: var(--sp-7); }
+  .hm-qbank-copy { position: static; }
+  .hm-modules-head { flex-direction: column; align-items: flex-start; gap: var(--sp-4); }
+  .hm-footer-grid { grid-template-columns: 1fr 1fr; }
+  .hm-stage-copy { width: min(380px, 42vw); }
+  /* Five nav labels at reading size need their gap back before they need to
+     be shrunk; the bar collapses to the burger 260px further down anyway. */
+  .hm-nav-links { gap: var(--sp-4); }
+  .hm-nav-inner { gap: var(--sp-4); }
+}
+
+/* Below this the bar cannot hold five destinations AND a call to action at a
+   size the labels can be read at — something has to go, and the button is the
+   only thing in the bar that is duplicated elsewhere (the hero, the finale,
+   and the menu sheet all carry it). Shrinking the labels instead is what this
+   refactor exists to stop. */
+@media (max-width: 900px) {
+  .hm-nav-cta { display: none; }
+}
+
+@media (max-width: 760px) {
+  .hm-section { padding: var(--sp-8) 0; }
+
+  .hm-nav-links, .hm-nav-cta { display: none; }
+  .hm-nav-burger { display: block; }
+  .hm-nav-sheet { display: flex; }
+
+  /* shorter pinned journeys on mobile */
+  .hm-hero { height: 300vh; }
+  .hm-stage-xray { height: 460vh; }
+  .hm-stage-us { height: 380vh; }
+  .hm-stage-mri { height: 400vh; }
+
+  .hm-hero-copy { left: var(--gutter); right: var(--gutter); max-width: none; top: auto; bottom: 15vh; transform: none; }
+  .hm-hero-cta { flex-direction: column; align-items: stretch; }
+  .hm-hero-cta .hm-btn { width: 100%; text-align: center; }
+  .hm-scene-note { right: var(--sp-4); bottom: var(--sp-2); max-width: 24ch; }
+  .hm-scroll-hint { display: none; }
+
+  .hm-stage-copy, .hm-copy-right { left: var(--gutter); right: var(--gutter); top: auto; bottom: 7vh; width: auto; }
+  .hm-stage-sub { display: none; }
+  .hm-chapters { margin-top: var(--sp-5); min-height: 148px; }
+  .hm-chapter h3 { margin: var(--sp-2) 0 var(--sp-1); }
+  .hm-chapter p { max-width: none; }
+  .hm-stage-copy .hm-stage-cta { position: static; margin-top: var(--sp-2); }
+  .hm-rail { display: none; }
+  .hm-stage-mri .hm-scene-note { display: none; }
+
+  .hm-signal-grid { grid-template-columns: 1fr 1fr; gap: var(--gap-cards); margin-top: var(--gap-header-content); }
+  .hm-module-list a { grid-template-columns: 40px 1fr 30px; }
+  .hm-mod-glyph { display: none; }
+  .hm-finale-cta { flex-direction: column; align-items: center; }
+  .hm-finale-cta .hm-btn { width: 100%; max-width: 320px; }
+  .hm-finale-rail { gap: var(--sp-2); }
+  .hm-finale-rail span { letter-spacing: 0.18em; }
+  .hm-footer-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+  .hm-footer-grid > .hm-footer-brand { grid-column: 1 / -1; }
+  .hm-footer-bottom { flex-direction: column; gap: var(--sp-1); }
+  .hm-question { padding: var(--card-pad); }
+}
+
+@media (max-width: 430px) {
+  .hm-signal-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page *, .home-page *::before, .home-page *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;
+  }
+  .hm-signal-grid li, .hm-module-list li, .hm-demo, .hm-question { opacity: 1 !important; transform: none !important; }
+  .hm-sig-wave { stroke-dashoffset: 0; }
+  .hm-finale-rail i { transform: scaleX(1); }
+}
+
+/* ---------- keep the chapter caption off the diagram ----------
+   The stage copy sat at left: 6vw, top: 13vh — directly on top of the tube
+   envelope (drawn from 0.09w to 0.34w) and the magnetisation field. The
+   heading is fine there: it sits above the schematic. The chapter caption is
+   not, so on wide screens it moves to the band beneath the diagram, clear of
+   the beam-spectrum inset in the bottom-left corner.
+
+   761, not 861: below 761 the phone layout anchors the whole copy block to
+   the bottom of the pin, which solves the same problem its own way. Between
+   the two there was a hundred-pixel band with neither treatment, where the
+   caption sat squarely across the tube — hard to see at 14px and impossible
+   to miss now the caption is set to be read. The offsets below hold at 768:
+   the chapter band starts at 32vw (246px), clear of the beam-spectrum inset
+   in the corner, and the heading keeps 34vw to itself. */
+
+@media (min-width: 761px) {
+  .hm-stage-copy {
+    /* Span the pinned area so heading and caption can be placed independently. */
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: auto;
+  }
+
+  .hm-stage-head {
+    position: absolute;
+    left: 6vw;
+    top: 13vh;
+    width: min(400px, 34vw);
+  }
+
+  .hm-chapters {
+    position: absolute;
+    left: 32vw;
+    right: 4vw;
+    bottom: 7vh;
+    margin: 0;
+    /* The chapters are stacked absolutely, so this reserves the tallest of
+       them; it grew with the caption's step up to reading size. */
+    min-height: 150px;
+  }
+
+  .hm-chapter p {
+    max-width: var(--measure);
+  }
+
+  /* The CTA followed the copy block; anchor it under the heading instead. */
+  .hm-stage-copy .hm-stage-cta {
+    position: absolute;
+    left: 6vw;
+    right: auto;
+    top: auto;
+    bottom: 9vh;
+    margin: 0;
+  }
+}
+
+/* The X-ray spectrum inset occupies the bottom-left, so its caption starts
+   further right than the other stages need to. */
+@media (min-width: 761px) {
+  #follow-the-photon .hm-chapters {
+    left: 34vw;
+  }
+}
+
+/* ---------- WebGL proton hero ---------- */
+
+.hm-proton-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hm-proton-host canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* The 2D canvas stays mounted only so the pinned-scroll hook has a context to
+   attach to; nothing is drawn on it now. */
+.hm-canvas-idle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hm-hero-3d .hm-hero-copy {
+  position: relative;
+  z-index: 2;
+}
+
+/* On mobile, .hm-hero-copy switches to bottom:15vh to anchor near the
+   screen's bottom (see the 760px block above) — but that only works with
+   absolute positioning; with position:relative (set above, for the WebGL
+   proton variant's text backdrop, and same specificity so it wins the
+   cascade regardless of source order up there) "bottom" is an offset from
+   the element's own static position instead, which shoves the heading up
+   off the top of the screen and pins the CTA row 20px past the right edge.
+   Same selector, placed after, restores absolute so the anchor works. */
+@media (max-width: 760px) {
+  .hm-hero-3d .hm-hero-copy { position: absolute; }
+}
+
+/* The proton supplies its own depth, so the hero no longer needs the painted
+   background the 2D scene sat on. */
+.hm-hero-3d .hm-pin {
+  background: #07080B;
+}
+
+/* Text over a bright refractive object needs a floor under it. */
+.hm-hero-3d .hm-hero-copy::before {
+  content: '';
+  position: absolute;
+  inset: -8vh -6vw;
+  background: radial-gradient(ellipse at 30% 50%, rgba(4, 6, 10, 0.82), rgba(4, 6, 10, 0) 72%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Nuclear medicine signal glyph — a radionuclide emitting a gamma photon. */
+.hm-sig-nuc { fill: rgba(217, 168, 78, 0.8); }
+.hm-sig-nuc-alt { fill: rgba(242, 238, 230, 0.45); }
+.in-view .hm-sig-nucleus circle { animation: hm-nucpulse 3.2s ease-in-out infinite; }
+@keyframes hm-nucpulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.hm-sig-gamma {
+  fill: none; stroke: var(--hm-amber); stroke-width: 1.6;
+  stroke-dasharray: 130; stroke-dashoffset: 130;
+}
+.in-view .hm-sig-gamma { animation: hm-drawin 1.6s ease forwards 0.4s; }
+.hm-sig-gamma-head { fill: none; stroke: var(--hm-amber); stroke-width: 1.6; opacity: 0; }
+.in-view .hm-sig-gamma-head { animation: hm-fadein 0.4s ease forwards 1.7s; }
+@keyframes hm-fadein { to { opacity: 0.9; } }
+
+/* ---------- refined signal vignettes (hm-sig2) ----------
+   Fine-line instrument sketches. The X-ray and ultrasound patterns extend one
+   wavelength beyond the frame and translate by exactly that wavelength, so the
+   travelling waves loop seamlessly. */
+
+.hm-sig-axishead { fill: none; stroke: rgba(242, 238, 230, 0.35); stroke-width: 1.2; }
+
+/* X-ray: the E field drawn solid over a fainter dashed B field. */
+.hm-sig2-e {
+  fill: none; stroke: var(--hm-xray); stroke-width: 1.5;
+  filter: drop-shadow(0 0 3px rgba(168, 203, 234, 0.35));
+}
+.hm-sig2-b { fill: none; stroke: rgba(242, 238, 230, 0.28); stroke-width: 1; stroke-dasharray: 3 3; }
+.in-view .hm-sig2-drift-x { animation: hm-sig2-driftx 3.6s linear infinite; }
+@keyframes hm-sig2-driftx { to { transform: translateX(28px); } }
+
+/* Ultrasound: the whole compression field advances one wavelength per loop. */
+.in-view .hm-sig2-drift-us { animation: hm-sig2-driftus 7s linear infinite; }
+@keyframes hm-sig2-driftus { to { transform: translateX(56px); } }
+
+/* MRI: precession refinements. */
+.hm-sig2-cone-inner { opacity: 0.45; }
+.hm-sig2-ghost { stroke: rgba(169, 158, 219, 0.22); stroke-width: 4.5; stroke-linecap: round; }
+.hm-sig2-tip-halo { fill: rgba(169, 158, 219, 0.18); }
+/* SVG user units inside a 120×56 viewBox — axis annotation on the drawing
+   (B₀, γ), not page text. The tile renders about 150px wide, so this sets at
+   roughly 9px on screen; it is part of the diagram's geometry and moves with
+   it, which is why it is not a token. */
+.hm-sig2-label {
+  font-family: var(--hm-sans); font-size: 7.5px; font-weight: 600;
+  fill: rgba(242, 238, 230, 0.5); letter-spacing: 0.06em;
+}
+
+/* Nuclear medicine: a close-packed nucleus inside a faint unstable halo,
+   and a photon pulse riding the gamma wiggle. */
+.hm-sig2-halo {
+  fill: none; stroke: rgba(217, 168, 78, 0.22); stroke-width: 0.9;
+  stroke-dasharray: 2.5 3.5;
+}
+.in-view .hm-sig2-halo { animation: hm-sig2-breathe 4.2s ease-in-out infinite; }
+@keyframes hm-sig2-breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.hm-sig2-proton {
+  fill: rgba(217, 168, 78, 0.85);
+  stroke: rgba(242, 238, 230, 0.25); stroke-width: 0.6;
+}
+.hm-sig2-neutron {
+  fill: rgba(242, 238, 230, 0.38);
+  stroke: rgba(242, 238, 230, 0.2); stroke-width: 0.6;
+}
+.hm-sig2-photon {
+  fill: var(--hm-amber);
+  filter: drop-shadow(0 0 3.5px rgba(217, 168, 78, 0.8));
+  opacity: 0;
+}
+.in-view .hm-sig2-photon { animation: hm-fadein 0.4s ease forwards 1.7s; }
+/* Also SVG user units — the γ symbol on the emitted photon. */
+.hm-sig2-label-gamma {
+  font-family: var(--hm-serif); font-style: italic; font-size: 10px;
+  fill: var(--hm-amber); opacity: 0;
+}
+.in-view .hm-sig2-label-gamma { animation: hm-fadein 0.4s ease forwards 1.9s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-sig-gamma { stroke-dashoffset: 0; }
+  .hm-sig-gamma-head { opacity: 0.9; }
+  .in-view .hm-sig-nucleus circle { animation: none; }
+  .in-view .hm-sig2-drift-x,
+  .in-view .hm-sig2-drift-us,
+  .in-view .hm-sig2-halo { animation: none; }
+  .hm-sig2-photon { display: none; }
+  .hm-sig2-label-gamma { opacity: 1; animation: none; }
+}
+
+/* Dev-only (?hmp=…): keep scene canvases at full strength for inspection. */
+.hm-debug .hm-canvas { opacity: 1 !important; }
+
+/* ---------- finale rail: tiny modality diagrams ---------- */
+
+.hm-fin-glyph {
+  display: block; width: min(120px, 82%); height: 44px; margin: 0 auto var(--sp-2);
+  color: var(--band); overflow: visible;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease);
+}
+.in-view .hm-fin-glyph { opacity: 0.85; transform: none; }
+.hm-finale-rail div:nth-child(2) .hm-fin-glyph { transition-delay: var(--dur-micro); }
+.hm-finale-rail div:nth-child(3) .hm-fin-glyph { transition-delay: calc(var(--dur-micro) * 2); }
+.hm-finale-rail div:nth-child(4) .hm-fin-glyph { transition-delay: calc(var(--dur-micro) * 3); }
+.hm-fin-glyph path, .hm-fin-glyph line, .hm-fin-glyph ellipse, .hm-fin-glyph circle {
+  fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round;
+}
+.hm-fin-glyph .fill { fill: currentColor; stroke: none; }
+
+/* the X-ray wave travels; the pattern period is 24 units, so the loop is seamless */
+.in-view .hm-fin-drift { animation: hm-fin-drift 2.8s linear infinite; }
+@keyframes hm-fin-drift { from { transform: translateX(0); } to { transform: translateX(24px); } }
+/* the ultrasound compressions propagate; period 56 units */
+.in-view .hm-fin-usdrift { animation: hm-fin-usdrift 5.2s linear infinite; }
+@keyframes hm-fin-usdrift { from { transform: translateX(0); } to { transform: translateX(56px); } }
+/* the CT source orbits the patient */
+.hm-fin-gantry { transform-origin: 60px 22px; }
+.in-view .hm-fin-gantry { animation: hm-fin-gantry 7s linear infinite; }
+@keyframes hm-fin-gantry { to { transform: rotate(360deg); } }
+/* the MRI moment precesses about B0 */
+.hm-fin-precess { transform-origin: 60px 38px; }
+.in-view .hm-fin-precess { animation: hm-fin-precess 6s ease-in-out infinite; }
+@keyframes hm-fin-precess {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  25% { transform: rotate(-8deg) scaleX(0.45); }
+  50% { transform: rotate(0deg) scaleX(-1); }
+  75% { transform: rotate(8deg) scaleX(0.45); }
+}
+
+@media (max-width: 760px) {
+  .hm-fin-glyph { height: 32px; margin-bottom: var(--sp-1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hm-fin-glyph { opacity: 0.85 !important; transform: none !important; }
+}
+
+/* ---------- fact bank band ---------- */
+.hm-factbank { background: linear-gradient(180deg, var(--hm-bg), #0B0D10 55%, var(--hm-bg)); }
+.hm-fb-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--gap-header-content) 0 var(--sp-6); max-width: var(--container-reading); }
+.hm-fb-chips a {
+  padding: var(--sp-3) var(--sp-4); border: 1px solid rgba(242, 238, 230, 0.16); border-radius: 22px;
+  font-size: var(--fs-support); font-weight: 500; color: var(--text-secondary); text-decoration: none;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease),
+              border-color var(--dur-micro) var(--ease), color var(--dur-micro) var(--ease);
+}
+.in-view .hm-fb-chips a { opacity: 1; transform: none; }
+.hm-fb-chips a:hover { border-color: var(--hm-amber); color: var(--hm-ink); }
+
+/* ---------- pricing band ---------- */
+.hm-price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); margin-top: var(--gap-header-content); }
+.hm-price-card {
+  display: block; background: var(--hm-surface); border: 1px solid rgba(242, 238, 230, 0.09);
+  border-radius: var(--radius-lg); padding: var(--card-pad-lg); text-decoration: none; color: var(--hm-ink);
+  position: relative; opacity: 0; transform: translateY(16px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease), border-color var(--dur) var(--ease);
+}
+.in-view .hm-price-card { opacity: 1; transform: none; }
+.hm-price-card:hover { border-color: rgba(242, 238, 230, 0.28); }
+.hm-price-card.is-hot { border-color: rgba(217, 168, 78, 0.55); }
+.hm-price-card.is-hot:hover { border-color: var(--hm-amber); }
+.hm-price-flag {
+  position: absolute; top: -11px; left: var(--sp-5); background: var(--hm-amber); color: var(--bg-base);
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-lg);
+}
+.hm-price-card h3 { font-family: var(--hm-serif); font-weight: 400; font-size: var(--fs-card); margin: 0 0 var(--sp-3); }
+.hm-price-figure { margin: 0 0 var(--sp-3); display: flex; align-items: baseline; gap: var(--sp-2); }
+.hm-price-figure strong { font-family: var(--hm-serif); font-optical-sizing: auto; font-weight: 380; font-size: var(--fs-page); }
+.hm-price-figure span { font-size: var(--fs-support); color: var(--text-secondary); }
+.hm-price-desc { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-secondary); margin: 0 0 var(--sp-4); }
+.hm-price-go { font-size: var(--fs-support); font-weight: 600; color: var(--hm-amber); }
+.hm-price-note { text-align: center; font-size: var(--fs-support); letter-spacing: 0.06em; color: var(--text-secondary); margin: var(--sp-5) 0 0; }
+@media (max-width: 900px) { .hm-price-grid { grid-template-columns: 1fr; max-width: var(--container-narrow); margin-inline: auto; } }
+
+/* ---------- the three doors ---------- */
+.hm-doors { background: transparent; }
+.hm-door-list { margin-top: var(--gap-header-content); border-top: 1px solid var(--hm-line); }
+.hm-door {
+  display: flex; align-items: center; gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-2); border-bottom: 1px solid var(--hm-line);
+  text-decoration: none; color: inherit;
+  opacity: 0; transform: translateY(16px);
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease), background var(--dur) var(--ease);
+}
+.in-view .hm-door { opacity: 1; transform: none; }
+.in-view .hm-door:nth-child(2) { transition-delay: var(--dur-micro); }
+.in-view .hm-door:nth-child(3) { transition-delay: calc(var(--dur-micro) * 2); }
+.hm-door:hover, .hm-door:focus-visible { background: rgba(242, 238, 230, 0.025); }
+.hm-door-txt { flex: 1; min-width: 0; }
+.hm-door-txt h3 {
+  font-family: var(--hm-serif); font-optical-sizing: auto; font-weight: 350;
+  font-size: var(--fs-section); line-height: var(--lh-heading); margin: 0 0 var(--gap-heading-desc);
+}
+/* The sentence under each door is the only thing telling you what is behind
+   it, so it reads at teaching size, not at caption size. */
+.hm-door-txt p { margin: 0; color: var(--text-secondary); font-size: var(--fs-teach); line-height: var(--lh-body); max-width: var(--measure-tight); }
+.hm-door-glyphs { display: flex; gap: var(--sp-5); align-items: center; }
+.hm-door-glyphs .hm-mod-glyph svg { width: 40px; height: 40px; }
+.hm-door:hover .hm-mod-glyph { color: var(--hm-amber); }
+.hm-door:hover .hm-mod-arrow { transform: translateX(6px); color: var(--hm-amber); }
+@media (max-width: 860px) {
+  .hm-door { flex-wrap: wrap; gap: var(--sp-4); padding: var(--sp-6) var(--sp-1); }
+  .hm-door-glyphs { order: 3; width: 100%; gap: var(--sp-4); }
+}
+
+/* ---------- finale pricing whisper ---------- */
+.hm-finale-price { margin: var(--sp-5) 0 0; font-size: var(--fs-support); color: var(--text-secondary); }
+.hm-finale-price a { color: var(--hm-amber); text-decoration: none; border-bottom: 1px solid rgba(217, 168, 78, 0.35); }
+.hm-finale-price a:hover { border-bottom-color: var(--hm-amber); }
+
+
+/* ---------- the signal tiles are the way in ----------
+   Each tile names a modality and now opens that modality's laboratory. The
+   whole tile is the target rather than the heading alone: it is one idea, and
+   a reader who has just looked at the diagram should be able to click the
+   diagram. The rule line at the top brightens on hover so the row reads as a
+   set of doors without any of them shouting. */
+.hm-signal-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  outline-offset: 4px;
+}
+.hm-signal-grid li {
+  transition: opacity var(--dur-reveal) var(--ease), transform var(--dur-reveal) var(--ease), border-color var(--dur) var(--ease);
+}
+.hm-signal-grid li:hover { border-top-color: rgba(242, 238, 230, 0.4); }
+.hm-signal-link h3 { transition: color var(--dur) var(--ease); }
+/* This is the invitation, not a caption: it was set in 11px tracked capitals,
+   which is the treatment this file reserves for metadata. Sentence case at
+   reading size says the same thing and can be read at a glance — and without
+   the tracking it still fits one line in a fifth of the container. */
+.hm-signal-go {
+  display: block;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-support);
+  font-weight: 500;
+  color: var(--text-secondary);
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.hm-signal-link:hover .hm-signal-go,
+.hm-signal-link:focus-visible .hm-signal-go { opacity: 1; transform: none; }
+
+/* CT: the gantry turns, because turning is what makes it CT. */
+.hm-sig-ct-bore { stroke-dasharray: 2 5; }
+.hm-sig-ct-patient { fill: rgba(242, 238, 230, 0.07); stroke: rgba(242, 238, 230, 0.3); stroke-width: 1; }
+.hm-sig-ct-source { fill: var(--hm-xray); }
+.hm-sig-ct-fan { stroke: var(--hm-xray); stroke-width: 0.9; opacity: 0.5; fill: none; }
+.hm-sig-ct-detector { fill: none; stroke: var(--hm-xray); stroke-width: 2.4; opacity: 0.8; stroke-linecap: round; }
+.hm-sig-ct-gantry { transform-origin: 60px 28px; }
+.in-view .hm-sig-ct-gantry { animation: hm-sig-ct-rotate 7s linear infinite; }
+@keyframes hm-sig-ct-rotate { to { transform: rotate(360deg); } }
+
+/* Bounded, not open-ended. This rule was written last in the file and left as
+   a bare max-width, so it won the cascade against every narrower breakpoint
+   above it: the two-column rules at 1020 and 760 and the single-column rule at
+   430 were all dead, and the row stayed three across down to a phone. At 390
+   that put five tiles in three columns of 122/95/84px — unequal, because 1fr
+   collapses to min-content when the track cannot hold the word — and pushed
+   the grid 16px and its last tile 23px past the container everything else on
+   the page lines up against. It never registered as overflow: the right
+   gutter absorbed it, so scrollWidth stayed equal to clientWidth.
+   The lower bound is the 1020 rule's ceiling, so the ladder now reads
+   downwards: five, three, two, one. The gap is the card gap the other
+   breakpoints use — this band had no reason to be the one that differed. */
+@media (min-width: 1021px) and (max-width: 1180px) {
+  .hm-signal-grid { grid-template-columns: repeat(3, 1fr); gap: var(--gap-cards); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-view .hm-sig-ct-gantry { animation: none; }
+  .hm-signal-go { opacity: 1; transform: none; }
+}

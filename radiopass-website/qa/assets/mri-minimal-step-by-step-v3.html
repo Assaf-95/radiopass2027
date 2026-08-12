@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRI Step-by-Step Version 3: Water/Fat Chemical Shift</title>
+  <style>
+    :root {
+      --bg: #f5f8fc;
+      --panel: #ffffff;
+      --line: #d6deea;
+      --ink: #0f172a;
+      --muted: #475569;
+      --accent: #1d4ed8;
+      --axis-x: #b91c1c;
+      --axis-y: #047857;
+      --axis-z: #2563eb;
+      --water: #1d4ed8;
+      --fat: #16a34a;
+      --net: #111827;
+      --b0: #2563eb;
+      --b1: #ea580c;
+      --signal: #334155;
+      --signal-active: #0f172a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 1050px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      aspect-ratio: 16 / 10;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 9px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #f8fafc;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.03rem;
+    }
+
+    #stepText {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      min-height: 60px;
+      white-space: pre-line;
+    }
+
+    #equation {
+      margin: 0;
+      min-height: 22px;
+      color: #1e3a8a;
+      font-family: "Courier New", monospace;
+      font-size: 0.95rem;
+    }
+
+    #status {
+      margin: 0;
+      font-size: 0.84rem;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      color: #0f172a;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 0.92rem;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      .panel { padding: 12px; }
+      #stepText { min-height: 88px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="top">
+        <h1>MRI Step-by-Step (Version 3): Water/Fat Chemical Shift</h1>
+        <div id="stepPill" class="pill">Step 1 of 5</div>
+      </div>
+      <p class="sub">Two tissues only (water and fat), no gradients. Focus: chemical shift, in-phase/out-of-phase behavior, and signal cancellation/recovery.</p>
+    </section>
+
+    <section class="panel">
+      <canvas id="scene" width="1200" height="760" aria-label="Bloch sphere and chemical-shift signal graph"></canvas>
+      <div class="legend">
+        <span class="key"><span class="dot" style="background: var(--water);"></span>Water</span>
+        <span class="key"><span class="dot" style="background: var(--fat);"></span>Fat</span>
+        <span class="key"><span class="dot" style="background: var(--net);"></span>Net combined vector</span>
+        <span class="key"><span class="dot" style="background: var(--b0);"></span>B0</span>
+        <span class="key"><span class="dot" style="background: var(--b1);"></span>B1 RF</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="stepTitle"></h2>
+      <p id="stepText"></p>
+      <p id="equation"></p>
+      <p id="status"></p>
+      <div class="controls">
+        <button id="backBtn">Back</button>
+        <button id="nextBtn" class="primary">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TAU = Math.PI * 2;
+    const GAMMA_MHZ_PER_T = 42.58;
+    const B0_T = 1.5;
+    const WATER_FREQ_MHZ = GAMMA_MHZ_PER_T * B0_T;
+    const DELTA_F_HZ = 220;
+    const FAT_FREQ_MHZ = WATER_FREQ_MHZ - DELTA_F_HZ / 1e6;
+
+    // Out-of-phase at 180 degrees: t = 1 / (2 * delta_f)
+    const T_OUT_MS = 1000 / (2 * DELTA_F_HZ);
+    // Back in-phase at 360 degrees: t = 1 / delta_f
+    const T_IN_MS = 1000 / DELTA_F_HZ;
+
+    const steps = [
+      {
+        title: "Step 1 - Apply B0",
+        text: "Water and fat net magnetisation align along +Z.\nBoth precess, but fat is slightly slower than water.",
+        equation: "F = γB0",
+        overlay: "Fat precesses at slightly lower frequency than water.",
+        durationMs: 900,
+        target: {
+          flipDeg: 4,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          seqMs: 0,
+          phaseSpin: 1,
+          phaseScale: 0.12,
+          showChemicalShift: 0
+        }
+      },
+      {
+        title: "Step 2 - Apply 90° RF Pulse",
+        text: "B1 pulse rotates both water and fat from +Z to +X.\nThey start fully in phase in the transverse plane.",
+        equation: "In phase immediately after RF\nMaximum transverse magnetisation",
+        overlay: "In phase immediately after RF",
+        durationMs: 1300,
+        target: {
+          flipDeg: 90,
+          b0Alpha: 1,
+          b1Alpha: 1,
+          seqMs: 0,
+          phaseSpin: 0,
+          phaseScale: 0,
+          showChemicalShift: 0
+        }
+      },
+      {
+        title: "Step 3 - Chemical Shift Dephasing",
+        text: "Water and fat rotate at slightly different Larmor frequencies.\nPhase difference (Δφ) grows and vectors separate.",
+        equation: "Chemical shift causes phase divergence",
+        overlay: "Chemical shift causes phase divergence",
+        durationMs: 1200,
+        target: {
+          flipDeg: 90,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          seqMs: 1.2,
+          phaseSpin: 1,
+          phaseScale: 1,
+          showChemicalShift: 1
+        }
+      },
+      {
+        title: "Step 4 - Out of Phase",
+        text: "Water and fat become 180° apart in the transverse plane.\nVectors oppose each other and signal cancels.",
+        equation: "Out of phase\nSignal cancellation",
+        overlay: "Out of phase",
+        durationMs: 900,
+        target: {
+          flipDeg: 90,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          seqMs: T_OUT_MS,
+          phaseSpin: 1,
+          phaseScale: 1,
+          showChemicalShift: 1
+        }
+      },
+      {
+        title: "Step 5 - Return to In Phase",
+        text: "Continued rotation brings water and fat back together.\nVectors re-align and signal rises again.",
+        equation: "In phase again",
+        overlay: "In phase again",
+        durationMs: 1100,
+        target: {
+          flipDeg: 90,
+          b0Alpha: 1,
+          b1Alpha: 0,
+          seqMs: T_IN_MS,
+          phaseSpin: 1,
+          phaseScale: 1,
+          showChemicalShift: 1
+        }
+      }
+    ];
+
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const stepPill = document.getElementById("stepPill");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepText = document.getElementById("stepText");
+    const equationEl = document.getElementById("equation");
+    const statusEl = document.getElementById("status");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let stepIndex = 0;
+    let transition = null;
+
+    const state = {
+      ...steps[0].target
+    };
+
+    const view = {
+      yaw: degToRad(35),
+      pitch: degToRad(-22),
+      radiusPx: 180
+    };
+
+    function snapshot() {
+      return {
+        flipDeg: state.flipDeg,
+        b0Alpha: state.b0Alpha,
+        b1Alpha: state.b1Alpha,
+        seqMs: state.seqMs,
+        phaseSpin: state.phaseSpin,
+        phaseScale: state.phaseScale,
+        showChemicalShift: state.showChemicalShift
+      };
+    }
+
+    function setStep(index) {
+      stepIndex = clamp(index, 0, steps.length - 1);
+      const step = steps[stepIndex];
+      transition = {
+        start: performance.now(),
+        duration: step.durationMs,
+        from: snapshot(),
+        to: { ...step.target }
+      };
+      renderStepText();
+      updateButtons();
+    }
+
+    function renderStepText() {
+      const step = steps[stepIndex];
+      stepPill.textContent = `Step ${stepIndex + 1} of ${steps.length}`;
+      stepTitle.textContent = step.title;
+      stepText.textContent = step.text;
+      equationEl.textContent = step.equation;
+    }
+
+    function updateButtons() {
+      backBtn.disabled = stepIndex === 0;
+      nextBtn.disabled = stepIndex === steps.length - 1;
+    }
+
+    backBtn.addEventListener("click", () => setStep(stepIndex - 1));
+    nextBtn.addEventListener("click", () => setStep(stepIndex + 1));
+
+    function applyTransition(nowMs) {
+      if (!transition) return;
+      const raw = clamp((nowMs - transition.start) / transition.duration, 0, 1);
+      const p = smooth01(raw);
+
+      state.flipDeg = lerp(transition.from.flipDeg, transition.to.flipDeg, p);
+      state.b0Alpha = lerp(transition.from.b0Alpha, transition.to.b0Alpha, p);
+      state.b1Alpha = lerp(transition.from.b1Alpha, transition.to.b1Alpha, p);
+      state.seqMs = lerp(transition.from.seqMs, transition.to.seqMs, p);
+      state.phaseSpin = lerp(transition.from.phaseSpin, transition.to.phaseSpin, p);
+      state.phaseScale = lerp(transition.from.phaseScale, transition.to.phaseScale, p);
+      state.showChemicalShift = lerp(transition.from.showChemicalShift, transition.to.showChemicalShift, p);
+
+      if (raw >= 1) {
+        Object.assign(state, transition.to);
+        transition = null;
+      }
+    }
+
+    function getVectors(nowSec) {
+      const flipRad = degToRad(state.flipDeg);
+      const mag = 0.92;
+
+      // Visual common precession component for both vectors.
+      const basePhase = state.phaseSpin * nowSec * 2.5;
+
+      // Chemical shift phase accrual after RF.
+      const tSec = Math.max(0, state.seqMs) / 1000;
+      const deltaPhi = TAU * DELTA_F_HZ * tSec * state.phaseScale;
+
+      const phiWater = basePhase;
+      const phiFat = basePhase - deltaPhi;
+
+      const water = {
+        x: mag * Math.sin(flipRad) * Math.cos(phiWater),
+        y: mag * Math.sin(flipRad) * Math.sin(phiWater),
+        z: mag * Math.cos(flipRad)
+      };
+
+      const fat = {
+        x: mag * Math.sin(flipRad) * Math.cos(phiFat),
+        y: mag * Math.sin(flipRad) * Math.sin(phiFat),
+        z: mag * Math.cos(flipRad)
+      };
+
+      const net = {
+        x: 0.5 * (water.x + fat.x),
+        y: 0.5 * (water.y + fat.y),
+        z: 0.5 * (water.z + fat.z)
+      };
+
+      const deltaDegUnwrapped = (deltaPhi * 180) / Math.PI;
+      const deltaDegMod = deltaDegUnwrapped % 360;
+
+      return {
+        water,
+        fat,
+        net,
+        deltaDegUnwrapped,
+        deltaDegMod,
+        flipDeg: state.flipDeg,
+        seqMs: state.seqMs
+      };
+    }
+
+    function project(v, cx, cy, zoom) {
+      const cyaw = Math.cos(view.yaw);
+      const syaw = Math.sin(view.yaw);
+      const cp = Math.cos(view.pitch);
+      const sp = Math.sin(view.pitch);
+
+      const x1 = v.x * cyaw + v.z * syaw;
+      const z1 = -v.x * syaw + v.z * cyaw;
+      const y2 = v.y * cp - z1 * sp;
+
+      return {
+        x: cx + x1 * view.radiusPx * zoom,
+        y: cy - y2 * view.radiusPx * zoom
+      };
+    }
+
+    function draw(nowSec, vectors) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width * 0.34;
+      const cy = canvas.height * 0.34;
+
+      drawSphere(cx, cy);
+      drawAxes(cx, cy);
+      drawB0(cx, cy);
+      drawB1(cx, cy);
+      drawVector(cx, cy, vectors.water, getCss("--water"), 3, "Water");
+      drawVector(cx, cy, vectors.fat, getCss("--fat"), 3, "Fat");
+      drawVector(cx, cy, vectors.net, getCss("--net"), 4, "Net");
+      drawOverlay(vectors);
+      drawSignalGraph(vectors);
+      updateStatus(vectors);
+    }
+
+    function drawSphere(cx, cy) {
+      const r = view.radiusPx;
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#dbe3ee";
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 0.38, 0, 0, TAU);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Bloch sphere", cx - 48, cy + r + 24);
+    }
+
+    function drawAxes(cx, cy) {
+      drawAxis(cx, cy, { x: -1.08, y: 0, z: 0 }, { x: 1.08, y: 0, z: 0 }, getCss("--axis-x"), "X");
+      drawAxis(cx, cy, { x: 0, y: -1.08, z: 0 }, { x: 0, y: 1.08, z: 0 }, getCss("--axis-y"), "Y");
+      drawAxis(cx, cy, { x: 0, y: 0, z: -1.2 }, { x: 0, y: 0, z: 1.2 }, getCss("--axis-z"), "Z");
+    }
+
+    function drawAxis(cx, cy, a, b, color, label) {
+      const p1 = project(a, cx, cy, 1);
+      const p2 = project(b, cx, cy, 1);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+      drawArrowHead(p1, p2, color, 10);
+      ctx.fillStyle = color;
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText(label, p2.x + 6, p2.y - 6);
+    }
+
+    function drawB0(cx, cy) {
+      if (state.b0Alpha < 0.01) return;
+      const a = project({ x: 0, y: 0, z: -1.25 }, cx, cy, 1);
+      const b = project({ x: 0, y: 0, z: 1.25 }, cx, cy, 1);
+      ctx.save();
+      ctx.globalAlpha = state.b0Alpha;
+      ctx.strokeStyle = getCss("--b0");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--b0"), 13);
+      ctx.fillStyle = getCss("--b0");
+      ctx.font = "bold 15px Segoe UI";
+      ctx.fillText("B0", b.x + 10, b.y - 8);
+      ctx.restore();
+    }
+
+    function drawB1(cx, cy) {
+      if (state.b1Alpha < 0.01) return;
+      const a = project({ x: -1.2, y: 0, z: 0 }, cx, cy, 1);
+      const b = project({ x: 1.2, y: 0, z: 0 }, cx, cy, 1);
+      ctx.save();
+      ctx.globalAlpha = state.b1Alpha;
+      ctx.strokeStyle = getCss("--b1");
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      drawArrowHead(a, b, getCss("--b1"), 13);
+      ctx.fillStyle = getCss("--b1");
+      ctx.font = "bold 14px Segoe UI";
+      ctx.fillText("B1 RF", b.x + 8, b.y + 14);
+      ctx.fillText(`Flip: ${state.flipDeg.toFixed(0)}°`, b.x + 8, b.y + 33);
+      ctx.restore();
+    }
+
+    function drawVector(cx, cy, vec, color, width, label) {
+      const p0 = project({ x: 0, y: 0, z: 0 }, cx, cy, 1);
+      const p1 = project(vec, cx, cy, 1);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+      drawArrowHead(p0, p1, color, width >= 4 ? 13 : 11);
+
+      ctx.fillStyle = color;
+      ctx.font = "bold 13px Segoe UI";
+      ctx.fillText(label, p1.x + 8, p1.y - 4);
+    }
+
+    function drawOverlay(vectors) {
+      const x = canvas.width * 0.60;
+      const y = 80;
+
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 20px Segoe UI";
+      ctx.fillText(steps[stepIndex].overlay, x, y);
+
+      ctx.font = "13px Segoe UI";
+      ctx.fillStyle = "#334155";
+      ctx.fillText(`Water frequency: ${WATER_FREQ_MHZ.toFixed(5)} MHz`, x, y + 24);
+      ctx.fillText(`Fat frequency:   ${FAT_FREQ_MHZ.toFixed(5)} MHz`, x, y + 42);
+      ctx.fillText(`Difference: ${DELTA_F_HZ.toFixed(0)} Hz`, x, y + 60);
+
+      if (state.showChemicalShift > 0.01 || stepIndex >= 2) {
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 14px Segoe UI";
+        const dMain = Math.min(360, vectors.deltaDegUnwrapped).toFixed(1);
+        const dMod = vectors.deltaDegMod.toFixed(1);
+        ctx.fillText(`Δφ = ${dMain}°  (mod 360: ${dMod}°)`, x, y + 88);
+      }
+    }
+
+    function drawSignalGraph(vectors) {
+      const pad = { left: 80, right: 38, top: 430, bottom: 58 };
+      const x0 = pad.left;
+      const y0 = pad.top;
+      const w = canvas.width - pad.left - pad.right;
+      const h = canvas.height - pad.top - pad.bottom;
+
+      ctx.strokeStyle = "#d6deea";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x0, y0, w, h);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "13px Segoe UI";
+      ctx.fillText("Combined transverse signal (|Mxy, water + fat|)", x0 + 8, y0 + 18);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x0, y0 + h - 30);
+      ctx.lineTo(x0 + w, y0 + h - 30);
+      ctx.moveTo(x0, y0 + 24);
+      ctx.lineTo(x0, y0 + h - 30);
+      ctx.stroke();
+
+      const yBottom = y0 + h - 30;
+      const yTop = y0 + 26;
+      const mapY = (v) => yBottom - v * (yBottom - yTop);
+
+      // Full-cycle reference curve from in-phase to in-phase.
+      ctx.strokeStyle = "#c7d2e6";
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      for (let i = 0; i <= 260; i += 1) {
+        const u = i / 260;
+        const t = u * T_IN_MS;
+        const amp = signalAmplitudeFromTime(t, 90);
+        const x = x0 + u * w;
+        const y = mapY(amp);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      const curMs = clamp(vectors.seqMs, 0, T_IN_MS);
+      const uCur = T_IN_MS <= 0 ? 0 : curMs / T_IN_MS;
+
+      ctx.strokeStyle = getCss("--signal-active");
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      for (let i = 0; i <= Math.max(1, Math.floor(260 * uCur)); i += 1) {
+        const u = i / 260;
+        const t = u * T_IN_MS;
+        const amp = signalAmplitudeFromTime(t, vectors.flipDeg);
+        const x = x0 + u * w;
+        const y = mapY(amp);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Markers for out-of-phase and in-phase timings.
+      const xOut = x0 + (T_OUT_MS / T_IN_MS) * w;
+      const xIn = x0 + w;
+      const xCur = x0 + uCur * w;
+
+      ctx.setLineDash([5, 5]);
+      drawLine(xOut, y0 + 24, xOut, yBottom, "#f59e0b");
+      drawLine(xIn, y0 + 24, xIn, yBottom, "#16a34a");
+      drawLine(xCur, y0 + 24, xCur, yBottom, "#1d4ed8");
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#334155";
+      ctx.font = "12px Segoe UI";
+      ctx.fillText("Out of phase (180°)", xOut + 6, y0 + h + 16);
+      ctx.fillText("In phase again (360°)", xIn - 140, y0 + h + 16);
+
+      const curAmp = Math.hypot(vectors.net.x, vectors.net.y) / 0.92;
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 12px Segoe UI";
+      ctx.fillText(`Current net transverse signal: ${curAmp.toFixed(2)}`, x0 + w - 210, y0 + 18);
+    }
+
+    function signalAmplitudeFromTime(tMs, flipDeg) {
+      const flipScale = Math.sin(degToRad(clamp(flipDeg, 0, 90)));
+      const delta = TAU * DELTA_F_HZ * (Math.max(0, tMs) / 1000);
+      const cancellation = Math.abs(Math.cos(delta / 2));
+      return flipScale * cancellation;
+    }
+
+    function updateStatus(vectors) {
+      const mw = Math.hypot(vectors.water.x, vectors.water.y);
+      const mf = Math.hypot(vectors.fat.x, vectors.fat.y);
+      const mn = Math.hypot(vectors.net.x, vectors.net.y);
+      statusEl.textContent =
+        `Water Mxy=${mw.toFixed(2)}  Fat Mxy=${mf.toFixed(2)}  Net Mxy=${mn.toFixed(2)}  Δφ=${Math.min(360, vectors.deltaDegUnwrapped).toFixed(1)}°`;
+    }
+
+    function drawLine(x1, y1, x2, y2, color) {
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function drawArrowHead(a, b, color, size) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len;
+      const uy = dy / len;
+      const left = {
+        x: b.x - ux * size - uy * (size * 0.45),
+        y: b.y - uy * size + ux * (size * 0.45)
+      };
+      const right = {
+        x: b.x - ux * size + uy * (size * 0.45),
+        y: b.y - uy * size - ux * (size * 0.45)
+      };
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(left.x, left.y);
+      ctx.lineTo(right.x, right.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function getCss(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function smooth01(t) {
+      const c = clamp(t, 0, 1);
+      return c * c * (3 - 2 * c);
+    }
+
+    function clamp(v, lo, hi) {
+      return Math.max(lo, Math.min(hi, v));
+    }
+
+    function degToRad(d) {
+      return (d * Math.PI) / 180;
+    }
+
+    function tick(nowMs) {
+      applyTransition(nowMs);
+      const nowSec = nowMs / 1000;
+      const vectors = getVectors(nowSec);
+      draw(nowSec, vectors);
+      requestAnimationFrame(tick);
+    }
+
+    renderStepText();
+    updateButtons();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

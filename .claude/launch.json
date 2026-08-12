@@ -1,0 +1,33 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "radiopass-dev",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": [
+        "/Users/User1/Desktop/Claude/radiopass-main/radiopass-website/scripts/dev-server.mjs"
+      ],
+      "autoPort": true
+    },
+    {
+      "name": "radiopass-dev-attach",
+      "url": "http://localhost:5182"
+    },
+    {
+      "name": "frcr-anatomy",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": [
+        "/Users/User1/Desktop/Claude/radiopass-main/ANATOMY CLAUDE/frcr-anatomy/scripts/dev-server.mjs"
+      ],
+      "autoPort": true
+    },
+    {
+      "name": "radiopass-2027-bundle",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": [
+        "/Users/User1/Desktop/Claude/radiopass-main/radiopass-website/scripts/serve-bundle.mjs"
+      ],
+      "autoPort": true
+    }
+  ]
+}
