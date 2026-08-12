@@ -17,7 +17,7 @@
  * the fact bank. Explanations stay strictly about the stem they sit under.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { HighYield } from '../design/primitives'
@@ -48,6 +48,7 @@ export function QuestionCard({
   attempt,
   autoFocus = false,
   restorePriorAttempt = true,
+  revealMarking = true,
 }: {
   question: QbQuestion
   number: number
@@ -75,6 +76,18 @@ export function QuestionCard({
    * practice must not arrive pre-answered and locked.
    */
   restorePriorAttempt?: boolean
+  /**
+   * Whether this card is allowed to mark the question in front of the
+   * candidate: the right/wrong verdicts, the per-stem explanations, the score
+   * and the take-home point.
+   *
+   * True everywhere except inside a live mock paper. A real exam does not tell
+   * you the answer while you are still sitting it — being marked question by
+   * question turns the paper into practice with a clock on it, and destroys the
+   * one thing a mock is for, which is finding out what you score without help.
+   * The mock turns this back on in review, once the paper is submitted.
+   */
+  revealMarking?: boolean
 }) {
   // A previously submitted question comes back exactly as it was left: the
   // candidate's own ticks, already marked. Submission is final, so this is a
@@ -91,6 +104,19 @@ export function QuestionCard({
   const [submitted, setSubmitted] = useState(() => !!restored()?.submitted)
   const [marks, setMarks] = useState(() => readQbMarks()[question.id] ?? {})
 
+  /**
+   * The answer sheet as it stands RIGHT NOW, updated synchronously on every
+   * tick.
+   *
+   * `choices` alone is not safe to build the next sheet from. It is captured
+   * per render, so two ticks landing before React re-renders both start from
+   * the same stale object and the second overwrites the first — five quick
+   * clicks down a question saved one statement, and in a mock that is a
+   * silently lost answer. The ref is written before setState, so each tick
+   * always extends the real sheet.
+   */
+  const choicesRef = useRef<StemChoice>(choices)
+
   // A new question arrives in the same card slot: load whatever that question
   // already holds, which is a clean sheet only if it has never been submitted.
   // `restored` is deliberately not a dependency — a paper-local attempt changes
@@ -100,6 +126,7 @@ export function QuestionCard({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const prior = restored()
+    choicesRef.current = prior?.choices ?? {}
     setChoices(prior?.choices ?? {})
     setSubmitted(!!prior?.submitted)
     setMarks(readQbMarks()[question.id] ?? {})
@@ -108,7 +135,8 @@ export function QuestionCard({
   // One place to record a tick, so the paper holding this card can follow the
   // answers before they are submitted.
   const pick = (label: string, value: boolean) => {
-    const next = { ...choices, [label]: value }
+    const next = { ...choicesRef.current, [label]: value }
+    choicesRef.current = next
     setChoices(next)
     onChoicesChanged?.(question.id, next)
   }
@@ -131,6 +159,11 @@ export function QuestionCard({
     onScored?.(question.id, correct, outOf, choices)
   }
 
+  /* The single gate on every piece of marking below. Inside a live mock this
+     stays false even for a question the candidate has finished, so the paper
+     gives nothing away until it is handed in. */
+  const marked = revealMarking && submitted
+
   const tone = outOf === 0 ? 'is-mid' : correct / outOf >= 0.8 ? 'is-good' : correct / outOf >= 0.5 ? 'is-mid' : 'is-poor'
 
   return (
@@ -151,8 +184,8 @@ export function QuestionCard({
       <ol className="qb-stems">
         {question.stems.map((stem) => {
           const picked = choices[stem.label]
-          const right = submitted && stem.answer !== null && picked === stem.answer
-          const wrong = submitted && stem.answer !== null && picked !== stem.answer
+          const right = marked && stem.answer !== null && picked === stem.answer
+          const wrong = marked && stem.answer !== null && picked !== stem.answer
           return (
             <li
               key={stem.label}
@@ -163,7 +196,7 @@ export function QuestionCard({
               </span>
               <p className="qb-stem-text">{stem.text}</p>
 
-              {!submitted ? (
+              {!marked ? (
                 <div className="qb-tf" role="group" aria-label={`Statement ${stem.label}: true or false`}>
                   <button
                     type="button"
@@ -204,7 +237,7 @@ export function QuestionCard({
                 </span>
               )}
 
-              {submitted && stem.explanation && (
+              {marked && stem.explanation && (
                 <p className="qb-stem-explain">{stem.explanation}</p>
               )}
             </li>
@@ -213,7 +246,10 @@ export function QuestionCard({
       </ol>
 
       <div className="qb-actions">
-        {!submitted && (
+        {/* No per-question submit inside a live paper: there is nothing to
+            submit to, because the paper is marked as a whole when it is handed
+            in. The mock's own pager carries "Finish paper". */}
+        {revealMarking && !submitted && (
           <>
             <button type="button" className="qb-btn qb-btn-solid" disabled={!allAnswered} onClick={submit}>
               Check my answers
@@ -224,6 +260,11 @@ export function QuestionCard({
               </span>
             )}
           </>
+        )}
+        {!revealMarking && !allAnswered && (
+          <span className="qb-unanswered">
+            {question.stems.length - answered} statement{question.stems.length - answered === 1 ? '' : 's'} still blank
+          </span>
         )}
         {/* Collecting a question for later is a filing action, not part of
             answering it, so it sits with the controls rather than above the
@@ -258,7 +299,7 @@ export function QuestionCard({
         )}
       </div>
 
-      {submitted && (
+      {marked && (
         <>
           <div className={`qb-score ${tone}`} role="status">
             <strong>
