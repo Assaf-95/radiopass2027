@@ -751,3 +751,23 @@
   .lx-panel h2 { font-size: var(--fs-page); }
   .lx-body { font-size: var(--fs-body); line-height: var(--lh-body); }
 }
+
+/* ---------------------------------------------------------------------------
+   Standalone scroll scenes (labs/motion.tsx).
+
+   The MRI and ultrasound scenes were written to sit inside the home page,
+   which supplies its own nav and footer. Given routes of their own they need
+   a little room under the last chapter so the way back does not collide with
+   the pinned canvas, and the shared site header needs to sit above it.
+   --------------------------------------------------------------------------- */
+.lab-motion { position: relative; }
+.lab-motion .hm-pin { z-index: 0; }
+
+.lab-motion-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-4) var(--sp-9);
+  background: var(--hm-bg, var(--bg-base));
+}
