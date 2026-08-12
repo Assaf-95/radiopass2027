@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { SECTION_META } from '../data/sections';
 import { computeSectionStats } from '../lib/stats';
 import { resetAllProgress } from '../lib/progress';
-import { allQuizzes, currentStreak, getAccount, getActivity, PLAN_LABEL } from '../lib/account';
+import { allQuizzes, currentStreak, getActivity } from '../lib/account';
 import { useState } from 'react';
 import './Dashboard.css';
 
@@ -22,7 +22,6 @@ export default function Dashboard() {
     { total: 0, attempted: 0, fullyCorrect: 0, partiallyCorrect: 0, incorrect: 0, rawScore: 0, maxScore: 0 }
   );
 
-  const account = getAccount();
   const activity = getActivity();
   const streak = currentStreak(activity.days);
   const quizzes = allQuizzes();
@@ -36,10 +35,9 @@ export default function Dashboard() {
       <Link to="/" className="back-link">← Back to sections</Link>
       <h1>Progress dashboard</h1>
 
-      {account && (
+      {activity.lastActive && (
         <p className="dash-who">
-          {account.name} · {PLAN_LABEL[account.plan]} · member since {account.memberSince}
-          {activity.lastActive && ` · last studied ${new Date(activity.lastActive).toLocaleString()}`}
+          This browser's record · last studied {new Date(activity.lastActive).toLocaleString()}
         </p>
       )}
 

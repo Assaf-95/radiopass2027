@@ -1,16 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigationType } from 'react-router-dom';
-import SignIn from './SignIn';
 import { hasServerSession, isAdmin } from '../lib/admin';
 import { contentState, loadContent, subscribeContent } from '../lib/content/store';
-import {
-  currentStreak,
-  getAccount,
-  getActivity,
-  PLAN_LABEL,
-  signOut,
-  type Account,
-} from '../lib/account';
+import { currentStreak, getActivity, storageWorks } from '../lib/account';
 import './Layout.css';
 
 /* Deliberately a new key. The previous one was written on every mount, so
@@ -55,15 +47,6 @@ function useTheme() {
   };
 }
 
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
 /* A new page starts at the top.
  *
  * Nothing was resetting the scroll on navigation, so following a link from
@@ -92,7 +75,10 @@ export default function Layout() {
   const isQuestionRoute = /\/q\//.test(location.pathname);
   useScrollToTopOnNavigate(location.pathname);
 
-  const [account, setAccount] = useState<Account | null>(() => getAccount());
+  /* Bumped to re-read the study record below. It lives in localStorage, not in
+     React state, so a submission in this tab or another one needs a nudge to
+     show up in the header. */
+  const [, setRecordRev] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -106,7 +92,7 @@ export default function Layout() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const refresh = useCallback(() => setAccount(getAccount()), []);
+  const refresh = useCallback(() => setRecordRev((n) => n + 1), []);
 
   /* Every route renders inside this component, so subscribing here is what
      makes a content change repaint the whole site — the question a candidate
@@ -135,8 +121,8 @@ export default function Layout() {
     };
   }, []);
 
-  /* Another tab in the same browser is the same account, so a sign-out or a
-     new submission there should be reflected here rather than diverging. */
+  /* Another tab in the same browser writes to the same study record, so a
+     submission there should be reflected here rather than diverging. */
   useEffect(() => {
     function onStorage(e: StorageEvent) {
       if (e.key === null || e.key.startsWith('radiopass-')) refresh();
@@ -153,8 +139,6 @@ export default function Layout() {
     window.addEventListener('mousedown', onDown);
     return () => window.removeEventListener('mousedown', onDown);
   }, [menuOpen]);
-
-  if (!account) return <SignIn onSignedIn={refresh} />;
 
   const activity = getActivity();
   const streak = currentStreak(activity.days);
@@ -213,21 +197,25 @@ export default function Layout() {
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"
                 >
-                  <span className="account-avatar">{initials(account.name)}</span>
-                  <span className="account-plan mono">{PLAN_LABEL[account.plan]}</span>
+                  <span className="account-avatar" aria-hidden="true">
+                    {streak > 0 ? streak : '·'}
+                  </span>
+                  <span className="account-plan mono">Progress</span>
                 </button>
                 {menuOpen && (
                   <div className="account-menu" role="menu">
-                    <p className="account-name">{account.name}</p>
-                    <p className="account-email">{account.email}</p>
+                    {/* What this browser has recorded. No name, no email and no
+                        plan: this app has no server to check any of them
+                        against, and the sign-in that used to collect them
+                        checked nothing. Study numbers are real — every one of
+                        these is written when the learner actually does the
+                        work. */}
+                    <p className="account-name">Your study record</p>
+                    <p className="account-email">Kept on this browser</p>
                     <dl className="account-facts mono">
                       <div>
-                        <dt>Plan</dt>
-                        <dd>{PLAN_LABEL[account.plan]}</dd>
-                      </div>
-                      <div>
-                        <dt>Member since</dt>
-                        <dd>{account.memberSince}</dd>
+                        <dt>Day streak</dt>
+                        <dd>{streak}</dd>
                       </div>
                       <div>
                         <dt>Days studied</dt>
@@ -255,19 +243,10 @@ export default function Layout() {
                         ? (hasServerSession() ? 'Editor tools · live' : 'Editor tools · this browser')
                         : 'Editor sign-in'}
                     </Link>
-                    <button
-                      type="button"
-                      className="account-link account-signout"
-                      onClick={() => {
-                        signOut();
-                        setMenuOpen(false);
-                        refresh();
-                      }}
-                    >
-                      Sign out
-                    </button>
                     <p className="account-note">
-                      Signing out keeps your work. It is still here next time.
+                      {storageWorks()
+                        ? 'Your work stays in this browser on this machine. It survives closing the tab, but it does not follow you to another device.'
+                        : 'This browser is not storing data — private browsing, most likely. You can work, but nothing will be here when you come back.'}
                     </p>
                   </div>
                 )}

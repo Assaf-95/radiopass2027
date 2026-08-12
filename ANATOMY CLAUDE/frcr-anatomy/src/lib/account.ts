@@ -1,28 +1,25 @@
 /* ===========================================================================
-   Account and study activity
+   Study activity
 
-   There is no server here. The account is held in this browser's local
-   storage, which is what makes it survive closing the tab, quitting the
-   browser and shutting the machine down — but it is per-browser and per-
-   machine, and clearing site data clears it. Everything the learner does is
-   written the moment they do it, so nothing depends on remembering to save.
+   There is no server here, and — since the fake sign-in was removed — no
+   account either. What this file keeps is the study record for THIS browser:
+   days studied, time spent, questions submitted, quiz scores. It survives
+   closing the tab, quitting the browser and shutting the machine down, but it
+   is per-browser and per-machine, and clearing site data clears it.
+   Everything is written the moment the learner does it, so nothing depends on
+   remembering to save.
+
+   There used to be an `Account` here — a name, an email and a PLAN, all typed
+   in by the visitor on a sign-in screen that checked nothing. It gated the
+   entire site, Atlas included. It has been removed rather than reimplemented:
+   this app has no backend to authenticate against, and a plan the learner
+   picks for themselves from a dropdown is not an entitlement. Real accounts
+   and real entitlement belong to the platform's Supabase auth, and this app
+   will use that when it is wired in — see the note in Layout.tsx.
    =========================================================================== */
 
-const ACCOUNT_KEY = 'radiopass-account-v1';
 const ACTIVITY_KEY = 'radiopass-activity-v1';
 const QUIZ_KEY = 'radiopass-quiz-v1';
-
-export type Plan = 'trial' | 'pass' | 'pass-plus';
-
-export interface Account {
-  name: string;
-  email: string;
-  plan: Plan;
-  /** ISO date the account was created in this browser. */
-  memberSince: string;
-  /** Exam the learner is working toward, shown on the dashboard. */
-  examDate?: string;
-}
 
 export interface Activity {
   /** ISO dates (YYYY-MM-DD) on which at least one question was submitted. */
@@ -40,12 +37,6 @@ export interface QuizRecord {
   bestStreak: number;
   missed: string[];
 }
-
-export const PLAN_LABEL: Record<Plan, string> = {
-  trial: 'Trial',
-  pass: 'Pass',
-  'pass-plus': 'Pass Plus',
-};
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -75,36 +66,6 @@ export function storageWorks(): boolean {
     return ok;
   } catch {
     return false;
-  }
-}
-
-export function getAccount(): Account | null {
-  return read<Account | null>(ACCOUNT_KEY, null);
-}
-
-export function signIn(name: string, email: string, plan: Plan = 'pass'): Account {
-  const existing = getAccount();
-  const account: Account = existing
-    ? { ...existing, name, email, plan }
-    : { name, email, plan, memberSince: new Date().toISOString().slice(0, 10) };
-  write(ACCOUNT_KEY, account);
-  return account;
-}
-
-export function updateAccount(patch: Partial<Account>): Account | null {
-  const a = getAccount();
-  if (!a) return null;
-  const next = { ...a, ...patch };
-  write(ACCOUNT_KEY, next);
-  return next;
-}
-
-/** Signs out without destroying anything — the work is still here on return. */
-export function signOut() {
-  try {
-    localStorage.removeItem(ACCOUNT_KEY);
-  } catch {
-    /* nothing to do */
   }
 }
 
