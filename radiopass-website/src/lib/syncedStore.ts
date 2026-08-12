@@ -19,6 +19,29 @@
 
 import { supabase } from './supabase'
 
+/**
+ * Every store's "forget the local copy" function.
+ *
+ * Sign-out has to empty all of them, and the stores are created as module
+ * singletons scattered across the app, so there is no other place that knows
+ * the full set. Registering here means a store added later is covered without
+ * anyone remembering to come back and add it.
+ */
+const localCaches = new Set<() => void>()
+
+/**
+ * Drops every store's local copy — the in-memory cache AND the localStorage
+ * blob behind it — and repaints anything watching.
+ *
+ * This is what stops one learner's record reaching the next person to use the
+ * browser. It is not a delete: for a signed-in candidate the record lives in
+ * Supabase, was pushed there on every write, and comes back on their next
+ * sign-in. What is thrown away here is only this device's copy.
+ */
+export function clearLocalCaches() {
+  localCaches.forEach((clear) => clear())
+}
+
 export function createSyncedStore<T>(opts: {
   /** localStorage key — keep the existing key so nobody's history resets. */
   localKey: string
@@ -96,6 +119,25 @@ export function createSyncedStore<T>(opts: {
     }
   }
 
+  /**
+   * Forgets this device's copy without touching the server's.
+   *
+   * `cache` matters as much as the localStorage line: it is the copy every
+   * live component is reading, so clearing storage alone would leave the
+   * previous learner's scores on screen until something forced a reload.
+   */
+  function clearLocal() {
+    cache = opts.empty
+    try {
+      localStorage.removeItem(opts.localKey)
+    } catch {
+      // Storage unavailable — the in-memory cache above is the one that matters.
+    }
+    listeners.forEach((listener) => listener())
+  }
+
+  localCaches.add(clearLocal)
+
   if (supabase) {
     supabase.auth.getSession().then(({ data }) => {
       userId = data.session?.user.id ?? null
@@ -104,7 +146,22 @@ export function createSyncedStore<T>(opts: {
     supabase.auth.onAuthStateChange((_event, session) => {
       const next = session?.user.id ?? null
       const changed = next !== userId
+      const signedOut = changed && userId !== null && next === null
       userId = next
+
+      /* Somebody signed out — or their session was revoked or expired from
+         another tab. Either way the record on this device stops being theirs
+         to show.
+         Two things went wrong without this. The visible one: their scores,
+         flags and lab history stayed on screen for whoever sat down next.
+         The worse one was silent — the next person to sign in triggered
+         pullAndMerge, which merges the LOCAL copy over the remote one and
+         pushes the result back up. The previous learner's answers were
+         written into the new learner's Supabase row and became theirs.
+         Note the guard: only a real signed-in -> signed-out transition
+         clears. A visitor who has never signed in also reports a null user
+         on first load, and their local-only progress must survive that. */
+      if (signedOut) clearLocal()
       if (userId && changed) void pullAndMerge(userId)
     })
   }
@@ -117,5 +174,7 @@ export function createSyncedStore<T>(opts: {
       return () => listeners.delete(listener)
     },
     hasSyncError: () => lastSyncError !== null,
+    /** Forgets this device's copy. The server's copy is untouched. */
+    clearLocal,
   }
 }

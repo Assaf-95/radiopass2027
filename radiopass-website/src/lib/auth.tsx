@@ -11,6 +11,28 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase, supabaseConfigured } from './supabase'
+import { clearLocalCaches } from './syncedStore'
+
+/**
+ * Local state that belongs to whoever was signed in, and must not outlive
+ * them on a shared machine.
+ *
+ * Deliberately NOT here: the display preferences — sound, reduced motion,
+ * the MRI reading mode. Those describe the device and the person sitting at
+ * it, not the account, and wiping them on sign-out would be a worse
+ * experience for no privacy gain.
+ */
+const PER_USER_KEYS = [
+  /* Unlocks the authoring tools. It gates the interface only — every write is
+     re-checked server-side — but leaving it set would hand the next person an
+     admin-looking site. */
+  'radiopass.author.v1',
+  /* A mock paper part-way through, with the answers given so far. Unlike the
+     progress stores this has no Supabase copy, so it is genuinely discarded —
+     which is right: an unfinished exam belongs to the person sitting it, and
+     inheriting a stranger's half-written paper is not a feature. */
+  'radiopass.qbank.mock.v1',
+]
 
 type AuthResult = { error: string | null }
 type SignUpResult = AuthResult & { needsEmailConfirmation: boolean }
@@ -59,9 +81,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
+  /**
+   * Ends the session AND clears this device of the learner who owned it.
+   *
+   * Signing out used to revoke the token and stop there, which left every
+   * score, flag, favourite and lab visit sitting in localStorage — on screen
+   * for the next person at the same computer, and worse, ready to be merged
+   * into whichever account signed in next. On a shared hospital machine that
+   * is a straight leak between candidates.
+   *
+   * Nothing is destroyed: a signed-in candidate's record was pushed to
+   * Supabase on every write and is pulled back when they next sign in.
+   *
+   * The clear runs whether or not the network call succeeds. A failed
+   * sign-out that left the data on the device would be the leak all over
+   * again, and the token is revoked locally by supabase-js regardless.
+   */
   const signOut = async () => {
     if (!supabase) return
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      clearLocalCaches()
+      for (const key of PER_USER_KEYS) {
+        try {
+          localStorage.removeItem(key)
+        } catch {
+          // Storage unavailable: nothing was persisted to leak in the first place.
+        }
+      }
+    }
   }
 
   const value: AuthContextValue = {
