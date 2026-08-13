@@ -1,0 +1,609 @@
+/* The Fact Bank.
+ *
+ * One job: make a single concept the only thing on screen, and make it
+ * comfortable to read for an hour. Everything here is subordinate to that —
+ * the measure, the type sizes, the near-total absence of colour.
+ *
+ * The page this replaced put 106 cards in a five-column grid with three or
+ * four coloured chips on each. The rules below are the opposite of that on
+ * purpose:
+ *
+ *   - ONE COLUMN, and it is centred and narrow. Prose past about 68
+ *     characters loses the reader's place on the return sweep.
+ *   - COLOUR MEANS "you lose marks here" and nothing else. Two flags exist,
+ *     exam trap and safety. Everything that used to be a chip is now text.
+ *   - THE TAKEAWAY IS THE BIGGEST THING. Nothing — not navigation, not a
+ *     counter, not a label — competes with the examinable sentence.
+ */
+
+.usf {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--gutter) var(--sp-9);
+}
+
+/* ------------------------------------------------------------------ head */
+
+.usf-head {
+  margin-bottom: var(--sp-7);
+}
+
+.usf-head-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.usf-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-section);
+  letter-spacing: -0.01em;
+  color: var(--us-text);
+}
+
+/* Three quiet words, not a toolbar. The view switch is the only global
+   control on the page. */
+.usf-views {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.usf-views button {
+  border: 0;
+  background: transparent;
+  color: var(--us-dim);
+  font: inherit;
+  font-size: var(--fs-support);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.usf-views button:hover {
+  color: var(--us-text);
+}
+
+.usf-views button.is-on {
+  color: var(--us-text);
+  background: rgba(125, 190, 255, 0.09);
+}
+
+.usf-scope {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-support);
+  color: var(--us-muted);
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.usf-scope strong { color: var(--us-text); font-weight: 600; }
+
+.usf-scope button {
+  border: 0;
+  background: transparent;
+  color: var(--us-cyan);
+  font: inherit;
+  font-size: var(--fs-meta);
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------- concept */
+
+/* Scroll target. The head itself carries margin, so scrolling to it would
+   land the reader a little above the text; an empty anchor puts the top of
+   the concept exactly at the top of the viewport. */
+.usf-concept-anchor {
+  scroll-margin-top: var(--sp-6);
+}
+
+.usf-where {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-meta);
+  color: var(--us-dim);
+}
+
+.usf-topic {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--us-muted);
+}
+
+.usf-count { font-variant-numeric: tabular-nums; }
+.usf-count b { color: var(--us-text); font-weight: 600; }
+
+/* The examinable sentence. This is the page. */
+.usf-takeaway {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(26px, 3.1vw, 38px);
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  color: var(--us-text);
+  max-width: 20ch;
+  max-width: min(100%, 26ch);
+  text-wrap: balance;
+}
+
+/* ----------------------------------------------------------------- flags */
+
+/* The entire colour budget of the page. Two flags, both meaning "marks are
+   lost here": a trap the exam sets, and a safety consequence. */
+.usf-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 0;
+}
+
+.usf-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.usf-flag.is-trap {
+  color: var(--us-amber);
+  border-color: rgba(255, 176, 58, 0.35);
+  background: rgba(255, 176, 58, 0.08);
+}
+
+.usf-flag.is-safety {
+  color: var(--us-red);
+  border-color: rgba(255, 100, 114, 0.35);
+  background: rgba(255, 100, 114, 0.08);
+}
+
+/* ----------------------------------------------------------------- folds */
+
+.usf-folds {
+  margin: var(--sp-6) 0 0;
+  border-top: 1px solid var(--us-line);
+}
+
+.usf-fold {
+  border-bottom: 1px solid var(--us-line);
+}
+
+.usf-fold > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--us-text);
+  transition: color var(--dur) var(--ease);
+}
+
+.usf-fold > summary::-webkit-details-marker { display: none; }
+.usf-fold > summary:hover { color: var(--us-cyan); }
+
+.usf-fold-title {
+  flex: 1;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.usf-fold-note {
+  font-size: var(--fs-meta);
+  color: var(--us-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.usf-fold > summary svg {
+  color: var(--us-dim);
+  flex: none;
+  transition: transform var(--dur) var(--ease);
+}
+
+.usf-fold[open] > summary svg { transform: rotate(90deg); }
+
+.usf-fold-body {
+  padding: 0 0 var(--sp-5);
+}
+
+/* The teaching voice. Larger than the interface around it, because it is
+   what the reader is here for. */
+.usf-fold-body p {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-teach);
+  line-height: var(--lh-loose);
+  color: var(--us-text);
+  max-width: 62ch;
+}
+
+.usf-fold-body p:last-child { margin-bottom: 0; }
+.usf-fold-body strong { color: #fff; font-weight: 650; }
+
+.usf-clarify {
+  border-left: 2px solid rgba(255, 176, 58, 0.5);
+  padding-left: var(--sp-4);
+}
+
+.usf-source {
+  font-family: var(--font-mono);
+  font-size: var(--fs-support) !important;
+  color: var(--us-muted) !important;
+}
+
+.usf-source-note {
+  font-size: var(--fs-support) !important;
+  color: var(--us-dim) !important;
+}
+
+/* ------------------------------------------------------------- equations */
+
+.usf-formula {
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius);
+  background: rgba(125, 190, 255, 0.045);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--us-cyan);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.usf-calc { margin-top: var(--sp-4); }
+
+.usf-calc-summary,
+.usf-calc-assume {
+  font-size: var(--fs-support) !important;
+  color: var(--us-muted) !important;
+}
+
+.usf-calc-out {
+  margin: var(--sp-4) 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  border: 1px solid rgba(82, 220, 255, 0.28);
+  background: rgba(82, 220, 255, 0.06);
+}
+
+.usf-calc-out small {
+  display: block;
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--us-muted);
+  font-weight: 700;
+  margin-bottom: var(--sp-1);
+}
+
+.usf-calc-out strong {
+  font-size: var(--fs-concept);
+  color: var(--us-cyan);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.usf-calc-out span {
+  margin-left: var(--sp-2);
+  font-size: var(--fs-support);
+  color: var(--us-muted);
+}
+
+.usf-calc-warn {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-amber);
+}
+
+/* ---------------------------------------------------------------- tables */
+
+/* A comparison table lives inside the concept it explains, so it has to fit
+   the reading column — and when it cannot, it scrolls inside its own box
+   rather than making the page scroll sideways. */
+.usf-table-wrap { margin: 0; }
+
+.usf-table-wrap figcaption {
+  font-size: var(--fs-support);
+  color: var(--us-muted);
+  margin-bottom: var(--sp-3);
+}
+
+.usf-table-scroll { overflow-x: auto; }
+
+.usf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-support);
+}
+
+.usf-table th,
+.usf-table td {
+  text-align: left;
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--us-line);
+  vertical-align: top;
+}
+
+.usf-table thead th {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--us-dim);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.usf-table tbody th {
+  color: var(--us-text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usf-table td { color: var(--us-muted); }
+.usf-table td.is-up { color: var(--us-green); }
+.usf-table td.is-down { color: var(--us-amber); }
+
+/* --------------------------------------------------------------- effects */
+
+.usf-effects {
+  list-style: none;
+  margin: 0 0 var(--sp-4);
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.usf-effects li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: var(--sp-2);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+.usf-effects b { color: var(--us-dim); font-size: var(--fs-body); }
+.usf-effects li.is-up b { color: var(--us-green); }
+.usf-effects li.is-down b { color: var(--us-amber); }
+.usf-effects li.is-warn b { color: var(--us-red); }
+.usf-effects strong { color: var(--us-text); }
+.usf-effects em { color: var(--us-dim); font-style: normal; }
+
+/* --------------------------------------------------------------- actions */
+
+.usf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin: var(--sp-6) 0 0;
+}
+
+.usf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius);
+  border: 1px solid var(--us-line-strong);
+  background: transparent;
+  color: var(--us-text);
+  font-size: var(--fs-support);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.usf-btn:hover { border-color: var(--us-cyan); background: rgba(82, 220, 255, 0.07); }
+
+.usf-btn.is-primary {
+  border-color: rgba(82, 220, 255, 0.45);
+  background: rgba(82, 220, 255, 0.1);
+  color: var(--us-cyan);
+}
+
+/* ----------------------------------------------------------------- pager */
+
+.usf-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin: var(--sp-7) 0 0;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--us-line);
+}
+
+.usf-pager button {
+  border: 0;
+  background: transparent;
+  color: var(--us-muted);
+  font: inherit;
+  font-size: var(--fs-support);
+  font-weight: 600;
+  padding: var(--sp-2) 0;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease);
+}
+
+.usf-pager button:hover:not(:disabled) { color: var(--us-cyan); }
+.usf-pager button:disabled { opacity: 0.25; cursor: default; }
+
+/* ---------------------------------------------------------------- browse */
+
+.usf-browse-controls {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-5);
+}
+
+.usf-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 200px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius);
+  background: var(--us-panel);
+  color: var(--us-dim);
+}
+
+.usf-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--us-text);
+  font: inherit;
+  font-size: var(--fs-support);
+}
+
+.usf-select select {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius);
+  background: var(--us-panel);
+  color: var(--us-text);
+  font: inherit;
+  font-size: var(--fs-support);
+}
+
+.usf-browse-count,
+.usf-empty {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-support);
+  color: var(--us-muted);
+}
+
+/* Two columns at most, and only when there is genuinely room. The point of
+   this view is finding something, so a row carries a topic, a title and one
+   line — never the content itself. */
+.usf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-2);
+}
+
+@media (min-width: 900px) {
+  .usf-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+}
+
+.usf-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-4);
+  border: 1px solid var(--us-line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.usf-list button:hover {
+  border-color: var(--us-line-strong);
+  background: rgba(125, 190, 255, 0.04);
+}
+
+.usf-list-topic {
+  display: block;
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--us-dim);
+  margin-bottom: var(--sp-2);
+}
+
+.usf-list-title {
+  display: block;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: var(--lh-heading);
+  color: var(--us-text);
+  margin-bottom: var(--sp-2);
+}
+
+.usf-list-summary {
+  display: block;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+}
+
+/* ------------------------------------------------------------- reference */
+
+.usf-reference h2 {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-section);
+  color: var(--us-text);
+}
+
+.usf-reference h3 {
+  margin: var(--sp-7) 0 var(--sp-2);
+  font-size: var(--fs-card);
+  font-weight: 600;
+  color: var(--us-text);
+}
+
+.usf-reference-intro {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--us-muted);
+  max-width: 62ch;
+}
+
+.usf-reference section { border-top: 1px solid var(--us-line); }
+.usf-reference section:first-of-type { border-top: 0; }
+
+/* ----------------------------------------------------------------- misc */
+
+.usf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .usf { padding-top: var(--sp-5); }
+  .usf-head-line { gap: var(--sp-3); }
+  .usf-actions .usf-btn { flex: 1; justify-content: center; }
+}

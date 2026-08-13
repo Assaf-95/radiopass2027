@@ -1,32 +1,52 @@
 /**
- * Module 21 — the Ultrasound Fact Bank.
+ * The Fact Bank — one concept at a time.
  *
- * Every sourced fact, live equation calculator, direction-of-change map and
- * comparison table, searchable and filterable on one scrolling document page.
- * Facts keep their engine ids as anchor ids, so a link such as
- * /ultrasound-lab/facts#us-nyquist lands on the exact card, and
- * #equations / #relations / #tables address the reference sections.
+ * WHAT THIS REPLACED, AND WHY. This page used to be a wall: 106 facts in a
+ * five-column auto-fill grid, every card carrying three or four coloured
+ * badges, above twenty filter pills, with the equation library, the
+ * relationship explorer and fifteen wide comparison tables stacked down the
+ * same document. Everything was on screen at once, so nothing was. The owner's
+ * verdict was that it "would actively discourage me from studying", and that
+ * the structure — not the spacing — was wrong.
+ *
+ * The rebuild keeps every fact, equation, table, relationship, source link and
+ * route into the experiments. Only the presentation and the interaction model
+ * changed:
+ *
+ *   STUDY (the default). One concept in a centred reading column. The
+ *   examinable sentence is the whole of the first impression, at display size.
+ *   The explanation, the equation, the provenance and the clinical application
+ *   are folded away behind labelled disclosures, so the reader chooses how
+ *   deep to go instead of being handed everything. One row of actions at the
+ *   bottom, once — not two buttons repeated a hundred and six times.
+ *
+ *   BROWSE. The finding view, deliberately separate: search, filters, and a
+ *   two-column list of title, topic and one summary line. Nothing expands
+ *   here; choosing something takes you into Study.
+ *
+ * WHAT COLOUR IS FOR NOW. Eight badge kinds became two markers. A concept is
+ * flagged only when it carries an exam trap or a safety consequence, because
+ * those are the two things a candidate is actually punished for missing.
+ * Everything the other six badges used to say is still on the page — the
+ * source, the recall year, whether there is an equation — as quiet text in the
+ * place it belongs, which is where it was always more useful than as a chip.
+ *
+ * DEEP LINKS ARE PRESERVED. The exam lab links here as `#<factId>` to show the
+ * concept behind a question, and as `#equations` for the calculators. Both
+ * still work: a fact hash opens Study at that concept, and #equations opens
+ * the reference drawer.
  */
 
-import {
-  Fragment,
-  useEffect,
-  useMemo,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { Slider } from '../components/Controls'
 import { UsIcon } from '../components/icons'
-import { PriorityBadge, SourceNote, UsLab } from '../components/Layout'
+import { UsLab } from '../components/Layout'
 import { DeltaList } from '../components/Teaching'
 import {
   CATEGORY_LABEL,
-  FACT_COUNTS,
   US_FACTS,
-  highYieldFacts,
   type UsCategory,
   type UsFact,
 } from '../engine/facts'
@@ -34,151 +54,158 @@ import {
   US_EQUATIONS,
   US_RELATIONS,
   US_TABLES,
+  type ComparisonTable,
   type RelationEffect,
   type UsEquation,
 } from '../engine/reference'
+import './factbank.css'
 
 /* ------------------------------------------------------------------ *
- * Small helpers
+ * Inline text
  * ------------------------------------------------------------------ */
 
-/** Renders the *italic* markers inside a plain segment. */
 function renderItalics(text: string, keyBase: string): ReactNode {
-  const parts = text.split('*')
-  if (parts.length === 1) return text
-  return parts.map((part, i) =>
-    i % 2 === 1 ? <em key={`${keyBase}-${i}`}>{part}</em> : <Fragment key={`${keyBase}-${i}`}>{part}</Fragment>,
-  )
-}
-
-/** Renders the **bold** markers used by fact detail text as real <strong> tags. */
-function renderBold(text: string): ReactNode {
-  return text.split('**').map((part, i) =>
-    i % 2 === 1 ? (
-      <strong key={i}>{part}</strong>
+  return text.split(/(\*[^*]+\*)/g).map((part, i) =>
+    part.startsWith('*') && part.endsWith('*') && part.length > 2 ? (
+      <em key={`${keyBase}-i${i}`}>{part.slice(1, -1)}</em>
     ) : (
-      <Fragment key={i}>{renderItalics(part, String(i))}</Fragment>
+      part
     ),
   )
 }
 
-/* Revision reading is the longest reading a candidate does, so the two shapes
-   this page repeats take their sizes from the scale: prose at support size,
-   and the all-caps group heading — which names a region rather than saying
-   anything — at metadata size. */
-const MUTED_P: CSSProperties = {
-  margin: '0 0 var(--sp-3)',
-  fontSize: 'var(--fs-support)',
-  lineHeight: 'var(--lh-body)',
-  color: 'var(--us-muted)',
-}
-
-const GROUP_HEAD: CSSProperties = {
-  margin: '0 0 var(--sp-2)',
-  fontSize: 'var(--fs-meta)',
-  letterSpacing: '0.1em',
-  textTransform: 'uppercase',
-  color: 'var(--us-muted)',
-  fontWeight: 700,
-}
-
-const VISUALLY_HIDDEN: CSSProperties = {
-  position: 'absolute',
-  width: 1,
-  height: 1,
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-}
-
-/* ------------------------------------------------------------------ *
- * Filters
- * ------------------------------------------------------------------ */
-
-type SpecialFilter = 'recall' | 'trap' | 'equation' | 'clarify'
-
-const SPECIAL_FILTERS: { id: SpecialFilter; label: string; test: (f: UsFact) => boolean }[] = [
-  { id: 'recall', label: 'High-yield recall', test: (f) => f.priority.includes('recall') },
-  { id: 'trap', label: 'Common trap', test: (f) => f.priority.includes('trap') },
-  { id: 'equation', label: 'Equations', test: (f) => Boolean(f.equation) },
-  { id: 'clarify', label: 'Source clarifications', test: (f) => Boolean(f.clarify) },
-]
-
-/**
- * Only the categories that some fact is actually filed under, in the curated
- * order. `controls` is labelled but unused — every machine-control fact is
- * currently filed under imaging, resolution or safety — and offering the chip
- * gave the learner a filter whose only possible answer was "No facts match".
- */
-const CATEGORY_IDS = (Object.keys(CATEGORY_LABEL) as UsCategory[]).filter((category) =>
-  US_FACTS.some((fact) => fact.category === category),
-)
-
-/* ------------------------------------------------------------------ *
- * Fact card
- * ------------------------------------------------------------------ */
-
-function FactCard({ fact }: { fact: UsFact }) {
-  return (
-    <article
-      id={fact.id}
-      className={fact.priority.includes('recall') ? 'us-fact is-recall' : 'us-fact'}
-      aria-label={fact.fact}
-    >
-      <div className="us-fact-badges">
-        {fact.priority.map((p) => (
-          <PriorityBadge key={p} kind={p} />
-        ))}
-      </div>
-      <h3>{fact.fact}</h3>
-      <p>{renderBold(fact.detail)}</p>
-      {fact.equation && (
-        <pre className="us-formula">
-          {fact.equation}
-          {fact.units ? `\n${fact.units}` : ''}
-        </pre>
-      )}
-      {fact.deltas && fact.deltas.length > 0 && <DeltaList deltas={fact.deltas} />}
-      {fact.clarify && <SourceNote>{fact.clarify}</SourceNote>}
-      <div className="us-fact-foot">
-        <span className="us-fact-source">{fact.source}</span>
-        {fact.experiment && (
-          <Link className="us-btn us-btn-small" to={fact.experiment}>
-            Open experiment
-          </Link>
-        )}
-        <Link className="us-btn us-btn-small" to="/ultrasound-lab/exam">
-          Test me
-        </Link>
-      </div>
-    </article>
+function renderBold(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={`b${i}`}>{part.slice(2, -2)}</strong>
+    ) : (
+      renderItalics(part, `p${i}`)
+    ),
   )
 }
 
 /* ------------------------------------------------------------------ *
- * Equation library — live calculators
+ * Where the reference material belongs
+ * ------------------------------------------------------------------ */
+
+/**
+ * Which concept each comparison table is really about.
+ *
+ * The tables carry no topic of their own, which is why they ended up stacked
+ * in one column at the foot of the page — fifteen wide grids in a row, none of
+ * them near the idea it explains. Anchoring each to a single concept puts it
+ * where it teaches and shows it exactly once.
+ */
+const TABLE_ANCHOR: Record<string, string> = {
+  frequency: 'us-frequency-tradeoff',
+  aperture: 'us-near-field',
+  damping: 'us-damping',
+  'depth-prf': 'us-prf-depth',
+  'focal-zones': 'us-focal-zones-cost',
+  'gain-power': 'us-gain-vs-power',
+  interactions: 'us-specular-diffuse',
+  resolutions: 'us-lateral-resolution',
+  probes: 'us-probe-choice',
+  'doppler-modes': 'us-cw-pw',
+  'mi-ti': 'us-ti-meaning',
+  harmonics: 'us-harmonics-benefit',
+  'shadow-enhance': 'us-enhancement',
+  'specular-diffuse': 'us-speckle-origin',
+  'prf-nyquist': 'us-nyquist',
+}
+
+/**
+ * Which concept each live calculator belongs to.
+ *
+ * Same reasoning. A calculator for the reflection coefficient is worth far
+ * more sitting under the concept that states the equation than in a library of
+ * seventeen sliders the reader has to match up themselves. Any calculator not
+ * claimed here stays reachable in the reference drawer, so none is lost.
+ */
+const EQUATION_ANCHOR: Record<string, string> = {
+  wave: 'us-frequency-range',
+  period: 'us-pulse-terms',
+  duty: 'us-prf-duty',
+  intensity: 'us-intensity',
+  spl: 'us-pulse-terms',
+  axial: 'us-axial-resolution',
+  impedance: 'us-z-equation',
+  reflection: 'us-reflection-coefficient',
+  snell: 'us-snell',
+  depth: 'us-depth-equation',
+  attenuation: 'us-attenuation-coefficient',
+  exponential: 'us-attenuation-exponential',
+  nearfield: 'us-near-field',
+  divergence: 'us-divergence',
+  doppler: 'us-doppler-equation',
+  nyquist: 'us-nyquist',
+  mi: 'us-mi-equation',
+}
+
+const tablesFor = (factId: string) =>
+  US_TABLES.filter((t) => TABLE_ANCHOR[t.id] === factId)
+const equationsFor = (factId: string) =>
+  US_EQUATIONS.filter((e) => EQUATION_ANCHOR[e.id] === factId)
+
+/* ------------------------------------------------------------------ *
+ * Disclosure
+ * ------------------------------------------------------------------ */
+
+/**
+ * A labelled fold.
+ *
+ * Native <details> on purpose: it is open-able before hydration, it is
+ * findable by the browser's own in-page search, and it needs no state of ours
+ * to be correct. `defaultOpen` is used for the explanation only — the first
+ * fold is the one a reader almost always wants, and making them ask for it
+ * would be ceremony rather than calm.
+ */
+function Fold({
+  title,
+  note,
+  defaultOpen = false,
+  children,
+}: {
+  title: string
+  note?: string
+  defaultOpen?: boolean
+  children: ReactNode
+}) {
+  return (
+    <details className="usf-fold" open={defaultOpen}>
+      <summary>
+        <span className="usf-fold-title">{title}</span>
+        {note && <span className="usf-fold-note">{note}</span>}
+        <UsIcon name="next" size={14} />
+      </summary>
+      <div className="usf-fold-body">{children}</div>
+    </details>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * Live calculator
  * ------------------------------------------------------------------ */
 
 function formatResult(value: number): string {
-  const magnitude = Math.abs(value)
-  if (magnitude >= 1000) return value.toFixed(0)
-  if (magnitude >= 100) return value.toFixed(1)
-  if (magnitude >= 1) return value.toFixed(2)
-  if (magnitude >= 0.01) return value.toFixed(3)
-  if (magnitude === 0) return '0'
-  return value.toExponential(2)
+  if (!Number.isFinite(value)) return '—'
+  const abs = Math.abs(value)
+  if (abs !== 0 && (abs < 0.01 || abs >= 100000)) return value.toExponential(2)
+  if (abs >= 100) return value.toFixed(0)
+  if (abs >= 10) return value.toFixed(1)
+  if (abs >= 1) return value.toFixed(2)
+  return value.toFixed(3)
 }
 
+const TONE_ARROW = { up: '↑', down: '↓', flat: '→' } as const
+
 function directionTone(text: string): 'up' | 'down' | 'flat' {
-  const tail = text.includes('→') ? text.slice(text.lastIndexOf('→') + 1) : text
-  if (tail.includes('↓')) return 'down'
-  if (tail.includes('↑')) return 'up'
+  if (/\b(rises?|higher|increases?|better|greater|longer|more)\b/i.test(text)) return 'up'
+  if (/\b(falls?|lower|decreases?|worse|shorter|less|fewer)\b/i.test(text)) return 'down'
   return 'flat'
 }
 
-const TONE_ARROW: Record<'up' | 'down' | 'flat', string> = { up: '↑', down: '↓', flat: '=' }
-
-function EquationCard({ eq }: { eq: UsEquation }) {
+function Calculator({ eq }: { eq: UsEquation }) {
   const [values, setValues] = useState<Record<string, number>>(() =>
     Object.fromEntries(eq.variables.map((variable) => [variable.key, variable.initial])),
   )
@@ -186,13 +213,9 @@ function EquationCard({ eq }: { eq: UsEquation }) {
   const noResult = Number.isNaN(out.value)
 
   return (
-    <article className="us-panel" aria-label={eq.name}>
-      <h3>
-        <UsIcon name="equation" size={13} />
-        {eq.name}
-      </h3>
-      <pre className="us-formula">{eq.formula}</pre>
-      <p style={{ ...MUTED_P, margin: '9px 0 10px' }}>{eq.summary}</p>
+    <div className="usf-calc" aria-label={eq.name}>
+      <pre className="usf-formula">{eq.formula}</pre>
+      <p className="usf-calc-summary">{eq.summary}</p>
 
       {eq.variables.map((variable) => (
         <Slider
@@ -207,61 +230,22 @@ function EquationCard({ eq }: { eq: UsEquation }) {
         />
       ))}
 
-      <div
-        role="status"
-        style={{
-          margin: '10px 0',
-          padding: '10px 12px',
-          borderRadius: 9,
-          border: '1px solid rgba(82, 220, 255, 0.28)',
-          background: 'rgba(82, 220, 255, 0.06)',
-        }}
-      >
+      <div className="usf-calc-out" role="status">
         {noResult ? (
-          <strong style={{ fontSize: 'var(--fs-support)', lineHeight: 'var(--lh-body)', color: 'var(--us-amber)' }}>
-            {out.label}
-          </strong>
+          <strong className="usf-calc-warn">{out.label}</strong>
         ) : (
           <>
-            {/* The answer the calculator just produced: the quantity's name and
-                its unit are labels, the number is the point. */}
-            <small
-              style={{
-                display: 'block',
-                fontSize: 'var(--fs-meta)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--us-muted)',
-                fontWeight: 700,
-                marginBottom: 'var(--sp-1)',
-              }}
-            >
-              {out.label}
-            </small>
-            <strong
-              style={{
-                fontSize: 'var(--fs-concept)',
-                color: 'var(--us-cyan)',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {formatResult(out.value)}
-            </strong>
-            {out.unit && (
-              <span style={{ marginLeft: 'var(--sp-2)', fontSize: 'var(--fs-support)', color: 'var(--us-muted)' }}>
-                {out.unit}
-              </span>
-            )}
+            <small>{out.label}</small>
+            <strong>{formatResult(out.value)}</strong>
+            {out.unit && <span>{out.unit}</span>}
           </>
         )}
       </div>
 
-      <p style={MUTED_P}>
-        <strong style={{ color: 'var(--us-text)' }}>Assumptions.</strong> {eq.assumptions}
+      <p className="usf-calc-assume">
+        <strong>Assumptions.</strong> {eq.assumptions}
       </p>
-
-      <ul className="us-deltas" style={{ marginBottom: 10 }}>
+      <ul className="us-deltas">
         {eq.directions.map((direction) => {
           const tone = directionTone(direction)
           return (
@@ -272,240 +256,352 @@ function EquationCard({ eq }: { eq: UsEquation }) {
           )
         })}
       </ul>
+    </div>
+  )
+}
 
-      <p className="us-trap-note">
-        <strong>Common mistake</strong>
-        {eq.mistake}
+/* ------------------------------------------------------------------ *
+ * Comparison table
+ * ------------------------------------------------------------------ */
+
+function Table({ table }: { table: ComparisonTable }) {
+  return (
+    <figure className="usf-table-wrap">
+      <figcaption>{table.intro}</figcaption>
+      <div className="usf-table-scroll">
+        <table className="usf-table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span className="usf-sr">Variable</span>
+              </th>
+              {table.columns.map((c) => (
+                <th key={c} scope="col">
+                  {c}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row) => (
+              <tr key={row.label}>
+                <th scope="row">{row.label}</th>
+                {row.cells.map((cell, i) => (
+                  <td key={i} className={cell.tone && cell.tone !== 'none' ? `is-${cell.tone}` : undefined}>
+                    {cell.text}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </figure>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * One concept
+ * ------------------------------------------------------------------ */
+
+/** The recall year, if the source records one. Shown as a sentence rather
+ *  than as a badge — it is provenance, and it reads as provenance. */
+function recallYear(source: string): string | null {
+  const m = source.match(/Recall\s+(\d{4})/i)
+  return m ? m[1] : null
+}
+
+function Concept({
+  fact,
+  position,
+  total,
+  onPrev,
+  onNext,
+}: {
+  fact: UsFact
+  position: number
+  total: number
+  onPrev: () => void
+  onNext: () => void
+}) {
+  const tables = tablesFor(fact.id)
+  const calculators = equationsFor(fact.id)
+  const isTrap = fact.priority.includes('trap') || Boolean(fact.distractor)
+  const isSafety = fact.priority.includes('safety') || fact.category === 'safety'
+  const year = recallYear(fact.source)
+
+  return (
+    <article className="usf-concept" id={fact.id} aria-label={fact.fact}>
+      <p className="usf-where">
+        <span className="usf-topic">{CATEGORY_LABEL[fact.category]}</span>
+        <span className="usf-count">
+          Concept <b>{position}</b> of {total}
+        </span>
       </p>
 
-      <div style={{ marginTop: 10 }}>
-        <Link className="us-btn us-btn-small" to={eq.experiment}>
-          Open the experiment
-        </Link>
+      {/* The whole of the first impression: the one examinable sentence, at
+          the size of the thing that matters most on the page. */}
+      <h1 className="usf-takeaway">{fact.fact}</h1>
+
+      {/* The only two markers left. Both mean "you lose marks here", which is
+          the one distinction worth spending colour on. */}
+      {(isTrap || isSafety) && (
+        <p className="usf-flags">
+          {isTrap && (
+            <span className="usf-flag is-trap">
+              <UsIcon name="trap" size={13} />
+              Exam trap
+            </span>
+          )}
+          {isSafety && (
+            <span className="usf-flag is-safety">
+              <UsIcon name="shield" size={13} />
+              Safety
+            </span>
+          )}
+        </p>
+      )}
+
+      <div className="usf-folds">
+        <Fold title="Explanation" defaultOpen>
+          <p>{renderBold(fact.detail)}</p>
+          {fact.deltas && fact.deltas.length > 0 && <DeltaList deltas={fact.deltas} />}
+        </Fold>
+
+        {(fact.equation || calculators.length > 0) && (
+          <Fold title="Equation" note={fact.units || undefined}>
+            {/* The calculator prints the formula itself, so showing the fact's
+                copy as well put the same line on screen twice. The interactive
+                one wins where both exist. */}
+            {fact.equation && calculators.length === 0 && (
+              <pre className="usf-formula">
+                {fact.equation}
+                {fact.units ? `\n${fact.units}` : ''}
+              </pre>
+            )}
+            {calculators.map((eq) => (
+              <Calculator key={eq.id} eq={eq} />
+            ))}
+          </Fold>
+        )}
+
+        {tables.map((table) => (
+          <Fold key={table.id} title={table.title}>
+            <Table table={table} />
+          </Fold>
+        ))}
+
+        {fact.distractor && (
+          <Fold title="Why the wrong answer is tempting">
+            <p>{renderBold(fact.distractor)}</p>
+          </Fold>
+        )}
+
+        {fact.clinical && (
+          <Fold title="In practice">
+            <p>{renderBold(fact.clinical)}</p>
+          </Fold>
+        )}
+
+        {/* Source and clarification are one fold, because they answer the same
+            question: how far should I trust this, and where did it come from. */}
+        <Fold title={fact.clarify ? 'Source — and a correction' : 'Where this comes from'}>
+          {fact.clarify && <p className="usf-clarify">{renderBold(fact.clarify)}</p>}
+          <p className="usf-source">{fact.source}</p>
+          {year && <p className="usf-source-note">Reported in a {year} sitting.</p>}
+          {fact.weight && fact.weight > 1 && (
+            <p className="usf-source-note">Tested by {fact.weight} separate questions in the bank.</p>
+          )}
+        </Fold>
       </div>
+
+      {/* One row of actions, once. "Open experiment" appears only where an
+          experiment genuinely exists — offering it everywhere taught the
+          reader to ignore it. */}
+      <div className="usf-actions">
+        <Link className="usf-btn is-primary" to="/ultrasound-lab/exam">
+          Test me on this
+        </Link>
+        {fact.experiment && (
+          <Link className="usf-btn" to={fact.experiment}>
+            Open experiment
+          </Link>
+        )}
+      </div>
+
+      <nav className="usf-pager" aria-label="Concept navigation">
+        <button type="button" onClick={onPrev} disabled={position <= 1}>
+          <span aria-hidden="true">←</span> Previous
+        </button>
+        <button type="button" onClick={onNext} disabled={position >= total}>
+          Next <span aria-hidden="true">→</span>
+        </button>
+      </nav>
     </article>
   )
 }
 
 /* ------------------------------------------------------------------ *
- * Relationship explorer
+ * Browse
  * ------------------------------------------------------------------ */
 
-const EFFECT_COLOUR: Record<RelationEffect['dir'], string> = {
-  up: 'var(--us-green)',
-  down: 'var(--us-amber)',
-  warn: 'var(--us-red)',
-  flat: 'var(--us-muted)',
+/** The first clause of the explanation — enough to recognise the concept,
+ *  never enough to be a second copy of it. */
+function summaryLine(fact: UsFact): string {
+  const plain = fact.detail.replace(/\*\*/g, '').replace(/\*/g, '')
+  const stop = plain.search(/[.;]\s/)
+  const line = stop > 0 ? plain.slice(0, stop + 1) : plain
+  return line.length > 132 ? `${line.slice(0, 129).trimEnd()}…` : line
 }
 
-const EFFECT_ARROW: Record<RelationEffect['dir'], string> = {
-  up: '↑',
-  down: '↓',
-  warn: '!',
-  flat: '=',
-}
+const CATEGORY_IDS = (Object.keys(CATEGORY_LABEL) as UsCategory[]).filter((c) =>
+  US_FACTS.some((f) => f.category === c),
+)
 
-const EFFECT_WORD: Record<RelationEffect['dir'], string> = {
-  up: 'increases',
-  down: 'decreases',
-  warn: 'caution',
-  flat: 'unchanged',
-}
-
-function EffectRow({ effect }: { effect: RelationEffect }) {
+function Browse({
+  facts,
+  query,
+  setQuery,
+  topic,
+  setTopic,
+  onOpen,
+}: {
+  facts: UsFact[]
+  query: string
+  setQuery: (q: string) => void
+  topic: UsCategory | 'all'
+  setTopic: (t: UsCategory | 'all') => void
+  onOpen: (id: string) => void
+}) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 10,
-        alignItems: 'baseline',
-        padding: '7px 0',
-        borderBottom: '1px solid var(--us-line)',
-      }}
-    >
-      <b
-        aria-hidden="true"
-        style={{
-          color: EFFECT_COLOUR[effect.dir],
-          flex: 'none',
-          width: 18,
-          textAlign: 'center',
-          fontSize: 'var(--fs-body)',
-        }}
-      >
-        {EFFECT_ARROW[effect.dir]}
-      </b>
-      {/* What changes, then why it changes — a claim and its reason, both read
-          rather than glanced at. */}
-      <div style={{ minWidth: 0 }}>
-        <strong style={{ fontSize: 'var(--fs-body)', color: 'var(--us-text)' }}>
-          {effect.label}
-          <span style={VISUALLY_HIDDEN}> — {EFFECT_WORD[effect.dir]}</span>
-        </strong>
-        <p
-          style={{
-            margin: 'var(--sp-1) 0 0',
-            fontSize: 'var(--fs-support)',
-            lineHeight: 'var(--lh-body)',
-            color: 'var(--us-muted)',
-          }}
-        >
-          {effect.why}
-        </p>
+    <div className="usf-browse">
+      <div className="usf-browse-controls">
+        <label className="usf-search">
+          <UsIcon name="search" size={14} />
+          <input
+            type="search"
+            value={query}
+            placeholder="Search concepts"
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search concepts"
+          />
+        </label>
+        <label className="usf-select">
+          <span className="usf-sr">Topic</span>
+          <select value={topic} onChange={(e) => setTopic(e.target.value as UsCategory | 'all')}>
+            <option value="all">All topics ({US_FACTS.length})</option>
+            {CATEGORY_IDS.map((c) => (
+              <option key={c} value={c}>
+                {CATEGORY_LABEL[c]} ({US_FACTS.filter((f) => f.category === c).length})
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
+
+      <p className="usf-browse-count">
+        {facts.length === US_FACTS.length
+          ? `${US_FACTS.length} concepts`
+          : `${facts.length} of ${US_FACTS.length} concepts`}
+      </p>
+
+      {facts.length === 0 ? (
+        <p className="usf-empty">Nothing matches that. Try a shorter search, or clear the topic.</p>
+      ) : (
+        <ol className="usf-list">
+          {facts.map((fact) => (
+            <li key={fact.id}>
+              <button type="button" onClick={() => onOpen(fact.id)}>
+                <span className="usf-list-topic">{CATEGORY_LABEL[fact.category]}</span>
+                <span className="usf-list-title">{fact.fact}</span>
+                <span className="usf-list-summary">{summaryLine(fact)}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
     </div>
   )
 }
 
-function RelationExplorer() {
-  const [relationId, setRelationId] = useState(US_RELATIONS[0].id)
-  const relation = US_RELATIONS.find((r) => r.id === relationId) ?? US_RELATIONS[0]
-  const direct = relation.effects.filter((e) => e.kind === 'direct')
-  const indirect = relation.effects.filter((e) => e.kind === 'indirect')
+/* ------------------------------------------------------------------ *
+ * Reference drawer — everything not anchored to a concept
+ * ------------------------------------------------------------------ */
 
+function EffectRow({ effect }: { effect: RelationEffect }) {
+  const arrow = effect.dir === 'up' ? '↑' : effect.dir === 'down' ? '↓' : effect.dir === 'warn' ? '!' : '→'
   return (
-    <section id="relations" className="us-panel" aria-label="Relationship explorer">
-      <h3>
-        <UsIcon name="spark" size={13} />
-        Relationship explorer
-      </h3>
-      <p style={MUTED_P}>
-        Pick an action and read off every consequence — <strong style={{ color: 'var(--us-text)' }}>
-        direct physics first</strong>, then the knock-on system effects.
-      </p>
-
-      <div className="us-chip-row" role="group" aria-label="Choose an action">
-        {US_RELATIONS.map((r) => (
-          <button
-            key={r.id}
-            type="button"
-            className={r.id === relation.id ? 'us-chip is-on' : 'us-chip'}
-            aria-pressed={r.id === relation.id}
-            onClick={() => setRelationId(r.id)}
-          >
-            {r.action}
-          </button>
-        ))}
-      </div>
-
-      <div className="us-split" style={{ marginTop: 14 }}>
-        <div className="us-col">
-          <h4 style={GROUP_HEAD}>Direct physical effects</h4>
-          <div>
-            {direct.map((effect) => (
-              <EffectRow key={effect.label} effect={effect} />
-            ))}
-          </div>
-        </div>
-        <div className="us-col">
-          <h4 style={GROUP_HEAD}>Indirect system effects</h4>
-          {indirect.length > 0 ? (
-            <div>
-              {indirect.map((effect) => (
-                <EffectRow key={effect.label} effect={effect} />
-              ))}
-            </div>
-          ) : (
-            <p style={MUTED_P}>Every consequence of this action is direct physics.</p>
-          )}
-        </div>
-      </div>
-
-      <div style={{ marginTop: 12 }}>
-        <Link className="us-btn us-btn-small" to={relation.experiment}>
-          Open the experiment
-        </Link>
-      </div>
-    </section>
+    <li className={`is-${effect.dir}`}>
+      <b aria-hidden="true">{arrow}</b>
+      <span>
+        <strong>{effect.label}</strong>
+        {effect.kind === 'indirect' && <em> (indirect)</em>} — {effect.why}
+      </span>
+    </li>
   )
 }
 
-/* ------------------------------------------------------------------ *
- * Comparison tables
- * ------------------------------------------------------------------ */
-
-function Tables() {
+function Reference() {
   return (
-    <section id="tables" aria-label="Comparison tables">
-      <header className="us-section-head" style={{ marginBottom: 12 }}>
-        <div>
-          <h2>
-            Comparison <span>tables</span>
-          </h2>
-          <p>
-            {US_TABLES.length} high-yield comparisons. Green means the quantity improves or rises;
-            amber means it falls or worsens. Hover a row for its note.
-          </p>
-        </div>
-      </header>
+    <div className="usf-reference" id="equations">
+      <h2>Reference</h2>
+      <p className="usf-reference-intro">
+        Everything here also appears inside the concept it belongs to. This view is for when you
+        already know what you are looking for.
+      </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {US_TABLES.map((table) => (
-          <div key={table.id} className="us-panel" id={`table-${table.id}`}>
-            <h3>
-              <UsIcon name="layers" size={13} />
-              {table.title}
-            </h3>
-            <p style={MUTED_P}>{table.intro}</p>
-            <div className="us-table-wrap">
-              <table className="us-table">
-                <thead>
-                  <tr>
-                    <th scope="col">
-                      <span style={VISUALLY_HIDDEN}>Row</span>
-                    </th>
-                    {table.columns.map((column) => (
-                      <th scope="col" key={column}>
-                        {column}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {table.rows.map((row) => (
-                    <Fragment key={row.label}>
-                      <tr>
-                        <th scope="row" title={row.note}>
-                          {row.label}
-                        </th>
-                        {row.cells.map((cell, i) => (
-                          <td
-                            key={`${table.columns[i]}-${i}`}
-                            className={cell.tone && cell.tone !== 'none' ? `is-${cell.tone}` : 'is-none'}
-                            title={row.note}
-                          >
-                            {cell.text}
-                          </td>
-                        ))}
-                      </tr>
-                      {row.note && (
-                        <tr>
-                          <td
-                            colSpan={table.columns.length + 1}
-                            style={{
-                              fontSize: 'var(--fs-support)',
-                              color: 'var(--us-muted)',
-                              background: 'rgba(159, 180, 204, 0.04)',
-                            }}
-                          >
-                            {row.note}
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div style={{ marginTop: 11 }}>
-              <Link className="us-btn us-btn-small" to={table.experiment}>
-                Open the experiment
-              </Link>
-            </div>
-          </div>
+      {/* ALL of them, not just the ones no concept claimed. The exam lab links
+          straight to #equations expecting the calculators, and since every one
+          is now anchored to a concept, listing only the unclaimed ones left
+          this section empty — the reader followed a link to the calculators
+          and found no calculators. */}
+      <section aria-label="Calculators">
+        <h3>Calculators</h3>
+        {US_EQUATIONS.map((eq) => (
+          <Fold key={eq.id} title={eq.name}>
+            <Calculator eq={eq} />
+            <p className="usf-calc-assume">
+              <strong>Common mistake.</strong> {eq.mistake}
+            </p>
+            <Link className="usf-btn" to={eq.experiment}>
+              Open experiment
+            </Link>
+          </Fold>
         ))}
-      </div>
-    </section>
+      </section>
+
+      <section aria-label="Relationship maps">
+        <h3>If I change this, what happens?</h3>
+        {US_RELATIONS.map((relation) => (
+          <Fold key={relation.id} title={relation.action}>
+            <ul className="usf-effects">
+              {relation.effects.map((effect) => (
+                <EffectRow key={effect.label} effect={effect} />
+              ))}
+            </ul>
+            <Link className="usf-btn" to={relation.experiment}>
+              Open experiment
+            </Link>
+          </Fold>
+        ))}
+      </section>
+
+      <section aria-label="All comparison tables">
+        <h3>Comparison tables</h3>
+        <p className="usf-reference-intro">
+          Each of these is shown with its own concept in Study. Green means the quantity rises or
+          improves; amber means it falls.
+        </p>
+        {US_TABLES.map((table) => (
+          <Fold key={table.id} title={table.title}>
+            <Table table={table} />
+            <Link className="usf-btn" to={table.experiment}>
+              Open experiment
+            </Link>
+          </Fold>
+        ))}
+      </section>
+    </div>
   )
 }
 
@@ -513,184 +609,169 @@ function Tables() {
  * The page
  * ------------------------------------------------------------------ */
 
+type View = 'study' | 'browse' | 'reference'
+
 export default function UsFactBankPage() {
-  const [search, setSearch] = useState('')
-  const [categories, setCategories] = useState<UsCategory[]>([])
-  const [specials, setSpecials] = useState<SpecialFilter[]>([])
-  const location = useLocation()
+  const { hash } = useLocation()
+  const [view, setView] = useState<View>('study')
+  const [query, setQuery] = useState('')
+  const [topic, setTopic] = useState<UsCategory | 'all'>('all')
+  const [currentId, setCurrentId] = useState<string>(US_FACTS[0].id)
 
-  // Land on the anchored card or section when arriving with a #hash.
-  useEffect(() => {
-    if (!location.hash) return undefined
-    const id = location.hash.slice(1)
-    const timer = setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ block: 'start' })
-    }, 60)
-    return () => clearTimeout(timer)
-  }, [location.hash])
-
-  const toggleCategory = (category: UsCategory) =>
-    setCategories((current) =>
-      current.includes(category)
-        ? current.filter((c) => c !== category)
-        : [...current, category],
-    )
-
-  const toggleSpecial = (special: SpecialFilter) =>
-    setSpecials((current) =>
-      current.includes(special) ? current.filter((s) => s !== special) : [...current, special],
-    )
+  /* The sequence Study walks. Choosing a topic in Browse narrows it, so
+     "Concept 3 of 7" means three of seven in THIS topic — a number a reader
+     can actually finish — rather than three of a hundred and six. */
+  const sequence = useMemo(
+    () => (topic === 'all' ? US_FACTS : US_FACTS.filter((f) => f.category === topic)),
+    [topic],
+  )
 
   const filtered = useMemo(() => {
-    // Recall filter switches to the weight-ordered high-yield listing.
-    const base = specials.includes('recall') ? highYieldFacts() : US_FACTS
-    const query = search.trim().toLowerCase()
-    return base.filter((fact) => {
-      if (categories.length > 0 && !categories.includes(fact.category)) return false
-      for (const special of specials) {
-        const def = SPECIAL_FILTERS.find((s) => s.id === special)
-        if (def && !def.test(fact)) return false
-      }
-      if (query) {
-        const haystack = `${fact.fact} ${fact.detail}`.replace(/\*/g, '').toLowerCase()
-        if (!haystack.includes(query)) return false
-      }
-      return true
-    })
-  }, [search, categories, specials])
+    const q = query.trim().toLowerCase()
+    if (!q) return sequence
+    return sequence.filter((f) =>
+      `${f.fact} ${f.detail} ${CATEGORY_LABEL[f.category]} ${f.clinical ?? ''}`.toLowerCase().includes(q),
+    )
+  }, [sequence, query])
 
-  const hasFilters = search.trim() !== '' || categories.length > 0 || specials.length > 0
+  const index = Math.max(
+    0,
+    sequence.findIndex((f) => f.id === currentId),
+  )
+  const current = sequence[index] ?? sequence[0]
+
+  const open = useCallback((id: string) => {
+    setCurrentId(id)
+    setView('study')
+  }, [])
+
+  /* The exam lab links in as #<factId> to show the concept behind a question,
+     and as #equations for the calculators. Both were live before this rebuild
+     and both still are. */
+  useEffect(() => {
+    const target = hash.replace(/^#/, '')
+    if (!target) return
+    if (target === 'equations' || target === 'relations' || target === 'tables') {
+      setView('reference')
+      return
+    }
+    const found = US_FACTS.find((f) => f.id === target)
+    if (found) {
+      /* A concept reached by link must be reachable in the sequence it lands
+         in, so a topic filter left over from browsing cannot hide it. */
+      setTopic((t) => (t === 'all' || t === found.category ? t : 'all'))
+      setCurrentId(found.id)
+      setView('study')
+    }
+  }, [hash])
+
+  const go = useCallback(
+    (delta: number) => {
+      const next = sequence[index + delta]
+      if (next) setCurrentId(next.id)
+    },
+    [sequence, index],
+  )
+
+  /* Paging to another concept must start it at the top, or the reader lands
+     half way down where the last one's disclosures had pushed them.
+     This lives here rather than inside Concept because Concept is keyed by id
+     and therefore remounts on every move — a "have I already arrived?" guard
+     inside it would reset every time and could never distinguish the first
+     render from a move. The page does not remount, so it can.
+     Skipped on arrival: scrolling on mount pushed the page's own heading and
+     the Study/Browse switch up out of the lab's scrolling pane. */
+  const topRef = useRef<HTMLDivElement | null>(null)
+  const arrived = useRef(false)
+  useEffect(() => {
+    if (!arrived.current) {
+      arrived.current = true
+      return
+    }
+    topRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' })
+  }, [currentId, view])
+
+  /* Left and right page the concept, which is what a keyboard reader reaches
+     for first. Ignored while typing in the search box. */
+  useEffect(() => {
+    if (view !== 'study') return
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null
+      if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return
+      if (e.key === 'ArrowRight') go(1)
+      if (e.key === 'ArrowLeft') go(-1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [view, go])
 
   return (
     <UsLab path="/ultrasound-lab/facts" scrolling>
-      <div className="us-scroll-body">
-        <header className="us-section-head">
-          <div>
-            <h2>
-              Ultrasound <span>Fact Bank</span>
-            </h2>
-            <p>
-              {FACT_COUNTS.total} sourced facts · {FACT_COUNTS.recall} high-yield recall ·{' '}
-              {FACT_COUNTS.traps} common traps · {FACT_COUNTS.equations} carry equations ·{' '}
-              {FACT_COUNTS.clarifications} source clarifications. Plus {US_EQUATIONS.length} live
-              equation calculators, {US_RELATIONS.length} relationship maps and {US_TABLES.length}{' '}
-              comparison tables — all searchable, every fact linked to its experiment.
-            </p>
+      <div className="usf">
+        <div ref={topRef} className="usf-top" />
+        <header className="usf-head">
+          <div className="usf-head-line">
+            <h1 className="usf-title">Fact Bank</h1>
+            <nav className="usf-views" aria-label="Fact Bank views">
+              <button
+                type="button"
+                className={view === 'study' ? 'is-on' : ''}
+                aria-pressed={view === 'study'}
+                onClick={() => setView('study')}
+              >
+                Study
+              </button>
+              <button
+                type="button"
+                className={view === 'browse' ? 'is-on' : ''}
+                aria-pressed={view === 'browse'}
+                onClick={() => setView('browse')}
+              >
+                Browse all
+              </button>
+              <button
+                type="button"
+                className={view === 'reference' ? 'is-on' : ''}
+                aria-pressed={view === 'reference'}
+                onClick={() => setView('reference')}
+              >
+                Reference
+              </button>
+            </nav>
           </div>
-          <nav className="us-chip-row" aria-label="Jump to a section">
-            <a className="us-chip" href="#equations">
-              Equation library
-            </a>
-            <a className="us-chip" href="#relations">
-              Relationship explorer
-            </a>
-            <a className="us-chip" href="#tables">
-              Comparison tables
-            </a>
-          </nav>
+          {view === 'study' && topic !== 'all' && (
+            <p className="usf-scope">
+              Studying <strong>{CATEGORY_LABEL[topic]}</strong>
+              <button type="button" onClick={() => setTopic('all')}>
+                Study all topics
+              </button>
+            </p>
+          )}
         </header>
 
-        <div className="us-fb-toolbar">
-          <label className="us-search">
-            <UsIcon name="search" size={14} />
-            <input
-              type="search"
-              placeholder="Search facts and details…"
-              aria-label="Search facts and details"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </label>
-          <div className="us-chip-row" role="group" aria-label="Special filters">
-            {SPECIAL_FILTERS.map((special) => (
-              <button
-                key={special.id}
-                type="button"
-                className={specials.includes(special.id) ? 'us-chip is-on' : 'us-chip'}
-                aria-pressed={specials.includes(special.id)}
-                onClick={() => toggleSpecial(special.id)}
-              >
-                {special.label}
-              </button>
-            ))}
-          </div>
-          <div className="us-chip-row" role="group" aria-label="Filter by category">
-            {CATEGORY_IDS.map((category) => (
-              <button
-                key={category}
-                type="button"
-                className={categories.includes(category) ? 'us-chip is-on' : 'us-chip'}
-                aria-pressed={categories.includes(category)}
-                onClick={() => toggleCategory(category)}
-              >
-                {CATEGORY_LABEL[category]}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="us-score" role="status">
-          <span>
-            <b>{filtered.length}</b> of {FACT_COUNTS.total} facts shown
-          </span>
-          {hasFilters && (
-            <button
-              type="button"
-              className="us-btn us-btn-small"
-              onClick={() => {
-                setSearch('')
-                setCategories([])
-                setSpecials([])
-              }}
-            >
-              <UsIcon name="close" size={11} />
-              Clear filters
-            </button>
-          )}
-        </div>
-
-        {filtered.length > 0 ? (
-          <div className="us-fact-grid">
-            {filtered.map((fact) => (
-              <FactCard key={fact.id} fact={fact} />
-            ))}
-          </div>
-        ) : (
-          <div className="us-panel">
-            <h3>
-              <UsIcon name="search" size={13} />
-              No facts match
-            </h3>
-            <p style={{ ...MUTED_P, marginBottom: 0 }}>
-              Nothing matches that combination of search and filters. Try fewer filters, or clear
-              them and search again.
-            </p>
-          </div>
+        {view === 'study' && current && (
+          <Concept
+            key={current.id}
+            fact={current}
+            position={index + 1}
+            total={sequence.length}
+            onPrev={() => go(-1)}
+            onNext={() => go(1)}
+          />
         )}
 
-        <section id="equations" aria-label="Equation library">
-          <header className="us-section-head" style={{ marginBottom: 12 }}>
-            <div>
-              <h2>
-                Equation <span>library</span>
-              </h2>
-              <p>
-                Every examinable formula with a <strong>live calculator</strong>: move the sliders
-                and watch the answer. The directions of change beneath each one are what the
-                questions actually test.
-              </p>
-            </div>
-          </header>
-          <div className="us-fact-grid">
-            {US_EQUATIONS.map((eq) => (
-              <EquationCard key={eq.id} eq={eq} />
-            ))}
-          </div>
-        </section>
+        {view === 'browse' && (
+          <Browse
+            facts={filtered}
+            query={query}
+            setQuery={setQuery}
+            topic={topic}
+            setTopic={setTopic}
+            onOpen={open}
+          />
+        )}
 
-        <RelationExplorer />
-
-        <Tables />
+        {view === 'reference' && <Reference />}
       </div>
     </UsLab>
   )
