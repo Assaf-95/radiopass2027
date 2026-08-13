@@ -11,6 +11,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { markPaper } from './Mock'
+import { QB_QUESTIONS } from '../data'
+import { MOCK_PAPERS } from '../data/mocks'
 import type { QbQuestion } from '../types'
 
 /** Five statements, all scorable, answers alternating true/false. */
@@ -83,6 +85,37 @@ describe('marking a mock paper', () => {
 
     expect(marked.outOf).toBe(3)
     expect(marked.correct).toBe(3)
+  })
+
+  it('has enough complete questions to build a full paper from', () => {
+    /* A built paper may only deal complete five-statement questions, so that
+       "40 questions" means 200 statements and the percentage is comparable to
+       a real sitting. This pins the pool the builder draws from.
+
+       The bank is deliberately larger than this: 453 questions of which only
+       201 are whole, because 252 are partial recalls — 166 of them carrying a
+       single statement, which is genuinely all the candidate who reported them
+       could remember. Practice serves all 453; a paper does not. */
+    const complete = QB_QUESTIONS.filter((q) => q.stems.length === 5)
+    expect(complete.length).toBeGreaterThanOrEqual(40)
+    // And the fragments really are in there, so this test is not vacuous.
+    expect(QB_QUESTIONS.length).toBeGreaterThan(complete.length)
+  })
+
+  it('marks a full built paper out of five statements per question', () => {
+    const complete = QB_QUESTIONS.filter((q) => q.stems.length === 5).slice(0, 40)
+    const marked = markPaper(complete, {})
+    // Every stem in these carries an answer, so the denominator is exact.
+    expect(marked.outOf).toBe(200)
+    expect(marked.correct).toBe(0)
+  })
+
+  it('keeps the three fixed papers at forty complete questions', () => {
+    for (const paper of MOCK_PAPERS) {
+      expect(paper.questions.length, paper.name).toBe(40)
+      const short = paper.questions.filter((q) => q.stems.length !== 5)
+      expect(short.map((q) => q.id), paper.name).toEqual([])
+    }
   })
 
   it('reports a per-question breakdown for the review', () => {

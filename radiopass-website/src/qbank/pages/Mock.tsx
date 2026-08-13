@@ -156,6 +156,33 @@ export default function MockPage() {
     return subject ? subject.sections.flatMap((section) => section.topics) : null
   }, [subjectId])
 
+  /**
+   * What a built paper is allowed to deal: complete five-statement questions
+   * only.
+   *
+   * The bank is 453 questions but only 201 of them are whole. The other 252 are
+   * partial recalls — 166 of them carry a single statement — because that is
+   * genuinely all the candidate who reported them could remember. They are
+   * perfectly good practice, and practice still serves every one of them.
+   *
+   * A paper is different. Dealing from the raw pool made "40 questions" mean
+   * roughly 116 statements instead of 200, so the paper was not exam-shaped and
+   * its percentage was not comparable to a real sitting — which is the entire
+   * reason for sitting one. Worse, it interacted with the whole-paper
+   * denominator: two papers of "40 questions" could be marked out of quite
+   * different totals depending on the luck of the shuffle.
+   *
+   * The three fixed RadioPass papers are curated five-stem sets already and are
+   * unaffected by this.
+   */
+  const builtPool = useMemo(() => {
+    const byTopic = topics ? QB_QUESTIONS.filter((q) => topics.includes(q.topic)) : QB_QUESTIONS
+    return byTopic.filter((q) => q.stems.length === 5)
+  }, [topics])
+
+  /** The paper this setup would actually produce, given what the pool holds. */
+  const dealt = Math.min(count, builtPool.length)
+
   /* Pick up an unfinished paper. Runs once, before anything is drawn, so a
      candidate who reloads mid-exam lands back on the question they left
      rather than on the setup screen with the sitting gone. */
@@ -217,13 +244,12 @@ export default function MockPage() {
   }
 
   const start = () => {
-    const pool = topics ? QB_QUESTIONS.filter((q) => topics.includes(q.topic)) : QB_QUESTIONS
     // A fresh seed per sitting. The paper is held in state, so the order is
     // already fixed for the life of the paper; seeding from the settings meant
     // "Sit another paper" with the same options dealt the identical questions
     // in the identical order, which is the one thing a built paper must not do.
     const seed = (Date.now() % 2147483646) + 1
-    beginPaper(shuffled(pool, seed).slice(0, Math.min(count, pool.length)), minutes)
+    beginPaper(shuffled(builtPool, seed).slice(0, Math.min(count, builtPool.length)), minutes)
   }
 
   // The three fixed RadioPass papers: 40 questions, 90 minutes, no shuffle —
@@ -291,6 +317,11 @@ export default function MockPage() {
             </div>
             <div className="qb-mock-panel" style={{ marginTop: 'var(--gap-cards)' }}>
               <h2 className="qb-serif-h">Or build your own paper</h2>
+              <p className="qb-lede">
+                Built from the complete five-statement questions only, so the paper is the same
+                shape as the exam and the percentage means the same thing. Partial recalls are
+                still available in practice.
+              </p>
               <div className="qb-mock-grid">
                 <div className="qb-field">
                   <label htmlFor="mock-count">Questions</label>
@@ -324,7 +355,28 @@ export default function MockPage() {
                   </select>
                 </div>
               </div>
-              <button type="button" className="qb-btn qb-btn-solid" onClick={start}>
+              {/* Say what will actually be dealt. A built paper draws only
+                  from the complete five-statement questions, so the honest
+                  number is rarely the number in the dropdown. */}
+              <p className="qb-paper-spec">
+                {dealt === 0 ? (
+                  <>No complete five-statement questions in this subject yet — choose another.</>
+                ) : (
+                  <>
+                    {dealt} question{dealt === 1 ? '' : 's'} · {dealt * 5} statements ·{' '}
+                    {minutes} minutes
+                    {dealt < count && (
+                      <> — {builtPool.length} complete questions available in this subject</>
+                    )}
+                  </>
+                )}
+              </p>
+              <button
+                type="button"
+                className="qb-btn qb-btn-solid"
+                disabled={dealt === 0}
+                onClick={start}
+              >
                 Start the paper
               </button>
             </div>
