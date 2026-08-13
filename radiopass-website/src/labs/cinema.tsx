@@ -66,7 +66,7 @@ export function FilmPage({ meta, scenes }: { meta: FilmMeta; scenes: FilmScene[]
 
   useEffect(() => {
     document.title = `${meta.title} · RadioPass`
-    return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
+    return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [meta.title])
 
   const jump = (i: number) => {

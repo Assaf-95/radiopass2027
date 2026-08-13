@@ -142,7 +142,7 @@ function studyImages(): StudyImage[] {
             relationships: [],
             /* Deep-linked to the exact slice, so "view the original" lands on
                the picture being looked at rather than the middle of the stack. */
-            sourceHref: `/mri/${study.id}?slice=${slice}`,
+            sourceHref: `/anatomy/mri/${study.id}?slice=${slice}`,
             sourceLabel: 'Open in the scrolling viewer',
             companions: neighbours
               .filter((n) => n.structureId !== structure.structureId)
@@ -209,7 +209,7 @@ function chestImages(): StudyImage[] {
           questionNumber: structure.id,
           teachingText: null,
           relationships: [],
-          sourceHref: '/cxr',
+          sourceHref: '/anatomy/cxr',
           sourceLabel: 'Open the chest X-ray atlas',
           companions: present
             .filter((n) => n.id !== structure.id)

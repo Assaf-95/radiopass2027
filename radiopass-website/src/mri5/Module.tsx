@@ -266,7 +266,7 @@ export function KnowledgeMap() {
 export function MriHome() {
   useEffect(() => {
     document.title = 'MRI physics · RadioPass'
-    return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
+    return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [])
 
   return (

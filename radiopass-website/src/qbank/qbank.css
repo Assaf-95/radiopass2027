@@ -607,3 +607,19 @@
   }
   .qb-mh-when { grid-column: 1 / -1; }
 }
+
+/* Wordmark and branch context, stacked. The breadcrumb names the branch so a
+   learner deep in the bank always knows which half of the exam they are in. */
+.qb-nav-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  /* The bar is tight on a phone; the branch link in the trail is enough. */
+  .qb-nav-id .rp-crumbs {
+    display: none;
+  }
+}

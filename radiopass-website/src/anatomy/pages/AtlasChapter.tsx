@@ -86,7 +86,7 @@ export default function AtlasChapter() {
     <div className="atlas atlas-chapter">
       <AtlasBreadcrumbs
         trail={[
-          { label: 'Structure Atlas', to: '/atlas' },
+          { label: 'Structure Atlas', to: '/anatomy/atlas' },
           { label: chapter.title },
         ]}
       />
@@ -245,7 +245,7 @@ export default function AtlasChapter() {
                     </p>
                     <Link
                       className="film-source mono"
-                      to={image.sourceHref ?? `/section/${image.section}/q/${image.questionId}`}
+                      to={image.sourceHref ?? `/anatomy/section/${image.section}/q/${image.questionId}`}
                     >
                       {image.sourceLabel ?? 'View original question'}
                     </Link>

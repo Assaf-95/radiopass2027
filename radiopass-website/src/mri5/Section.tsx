@@ -322,7 +322,7 @@ export function SectionPage({
 
   useEffect(() => {
     if (meta) document.title = `${meta.number} ${meta.title} · MRI · RadioPass`
-    return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
+    return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [meta])
 
   // A new section always starts at its own opening, never part-way through.

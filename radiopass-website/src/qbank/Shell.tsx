@@ -5,6 +5,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Breadcrumb, CRUMB_PHYSICS, CRUMB_ROOT } from '../design/breadcrumb'
 import { record } from '../lib/learner'
 
 import { useAuth } from '../lib/auth'
@@ -40,7 +41,7 @@ export function QbShell({ title, children }: { title?: string; children: ReactNo
       ? `${title} · Question Bank · RadioPass`
       : 'Question Bank · RadioPass'
     return () => {
-      document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual'
+      document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics'
     }
   }, [title])
 
@@ -48,9 +49,16 @@ export function QbShell({ title, children }: { title?: string; children: ReactNo
     <main className="qb-root">
       <header className="qb-nav">
         <div className="qb-nav-inner">
-          <Link to="/" className="qb-nav-brand" aria-label="RadioPass home">
-            RADIOPASS
-          </Link>
+          {/* Wordmark plus branch context. The bar used to carry the wordmark
+              alone, so a learner in the question bank could not tell which
+              branch they were in and the only way out went to the master
+              homepage rather than back to Physics. */}
+          <div className="qb-nav-id">
+            <Link to="/" className="qb-nav-brand" aria-label="RadioPass home">
+              RADIOPASS
+            </Link>
+            <Breadcrumb trail={[CRUMB_ROOT, CRUMB_PHYSICS, { label: title ?? 'Question bank' }]} />
+          </div>
           <nav className="qb-nav-links" aria-label="Question bank">
             <NavLink to="/question-bank" end className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
               All subjects

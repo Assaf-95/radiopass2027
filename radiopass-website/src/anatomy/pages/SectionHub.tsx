@@ -204,7 +204,7 @@ export default function SectionHub() {
    into two and therefore has no single destination. */
 function atlasChapterLink(section: SectionId): string {
   const chapters = ATLAS_CHAPTERS.filter((c) => c.homeSection === section);
-  return chapters.length === 1 ? `/atlas/${chapters[0].id}` : '/atlas';
+  return chapters.length === 1 ? `/anatomy/atlas/${chapters[0].id}` : '/anatomy/atlas';
 }
 
 function Stat({ label, value, tone }: { label: string; value: string | number; tone?: string }) {

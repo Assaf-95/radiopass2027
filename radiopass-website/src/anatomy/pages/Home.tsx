@@ -181,8 +181,8 @@ export default function Home() {
      carries the same links, the same numbers and the same way past the film. */
   const heroProps = {
     startTo: resumable
-      ? `/section/${resumable.meta.id}/q/${resumable.last}`
-      : `/section/${firstLoaded?.meta.id ?? 'spine'}`,
+      ? `/anatomy/section/${resumable.meta.id}/q/${resumable.last}`
+      : `/anatomy/section/${firstLoaded?.meta.id ?? 'spine'}`,
     onQuestionBank: openRandom,
     metaLine: `${totals.questions} labelled cases · ${Math.round(
       totals.structures

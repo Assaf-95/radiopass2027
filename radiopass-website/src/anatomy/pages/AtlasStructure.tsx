@@ -94,7 +94,7 @@ export default function AtlasStructure() {
       <div className="empty-state">
         <h1>Structure not found</h1>
         <p>That address does not match a structure in this chapter.</p>
-        <Link className="btn btn-primary" to={chapter ? `/atlas/${chapter.id}` : '/atlas'}>
+        <Link className="btn btn-primary" to={chapter ? `/anatomy/atlas/${chapter.id}` : '/anatomy/atlas'}>
           {chapter ? `Back to ${chapter.title}` : 'Back to the Structure Atlas'}
         </Link>
       </div>

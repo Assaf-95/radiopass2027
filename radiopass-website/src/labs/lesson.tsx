@@ -174,7 +174,7 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
 
   useEffect(() => {
     document.title = `${meta.title} · RadioPass`
-    return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
+    return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [meta.title])
 
   /* MODULE STARTED — once per visit, when the learner actually enters the

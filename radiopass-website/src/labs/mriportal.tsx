@@ -171,7 +171,7 @@ function CoverLoop() {
 export default function MriPortal() {
   useEffect(() => {
     document.title = 'MRI — the course · RadioPass'
-    return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
+    return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [])
 
   let n = 0

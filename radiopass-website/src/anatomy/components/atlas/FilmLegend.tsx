@@ -47,7 +47,7 @@ export default function FilmLegend({ image, currentKey, currentName, chapter, co
         label: c.label,
         name: target?.name ?? c.officialAnswer,
         current: false,
-        to: target ? `/atlas/${target.chapter}/${target.id}` : null,
+        to: target ? `/anatomy/atlas/${target.chapter}/${target.id}` : null,
         /* An editor's note, written online for this film, beats the
            checked-in table; neither is invented, and when there is no note
            at all the line simply does not appear. */

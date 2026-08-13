@@ -1,0 +1,48 @@
+/* The breadcrumb. Orientation, not furniture: one quiet line that says which
+   branch you are in and gives you the way back to it. */
+
+.rp-crumbs ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0;
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+}
+
+.rp-crumbs li {
+  display: flex;
+  align-items: baseline;
+}
+
+.rp-crumbs a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.rp-crumbs a:hover {
+  color: var(--text-primary);
+}
+
+/* The page you are on. Brightest thing in the trail, so the eye lands on
+   "where am I" rather than on the path taken to get here. */
+.rp-crumbs [aria-current='page'] {
+  color: var(--text-secondary);
+}
+
+.rp-crumb-sep {
+  margin: 0 var(--sp-2);
+  color: var(--text-disabled);
+}
+
+@media (max-width: 560px) {
+  /* On a phone the branch and the page are what matter; the master root is
+     always one tap away through the wordmark beside it. */
+  .rp-crumbs li:first-child {
+    display: none;
+  }
+}

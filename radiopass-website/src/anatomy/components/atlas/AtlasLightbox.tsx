@@ -207,7 +207,7 @@ export default function AtlasLightbox({
             <div className="film-links">
               <Link
                 className="btn btn-line lb-source"
-                to={image.sourceHref ?? `/section/${image.section}/q/${image.questionId}`}
+                to={image.sourceHref ?? `/anatomy/section/${image.section}/q/${image.questionId}`}
               >
                 {image.sourceLabel ?? 'View original question'}
               </Link>

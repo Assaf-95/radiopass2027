@@ -246,7 +246,7 @@ export function UsLab({
     document.title = `${stage.label} · Ultrasound Physics Lab · RadioPass`
     return () => {
       // Restore the site's canonical title (kept in sync with index.html).
-      document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual'
+      document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics'
     }
   }, [path, stage.label])
 
