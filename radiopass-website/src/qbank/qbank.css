@@ -623,3 +623,38 @@
     display: none;
   }
 }
+
+/* --- The bar on a phone ---------------------------------------------------
+   At 390px this bar carried the wordmark, a scrolling subject list, "Log in to
+   sync progress" (105px) and "Open the labs" (139px). The two calls to action
+   squeezed the wordmark until it was CLIPPED MID-WORD — the page read
+   "ADIOPASS" — and ellipsized the account prompt to "n to sync prog", which is
+   worse than not showing it.
+
+   Both go. Neither is lost: the labs are one tap from the branch home, and the
+   account prompt lives in the main site header and on both branch homes. What
+   remains is what the bar is for — who you are, where you are, and the
+   subjects.
+
+   SPECIFICITY MATTERS HERE and cost two attempts to see. touch.css is imported
+   last on purpose so its coarse-pointer rules win, and it contains
+   `.qb-nav a { display: inline-flex }`. That selector scores 0-1-1, which
+   outranks a bare `.qb-nav-cta` at 0-1-0 — so on any touch device the button
+   came straight back however many times it was hidden here. Scoping through
+   the parent scores 0-2-0 and settles it. */
+@media (max-width: 560px) {
+  .qb-nav .qb-nav-cta,
+  .qb-nav .qb-nav-account,
+  .qb-nav .qb-nav-account.is-cta {
+    display: none;
+  }
+
+  .qb-nav-brand {
+    /* Never squeezed: the wordmark is the one thing that must stay legible. */
+    flex: none;
+  }
+
+  .qb-nav-inner {
+    gap: var(--sp-4);
+  }
+}
