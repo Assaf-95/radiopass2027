@@ -249,6 +249,17 @@ export default function PhysicsHome() {
         </ul>
       </section>
 
+      {/* Secondary. The fact bank and the cinematic tour are worth reaching
+          and are not peers of the five destinations above — putting them there
+          would say the branch has seven equal parts when it has five. */}
+      <section className="ph-secondary" aria-label="Also in Physics">
+        <Link to="/fact-bank">Fact bank</Link>
+        <Link to="/ultrasound-lab/facts">Ultrasound facts</Link>
+        <Link to="/mri-lab/motion">MRI in motion</Link>
+        <Link to="/ultrasound-lab/motion">Ultrasound in motion</Link>
+        <Link to="/study-plan">Six-week plan</Link>
+      </section>
+
       <footer className="ph-foot">
         <p>
           The physics of the First FRCR in {QB_TOTALS.questions} questions and{' '}

@@ -109,16 +109,16 @@
   color: var(--text-tertiary);
 }
 
-/* The unconfigured state. Quiet and factual — it is not an error, and it must
-   not read like a broken tile. */
-.ft-pending {
-  margin: 0;
-  padding: var(--sp-4);
-  width: 100%;
-  border: 1px dashed var(--bg-interactive);
-  border-radius: var(--radius-sm);
-  font-size: var(--fs-support);
+/* The unconfigured state wears the same clothes as the configured one: the
+   same rows, the same rhythm, only quieter. A dashed placeholder box reads as
+   something that failed to load; this reads as a decision not yet taken. */
+.ft-list.is-pending .ft-kind {
   color: var(--text-tertiary);
+}
+
+.ft-list.is-pending .ft-detail {
+  font-style: italic;
+  opacity: 0.75;
 }
 
 /* --- Foot ---------------------------------------------------------------- */

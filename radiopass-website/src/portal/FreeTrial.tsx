@@ -36,6 +36,11 @@ const KIND_LABEL: Record<Resource['kind'], string> = {
   progress: 'Progress',
 }
 
+/* The shape the trial will take once chosen — shown as pending rather than
+   left blank, so the page reads as deliberate rather than unfinished. These
+   are the KINDS a trial can contain, not a promise about which items. */
+const PENDING_ROWS = ['Question bank', 'Learning material', 'Mock exams'] as const
+
 const BRANCHES: { id: Branch; name: string; to: string; blurb: string }[] = [
   {
     id: 'anatomy',
@@ -72,9 +77,20 @@ function BranchPanel({ branch }: { branch: (typeof BRANCHES)[number] }) {
         </ul>
       ) : (
         /* The controlled empty state. It does not apologise and it does not
-           invent — it says what is true, and still gives the visitor
-           somewhere to go, because both branch homes are open to everyone. */
-        <p className="ft-pending">Free {branch.name.toLowerCase()} content is being chosen.</p>
+           invent — it says what is true, and still gives the visitor somewhere
+           to go, because both branch overviews are open to everyone.
+
+           Deliberately shaped like the list it will become: the same rows, the
+           same rhythm, with the selection pending rather than a dashed box
+           that reads as a broken tile. */
+        <ul className="ft-list is-pending">
+          {PENDING_ROWS.map((label) => (
+            <li key={label}>
+              <span className="ft-kind">{label}</span>
+              <span className="ft-detail">Selection pending</span>
+            </li>
+          ))}
+        </ul>
       )}
 
       <Link className="button button-outline" to={branch.to}>
@@ -99,7 +115,7 @@ export default function FreeTrial() {
         <p className="ft-lede">
           {configured
             ? 'A sample of both halves of FRCR Part 1 — the real pages, not a demo.'
-            : 'A sample of both halves of FRCR Part 1. We are choosing which anatomy and physics to open up; both branch overviews are already free to explore.'}
+            : 'A sample of both halves of FRCR Part 1, on the real pages rather than a demo. We are still choosing exactly what to open up; both branch overviews are free to explore in the meantime.'}
         </p>
       </section>
 
