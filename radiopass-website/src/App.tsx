@@ -332,7 +332,6 @@ function Header() {
     ['Question bank', '/question-bank'],
     ['Mock exams', '/question-bank/mock'],
     ['Simulator labs', '/ultrasound-lab'],
-    ['Fact bank', '/fact-bank'],
   ]
 
   return <header className="site-header">
@@ -348,8 +347,9 @@ function Header() {
         <NavLink className={({ isActive }: { isActive: boolean }) => isActive ? 'nav-branch active' : 'nav-branch'} to="/physics">Physics</NavLink>
         <span className="nav-divider" aria-hidden="true" />
         {links.map(([label, href]) => <NavLink key={href} to={href} className={({ isActive }: { isActive: boolean }) => isActive ? 'active' : ''}>{label}</NavLink>)}
-        <span className="nav-divider" aria-hidden="true" />
-        <NavLink to="/free-trial" className={({ isActive }: { isActive: boolean }) => isActive ? 'active' : ''}>Free trial</NavLink>
+        {/* No "Free trial" link here: the "Start free trial" button in the
+            account group beside this nav is already that entry, and having
+            both put the same destination in the bar twice. */}
         {user ? (
           <button type="button" className="mobile-login" onClick={logOut}>Log out ({user.email})</button>
         ) : (
