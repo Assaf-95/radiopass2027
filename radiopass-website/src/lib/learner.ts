@@ -13,13 +13,12 @@
  * an append-only record of events alongside them. Nothing is migrated, nothing
  * is reset, and if this log is empty the app behaves exactly as it does today.
  *
- * SHARED WITH ANATOMY BY KEY, NOT BY IMPORT. Anatomy is still a separate Vite
- * build, so it cannot import this module. It carries a mirrored copy writing
- * the same key with the same schema — the two halves share an origin in the
- * packaged deployment, so they share localStorage. That duplication is
- * deliberate and temporary: it is the one thing the eventual merge deletes.
- * Both copies must change together; the schema version below is how a mismatch
- * is caught rather than silently corrupting the log.
+ * ONE MODULE, BOTH BRANCHES. Anatomy used to carry a mirrored copy of this
+ * file because it was a separate build and could not import across. Since the
+ * merge there is one canonical implementation and anatomy imports it like
+ * anything else — the duplication that had to be kept in step by hand is gone.
+ * The schema version remains: it is what lets a log written by an older build
+ * be ignored rather than silently misread.
  *
  * ENTITLEMENT IS NOT INVOLVED. A trial learner, an anatomy-only learner and a
  * full subscriber all write here identically. Access decides what can be
@@ -62,8 +61,13 @@ export type LearnerEvent =
       contentId: string
       chapter?: string
     })
-  | (Base & { type: 'module.started' | 'module.completed'; contentId: string; topic?: string })
-  | (Base & { type: 'lab.opened' | 'lab.completed'; contentId: string })
+  /* Split rather than a union of two literals: Extract<> cannot narrow a
+     member whose `type` is itself a union, so lastOfType('module.started')
+     would resolve to never and lose contentId. */
+  | (Base & { type: 'module.started'; contentId: string; topic?: string })
+  | (Base & { type: 'module.completed'; contentId: string; topic?: string })
+  | (Base & { type: 'lab.opened'; contentId: string })
+  | (Base & { type: 'lab.completed'; contentId: string })
   | (Base & {
       type: 'mock.started'
       attemptId: string

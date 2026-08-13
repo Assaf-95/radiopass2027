@@ -68,10 +68,10 @@ export default function ReviewPage() {
 
   const onScored = useCallback(
     (qid: string, correct: number, outOf: number, choices: Record<string, boolean>) => {
-      recordQbScore(qid, correct, outOf, choices)
+      recordQbScore(qid, correct, outOf, choices, questions.find((q) => q.id === qid)?.topic)
       setVersion((v) => v + 1)
     },
-    [],
+    [questions],
   )
 
   if (!valid) return <Navigate to="/question-bank" replace />

@@ -36,6 +36,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { clearToneMemory, isSoundOn, playOnce, setSoundOn, subscribeSound, unlockAudio } from '../lib/sound'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { record } from '../lib/learner'
 import { CommonTrap, HighYield } from '../design/primitives'
 import { useReducedMotion } from '../home/fx'
 import './labs.css'
@@ -175,6 +176,37 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
     document.title = `${meta.title} · RadioPass`
     return () => { document.title = 'RadioPass — FRCR Part 1 Physics, Made Visual' }
   }, [meta.title])
+
+  /* MODULE STARTED — once per visit, when the learner actually enters the
+     lesson rather than merely lands on its intro screen. `moduleId` is the
+     route, so it matches what Continue links back to. */
+  const startedRef = useRef(false)
+  useEffect(() => {
+    if (startedRef.current || index < 0) return
+    startedRef.current = true
+    record({
+      type: 'module.started',
+      subject: 'physics',
+      contentId: window.location.pathname,
+      topic: meta.kicker,
+    })
+  }, [index, meta.kicker])
+
+  /* MODULE COMPLETED — only on reaching the finish screen, which is the one
+     point in this player where "completed" has an unambiguous meaning: every
+     concept has been stepped through. Nothing is emitted for scrolling past,
+     deep-linking to a step, or closing the tab part way. */
+  const completedRef = useRef(false)
+  useEffect(() => {
+    if (completedRef.current || index < steps.length) return
+    completedRef.current = true
+    record({
+      type: 'module.completed',
+      subject: 'physics',
+      contentId: window.location.pathname,
+      topic: meta.kicker,
+    })
+  }, [index, steps.length, meta.kicker])
 
   // The per-step animation clock: reveal over ~1.5 s, freeze at ~3.5 s.
   useEffect(() => {

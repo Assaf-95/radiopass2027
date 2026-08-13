@@ -28,6 +28,7 @@ import { Link } from 'react-router-dom'
 import { QB_QUESTIONS, QB_TOTALS } from '../qbank/data'
 import { readQbProgress, readQbMarks } from '../qbank/Shell'
 import { readProgress as readUsProgress } from '../us/components/progress'
+import { completedModules, lastOfType } from '../lib/learner'
 import { QB_SUBJECTS } from '../qbank/types'
 import './physicshome.css'
 
@@ -43,6 +44,9 @@ type Snapshot = {
   labsVisited: number
   /** The subject with the most recent submitted answer, if any. */
   lastSubject: { id: string; name: string; at: string } | null
+  /** The most recent module the learner opened, if that is newer. */
+  lastModule: { path: string; topic?: string; at: string } | null
+  modulesCompleted: number
   hasActivity: boolean
 }
 
@@ -83,6 +87,14 @@ function readSnapshot(): Snapshot {
 
   const flagged = Object.values(marks).filter((m) => m.flagged).length
 
+  /* The other half of "where was I": a lesson the learner opened but did not
+     answer questions in leaves no trace in the progress store, only on the
+     timeline. Continue picks whichever of the two is genuinely more recent. */
+  const moduleEvent = lastOfType('module.started', 'physics')
+  const lastModule = moduleEvent
+    ? { path: moduleEvent.contentId, topic: moduleEvent.topic, at: moduleEvent.at }
+    : null
+
   return {
     answered: entries.length,
     correct,
@@ -90,7 +102,9 @@ function readSnapshot(): Snapshot {
     flagged,
     labsVisited: us.visited.length,
     lastSubject,
-    hasActivity: entries.length > 0 || us.visited.length > 0,
+    lastModule,
+    modulesCompleted: completedModules('physics').length,
+    hasActivity: entries.length > 0 || us.visited.length > 0 || lastModule !== null,
   }
 }
 
@@ -173,17 +187,37 @@ export default function PhysicsHome() {
               {accuracy !== null && <Stat value={`${accuracy}%`} label={`${s.correct} of ${s.outOf} statements correct`} />}
               {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
               {s.labsVisited > 0 && <Stat value={`${s.labsVisited}`} label="laboratories opened" />}
+              {s.modulesCompleted > 0 && (
+                <Stat value={`${s.modulesCompleted}`} label="modules completed" />
+              )}
             </div>
 
-            {s.lastSubject && (
-              <Link className="ph-continue" to={`/question-bank/${s.lastSubject.id}`}>
-                <span className="ph-continue-label">Continue</span>
-                <span className="ph-continue-name">{s.lastSubject.name}</span>
-                <span className="ph-continue-go" aria-hidden="true">
-                  &rarr;
-                </span>
-              </Link>
-            )}
+            {/* One Continue, pointing at whichever activity is genuinely the
+                most recent — a lesson or a subject in the bank. Never both,
+                and never a guess when there is no history at all. */}
+            {(() => {
+              const useModule =
+                s.lastModule && (!s.lastSubject || s.lastModule.at > s.lastSubject.at)
+              if (useModule && s.lastModule) {
+                return (
+                  <Link className="ph-continue" to={s.lastModule.path}>
+                    <span className="ph-continue-label">Continue</span>
+                    <span className="ph-continue-name">
+                      {s.lastModule.topic ?? 'Your last lesson'}
+                    </span>
+                    <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
+                  </Link>
+                )
+              }
+              if (!s.lastSubject) return null
+              return (
+                <Link className="ph-continue" to={`/question-bank/${s.lastSubject.id}`}>
+                  <span className="ph-continue-label">Continue</span>
+                  <span className="ph-continue-name">{s.lastSubject.name}</span>
+                  <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
+                </Link>
+              )
+            })()}
           </>
         ) : (
           /* No activity. Say that, and give one obvious first step — never a

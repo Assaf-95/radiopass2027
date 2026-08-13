@@ -5,6 +5,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { record } from '../lib/learner'
 
 import { useAuth } from '../lib/auth'
 import { createSyncedStore } from '../lib/syncedStore'
@@ -146,13 +147,19 @@ export function readQbProgress(): QbProgress {
  * only ever re-display the original answer, never quietly re-score it. The
  * only way back to a clean sheet is resetting the account.
  */
-export function recordQbScore(questionId: string, correct: number, outOf: number, choices?: QbChoices) {
+export function recordQbScore(questionId: string, correct: number, outOf: number, choices?: QbChoices, topic?: string) {
   const all = progressStore.read()
   if (all[questionId]) return
   progressStore.write({
     ...all,
     [questionId]: { correct, outOf, choices, submittedAt: new Date().toISOString() },
   })
+  /* The shared timeline, written alongside the store rather than instead of
+     it. The store answers "what did they score"; this answers "when, and in
+     which branch" — which is what Continue and any activity view need, and
+     what the store cannot say. Guarded by the same first-submission rule
+     above, so re-visiting a question never records a second attempt. */
+  record({ type: 'question.answered', subject: 'physics', contentId: questionId, topic, correct, outOf })
 }
 
 /** Wipes every score and answer. The deliberate, account-level undo. */
