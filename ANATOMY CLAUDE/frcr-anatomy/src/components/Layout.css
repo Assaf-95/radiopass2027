@@ -246,3 +246,19 @@
   font-size: 14px;
 }
 .app-nav-physics:hover { color: var(--amber-accent); }
+
+/* One navigation language: branches lead, then this branch's tools, then the
+   trial. The dividers carry the hierarchy without needing a second row. */
+.app-nav-branch { color: var(--text); font-weight: 500; }
+.app-nav-branch.is-here { color: var(--amber-accent); }
+.app-nav-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--rule);
+  flex: none;
+}
+.app-nav-trial { color: var(--text); }
+
+@media (max-width: 900px) {
+  .app-nav-divider { display: none; }
+}

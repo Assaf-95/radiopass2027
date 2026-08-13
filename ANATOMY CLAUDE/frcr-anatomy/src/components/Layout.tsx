@@ -155,14 +155,23 @@ export default function Layout() {
               <span className="brand-sub">Anatomy</span>
             </Link>
 
+            {/* ONE NAVIGATION LANGUAGE ACROSS BOTH BRANCHES.
+                The same shape the physics header uses: the two branches
+                first, then the tools of the branch you are actually in, then
+                the trial. That anatomy is a separate Vite build is an
+                implementation detail and must never be something the learner
+                can feel — so the first group and the trial entry are
+                identical on both sides, and only the middle group differs. */}
             <nav className="app-nav">
-              {/* Information first: the syllabus leads, the labs follow. */}
-              <Link to="/?goto=modules">Modules</Link>
-              {/* The second way into the same material: structure first
-                  rather than question first. */}
+              <Link className="app-nav-branch is-here" to="/">Anatomy</Link>
+              {/* A plain <a> because it leaves this build. */}
+              <a className="app-nav-branch" href={PHYSICS_URL}>Physics</a>
+              <span className="app-nav-divider" aria-hidden="true" />
+
+              {/* Anatomy's own tools. Three ways into the same material:
+                  question first, structure first, region first. */}
+              <Link to="/?goto=modules">Question bank</Link>
               <Link to="/atlas">Atlas</Link>
-              {/* The third way in: region first. A scout down the body that
-                  hands you into that region's questions. */}
               <Link to="/volume">Scout</Link>
               <Link to="/cxr">X-ray</Link>
               <Link to="/mri/head-bone">CT</Link>
@@ -170,10 +179,13 @@ export default function Layout() {
               <Link to="/dashboard">Progress</Link>
               <Link to="/disputes">Disputes</Link>
               {isAdmin() && <Link to="/admin">Editor</Link>}
-              {/* The other half of RadioPass. A plain <a> because it leaves
-                  this app: '/' is the physics site when both halves share a
-                  domain (the drop-in deploy); override for split hosting. */}
-              <a className="app-nav-physics" href={PHYSICS_URL}>Physics ↗</a>
+
+              <span className="app-nav-divider" aria-hidden="true" />
+              {/* Same destination the physics header offers, so the trial is
+                  reachable from anywhere in the product. */}
+              <a className="app-nav-trial" href={`${PHYSICS_URL}/free-trial`.replace(/([^:])\/\//g, '$1/')}>
+                Free trial
+              </a>
             </nav>
 
             <div className="app-header-actions">

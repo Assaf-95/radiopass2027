@@ -322,3 +322,20 @@
    page composition is unchanged, and states what is actually known instead. */
 .plan-empty{margin:0 0 var(--sp-4);padding:0 7px;color:var(--text-secondary);font-size:var(--fs-support);line-height:var(--lh-body)}
 .plan-dashboard .button{margin:0 7px}
+
+/* --- One navigation language ---------------------------------------------
+   The two branches lead, then the tools of the branch you are in, then the
+   trial. The dividers are what stop eight links reading as one flat list of
+   equals — the hierarchy is visible without a second row. */
+.nav-branch { color: var(--ink); font-weight: 500; }
+.nav-branch.active { color: var(--lime); }
+.nav-divider {
+  width: 1px;
+  height: 15px;
+  background: rgba(242, 238, 230, 0.16);
+  flex: none;
+}
+@media (max-width: 900px) {
+  /* Stacked: a vertical rule would read as a stray mark. */
+  .nav-divider { width: 100%; height: 1px; margin: var(--sp-2) 0; }
+}

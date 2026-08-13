@@ -292,6 +292,12 @@ function hasOwnChrome(pathname: string): boolean {
   return exact.includes(pathname) || trees.some((tree) => pathname.startsWith(tree))
 }
 
+/* Where the anatomy build lives. Same resolution Crossing uses: '/anatomy'
+   when both halves share a domain (the drop-in deploy), overridable for split
+   hosting. Hash routing means the trailing '/#/' lands on its home. */
+const ANATOMY_HREF =
+  ((import.meta.env.VITE_ANATOMY_URL as string | undefined)?.replace(/\/$/, '') ?? '/anatomy') + '/#/'
+
 function Header() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
@@ -307,13 +313,26 @@ function Header() {
 
   // The learner's journey, in order: learn it, drill it, sit it, keep it.
   // Every lab lives inside Learn — nothing removed, just one clear door each.
-  const links = [
-    ['Learn', '/visual-lab'],
-    ['Practise', '/question-bank'],
-    ['Mock Exams', '/question-bank/mock'],
-    ['Fact Bank', '/fact-bank'],
-    ['Study Plan', '/study-plan'],
-    ['Pricing', '/pricing'],
+  /* ONE NAVIGATION LANGUAGE ACROSS BOTH BRANCHES.
+     The bar used to list six physics tools — Learn, Practise, Mock Exams,
+     Fact Bank, Study Plan, Pricing — as if they were the product's top level,
+     and carried NO link to anatomy at all. A learner inside physics could not
+     reach the other half of the exam from the header.
+
+     It now reads the way the product is shaped: the two branches first, then
+     the tools of the branch you are actually in, then the trial. The anatomy
+     app's header carries the same first group and the same trial entry, so
+     moving between the two builds does not feel like changing website. */
+  const branchLinks: [string, string][] = [
+    ['Anatomy', ANATOMY_HREF],
+    ['Physics', '/physics'],
+  ]
+  const links: [string, string][] = [
+    ['Modules', '/visual-lab'],
+    ['Question bank', '/question-bank'],
+    ['Mock exams', '/question-bank/mock'],
+    ['Simulator labs', '/ultrasound-lab'],
+    ['Fact bank', '/fact-bank'],
   ]
 
   return <header className="site-header">
@@ -323,7 +342,14 @@ function Header() {
         <span>radio<span>pass</span></span>
       </Link>
       <nav className={open ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
+        {/* The two branches. Anatomy is a plain <a> because it leaves this
+            build — an implementation detail the learner must never feel. */}
+        <a className="nav-branch" href={ANATOMY_HREF}>{branchLinks[0][0]}</a>
+        <NavLink className={({ isActive }: { isActive: boolean }) => isActive ? 'nav-branch active' : 'nav-branch'} to="/physics">Physics</NavLink>
+        <span className="nav-divider" aria-hidden="true" />
         {links.map(([label, href]) => <NavLink key={href} to={href} className={({ isActive }: { isActive: boolean }) => isActive ? 'active' : ''}>{label}</NavLink>)}
+        <span className="nav-divider" aria-hidden="true" />
+        <NavLink to="/free-trial" className={({ isActive }: { isActive: boolean }) => isActive ? 'active' : ''}>Free trial</NavLink>
         {user ? (
           <button type="button" className="mobile-login" onClick={logOut}>Log out ({user.email})</button>
         ) : (
