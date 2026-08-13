@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import { hasServerSession, isAdmin } from '../lib/admin';
 import { contentState, loadContent, subscribeContent } from '../lib/content/store';
 import { currentStreak, getActivity, storageWorks } from '../lib/account';
+import { useAuth } from '../../lib/auth';
 import './Layout.css';
 
 /* Deliberately a new key. The previous one was written on every mount, so
@@ -131,6 +132,10 @@ export default function Layout() {
 
   const activity = getActivity();
   const streak = currentStreak(activity.days);
+  /* THE SAME LEARNER AS PHYSICS. Before the merge anatomy was a separate
+     build and could not see the account at all, so its header could only ever
+     talk about "this browser". It now reads the one RadioPass session. */
+  const { user, signOut, configured } = useAuth();
 
   return (
     <div className="app-shell">
@@ -206,14 +211,14 @@ export default function Layout() {
                 </button>
                 {menuOpen && (
                   <div className="account-menu" role="menu">
-                    {/* What this browser has recorded. No name, no email and no
-                        plan: this app has no server to check any of them
-                        against, and the sign-in that used to collect them
-                        checked nothing. Study numbers are real — every one of
-                        these is written when the learner actually does the
-                        work. */}
-                    <p className="account-name">Your study record</p>
-                    <p className="account-email">Kept on this browser</p>
+                    {/* One account across both branches. The study numbers
+                        below are real either way — they are written when the
+                        learner does the work — but WHOSE they are is now a
+                        question the app can answer. */}
+                    <p className="account-name">{user ? 'Signed in' : 'Your study record'}</p>
+                    <p className="account-email">
+                      {user ? user.email : configured ? 'Not signed in' : 'Kept on this browser'}
+                    </p>
                     <dl className="account-facts mono">
                       <div>
                         <dt>Day streak</dt>
@@ -245,10 +250,26 @@ export default function Layout() {
                         ? (hasServerSession() ? 'Editor tools · live' : 'Editor tools · this browser')
                         : 'Editor sign-in'}
                     </Link>
+                    {/* One sign-in, one sign-out, for the whole product. */}
+                    {configured && (user ? (
+                      <button
+                        type="button"
+                        className="account-link account-signout"
+                        onClick={() => { setMenuOpen(false); void signOut(); }}
+                      >
+                        Sign out
+                      </button>
+                    ) : (
+                      <Link to="/login" className="account-link" onClick={() => setMenuOpen(false)}>
+                        Sign in
+                      </Link>
+                    ))}
                     <p className="account-note">
-                      {storageWorks()
+                      {user
+                        ? 'Your progress follows this account between devices.'
+                        : storageWorks()
                         ? 'Your work stays in this browser on this machine. It survives closing the tab, but it does not follow you to another device.'
-                        : 'This browser is not storing data — private browsing, most likely. You can work, but nothing will be here when you come back.'}
+                          : 'This browser is not storing data — private browsing, most likely. You can work, but nothing will be here when you come back.'}
                     </p>
                   </div>
                 )}

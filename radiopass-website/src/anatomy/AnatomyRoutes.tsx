@@ -126,8 +126,14 @@ export default function AnatomyRoutes() {
   const ready = useContentBoot()
   if (!ready) return <Loading />
 
+  /* THE SCOPE. anatomy.css places every anatomy rule under `.rp-anatomy`,
+     because the two halves declared eight CSS variables under the same names
+     on :root and sharing a document would have repainted physics by load
+     order. This element is the other half of that contract — without it the
+     anatomy pages render with none of their own styling. */
   return (
     <LegacyHashRedirect>
+      <div className="rp-anatomy">
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
@@ -162,6 +168,7 @@ export default function AnatomyRoutes() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </div>
     </LegacyHashRedirect>
   )
 }
