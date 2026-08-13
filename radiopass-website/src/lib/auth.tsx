@@ -32,6 +32,11 @@ const PER_USER_KEYS = [
      which is right: an unfinished exam belongs to the person sitting it, and
      inheriting a stranger's half-written paper is not a feature. */
   'radiopass.qbank.mock.v1',
+  /* The learner event log — mock history, module completions, activity dates.
+     It is a record of what one person did and must not follow them out of the
+     browser onto the next candidate, for exactly the reason the progress
+     stores must not. Written by both branches under one key. */
+  'radiopass.learner.events.v1',
 ]
 
 type AuthResult = { error: string | null }

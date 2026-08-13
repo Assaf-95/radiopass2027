@@ -25,13 +25,14 @@
  *      as it would in a real exam — instead of politely pausing.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { QB_QUESTIONS } from '../data'
 import { MOCK_PAPERS, type MockPaper } from '../data/mocks'
 import { QuestionCard, scoreQuestion, type StemChoice } from '../QuestionCard'
 import { QbShell } from '../Shell'
+import { mockHistory, record } from '../../lib/learner'
 import { QB_SUBJECTS, type QbQuestion, type QbTopic } from '../types'
 
 /** Deterministic shuffle so a re-render never reorders a live paper. */
@@ -149,6 +150,15 @@ export default function MockPage() {
   /** The paper's answer sheet: ticks only. Nothing here is marked until submission. */
   const [answers, setAnswers] = useState<Record<string, StemChoice>>({})
   const [result, setResult] = useState<Marked | null>(null)
+  /* Which sitting this is, and what it was called. Refs rather than state:
+     they are written when a paper begins and only read at submission, so they
+     must not trigger a render, and must not be stale inside the memoised
+     submit handler. */
+  const attemptIdRef = useRef('')
+  const paperNameRef = useRef('Built paper')
+  /* Papers already sat, newest first. Read once on mount and again after a
+     submission, which is the only thing that can add to it. */
+  const history = useMemo(() => mockHistory('physics'), [phase])
 
   const topics = useMemo<QbTopic[] | null>(() => {
     if (subjectId === 'all') return null
@@ -200,10 +210,37 @@ export default function MockPage() {
 
   const submitPaper = useCallback(
     (sat: QbQuestion[], sheet: Record<string, StemChoice>) => {
-      setResult(markPaper(sat, sheet))
+      const marked = markPaper(sat, sheet)
+      setResult(marked)
       setEndsAt(null)
       setPhase('review')
       saveAttempt(null)
+
+      /* The paper is recorded to the learner log before the in-flight attempt
+         is discarded. Until now a finished paper left no trace anywhere: the
+         attempt store holds one sitting and clears it on submission, so score,
+         date and breakdown all vanished the moment the learner navigated away.
+         This is the only place a completed mock has ever been written down. */
+      const perTopic: Record<string, { correct: number; outOf: number }> = {}
+      for (const q of sat) {
+        const row = marked.perQuestion[q.id]
+        if (!row) continue
+        const t = (perTopic[q.topic] ??= { correct: 0, outOf: 0 })
+        t.correct += row.correct
+        t.outOf += row.outOf
+      }
+      record({
+        type: 'mock.completed',
+        subject: 'physics',
+        attemptId: attemptIdRef.current || `mock_${sat.length}_${marked.outOf}`,
+        paper: paperNameRef.current,
+        correct: marked.correct,
+        outOf: marked.outOf,
+        attempted: marked.attempted,
+        questionCount: sat.length,
+        perTopic,
+      })
+
       window.scrollTo({ top: 0 })
     },
     [],
@@ -232,7 +269,16 @@ export default function MockPage() {
     saveAttempt({ questionIds: paper.map((q) => q.id), answers, index, endsAt })
   }, [phase, paper, answers, index, endsAt])
 
-  const beginPaper = (questions: QbQuestion[], forMinutes: number) => {
+  const beginPaper = (questions: QbQuestion[], forMinutes: number, name = 'Built paper') => {
+    attemptIdRef.current = `mock_${Date.now().toString(36)}`
+    paperNameRef.current = name
+    record({
+      type: 'mock.started',
+      subject: 'physics',
+      attemptId: attemptIdRef.current,
+      paper: name,
+      questionCount: questions.length,
+    })
     setPaper(questions)
     setAnswers({})
     setResult(null)
@@ -254,7 +300,7 @@ export default function MockPage() {
 
   // The three fixed RadioPass papers: 40 questions, 90 minutes, no shuffle —
   // every sitting of Paper 1 is the same Paper 1.
-  const startPaper = (mock: MockPaper) => beginPaper(mock.questions, mock.minutes)
+  const startPaper = (mock: MockPaper) => beginPaper(mock.questions, mock.minutes, mock.name)
 
   const abandon = () => {
     saveAttempt(null)
@@ -380,6 +426,31 @@ export default function MockPage() {
                 Start the paper
               </button>
             </div>
+
+            {/* Papers already sat. Nothing invented — every row is a mock this
+                learner actually completed, recorded at submission. Absent
+                entirely until there is one. */}
+            {history.length > 0 && (
+              <div className="qb-mock-panel" style={{ marginTop: 'var(--gap-cards)' }}>
+                <h2 className="qb-serif-h">Papers you have sat</h2>
+                <ul className="qb-mock-history">
+                  {history.slice(0, 8).map((a) => (
+                    <li key={a.attemptId}>
+                      <span className="qb-mh-paper">{a.paper}</span>
+                      <span className="qb-mh-score">
+                        {a.correct} / {a.outOf}
+                        <em>{a.outOf > 0 ? `${Math.round((a.correct / a.outOf) * 100)}%` : '—'}</em>
+                      </span>
+                      <span className="qb-mh-when">
+                        {new Date(a.at).toLocaleDateString('en-GB', {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                        })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </>
       )}
