@@ -11,8 +11,9 @@
 #      browser keeps loading chunk names that no longer exist after a deploy.
 #
 # The anatomy app lives under /anatomy/ as its own bundle. It routes with
-# URL hashes, so it only ever requests real files and needs no fallback —
-# it just has to be excluded from this one.
+# Since the merge there is ONE application. /anatomy is one of its routes, and
+# public/anatomy/ holds only media, so anatomy deep links need exactly the same
+# fallback every other route needs.
 
 Options -MultiViews
 DirectoryIndex index.html
@@ -21,12 +22,20 @@ DirectoryIndex index.html
   RewriteEngine On
   RewriteBase /
 
-  # /anatomy/ is a separate app: serve its real files, never rewrite into it.
-  RewriteRule ^anatomy(/.*)?$ - [L]
-
-  # Everything else that is not a real file or directory is a client route.
+  # Anything that is not a real FILE is a client route.
+  #
+  # Two rules used to sit here and both are now wrong. The first excluded
+  # /anatomy entirely, because anatomy was a separate app with its own
+  # index.html; left in place after the merge it would have 404'd every
+  # anatomy deep link on the live host — /anatomy/atlas is a route now, not a
+  # file. The second tested !-d, and public/anatomy IS a real directory, so a
+  # request for /anatomy would have been served as a directory rather than
+  # handed to the app.
+  #
+  # Testing files alone is correct for a single-page app: the real assets
+  # (assets/, visuals/*.html, anatomy/images/*) are files and are served
+  # before this rule is reached; everything else belongs to the router.
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
 

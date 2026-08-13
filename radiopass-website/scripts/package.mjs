@@ -6,16 +6,22 @@
  * produces  deploy/  containing the whole of RadioPass as one static tree:
  *
  *   deploy/
- *     index.html, assets/, .htaccess, 404.html, favicon.svg   ← physics site
- *     anatomy/                                                ← anatomy site
+ *     index.html, assets/, .htaccess, 404.html, favicon.svg
+ *     anatomy/images, anatomy/ct, anatomy/cxr, anatomy/mri   ← anatomy media
+ *
+ * ONE BUILD. This script used to compile two applications and copy the second
+ * into deploy/anatomy/, because anatomy was a separate Vite project routing by
+ * URL hash. Since the merge there is one application: /anatomy is an ordinary
+ * route of it, its media ships through public/anatomy/ like any other asset,
+ * and the stitching step is gone.
  *
  * Copy the CONTENTS of deploy/ into a host's public_html and the product is
- * live: the .htaccess gives deep links their fallback on Apache/LiteSpeed
- * (Hostinger, GoDaddy and the other shared hosts), and the anatomy app routes
- * by URL hash so it needs nothing from the server at all.
+ * live. The .htaccess gives deep links their fallback on Apache/LiteSpeed
+ * (Hostinger, GoDaddy and the other shared hosts) — and it matters MORE now
+ * than it did, because /anatomy/atlas is a real path the server must hand back
+ * to the SPA rather than a hash the browser resolved on its own.
  *
- * Both builds are gated on their own typecheck: a package that would not
- * compile must not exist.
+ * Gated on typecheck: a package that would not compile must not exist.
  *
  * Everything is spawned by absolute binary path, never through a shell PATH
  * lookup — this repo's own path contains a literal colon, which breaks PATH
@@ -27,9 +33,8 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, rea
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const PHYSICS = resolve(fileURLToPath(new URL('..', import.meta.url)))
-const ANATOMY = resolve(PHYSICS, '..', 'ANATOMY CLAUDE', 'frcr-anatomy')
-const DEPLOY = join(PHYSICS, 'deploy')
+const APP = resolve(fileURLToPath(new URL('..', import.meta.url)))
+const DEPLOY = join(APP, 'deploy')
 
 function run(cwd, binary, args, label) {
   const bin = join(cwd, 'node_modules', '.bin', binary)
@@ -56,30 +61,22 @@ function treeSize(dir) {
   return bytes
 }
 
-// ---- build both sites, typecheck first --------------------------------------
+// ---- build, typecheck first -------------------------------------------------
 
-run(PHYSICS, 'tsc', ['--noEmit', '-p', 'tsconfig.app.json'], 'physics typecheck')
-run(PHYSICS, 'vite', ['build'], 'physics build')
-run(ANATOMY, 'tsc', ['--noEmit', '-p', 'tsconfig.app.json'], 'anatomy typecheck')
-run(ANATOMY, 'vite', ['build'], 'anatomy build')
+run(APP, 'tsc', ['--noEmit', '-p', 'tsconfig.app.json'], 'typecheck')
+run(APP, 'vite', ['build'], 'build')
 
 // ---- assemble ---------------------------------------------------------------
 
 rmSync(DEPLOY, { recursive: true, force: true })
 mkdirSync(DEPLOY)
-cpSync(join(PHYSICS, 'dist'), DEPLOY, { recursive: true })
-cpSync(join(ANATOMY, 'dist'), join(DEPLOY, 'anatomy'), { recursive: true })
+cpSync(join(APP, 'dist'), DEPLOY, { recursive: true })
 
-// The anatomy build uses a relative base, but references to public/ files
-// written as root-absolute in its index.html (favicon, the hero preload that
-// build-hero-frames.mjs regenerates) would escape /anatomy/ on a shared
-// domain. Relativise them — belt and braces even if the build already did.
-const anatomyIndex = join(DEPLOY, 'anatomy', 'index.html')
-const html = readFileSync(anatomyIndex, 'utf8')
-const fixed = html.replace(/(href|src)="\/(?!\/)/g, '$1="./')
-if (fixed !== html) {
-  writeFileSync(anatomyIndex, fixed)
-  console.log('• anatomy index.html: relativised root-absolute asset URLs')
+// The anatomy media has to be there, or every film 404s on the live site.
+// Cheap to assert, and the failure it catches is total.
+if (!existsSync(join(DEPLOY, 'anatomy', 'images'))) {
+  console.error('✗ deploy/anatomy/images missing — public/anatomy did not reach dist')
+  process.exit(1)
 }
 
 // Hosts that use a 404 document instead of rewrites (and some static hosts)
