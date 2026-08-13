@@ -18,6 +18,11 @@ import { Link, useLocation } from 'react-router-dom'
 import { GROUPS, MRI_BASE, SECTIONS, sectionIndex, sectionPath } from './sections'
 import './mri5.css'
 
+/** The full name of a group, for prose. The rail uses `short`. */
+function groupLabel(id: string): string {
+  return GROUPS.find((g) => g.id === id)?.label ?? ''
+}
+
 export function ModuleNav() {
   const { pathname } = useLocation()
   const slug = pathname.startsWith(`${MRI_BASE}/`) ? pathname.slice(MRI_BASE.length + 1) : ''
@@ -25,6 +30,37 @@ export function ModuleNav() {
   const current = index >= 0 ? SECTIONS[index] : undefined
   const [open, setOpen] = useState(false)
   const navRef = useRef<HTMLElement | null>(null)
+  const hereRef = useRef<HTMLAnchorElement | null>(null)
+
+  /* Ten groups do not fit the bar, so the rail scrolls and its edges are
+     faded. Without this the fade fell across the group you were actually IN
+     once you got past the middle of the module — "Quality" showing as
+     "Quali…", which reads as a broken layout rather than as more to scroll.
+     Bringing the current group into view means a faded edge is always
+     somewhere you are not, which is what a fade should mean. */
+  const railRef = useRef<HTMLOListElement | null>(null)
+  const [edges, setEdges] = useState({ start: false, end: false })
+
+  const measureEdges = () => {
+    const rail = railRef.current
+    if (!rail) return
+    const max = rail.scrollWidth - rail.clientWidth
+    setEdges({ start: rail.scrollLeft > 1, end: rail.scrollLeft < max - 1 })
+  }
+
+  useEffect(() => {
+    hereRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' })
+    measureEdges()
+  }, [slug])
+
+  /* The fade is on whichever side actually has more rail. Masking both ends
+     unconditionally would fade "Machine" while the rail sat at its start,
+     which is the same "cut off mid-word" impression at the other end. */
+  useEffect(() => {
+    measureEdges()
+    window.addEventListener('resize', measureEdges)
+    return () => window.removeEventListener('resize', measureEdges)
+  }, [])
 
   // The panel is a mobile affordance; a route change means the reader has used
   // it, so it should get out of the way.
@@ -56,7 +92,13 @@ export function ModuleNav() {
           <span className="m5-nav-title">The module</span>
         </Link>
 
-        <ol className="m5-nav-groups">
+        <ol
+          className="m5-nav-groups"
+          ref={railRef}
+          onScroll={measureEdges}
+          data-fade-start={edges.start ? 'on' : undefined}
+          data-fade-end={edges.end ? 'on' : undefined}
+        >
           {GROUPS.map((group) => {
             const first = SECTIONS.find((s) => s.group === group.id)
             const isHere = current?.group === group.id
@@ -64,6 +106,7 @@ export function ModuleNav() {
             return (
               <li key={group.id}>
                 <Link
+                  ref={isHere ? hereRef : undefined}
                   to={sectionPath(first.slug)}
                   className={isHere ? 'm5-nav-group is-here' : 'm5-nav-group'}
                   aria-current={isHere ? 'true' : undefined}
@@ -77,12 +120,20 @@ export function ModuleNav() {
         </ol>
 
         <div className="m5-nav-progress">
+          {/* "Section 5.3 of 5.21" was arithmetic, not navigation: it read as
+              a decimal fraction and invited the question of what 5.21 counts.
+              5.3 is a syllabus reference, not a position, and mixing the two
+              in one phrase made neither legible. The position is now stated as
+              a position, under the name of the part of the module it is in,
+              which is what a learner actually wants to know. The syllabus
+              number is still printed on the section itself, where it maps to
+              the exam. */}
           {current ? (
             <span className="m5-nav-count">
-              Section <b>{current.number}</b> of 5.21
+              {groupLabel(current.group)} · <b>{index + 1}</b> of {SECTIONS.length}
             </span>
           ) : (
-            <span className="m5-nav-count">21 sections</span>
+            <span className="m5-nav-count">{SECTIONS.length} sections</span>
           )}
           <button
             type="button"

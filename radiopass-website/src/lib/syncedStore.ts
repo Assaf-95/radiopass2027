@@ -138,6 +138,21 @@ export function createSyncedStore<T>(opts: {
 
   localCaches.add(clearLocal)
 
+  /* Another tab of the same site wrote this store: drop the cache so this one
+     re-reads rather than serving a stale copy and, worse, writing that stale
+     copy back over the other tab's work on its next save.
+     Anatomy's progress store had this and the physics stores never did, so
+     converting anatomy onto this mechanism would have quietly removed it.
+     Putting it here instead fixes both. The event only fires in OTHER tabs,
+     so this cannot loop on our own writes. */
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', (e) => {
+      if (e.key !== opts.localKey) return
+      cache = null
+      listeners.forEach((listener) => listener())
+    })
+  }
+
   if (supabase) {
     supabase.auth.getSession().then(({ data }) => {
       userId = data.session?.user.id ?? null

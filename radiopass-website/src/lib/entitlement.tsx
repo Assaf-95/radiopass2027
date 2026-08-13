@@ -7,10 +7,48 @@
  * to read them — no route and no page changes.
  */
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import { useAuth } from './auth'
+import { supabase } from './supabase'
 import { ANONYMOUS, UNKNOWN, entitlementOf, type Entitlement, type Grant } from './access'
+
+/** Grants as the server records them, or null while nothing has been read. */
+type ServerGrants = { grants: Grant[]; expiresAt: string | null } | null
+
+const KNOWN_GRANTS: readonly string[] = ['account', 'trial', 'anatomy', 'physics', 'full', 'admin']
+
+/**
+ * Reads what this account has actually been given.
+ *
+ * public.entitlements is select-only for an authenticated user: they can read
+ * their own row and cannot write any row. That is what makes this different
+ * from the localStorage author flag below — an entitlement cannot be granted
+ * by editing devtools, only by the service role that the payment flow runs as.
+ *
+ * A missing row is not a failure. During early access nobody has one, and the
+ * caller falls back to EARLY_ACCESS_GRANTS.
+ */
+async function readServerGrants(userId: string): Promise<ServerGrants> {
+  if (!supabase) return null
+  try {
+    const { data, error } = await supabase
+      .from('entitlements')
+      .select('grants, expires_at')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error || !data) return null
+    const grants = (Array.isArray(data.grants) ? data.grants : []).filter((g): g is Grant =>
+      KNOWN_GRANTS.includes(g)
+    )
+    return { grants, expiresAt: (data.expires_at as string | null) ?? null }
+  } catch {
+    /* Offline, or the table has not been created on this deployment. Treated
+       as "no row", never as "no access": a paying learner must not be locked
+       out of the product by a network blip. */
+    return null
+  }
+}
 
 /**
  * What a signed-in account is worth today.
@@ -41,6 +79,26 @@ const EntitlementContext = createContext<Entitlement | null>(null)
 export function EntitlementProvider({ children }: { children: ReactNode }) {
   const { user, loading, configured } = useAuth()
 
+  /* What the server says this account has. `undefined` means "not asked yet",
+     which is different from null ("asked, no row") — the first must keep the
+     entitlement UNKNOWN so no upgrade prompt flashes past a paying learner. */
+  const [server, setServer] = useState<ServerGrants | undefined>(undefined)
+
+  useEffect(() => {
+    if (!configured || !user) {
+      setServer(null)
+      return
+    }
+    let cancelled = false
+    setServer(undefined)
+    void readServerGrants(user.id).then((g) => {
+      if (!cancelled) setServer(g)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [configured, user])
+
   const value = useMemo<Entitlement>(() => {
     /* Still asking. Consumers read `known` and render a loading state rather
        than an upgrade prompt, so a paying learner never sees "not included in
@@ -54,14 +112,36 @@ export function EntitlementProvider({ children }: { children: ReactNode }) {
 
     if (!user) return ANONYMOUS
 
-    const grants: Grant[] = [...EARLY_ACCESS_GRANTS]
+    /* Signed in, but the server has not answered yet. */
+    if (server === undefined) return UNKNOWN
+
+    /* A row exists: the account's entitlement is whatever the SERVER says,
+       not what this browser would like it to be. An expired row grants
+       nothing beyond the account itself — that is what makes a trial end. */
+    let grants: Grant[]
+    if (server && server.grants.length) {
+      const expired = server.expiresAt !== null && Date.parse(server.expiresAt) <= Date.now()
+      grants = expired ? ['account'] : [...server.grants]
+    } else {
+      /* No row. Early access: an account is worth everything, and says so on
+         the pricing page. When payments arrive, accounts get rows and this
+         fallback becomes ['account']. */
+      grants = [...EARLY_ACCESS_GRANTS]
+    }
+
     /* Authoring is a separate grant and never implies content access on its
        own — canAccess() happens to let admin see everything, which is
        deliberate (an author must be able to check any page), but the two
-       remain distinct concepts. */
+       remain distinct concepts.
+
+       This one IS client-side, and stays that way knowingly: it unlocks the
+       authoring INTERFACE, and every write the interface can attempt is
+       re-checked server-side against a signed session (see
+       src/lib/contentAuth.test.ts). Setting it by hand shows someone the
+       editor's buttons and gets them a 401 when they press one. */
     if (hasAuthorFlag()) grants.push('admin')
     return entitlementOf(grants)
-  }, [user, loading, configured])
+  }, [user, loading, configured, server])
 
   return <EntitlementContext.Provider value={value}>{children}</EntitlementContext.Provider>
 }

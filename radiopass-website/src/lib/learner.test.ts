@@ -6,6 +6,14 @@
  * the source of truth for current state — and it is defensive on read, because
  * it is written by two separate builds and one malformed entry must not throw
  * inside a render.
+ *
+ * SETTING STORAGE DIRECTLY NEEDS A NUDGE NOW. The log is account-backed, which
+ * means it reads through a cache rather than parsing localStorage on every
+ * call. Writing the key behind the store's back — which is what these tests do
+ * to simulate a log left by another build — is exactly what happens when a
+ * SECOND TAB writes, so it is announced the same way the browser announces it,
+ * with a storage event. That keeps the tests on a real mechanism instead of a
+ * back door opened in the module for their benefit.
  */
 
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -21,8 +29,20 @@ import {
   record,
 } from './learner'
 
+/** Writes the key as another tab would, and tells this one it happened. */
+function setStorageExternally(value: string | null) {
+  if (value === null) localStorage.removeItem(LEARNER_EVENTS_KEY)
+  else localStorage.setItem(LEARNER_EVENTS_KEY, value)
+  window.dispatchEvent(new StorageEvent('storage', { key: LEARNER_EVENTS_KEY }))
+}
+
 describe('the learner event log', () => {
-  beforeEach(() => localStorage.clear())
+  beforeEach(() => {
+    localStorage.clear()
+    /* Drops the store's cache too, so each test starts genuinely empty rather
+       than inheriting the previous one's events from memory. */
+    window.dispatchEvent(new StorageEvent('storage', { key: LEARNER_EVENTS_KEY }))
+  })
 
   it('starts empty and derives nothing from nothing', () => {
     expect(readEvents()).toEqual([])
@@ -118,8 +138,7 @@ describe('the learner event log', () => {
 
   describe('reading a log written by another build', () => {
     it('ignores entries at a different schema version without throwing', () => {
-      localStorage.setItem(
-        LEARNER_EVENTS_KEY,
+      setStorageExternally(
         JSON.stringify([
           { v: 99, at: '2026-08-01T00:00:00.000Z', type: 'question.answered', subject: 'anatomy' },
           { v: 1, at: '2026-08-02T00:00:00.000Z', type: 'lab.opened', subject: 'physics', contentId: 'ct-lab' },
@@ -131,13 +150,13 @@ describe('the learner event log', () => {
     })
 
     it('survives malformed storage rather than blanking the page', () => {
-      localStorage.setItem(LEARNER_EVENTS_KEY, 'not json at all')
+      setStorageExternally('not json at all')
       expect(readEvents()).toEqual([])
 
-      localStorage.setItem(LEARNER_EVENTS_KEY, JSON.stringify({ not: 'an array' }))
+      setStorageExternally(JSON.stringify({ not: 'an array' }))
       expect(readEvents()).toEqual([])
 
-      localStorage.setItem(LEARNER_EVENTS_KEY, JSON.stringify([null, 3, 'x', { v: 1 }]))
+      setStorageExternally(JSON.stringify([null, 3, 'x', { v: 1 }]))
       expect(readEvents()).toEqual([])
     })
   })

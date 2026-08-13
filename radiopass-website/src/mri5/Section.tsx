@@ -41,8 +41,13 @@ import { Link } from 'react-router-dom'
 
 import { HighYield as HighYieldNote } from '../design/primitives'
 import { TaskCue, TaskGate, useTask } from '../labs/task'
-import { neighbours, sectionPath, SECTION_BY_SLUG } from './sections'
+import { GROUPS, neighbours, sectionIndex, sectionPath, SECTIONS, SECTION_BY_SLUG } from './sections'
 import './mri5.css'
+
+/** The full name of a group, for prose. The navigator rail uses `short`. */
+function groupLabel(id: string): string {
+  return GROUPS.find((g) => g.id === id)?.label ?? ''
+}
 
 /** Inline **bold** in prose, matching the rest of the site's copy convention. */
 export function Rich({ text }: { text: string }) {
@@ -361,9 +366,17 @@ export function SectionPage({
 
   const head = (
     <header className="m5-section-head">
+      {/* Two different numbers sat side by side here — the syllabus reference
+          "5.3" and the position "Section 3 of 21" — and a reader had to work
+          out that they were not the same count said twice. The syllabus
+          reference stays, because it is how this page maps to the exam, but it
+          is now labelled as one; the position is stated under the name of the
+          part of the module it belongs to. */}
       <p className="m5-eyebrow">
-        <span className="m5-number">{meta.number}</span>
-        <span className="m5-of">Section {meta.number.split('.')[1]} of 21</span>
+        <span className="m5-number" title="FRCR Part 1 syllabus reference">{meta.number}</span>
+        <span className="m5-of">
+          {groupLabel(meta.group)} · {sectionIndex(meta.slug) + 1} of {SECTIONS.length}
+        </span>
       </p>
       <h2>{meta.title}</h2>
       <p className="m5-lede"><Rich text={lede} /></p>

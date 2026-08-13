@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigationType } from 'react-router-dom';
 import { hasServerSession, isAdmin } from '../lib/admin';
 import { contentState, loadContent, subscribeContent } from '../lib/content/store';
 import { currentStreak, getActivity, storageWorks } from '../lib/account';
+import { progressSyncFailing, subscribeProgress } from '../lib/progress';
 import { useAuth } from '../../lib/auth';
 import './Layout.css';
 
@@ -95,6 +96,13 @@ export default function Layout() {
     () => subscribeContent(() => setContentRev(contentState().overlay.rev)),
     []
   );
+
+  /* The account note below reports whether progress is actually reaching the
+     account, and that answer changes after the first push or pull rather than
+     at sign-in. Without this the menu would keep showing whatever was true
+     when it was first painted. */
+  const [, setSyncRev] = useState(0);
+  useEffect(() => subscribeProgress(() => setSyncRev((n) => n + 1)), []);
 
   /* Coming back to the tab re-reads the content, so a change made on another
      device — or in the editor in a second tab — is picked up without a
@@ -265,12 +273,24 @@ export default function Layout() {
                         Sign in
                       </Link>
                     ))}
+                    {/* Says what is actually true, not what is intended.
+                        This line used to read "your progress follows this
+                        account between devices" the moment anyone signed in,
+                        while anatomy wrote to localStorage and nowhere else —
+                        a promise the storage did not keep. Progress is
+                        account-backed now, but "the code syncs" and "this
+                        deployment's Supabase actually has the table" are
+                        different things, so the signed-in wording is driven
+                        by whether syncing is really working rather than by
+                        the fact of being signed in. */}
                     <p className="account-note">
-                      {user
-                        ? 'Your progress follows this account between devices.'
-                        : storageWorks()
+                      {!storageWorks()
+                        ? 'This browser is not storing data — private browsing, most likely. You can work, but nothing will be here when you come back.'
+                        : !user
                         ? 'Your work stays in this browser on this machine. It survives closing the tab, but it does not follow you to another device.'
-                          : 'This browser is not storing data — private browsing, most likely. You can work, but nothing will be here when you come back.'}
+                        : progressSyncFailing()
+                        ? 'Signed in, but your progress is not reaching your account at the moment. It is saved in this browser, so nothing is lost.'
+                        : 'Your progress follows this account between devices.'}
                     </p>
                   </div>
                 )}
