@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { SECTION_META, getSectionQuestions } from '../data/sections';
+import { flaggedQuestions } from '../lib/stats';
+import { lastOfType } from '../lib/learner';
 import { computeSectionStats } from '../lib/stats';
 import { getLastQuestion } from '../lib/progress';
 import AnatomyJourney from '../components/AnatomyJourney';
@@ -57,6 +59,31 @@ export default function Home() {
         const modalities = Array.from(new Set(questions.map((q) => q.imagingModality)));
         return { meta: s, stats, modalities, last: getLastQuestion(s.id) };
       }),
+    []
+  );
+
+  /* THE ONE OBVIOUS NEXT ACTION.
+     Taken from the shared learner timeline rather than guessed: the most
+     recent answered question names the region, and getLastQuestion gives the
+     exact case to resume. With no history there is no Continue at all — an
+     invented "start with the spine" would be a recommendation nobody made. */
+  const resume = useMemo(() => {
+    const last = lastOfType('question.answered', 'anatomy');
+    if (!last?.topic) return null;
+    const meta = SECTION_META.find((m) => m.id === last.topic);
+    if (!meta) return null;
+    const questionId = getLastQuestion(meta.id);
+    return {
+      meta,
+      to: questionId ? `/section/${meta.id}/q/${questionId}` : `/section/${meta.id}`,
+      at: last.at,
+    };
+  }, []);
+
+  /* Flagged across every region. Real count or nothing — never a zero chip
+     pretending to be a feature the learner has not used. */
+  const flaggedCount = useMemo(
+    () => SECTION_META.reduce((n, m) => n + flaggedQuestions(m.id).length, 0),
     []
   );
 
@@ -218,6 +245,45 @@ export default function Home() {
             </span>
           </div>
         </div>
+      </section>
+
+      {/* ONE OBVIOUS NEXT ACTION, then everything else.
+          Present only when there is a real history to resume. */}
+      {resume && (
+        <section className="an-continue-wrap" aria-label="Continue">
+          <Link className="an-continue" to={resume.to}>
+            <span className="an-continue-label mono">Continue</span>
+            <span className="an-continue-name">{resume.meta.title}</span>
+            <span className="an-continue-go" aria-hidden="true">&rarr;</span>
+          </Link>
+        </section>
+      )}
+
+      {/* The four Anatomy destinations. The regions below ARE the question
+          bank, so it points at them rather than duplicating the list. */}
+      <section className="an-dest" aria-label="Anatomy">
+        <Link className="an-dest-item" to="/atlas">
+          <strong>Structure Atlas</strong>
+          <span>Every image of a structure on one page, across modalities and planes.</span>
+        </Link>
+        <a className="an-dest-item" href="#modules">
+          <strong>Question bank</strong>
+          <span>{totals.questions} labelled cases across six regions, marked 0/1/2 like the exam.</span>
+        </a>
+        {/* No anatomy mock papers exist yet. Saying so is the honest state;
+            inventing one to fill the row would be worse than the gap. */}
+        <span className="an-dest-item is-pending">
+          <strong>Mock exams</strong>
+          <span>Timed anatomy papers are not built yet.</span>
+        </span>
+        <Link className="an-dest-item" to="/dashboard">
+          <strong>Progress &amp; revision</strong>
+          <span>
+            {flaggedCount > 0
+              ? `Your scores by region, and the ${flaggedCount} case${flaggedCount === 1 ? '' : 's'} you flagged.`
+              : 'Your scores by region, and everything worth another pass.'}
+          </span>
+        </Link>
       </section>
 
       {/* The topics, each carrying its own share of the same two numbers. */}

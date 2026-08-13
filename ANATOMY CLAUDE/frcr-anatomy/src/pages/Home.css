@@ -951,3 +951,104 @@
   .scoreband-grid { grid-template-columns: 1fr 1fr; row-gap: 26px; }
   .score-cell-lead { grid-column: 1 / -1; }
 }
+
+/* --- Continue, and the four Anatomy destinations -------------------------
+   Added beneath the scoreband so the page reads: how am I doing → what do I
+   do next → where is everything → the regions in detail. Deliberately not
+   more cards: one accented action, then a plain row of destinations. */
+
+.an-continue-wrap {
+  max-width: var(--page-max, 1180px);
+  margin: 0 auto;
+  padding: 0 var(--page-gutter, 32px);
+}
+
+.an-continue {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 18px 22px;
+  border: 1px solid var(--amber-accent);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.18s ease;
+}
+
+.an-continue:hover {
+  background: color-mix(in srgb, var(--amber-accent) 8%, transparent);
+}
+
+.an-continue-label {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber-accent);
+}
+
+.an-continue-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-size: 21px;
+  color: var(--text);
+}
+
+.an-continue-go {
+  color: var(--amber-accent);
+  font-size: 18px;
+}
+
+.an-dest {
+  max-width: var(--page-max, 1180px);
+  margin: 34px auto 0;
+  padding: 0 var(--page-gutter, 32px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border-block: 1px solid var(--rule);
+}
+
+.an-dest-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 20px;
+  background: var(--bg);
+  text-decoration: none;
+  transition: background 0.18s ease;
+}
+
+a.an-dest-item:hover {
+  background: var(--bg-raised, rgba(255, 255, 255, 0.03));
+}
+
+.an-dest-item strong {
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.an-dest-item span {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+/* The honest not-yet state. Reads as information, not as a broken link. */
+.an-dest-item.is-pending strong,
+.an-dest-item.is-pending span {
+  color: var(--text-faint);
+}
+
+@media (max-width: 720px) {
+  .an-dest {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-continue {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

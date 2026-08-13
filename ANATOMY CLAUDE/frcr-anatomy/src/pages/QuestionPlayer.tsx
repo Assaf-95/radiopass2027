@@ -7,6 +7,7 @@ import { assetUrl } from '../lib/assetUrl';
 import { gradeAnswer, overallResult } from '../lib/grading';
 import { getQuestionProgress, saveQuestionProgress, setLastQuestion, saveDispute, flushProgress } from '../lib/progress';
 import { recordSubmission, recordStudySeconds } from '../lib/account';
+import { record as recordEvent } from '../lib/learner';
 import { isCustomImageRef, resolveCustomImageSrc } from '../lib/customStore';
 import ImageViewer from '../components/ImageViewer';
 import DisputeModal from '../components/DisputeModal';
@@ -257,6 +258,19 @@ export default function QuestionPlayer() {
     /* Writes are coalesced while typing, but a submission is the moment the
        candidate would be most upset to lose. Committed straight away. */
     flushProgress();
+
+    /* The shared timeline. The progress store already knows this question was
+       answered and what it scored; what it cannot say is WHEN, or in which
+       branch, which is what "continue where you left off" and any future
+       activity view need. Written alongside, never instead. */
+    recordEvent({
+      type: 'question.answered',
+      subject: 'anatomy',
+      contentId: question.id,
+      topic: section,
+      correct: totalScore,
+      outOf: maxScore,
+    });
   }
 
   function goTo(offset: number) {
