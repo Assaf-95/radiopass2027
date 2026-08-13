@@ -88,6 +88,12 @@ const UsFactBank = lazyImport(() => import('./us/pages/FactBank'))
 // page styling. It also renders its own navigation and footer.
 const HomePage = lazyImport(() => import('./home/Home'))
 
+/* /physics is now the learner's home. The cinematic page it replaced is not
+   destroyed — it moves to /physics/tour and is linked from the foot of the
+   learner home, because a candidate on their fourth visit needs to know where
+   they were, not to be sold physics again. */
+const PhysicsHome = lazyImport(() => import('./physics/Home'))
+
 // The focused lesson modules: one concept per screen, a diagram and a Next
 // button. Each is a data file of steps rendered by the shared lesson player.
 const CtLab = lazyImport(() => import('./labs/ct'))
@@ -262,7 +268,12 @@ function ScrollToTop() {
  * bar on one of them and not the other.
  */
 function hasOwnChrome(pathname: string): boolean {
-  const exact = ['/', '/physics', '/admin', '/ultrasound-lab', '/mri', '/anatomy']
+  /* '/physics' is deliberately NOT here any more. It used to render the
+     cinematic page, which brought its own nav and footer; it is now the
+     learner's home and needs the shared header like every other page — a
+     learner home with no way out is a dead end. The cinematic page kept its
+     own chrome and moved to '/physics/tour', which IS listed. */
+  const exact = ['/', '/physics/tour', '/admin', '/ultrasound-lab', '/mri', '/anatomy']
   const trees = [
     '/question-bank',
     '/ct-lab',
@@ -318,7 +329,7 @@ function Header() {
         ) : (
           <>
             <Link to="/login" className="mobile-login">Log in</Link>
-            <Link to="/pricing" className="button button-small mobile-cta">Start free trial <Icon name="arrow" size={16}/></Link>
+            <Link to="/free-trial" className="button button-small mobile-cta">Start free trial <Icon name="arrow" size={16}/></Link>
           </>
         )}
       </nav>
@@ -331,7 +342,7 @@ function Header() {
         ) : (
           <>
             <Link to="/login" className="login-link">Log in</Link>
-            <Link to="/pricing" className="button button-small">Start free trial <Icon name="arrow" size={16}/></Link>
+            <Link to="/free-trial" className="button button-small">Start free trial <Icon name="arrow" size={16}/></Link>
           </>
         )}
         <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>
@@ -688,7 +699,7 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy" element={<Crossing/>}/><Route path="/anatomy/*" element={<Crossing/>}/><Route path="/question-bank" element={<QbIndex/>}/><Route path="/question-bank/mock" element={<QbMock/>}/><Route path="/question-bank/review/:filterId" element={<QbReview/>}/><Route path="/question-bank/:subjectId" element={<QbPractice/>}/><Route path="/fact-bank" element={<FactBankPage/>}/><Route path="/fact-bank/:topicId" element={<FactTopicPage/>}/><Route path="/ct-lab" element={<CtLab/>}/><Route path="/ct-lab/film" element={<CtFilm/>}/><Route path="/nm-lab" element={<NmLab/>}/><Route path="/nm-lab/film" element={<NmFilm/>}/><Route path="/mri-lab/motion" element={<MriMotion/>}/><Route path="/ultrasound-lab/motion" element={<UsMotion/>}/><Route path="/xray-lab" element={<XrayHub/>}/><Route path="/xray-lab/production" element={<XrayProductionLesson/>}/><Route path="/xray-lab/spectrum" element={<XraySpectrumLesson/>}/><Route path="/xray-lab/geometry" element={<XrayGeometryLesson/>}/><Route path="/xray-lab/interactions" element={<XrayInteractionsLesson/>}/><Route path="/xray-lab/mammography" element={<MammoLab/>}/><Route path="/xray-lab/fluoroscopy" element={<FluoroLab/>}/><Route path="/xray-lab/digital" element={<DigitalLab/>}/><Route path="/visual-lab" element={<VisualLabPage/>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy" element={<Crossing/>}/><Route path="/anatomy/*" element={<Crossing/>}/><Route path="/question-bank" element={<QbIndex/>}/><Route path="/question-bank/mock" element={<QbMock/>}/><Route path="/question-bank/review/:filterId" element={<QbReview/>}/><Route path="/question-bank/:subjectId" element={<QbPractice/>}/><Route path="/fact-bank" element={<FactBankPage/>}/><Route path="/fact-bank/:topicId" element={<FactTopicPage/>}/><Route path="/ct-lab" element={<CtLab/>}/><Route path="/ct-lab/film" element={<CtFilm/>}/><Route path="/nm-lab" element={<NmLab/>}/><Route path="/nm-lab/film" element={<NmFilm/>}/><Route path="/mri-lab/motion" element={<MriMotion/>}/><Route path="/ultrasound-lab/motion" element={<UsMotion/>}/><Route path="/xray-lab" element={<XrayHub/>}/><Route path="/xray-lab/production" element={<XrayProductionLesson/>}/><Route path="/xray-lab/spectrum" element={<XraySpectrumLesson/>}/><Route path="/xray-lab/geometry" element={<XrayGeometryLesson/>}/><Route path="/xray-lab/interactions" element={<XrayInteractionsLesson/>}/><Route path="/xray-lab/mammography" element={<MammoLab/>}/><Route path="/xray-lab/fluoroscopy" element={<FluoroLab/>}/><Route path="/xray-lab/digital" element={<DigitalLab/>}/><Route path="/visual-lab" element={<VisualLabPage/>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
     {/* Chapter 5 — the taught module. Nested so the navigator persists across
         every section instead of remounting on each one. */}
     <Route path="/mri" element={<MriModule/>}>

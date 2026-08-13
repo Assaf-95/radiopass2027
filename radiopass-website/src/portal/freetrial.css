@@ -3,9 +3,10 @@
    spacing, so it inherits every future change to the system. */
 
 .ft {
+  /* Clears the fixed 78px site header, the same way .page-hero does. */
   max-width: 62rem;
   margin: 0 auto;
-  padding: var(--gap-page) var(--sp-5) var(--gap-page);
+  padding: calc(78px + var(--gap-section)) var(--sp-5) var(--gap-page);
 }
 
 /* --- Hero ---------------------------------------------------------------- */

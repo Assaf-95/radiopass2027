@@ -1,0 +1,228 @@
+/* RadioPass Physics — learner home.
+   Design-system tokens only. Structure and space carry the hierarchy; there is
+   deliberately no card-inside-card-inside-panel. */
+
+.ph {
+  /* Clears the fixed 78px site header, the same way .page-hero does. */
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: calc(78px + var(--gap-section)) var(--sp-5) var(--gap-page);
+}
+
+.ph-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Head ---------------------------------------------------------------- */
+
+.ph-head {
+  margin-bottom: var(--gap-section);
+}
+
+.ph-eyebrow {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ph-head h1 {
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--fs-page);
+  line-height: 1.06;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
+}
+
+.ph-head h1 span {
+  color: var(--text-tertiary);
+}
+
+/* --- The learner's record ------------------------------------------------ */
+
+.ph-state {
+  margin-bottom: var(--gap-section);
+}
+
+.ph-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6) var(--sp-8);
+  padding-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--bg-interactive);
+}
+
+.ph-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.ph-stat strong {
+  font-size: var(--fs-section);
+  line-height: 1;
+  font-weight: 400;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ph-stat span {
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
+}
+
+/* Continue — the single most important control on the page when there is
+   activity, so it is the only accented surface here. */
+.ph-continue {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: background 0.18s ease;
+}
+
+.ph-continue:hover {
+  background: var(--bg-elevated);
+}
+
+.ph-continue-label {
+  font-size: var(--fs-meta);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ph-continue-name {
+  flex: 1;
+  font-size: var(--fs-card);
+  color: var(--text-primary);
+}
+
+.ph-continue-go {
+  color: var(--accent);
+}
+
+/* The honest empty state. Not an error, not a zero-filled dashboard. */
+.ph-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+  border: 1px dashed var(--bg-interactive);
+  border-radius: var(--radius);
+}
+
+.ph-empty p {
+  margin: 0;
+  max-width: 52ch;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* --- Destinations --------------------------------------------------------
+   A list, not a grid of cards. Each row is one place to go; the rule between
+   them is enough structure and keeps the eye moving down rather than hunting
+   around a mosaic. */
+
+.ph-destinations h2 {
+  margin: 0 0 var(--sp-5);
+  font-size: var(--fs-section);
+  color: var(--text-primary);
+}
+
+.ph-destinations ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ph-destinations li + li {
+  border-top: 1px solid var(--bg-interactive);
+}
+
+.ph-destinations a {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: var(--sp-2) var(--sp-6);
+  padding: var(--sp-5) var(--sp-3);
+  margin-inline: calc(var(--sp-3) * -1);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background 0.18s ease;
+}
+
+.ph-destinations a:hover {
+  background: var(--bg-elevated);
+}
+
+.ph-destinations strong {
+  font-size: var(--fs-card);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.ph-destinations span {
+  font-size: var(--fs-support);
+  line-height: 1.55;
+  color: var(--text-tertiary);
+}
+
+/* --- Foot ---------------------------------------------------------------- */
+
+.ph-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-top: var(--gap-section);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--bg-interactive);
+}
+
+.ph-foot p {
+  margin: 0;
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
+}
+
+.ph-foot a {
+  font-size: var(--fs-support);
+  color: var(--text-secondary);
+}
+
+/* --- Narrow -------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .ph {
+    padding-inline: var(--sp-4);
+  }
+
+  /* One column: the name above its description, rather than a 14rem column
+     squeezed against the screen edge. */
+  .ph-destinations a {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ph-stats {
+    gap: var(--sp-5) var(--sp-6);
+  }
+
+  .ph-empty .button {
+    width: 100%;
+    justify-content: center;
+  }
+}
