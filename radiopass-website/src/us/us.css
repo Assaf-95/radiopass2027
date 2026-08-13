@@ -2105,3 +2105,11 @@ body.us-zen-body .site-header { display: none; }
 .us-zen .us-work.is-focus .us-step-caption {
   padding: var(--sp-5) var(--sp-6);
 }
+
+/* The lab's identity, stacked over its place in the product. */
+.us-topbar-brand { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.us-topbar-brand-row { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 900px) {
+  /* The bar is tight here; the lab name alone is enough on a phone. */
+  .us-topbar-brand .rp-crumbs { display: none; }
+}

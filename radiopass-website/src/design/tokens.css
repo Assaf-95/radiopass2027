@@ -20,6 +20,24 @@
  */
 
 :root {
+  /* ------------------------------------------------------------ typefaces
+     The product's three voices, declared once.
+
+     They were previously declared three times — --pt-serif/--pt-sans/--pt-mono
+     on the master homepage, --font-display/--font-mono in anatomy, and bare
+     'Inter' literals through the physics stylesheet — so the same product
+     spoke in a different voice depending on which surface you were standing
+     on. The branch homes are the clearest example: the master page and
+     anatomy set their headings in Fraunces while physics and the trial used
+     Inter, which is exactly the tell that says "two websites".
+
+     Fraunces is the display voice: brand, page titles, the things that
+     announce. Inter carries everything a learner actually reads. Mono is for
+     data — DICOM overlays, window/level readouts, counts. */
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
   /* ---------------------------------------------------------------- type
      A learner reads this for hours. The floor for anything instructional is
      16px, and the body default is 18px — the brief's "normal body 17-19px".

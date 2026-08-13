@@ -33,6 +33,11 @@
 }
 
 .ph-head h1 {
+  /* The product's display voice, shared with the master homepage and anatomy.
+     This was Inter, which is what made /physics read as a different site. */
+  font-family: var(--font-display);
+  font-weight: 340;
+  letter-spacing: -0.01em;
   margin: 0;
   max-width: 20ch;
   font-size: var(--fs-page);
@@ -138,6 +143,8 @@
    around a mosaic. */
 
 .ph-destinations h2 {
+  font-family: var(--font-display);
+  font-weight: 340;
   margin: 0 0 var(--sp-5);
   font-size: var(--fs-section);
   color: var(--text-primary);

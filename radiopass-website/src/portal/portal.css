@@ -45,9 +45,11 @@
   --pt-us: var(--hue-us);
   --pt-mri: var(--hue-mri);
 
-  --pt-serif: var(--display, 'Fraunces', 'Iowan Old Style', Georgia, serif);
-  --pt-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --pt-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Now aliases onto the shared tokens rather than a third declaration
+     of the same three stacks. Nothing here changes visually. */
+  --pt-serif: var(--font-display);
+  --pt-sans: var(--font-body);
+  --pt-mono: var(--font-mono);
 
   /* One measure, shared with the physics homepage — both are now the same
      container token rather than two hand-written copies of the same sum. */

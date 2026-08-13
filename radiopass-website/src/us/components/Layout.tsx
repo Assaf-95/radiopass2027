@@ -13,6 +13,7 @@ import { Link, NavLink, useSearchParams } from 'react-router-dom'
 
 import { UsIcon, type UsIconName } from './icons'
 import { readProgress, subscribeProgress, markVisited } from './progress'
+import { Breadcrumb, CRUMB_PHYSICS, CRUMB_ROOT } from '../../design/breadcrumb'
 
 export type UsStage = {
   path: string
@@ -116,9 +117,18 @@ function TopBar({
 
   return (
     <header className="us-topbar">
+      {/* The laboratory's own identity, and where it sits in the product. The
+          bar named the lab but not the branch, so a learner three experiments
+          deep had no way back to Physics and nothing telling them which half
+          of the exam they were in. */}
       <div className="us-topbar-brand">
-        <UsIcon name="wave" size={17} />
-        <span>Ultrasound Physics Lab</span>
+        <div className="us-topbar-brand-row">
+          <UsIcon name="wave" size={17} />
+          <span>Ultrasound Physics Lab</span>
+        </div>
+        <Breadcrumb
+          trail={[CRUMB_ROOT, CRUMB_PHYSICS, { label: 'Simulator labs', to: '/visual-lab' }]}
+        />
       </div>
 
       {/* The experiment's name is the page's one first-level heading. It used to

@@ -25,6 +25,9 @@
 }
 
 .ft-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 340;
+  letter-spacing: -0.01em;
   margin: 0 0 var(--gap-heading-desc);
   font-size: var(--fs-hero);
   line-height: 1.04;
@@ -66,6 +69,8 @@
 }
 
 .ft-branch h2 {
+  font-family: var(--font-display);
+  font-weight: 340;
   margin: 0;
   font-size: var(--fs-section);
   line-height: 1.1;
