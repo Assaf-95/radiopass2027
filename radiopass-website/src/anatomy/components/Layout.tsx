@@ -142,11 +142,13 @@ export default function Layout() {
       {!isQuestionRoute && (
         <header className={scrolled ? "app-header is-scrolled" : "app-header"}>
           <div className="app-header-inner">
-            <Link to="/anatomy" className="brand">
-              <span className="brand-mark">RadioPass</span>
-              {/* Which half of the product this is. The portal's doors and the
-                  physics module headers use the same two words. */}
-              <span className="brand-sub">Anatomy</span>
+            {/* The wordmark only. The sub-label used to read "Anatomy" beside
+                it, which since the nav gained real branch links said the same
+                word twice AND physically overlapped the "Anatomy" link 34px to
+                its right. Which branch you are in is the nav's job now, and it
+                marks it as current. */}
+            <Link to="/anatomy" className="rpa-brand">
+              <span className="rpa-brand-mark">RadioPass</span>
             </Link>
 
             {/* ONE NAVIGATION LANGUAGE ACROSS BOTH BRANCHES.
@@ -162,16 +164,15 @@ export default function Layout() {
               <Link className="app-nav-branch" to="/physics">Physics</Link>
               <span className="app-nav-divider" aria-hidden="true" />
 
-              {/* Anatomy's own tools. Three ways into the same material:
-                  question first, structure first, region first. */}
+              {/* Anatomy's own tools — the four that match the branch's four
+                  destinations, and no more. The cross-sectional viewers and
+                  the disputes list moved to the home page: thirteen items in
+                  this bar crushed the wordmark to nothing at 1280px and still
+                  overflowed the container by 97px. */}
               <Link to="/anatomy?goto=modules">Question bank</Link>
               <Link to="/anatomy/atlas">Atlas</Link>
               <Link to="/anatomy/volume">Scout</Link>
-              <Link to="/anatomy/cxr">X-ray</Link>
-              <Link to="/anatomy/mri/head-bone">CT</Link>
-              <Link to="/anatomy/mri/hip-axial-t1">MRI</Link>
               <Link to="/anatomy/dashboard">Progress</Link>
-              <Link to="/anatomy/disputes">Disputes</Link>
               {isAdmin() && <Link to="/anatomy/admin">Editor</Link>}
 
               <span className="app-nav-divider" aria-hidden="true" />
@@ -199,7 +200,7 @@ export default function Layout() {
               <div className="app-account" ref={menuRef}>
                 <button
                   type="button"
-                  className="account-chip"
+                  className="rpa-account-chip"
                   onClick={() => setMenuOpen((v) => !v)}
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"

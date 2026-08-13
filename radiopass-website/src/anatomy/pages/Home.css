@@ -1,3 +1,9 @@
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
 /* ===========================================================================
    Home — "The acquisition"
 
@@ -10,17 +16,14 @@
    The stage stays dark in both themes for the same reason --void does: the
    image is the lit thing, and you do not read a film off a white surround.
    =========================================================================== */
-
-.home {
+.rp-anatomy .home {
   position: relative;
 }
-
 /* --- Stage ----------------------------------------------------------------
    One render per region, stacked and cross-faded. They sit to the RIGHT of
    centre with the copy on the left, which is the arrangement every one of the
    mock-ups uses, and they are lit from behind by a single vertical beam. */
-
-.scan-stage {
+.rp-anatomy .scan-stage {
   position: fixed;
   top: 0;
   left: 0;
@@ -32,10 +35,9 @@
   pointer-events: none;
   opacity: var(--stage-opacity, 1);
 }
-
 /* The beam behind the subject. Every mock-up has it: a narrow cold shaft
    running the full height, brightest at the top. */
-.scan-stage .stage-beam {
+.rp-anatomy .scan-stage .stage-beam {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -51,8 +53,7 @@
   filter: blur(1px);
   box-shadow: 0 0 60px 18px rgba(140, 180, 214, 0.14);
 }
-
-.stage-plate {
+.rp-anatomy .stage-plate {
   position: absolute;
   top: 50%;
   left: 57%;
@@ -64,11 +65,9 @@
   opacity: 0;
   transition: opacity 0.85s ease;
 }
-
-.stage-plate.is-on { opacity: 1; }
-
+.rp-anatomy .stage-plate.is-on { opacity: 1; }
 /* Legibility wash over the left third, where the copy sits. */
-.scan-stage::after {
+.rp-anatomy .scan-stage::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -81,15 +80,12 @@
     rgba(0, 0, 0, 0) 62%
   );
 }
-
 /* Colours inside the stage are fixed rather than themed — this band is the
    viewport, not the surround. */
-.home .dcm { color: rgba(160, 180, 200, 0.62); }
-.home .dcm-strong { color: rgba(214, 230, 242, 0.85); }
-
+.rp-anatomy .home .dcm { color: rgba(160, 180, 200, 0.62); }
+.rp-anatomy .home .dcm-strong { color: rgba(214, 230, 242, 0.85); }
 /* --- Scroll track --------------------------------------------------------- */
-
-.scan {
+.rp-anatomy .scan {
   position: relative;
   z-index: 1;
 
@@ -98,8 +94,7 @@
   --on-stage-dim: #a9bccd;
   --on-stage-faint: #6f8598;
 }
-
-.stop {
+.rp-anatomy .stop {
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
@@ -107,36 +102,29 @@
   align-content: center;
   padding: 96px 0;
 }
-
-.stop-panel {
+.rp-anatomy .stop-panel {
   width: var(--container);
   margin: 0 auto;
 }
-
 /* Everything in a panel is capped so it hugs the shaded left edge and never
    runs under the volume. */
-.stop-panel > * {
+.rp-anatomy .stop-panel > * {
   max-width: 560px;
 }
-
 /* The mock-up sets the copy against the left edge at about 4vw, on a block a
    little under half the viewport. */
-.stop-hero .stop-panel,
-.stop .stop-panel {
+.rp-anatomy .stop-hero .stop-panel, .rp-anatomy .stop .stop-panel {
   width: auto;
   max-width: 620px;
   margin-inline: 0;
   padding-left: max(4vw, 24px);
 }
-
-.stop-hero .stop-panel > * { max-width: none; }
-
+.rp-anatomy .stop-hero .stop-panel > * { max-width: none; }
 /* --- Hero -----------------------------------------------------------------
-   Copied from .hm-hero-copy on the Physics homepage: the wordmark at 0.55em
+   Copied from .rpa-hero-copy on the Physics homepage: the wordmark at 0.55em
    tracking, a Fraunces headline at weight 330 whose second line is italic
    amber, an italic serif line beneath it, then the muted sentence. */
-
-.hero-title {
+.rp-anatomy .hero-title {
   margin: 0;
   font-family: var(--font-display);
   font-optical-sizing: auto;
@@ -146,37 +134,32 @@
   letter-spacing: -0.015em;
   color: #F7F4ED;
 }
-
 /* The one place the accent is spent. */
-.hero-title em {
+.rp-anatomy .hero-title em {
   font-style: italic;
   color: var(--amber-accent);
 }
-
-.hero-eq {
+.rp-anatomy .hero-eq {
   margin: 30px 0 0;
   font-family: var(--font-display);
   font-style: italic;
   font-size: clamp(18px, 1.6vw, 22px);
   color: rgba(242, 238, 230, 0.9);
 }
-
-.hero-sub {
+.rp-anatomy .hero-sub {
   margin: 16px 0 0;
   max-width: 520px;
   font-size: 16px;
   line-height: 1.65;
   color: #9AA0A8;
 }
-
-.hero-actions {
+.rp-anatomy .rpa-hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 40px;
 }
-
-.hero-cue {
+.rp-anatomy .hero-cue {
   position: absolute;
   left: 50%;
   bottom: 30px;
@@ -195,10 +178,9 @@
   color: #8B929B;
   white-space: nowrap;
 }
-
 /* A table advancing, drawn rather than an icon: the line travels the way the
    scan does the moment you start scrolling. */
-.cue-arrow {
+.rp-anatomy .cue-arrow {
   display: block;
   width: 1px;
   height: 46px;
@@ -206,19 +188,15 @@
   transform-origin: top;
   animation: hero-hint 2.4s ease-in-out infinite;
 }
-
 @keyframes hero-hint {
-  0%, 100% { transform: scaleY(0.6); opacity: 0.5; }
-  50% { transform: scaleY(1); opacity: 1; }
+  .rp-anatomy 0%, .rp-anatomy 100% { transform: scaleY(0.6); opacity: 0.5; }
+  .rp-anatomy 50% { transform: scaleY(1); opacity: 1; }
 }
-
 /* --- Latin ----------------------------------------------------------------
    Anatomical nomenclature is set in italic Latin in every atlas ever printed.
    Fraunces italic carries it — the same face the Physics site uses for its
    display voice, so the two sites read as one. */
-
-.hero-latin,
-.stop-latin {
+.rp-anatomy .hero-latin, .rp-anatomy .stop-latin {
   font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
   font-optical-sizing: auto;
   font-style: italic;
@@ -227,8 +205,7 @@
   color: var(--on-stage-dim);
   margin: 0;
 }
-
-.hero-latin {
+.rp-anatomy .hero-latin {
   font-size: clamp(21px, 2.1vw, 28px);
   margin-top: 16px;
   padding-top: 16px;
@@ -237,19 +214,16 @@
   width: fit-content;
   white-space: nowrap;
 }
-
-.stop-latin {
+.rp-anatomy .stop-latin {
   font-size: clamp(22px, 2.4vw, 32px);
   margin-top: 6px;
   color: var(--teal-bright);
   opacity: 0.9;
 }
-
 /* --- Region panels --------------------------------------------------------
    Each region reads as a Physics pillar card set on the blue: a mono code
    chip, a serif title, heavy prose and a cyan "open" link. */
-
-.stop-code {
+.rp-anatomy .stop-code {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -260,8 +234,7 @@
   text-transform: uppercase;
   color: var(--on-stage-faint);
 }
-
-.stop-code-badge {
+.rp-anatomy .stop-code-badge {
   display: grid;
   place-items: center;
   width: 40px;
@@ -275,8 +248,7 @@
   letter-spacing: 0.08em;
   color: var(--amber-accent);
 }
-
-.stop-title {
+.rp-anatomy .stop-title {
   margin: 20px 0 0;
   font-family: var(--font-display);
   font-optical-sizing: auto;
@@ -286,18 +258,16 @@
   letter-spacing: -0.01em;
   color: var(--on-stage);
 }
-
-.stop-desc {
+.rp-anatomy .stop-desc {
   margin: 18px 0 0;
   max-width: 560px;
   font-size: 17px;
   line-height: 1.7;
   color: var(--on-stage-dim);
 }
-
 /* The legend on an atlas plate: the structures this region actually asks you
    to name, counted straight out of the bank. */
-.stop-structures {
+.rp-anatomy .stop-structures {
   list-style: none;
   margin: 26px 0 0;
   padding: 0 0 0 18px;
@@ -306,15 +276,13 @@
   flex-direction: column;
   gap: 7px;
 }
-
-.stop-structures li {
+.rp-anatomy .stop-structures li {
   position: relative;
   font-size: 14px;
   line-height: 1.4;
   color: var(--on-stage-dim);
 }
-
-.stop-structures li::before {
+.rp-anatomy .stop-structures li::before {
   content: '';
   position: absolute;
   left: -19px;
@@ -324,43 +292,37 @@
   background: var(--teal);
   opacity: 0.7;
 }
-
-.stop-figures {
+.rp-anatomy .stop-figures {
   display: flex;
   gap: 34px;
   margin: 30px 0 0;
 }
-
-.stop-figures dt {
+.rp-anatomy .stop-figures dt {
   font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--on-stage-faint);
 }
-
-.stop-figures dd {
+.rp-anatomy .stop-figures dd {
   margin: 5px 0 0;
   font-size: 24px;
   font-weight: 500;
   color: var(--on-stage);
 }
-
-.stop-modalities {
+.rp-anatomy .stop-modalities {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 26px;
 }
-
 /* Chips sit on the stage, so they carry their own surface rather than the
    themed one. */
-.scan .pill {
+.rp-anatomy .scan .pill {
   background: rgba(242, 238, 230, 0.09);
   border-color: rgba(160, 180, 200, 0.18);
   color: var(--on-stage-dim);
 }
-
-.stop-link {
+.rp-anatomy .stop-link {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -372,24 +334,20 @@
   border-bottom: 1px solid rgba(217, 168, 78, 0.4);
   transition: border-color 0.25s, gap 0.16s ease;
 }
-
-.stop-link:hover { gap: 14px; border-bottom-color: var(--amber-accent); }
-.stop-link span { transition: transform 0.16s ease; }
-.stop-link:hover span { transform: translateX(2px); }
-
-.stop-empty {
+.rp-anatomy .stop-link:hover { gap: 14px; border-bottom-color: var(--amber-accent); }
+.rp-anatomy .stop-link span { transition: transform 0.16s ease; }
+.rp-anatomy .stop-link:hover span { transform: translateX(2px); }
+.rp-anatomy .stop-empty {
   margin: 30px 0 0;
   font-size: 11.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--on-stage-faint);
 }
-
 /* --- Gantry rail ----------------------------------------------------------
    Where the table is, and a way to send it somewhere. Ticks are spaced evenly
    because the stops are regions, not distances. */
-
-.rail {
+.rp-anatomy .rail {
   position: fixed;
   top: var(--header-h);
   bottom: 0;
@@ -402,28 +360,23 @@
   gap: 14px;
   pointer-events: none;
 }
-
 /* Retired, not removed: scrolling back up brings it straight back. */
-.rail.is-retired {
+.rp-anatomy .rail.is-retired {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s ease, visibility 0s linear 0.25s;
 }
-
-.rail {
+.rp-anatomy .rail {
   transition: opacity 0.25s ease;
 }
-
-.rail-cap {
+.rp-anatomy .rail-cap {
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(242, 238, 230, 0.35);
 }
-
-.rail-track { display: none; }
-
-.rail-stops {
+.rp-anatomy .rail-track { display: none; }
+.rp-anatomy .rail-stops {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -432,8 +385,7 @@
   gap: 2px;
   pointer-events: auto;
 }
-
-.rail-stop {
+.rp-anatomy .rail-stop {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -447,11 +399,9 @@
   font-size: 11px;
   transition: color 0.16s ease;
 }
-
-.rail-stop:hover { color: var(--text); }
-.rail-stop.is-active { color: var(--amber-accent); }
-
-.rail-name {
+.rp-anatomy .rail-stop:hover { color: var(--text); }
+.rp-anatomy .rail-stop.is-active { color: var(--amber-accent); }
+.rp-anatomy .rail-name {
   order: -1;
   font-family: var(--font-sans);
   font-size: 12px;
@@ -461,24 +411,20 @@
   transform: translateX(6px);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
-
-.rail-stop:hover .rail-name,
-.rail-stop.is-active .rail-name {
+.rp-anatomy .rail-stop:hover .rail-name, .rp-anatomy .rail-stop.is-active .rail-name {
   opacity: 1;
   transform: none;
 }
-
-.rail-code {
+.rp-anatomy .rail-code {
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
   min-width: 20px;
   text-align: right;
 }
-
 /* The tick grows into a bar on the active stop — the readout you can find
    without reading it. */
-.rail-tick {
+.rp-anatomy .rail-tick {
   order: 1;
   width: 14px;
   height: 1px;
@@ -486,47 +432,38 @@
   opacity: 0.55;
   transition: width 0.2s ease, opacity 0.2s ease, height 0.2s ease;
 }
-
-.rail-stop.is-active .rail-tick {
+.rp-anatomy .rail-stop.is-active .rail-tick {
   width: 26px;
   height: 2px;
   opacity: 1;
 }
-
 /* The console annotations must not collide with the rail. */
 @media (min-width: 901px) {
-  .home .dcm-tr,
-  .home .dcm-br { right: 96px; }
+  .rp-anatomy .home .dcm-tr, .rp-anatomy .home .dcm-br { right: 96px; }
 }
-
 /* --- Stats band -----------------------------------------------------------
    A quiet strip of figures between the scan and the labs. Fraunces numerals,
    the amber accent held back, hairline dividers. */
-
-.stats-band {
+.rp-anatomy .stats-band {
   position: relative;
   z-index: 1;
   background: var(--bg);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
-
-.stats-grid {
+.rp-anatomy .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: var(--container);
   margin: 0 auto;
 }
-
-.stats-grid > div {
+.rp-anatomy .stats-grid > div {
   padding: 34px 20px;
   text-align: center;
   border-right: 1px solid var(--line);
 }
-
-.stats-grid > div:last-child { border-right: 0; }
-
-.stat-value {
+.rp-anatomy .stats-grid > div:last-child { border-right: 0; }
+.rp-anatomy .stat-value {
   margin: 0;
   font-family: var(--font-display);
   font-optical-sizing: auto;
@@ -535,8 +472,7 @@
   line-height: 1;
   color: var(--text);
 }
-
-.stat-label {
+.rp-anatomy .stat-label {
   margin: 12px 0 0;
   font-family: var(--font-sans);
   font-size: 10.5px;
@@ -545,33 +481,27 @@
   text-transform: uppercase;
   color: var(--text-dim);
 }
-
 @media (min-width: 1024px) {
-  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .rp-anatomy .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
-
 @media (max-width: 1023px) {
-  .stats-grid > div:nth-child(2n) { border-right: 0; }
-  .stats-grid > div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  .rp-anatomy .stats-grid > div:nth-child(2n) { border-right: 0; }
+  .rp-anatomy .stats-grid > div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
 }
-
 /* --- Labs band ------------------------------------------------------------
    The Physics module cards: charcoal panel, hairline, a serif title, muted
    prose and an amber underlined link. */
-
-.labs-band {
+.rp-anatomy .labs-band {
   position: relative;
   z-index: 1;
   background: var(--bg);
 }
-
-.programs {
+.rp-anatomy .programs {
   display: grid;
   gap: 22px;
   grid-template-columns: 1fr;
 }
-
-.program {
+.rp-anatomy .program {
   display: block;
   padding: 30px;
   border-radius: var(--radius-lg);
@@ -579,14 +509,12 @@
   background: var(--panel);
   transition: border-color 0.25s, transform 0.25s, background 0.25s;
 }
-
-.program:hover {
+.rp-anatomy .program:hover {
   border-color: rgba(242, 238, 230, 0.22);
   background: var(--panel-2);
   transform: translateY(-2px);
 }
-
-.program h2 {
+.rp-anatomy .program h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 340;
@@ -595,8 +523,7 @@
   letter-spacing: -0.01em;
   color: var(--text);
 }
-
-.program-sub {
+.rp-anatomy .program-sub {
   margin: 10px 0 0;
   font-size: 11px;
   font-weight: 600;
@@ -604,22 +531,19 @@
   text-transform: uppercase;
   color: var(--amber-accent);
 }
-
-.program-text {
+.rp-anatomy .program-text {
   margin: 20px 0 0;
   font-size: 15px;
   line-height: 1.7;
   color: var(--text-dim);
 }
-
-.program-meta {
+.rp-anatomy .program-meta {
   margin: 20px 0 0;
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--text-faint);
 }
-
-.program-go {
+.rp-anatomy .program-go {
   display: inline-flex;
   gap: 9px;
   margin-top: 24px;
@@ -629,29 +553,24 @@
   color: var(--amber-accent);
   border-bottom: 1px solid rgba(217, 168, 78, 0.4);
 }
-
-.program:hover .program-go { border-bottom-color: var(--amber-accent); }
-
+.rp-anatomy .program:hover .program-go { border-bottom-color: var(--amber-accent); }
 @media (min-width: 1024px) {
-  .programs { grid-template-columns: repeat(3, 1fr); }
+  .rp-anatomy .programs { grid-template-columns: repeat(3, 1fr); }
 }
-
 /* --- Worklist -------------------------------------------------------------
    The Physics "learning library" band — warm paper, eyebrow, serif heading —
    holding a PACS-style study list rather than a grid of marketing cards. That
    is how a radiologist picks up work, and it lets six regions be compared on
    count and progress at a glance. */
-
-.worklist {
+.rp-anatomy .worklist {
   position: relative;
   z-index: 1;
   width: var(--container);
   margin: 0 auto;
   padding: 96px 0;
 }
-
 /* The stage ends here, so the worklist carries its own full-bleed ground. */
-.worklist::before {
+.rp-anatomy .worklist::before {
   content: '';
   position: absolute;
   top: 0;
@@ -665,15 +584,13 @@
   background: rgba(7, 8, 11, 0.86);
   z-index: -1;
 }
-
-.worklist-head {
+.rp-anatomy .worklist-head {
   display: grid;
   gap: 6px;
   padding-bottom: 28px;
   border-bottom: 1px solid var(--line);
 }
-
-.worklist-head h2 {
+.rp-anatomy .worklist-head h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 340;
@@ -683,10 +600,8 @@
   text-transform: none;
   color: var(--text);
 }
-
-.worklist-count { font-size: 12px; color: var(--text-faint); }
-
-.wl-row {
+.rp-anatomy .worklist-count { font-size: 12px; color: var(--text-faint); }
+.rp-anatomy .wl-row {
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr) auto auto auto auto;
   align-items: center;
@@ -698,11 +613,9 @@
   border-radius: var(--radius-lg);
   transition: border-color 0.25s, background 0.25s, transform 0.25s;
 }
-
-.wl-row:hover { border-color: rgba(242, 238, 230, 0.22); background: var(--panel-2); transform: translateY(-2px); }
-.wl-row:hover .wl-action { color: var(--teal-bright); }
-
-.wl-code {
+.rp-anatomy .wl-row:hover { border-color: rgba(242, 238, 230, 0.22); background: var(--panel-2); transform: translateY(-2px); }
+.rp-anatomy .wl-row:hover .wl-action { color: var(--teal-bright); }
+.rp-anatomy .wl-code {
   display: grid;
   place-items: center;
   width: 44px;
@@ -715,10 +628,8 @@
   letter-spacing: 0.08em;
   color: var(--amber-accent);
 }
-
-.wl-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-
-.wl-title {
+.rp-anatomy .wl-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rp-anatomy .wl-title {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-size: 21px;
@@ -726,8 +637,7 @@
   letter-spacing: -0.01em;
   color: var(--text);
 }
-
-.wl-desc {
+.rp-anatomy .wl-desc {
   font-size: 13.5px;
   line-height: 1.6;
   color: var(--text-dim);
@@ -735,26 +645,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.wl-modalities { display: flex; gap: 5px; }
-
-.wl-count { font-size: 12.5px; color: var(--text-dim); text-align: right; }
-
-.wl-progress { display: flex; align-items: center; gap: 10px; }
-
-.wl-bar {
+.rp-anatomy .wl-modalities { display: flex; gap: 5px; }
+.rp-anatomy .wl-count { font-size: 12.5px; color: var(--text-dim); text-align: right; }
+.rp-anatomy .wl-progress { display: flex; align-items: center; gap: 10px; }
+.rp-anatomy .wl-bar {
   flex: 1;
   height: 3px;
   border-radius: 2px;
   background: var(--panel-3);
   overflow: hidden;
 }
-
-.wl-bar-fill { display: block; height: 100%; background: var(--teal-bright); }
-
-.wl-pct { font-size: 11.5px; color: var(--text-faint); min-width: 36px; text-align: right; }
-
-.wl-action {
+.rp-anatomy .wl-bar-fill { display: block; height: 100%; background: var(--teal-bright); }
+.rp-anatomy .wl-pct { font-size: 11.5px; color: var(--text-faint); min-width: 36px; text-align: right; }
+.rp-anatomy .wl-action {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -763,11 +666,9 @@
   text-align: right;
   transition: color 0.14s ease;
 }
-
-.wl-row-empty { opacity: 0.42; }
-.wl-row-empty:hover { background: none; padding-left: 4px; }
-
-.worklist-foot {
+.rp-anatomy .wl-row-empty { opacity: 0.42; }
+.rp-anatomy .wl-row-empty:hover { background: none; padding-left: 4px; }
+.rp-anatomy .worklist-foot {
   display: flex;
   gap: 26px;
   padding-top: 22px;
@@ -778,24 +679,21 @@
   text-transform: uppercase;
   color: var(--text-faint);
 }
-
 /* --- Responsive ----------------------------------------------------------- */
-
 /* Below the two-column threshold the row sheds its optional columns in
    order of usefulness — action label first (the whole row is clickable),
    then the modality chips, then the progress bar. Every hidden column is
    removed from the grid template too, or it would wrap onto its own line. */
 @media (max-width: 1100px) {
-  .wl-row { grid-template-columns: 44px minmax(0, 1fr) auto 92px 130px; }
-  .wl-action { display: none; }
+  .rp-anatomy .wl-row { grid-template-columns: 44px minmax(0, 1fr) auto 92px 130px; }
+  .rp-anatomy .wl-action { display: none; }
 }
-
 /* At this width the volume moves behind the copy rather than beside it, so
    the scrim flips from a side wash to a floor. */
 @media (max-width: 900px) {
   /* The volume moves above the copy rather than beside it, so the scrim turns
      into a floor: clear at the top where the anatomy is, solid under the type. */
-  .scan-stage::after {
+  .rp-anatomy .scan-stage::after {
     background: linear-gradient(
       180deg,
       rgba(11, 13, 16, 0.42) 0%,
@@ -805,16 +703,13 @@
       rgba(11, 13, 16, 0.99) 100%
     );
   }
-
-  .stop {
+  .rp-anatomy .stop {
     align-content: end;
     /* Clears the rail, which sits along the bottom edge at this width. */
     padding: 88px 0 104px;
   }
-
-  .stop-panel > * { max-width: none; }
-
-  .rail {
+  .rp-anatomy .stop-panel > * { max-width: none; }
+  .rp-anatomy .rail {
     top: auto;
     bottom: 0;
     left: 0;
@@ -826,45 +721,38 @@
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
     background: linear-gradient(180deg, rgba(11, 13, 16, 0) 0%, rgba(11, 13, 16, 0.92) 45%);
   }
-
-  .rail-cap { display: none; }
-  .rail-stops { flex-direction: row; gap: 4px; }
-
-  .rail-stop {
+  .rp-anatomy .rail-cap { display: none; }
+  .rp-anatomy .rail-stops { flex-direction: row; gap: 4px; }
+  .rp-anatomy .rail-stop {
     flex-direction: column;
     gap: 5px;
     padding: 6px 9px;
   }
-
-  .rail-name { display: none; }
-  .rail-tick { order: 1; width: 18px; }
-  .rail-stop.is-active .rail-tick { width: 18px; }
-
-  .wl-row { grid-template-columns: 40px minmax(0, 1fr) 96px; padding: 14px 8px 14px 4px; }
-  .wl-modalities, .wl-progress { display: none; }
+  .rp-anatomy .rail-name { display: none; }
+  .rp-anatomy .rail-tick { order: 1; width: 18px; }
+  .rp-anatomy .rail-stop.is-active .rail-tick { width: 18px; }
+  .rp-anatomy .wl-row { grid-template-columns: 40px minmax(0, 1fr) 96px; padding: 14px 8px 14px 4px; }
+  .rp-anatomy .wl-modalities, .rp-anatomy .wl-progress { display: none; }
 }
-
 @media (max-width: 560px) {
-  .stop { padding: 80px 0 96px; }
-  .hero-title { font-size: clamp(40px, 12vw, 56px); }
-  .stop-figures { gap: 22px; }
-  .stop-figures dd { font-size: 20px; }
-  .worklist { padding: 48px 0 56px; }
-  .wl-row { grid-template-columns: 34px minmax(0, 1fr) 74px; gap: 12px; }
-  .wl-desc { display: none; }
-  .worklist-foot { flex-direction: column; gap: 6px; }
+  .rp-anatomy .stop { padding: 80px 0 96px; }
+  .rp-anatomy .hero-title { font-size: clamp(40px, 12vw, 56px); }
+  .rp-anatomy .stop-figures { gap: 22px; }
+  .rp-anatomy .stop-figures dd { font-size: 20px; }
+  .rp-anatomy .worklist { padding: 48px 0 56px; }
+  .rp-anatomy .wl-row { grid-template-columns: 34px minmax(0, 1fr) 74px; gap: 12px; }
+  .rp-anatomy .wl-desc { display: none; }
+  .rp-anatomy .worklist-foot { flex-direction: column; gap: 6px; }
 }
-
 /* The volume already respects reduced motion internally by parking the sweep;
    the page-level cue is the only other thing that moves on its own. */
 @media (prefers-reduced-motion: reduce) {
+
 }
-
-
 /* The page's ground: the chest, fixed and faint, behind everything after the
    hero. An element rather than background-attachment:fixed, which iOS
    ignores. pointer-events none — it is scenery. */
-.home-chest-bg {
+.rp-anatomy .home-chest-bg {
   position: fixed;
   top: 50%;
   left: 57%;
@@ -877,23 +765,20 @@
   z-index: 0;
   pointer-events: none;
 }
-
 @media (max-width: 900px) {
-  .home-chest-bg { left: 50%; height: min(70vh, 640px); opacity: 0.12; }
+  .rp-anatomy .home-chest-bg { left: 50%; height: min(70vh, 640px); opacity: 0.12; }
 }
-
-
 /* ---------- your standing ----------
    Three figures, the first one twice the size of the others: the score is the
    answer to the question someone opened the page with, and the other two are
    the context that makes it mean something. Kept above the topic list so it is
    read before any decision about where to go next. */
-.scoreband {
+.rp-anatomy .scoreband {
   position: relative;
   z-index: 1;
   padding: clamp(28px, 5vw, 54px) 24px clamp(18px, 3vw, 30px);
 }
-.scoreband-grid {
+.rp-anatomy .scoreband-grid {
   max-width: 1080px;
   margin: 0 auto;
   display: grid;
@@ -901,8 +786,8 @@
   gap: clamp(16px, 3vw, 40px);
   align-items: end;
 }
-.score-cell { min-width: 0; }
-.score-value {
+.rp-anatomy .score-cell { min-width: 0; }
+.rp-anatomy .score-value {
   margin: 0;
   font-family: var(--display, 'Fraunces', Georgia, serif);
   font-weight: 340;
@@ -910,17 +795,17 @@
   line-height: 1;
   letter-spacing: -0.02em;
 }
-.score-cell-lead .score-value { font-size: clamp(50px, 8vw, 92px); }
-.score-of { font-size: 0.46em; color: var(--muted, #8B929B); margin-left: 2px; }
-.score-label {
+.rp-anatomy .score-cell-lead .score-value { font-size: clamp(50px, 8vw, 92px); }
+.rp-anatomy .score-of { font-size: 0.46em; color: var(--muted, #8B929B); margin-left: 2px; }
+.rp-anatomy .score-label {
   margin: 10px 0 0;
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted, #8B929B);
 }
-.score-note { margin: 4px 0 0; font-size: 11px; color: var(--muted, #8B929B); opacity: 0.72; }
-.score-bar {
+.rp-anatomy .score-note { margin: 4px 0 0; font-size: 11px; color: var(--muted, #8B929B); opacity: 0.72; }
+.rp-anatomy .score-bar {
   display: block;
   margin-top: 12px;
   height: 3px;
@@ -928,11 +813,10 @@
   background: rgba(242, 238, 230, 0.12);
   overflow: hidden;
 }
-.score-bar-fill { display: block; height: 100%; background: var(--lime, #D9A84E); }
-
+.rp-anatomy .score-bar-fill { display: block; height: 100%; background: var(--lime, #D9A84E); }
 /* The score sits between the count and the completion bar, so a row reads
    left to right as: which region, how much of it, how well. */
-.wl-score {
+.rp-anatomy .wl-score {
   display: flex;
   align-items: baseline;
   gap: 5px;
@@ -940,30 +824,26 @@
   color: var(--ink, #F2EEE6);
   font-variant-numeric: tabular-nums;
 }
-.wl-score small {
+.rp-anatomy .wl-score small {
   font-size: 9.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted, #8B929B);
 }
-
 @media (max-width: 760px) {
-  .scoreband-grid { grid-template-columns: 1fr 1fr; row-gap: 26px; }
-  .score-cell-lead { grid-column: 1 / -1; }
+  .rp-anatomy .scoreband-grid { grid-template-columns: 1fr 1fr; row-gap: 26px; }
+  .rp-anatomy .score-cell-lead { grid-column: 1 / -1; }
 }
-
 /* --- Continue, and the four Anatomy destinations -------------------------
    Added beneath the scoreband so the page reads: how am I doing → what do I
    do next → where is everything → the regions in detail. Deliberately not
    more cards: one accented action, then a plain row of destinations. */
-
-.an-continue-wrap {
+.rp-anatomy .an-continue-wrap {
   max-width: var(--page-max, 1180px);
   margin: 0 auto;
   padding: 0 var(--page-gutter, 32px);
 }
-
-.an-continue {
+.rp-anatomy .an-continue {
   display: flex;
   align-items: baseline;
   gap: 14px;
@@ -973,32 +853,27 @@
   text-decoration: none;
   transition: background 0.18s ease;
 }
-
-.an-continue:hover {
+.rp-anatomy .an-continue:hover {
   background: color-mix(in srgb, var(--amber-accent) 8%, transparent);
 }
-
-.an-continue-label {
+.rp-anatomy .an-continue-label {
   font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--amber-accent);
 }
-
-.an-continue-name {
+.rp-anatomy .an-continue-name {
   flex: 1;
   font-family: var(--font-display);
   font-weight: 340;
   font-size: 21px;
   color: var(--text);
 }
-
-.an-continue-go {
+.rp-anatomy .an-continue-go {
   color: var(--amber-accent);
   font-size: 18px;
 }
-
-.an-dest {
+.rp-anatomy .an-dest {
   max-width: var(--page-max, 1180px);
   margin: 34px auto 0;
   padding: 0 var(--page-gutter, 32px);
@@ -1008,8 +883,7 @@
   background: var(--rule);
   border-block: 1px solid var(--rule);
 }
-
-.an-dest-item {
+.rp-anatomy .an-dest-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1018,37 +892,54 @@
   text-decoration: none;
   transition: background 0.18s ease;
 }
-
-a.an-dest-item:hover {
+.rp-anatomy a.an-dest-item:hover {
   background: var(--bg-raised, rgba(255, 255, 255, 0.03));
 }
-
-.an-dest-item strong {
+.rp-anatomy .an-dest-item strong {
   font-family: var(--font-display);
   font-weight: 340;
   font-size: 17px;
   color: var(--text);
 }
-
-.an-dest-item span {
+.rp-anatomy .an-dest-item span {
   font-size: 13px;
   line-height: 1.55;
   color: var(--text-dim);
 }
-
 /* The honest not-yet state. Reads as information, not as a broken link. */
-.an-dest-item.is-pending strong,
-.an-dest-item.is-pending span {
+.rp-anatomy .an-dest-item.is-pending strong, .rp-anatomy .an-dest-item.is-pending span {
   color: var(--text-faint);
 }
-
 @media (max-width: 720px) {
-  .an-dest {
+  .rp-anatomy .an-dest {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .an-continue {
+  .rp-anatomy .an-continue {
     flex-wrap: wrap;
     gap: 8px;
   }
+}
+
+/* Secondary tools: the viewers and the appeals list, moved off the header when
+   it ran out of room. A quiet row of links — deliberately not cards, so they
+   read as secondary to the four destinations above. */
+.rp-anatomy .an-tools {
+  max-width: var(--page-max, 1180px);
+  margin: 28px auto 0;
+  padding: 0 var(--page-gutter, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+}
+
+.rp-anatomy .an-tools a {
+  font-size: 13px;
+  color: var(--text-dim);
+  border-bottom: 1px solid transparent;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.rp-anatomy .an-tools a:hover {
+  color: var(--text);
+  border-bottom-color: var(--amber-accent);
 }

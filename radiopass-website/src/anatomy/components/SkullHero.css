@@ -1,3 +1,9 @@
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
 /* One still skull beside the copy, one viewport tall, scrolling away like any
    other section. No pin, no track, no scroll-owned styles — the "jump" the
    pinned versions produced came from scroll being spent without movement, and
@@ -6,28 +12,25 @@
    Every selector is prefixed .skull-. This file is emitted BETWEEN
    AnatomyJourney.css and Home.css, so Home.css wins every same-specificity
    tie. The shared furniture — .hero-title, .hero-eq, .hero-sub,
-   .hero-actions, .hero-cue, .hero-meta, .journey-modules, .journey-chip,
+   .rpa-hero-actions, .hero-cue, .hero-meta, .journey-modules, .journey-chip,
    .journey-skip — is reused from those files exactly as it is. */
-
-.skull-hero {
+.rp-anatomy .skull-hero {
   position: relative;
   /* Above Home's fixed chest layer (z 0), which is a LATER sibling and would
      otherwise paint over this section's black ground. */
   z-index: 1;
   background: #000000;
 }
-
-.skull-pin {
+.rp-anatomy .skull-pin {
   position: relative;
   height: 100vh;
   height: 100svh; /* both, deliberately — small viewports without svh */
   overflow: hidden;
   background: #000000;
 }
-
 /* Square, reserved before the image decodes. Seated at 57% so the skull sits
    right of the copy, as every mock-up arranges it. */
-.skull-stage {
+.rp-anatomy .skull-stage {
   position: absolute;
   top: 50%;
   left: 57%;
@@ -36,8 +39,7 @@
   aspect-ratio: 1;
   z-index: 2;
 }
-
-.skull-poster {
+.rp-anatomy .skull-poster {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -45,9 +47,8 @@
   object-fit: contain;
   display: block;
 }
-
 /* Legibility wash on the copy side only. */
-.skull-pin::before {
+.rp-anatomy .skull-pin::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -61,8 +62,7 @@
     rgba(0, 0, 0, 0.04) 64%
   );
 }
-
-.skull-copy {
+.rp-anatomy .skull-copy {
   position: absolute;
   z-index: 5;
   left: max(4vw, 24px);
@@ -70,13 +70,11 @@
   translate: 0 -50%;
   max-width: 620px;
 }
-
-.skull-pin .hero-cue { z-index: 6; }
-
+.rp-anatomy .skull-pin .hero-cue { z-index: 6; }
 @media (max-width: 900px) {
-  .skull-stage { left: 50%; top: 36%; width: min(58vh, 86vw); }
-  .skull-copy { top: auto; bottom: 14vh; translate: 0 0; }
-  .skull-pin::before {
+  .rp-anatomy .skull-stage { left: 50%; top: 36%; width: min(58vh, 86vw); }
+  .rp-anatomy .skull-copy { top: auto; bottom: 14vh; translate: 0 0; }
+  .rp-anatomy .skull-pin::before {
     background: linear-gradient(
       180deg,
       rgba(0, 0, 0, 0.4) 0%,

@@ -286,10 +286,21 @@ export default function Home() {
         </Link>
       </section>
 
+      {/* The cross-sectional viewers and the appeals list. Secondary to the
+          four destinations above — they are tools you reach for occasionally,
+          not the shape of the syllabus — but they must stay reachable, and
+          they left the header when it ran out of room. */}
+      <section className="an-tools" aria-label="Viewers">
+        <Link to="/anatomy/cxr">Chest radiograph atlas</Link>
+        <Link to="/anatomy/mri/head-bone">CT head — bone window</Link>
+        <Link to="/anatomy/mri/hip-axial-t1">MRI hip — axial T1</Link>
+        <Link to="/anatomy/disputes">Disputed marks</Link>
+      </section>
+
       {/* The topics, each carrying its own share of the same two numbers. */}
       <section className="worklist" id="modules">
         <header className="worklist-head">
-          <p className="eyebrow">By topic</p>
+          <p className="rpa-eyebrow">By topic</p>
           <h2>Where you stand in each region</h2>
           <span className="worklist-count mono">
             {loadedRegions} of {rows.length} regions loaded

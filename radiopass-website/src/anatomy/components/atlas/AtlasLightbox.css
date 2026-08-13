@@ -1,7 +1,12 @@
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
 /* The full-size viewer. A layer, not a page: closing it puts you back in the
    gallery exactly where you were. */
-
-.lightbox {
+.rp-anatomy .lightbox {
   position: fixed;
   inset: 0;
   z-index: 120;
@@ -10,15 +15,13 @@
   justify-content: center;
   padding: 18px;
 }
-
-.lightbox-scrim {
+.rp-anatomy .lightbox-scrim {
   position: absolute;
   inset: 0;
   background: rgba(4, 5, 7, 0.92);
   backdrop-filter: blur(3px);
 }
-
-.lightbox-panel {
+.rp-anatomy .lightbox-panel {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -30,8 +33,7 @@
   overflow: hidden;
   outline: none;
 }
-
-.lightbox-head {
+.rp-anatomy .lightbox-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -40,12 +42,10 @@
   padding: 14px 18px;
   border-bottom: 1px solid var(--line);
 }
-
-.lightbox-title h2 { font-size: 22px; }
-.lightbox-title p { margin: 6px 0 0; font-size: 11.5px; color: var(--text-faint); }
-
+.rp-anatomy .lightbox-title h2 { font-size: 22px; }
+.rp-anatomy .lightbox-title p { margin: 6px 0 0; font-size: 11.5px; color: var(--text-faint); }
 /* Which part of the entity this particular film shows. */
-.lightbox-title .lb-label {
+.rp-anatomy .lightbox-title .lb-label {
   display: flex;
   align-items: baseline;
   gap: 9px;
@@ -55,12 +55,9 @@
   color: var(--amber-accent);
   margin-top: 4px;
 }
-
-.lightbox-title .film-label-key { width: 22px; height: 22px; font-size: 11px; }
-
-.lightbox-tools { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-
-.lb-btn {
+.rp-anatomy .lightbox-title .film-label-key { width: 22px; height: 22px; font-size: 11px; }
+.rp-anatomy .lightbox-tools { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rp-anatomy .lb-btn {
   min-width: 38px;
   height: 34px;
   padding: 0 11px;
@@ -74,13 +71,11 @@
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-
-.lb-btn:hover { background: var(--panel-2); color: var(--text); }
-.lb-btn.is-on { border-color: var(--amber-accent); color: var(--amber-accent); background: var(--teal-bg); }
-.lb-close { font-size: 15px; }
-.lb-zoom { font-size: 11px; color: var(--text-faint); min-width: 44px; text-align: center; }
-
-.lightbox-stage {
+.rp-anatomy .lb-btn:hover { background: var(--panel-2); color: var(--text); }
+.rp-anatomy .lb-btn.is-on { border-color: var(--amber-accent); color: var(--amber-accent); background: var(--teal-bg); }
+.rp-anatomy .lb-close { font-size: 15px; }
+.rp-anatomy .lb-zoom { font-size: 11px; color: var(--text-faint); min-width: 44px; text-align: center; }
+.rp-anatomy .lightbox-stage {
   position: relative;
   flex: 1;
   min-height: 0;
@@ -88,15 +83,13 @@
   overflow: hidden;
   container-type: inline-size;
 }
-
-.lightbox-film {
+.rp-anatomy .lightbox-film {
   position: absolute;
   inset: 0;
   transform-origin: center center;
   transition: transform 0.12s ease-out;
 }
-
-.lb-nav {
+.rp-anatomy .lb-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -112,12 +105,10 @@
   cursor: pointer;
   transition: background 0.2s ease;
 }
-
-.lb-nav:hover { background: rgba(11, 13, 16, 0.95); }
-.lb-prev { left: 12px; }
-.lb-next { right: 12px; }
-
-.lightbox-foot {
+.rp-anatomy .lb-nav:hover { background: rgba(11, 13, 16, 0.95); }
+.rp-anatomy .lb-prev { left: 12px; }
+.rp-anatomy .lb-next { right: 12px; }
+.rp-anatomy .lightbox-foot {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 26px;
@@ -126,17 +117,14 @@
   max-height: 34vh;
   overflow-y: auto;
 }
-
-.lightbox-caption { display: flex; flex-direction: column; gap: 7px; }
-.lb-desc { margin: 0; font-size: 15px; color: var(--text); }
-.lb-desc.is-blank { color: var(--text-faint); font-style: italic; }
-.lb-source { align-self: flex-start; margin-top: 4px; font-size: 12px; }
-
-.lightbox-foot .film-legend { margin-top: 0; padding-top: 0; border-top: 0; }
-
+.rp-anatomy .lightbox-caption { display: flex; flex-direction: column; gap: 7px; }
+.rp-anatomy .lb-desc { margin: 0; font-size: 15px; color: var(--text); }
+.rp-anatomy .lb-desc.is-blank { color: var(--text-faint); font-style: italic; }
+.rp-anatomy .lb-source { align-self: flex-start; margin-top: 4px; font-size: 12px; }
+.rp-anatomy .lightbox-foot .film-legend { margin-top: 0; padding-top: 0; border-top: 0; }
 @media (max-width: 860px) {
-  .lightbox { padding: 0; }
-  .lightbox-panel { border-radius: 0; border: 0; }
-  .lightbox-foot { grid-template-columns: 1fr; gap: 14px; max-height: 40vh; }
-  .lb-nav { width: 38px; height: 62px; font-size: 24px; }
+  .rp-anatomy .lightbox { padding: 0; }
+  .rp-anatomy .lightbox-panel { border-radius: 0; border: 0; }
+  .rp-anatomy .lightbox-foot { grid-template-columns: 1fr; gap: 14px; max-height: 40vh; }
+  .rp-anatomy .lb-nav { width: 38px; height: 62px; font-size: 24px; }
 }

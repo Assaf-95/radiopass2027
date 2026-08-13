@@ -1,3 +1,9 @@
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
 /* ===========================================================================
    Structure Atlas.
 
@@ -9,8 +15,7 @@
    The one rule that governs every decision here: the anatomy is the content.
    Metadata is small, muted and never competes with a film for attention.
    =========================================================================== */
-
-.atlas {
+.rp-anatomy .atlas {
   width: var(--container);
   margin: 0 auto;
   /* .app-header is fixed and goes opaque as soon as the page scrolls, so the
@@ -18,88 +23,69 @@
      section hub makes. */
   padding: calc(var(--header-h) + 24px) 0 96px;
 }
-
 /* --- Breadcrumbs --------------------------------------------------------- */
-
-.atlas-crumbs-row {
+.rp-anatomy .atlas-crumbs-row {
   display: flex;
   align-items: center;
   gap: 18px;
   flex-wrap: wrap;
   margin-bottom: 28px;
 }
-
-.atlas-crumbs {
+.rp-anatomy .atlas-crumbs {
   font-size: 12px;
   color: var(--text-faint);
   letter-spacing: 0.03em;
 }
-
-.atlas-crumbs a:hover { color: var(--amber-accent); }
-.atlas-crumbs [aria-current='page'] { color: var(--text-dim); }
-.atlas-crumb-sep { margin: 0 8px; opacity: 0.5; }
-
+.rp-anatomy .atlas-crumbs a:hover { color: var(--amber-accent); }
+.rp-anatomy .atlas-crumbs [aria-current='page'] { color: var(--text-dim); }
+.rp-anatomy .atlas-crumb-sep { margin: 0 8px; opacity: 0.5; }
 /* The trail is the wayfinding on a wide screen; the back control is the
    wayfinding on a phone. Neither is worth showing twice. */
-.atlas-back { display: none; }
-
+.rp-anatomy .atlas-back { display: none; }
 /* --- Page head ----------------------------------------------------------- */
-
-.atlas-head { max-width: 62ch; margin-bottom: 30px; }
-.atlas-head h1 { font-size: clamp(32px, 5vw, 56px); margin: 14px 0 0; }
-
-.atlas-lede {
+.rp-anatomy .atlas-head { max-width: 62ch; margin-bottom: 30px; }
+.rp-anatomy .atlas-head h1 { font-size: clamp(32px, 5vw, 56px); margin: 14px 0 0; }
+.rp-anatomy .atlas-lede {
   margin: 14px 0 0;
   color: var(--text-dim);
   font-size: 17px;
   line-height: 1.6;
 }
-
-.atlas-figures {
+.rp-anatomy .atlas-figures {
   margin: 16px 0 0;
   font-size: 12px;
   color: var(--text-faint);
   letter-spacing: 0.04em;
 }
-
-.structure-head h1 { text-transform: none; }
-
-.structure-aliases {
+.rp-anatomy .structure-head h1 { text-transform: none; }
+.rp-anatomy .structure-aliases {
   margin: 12px 0 0;
   color: var(--text-faint);
   font-size: 13.5px;
 }
-
-.structure-aliases em { font-style: normal; color: var(--text-dim); }
-
+.rp-anatomy .structure-aliases em { font-style: normal; color: var(--text-dim); }
 /* The named parts folded into this entity. Stated on the page because a
    count of 16 that quietly contains eight aortic arches would be hiding
    something the reader needs. */
-.structure-variants {
+.rp-anatomy .structure-variants {
   margin: 12px 0 0;
   font-size: 13.5px;
   color: var(--text-faint);
   line-height: 1.7;
 }
-
-.variant-name { color: var(--text-dim); }
-.variant-count { color: var(--amber-accent); font-size: 11px; }
-
+.rp-anatomy .variant-name { color: var(--text-dim); }
+.rp-anatomy .variant-count { color: var(--amber-accent); font-size: 11px; }
 /* --- Search -------------------------------------------------------------- */
-
-.atlas-search-band { margin-bottom: 34px; }
-.atlas-search { position: relative; max-width: 620px; }
-
-.atlas-search-input {
+.rp-anatomy .atlas-search-band { margin-bottom: 34px; }
+.rp-anatomy .atlas-search { position: relative; max-width: 620px; }
+.rp-anatomy .atlas-search-input {
   width: 100%;
   padding: 15px 18px;
   font-size: 16px;
   border-radius: var(--radius-md);
 }
-
-.atlas-search-results { margin-top: 14px; }
-
-.atlas-search-empty {
+.rp-anatomy .atlas-search-results { margin-top: 14px; }
+.rp-anatomy .atlas-search-empty {
   margin: 0;
   padding: 18px 20px;
   border: 1px solid var(--line);
@@ -109,8 +95,7 @@
   font-size: 14px;
   max-width: 62ch;
 }
-
-.atlas-hit-list {
+.rp-anatomy .atlas-hit-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -121,8 +106,7 @@
   max-height: 62vh;
   overflow-y: auto;
 }
-
-.atlas-hit {
+.rp-anatomy .atlas-hit {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -130,11 +114,9 @@
   border-bottom: 1px solid var(--line);
   transition: background 0.15s ease;
 }
-
-.atlas-hit-list li:last-child .atlas-hit { border-bottom: 0; }
-.atlas-hit:hover { background: var(--panel-2); }
-
-.atlas-hit-thumb {
+.rp-anatomy .atlas-hit-list li:last-child .atlas-hit { border-bottom: 0; }
+.rp-anatomy .atlas-hit:hover { background: var(--panel-2); }
+.rp-anatomy .atlas-hit-thumb {
   flex: none;
   width: 56px;
   height: 56px;
@@ -142,22 +124,17 @@
   overflow: hidden;
   background: var(--void);
 }
-
-.atlas-hit-thumb .atlas-film { background: transparent; }
-
-.atlas-hit-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.atlas-hit-name { font-size: 15px; }
-.atlas-hit-meta { font-size: 11.5px; color: var(--text-faint); }
-
+.rp-anatomy .atlas-hit-thumb .atlas-film { background: transparent; }
+.rp-anatomy .atlas-hit-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.rp-anatomy .atlas-hit-name { font-size: 15px; }
+.rp-anatomy .atlas-hit-meta { font-size: 11.5px; color: var(--text-faint); }
 /* --- Chapter cards ------------------------------------------------------- */
-
-.chapter-grid {
+.rp-anatomy .chapter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
   gap: 22px;
 }
-
-.chapter-card {
+.rp-anatomy .chapter-card {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
@@ -166,61 +143,51 @@
   overflow: hidden;
   transition: border-color 0.25s ease, transform 0.25s ease;
 }
-
-.chapter-card:hover {
+.rp-anatomy .chapter-card:hover {
   border-color: var(--line-strong);
   transform: translateY(-2px);
 }
-
-.chapter-cover {
+.rp-anatomy .chapter-cover {
   display: block;
   height: 190px;
   background: var(--void);
   overflow: hidden;
 }
-
 /* The FILM, not the scanned page: every thumbnail goes through the same crop
    the question player uses, or the printed stem and answer key from the
    source page would show through on the card. */
-.chapter-cover .atlas-film { opacity: 0.85; transition: opacity 0.3s ease; }
-.chapter-card:hover .chapter-cover .atlas-film { opacity: 1; }
-.chapter-cover-blank { display: block; width: 100%; height: 100%; }
-
-.chapter-body {
+.rp-anatomy .chapter-cover .atlas-film { opacity: 0.85; transition: opacity 0.3s ease; }
+.rp-anatomy .chapter-card:hover .chapter-cover .atlas-film { opacity: 1; }
+.rp-anatomy .chapter-cover-blank { display: block; width: 100%; height: 100%; }
+.rp-anatomy .chapter-body {
   display: flex;
   flex-direction: column;
   gap: 7px;
   padding: 20px 22px 24px;
 }
-
-.chapter-code {
+.rp-anatomy .chapter-code {
   font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--amber-accent);
 }
-
-.chapter-title {
+.rp-anatomy .chapter-title {
   font-family: var(--font-display);
   font-weight: 340;
   font-size: 25px;
   line-height: 1.15;
 }
-
-.chapter-blurb { color: var(--text-dim); font-size: 13.5px; line-height: 1.55; }
-.chapter-figures { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; }
-.chapter-cover-note { font-size: 10.5px; color: var(--text-faint); opacity: 0.65; }
-
+.rp-anatomy .chapter-blurb { color: var(--text-dim); font-size: 13.5px; line-height: 1.55; }
+.rp-anatomy .chapter-figures { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; }
+.rp-anatomy .chapter-cover-note { font-size: 10.5px; color: var(--text-faint); opacity: 0.65; }
 /* --- Controls ------------------------------------------------------------ */
-
-.atlas-controls {
+.rp-anatomy .atlas-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   margin-bottom: 20px;
 }
-
-.seg {
+.rp-anatomy .seg {
   display: inline-flex;
   flex-wrap: wrap;
   border: 1px solid var(--line);
@@ -228,8 +195,7 @@
   overflow: hidden;
   background: var(--panel);
 }
-
-.seg-btn {
+.rp-anatomy .seg-btn {
   border: 0;
   border-right: 1px solid var(--line);
   background: transparent;
@@ -241,33 +207,28 @@
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
-
-.seg > .seg-btn:last-child { border-right: 0; }
-.seg-btn:hover { background: var(--panel-2); color: var(--text); }
-.seg-btn.is-on { background: var(--text); color: var(--bg); }
-
-.seg-btn.solo {
+.rp-anatomy .seg > .seg-btn:last-child { border-right: 0; }
+.rp-anatomy .seg-btn:hover { background: var(--panel-2); color: var(--text); }
+.rp-anatomy .seg-btn.is-on { background: var(--text); color: var(--bg); }
+.rp-anatomy .seg-btn.solo {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--panel);
 }
-
-.seg-btn.solo.is-on {
+.rp-anatomy .seg-btn.solo.is-on {
   background: var(--teal-bg);
   border-color: var(--amber-accent);
   color: var(--amber-accent);
 }
-
 /* A–Z rail. Letters with nothing behind them are disabled rather than
    hidden, so the alphabet does not reflow as chapters change. */
-.az-rail {
+.rp-anatomy .az-rail {
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
   margin-bottom: 26px;
 }
-
-.az-btn {
+.rp-anatomy .az-btn {
   min-width: 30px;
   padding: 5px 6px;
   border: 1px solid transparent;
@@ -278,20 +239,16 @@
   font-size: 12px;
   cursor: pointer;
 }
-
-.az-btn:hover:not(:disabled) { background: var(--panel-2); color: var(--text); }
-.az-btn.is-on { background: var(--amber-accent); color: var(--bg); }
-.az-btn:disabled { opacity: 0.22; cursor: default; }
-
+.rp-anatomy .az-btn:hover:not(:disabled) { background: var(--panel-2); color: var(--text); }
+.rp-anatomy .az-btn.is-on { background: var(--amber-accent); color: var(--bg); }
+.rp-anatomy .az-btn:disabled { opacity: 0.22; cursor: default; }
 /* --- Structure cards ----------------------------------------------------- */
-
-.structure-grid {
+.rp-anatomy .structure-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 20px;
 }
-
-.structure-card {
+.rp-anatomy .structure-card {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
@@ -300,43 +257,35 @@
   overflow: hidden;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
-
-.structure-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
-
-.sc-thumb {
+.rp-anatomy .structure-card:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.rp-anatomy .sc-thumb {
   display: block;
   height: 168px;
   background: var(--void);
   overflow: hidden;
 }
-
-.sc-thumb .atlas-film { opacity: 0.9; transition: opacity 0.2s ease; }
-.structure-card:hover .sc-thumb .atlas-film { opacity: 1; }
-
-.sc-body { display: flex; flex-direction: column; gap: 5px; padding: 14px 15px 16px; }
-.sc-name { font-size: 15px; line-height: 1.3; }
-.sc-count { font-size: 11px; color: var(--text-faint); }
-.sc-mods { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.sc-mods .pill { font-size: 9.5px; padding: 2px 6px; }
-
-.atlas-empty {
+.rp-anatomy .sc-thumb .atlas-film { opacity: 0.9; transition: opacity 0.2s ease; }
+.rp-anatomy .structure-card:hover .sc-thumb .atlas-film { opacity: 1; }
+.rp-anatomy .sc-body { display: flex; flex-direction: column; gap: 5px; padding: 14px 15px 16px; }
+.rp-anatomy .sc-name { font-size: 15px; line-height: 1.3; }
+.rp-anatomy .sc-count { font-size: 11px; color: var(--text-faint); }
+.rp-anatomy .sc-mods { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.rp-anatomy .sc-mods .pill { font-size: 9.5px; padding: 2px 6px; }
+.rp-anatomy .atlas-empty {
   grid-column: 1 / -1;
   color: var(--text-dim);
   font-size: 14px;
   padding: 24px 0;
 }
-
 /* --- Gallery ------------------------------------------------------------- */
-
 /* Wide cards on purpose. A radiograph shrunk into a 200-pixel tile teaches
    nothing, and the whole feature is comparison by eye. */
-.gallery {
+.rp-anatomy .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
   gap: 26px;
 }
-
-.gallery-item {
+.rp-anatomy .gallery-item {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
@@ -344,8 +293,7 @@
   background: var(--panel);
   overflow: hidden;
 }
-
-.gallery-film {
+.rp-anatomy .gallery-film {
   display: block;
   width: 100%;
   height: 340px;
@@ -356,20 +304,15 @@
   cursor: zoom-in;
   container-type: inline-size;
 }
-
-.gallery-caption { display: flex; flex-direction: column; gap: 6px; padding: 15px 16px 17px; }
-
-.film-desc { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--text); }
-.film-desc.is-blank { color: var(--text-faint); font-style: italic; }
-
-.lb-facts,
-.gallery-caption .lb-facts { margin: 0; font-size: 11px; color: var(--text-faint); }
-.fact-sep { margin: 0 7px; opacity: 0.55; }
-
+.rp-anatomy .gallery-caption { display: flex; flex-direction: column; gap: 6px; padding: 15px 16px 17px; }
+.rp-anatomy .film-desc { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--text); }
+.rp-anatomy .film-desc.is-blank { color: var(--text-faint); font-style: italic; }
+.rp-anatomy .lb-facts, .rp-anatomy .gallery-caption .lb-facts { margin: 0; font-size: 11px; color: var(--text-faint); }
+.rp-anatomy .fact-sep { margin: 0 7px; opacity: 0.55; }
 /* The part this film is labelling. On an entity page — Mandible, Aorta,
    Humerus — this is the line that does the teaching, so it leads the caption
    and takes the accent, matching the badge drawn on the film itself. */
-.film-label {
+.rp-anatomy .film-label {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -380,11 +323,10 @@
   line-height: 1.2;
   color: var(--amber-accent);
 }
-
 /* The letter printed on the film, drawn as the same amber disc that marks it
    there. Two copies of one fact, so the eye can jump between them without
    going through the legend. */
-.film-label-key {
+.rp-anatomy .film-label-key {
   flex: none;
   display: grid;
   place-items: center;
@@ -399,10 +341,8 @@
   line-height: 1;
   transform: translateY(2px);
 }
-
-.film-answer { margin: 0; font-size: 12px; color: var(--text-dim); }
-
-.film-source {
+.rp-anatomy .film-answer { margin: 0; font-size: 12px; color: var(--text-dim); }
+.rp-anatomy .film-source {
   margin-top: 6px;
   align-self: flex-start;
   font-size: 11.5px;
@@ -410,83 +350,64 @@
   border-bottom: 1px solid rgba(217, 168, 78, 0.35);
   padding-bottom: 2px;
 }
-
-.film-source:hover { border-bottom-color: var(--amber-accent); }
-
+.rp-anatomy .film-source:hover { border-bottom-color: var(--amber-accent); }
 /* Editing entry points sit beside the source link, not above the anatomy. */
-.film-links {
+.rp-anatomy .film-links {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   align-items: baseline;
   margin-top: 6px;
 }
-
-.film-links .film-source { margin-top: 0; }
-
-.film-edit {
+.rp-anatomy .film-links .film-source { margin-top: 0; }
+.rp-anatomy .film-edit {
   font-size: 11.5px;
   color: var(--text-faint);
   border-bottom: 1px solid transparent;
   padding-bottom: 2px;
 }
-
-.film-edit:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
-
+.rp-anatomy .film-edit:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
 /* --- The legend: what else is on this film ------------------------------- */
-
-.film-legend {
+.rp-anatomy .film-legend {
   margin-top: 10px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
 }
-
-.film-legend-head { font-size: 9.5px; letter-spacing: 0.24em; }
-.film-legend-head::before { width: 14px; margin-right: 8px; }
-
-.film-legend-list { list-style: none; margin: 9px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
-
-.film-legend-list li {
+.rp-anatomy .film-legend-head { font-size: 9.5px; letter-spacing: 0.24em; }
+.rp-anatomy .film-legend-head::before { width: 14px; margin-right: 8px; }
+.rp-anatomy .film-legend-list { list-style: none; margin: 9px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.rp-anatomy .film-legend-list li {
   display: grid;
   grid-template-columns: 20px 1fr;
   gap: 4px 8px;
   align-items: baseline;
   font-size: 13px;
 }
-
-.legend-key { color: var(--text-faint); font-size: 11px; }
-.film-legend-list li.is-current .legend-key { color: var(--amber-accent); }
-
-.legend-name { color: var(--text-dim); }
-.film-legend-list li.is-current .legend-name { color: var(--text); }
-
-.legend-tag {
+.rp-anatomy .legend-key { color: var(--text-faint); font-size: 11px; }
+.rp-anatomy .film-legend-list li.is-current .legend-key { color: var(--amber-accent); }
+.rp-anatomy .legend-name { color: var(--text-dim); }
+.rp-anatomy .film-legend-list li.is-current .legend-name { color: var(--text); }
+.rp-anatomy .legend-tag {
   margin-left: 8px;
   font-size: 9.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--amber-accent);
 }
-
-.legend-link { color: var(--text-dim); border-bottom: 1px solid transparent; }
-.legend-link:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
-.legend-arrow { margin-left: 6px; opacity: 0.5; font-size: 11px; }
-.legend-link:hover .legend-arrow { opacity: 1; }
-
-.legend-note {
+.rp-anatomy .legend-link { color: var(--text-dim); border-bottom: 1px solid transparent; }
+.rp-anatomy .legend-link:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
+.rp-anatomy .legend-arrow { margin-left: 6px; opacity: 0.5; font-size: 11px; }
+.rp-anatomy .legend-link:hover .legend-arrow { opacity: 1; }
+.rp-anatomy .legend-note {
   grid-column: 2;
   color: var(--text-faint);
   font-size: 12px;
   line-height: 1.4;
 }
-
-.film-legend-compact { border-top-color: rgba(242, 238, 230, 0.14); }
-
+.rp-anatomy .film-legend-compact { border-top-color: rgba(242, 238, 230, 0.14); }
 /* --- Notes and teaching -------------------------------------------------- */
-
-.structure-notes { margin-bottom: 22px; max-width: 76ch; }
-
-.notes-toggle {
+.rp-anatomy .structure-notes { margin-bottom: 22px; max-width: 76ch; }
+.rp-anatomy .notes-toggle {
   display: flex;
   width: 100%;
   align-items: center;
@@ -501,48 +422,38 @@
   font-weight: 600;
   cursor: pointer;
 }
-
-.notes-body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 16px; }
-.notes-body p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--text-dim); }
-.note-block { display: flex; flex-direction: column; gap: 7px; }
-
-.teaching-drop { margin-top: 48px; max-width: 78ch; }
-
-.teaching-drop summary {
+.rp-anatomy .notes-body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 16px; }
+.rp-anatomy .notes-body p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--text-dim); }
+.rp-anatomy .note-block { display: flex; flex-direction: column; gap: 7px; }
+.rp-anatomy .teaching-drop { margin-top: 48px; max-width: 78ch; }
+.rp-anatomy .teaching-drop summary {
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-faint);
   letter-spacing: 0.04em;
 }
-
-.teaching-drop summary:hover { color: var(--amber-accent); }
-
-.teaching-body { display: flex; flex-direction: column; gap: 26px; padding-top: 20px; }
-.teaching-body p { margin: 0; color: var(--text-dim); font-size: 14.5px; line-height: 1.65; white-space: pre-wrap; }
-.teaching-body .eyebrow { margin-bottom: 8px; }
-.teaching-body a { color: var(--amber-accent); font-size: 11.5px; }
-
-.atlas-foot {
+.rp-anatomy .teaching-drop summary:hover { color: var(--amber-accent); }
+.rp-anatomy .teaching-body { display: flex; flex-direction: column; gap: 26px; padding-top: 20px; }
+.rp-anatomy .teaching-body p { margin: 0; color: var(--text-dim); font-size: 14.5px; line-height: 1.65; white-space: pre-wrap; }
+.rp-anatomy .teaching-body .rpa-eyebrow { margin-bottom: 8px; }
+.rp-anatomy .teaching-body a { color: var(--amber-accent); font-size: 11.5px; }
+.rp-anatomy .atlas-foot {
   margin-top: 56px;
   padding-top: 20px;
   border-top: 1px solid var(--line);
   font-size: 11.5px;
   color: var(--text-faint);
 }
-
-.atlas-foot a { color: var(--amber-accent); }
-.atlas-foot-sep { display: inline-block; width: 14px; }
-
+.rp-anatomy .atlas-foot a { color: var(--amber-accent); }
+.rp-anatomy .atlas-foot-sep { display: inline-block; width: 14px; }
 /* --- All-images view ----------------------------------------------------- */
-
-.film-grid {
+.rp-anatomy .film-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 22px;
 }
-
-.film-card {
+.rp-anatomy .film-card {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
@@ -550,98 +461,83 @@
   background: var(--panel);
   overflow: hidden;
 }
-
-.film-card-thumb { display: block; height: 210px; background: var(--void); }
-.film-card-thumb .atlas-film { opacity: 0.9; transition: opacity 0.2s ease; }
-.film-card-thumb:hover .atlas-film { opacity: 1; }
-
-.film-card-body { display: flex; flex-direction: column; gap: 7px; padding: 14px 15px 16px; }
-.film-structures { margin: 0; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
-.film-structures a { border-bottom: 1px solid transparent; }
-.film-structures a:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
-
+.rp-anatomy .film-card-thumb { display: block; height: 210px; background: var(--void); }
+.rp-anatomy .film-card-thumb .atlas-film { opacity: 0.9; transition: opacity 0.2s ease; }
+.rp-anatomy .film-card-thumb:hover .atlas-film { opacity: 1; }
+.rp-anatomy .film-card-body { display: flex; flex-direction: column; gap: 7px; padding: 14px 15px 16px; }
+.rp-anatomy .film-structures { margin: 0; font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+.rp-anatomy .film-structures a { border-bottom: 1px solid transparent; }
+.rp-anatomy .film-structures a:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
 /* --- Responsive ---------------------------------------------------------- */
-
 @media (max-width: 900px) {
-  .gallery { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-  .gallery-film { height: 300px; }
+  .rp-anatomy .gallery { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .rp-anatomy .gallery-film { height: 300px; }
 }
-
 @media (max-width: 640px) {
   /* Still clear of the fixed header — only the breathing room below it is
      trimmed. Setting a flat 20px here put the breadcrumbs under the bar. */
   /* The site-wide measure keeps 48px of margin each side, which on a 375px
      phone spends a quarter of the screen on nothing. Films need that width. */
-  .atlas {
+  .rp-anatomy .atlas {
     width: min(1200px, calc(100vw - 32px));
     padding-top: calc(var(--header-h) + 12px);
   }
-  .atlas-crumbs { display: none; }
-  .atlas-back { display: inline-flex; }
-  .chapter-grid { grid-template-columns: 1fr; }
-  .structure-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  .sc-thumb { height: 130px; }
-  .gallery { grid-template-columns: 1fr; gap: 22px; }
+  .rp-anatomy .atlas-crumbs { display: none; }
+  .rp-anatomy .atlas-back { display: inline-flex; }
+  .rp-anatomy .chapter-grid { grid-template-columns: 1fr; }
+  .rp-anatomy .structure-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .rp-anatomy .sc-thumb { height: 130px; }
+  .rp-anatomy .gallery { grid-template-columns: 1fr; gap: 22px; }
   /* Never smaller than this: a phone is where most revision happens, and a
      postage-stamp radiograph is worse than no radiograph. */
-  .gallery-film { height: min(74vw, 330px); }
-  .film-grid { grid-template-columns: 1fr; }
-  .az-rail { gap: 2px; }
-  .az-btn { min-width: 26px; font-size: 11px; }
+  .rp-anatomy .gallery-film { height: min(74vw, 330px); }
+  .rp-anatomy .film-grid { grid-template-columns: 1fr; }
+  .rp-anatomy .az-rail { gap: 2px; }
+  .rp-anatomy .az-btn { min-width: 26px; font-size: 11px; }
 }
-
 /* --- Related anatomy -----------------------------------------------------
    Shown, because the owner wants the aorta wherever it appears — but shown
    UNDER ITS OWN NAME and at a smaller size than the gallery above, so the
    page never implies that a descending thoracic aorta is an abdominal one.
    The structure you asked for stays the biggest thing on the page. */
-
-.related-band {
+.rp-anatomy .related-band {
   margin-top: 56px;
   padding-top: 28px;
   border-top: 1px solid var(--line);
 }
-
-.related-head { max-width: 62ch; margin-bottom: 26px; }
-
-.related-note {
+.rp-anatomy .related-head { max-width: 62ch; margin-bottom: 26px; }
+.rp-anatomy .related-note {
   margin: 12px 0 0;
   color: var(--text-faint);
   font-size: 13px;
   line-height: 1.55;
 }
-
-.related-row { margin-bottom: 26px; }
-
-.related-row-head {
+.rp-anatomy .related-row { margin-bottom: 26px; }
+.rp-anatomy .related-row-head {
   display: flex;
   align-items: baseline;
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
-
-.related-name {
+.rp-anatomy .related-name {
   font-family: var(--font-display);
   font-weight: 340;
   font-size: 19px;
   border-bottom: 1px solid transparent;
 }
-
-.related-name:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
-.related-meta { font-size: 11px; color: var(--text-faint); }
-
+.rp-anatomy .related-name:hover { color: var(--amber-accent); border-bottom-color: rgba(217, 168, 78, 0.4); }
+.rp-anatomy .related-meta { font-size: 11px; color: var(--text-faint); }
 /* A strip rather than a grid: related anatomy is a lead to follow, not the
    thing being studied. It scrolls sideways instead of pushing the page down. */
-.related-strip {
+.rp-anatomy .related-strip {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 6px;
   scroll-snap-type: x proximity;
 }
-
-.related-thumb {
+.rp-anatomy .related-thumb {
   flex: none;
   width: 168px;
   height: 132px;
@@ -652,10 +548,8 @@
   scroll-snap-align: start;
   transition: border-color 0.2s ease;
 }
-
-.related-thumb:hover { border-color: var(--line-strong); }
-
-.related-more {
+.rp-anatomy .related-thumb:hover { border-color: var(--line-strong); }
+.rp-anatomy .related-more {
   flex: none;
   display: grid;
   place-items: center;
@@ -666,9 +560,7 @@
   color: var(--text-faint);
   font-size: 12px;
 }
-
-.related-more:hover { color: var(--amber-accent); border-color: var(--line-strong); }
-
+.rp-anatomy .related-more:hover { color: var(--amber-accent); border-color: var(--line-strong); }
 @media (max-width: 640px) {
-  .related-thumb { width: 132px; height: 104px; }
+  .rp-anatomy .related-thumb { width: 132px; height: 104px; }
 }

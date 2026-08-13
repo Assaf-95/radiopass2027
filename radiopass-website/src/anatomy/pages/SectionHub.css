@@ -1,4 +1,10 @@
-.hub {
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
+.rp-anatomy .hub {
   max-width: 1180px;
   margin: 0 auto;
   /* .app-header is fixed and goes opaque the instant scrollY passes 24px
@@ -8,15 +14,13 @@
   padding: calc(var(--header-h) + 24px) 24px 80px;
   width: 100%;
 }
-
-.back-link {
+.rp-anatomy .back-link {
   display: inline-block;
   color: var(--text-dim);
   font-size: 13.5px;
   margin-bottom: 16px;
 }
-
-.hub-head {
+.rp-anatomy .hub-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -24,15 +28,12 @@
   gap: 14px;
   margin-bottom: 20px;
 }
-
-.hub-sub { color: var(--text-dim); margin-top: 4px; }
-
-.hub-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
+.rp-anatomy .hub-sub { color: var(--text-dim); margin-top: 4px; }
+.rp-anatomy .hub-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 /* A readout strip, like the metrics band on a workstation: fixed columns so
    the eight figures stay on one line and can be scanned across, with hairline
    dividers instead of boxes. */
-.hub-stats {
+.rp-anatomy .hub-stats {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 0;
@@ -40,57 +41,49 @@
   margin-bottom: 18px;
   overflow: hidden;
 }
-
-.stat {
+.rp-anatomy .stat {
   display: flex;
   flex-direction: column;
   gap: 3px;
   padding: 16px 18px;
   border-right: 1px solid var(--line);
 }
-
-.stat:last-child { border-right: none; }
-
-.stat-value {
+.rp-anatomy .stat:last-child { border-right: none; }
+.rp-anatomy .stat-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
-
-.stat-label {
+.rp-anatomy .stat-label {
   font-size: 10px;
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   white-space: nowrap;
 }
-
 @media (max-width: 900px) {
-  .hub-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .stat:nth-child(4n) { border-right: none; }
-  .stat:nth-child(-n + 4) { border-bottom: 1px solid var(--line); }
+  .rp-anatomy .hub-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .rp-anatomy .stat:nth-child(4n) { border-right: none; }
+  .rp-anatomy .stat:nth-child(-n + 4) { border-bottom: 1px solid var(--line); }
 }
-
 @media (max-width: 520px) {
-  .hub-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stat:nth-child(2n) { border-right: none; }
-  .stat:nth-child(-n + 6) { border-bottom: 1px solid var(--line); }
+  .rp-anatomy .hub-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rp-anatomy .stat:nth-child(2n) { border-right: none; }
+  .rp-anatomy .stat:nth-child(-n + 6) { border-bottom: 1px solid var(--line); }
 }
-.tone-green { color: var(--green); }
-.tone-amber { color: var(--amber); }
-.tone-red { color: var(--red); }
-.tone-purple { color: var(--purple); }
-
-.review-row {
+.rp-anatomy .tone-green { color: var(--green); }
+.rp-anatomy .tone-amber { color: var(--amber); }
+.rp-anatomy .tone-red { color: var(--red); }
+.rp-anatomy .tone-purple { color: var(--purple); }
+.rp-anatomy .review-row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
-
-.review-chip {
+.rp-anatomy .review-chip {
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);
@@ -100,12 +93,10 @@
   font-weight: 600;
   cursor: pointer;
 }
-
-.review-chip:hover { background: var(--panel-2); }
-.review-chip:disabled { opacity: 0.4; cursor: not-allowed; }
-.review-chip.danger { color: var(--red); border-color: var(--red-bg); }
-
-.confirm-bar {
+.rp-anatomy .review-chip:hover { background: var(--panel-2); }
+.rp-anatomy .review-chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.rp-anatomy .review-chip.danger { color: var(--red); border-color: var(--red-bg); }
+.rp-anatomy .confirm-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -114,16 +105,13 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-
-.confirm-actions { display: flex; gap: 8px; }
-
-.browse-toggle {
+.rp-anatomy .confirm-actions { display: flex; gap: 8px; }
+.rp-anatomy .browse-toggle {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
 }
-
-.toggle-btn {
+.rp-anatomy .toggle-btn {
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text-dim);
@@ -133,39 +121,32 @@
   font-weight: 600;
   cursor: pointer;
 }
-
-.toggle-btn.active {
+.rp-anatomy .toggle-btn.active {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-contrast);
 }
-
-.browse-grid {
+.rp-anatomy .browse-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 14px;
   margin-bottom: 32px;
 }
-
-.browse-card {
+.rp-anatomy .browse-card {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
-.browse-card h3 { font-size: 14.5px; }
-.browse-count { color: var(--text-faint); font-size: 12.5px; }
-
-.question-index h3 { margin-bottom: 12px; font-size: 15px; }
-
-.index-grid {
+.rp-anatomy .browse-card h3 { font-size: 14.5px; }
+.rp-anatomy .browse-count { color: var(--text-faint); font-size: 12.5px; }
+.rp-anatomy .question-index h3 { margin-bottom: 12px; font-size: 15px; }
+.rp-anatomy .index-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
   gap: 6px;
 }
-
-.idx-cell {
+.rp-anatomy .idx-cell {
   position: relative;
   aspect-ratio: 1;
   border-radius: 8px;
@@ -175,23 +156,20 @@
   cursor: pointer;
   color: var(--text);
 }
-
-.idx-cell.grey { background: var(--grey-bg); }
-.idx-cell.blue { background: var(--blue-bg); }
-.idx-cell.green { background: var(--green-bg); color: var(--green); }
-.idx-cell.amber { background: var(--amber-bg); color: var(--amber); }
-.idx-cell.red { background: var(--red-bg); color: var(--red); }
-.idx-cell.purple { background: var(--purple-bg); color: var(--purple); }
-
-.idx-fav {
+.rp-anatomy .idx-cell.grey { background: var(--grey-bg); }
+.rp-anatomy .idx-cell.blue { background: var(--blue-bg); }
+.rp-anatomy .idx-cell.green { background: var(--green-bg); color: var(--green); }
+.rp-anatomy .idx-cell.amber { background: var(--amber-bg); color: var(--amber); }
+.rp-anatomy .idx-cell.red { background: var(--red-bg); color: var(--red); }
+.rp-anatomy .idx-cell.purple { background: var(--purple-bg); color: var(--purple); }
+.rp-anatomy .idx-fav {
   position: absolute;
   top: -4px;
   right: -4px;
   font-size: 9px;
   color: var(--red);
 }
-
-.empty-state {
+.rp-anatomy .empty-state {
   padding: 40px;
   text-align: center;
   color: var(--text-dim);
@@ -200,12 +178,11 @@
   align-items: center;
   gap: 16px;
 }
-
 /* Section backdrop. The image is atmosphere, not content: it is held behind
    everything, dimmed, and faded out toward the left and bottom so the title
    and the case list keep full contrast over it. */
-.hub-has-hero { position: relative; isolation: isolate; }
-.hub-hero {
+.rp-anatomy .hub-has-hero { position: relative; isolation: isolate; }
+.rp-anatomy .hub-hero {
   position: absolute; inset: -20px -20px auto -20px; height: 340px; z-index: -1;
   background-size: cover; background-position: center right;
   opacity: 0.5;
@@ -215,4 +192,6 @@
                       linear-gradient(to right, transparent 0%, #000 42%);
   -webkit-mask-composite: source-in; mask-composite: intersect;
 }
-@media (max-width: 800px) { .hub-hero { height: 220px; opacity: 0.34; } }
+@media (max-width: 800px) {
+  .rp-anatomy .hub-hero { height: 220px; opacity: 0.34; }
+}

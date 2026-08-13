@@ -1,15 +1,19 @@
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
 /* One continuous body, travelled by scroll. The wrapper is the length of the
    film; the sticky viewport is the camera; .giant-human is the specimen. No
    CSS transitions on anything the rAF loop owns — scroll IS the timeline. */
-
-.anatomy-journey {
+.rp-anatomy .anatomy-journey {
   position: relative;
   height: 460vh;
   z-index: 1;
   background: #000000;
 }
-
-.journey-viewport {
+.rp-anatomy .journey-viewport {
   position: sticky;
   top: 0;
   height: 100vh;
@@ -17,32 +21,26 @@
   overflow: hidden;
   background: #000000;
 }
-
 /* Reduced motion: no pin, no travel — the composed body, readable at rest. */
-.anatomy-journey.is-static { height: auto; }
-.anatomy-journey.is-static .journey-viewport {
+.rp-anatomy .anatomy-journey.is-static { height: auto; }
+.rp-anatomy .anatomy-journey.is-static .journey-viewport {
   position: relative;
   height: auto;
   min-height: 100vh;
 }
-.anatomy-journey.is-static .giant-human { position: relative; height: 400vh; }
-.anatomy-journey.is-static .journey-callout { opacity: 1; --line-draw: 1; }
-.anatomy-journey.is-static .journey-names,
-.anatomy-journey.is-static .journey-panels { display: none; }
-
+.rp-anatomy .anatomy-journey.is-static .giant-human { position: relative; height: 400vh; }
+.rp-anatomy .anatomy-journey.is-static .journey-callout { opacity: 1; --line-draw: 1; }
+.rp-anatomy .anatomy-journey.is-static .journey-names, .rp-anatomy .anatomy-journey.is-static .journey-panels { display: none; }
 /* --- Layers, back to front ------------------------------------------------ */
-
-.journey-far { position: absolute; inset: 0; z-index: 0; will-change: transform; }
-
-.far-rule {
+.rp-anatomy .journey-far { position: absolute; inset: 0; z-index: 0; will-change: transform; }
+.rp-anatomy .far-rule {
   position: absolute;
   right: 3vw;
   font-size: 9px;
   letter-spacing: 0.3em;
   color: rgba(139, 146, 155, 0.22);
 }
-
-.far-rule::before {
+.rp-anatomy .far-rule::before {
   content: '';
   display: inline-block;
   width: 34px;
@@ -51,10 +49,8 @@
   background: rgba(139, 146, 155, 0.16);
   vertical-align: middle;
 }
-
-.journey-panels { position: absolute; inset: 0; z-index: 1; will-change: transform; }
-
-.journey-panel {
+.rp-anatomy .journey-panels { position: absolute; inset: 0; z-index: 1; will-change: transform; }
+.rp-anatomy .journey-panel {
   position: absolute;
   opacity: 0.34;
   border: 1px solid rgba(242, 238, 230, 0.1);
@@ -62,10 +58,8 @@
   overflow: hidden;
   background: #07080B;
 }
-
-.journey-panel img { display: block; width: 100%; height: auto; }
-
-.journey-panel-label {
+.rp-anatomy .journey-panel img { display: block; width: 100%; height: auto; }
+.rp-anatomy .journey-panel-label {
   position: absolute;
   top: 6px;
   right: 8px;
@@ -73,10 +67,8 @@
   letter-spacing: 0.18em;
   color: rgba(214, 230, 242, 0.6);
 }
-
 /* --- The body ------------------------------------------------------------- */
-
-.giant-human {
+.rp-anatomy .giant-human {
   position: absolute;
   top: 0;
   left: 0;
@@ -85,9 +77,8 @@
   z-index: 2;
   will-change: transform;
 }
-
 /* The specimen: one frontal composition, centred on the beam's axis. */
-.body-full {
+.rp-anatomy .body-full {
   position: absolute;
   top: 0;
   left: 57%;
@@ -95,10 +86,8 @@
   width: auto;
   transform: translateX(-50%);
 }
-
 /* --- Callouts ------------------------------------------------------------- */
-
-.journey-callout {
+.rp-anatomy .journey-callout {
   position: absolute;
   display: flex;
   align-items: center;
@@ -106,21 +95,17 @@
   opacity: 0;
   z-index: 4;
 }
-
-.journey-callout.is-left { flex-direction: row-reverse; }
-
-.journey-callout-line {
+.rp-anatomy .journey-callout.is-left { flex-direction: row-reverse; }
+.rp-anatomy .journey-callout-line {
   display: block;
   width: 64px;
   height: 1px;
   background: rgba(217, 168, 78, 0.55);
   transform: scaleX(var(--line-draw, 0));
 }
-
-.journey-callout.is-right .journey-callout-line { transform-origin: left; }
-.journey-callout.is-left .journey-callout-line { transform-origin: right; }
-
-.journey-callout-title {
+.rp-anatomy .journey-callout.is-right .journey-callout-line { transform-origin: left; }
+.rp-anatomy .journey-callout.is-left .journey-callout-line { transform-origin: right; }
+.rp-anatomy .journey-callout-title {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-weight: 380;
@@ -129,10 +114,8 @@
   color: #f2eee6;
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
 }
-
 /* --- Fixed optics --------------------------------------------------------- */
-
-.journey-beam {
+.rp-anatomy .journey-beam {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -150,9 +133,8 @@
   box-shadow: 0 0 54px 16px rgba(140, 180, 214, 0.12);
   pointer-events: none;
 }
-
 /* The sectional level: a thin luminous line the body passes through. */
-.journey-plane {
+.rp-anatomy .journey-plane {
   position: absolute;
   left: 38%;
   right: 6%;
@@ -169,10 +151,8 @@
   );
   pointer-events: none;
 }
-
 /* --- Content -------------------------------------------------------------- */
-
-.journey-copy {
+.rp-anatomy .journey-copy {
   position: absolute;
   z-index: 5;
   left: max(4vw, 24px);
@@ -184,8 +164,7 @@
   max-width: 620px;
   will-change: transform, opacity;
 }
-
-.journey-names {
+.rp-anatomy .journey-names {
   position: absolute;
   z-index: 5;
   left: max(4vw, 24px);
@@ -194,8 +173,7 @@
   gap: 10px;
   pointer-events: none;
 }
-
-.journey-name {
+.rp-anatomy .journey-name {
   margin: 0;
   display: flex;
   align-items: baseline;
@@ -207,14 +185,12 @@
   color: #d5d1c8;
   opacity: 0;
 }
-
-.journey-name .mono {
+.rp-anatomy .journey-name .mono {
   font-size: 10px;
   color: rgba(217, 168, 78, 0.9);
 }
-
 /* Legibility wash on the copy side only. */
-.journey-viewport::before {
+.rp-anatomy .journey-viewport::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -228,27 +204,22 @@
     rgba(0, 0, 0, 0.04) 64%
   );
 }
-
-.journey-viewport .hero-cue { z-index: 6; }
-
+.rp-anatomy .journey-viewport .hero-cue { z-index: 6; }
 /* --- Information-first hero furniture ------------------------------------ */
-
-.hero-meta {
+.rp-anatomy .hero-meta {
   margin: 18px 0 0;
   font-size: 12px;
   letter-spacing: 0.08em;
   color: rgba(217, 168, 78, 0.85);
 }
-
-.journey-modules {
+.rp-anatomy .journey-modules {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 26px;
   max-width: 560px;
 }
-
-.journey-chip {
+.rp-anatomy .journey-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -260,11 +231,9 @@
   color: #d5d1c8;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
-
-.journey-chip:hover { border-color: var(--amber-accent); color: #ffffff; background: rgba(217, 168, 78, 0.08); }
-.journey-chip .mono { font-size: 10px; color: rgba(217, 168, 78, 0.9); }
-
-.journey-skip {
+.rp-anatomy .journey-chip:hover { border-color: var(--amber-accent); color: #ffffff; background: rgba(217, 168, 78, 0.08); }
+.rp-anatomy .journey-chip .mono { font-size: 10px; color: rgba(217, 168, 78, 0.9); }
+.rp-anatomy .journey-skip {
   display: inline-block;
   margin-top: 22px;
   padding: 8px 2px;
@@ -278,24 +247,20 @@
   cursor: pointer;
   transition: border-color 0.2s;
 }
-
-.journey-skip:hover { border-bottom-color: var(--amber-accent); }
-
+.rp-anatomy .journey-skip:hover { border-bottom-color: var(--amber-accent); }
 /* --- Responsive ----------------------------------------------------------- */
-
 @media (max-width: 1100px) {
-  .anatomy-journey { height: 420vh; }
-  .journey-panel:nth-of-type(2n) { display: none; }
+  .rp-anatomy .anatomy-journey { height: 420vh; }
+  .rp-anatomy .journey-panel:nth-of-type(2n) { display: none; }
 }
-
 @media (max-width: 900px) {
-  .anatomy-journey { height: 320vh; }
-  .journey-panels, .journey-callout, .journey-far { display: none; }
-  .body-full { left: 50%; }
-  .journey-beam { left: 50%; }
-  .journey-copy { top: auto; bottom: 16vh; translate: 0 0; transform: none; }
-  .journey-names { display: none; }
-  .journey-viewport::before {
+  .rp-anatomy .anatomy-journey { height: 320vh; }
+  .rp-anatomy .journey-panels, .rp-anatomy .journey-callout, .rp-anatomy .journey-far { display: none; }
+  .rp-anatomy .body-full { left: 50%; }
+  .rp-anatomy .journey-beam { left: 50%; }
+  .rp-anatomy .journey-copy { top: auto; bottom: 16vh; translate: 0 0; transform: none; }
+  .rp-anatomy .journey-names { display: none; }
+  .rp-anatomy .journey-viewport::before {
     background: linear-gradient(
       180deg,
       rgba(0, 0, 0, 0.4) 0%,
@@ -306,7 +271,6 @@
     );
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .cue-arrow { animation: none; }
+  .rp-anatomy .cue-arrow { animation: none; }
 }

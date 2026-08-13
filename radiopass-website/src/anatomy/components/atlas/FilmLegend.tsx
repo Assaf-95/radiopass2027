@@ -61,7 +61,7 @@ export default function FilmLegend({ image, currentKey, currentName, chapter, co
 
   return (
     <div className={compact ? 'film-legend film-legend-compact' : 'film-legend'}>
-      <p className="film-legend-head eyebrow">Structures in this image</p>
+      <p className="film-legend-head rpa-eyebrow">Structures in this image</p>
       <ul className="film-legend-list">
         {rows.map((r) => (
           <li key={r.label} className={r.current ? 'is-current' : undefined}>

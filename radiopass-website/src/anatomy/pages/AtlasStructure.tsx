@@ -118,7 +118,7 @@ export default function AtlasStructure() {
       />
 
       <header className="atlas-head structure-head">
-        <p className="eyebrow">{chapter.title}</p>
+        <p className="rpa-eyebrow">{chapter.title}</p>
         <h1>{structure.name}</h1>
         <p className="atlas-figures mono">
           {allImages.length} {allImages.length === 1 ? 'image' : 'images'}
@@ -172,19 +172,19 @@ export default function AtlasStructure() {
               {structure.description && <p>{structure.description}</p>}
               {structure.keyRecognitionFeature && (
                 <div className="note-block">
-                  <p className="eyebrow">How to recognise it</p>
+                  <p className="rpa-eyebrow">How to recognise it</p>
                   <p>{structure.keyRecognitionFeature}</p>
                 </div>
               )}
               {structure.commonPitfall && (
                 <div className="note-block">
-                  <p className="eyebrow">Common confusion</p>
+                  <p className="rpa-eyebrow">Common confusion</p>
                   <p>{structure.commonPitfall}</p>
                 </div>
               )}
               {structure.examTip && (
                 <div className="note-block">
-                  <p className="eyebrow">FRCR tip</p>
+                  <p className="rpa-eyebrow">FRCR tip</p>
                   <p>{structure.examTip}</p>
                 </div>
               )}
@@ -338,7 +338,7 @@ export default function AtlasStructure() {
       {related.length > 0 && (
         <section className="related-band" aria-label="Related structures">
           <header className="related-head">
-            <p className="eyebrow">Related anatomy</p>
+            <p className="rpa-eyebrow">Related anatomy</p>
             <p className="related-note">
               Other parts of the same structure, each under its own name. They are not
               merged into the gallery above — a descending thoracic aorta is not an
@@ -408,7 +408,7 @@ export default function AtlasStructure() {
               .filter((i) => i.teachingText)
               .map((i) => (
                 <section key={i.id}>
-                  <p className="eyebrow">
+                  <p className="rpa-eyebrow">
                     {i.caseLabel ?? `Question ${i.questionNumber}`} · {i.sourceFile}
                   </p>
                   <p>{i.teachingText}</p>

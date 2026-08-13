@@ -591,7 +591,7 @@ export default function MriViewer() {
           </label>
           <select
             id="mri-study"
-            className="mri-select"
+            className="rpa-mri-select"
             value={BASE.id}
             onChange={(e) => {
               window.location.hash = `#/mri/${e.target.value}`;
@@ -610,7 +610,7 @@ export default function MriViewer() {
             id="mri-mode"
             value={mode}
             onChange={(e) => setMode(e.target.value as Mode)}
-            className="mri-select"
+            className="rpa-mri-select"
           >
             {modesFor(BASE).map((m) => (
               <option key={m.id} value={m.id}>
@@ -649,7 +649,7 @@ export default function MriViewer() {
       </header>
 
       <div className="mri-body">
-        <aside className="mri-controls">
+        <aside className="rpa-mri-controls">
           <section>
             <h2 className="mri-h">Slice</h2>
             <div className="mri-row">
@@ -781,7 +781,7 @@ export default function MriViewer() {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="mri-canvas" ref={canvasRef} onClick={onCanvasClick}>
+          <div className="rpa-mri-canvas" ref={canvasRef} onClick={onCanvasClick}>
             <img
               ref={imgRef}
               className="mri-image"
@@ -888,7 +888,7 @@ export default function MriViewer() {
               <h2 className="mri-h">Quiz</h2>
               <div className="mri-row">
                 <select
-                  className="mri-select"
+                  className="rpa-mri-select"
                   value={quizKind}
                   onChange={(e) => setQuizKind(e.target.value as 'typed' | 'choice')}
                 >
@@ -896,7 +896,7 @@ export default function MriViewer() {
                   <option value="choice">Multiple choice</option>
                 </select>
                 <select
-                  className="mri-select"
+                  className="rpa-mri-select"
                   value={quizFilter}
                   onChange={(e) => setQuizFilter(e.target.value as 'all' | StructureCategory)}
                 >
@@ -991,12 +991,12 @@ export default function MriViewer() {
           ) : editing ? (
             <div className="mri-editor">
               <h2 className="mri-h">Annotation editor</h2>
-              <p className="mri-note">
+              <p className="rpa-mri-note">
                 Pick a structure, then click the image to place its arrow tip on this slice.
                 Everything is stored per slice; slices between two edited ones are interpolated.
               </p>
               <select
-                className="mri-select mri-wide"
+                className="rpa-mri-select mri-wide"
                 value={editTarget ?? ''}
                 onChange={(e) => setEditTarget(e.target.value || null)}
               >
@@ -1026,7 +1026,7 @@ export default function MriViewer() {
                         <label className="mri-field">
                           <span>Category</span>
                           <select
-                            className="mri-select"
+                            className="rpa-mri-select"
                             value={s.category}
                             onChange={(e) =>
                               patchStructure(s.structureId, {
@@ -1068,7 +1068,7 @@ export default function MriViewer() {
                         <label className="mri-field">
                           <span>Confidence</span>
                           <select
-                            className="mri-select"
+                            className="rpa-mri-select"
                             value={s.confidence}
                             onChange={(e) =>
                               patchStructure(s.structureId, {
@@ -1194,7 +1194,7 @@ export default function MriViewer() {
                   </dd>
                 </div>
               </dl>
-              {selectedStructure.note && <p className="mri-note">{selectedStructure.note}</p>}
+              {selectedStructure.note && <p className="rpa-mri-note">{selectedStructure.note}</p>}
               <button
                 type="button"
                 className="btn"
@@ -1207,9 +1207,9 @@ export default function MriViewer() {
               </button>
             </div>
           ) : (
-            <div className="mri-legend">
+            <div className="rpa-mri-legend">
               <h2 className="mri-h">On this slice</h2>
-              <p className="mri-note">{level}</p>
+              <p className="rpa-mri-note">{level}</p>
               <ul>
                 {visible.map((s) => (
                   <li key={s.structureId}>
@@ -1219,7 +1219,7 @@ export default function MriViewer() {
                     </button>
                   </li>
                 ))}
-                {!visible.length && <li className="mri-note">No labels in this mode.</li>}
+                {!visible.length && <li className="rpa-mri-note">No labels in this mode.</li>}
               </ul>
               <p className="mri-provenance">{study.provenance}</p>
             </div>
@@ -1227,7 +1227,7 @@ export default function MriViewer() {
         </aside>
       </div>
 
-      <div className="mri-scrub">
+      <div className="rpa-mri-scrub">
         <input
           type="range"
           min={0}

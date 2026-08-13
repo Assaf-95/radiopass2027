@@ -1,4 +1,10 @@
-.disp {
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
+.rp-anatomy .disp {
   max-width: 800px;
   margin: 0 auto;
   /* .app-header is fixed at --header-h tall and goes opaque past 24px of
@@ -6,19 +12,11 @@
   padding: calc(var(--header-h) + 24px) 24px 80px;
   width: 100%;
 }
-
-.disp h1 { margin-bottom: 18px; font-size: 26px; }
-
-.disp-list { display: flex; flex-direction: column; gap: 14px; }
-
-.disp-card { padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
-
-.disp-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
-
-.disp-source { font-size: 11.5px; color: var(--text-faint); margin-left: auto; }
-
-.disp-note { color: var(--text-dim); }
-
-.disp-override { color: var(--accent); font-size: 12.5px; }
-
-.disp-actions { display: flex; gap: 8px; margin-top: 6px; }
+.rp-anatomy .disp h1 { margin-bottom: 18px; font-size: 26px; }
+.rp-anatomy .disp-list { display: flex; flex-direction: column; gap: 14px; }
+.rp-anatomy .disp-card { padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.rp-anatomy .disp-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.rp-anatomy .disp-source { font-size: 11.5px; color: var(--text-faint); margin-left: auto; }
+.rp-anatomy .disp-note { color: var(--text-dim); }
+.rp-anatomy .disp-override { color: var(--accent); font-size: 12.5px; }
+.rp-anatomy .disp-actions { display: flex; gap: 8px; margin-top: 6px; }

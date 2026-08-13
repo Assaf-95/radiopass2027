@@ -1,4 +1,10 @@
-.iv-root {
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
+.rp-anatomy .iv-root {
   position: relative;
   width: 100%;
   height: 100%;
@@ -9,15 +15,13 @@
   align-items: center;
   justify-content: center;
 }
-
-.iv-canvas {
+.rp-anatomy .iv-canvas {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   touch-action: none;
 }
-
 /* Sized and positioned in JS (ImageViewer's imgBox) to exactly match the
    image's actual rendered content rect within the canvas — a CSS
    max-height:100% chain can't do this reliably, because a max-height cap on
@@ -28,39 +32,35 @@
    regardless of letterboxing. */
 /* Clips the crop. Without this the oversized image inside would spill past
    the fitted box and the cropped-off question stem would still be visible. */
-.iv-image-wrap {
+.rp-anatomy .iv-image-wrap {
   position: absolute;
   overflow: hidden;
   transition: transform 0.06s linear, opacity 0.1s ease;
   will-change: transform;
 }
-
-.iv-image {
+.rp-anatomy .iv-image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
   user-select: none;
 }
-
-.iv-fullscreen {
+.rp-anatomy .iv-fullscreen {
   position: fixed;
   inset: 0;
   z-index: 1000;
   border-radius: 0;
   background: #000;
 }
-
-.iv-fullscreen .iv-image-wrap {
+.rp-anatomy .iv-fullscreen .iv-image-wrap {
   transition: none;
 }
-
 /* Leader lines + arrowheads, drawn beneath the badges so a line never
    crosses over a letter. Shares the markers' 0-100 percentage space
    stretched to the image box, so an arrow tip stays locked to its structure
    at every zoom level and viewport size. overflow:visible keeps an
    arrowhead near the edge from being clipped. */
-.iv-arrow-layer {
+.rp-anatomy .iv-arrow-layer {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -68,8 +68,7 @@
   overflow: visible;
   pointer-events: none;
 }
-
-.iv-marker {
+.rp-anatomy .iv-marker {
   position: absolute;
   width: var(--marker-size, 4.5%);
   aspect-ratio: 1 / 1;
@@ -77,24 +76,22 @@
   pointer-events: none;
   container-type: inline-size;
 }
-
 /* Replace mode only: an opaque plate a little larger than the badge, so the
    source atlas's own printed letter underneath — including its
    anti-aliased edge and any halo — is fully concealed rather than peeking
    out around our badge. Deliberately neutral dark so it reads as part of
    the film rather than as a sticker. */
-.iv-marker-mask {
+.rp-anatomy .iv-marker-mask {
   position: absolute;
   inset: -9%;
   border-radius: 50%;
   background: #0B0D10;
 }
-
 /* The badge carries the marker's own colour, so a colour choice shows on the
    letter and not only on the arrow. The rim uses the pointer's halo colour,
    which is what keeps a white badge legible against a bright mediastinum and
    a black one legible in a lung field. */
-.iv-marker-dot {
+.rp-anatomy .iv-marker-dot {
   position: absolute;
   inset: 0;
   display: flex;
@@ -108,8 +105,7 @@
   font-weight: 700;
   line-height: 1;
 }
-
-.iv-controls {
+.rp-anatomy .iv-controls {
   position: absolute;
   bottom: 16px;
   left: 50%;
@@ -127,8 +123,7 @@
   max-width: calc(100vw - 32px);
   justify-content: center;
 }
-
-.iv-controls button {
+.rp-anatomy .iv-controls button {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #e8ecf1;
@@ -138,45 +133,38 @@
   cursor: pointer;
   white-space: nowrap;
 }
-
-.iv-controls button:hover {
+.rp-anatomy .iv-controls button:hover {
   background: rgba(255, 255, 255, 0.16);
 }
-
-.iv-toggle.active {
+.rp-anatomy .iv-toggle.active {
   background: var(--accent, #D9A84E);
   color: #06201f;
   border-color: var(--accent, #D9A84E);
 }
-
-.iv-zoom-label {
+.rp-anatomy .iv-zoom-label {
   color: #cfd6e0;
   font-size: 12px;
   min-width: 42px;
   text-align: center;
 }
-
-.iv-sep {
+.rp-anatomy .iv-sep {
   width: 1px;
   align-self: stretch;
   background: rgba(255, 255, 255, 0.14);
   margin: 0 2px;
 }
-
-.iv-slider {
+.rp-anatomy .iv-slider {
   display: flex;
   align-items: center;
   gap: 4px;
   color: #cfd6e0;
   font-size: 12px;
 }
-
-.iv-slider input[type='range'] {
+.rp-anatomy .iv-slider input[type='range'] {
   width: 64px;
   accent-color: var(--accent, #D9A84E);
 }
-
-.iv-close-x {
+.rp-anatomy .iv-close-x {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -190,17 +178,15 @@
   font-size: 16px;
   cursor: pointer;
 }
-
-.iv-close-x:hover {
+.rp-anatomy .iv-close-x:hover {
   background: rgba(255, 255, 255, 0.2);
 }
-
 /* Orientation layer: holds the film in its un-rotated proportions and is
    turned as a whole inside .iv-image-wrap, which is sized to the rotated
    result. Centred on the wrapper's midpoint so a quarter turn lands square.
    Markers are siblings of this, not children — they are stored in the
    oriented space already. */
-.iv-orient {
+.rp-anatomy .iv-orient {
   position: absolute;
   left: 50%;
   top: 50%;

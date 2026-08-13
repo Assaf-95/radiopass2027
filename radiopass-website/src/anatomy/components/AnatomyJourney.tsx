@@ -300,7 +300,7 @@ export default function AnatomyJourney({ startTo, onQuestionBank, metaLine, onSk
           <p className="hero-eq">See what the structure means.</p>
           <p className="hero-sub">Interactive visual learning for FRCR anatomy.</p>
           {metaLine && <p className="hero-meta mono">{metaLine}</p>}
-          <div className="hero-actions">
+          <div className="rpa-hero-actions">
             <Link className="btn btn-primary" to={startTo}>
               Explore the Modules
               <span aria-hidden="true">→</span>

@@ -59,7 +59,7 @@ export default function AdminLogin() {
     return (
       <div className="admin-gate">
         <form className="admin-card" onSubmit={submit}>
-          <p className="eyebrow">RadioPass · Editing</p>
+          <p className="rpa-eyebrow">RadioPass · Editing</p>
           <h1>Editor sign-in</h1>
           <p className="admin-sub">
             Replacing images, placing labels and arrows, showing and hiding options,
@@ -111,7 +111,7 @@ export default function AdminLogin() {
   return (
     <div className="admin-gate">
       <div className="admin-card admin-hub">
-        <p className="eyebrow">RadioPass · Editing</p>
+        <p className="rpa-eyebrow">RadioPass · Editing</p>
         <h1>Editor tools</h1>
         <p className={server ? 'admin-sub admin-live' : 'admin-sub'}>
           {server

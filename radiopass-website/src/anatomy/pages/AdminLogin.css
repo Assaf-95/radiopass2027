@@ -1,17 +1,22 @@
-.admin-gate { min-height: 70vh; display: grid; place-items: center; padding: 40px 20px; }
-.admin-card { width: 100%; max-width: 520px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 30px; display: grid; gap: 14px; }
-.admin-hub { max-width: 720px; }
-.admin-card h1 { font-size: 26px; }
-.admin-card h2 { font-size: 14px; margin-top: 10px; color: var(--text-dim); }
-.admin-sub { color: var(--text-dim); font-size: 14px; margin: 0; }
-.admin-hint { color: var(--text-faint); font-size: 12.5px; margin: 0; line-height: 1.6; }
-.admin-field { display: grid; gap: 6px; font-size: 13px; }
-.admin-field span { color: var(--text-dim); }
-.admin-error { color: var(--red); font-size: 13px; margin: 0; }
-.admin-note { color: var(--text-faint); font-size: 11.5px; line-height: 1.6; border-top: 1px solid var(--line); padding-top: 12px; margin: 4px 0 0; }
-.admin-links { display: flex; flex-wrap: wrap; gap: 8px; }
-.admin-edits { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); }
-
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
+.rp-anatomy .admin-gate { min-height: 70vh; display: grid; place-items: center; padding: 40px 20px; }
+.rp-anatomy .admin-card { width: 100%; max-width: 520px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 30px; display: grid; gap: 14px; }
+.rp-anatomy .admin-hub { max-width: 720px; }
+.rp-anatomy .admin-card h1 { font-size: 26px; }
+.rp-anatomy .admin-card h2 { font-size: 14px; margin-top: 10px; color: var(--text-dim); }
+.rp-anatomy .admin-sub { color: var(--text-dim); font-size: 14px; margin: 0; }
+.rp-anatomy .admin-hint { color: var(--text-faint); font-size: 12.5px; margin: 0; line-height: 1.6; }
+.rp-anatomy .admin-field { display: grid; gap: 6px; font-size: 13px; }
+.rp-anatomy .admin-field span { color: var(--text-dim); }
+.rp-anatomy .admin-error { color: var(--red); font-size: 13px; margin: 0; }
+.rp-anatomy .admin-note { color: var(--text-faint); font-size: 11.5px; line-height: 1.6; border-top: 1px solid var(--line); padding-top: 12px; margin: 4px 0 0; }
+.rp-anatomy .admin-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.rp-anatomy .admin-edits { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); }
 /* Signed in against a real service rather than the browser-only lock. */
-.admin-live { color: var(--green); }
-.admin-when { color: var(--text-faint); font-size: 11px; margin-left: 8px; }
+.rp-anatomy .admin-live { color: var(--green); }
+.rp-anatomy .admin-when { color: var(--text-faint); font-size: 11px; margin-left: 8px; }

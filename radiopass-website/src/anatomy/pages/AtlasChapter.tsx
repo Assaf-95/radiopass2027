@@ -92,7 +92,7 @@ export default function AtlasChapter() {
       />
 
       <header className="atlas-head">
-        <p className="eyebrow">Structure Atlas</p>
+        <p className="rpa-eyebrow">Structure Atlas</p>
         <h1>{chapter.title}</h1>
         <p className="atlas-lede">{chapter.blurb}</p>
         <p className="atlas-figures mono">

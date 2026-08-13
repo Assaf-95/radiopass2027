@@ -1,4 +1,10 @@
-.dm-backdrop {
+/* SCOPED TO .rp-anatomy during the physical merge.
+   26 class names collided between the two halves — brand, brand-mark, home,
+   eyebrow, is-right, is-wrong, the mri-* viewer classes — and physics's
+   .rpa-brand-mark is a 29px circle, which silently crushed anatomy's wordmark to
+   nothing. Scoping keeps anatomy's appearance exactly as it was while making
+   it impossible for either side to reach the other. */
+.rp-anatomy .dm-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(10, 12, 16, 0.55);
@@ -8,8 +14,7 @@
   z-index: 1200;
   padding: 20px;
 }
-
-.dm-panel {
+.rp-anatomy .dm-panel {
   width: 100%;
   max-width: 480px;
   padding: 24px;
@@ -17,20 +22,17 @@
   flex-direction: column;
   gap: 12px;
 }
-
-.dm-details p {
+.rp-anatomy .dm-details p {
   font-size: 13.5px;
   margin: 6px 0;
   color: var(--text-dim);
 }
-
-.dm-note-label {
+.rp-anatomy .dm-note-label {
   font-size: 13px;
   font-weight: 600;
   margin-top: 6px;
 }
-
-.dm-panel textarea {
+.rp-anatomy .dm-panel textarea {
   width: 100%;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
@@ -40,8 +42,7 @@
   font-family: inherit;
   resize: vertical;
 }
-
-.dm-actions {
+.rp-anatomy .dm-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;

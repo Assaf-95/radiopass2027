@@ -66,7 +66,7 @@ export default function SkullHero({
               the reader met the same six links twice before reaching anything
               they had not already seen. The question bank is the thing the
               page is for, so it is the only action here. */}
-          <div className="hero-actions">
+          <div className="rpa-hero-actions">
             <button type="button" className="btn btn-primary" onClick={onQuestionBank}>
               {startTo ? 'Resume the question bank' : 'Start the question bank'}
               <span aria-hidden="true">→</span>

@@ -8,7 +8,7 @@
    under the same names on :root — --accent, --line, --border, --radius-sm,
    --radius-lg, --shadow, --shadow-lg and --bg-elevated — so sharing one
    document would have silently repainted physics with anatomy's values,
-   decided by whichever stylesheet happened to load second. `.eyebrow`
+   decided by whichever stylesheet happened to load second. `.rpa-eyebrow`
    collided too.
 
    Anatomy therefore looks exactly as it did; it simply cannot escape its own
@@ -171,14 +171,14 @@
    Monospace is imaging's own voice: it is what a DICOM corner overlay, a
    window/level readout and a study reference are set in. Used for anything
    that is data rather than prose. */
-.rp-anatomy .mono, .rp-anatomy .eyebrow, .rp-anatomy .pill, .rp-anatomy .metric-value, .rp-anatomy .dash-value {
+.rp-anatomy .mono, .rp-anatomy .rpa-eyebrow, .rp-anatomy .pill, .rp-anatomy .metric-value, .rp-anatomy .dash-value {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 /* The Physics eyebrow, verbatim: Inter, 11px, very wide tracking, muted —
    and preceded by a short amber rule, which is the one flourish that site
    allows itself above a heading. */
-.rp-anatomy .eyebrow {
+.rp-anatomy .rpa-eyebrow {
   display: inline-flex;
   align-items: center;
   font-family: var(--font-sans);
@@ -188,7 +188,7 @@
   text-transform: uppercase;
   color: var(--text-dim);
 }
-.rp-anatomy .eyebrow::before {
+.rp-anatomy .rpa-eyebrow::before {
   content: '';
   display: inline-block;
   width: 22px;

@@ -38,7 +38,7 @@ export default function AtlasHome() {
       <AtlasBreadcrumbs trail={[{ label: 'Modules', to: '/' }, { label: 'Structure Atlas' }]} />
 
       <header className="atlas-head">
-        <p className="eyebrow">Revision</p>
+        <p className="rpa-eyebrow">Revision</p>
         <h1>Structure Atlas</h1>
         <p className="atlas-lede">
           Choose a structure and see every image in the question bank that teaches it — across
