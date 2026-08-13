@@ -995,3 +995,59 @@
 }
 @keyframes pt-cross { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
 @media (prefers-reduced-motion: reduce) { .pt-crossing-rail i { animation: none; width: 100%; } }
+
+/* --- The free trial invitation -------------------------------------------
+   Deliberately not a plate. It sits beneath the two branch doors as a single
+   rule-topped line, so the page still reads "two subjects" at a glance and
+   the trial reads as a way in rather than a third thing to study. */
+
+.pt-trial {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--rule, var(--bg-interactive));
+}
+
+.pt-trial-copy {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--fs-support);
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+.pt-trial-copy strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.pt-trial-go {
+  flex: none;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: opacity 0.18s ease;
+}
+
+.pt-trial-go i {
+  font-style: normal;
+  margin-left: var(--sp-2);
+}
+
+.pt-trial-go:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .pt-trial {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-3);
+  }
+}

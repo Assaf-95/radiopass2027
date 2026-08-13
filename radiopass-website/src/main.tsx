@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from './lib/auth'
+import { EntitlementProvider } from './lib/entitlement'
 import './design/tokens.css'
 import './styles.css'
 // Imported after every module stylesheet so its coarse-pointer rules win on
@@ -30,7 +31,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        {/* Access sits directly on top of the account, so every route can ask
+            one question — canAccess() — instead of inventing its own rule. */}
+        <EntitlementProvider>
+          <App />
+        </EntitlementProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

@@ -1,0 +1,162 @@
+/* The free trial page.
+   Built entirely from design-system tokens — no literal sizes, colours or
+   spacing, so it inherits every future change to the system. */
+
+.ft {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: var(--gap-page) var(--sp-5) var(--gap-page);
+}
+
+/* --- Hero ---------------------------------------------------------------- */
+
+.ft-hero {
+  max-width: 40rem;
+  margin-bottom: var(--gap-section);
+}
+
+.ft-eyebrow {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ft-hero h1 {
+  margin: 0 0 var(--gap-heading-desc);
+  font-size: var(--fs-hero);
+  line-height: 1.04;
+  color: var(--text-primary);
+  /* "RadioPass" is one long word. On a narrow phone it must be allowed to
+     break rather than push the page sideways. */
+  overflow-wrap: break-word;
+}
+
+.ft-hero h1 span {
+  color: var(--text-tertiary);
+}
+
+.ft-lede {
+  margin: 0;
+  font-size: var(--fs-teach);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* --- The two branches ----------------------------------------------------
+   Two panels, not cards inside cards. A rule and space carry the structure;
+   the branch name is the object, everything else supports it. */
+
+.ft-branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--gap-cards);
+  margin-bottom: var(--gap-section);
+}
+
+.ft-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding-top: var(--sp-5);
+  border-top: 2px solid var(--accent);
+}
+
+.ft-branch h2 {
+  margin: 0;
+  font-size: var(--fs-section);
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.ft-branch-blurb {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* What the trial actually frees, once configured. */
+
+.ft-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.ft-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--bg-interactive);
+}
+
+.ft-kind {
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+}
+
+.ft-detail {
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
+}
+
+/* The unconfigured state. Quiet and factual — it is not an error, and it must
+   not read like a broken tile. */
+.ft-pending {
+  margin: 0;
+  padding: var(--sp-4);
+  width: 100%;
+  border: 1px dashed var(--bg-interactive);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-support);
+  color: var(--text-tertiary);
+}
+
+/* --- Foot ---------------------------------------------------------------- */
+
+.ft-foot {
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--bg-interactive);
+}
+
+.ft-foot p {
+  margin: 0 0 var(--sp-5);
+  max-width: 44rem;
+  font-size: var(--fs-support);
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+.ft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+@media (max-width: 640px) {
+  .ft {
+    padding-inline: var(--sp-4);
+  }
+
+  /* One column, and a track that is allowed to be narrower than its content.
+     `repeat(auto-fit, minmax(min(100%, 20rem), 1fr))` looks safe but is not:
+     while the grid is being intrinsically sized the percentage cannot resolve,
+     so the 20rem floor wins and the page is forced to 320px — which on a 280px
+     screen scrolls the whole document sideways. */
+  .ft-branches {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ft-actions .button {
+    width: 100%;
+    justify-content: center;
+  }
+}

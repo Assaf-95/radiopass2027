@@ -24,11 +24,19 @@
      A learner reads this for hours. The floor for anything instructional is
      16px, and the body default is 18px — the brief's "normal body 17-19px".
      Every step is clamped so the same token is as large as the screen can
-     hold and no larger: one rule, five viewports, no per-page overrides. */
-  --fs-hero:     clamp(40px, 5.2vw, 72px);
-  --fs-page:     clamp(32px, 3.6vw, 48px);
-  --fs-section:  clamp(26px, 2.6vw, 36px);
-  --fs-concept:  clamp(24px, 2.4vw, 34px);
+     hold and no larger: one rule, five viewports, no per-page overrides.
+
+     THE FLOORS FIT THE NARROWEST PHONE. They used to be set for a 375px
+     screen, which meant the display steps stopped shrinking well before the
+     viewport did: at 280px --fs-hero still resolved to 40px, and the word
+     "RadioPass" alone measured 288px — eight pixels wider than the screen, so
+     the whole document scrolled sideways. A heading that forces horizontal
+     scrolling is worse than a smaller heading. The upper end and the growth
+     rate are untouched, so nothing at tablet size or above moves. */
+  --fs-hero:     clamp(30px, 5.2vw, 72px);
+  --fs-page:     clamp(26px, 3.6vw, 48px);
+  --fs-section:  clamp(22px, 2.6vw, 36px);
+  --fs-concept:  clamp(21px, 2.4vw, 34px);
   --fs-card:     clamp(18px, 1.5vw, 22px);
   /* The teaching voice: explanations a learner must actually absorb. */
   --fs-teach:    clamp(18px, 1.25vw, 21px);

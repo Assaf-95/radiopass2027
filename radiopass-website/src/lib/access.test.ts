@@ -1,0 +1,193 @@
+/**
+ * Access control, tested against the scenarios the product has to serve.
+ *
+ * The two failures that matter most are opposite in direction and both are
+ * covered here: a paid resource must not be reachable by typing its URL, and
+ * an entitled learner must never be blocked by trial logic that does not
+ * concern them. The second is the one that quietly loses customers.
+ *
+ * The trial configuration is deliberately empty at this stage, so these tests
+ * pass an explicit config where they need to prove the mechanism works — that
+ * way they keep testing the mechanism rather than today's emptiness, and they
+ * will not all start failing the moment the owner configures the real trial.
+ */
+
+import { describe, expect, it } from 'vitest'
+
+import {
+  ANONYMOUS,
+  canAccess,
+  entitlementOf,
+  isAllowed,
+  trialAllows,
+  trialContents,
+  trialIsConfigured,
+  TRIAL,
+  UNKNOWN,
+  type Resource,
+  type TrialConfig,
+} from './access'
+
+const atlas: Resource = { branch: 'anatomy', kind: 'atlas', id: 'thorax' }
+const anatomyQuestions: Resource = { branch: 'anatomy', kind: 'questions', id: 'thorax' }
+const physicsLab: Resource = { branch: 'physics', kind: 'lab', id: 'ultrasound-lab/doppler' }
+const physicsQuestions: Resource = { branch: 'physics', kind: 'questions', id: 'ct' }
+const physicsMock: Resource = { branch: 'physics', kind: 'mock' }
+const anatomyHome: Resource = { branch: 'anatomy', kind: 'home' }
+const physicsHome: Resource = { branch: 'physics', kind: 'home' }
+
+describe('A — anonymous visitor', () => {
+  it('may open either branch home', () => {
+    expect(isAllowed(anatomyHome, ANONYMOUS)).toBe(true)
+    expect(isAllowed(physicsHome, ANONYMOUS)).toBe(true)
+  })
+
+  it('is asked to sign in for paid content, not told to upgrade', () => {
+    const d = canAccess(atlas, ANONYMOUS)
+    expect(d).toEqual({ allowed: false, reason: 'sign-in', branch: 'anatomy' })
+  })
+
+  it('cannot reach a paid resource by typing its URL', () => {
+    for (const r of [atlas, anatomyQuestions, physicsLab, physicsQuestions, physicsMock]) {
+      expect(isAllowed(r, ANONYMOUS), `${r.branch}/${r.kind}`).toBe(false)
+    }
+  })
+})
+
+describe('B — trial user', () => {
+  const trial = entitlementOf(['account', 'trial'])
+  /* A configuration standing in for one the owner might choose later. */
+  const config: TrialConfig = {
+    questions: { anatomy: ['thorax'], physics: ['ct'] },
+    lab: { physics: ['ultrasound-lab/doppler'] },
+    atlas: { anatomy: true },
+  }
+
+  it('reaches configured anatomy and physics resources', () => {
+    expect(trialAllows(anatomyQuestions, config)).toBe(true)
+    expect(trialAllows(physicsQuestions, config)).toBe(true)
+    expect(trialAllows(physicsLab, config)).toBe(true)
+  })
+
+  it('reaches a whole kind when the branch is configured as true', () => {
+    expect(trialAllows({ branch: 'anatomy', kind: 'atlas', id: 'anything' }, config)).toBe(true)
+  })
+
+  it('does NOT reach resources outside the configuration', () => {
+    expect(trialAllows({ branch: 'anatomy', kind: 'questions', id: 'spine' }, config)).toBe(false)
+    expect(trialAllows(physicsMock, config)).toBe(false)
+    expect(trialAllows({ branch: 'physics', kind: 'lab', id: 'ct-lab' }, config)).toBe(false)
+  })
+
+  it('is told to upgrade rather than sign in, because they already have an account', () => {
+    const d = canAccess(physicsMock, trial)
+    expect(d).toEqual({ allowed: false, reason: 'upgrade', branch: 'physics' })
+  })
+
+  it('gets nothing extra while the trial is unconfigured', () => {
+    // The live TRIAL is empty, so a trial grant currently opens no paid content.
+    expect(isAllowed(atlas, trial)).toBe(false)
+    expect(isAllowed(physicsLab, trial)).toBe(false)
+    // …but the branch homes stay open, so the trial page is never a dead end.
+    expect(isAllowed(anatomyHome, trial)).toBe(true)
+  })
+})
+
+describe('C — anatomy entitlement', () => {
+  const anatomy = entitlementOf(['account', 'anatomy'])
+
+  it('opens all of anatomy', () => {
+    for (const r of [atlas, anatomyQuestions, { branch: 'anatomy', kind: 'mock' } as Resource]) {
+      expect(isAllowed(r, anatomy), r.kind).toBe(true)
+    }
+  })
+
+  it('leaves physics paid content restricted', () => {
+    expect(isAllowed(physicsLab, anatomy)).toBe(false)
+    expect(isAllowed(physicsQuestions, anatomy)).toBe(false)
+  })
+})
+
+describe('D — physics entitlement', () => {
+  const physics = entitlementOf(['account', 'physics'])
+
+  it('opens all of physics', () => {
+    for (const r of [physicsLab, physicsQuestions, physicsMock]) {
+      expect(isAllowed(r, physics), r.kind).toBe(true)
+    }
+  })
+
+  it('leaves anatomy paid content restricted', () => {
+    expect(isAllowed(atlas, physics)).toBe(false)
+    expect(isAllowed(anatomyQuestions, physics)).toBe(false)
+  })
+})
+
+describe('E — full RadioPass entitlement', () => {
+  const full = entitlementOf(['account', 'full'])
+
+  it('opens both branches entirely', () => {
+    for (const r of [atlas, anatomyQuestions, physicsLab, physicsQuestions, physicsMock]) {
+      expect(isAllowed(r, full), `${r.branch}/${r.kind}`).toBe(true)
+    }
+  })
+
+  it('is never blocked by trial logic, configured or not', () => {
+    // The regression this guards: gating on "is it in the trial?" before
+    // checking entitlement, which locks paying customers out of what they own.
+    expect(trialIsConfigured(TRIAL)).toBe(false)
+    expect(isAllowed(physicsLab, full)).toBe(true)
+    expect(isAllowed({ branch: 'anatomy', kind: 'module', id: 'anything' }, full)).toBe(true)
+  })
+})
+
+describe('F — admin', () => {
+  const admin = entitlementOf(['account', 'admin'])
+
+  it('may open any page, so an author can check their own work', () => {
+    for (const r of [atlas, anatomyQuestions, physicsLab, physicsMock]) {
+      expect(isAllowed(r, admin), `${r.branch}/${r.kind}`).toBe(true)
+    }
+  })
+
+  it('is a separate grant from content access', () => {
+    // admin is not implied by full, and full is not implied by admin.
+    const full = entitlementOf(['account', 'full'])
+    expect(full.grants.has('admin')).toBe(false)
+    expect(admin.grants.has('full')).toBe(false)
+  })
+})
+
+describe('the trial configuration, while empty', () => {
+  it('reports itself as unconfigured', () => {
+    expect(trialIsConfigured(TRIAL)).toBe(false)
+  })
+
+  it('lists nothing for either branch, so no fake cards can render', () => {
+    expect(trialContents('anatomy', TRIAL)).toEqual([])
+    expect(trialContents('physics', TRIAL)).toEqual([])
+  })
+
+  it('frees nothing at all', () => {
+    const trial = entitlementOf(['account', 'trial'])
+    for (const r of [atlas, anatomyQuestions, physicsLab, physicsQuestions, physicsMock]) {
+      expect(isAllowed(r, trial), `${r.branch}/${r.kind}`).toBe(false)
+    }
+  })
+
+  it('counts an empty array as freeing nothing', () => {
+    const empty: TrialConfig = { questions: { anatomy: [] } }
+    expect(trialIsConfigured(empty)).toBe(false)
+    expect(trialContents('anatomy', empty)).toEqual([])
+    expect(trialAllows(anatomyQuestions, empty)).toBe(false)
+  })
+})
+
+describe('before the account system has answered', () => {
+  it('is not treated as a denial', () => {
+    // UNKNOWN means "ask again in a moment", and callers check `known` so a
+    // paying learner never sees an upgrade prompt during a page load.
+    expect(UNKNOWN.known).toBe(false)
+    expect(ANONYMOUS.known).toBe(true)
+  })
+})

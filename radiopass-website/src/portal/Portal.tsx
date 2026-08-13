@@ -726,6 +726,9 @@ export default function Portal() {
           <nav className="pt-bar-nav" aria-label="Sections">
             <a href={anatomy()}>Anatomy</a>
             <Link to="/physics">Physics</Link>
+            {/* An access route, deliberately after the two branches and set in
+                the same quiet type — it must not read as a third subject. */}
+            <Link to="/free-trial">Free trial</Link>
             <Link to="/pricing">Pricing</Link>
           </nav>
         </div>
@@ -861,6 +864,21 @@ export default function Portal() {
               </span>
             </Link>
           </div>
+
+          {/* The trial sits UNDER the two plates and looks nothing like them:
+              one line of type and a link, no figure, no viewport, no numerals.
+              The question the plates ask is "which subject?"; this asks a
+              different one — "do you want to try first?" — and the hierarchy
+              has to say so without a third door. */}
+          <aside className="pt-trial">
+            <p className="pt-trial-copy">
+              <strong>Not ready to choose?</strong> Try RadioPass first — a sample of both
+              anatomy and physics.
+            </p>
+            <Link className="pt-trial-go" to="/free-trial">
+              Free trial <i aria-hidden="true">&rarr;</i>
+            </Link>
+          </aside>
         </section>
 
 
