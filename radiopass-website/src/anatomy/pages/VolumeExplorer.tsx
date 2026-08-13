@@ -132,7 +132,7 @@ export default function VolumeExplorer() {
                 Two consoles contradicting each other is worse than one, and
                 the corner is where a radiologist looks anyway. */}
             {meta && (
-              <Link className="btn btn-primary vx-go" to={`/section/${stop.key}`}>
+              <Link className="btn btn-primary vx-go" to={`/anatomy/section/${stop.key}`}>
                 Open {meta.title} questions →
               </Link>
             )}
@@ -163,7 +163,7 @@ export default function VolumeExplorer() {
           Every point is computed, not filmed: {stops.length} regions built from real Hounsfield
           densities, windowed live. Nothing here is a photograph or a video.
         </p>
-        <Link className="btn" to="/">
+        <Link className="btn" to="/anatomy">
           ← Back to the sections
         </Link>
       </div>

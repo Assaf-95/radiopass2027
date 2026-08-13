@@ -56,7 +56,7 @@ export default function AtlasHome() {
       {!query.trim() && (
         <section className="chapter-grid" aria-label="Chapters">
           {cards.map(({ chapter, cover, coverName }) => (
-            <Link key={chapter.id} to={`/atlas/${chapter.id}`} className="chapter-card">
+            <Link key={chapter.id} to={`/anatomy/atlas/${chapter.id}`} className="chapter-card">
               <span className="chapter-cover" aria-hidden="true">
                 {cover ? (
                   <AtlasFilm

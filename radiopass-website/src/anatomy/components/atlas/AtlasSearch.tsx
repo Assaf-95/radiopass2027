@@ -56,7 +56,7 @@ export default function AtlasSearch({ value, onChange, chapter, placeholder, aut
                 <li key={`${structure.chapter}-${structure.id}`}>
                   <Link
                     className="atlas-hit"
-                    to={`/atlas/${structure.chapter}/${structure.id}`}
+                    to={`/anatomy/atlas/${structure.chapter}/${structure.id}`}
                     onClick={() => onChange('')}
                   >
                     <span className="atlas-hit-thumb" aria-hidden="true">

@@ -102,7 +102,7 @@ export default function AdminLogin() {
               that save centrally.
             </p>
           )}
-          <Link className="back-link" to="/">← Back to the site</Link>
+          <Link className="back-link" to="/anatomy">← Back to the site</Link>
         </form>
       </div>
     );
@@ -129,14 +129,14 @@ export default function AdminLogin() {
         </p>
         <div className="admin-links">
           {SECTION_META.map((s) => (
-            <Link key={s.id} className="btn" to={`/section/${s.id}`}>{s.title}</Link>
+            <Link key={s.id} className="btn" to={`/anatomy/section/${s.id}`}>{s.title}</Link>
           ))}
         </div>
 
         <h2>Add your own cases</h2>
         <div className="admin-links">
           {SECTION_META.map((s) => (
-            <Link key={s.id} className="btn" to={`/section/${s.id}/custom`}>+ {s.title}</Link>
+            <Link key={s.id} className="btn" to={`/anatomy/section/${s.id}/custom`}>+ {s.title}</Link>
           ))}
         </div>
 

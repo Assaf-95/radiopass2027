@@ -437,7 +437,7 @@ export default function ChestXrayAtlas() {
   return (
     <div className="cxr">
       <header className="cxr-top">
-        <Link to="/" className="back-link">
+        <Link to="/anatomy" className="back-link">
           ← RadioPass
         </Link>
         <div className="cxr-ident">

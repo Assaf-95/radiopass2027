@@ -13,12 +13,12 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { buildAtlas } from '../src/lib/atlas/build.ts';
-import { atlasStudyImages } from '../src/lib/atlas/studies.ts';
-import type { Question, SectionId } from '../src/types.ts';
+import { buildAtlas } from '../src/anatomy/lib/atlas/build.ts';
+import { atlasStudyImages } from '../src/anatomy/lib/atlas/studies.ts';
+import type { Question, SectionId } from '../src/anatomy/types.ts';
 
 const require = createRequire(import.meta.url);
-const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data');
+const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'anatomy', 'data');
 const FILES: Record<SectionId, string> = {
   spine: 'spine.json',
   'upper-limb': 'upperLimb.json',

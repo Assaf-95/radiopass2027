@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { SECTION_META, getSectionQuestions } from '../data/sections';
 import { flaggedQuestions } from '../lib/stats';
-import { lastOfType } from '../lib/learner';
+import { lastOfType } from '../../lib/learner';
 import { computeSectionStats } from '../lib/stats';
 import { getLastQuestion } from '../lib/progress';
 import AnatomyJourney from '../components/AnatomyJourney';
@@ -126,7 +126,7 @@ export default function Home() {
     const r = pool[Math.floor(Math.random() * pool.length)];
     const qs = getSectionQuestions(r.meta.id);
     const q = qs[Math.floor(Math.random() * qs.length)];
-    navigate(`/section/${r.meta.id}/q/${q.id}`);
+    navigate(`/anatomy/section/${r.meta.id}/q/${q.id}`);
   }
 
   /* Honour ?goto=modules from the header: land on the syllabus, no film.
@@ -262,7 +262,7 @@ export default function Home() {
       {/* The four Anatomy destinations. The regions below ARE the question
           bank, so it points at them rather than duplicating the list. */}
       <section className="an-dest" aria-label="Anatomy">
-        <Link className="an-dest-item" to="/atlas">
+        <Link className="an-dest-item" to="/anatomy/atlas">
           <strong>Structure Atlas</strong>
           <span>Every image of a structure on one page, across modalities and planes.</span>
         </Link>
@@ -276,7 +276,7 @@ export default function Home() {
           <strong>Mock exams</strong>
           <span>Timed anatomy papers are not built yet.</span>
         </span>
-        <Link className="an-dest-item" to="/dashboard">
+        <Link className="an-dest-item" to="/anatomy/dashboard">
           <strong>Progress &amp; revision</strong>
           <span>
             {flaggedCount > 0
@@ -301,7 +301,7 @@ export default function Home() {
             const empty = stats.total === 0;
             return (
               <Link
-                to={`/section/${meta.id}`}
+                to={`/anatomy/section/${meta.id}`}
                 key={meta.id}
                 className={empty ? 'wl-row wl-row-empty' : 'wl-row'}
               >

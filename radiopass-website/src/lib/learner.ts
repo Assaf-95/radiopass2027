@@ -167,6 +167,22 @@ export function lastActivity(subject?: Subject): LearnerEvent | null {
 }
 
 /**
+ * The most recent event of one kind — what "continue where you left off" is
+ * built from. Narrowed to that member, so the caller gets `contentId` and
+ * `topic` without a cast.
+ */
+export function lastOfType<K extends LearnerEvent['type']>(
+  type: K,
+  subject?: Subject,
+): Extract<LearnerEvent, { type: K }> | null {
+  const all = readAll().filter(
+    (e): e is Extract<LearnerEvent, { type: K }> =>
+      e.type === type && (!subject || e.subject === subject),
+  )
+  return all.length ? all[all.length - 1] : null
+}
+
+/**
  * Completed mock papers, newest first.
  *
  * This is the whole reason the log exists: the mock store holds ONE in-flight

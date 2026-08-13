@@ -32,7 +32,7 @@ export default function Dashboard() {
 
   return (
     <div className="dash">
-      <Link to="/" className="back-link">← Back to sections</Link>
+      <Link to="/anatomy" className="back-link">← Back to sections</Link>
       <h1>Progress dashboard</h1>
 
       {activity.lastActive && (
@@ -97,7 +97,7 @@ export default function Dashboard() {
               <td>{stats.rawScore}/{stats.maxScore}</td>
               <td>{stats.percentScore}%</td>
               <td>{stats.flagged}</td>
-              <td><Link className="btn" to={`/section/${meta.id}`}>Open</Link></td>
+              <td><Link className="btn" to={`/anatomy/section/${meta.id}`}>Open</Link></td>
             </tr>
           ))}
         </tbody>

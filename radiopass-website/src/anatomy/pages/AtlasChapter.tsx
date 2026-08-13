@@ -77,7 +77,7 @@ export default function AtlasChapter() {
       <div className="empty-state">
         <h1>Chapter not found</h1>
         <p>That address does not match any of the seven Atlas chapters.</p>
-        <Link className="btn btn-primary" to="/atlas">Back to the Structure Atlas</Link>
+        <Link className="btn btn-primary" to="/anatomy/atlas">Back to the Structure Atlas</Link>
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function AtlasChapter() {
           {view === 'structures' ? (
             <section className="structure-grid" aria-label="Structures">
               {structures.map((s, i) => (
-                <Link key={s.id} to={`/atlas/${chapter.id}/${s.id}`} className="structure-card">
+                <Link key={s.id} to={`/anatomy/atlas/${chapter.id}/${s.id}`} className="structure-card">
                   <span className="sc-thumb">
                     <AtlasFilm
                       src={assetUrl(s.representative.src)}
@@ -218,7 +218,7 @@ export default function AtlasChapter() {
                 <article key={image.questionId} className="film-card">
                   <Link
                     className="film-card-thumb"
-                    to={`/atlas/${chapter.id}/${on[0].id}`}
+                    to={`/anatomy/atlas/${chapter.id}/${on[0].id}`}
                     aria-label={`Open ${on[0].name}`}
                   >
                     <AtlasFilm
@@ -238,7 +238,7 @@ export default function AtlasChapter() {
                       {on.slice(0, 6).map((s, i) => (
                         <span key={s.id}>
                           {i > 0 && <span className="fact-sep" aria-hidden="true">·</span>}
-                          <Link to={`/atlas/${chapter.id}/${s.id}`}>{s.name}</Link>
+                          <Link to={`/anatomy/atlas/${chapter.id}/${s.id}`}>{s.name}</Link>
                         </span>
                       ))}
                       {on.length > 6 && <span className="mono"> +{on.length - 6}</span>}

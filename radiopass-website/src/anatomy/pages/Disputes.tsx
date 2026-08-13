@@ -20,7 +20,7 @@ export default function Disputes() {
 
   return (
     <div className="disp">
-      <Link to="/" className="back-link">← Back to sections</Link>
+      <Link to="/anatomy" className="back-link">← Back to sections</Link>
       <h1>Disputed answers</h1>
       {disputes.length === 0 ? (
         <div className="empty-state card"><p>No disputes have been raised yet. Use "Dispute this result" beside any graded answer to flag it here.</p></div>

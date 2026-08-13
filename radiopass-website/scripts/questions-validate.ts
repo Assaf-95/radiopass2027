@@ -27,11 +27,11 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { validateQuestions, summariseIssues } from '../src/lib/validateQuestions.ts';
-import type { Question, SectionId } from '../src/types.ts';
+import { validateQuestions, summariseIssues } from '../src/anatomy/lib/validateQuestions.ts';
+import type { Question, SectionId } from '../src/anatomy/types.ts';
 
 const require = createRequire(import.meta.url);
-const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data');
+const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'anatomy', 'data');
 
 /* The same six files, under the same ids, that src/data/sections.ts resolves
    at runtime — so what is validated here is what the site actually serves. */

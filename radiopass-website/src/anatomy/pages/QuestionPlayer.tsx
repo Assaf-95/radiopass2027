@@ -7,7 +7,7 @@ import { assetUrl } from '../lib/assetUrl';
 import { gradeAnswer, overallResult } from '../lib/grading';
 import { getQuestionProgress, saveQuestionProgress, setLastQuestion, saveDispute, flushProgress } from '../lib/progress';
 import { recordSubmission, recordStudySeconds } from '../lib/account';
-import { record as recordEvent } from '../lib/learner';
+import { record as recordEvent } from '../../lib/learner';
 import { isCustomImageRef, resolveCustomImageSrc } from '../lib/customStore';
 import ImageViewer from '../components/ImageViewer';
 import DisputeModal from '../components/DisputeModal';
@@ -164,7 +164,7 @@ export default function QuestionPlayer() {
       <div className="empty-state">
         <h1>Section not found</h1>
         <p>That address does not match any of the six anatomy modules.</p>
-        <Link className="btn btn-primary" to="/">Back to the modules</Link>
+        <Link className="btn btn-primary" to="/anatomy">Back to the modules</Link>
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function QuestionPlayer() {
     return (
       <div className="qp-missing">
         <p>Question not found.</p>
-        <Link to={`/section/${section}`}>Back to section</Link>
+        <Link to={`/anatomy/section/${section}`}>Back to section</Link>
       </div>
     );
   }
@@ -275,7 +275,7 @@ export default function QuestionPlayer() {
 
   function goTo(offset: number) {
     const next = questions[index + offset];
-    if (next) navigate(`/section/${section}/q/${next.id}`);
+    if (next) navigate(`/anatomy/section/${section}/q/${next.id}`);
   }
 
   function toggleFlag() {
@@ -320,7 +320,7 @@ export default function QuestionPlayer() {
   return (
     <div className="qp-root">
       <div className="qp-topbar">
-        <Link to={`/section/${section}`} className="qp-back">← {meta.title}</Link>
+        <Link to={`/anatomy/section/${section}`} className="qp-back">← {meta.title}</Link>
         <div className="qp-progress-text">Question {index + 1} of {questions.length}</div>
         <span className={savedPulse ? 'qp-saved show' : 'qp-saved'}>Saved</span>
         <div className="qp-topbar-actions">
@@ -329,7 +329,7 @@ export default function QuestionPlayer() {
           {isAdmin() && (
           <Link
             className="qp-nav-toggle"
-            to={`/section/${section}/q/${question.id}/replace-image`}
+            to={`/anatomy/section/${section}/q/${question.id}/replace-image`}
             title="Replace the image, place arrows and labels, show or hide options, edit Atlas metadata"
           >
             Edit image &amp; labels
@@ -343,7 +343,7 @@ export default function QuestionPlayer() {
       {showIndex && (
         <div className="qp-navigator">
           {questions.map((q, i) => (
-            <button key={q.id} className={i === index ? 'nav-dot current' : 'nav-dot'} onClick={() => { navigate(`/section/${section}/q/${q.id}`); setShowIndex(false); }}>{i + 1}</button>
+            <button key={q.id} className={i === index ? 'nav-dot current' : 'nav-dot'} onClick={() => { navigate(`/anatomy/section/${section}/q/${q.id}`); setShowIndex(false); }}>{i + 1}</button>
           ))}
         </div>
       )}
@@ -375,7 +375,7 @@ export default function QuestionPlayer() {
               {isAdmin() && (
                 <Link
                   className="btn"
-                  to={`/section/${section}/q/${question.id}/replace-image`}
+                  to={`/anatomy/section/${section}/q/${question.id}/replace-image`}
                 >
                   Upload a replacement
                 </Link>

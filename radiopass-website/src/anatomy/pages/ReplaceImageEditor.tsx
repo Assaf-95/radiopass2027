@@ -299,7 +299,7 @@ function Editor() {
     return (
       <div className="empty-state">
         <h1>Question not found</h1>
-        <Link className="btn btn-primary" to="/">Back to the modules</Link>
+        <Link className="btn btn-primary" to="/anatomy">Back to the modules</Link>
       </div>
     );
   }
@@ -646,7 +646,7 @@ function Editor() {
   return (
     <div className="rie">
       <header className="rie-head">
-        <Link className="back-link" to={`/section/${section}/q/${original.id}`}>
+        <Link className="back-link" to={`/anatomy/section/${section}/q/${original.id}`}>
           ← {meta.title} Question {displayNumber}
         </Link>
         <h1>Replace image</h1>
@@ -668,7 +668,7 @@ function Editor() {
             <button
               type="button"
               className="btn"
-              onClick={() => navigate(`/section/${section}/q/${original!.id}`)}
+              onClick={() => navigate(`/anatomy/section/${section}/q/${original!.id}`)}
             >
               Done — back to the question
             </button>
@@ -1277,7 +1277,7 @@ function Editor() {
                 onClick={() =>
                   setConfirm({
                     message: 'Revert this question to the original shipped version? Your edits are discarded.',
-                    onYes: () => { clearEdit(original.id); navigate(`/section/${section}/q/${original.id}`); },
+                    onYes: () => { clearEdit(original.id); navigate(`/anatomy/section/${section}/q/${original.id}`); },
                   })
                 }
               >

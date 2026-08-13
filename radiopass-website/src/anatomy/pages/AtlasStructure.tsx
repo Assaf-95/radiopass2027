@@ -322,7 +322,7 @@ export default function AtlasStructure() {
                        here replaces it there. */
                     <Link
                       className="film-edit mono"
-                      to={`/section/${image.section}/q/${image.questionId}/replace-image`}
+                      to={`/anatomy/section/${image.section}/q/${image.questionId}/replace-image`}
                       title="Replace the image, move arrows, show or hide labels, edit this caption"
                     >
                       Edit this film →
@@ -349,7 +349,7 @@ export default function AtlasStructure() {
           {related.map(({ structure: r, chapterTitle }) => (
             <article className="related-row" key={`${r.chapter}-${r.id}`}>
               <div className="related-row-head">
-                <Link className="related-name" to={`/atlas/${r.chapter}/${r.id}`}>
+                <Link className="related-name" to={`/anatomy/atlas/${r.chapter}/${r.id}`}>
                   {r.name}
                 </Link>
                 <span className="related-meta mono">
@@ -361,7 +361,7 @@ export default function AtlasStructure() {
                   <Link
                     key={img.id}
                     className="related-thumb"
-                    to={`/atlas/${r.chapter}/${r.id}`}
+                    to={`/anatomy/atlas/${r.chapter}/${r.id}`}
                     aria-label={`${r.name} — ${img.description || 'anatomy image'}`}
                   >
                     <AtlasFilm
@@ -374,7 +374,7 @@ export default function AtlasStructure() {
                   </Link>
                 ))}
                 {r.images.length > 8 && (
-                  <Link className="related-more mono" to={`/atlas/${r.chapter}/${r.id}`}>
+                  <Link className="related-more mono" to={`/anatomy/atlas/${r.chapter}/${r.id}`}>
                     +{r.images.length - 8}
                   </Link>
                 )}
@@ -412,7 +412,7 @@ export default function AtlasStructure() {
                     {i.caseLabel ?? `Question ${i.questionNumber}`} · {i.sourceFile}
                   </p>
                   <p>{i.teachingText}</p>
-                  <Link className="mono" to={`/section/${i.section}/q/${i.questionId}`}>
+                  <Link className="mono" to={`/anatomy/section/${i.section}/q/${i.questionId}`}>
                     Open this question
                   </Link>
                 </section>
@@ -424,7 +424,7 @@ export default function AtlasStructure() {
       <p className="atlas-foot mono">
         Every image here is a question image from the bank, shown with the structure it teaches.
         <span className="atlas-foot-sep"> </span>
-        <Link to={`/atlas/${chapter.id}`}>Back to {chapter.title}</Link>
+        <Link to={`/anatomy/atlas/${chapter.id}`}>Back to {chapter.title}</Link>
       </p>
     </div>
   );

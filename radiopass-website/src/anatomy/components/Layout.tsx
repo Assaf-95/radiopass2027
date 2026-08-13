@@ -12,17 +12,6 @@ import './Layout.css';
    writes, so a stored value now means a real preference. */
 const THEME_KEY = 'radiopass-theme-v2';
 
-/* Where the physics half of RadioPass lives. Detected at runtime rather than
-   fixed at build time, so ONE build of this app links correctly from both of
-   its homes: served under /anatomy/ on the combined host, physics is the same
-   domain's root; served at a domain root of its own (the split Netlify pair),
-   '/' would be this app's own homepage — a link that goes nowhere — so it
-   crosses to the physics deployment instead. VITE_PHYSICS_URL overrides both. */
-const PHYSICS_URL =
-  (import.meta.env.VITE_PHYSICS_URL as string | undefined)
-  ?? (typeof window !== 'undefined' && window.location.pathname.startsWith('/anatomy')
-    ? '/'
-    : 'https://radiopass.co.uk');
 
 function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -148,7 +137,7 @@ export default function Layout() {
       {!isQuestionRoute && (
         <header className={scrolled ? "app-header is-scrolled" : "app-header"}>
           <div className="app-header-inner">
-            <Link to="/" className="brand">
+            <Link to="/anatomy" className="brand">
               <span className="brand-mark">RadioPass</span>
               {/* Which half of the product this is. The portal's doors and the
                   physics module headers use the same two words. */}
@@ -163,29 +152,27 @@ export default function Layout() {
                 can feel — so the first group and the trial entry are
                 identical on both sides, and only the middle group differs. */}
             <nav className="app-nav">
-              <Link className="app-nav-branch is-here" to="/">Anatomy</Link>
+              <Link className="app-nav-branch is-here" to="/anatomy">Anatomy</Link>
               {/* A plain <a> because it leaves this build. */}
-              <a className="app-nav-branch" href={PHYSICS_URL}>Physics</a>
+              <Link className="app-nav-branch" to="/physics">Physics</Link>
               <span className="app-nav-divider" aria-hidden="true" />
 
               {/* Anatomy's own tools. Three ways into the same material:
                   question first, structure first, region first. */}
-              <Link to="/?goto=modules">Question bank</Link>
-              <Link to="/atlas">Atlas</Link>
-              <Link to="/volume">Scout</Link>
-              <Link to="/cxr">X-ray</Link>
-              <Link to="/mri/head-bone">CT</Link>
-              <Link to="/mri/hip-axial-t1">MRI</Link>
-              <Link to="/dashboard">Progress</Link>
-              <Link to="/disputes">Disputes</Link>
-              {isAdmin() && <Link to="/admin">Editor</Link>}
+              <Link to="/anatomy?goto=modules">Question bank</Link>
+              <Link to="/anatomy/atlas">Atlas</Link>
+              <Link to="/anatomy/volume">Scout</Link>
+              <Link to="/anatomy/cxr">X-ray</Link>
+              <Link to="/anatomy/mri/head-bone">CT</Link>
+              <Link to="/anatomy/mri/hip-axial-t1">MRI</Link>
+              <Link to="/anatomy/dashboard">Progress</Link>
+              <Link to="/anatomy/disputes">Disputes</Link>
+              {isAdmin() && <Link to="/anatomy/admin">Editor</Link>}
 
               <span className="app-nav-divider" aria-hidden="true" />
               {/* Same destination the physics header offers, so the trial is
                   reachable from anywhere in the product. */}
-              <a className="app-nav-trial" href={`${PHYSICS_URL}/free-trial`.replace(/([^:])\/\//g, '$1/')}>
-                Free trial
-              </a>
+              <Link className="app-nav-trial" to="/free-trial">Free trial</Link>
             </nav>
 
             <div className="app-header-actions">
@@ -199,7 +186,7 @@ export default function Layout() {
                 {theme === 'dark' ? '☾' : '☀'}
               </button>
 
-              <Link className="app-cta" to="/?goto=modules">
+              <Link className="app-cta" to="/anatomy?goto=modules">
                 Start Learning
                 <span aria-hidden="true">→</span>
               </Link>
@@ -241,7 +228,7 @@ export default function Layout() {
                         <dd>{activity.submissions}</dd>
                       </div>
                     </dl>
-                    <Link to="/dashboard" className="account-link" onClick={() => setMenuOpen(false)}>
+                    <Link to="/anatomy/dashboard" className="account-link" onClick={() => setMenuOpen(false)}>
                       Your progress
                     </Link>
                     {/* The way into the editing tools, and the fix for a real
@@ -253,7 +240,7 @@ export default function Layout() {
                         tool behind it was unreachable with it. This entry is
                         always present, and quiet enough to stay out of a
                         candidate's way. */}
-                    <Link to="/admin" className="account-link" onClick={() => setMenuOpen(false)}>
+                    <Link to="/anatomy/admin" className="account-link" onClick={() => setMenuOpen(false)}>
                       {isAdmin()
                         ? (hasServerSession() ? 'Editor tools · live' : 'Editor tools · this browser')
                         : 'Editor sign-in'}

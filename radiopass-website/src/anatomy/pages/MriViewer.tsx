@@ -576,7 +576,7 @@ export default function MriViewer() {
   return (
     <div className={fullscreen ? 'mri mri-fullscreen' : 'mri'}>
       <header className="mri-top">
-        <Link to="/" className="back-link">
+        <Link to="/anatomy" className="back-link">
           ← RadioPass
         </Link>
         <div className="mri-ident">

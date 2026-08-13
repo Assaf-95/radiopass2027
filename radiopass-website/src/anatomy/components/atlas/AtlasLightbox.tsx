@@ -115,7 +115,7 @@ export default function AtlasLightbox({
     const target = findByKey(companion.structureKey, chapter);
     if (!target) return;
     onClose();
-    navigate(`/atlas/${target.chapter}/${target.id}`);
+    navigate(`/anatomy/atlas/${target.chapter}/${target.id}`);
   };
 
   return (
@@ -214,7 +214,7 @@ export default function AtlasLightbox({
               {isAdmin() && !image.sourceHref && (
                 <Link
                   className="btn btn-line lb-source"
-                  to={`/section/${image.section}/q/${image.questionId}/replace-image`}
+                  to={`/anatomy/section/${image.section}/q/${image.questionId}/replace-image`}
                   onClick={onClose}
                 >
                   Edit this film

@@ -327,7 +327,7 @@ export default function CustomCaseEditor() {
       invalidateAtlas();
       reset();
       setExisting(getCustomQuestions(section));
-      navigate(`/section/${section}/q/${question.id}`);
+      navigate(`/anatomy/section/${section}/q/${question.id}`);
     } finally {
       setSaving(false);
     }
@@ -347,13 +347,13 @@ export default function CustomCaseEditor() {
       <div className="empty-state">
         <h1>Section not found</h1>
         <p>That address does not match any of the six anatomy modules.</p>
-        <Link className="btn btn-primary" to="/">Back to the modules</Link>
+        <Link className="btn btn-primary" to="/anatomy">Back to the modules</Link>
       </div>
     );
   }
   return (
     <div className="cce-root">
-      <Link to={`/section/${section}`} className="back-link">← {meta.title}</Link>
+      <Link to={`/anatomy/section/${section}`} className="back-link">← {meta.title}</Link>
       <h1>Add your own case — {meta.title}</h1>
       <p className="cce-sub">Upload an image, click anywhere on it to drop a marker, then give each marker its answer. It's graded and reviewed exactly like the rest of the section.</p>
 
@@ -597,7 +597,7 @@ export default function CustomCaseEditor() {
                 {existingPreviews[q.id] && <img src={existingPreviews[q.id]} alt={q.questionText} />}
                 <p>{q.questionText}</p>
                 <div className="cce-existing-actions">
-                  <Link to={`/section/${section}/q/${q.id}`} className="btn">Open</Link>
+                  <Link to={`/anatomy/section/${section}/q/${q.id}`} className="btn">Open</Link>
                   <button type="button" className="btn cce-delete" onClick={() => handleDelete(q.id)}>Delete</button>
                 </div>
               </div>

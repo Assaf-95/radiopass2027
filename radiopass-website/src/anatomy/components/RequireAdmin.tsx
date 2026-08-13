@@ -8,7 +8,7 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
     <div className="empty-state">
       <h1>Authoring only</h1>
       <p>This page edits question content, so it is available to the author only.</p>
-      <Link className="btn btn-primary" to="/admin">Author sign-in</Link>
+      <Link className="btn btn-primary" to="/anatomy/admin">Author sign-in</Link>
     </div>
   );
 }

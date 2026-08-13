@@ -41,7 +41,7 @@ export default function SectionHub() {
   const firstUnanswered = questions.find((q) => progress.questions[q.id]?.status !== 'submitted');
 
   function goToQuestion(id: string) {
-    navigate(`/section/${section}/q/${id}`);
+    navigate(`/anatomy/section/${section}/q/${id}`);
   }
 
   function startRandom() {
@@ -63,7 +63,7 @@ export default function SectionHub() {
       <div className="empty-state">
         <h1>Section not found</h1>
         <p>That address does not match any of the six anatomy modules.</p>
-        <Link className="btn btn-primary" to="/">Back to the modules</Link>
+        <Link className="btn btn-primary" to="/anatomy">Back to the modules</Link>
       </div>
     );
   }
@@ -71,11 +71,11 @@ export default function SectionHub() {
   if (questions.length === 0) {
     return (
       <div className="hub">
-        <Link to="/" className="back-link">← Back to sections</Link>
+        <Link to="/anatomy" className="back-link">← Back to sections</Link>
         <div className="empty-state card">
           <h2>{meta.title}</h2>
           <p>This section is still being extracted from the source PDFs and will appear here once processing completes. No placeholder questions are shown.</p>
-          {isAdmin() && (<Link to={`/section/${section}/custom`} className="btn btn-primary">+ Add your own case</Link>)}
+          {isAdmin() && (<Link to={`/anatomy/section/${section}/custom`} className="btn btn-primary">+ Add your own case</Link>)}
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function SectionHub() {
           style={{ backgroundImage: `url(${meta.heroImage})` }}
         />
       )}
-      <Link to="/" className="back-link">← Back to sections</Link>
+      <Link to="/anatomy" className="back-link">← Back to sections</Link>
       <div className="hub-head">
         <div>
           <h1>{meta.title}</h1>
@@ -108,7 +108,7 @@ export default function SectionHub() {
               Abdomen and pelvis are one module but two Atlas chapters, so
               that one goes to the Atlas front page to choose. */}
           <Link to={atlasChapterLink(section)} className="btn">Structure Atlas</Link>
-          <Link to={`/section/${section}/custom`} className="btn">+ Add your own case</Link>
+          <Link to={`/anatomy/section/${section}/custom`} className="btn">+ Add your own case</Link>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export default function SectionHub() {
         <ReviewChip label={`Review partial / laterality (${partial.length})`} onClick={() => partial[0] && goToQuestion(partial[0].id)} disabled={partial.length === 0} />
         <ReviewChip label={`Flagged for review (${flagged.length})`} onClick={() => flagged[0] && goToQuestion(flagged[0].id)} disabled={flagged.length === 0} />
         <ReviewChip label={`Favourites (${favourites.length})`} onClick={() => favourites[0] && goToQuestion(favourites[0].id)} disabled={favourites.length === 0} />
-        <Link to="/disputes" className="review-chip">Disputed answers</Link>
+        <Link to="/anatomy/disputes" className="review-chip">Disputed answers</Link>
         <button className="review-chip danger" onClick={() => setConfirmReset(true)}>Reset this section</button>
       </div>
 
