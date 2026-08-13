@@ -15,7 +15,9 @@
       with no API there is nowhere to check a secret and nowhere to save, but
       the authoring tools still work against this browser's own storage, and
       losing that would be a regression. It is a UI lock and is labelled as
-      one wherever it appears.
+      one wherever it appears. Its passcode comes from VITE_ADMIN_PASSCODE and
+      has NO default: unset, the local lock is unavailable rather than opening
+      to a string anyone could read out of the bundle.
 
    `isAdmin()` is true for either, because it only ever guards what the
    INTERFACE shows. Nothing the server accepts depends on it: a write needs a
@@ -25,28 +27,6 @@
 import { sessionToken, setSessionToken, signIn as apiSignIn } from './content/api';
 
 const KEY = 'radiopass-admin-v1';
-
-/* Compared as a hash so the plain passcode is not sitting in the bundle as a
-   readable string. This raises the effort slightly; it does not change the
-   fact that a determined reader can bypass the LOCAL check entirely — which
-   is why server writes do not trust it. */
-const PASSCODE_HASH =
-  '7c9e6679f7c1a1f0e05f2b6b5f4b4a3e8d9c0a1b2c3d4e5f60718293a4b5c6d7';
-
-/** FNV-1a, widened to 64 hex chars. Not a security primitive — an obfuscator. */
-function weakHash(s: string): string {
-  let h1 = 0x811c9dc5;
-  let h2 = 0x01000193;
-  for (let i = 0; i < s.length; i++) {
-    h1 ^= s.charCodeAt(i);
-    h1 = Math.imul(h1, 0x01000193) >>> 0;
-    h2 ^= s.charCodeAt(s.length - 1 - i);
-    h2 = Math.imul(h2, 0x811c9dc5) >>> 0;
-  }
-  const a = h1.toString(16).padStart(8, '0');
-  const b = h2.toString(16).padStart(8, '0');
-  return (a + b).repeat(4).slice(0, 64);
-}
 
 /** Signed in by either route. Governs what the interface offers, never what
  *  the server accepts. */
@@ -72,9 +52,12 @@ export async function signInEditor(password: string): Promise<void> {
   setSessionToken(token);
 }
 
-/** The local fallback, for a deployment with no API. */
+/** The local fallback, for a deployment with no API. Unavailable unless a
+ *  passcode has actually been configured — see localPasscode(). */
 export function signInAdmin(passcode: string): boolean {
-  const ok = weakHash(passcode.trim()) === PASSCODE_HASH || passcode.trim() === defaultPasscode();
+  const configured = localPasscode();
+  if (!configured) return false;
+  const ok = passcode.trim() === configured;
   if (ok) localStorage.setItem(KEY, 'yes');
   return ok;
 }
@@ -88,8 +71,25 @@ export function signOutAdmin(): void {
   }
 }
 
-/* Set at build time via VITE_ADMIN_PASSCODE. Only ever used by the local
-   fallback; the server password is never in the bundle. */
-export function defaultPasscode(): string {
-  return (import.meta.env.VITE_ADMIN_PASSCODE as string | undefined) ?? 'radiopass-author';
+/**
+ * The local lock's passcode, supplied at build time. There is deliberately NO
+ * fallback value.
+ *
+ * It used to fall back to a literal string, which meant the production
+ * passcode was committed to the repository and shipped inside the JavaScript
+ * bundle. A default is worse than nothing here: it is a known credential that
+ * unlocks every deployment that forgot to set the real one.
+ *
+ * Unset, the local lock is simply unavailable — the safe failure, and a cheap
+ * one, because this gate only governs what the INTERFACE offers. Every write
+ * is re-checked against a server session, which no amount of localStorage can
+ * produce.
+ */
+export function localPasscode(): string {
+  return ((import.meta.env.VITE_ADMIN_PASSCODE as string | undefined) ?? '').trim();
+}
+
+/** Whether the local lock can be used at all on this deployment. */
+export function localLockConfigured(): boolean {
+  return localPasscode().length > 0;
 }

@@ -26,8 +26,24 @@ const ANATOMY = (
   (import.meta.env.VITE_ANATOMY_URL as string | undefined) ?? '/anatomy'
 ).replace(/\/+$/, '')
 const KEY = 'radiopass.author.v1'
-/** Matches the anatomy site's own author passcode so one code opens both. */
-const PASSCODE = 'radiopass-author'
+
+/**
+ * The author passcode, supplied at build time. There is deliberately NO
+ * fallback.
+ *
+ * This used to be a literal in the source, which meant the production passcode
+ * was committed to the repository and shipped inside the JavaScript bundle —
+ * readable by anyone who opened devtools on the live site. A default value is
+ * worse than no value here: it is a known credential that unlocks every
+ * deployment that forgot to set the real one.
+ *
+ * With the variable unset the local unlock is simply unavailable, which is the
+ * safe failure. It costs nothing in practice: this gate only governs what the
+ * INTERFACE offers. The anatomy content API checks a server session for every
+ * write and no amount of localStorage produces one.
+ */
+const PASSCODE = (import.meta.env.VITE_ADMIN_PASSCODE as string | undefined)?.trim() ?? ''
+const PASSCODE_CONFIGURED = PASSCODE.length > 0
 
 type Tool = { name: string; blurb: string; href: string; external?: boolean }
 
@@ -96,6 +112,10 @@ export default function Admin() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
+    if (!PASSCODE_CONFIGURED) {
+      setError('Author access is not configured on this deployment. Set VITE_ADMIN_PASSCODE and rebuild.')
+      return
+    }
     if (entry.trim() !== PASSCODE) {
       setError('That passcode is not right.')
       return
