@@ -28,19 +28,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './portal.css'
 
-/* Where the anatomy app lives. Defaults to "/anatomy" — the two apps now ship
-   together in one folder on one host, physics at the root and anatomy in that
-   subfolder. It used to default to a separate radiopass-anatomy.netlify.app
-   deployment; that site has been retired, so the old default would now be a
-   link to nothing. Override with VITE_ANATOMY_URL at build time to point at a
-   separate deployment again. Stored without a trailing slash; callers add
-   their own. The anatomy app uses a HashRouter, so a deep link into a region
-   is `${ANATOMY_URL}/#/section/<id>`. */
-const ANATOMY_URL = (
-  (import.meta.env.VITE_ANATOMY_URL as string | undefined) ?? '/anatomy'
-).replace(/\/+$/, '')
-
-const anatomy = (hash = '') => `${ANATOMY_URL}/#${hash || '/'}`
+/* Anatomy is a route of this application now, not a second deployment, so
+   these are ordinary internal paths and ordinary <Link>s: client-side
+   navigation, no page reload, no VITE_ANATOMY_URL to configure. The old
+   `${ANATOMY_URL}/#/section/…` form still resolves for anyone arriving on an
+   old bookmark — AnatomyRoutes redirects it — but nothing in the product
+   should still be MINTING that form. */
+const anatomy = (path = '') => `/anatomy${path}`
 
 /* ------------------------------------------------------------------ *
  * The numbers
@@ -724,7 +718,7 @@ export default function Portal() {
           </Link>
           <span className="pt-bar-sub">First FRCR · Anatomy &amp; Physics</span>
           <nav className="pt-bar-nav" aria-label="Sections">
-            <a href={anatomy()}>Anatomy</a>
+            <Link to={anatomy()}>Anatomy</Link>
             <Link to="/physics">Physics</Link>
             {/* An access route, deliberately after the two branches and set in
                 the same quiet type — it must not read as a third subject. */}
@@ -751,7 +745,7 @@ export default function Portal() {
               against its source.
             </p>
             <div className="pt-hero-actions">
-              <a className="pt-btn pt-btn-solid" href={anatomy()}>Enter anatomy</a>
+              <Link className="pt-btn pt-btn-solid" to={anatomy()}>Enter anatomy</Link>
               <Link className="pt-btn pt-btn-ghost" to="/physics">Enter physics</Link>
             </div>
           </div>
@@ -775,9 +769,9 @@ export default function Portal() {
           </div>
 
           <div className="pt-plates">
-            <a
+            <Link
               className="pt-plate pt-door-anatomy"
-              href={anatomy()}
+              to={anatomy()}
               onMouseEnter={() => setHover('anatomy')}
               onMouseLeave={() => setHover(null)}
               onFocus={() => setHover('anatomy')}
@@ -818,7 +812,7 @@ export default function Portal() {
                 </span>
                 <span className="pt-door-go">Enter anatomy <i aria-hidden="true">→</i></span>
               </span>
-            </a>
+            </Link>
 
             <Link
               className="pt-plate pt-plate-flip pt-door-physics"
@@ -948,7 +942,7 @@ export default function Portal() {
             One exam. <em>Both halves.</em> One place.
           </h2>
           <div className="pt-hero-actions">
-            <a className="pt-btn pt-btn-solid" href={anatomy()}>Start with anatomy</a>
+            <Link className="pt-btn pt-btn-solid" to={anatomy()}>Start with anatomy</Link>
             <Link className="pt-btn pt-btn-ghost" to="/physics">Start with physics</Link>
           </div>
           <p className="pt-close-note">
@@ -969,7 +963,7 @@ export default function Portal() {
               never links past the choice it exists to offer. */}
           <nav aria-label="Branches">
             <h4>Branches</h4>
-            <a href={anatomy()}>Anatomy</a>
+            <Link to={anatomy()}>Anatomy</Link>
             <Link to="/physics">Physics</Link>
           </nav>
           <nav aria-label="RadioPass">
