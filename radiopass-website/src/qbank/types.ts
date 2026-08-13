@@ -31,6 +31,23 @@ export type QbQuestion = {
   id: string
   title: string
   topic: QbTopic
+  /**
+   * Which FRCR sitting this recall came from — '2024', '2012', or 'Collection'
+   * for the curated sets that are not tied to one paper.
+   *
+   * Recovered from the archive: it was dropped in a migration and cannot be
+   * regenerated from anything, because nothing else in the data records which
+   * paper a candidate was remembering.
+   */
+  year?: string
+  /** Whether all five statements were recovered. 201 of 453 are complete. */
+  completeFive?: boolean
+  /**
+   * Concept tags binding this question to the teaching visual that explains it
+   * — 263 questions across 42 tags. Recovered with `year`; not yet resolved to
+   * routes, so nothing reads this today. It is here so the mapping survives.
+   */
+  visualTags?: string[]
   /** Provenance group; presented only as a neutral collection name. */
   source: string
   stems: QbStem[]

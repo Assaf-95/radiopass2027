@@ -551,3 +551,10 @@
 @media (prefers-reduced-motion: reduce) {
   .qb-root * { transition-duration: 0.01ms !important; }
 }
+
+/* The sitting a recall came from, beside its collection name. Quieter than the
+   source itself: provenance, not a heading. */
+.qb-qyear {
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+}

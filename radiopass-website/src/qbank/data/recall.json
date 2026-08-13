@@ -1,0 +1,3096 @@
+{
+  "b1": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions"
+    ],
+    "sourceQuestionId": "1"
+  },
+  "b2": {
+    "year": "2025",
+    "completeFive": true,
+    "sourceQuestionId": "2"
+  },
+  "b3": {
+    "year": "2025",
+    "completeFive": true,
+    "sourceQuestionId": "3"
+  },
+  "b4": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "ct-beam-hardening",
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "4"
+  },
+  "b5": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "radiographic-magnification",
+      "mammography-compression"
+    ],
+    "sourceQuestionId": "5"
+  },
+  "b6": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "6"
+  },
+  "b7": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ],
+    "sourceQuestionId": "7"
+  },
+  "b8": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ],
+    "sourceQuestionId": "8"
+  },
+  "b9": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "9"
+  },
+  "b10": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose",
+      "ct-windowing"
+    ],
+    "sourceQuestionId": "10"
+  },
+  "b11": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "11"
+  },
+  "b12": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "12"
+  },
+  "b13": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing"
+    ],
+    "sourceQuestionId": "13"
+  },
+  "b14": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "14"
+  },
+  "b15": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "photoelectric-effect",
+      "gamma-camera-collimator"
+    ],
+    "sourceQuestionId": "15"
+  },
+  "b16": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "16"
+  },
+  "b17": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "17"
+  },
+  "b18": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "suv"
+    ],
+    "sourceQuestionId": "18"
+  },
+  "b19": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "suv"
+    ],
+    "sourceQuestionId": "18"
+  },
+  "b20": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "19"
+  },
+  "b21": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "ultrasound-mi-ti"
+    ],
+    "sourceQuestionId": "20"
+  },
+  "b22": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-gradients-kspace",
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "21"
+  },
+  "b23": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-tissue-signal"
+    ],
+    "sourceQuestionId": "22"
+  },
+  "b24": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation",
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "23"
+  },
+  "b25": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "spect-acquisition"
+    ],
+    "sourceQuestionId": "24"
+  },
+  "b26": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "spect-acquisition",
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "25"
+  },
+  "b27": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing",
+      "mri-refocusing"
+    ],
+    "sourceQuestionId": "26"
+  },
+  "b28": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "27"
+  },
+  "b29": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "28"
+  },
+  "b30": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ],
+    "sourceQuestionId": "29"
+  },
+  "b31": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "ultrasound-acoustic-impedance"
+    ],
+    "sourceQuestionId": "30"
+  },
+  "b32": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "31"
+  },
+  "b33": {
+    "year": "2025",
+    "completeFive": false,
+    "sourceQuestionId": "32"
+  },
+  "b34": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "33"
+  },
+  "b35": {
+    "year": "2025",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "33"
+  },
+  "b36": {
+    "year": "2025",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "33"
+  },
+  "b37": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "34"
+  },
+  "b38": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-chemical-shift"
+    ],
+    "sourceQuestionId": "35"
+  },
+  "b39": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-chemical-shift"
+    ],
+    "sourceQuestionId": "36"
+  },
+  "b40": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-chemical-shift"
+    ],
+    "sourceQuestionId": "37"
+  },
+  "b41": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-chemical-shift"
+    ],
+    "sourceQuestionId": "38"
+  },
+  "b42": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-chemical-shift"
+    ],
+    "sourceQuestionId": "39"
+  },
+  "b43": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "40"
+  },
+  "b44": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "41"
+  },
+  "b45": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "ct-windowing"
+    ],
+    "sourceQuestionId": "42"
+  },
+  "b46": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "43"
+  },
+  "b47": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "44"
+  },
+  "b48": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "45"
+  },
+  "b49": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "46"
+  },
+  "b50": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "47"
+  },
+  "b51": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "48"
+  },
+  "b52": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "49"
+  },
+  "b53": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "ct-beam-hardening"
+    ],
+    "sourceQuestionId": "50"
+  },
+  "b54": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "51"
+  },
+  "b55": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "52"
+  },
+  "b56": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "53"
+  },
+  "b57": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "54"
+  },
+  "b58": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "55"
+  },
+  "b59": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "56"
+  },
+  "b60": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "57"
+  },
+  "b61": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "58"
+  },
+  "b62": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ],
+    "sourceQuestionId": "59"
+  },
+  "b63": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "60"
+  },
+  "b64": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "61"
+  },
+  "b65": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "62"
+  },
+  "b66": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "63"
+  },
+  "b67": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "64"
+  },
+  "b68": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "65"
+  },
+  "b69": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "66"
+  },
+  "b70": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "67"
+  },
+  "b71": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "68"
+  },
+  "b72": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "69"
+  },
+  "b73": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "70"
+  },
+  "b74": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "71"
+  },
+  "b75": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "72"
+  },
+  "b76": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "73"
+  },
+  "b77": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "74"
+  },
+  "b78": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "75"
+  },
+  "b79": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "76"
+  },
+  "b80": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "77"
+  },
+  "b81": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ],
+    "sourceQuestionId": "78"
+  },
+  "b82": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "79"
+  },
+  "b83": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "80"
+  },
+  "b84": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "81"
+  },
+  "b85": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "82"
+  },
+  "b86": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "83"
+  },
+  "b87": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "84"
+  },
+  "b88": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "85"
+  },
+  "b89": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "ultrasound-mi-ti"
+    ],
+    "sourceQuestionId": "86"
+  },
+  "b90": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "87"
+  },
+  "b91": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "88"
+  },
+  "b92": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "wave-frequency-period"
+    ],
+    "sourceQuestionId": "89"
+  },
+  "b93": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "90"
+  },
+  "b94": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "91"
+  },
+  "b95": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "92"
+  },
+  "b96": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "93"
+  },
+  "b97": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "94"
+  },
+  "b98": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "95"
+  },
+  "b99": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "96"
+  },
+  "b100": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "97"
+  },
+  "b101": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "98"
+  },
+  "b102": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "99"
+  },
+  "b103": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator",
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "100"
+  },
+  "b104": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ],
+    "sourceQuestionId": "101"
+  },
+  "b105": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "102"
+  },
+  "b106": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ],
+    "sourceQuestionId": "103"
+  },
+  "b107": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-larmor-precession"
+    ],
+    "sourceQuestionId": "104"
+  },
+  "b108": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "105"
+  },
+  "b109": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "106"
+  },
+  "b110": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "107"
+  },
+  "b111": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "108"
+  },
+  "b112": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "109"
+  },
+  "b113": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ],
+    "sourceQuestionId": "110"
+  },
+  "b114": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-dephasing-step-sequence",
+      "mri-spin-echo"
+    ],
+    "sourceQuestionId": "111"
+  },
+  "b115": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing"
+    ],
+    "sourceQuestionId": "112"
+  },
+  "b116": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "113"
+  },
+  "b117": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "114"
+  },
+  "b118": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "115"
+  },
+  "b119": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "116"
+  },
+  "b120": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "117"
+  },
+  "b121": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "118"
+  },
+  "b122": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "119"
+  },
+  "b123": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "120"
+  },
+  "b124": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "121"
+  },
+  "b125": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "122"
+  },
+  "b126": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "suv"
+    ],
+    "sourceQuestionId": "123"
+  },
+  "b127": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "124"
+  },
+  "b128": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "125"
+  },
+  "b129": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "exponential-attenuation"
+    ],
+    "sourceQuestionId": "126"
+  },
+  "b130": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ],
+    "sourceQuestionId": "127"
+  },
+  "b131": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "128"
+  },
+  "b132": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "129"
+  },
+  "b133": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "130"
+  },
+  "b134": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ],
+    "sourceQuestionId": "131"
+  },
+  "b135": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "132"
+  },
+  "b136": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "133"
+  },
+  "b137": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "134"
+  },
+  "b138": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "135"
+  },
+  "b139": {
+    "year": "2024",
+    "completeFive": false,
+    "visualTags": [
+      "digital-breast-tomosynthesis"
+    ],
+    "sourceQuestionId": "136"
+  },
+  "b140": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "137"
+  },
+  "b141": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "138"
+  },
+  "b142": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "139"
+  },
+  "b143": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "140"
+  },
+  "b144": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "141"
+  },
+  "b145": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "142"
+  },
+  "b146": {
+    "year": "2024",
+    "completeFive": false,
+    "sourceQuestionId": "143"
+  },
+  "b147": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "144"
+  },
+  "b148": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "145"
+  },
+  "b149": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "146"
+  },
+  "b150": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "147"
+  },
+  "b151": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "148"
+  },
+  "b152": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "149"
+  },
+  "b153": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "150"
+  },
+  "b154": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "151"
+  },
+  "b155": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "152"
+  },
+  "b156": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "wave-frequency-period"
+    ],
+    "sourceQuestionId": "153"
+  },
+  "b157": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "154"
+  },
+  "b158": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar"
+    ],
+    "sourceQuestionId": "155"
+  },
+  "b159": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "156"
+  },
+  "b160": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "157"
+  },
+  "b161": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "158"
+  },
+  "b162": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "159"
+  },
+  "b163": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "160"
+  },
+  "b164": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "mri-tissue-signal"
+    ],
+    "sourceQuestionId": "161"
+  },
+  "b165": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "162"
+  },
+  "b166": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "163"
+  },
+  "b167": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "164"
+  },
+  "b168": {
+    "year": "2023",
+    "completeFive": true,
+    "sourceQuestionId": "165"
+  },
+  "b169": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "166"
+  },
+  "b170": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "167"
+  },
+  "b171": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "168"
+  },
+  "b172": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "169"
+  },
+  "b173": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "170"
+  },
+  "b174": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "171"
+  },
+  "b175": {
+    "year": "2023",
+    "completeFive": false,
+    "visualTags": [
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "172"
+  },
+  "b176": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "173"
+  },
+  "b177": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "174"
+  },
+  "b178": {
+    "year": "2023",
+    "completeFive": false,
+    "sourceQuestionId": "175"
+  },
+  "b179": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "176"
+  },
+  "b180": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "177"
+  },
+  "b181": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "178"
+  },
+  "b182": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "179"
+  },
+  "b183": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "180"
+  },
+  "b184": {
+    "year": "2022",
+    "completeFive": true,
+    "sourceQuestionId": "181"
+  },
+  "b185": {
+    "year": "2022",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing"
+    ],
+    "sourceQuestionId": "182"
+  },
+  "b186": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "183"
+  },
+  "b187": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "184"
+  },
+  "b188": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "185"
+  },
+  "b189": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "186"
+  },
+  "b190": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "187"
+  },
+  "b191": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ],
+    "sourceQuestionId": "188"
+  },
+  "b192": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "spect-acquisition"
+    ],
+    "sourceQuestionId": "189"
+  },
+  "b193": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator",
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "190"
+  },
+  "b194": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "191"
+  },
+  "b195": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "192"
+  },
+  "b196": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "193"
+  },
+  "b197": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-chemical-shift",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing",
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "194"
+  },
+  "b198": {
+    "year": "2022",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift",
+      "mri-tissue-signal"
+    ],
+    "sourceQuestionId": "195"
+  },
+  "b199": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "196"
+  },
+  "b200": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "197"
+  },
+  "b201": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "198"
+  },
+  "b202": {
+    "year": "2022",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ],
+    "sourceQuestionId": "199"
+  },
+  "b203": {
+    "year": "2022",
+    "completeFive": false,
+    "sourceQuestionId": "200"
+  },
+  "b204": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "201"
+  },
+  "b205": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ],
+    "sourceQuestionId": "202"
+  },
+  "b206": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "203"
+  },
+  "b207": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "204"
+  },
+  "b208": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-gradients-kspace",
+      "mri-dephasing"
+    ],
+    "sourceQuestionId": "205"
+  },
+  "b209": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "206"
+  },
+  "b210": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "207"
+  },
+  "b211": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "doppler-angle"
+    ],
+    "sourceQuestionId": "208"
+  },
+  "b212": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "209"
+  },
+  "b213": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "210"
+  },
+  "b214": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "211"
+  },
+  "b215": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "line-focus-principle",
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "212"
+  },
+  "b216": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "213"
+  },
+  "b217": {
+    "year": "2020",
+    "completeFive": true,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-chemical-shift",
+      "mri-tissue-signal"
+    ],
+    "sourceQuestionId": "214"
+  },
+  "b218": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ],
+    "sourceQuestionId": "215"
+  },
+  "b219": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "216"
+  },
+  "b220": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "pet-coincidence"
+    ],
+    "sourceQuestionId": "217"
+  },
+  "b221": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ],
+    "sourceQuestionId": "218"
+  },
+  "b222": {
+    "year": "2020",
+    "completeFive": true,
+    "sourceQuestionId": "219"
+  },
+  "b223": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "220"
+  },
+  "b224": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ],
+    "sourceQuestionId": "221"
+  },
+  "b225": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "222"
+  },
+  "b226": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "223"
+  },
+  "b227": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ],
+    "sourceQuestionId": "224"
+  },
+  "b228": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "ct-beam-hardening"
+    ],
+    "sourceQuestionId": "225"
+  },
+  "b229": {
+    "year": "2020",
+    "completeFive": false,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "226"
+  },
+  "b230": {
+    "year": "2020",
+    "completeFive": false,
+    "sourceQuestionId": "227"
+  },
+  "b231": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "228"
+  },
+  "b232": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose",
+      "ct-beam-hardening"
+    ],
+    "sourceQuestionId": "229"
+  },
+  "b233": {
+    "year": "2019",
+    "completeFive": false,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-tissue-signal"
+    ],
+    "sourceQuestionId": "230"
+  },
+  "b234": {
+    "year": "2019",
+    "completeFive": false,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-chemical-shift",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-gradients-kspace",
+      "mri-spin-echo"
+    ],
+    "sourceQuestionId": "231"
+  },
+  "b235": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle",
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "232"
+  },
+  "b236": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "233"
+  },
+  "b237": {
+    "year": "2019",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ],
+    "sourceQuestionId": "234"
+  },
+  "b238": {
+    "year": "2019",
+    "completeFive": true,
+    "sourceQuestionId": "235"
+  },
+  "b239": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "235"
+  },
+  "b240": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ],
+    "sourceQuestionId": "236"
+  },
+  "b241": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing"
+    ],
+    "sourceQuestionId": "237"
+  },
+  "b242": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "238"
+  },
+  "b243": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "239"
+  },
+  "b244": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-gradients-kspace",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ],
+    "sourceQuestionId": "240"
+  },
+  "b245": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "241"
+  },
+  "b246": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal"
+    ],
+    "sourceQuestionId": "242"
+  },
+  "b247": {
+    "year": "2019",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-dephasing",
+      "mri-b0-precession-rf-recovery-overview"
+    ],
+    "sourceQuestionId": "242"
+  },
+  "b248": {
+    "year": "2019",
+    "completeFive": false,
+    "sourceQuestionId": "242"
+  },
+  "b249": {
+    "year": "2019",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "243"
+  },
+  "b250": {
+    "year": "2015",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "244"
+  },
+  "b251": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-beam-quality",
+      "exponential-attenuation"
+    ],
+    "sourceQuestionId": "244"
+  },
+  "b252": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "245"
+  },
+  "b253": {
+    "year": "2015",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-focal-spot-unsharpness",
+      "xray-beam-quality"
+    ],
+    "sourceQuestionId": "246"
+  },
+  "b254": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-beam-quality",
+      "exponential-attenuation"
+    ],
+    "sourceQuestionId": "246"
+  },
+  "b255": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "radiographic-magnification",
+      "mammography-compression"
+    ],
+    "sourceQuestionId": "247"
+  },
+  "b256": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "248"
+  },
+  "b257": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "249"
+  },
+  "b258": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "250"
+  },
+  "b259": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "xray-beam-quality",
+      "dsa-subtraction-noise"
+    ],
+    "sourceQuestionId": "251"
+  },
+  "b260": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ],
+    "sourceQuestionId": "252"
+  },
+  "b261": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "253"
+  },
+  "b262": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "254"
+  },
+  "b263": {
+    "year": "2015",
+    "completeFive": false,
+    "sourceQuestionId": "255"
+  },
+  "b264": {
+    "year": "2015",
+    "completeFive": false,
+    "visualTags": [
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "256"
+  },
+  "b265": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ],
+    "sourceQuestionId": "257"
+  },
+  "b266": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ],
+    "sourceQuestionId": "258"
+  },
+  "b267": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "259"
+  },
+  "b268": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-focal-spot-unsharpness",
+      "mammography-compression"
+    ],
+    "sourceQuestionId": "260"
+  },
+  "b269": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "mammography-compression"
+    ],
+    "sourceQuestionId": "260"
+  },
+  "b270": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions"
+    ],
+    "sourceQuestionId": "261"
+  },
+  "b271": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "261"
+  },
+  "b272": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose"
+    ],
+    "sourceQuestionId": "262"
+  },
+  "b273": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "263"
+  },
+  "b274": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "264"
+  },
+  "b275": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "264"
+  },
+  "b276": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "265"
+  },
+  "b277": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "265"
+  },
+  "b278": {
+    "year": "2012",
+    "completeFive": true,
+    "sourceQuestionId": "266"
+  },
+  "b279": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ],
+    "sourceQuestionId": "267"
+  },
+  "b280": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "267"
+  },
+  "b281": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions"
+    ],
+    "sourceQuestionId": "268"
+  },
+  "b282": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "line-focus-principle",
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "269"
+  },
+  "b283": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ],
+    "sourceQuestionId": "270"
+  },
+  "b284": {
+    "year": "2012",
+    "completeFive": true,
+    "sourceQuestionId": "271"
+  },
+  "b285": {
+    "year": "2012",
+    "completeFive": true,
+    "sourceQuestionId": "272"
+  },
+  "b286": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ],
+    "sourceQuestionId": "273"
+  },
+  "b287": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "ultrasound-mi-ti"
+    ],
+    "sourceQuestionId": "274"
+  },
+  "b288": {
+    "year": "2012",
+    "completeFive": false,
+    "sourceQuestionId": "275"
+  },
+  "b289": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "irmer-irr"
+    ],
+    "sourceQuestionId": "276"
+  },
+  "b290": {
+    "year": "2012",
+    "completeFive": true,
+    "sourceQuestionId": "277"
+  },
+  "b291": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar"
+    ],
+    "sourceQuestionId": "277"
+  },
+  "b292": {
+    "year": "2012",
+    "completeFive": false,
+    "visualTags": [
+      "mri-sar",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ],
+    "sourceQuestionId": "278"
+  },
+  "b293": {
+    "year": "2012",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift",
+      "mri-artifacts"
+    ],
+    "sourceQuestionId": "279"
+  },
+  "b294": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b295": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ]
+  },
+  "b296": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ]
+  },
+  "b297": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "line-focus-principle",
+      "xray-focal-spot-unsharpness"
+    ]
+  },
+  "b298": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect",
+      "xray-beam-quality"
+    ]
+  },
+  "b299": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b300": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ]
+  },
+  "b301": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b302": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ]
+  },
+  "b303": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b304": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "spect-acquisition"
+    ]
+  },
+  "b305": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "spect-acquisition",
+      "pet-coincidence"
+    ]
+  },
+  "b306": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ]
+  },
+  "b307": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b308": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b309": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b310": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose",
+      "ct-beam-hardening"
+    ]
+  },
+  "b311": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ]
+  },
+  "b312": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing"
+    ]
+  },
+  "b313": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose",
+      "ct-dose-profile"
+    ]
+  },
+  "b314": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose"
+    ]
+  },
+  "b315": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-larmor-precession",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-magnetisation-recovery"
+    ]
+  },
+  "b316": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-larmor-precession",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-refocusing",
+      "mri-rf-excitation"
+    ]
+  },
+  "b317": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing",
+      "mri-refocusing"
+    ]
+  },
+  "b318": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-gradients-kspace",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing",
+      "mri-refocusing"
+    ]
+  },
+  "b319": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "wave-frequency-period"
+    ]
+  },
+  "b320": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ultrasound-acoustic-impedance"
+    ]
+  },
+  "b321": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b322": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ]
+  },
+  "b323": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle",
+      "ultrasound-mi-ti"
+    ]
+  },
+  "b324": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions"
+    ]
+  },
+  "b325": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter",
+      "photoelectric-effect"
+    ]
+  },
+  "b326": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b327": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "xray-beam-quality"
+    ]
+  },
+  "b328": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality",
+      "exponential-attenuation"
+    ]
+  },
+  "b329": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b330": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ]
+  },
+  "b331": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "xray-beam-quality",
+      "mammography-compression"
+    ]
+  },
+  "b332": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter",
+      "exponential-attenuation"
+    ]
+  },
+  "b333": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ]
+  },
+  "b334": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "spect-acquisition",
+      "pet-coincidence"
+    ]
+  },
+  "b335": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "pet-coincidence"
+    ]
+  },
+  "b336": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b337": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b338": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b339": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ]
+  },
+  "b340": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ]
+  },
+  "b341": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-focal-spot-unsharpness"
+    ]
+  },
+  "b342": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose",
+      "ct-windowing"
+    ]
+  },
+  "b343": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-dose-profile"
+    ]
+  },
+  "b344": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b345": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-rf-excitation",
+      "mri-b0-precession-rf-recovery-overview"
+    ]
+  },
+  "b346": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-magnetisation-recovery",
+      "mri-spin-echo"
+    ]
+  },
+  "b347": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b348": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift",
+      "mri-artifacts"
+    ]
+  },
+  "b349": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-sar",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ]
+  },
+  "b350": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ultrasound-acoustic-impedance"
+    ]
+  },
+  "b351": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ultrasound-acoustic-impedance"
+    ]
+  },
+  "b352": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b353": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ]
+  },
+  "b354": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ]
+  },
+  "b355": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ]
+  },
+  "b356": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-beam-quality",
+      "exponential-attenuation"
+    ]
+  },
+  "b357": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b358": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b359": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b360": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b361": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b362": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ]
+  },
+  "b363": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "gamma-camera-collimator"
+    ]
+  },
+  "b364": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "pet-coincidence"
+    ]
+  },
+  "b365": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "suv"
+    ]
+  },
+  "b366": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr",
+      "deterministic-stochastic-effects"
+    ]
+  },
+  "b367": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b368": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b369": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness"
+    ]
+  },
+  "b370": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b371": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-pitch-dose"
+    ]
+  },
+  "b372": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-beam-hardening"
+    ]
+  },
+  "b373": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b374": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-beam-hardening"
+    ]
+  },
+  "b375": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-larmor-precession",
+      "mri-b0-precession-rf-recovery-overview"
+    ]
+  },
+  "b376": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-gradients-kspace",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing",
+      "mri-rf-excitation"
+    ]
+  },
+  "b377": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-gradients-kspace",
+      "mri-tissue-signal"
+    ]
+  },
+  "b378": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b379": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b380": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "wave-frequency-period"
+    ]
+  },
+  "b381": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b382": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b383": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b384": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect",
+      "mammography-compression"
+    ]
+  },
+  "b385": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter",
+      "xray-beam-quality"
+    ]
+  },
+  "b386": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "exponential-attenuation"
+    ]
+  },
+  "b387": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "xray-beam-quality"
+    ]
+  },
+  "b388": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "xray-beam-quality"
+    ]
+  },
+  "b389": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b390": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ]
+  },
+  "b391": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "radiographic-magnification",
+      "mammography-compression"
+    ]
+  },
+  "b392": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b393": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b394": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "spect-acquisition"
+    ]
+  },
+  "b395": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "pet-coincidence"
+    ]
+  },
+  "b396": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b397": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b398": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b399": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b400": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b401": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "ct-pitch-dose"
+    ]
+  },
+  "b402": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b403": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b404": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-dose-profile",
+      "irmer-irr"
+    ]
+  },
+  "b405": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-magnetisation-recovery",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-dephasing"
+    ]
+  },
+  "b406": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "wave-frequency-period"
+    ]
+  },
+  "b407": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift"
+    ]
+  },
+  "b408": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-larmor-precession",
+      "mri-artifacts"
+    ]
+  },
+  "b409": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b410": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ultrasound-acoustic-impedance"
+    ]
+  },
+  "b411": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b412": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b413": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ]
+  },
+  "b414": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mammography-compression"
+    ]
+  },
+  "b415": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b416": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b417": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-beam-quality"
+    ]
+  },
+  "b418": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b419": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-tissue-signal"
+    ]
+  },
+  "b420": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter",
+      "photoelectric-effect"
+    ]
+  },
+  "b421": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b422": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "doppler-angle"
+    ]
+  },
+  "b423": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b424": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b425": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing"
+    ]
+  },
+  "b426": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-chemical-shift",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-larmor-precession"
+    ]
+  },
+  "b427": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "fluoroscopy-image-intensifier"
+    ]
+  },
+  "b428": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b429": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "photoelectric-effect"
+    ]
+  },
+  "b430": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "ct-windowing",
+      "exponential-attenuation"
+    ]
+  },
+  "b431": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions",
+      "compton-scatter"
+    ]
+  },
+  "b432": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "radiographic-magnification",
+      "mammography-compression"
+    ]
+  },
+  "b433": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b434": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b435": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b436": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "wave-frequency-period"
+    ]
+  },
+  "b437": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "deterministic-stochastic-effects"
+    ]
+  },
+  "b438": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-t2-t2star-signal",
+      "mri-gradients-kspace",
+      "mri-spin-echo",
+      "mri-artifacts"
+    ]
+  },
+  "b439": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mammography-compression"
+    ]
+  },
+  "b440": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-t2star-signal",
+      "mri-magnetisation-recovery",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-rf-excitation"
+    ]
+  },
+  "b441": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "gamma-camera-collimator",
+      "pet-coincidence"
+    ]
+  },
+  "b442": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-guided-interactions"
+    ]
+  },
+  "b443": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "irmer-irr"
+    ]
+  },
+  "b444": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b445": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b446": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b447": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "beam-divergence-isocentre",
+      "ct-beam-hardening"
+    ]
+  },
+  "b448": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "dsa-subtraction-noise"
+    ]
+  },
+  "b449": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b450": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "mri-t2-dephasing-spin-echo",
+      "mri-dephasing-step-sequence",
+      "mri-spin-echo",
+      "mri-b0-precession-rf-recovery-overview",
+      "mri-refocusing",
+      "mri-rf-excitation"
+    ]
+  },
+  "b451": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "gamma-camera-collimator"
+    ]
+  },
+  "b452": {
+    "year": "Collection",
+    "completeFive": true
+  },
+  "b453": {
+    "year": "Collection",
+    "completeFive": true,
+    "visualTags": [
+      "xray-focal-spot-unsharpness",
+      "radiographic-magnification"
+    ]
+  }
+}

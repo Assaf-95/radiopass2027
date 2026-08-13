@@ -175,6 +175,14 @@ export function QuestionCard({
         </span>
         <span className={isRecall ? 'qb-qsource is-recall' : 'qb-qsource'}>
           {isRecall ? 'High-yield recall' : question.source}
+          {/* Which sitting this was remembered from. Recovered provenance — it
+              was dropped in a migration and restored from the archive, and it
+              is the one thing a candidate most wants to know about a recall.
+              'Collection' means a curated set rather than one paper, so it is
+              not worth printing. */}
+          {question.year && question.year !== 'Collection' && (
+            <span className="qb-qyear"> · {question.year}</span>
+          )}
         </span>
       </div>
 

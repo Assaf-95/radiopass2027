@@ -79,3 +79,60 @@ describe('question bank data', () => {
     }
   })
 })
+
+/**
+ * Recovered provenance must not go missing a second time.
+ *
+ * `year`, `completeFive` and `visualTags` were dropped from questions.base.json
+ * in a migration and restored from the archive. None of them is derivable from
+ * the question text: nothing else records which FRCR sitting a candidate was
+ * remembering, or whether all five statements survived, or which teaching
+ * visual explains the concept. If they are lost again with the archive gone,
+ * they are gone.
+ *
+ * These pin the exact counts, so a data change that silently drops them fails
+ * here rather than being noticed years later.
+ */
+describe('recovered recall provenance', () => {
+  const base = QB_QUESTIONS.filter((q) => q.id.startsWith('b'))
+
+  it('carries a sitting year for every question in the base collection', () => {
+    const missing = base.filter((q) => !q.year).map((q) => q.id)
+    expect(missing).toEqual([])
+    expect(base.length).toBe(453)
+  })
+
+  it('keeps the recovered year distribution exactly', () => {
+    const years: Record<string, number> = {}
+    for (const q of base) years[q.year!] = (years[q.year!] ?? 0) + 1
+    expect(years).toEqual({
+      '2012': 29,
+      '2015': 15,
+      '2019': 19,
+      '2020': 27,
+      '2022': 25,
+      '2023': 32,
+      '2024': 110,
+      '2025': 36,
+      Collection: 160,
+    })
+  })
+
+  it('agrees with the stems about which questions are complete', () => {
+    // The strongest check available: completeFive came from the archive, the
+    // stem count is computed from today's data, and they must say the same
+    // thing. 201 both ways is what proves the join was sound.
+    const flagged = base.filter((q) => q.completeFive)
+    const fiveStem = base.filter((q) => q.stems.length === 5)
+    expect(flagged.length).toBe(201)
+    expect(fiveStem.length).toBe(201)
+    expect(flagged.map((q) => q.id).sort()).toEqual(fiveStem.map((q) => q.id).sort())
+  })
+
+  it('keeps the visual concept tags', () => {
+    const tagged = base.filter((q) => q.visualTags && q.visualTags.length > 0)
+    const tags = new Set(tagged.flatMap((q) => q.visualTags!))
+    expect(tagged.length).toBe(263)
+    expect(tags.size).toBe(42)
+  })
+})

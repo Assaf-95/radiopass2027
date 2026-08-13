@@ -11,6 +11,7 @@
 
 import baseRaw from './questions.base.json'
 import annotationsRaw from './annotations.json'
+import recallRaw from './recall.json'
 import extractedRaw from './extracted.json'
 import { QB_SUBJECTS, type QbQuestion, type QbStem, type QbTopic } from '../types'
 
@@ -24,6 +25,16 @@ type RawQuestion = {
 }
 
 const annotations = annotationsRaw as Record<string, { keyPoint: string; topic: string }>
+
+/* Recovered provenance: which sitting each recall came from, whether all five
+   statements survived, and the concept tags binding a question to the visual
+   that teaches it. Dropped in an earlier migration and restored from the
+   archive by scripts/recover-recall-metadata.mjs — none of it is derivable
+   from the question text, so losing it again would be permanent. */
+const recall = recallRaw as Record<
+  string,
+  { year?: string; completeFive?: boolean; visualTags?: string[]; sourceQuestionId?: string }
+>
 
 const SOURCE_LABEL: Record<string, string> = {
   recall: 'High-yield recall collection',
@@ -50,6 +61,7 @@ function normalise(raw: RawQuestion, index: number): QbQuestion | null {
   if (stems.length === 0) return null
 
   const topic = (annotation?.topic ?? raw.topic) as QbTopic
+  const provenance = recall[raw.id]
   return {
     id: raw.id || `q${index}`,
     title: raw.title.trim(),
@@ -57,6 +69,9 @@ function normalise(raw: RawQuestion, index: number): QbQuestion | null {
     source: SOURCE_LABEL[raw.source] ?? raw.source,
     stems,
     keyPoint: raw.keyPoint?.trim() || annotation?.keyPoint || '',
+    ...(provenance?.year ? { year: provenance.year } : {}),
+    ...(provenance?.completeFive != null ? { completeFive: provenance.completeFive } : {}),
+    ...(provenance?.visualTags ? { visualTags: provenance.visualTags } : {}),
   }
 }
 
