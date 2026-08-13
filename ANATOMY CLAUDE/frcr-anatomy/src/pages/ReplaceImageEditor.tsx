@@ -17,7 +17,7 @@ import ImageViewer, { defaultLabelPos, DEFAULT_THICKNESS_PCT } from '../componen
 import { assetUrl } from '../lib/assetUrl';
 import { isCustomImageRef, resolveCustomImageSrc } from '../lib/customStore';
 import {
-  applyEdit, auditAnnotations, clearEdit, getEdit, reletter, saveEdit,
+  applyEdit, auditAnnotations, clearEdit, getEdit, nextFreeLetter, saveEdit,
   toEditableAnswers, type EditableAnswer, type QuestionEdit,
 } from '../lib/questionEdits';
 import { NO_ORIENTATION, isOriented, remapMarker, type ImageOrientation, type SectionId } from '../types';
@@ -404,11 +404,16 @@ function Editor() {
          stored badge speaks the edit model's (x/y). Same numbers, different
          field names — translate rather than store the wrong shape. */
       const { labelX, labelY } = defaultLabelPos(p.x, p.y);
-      const next = reletter([
+      /* The lowest letter not already in use, so a new label can fill a gap
+         left by a deletion. Nothing else is touched: every existing record
+         keeps the letter it already had. */
+      const letter = nextFreeLetter(prev);
+      if (!letter) return prev;
+      const next: EditableAnswer[] = [
         ...prev,
         {
           id,
-          letter: '',
+          letter,
           officialAnswer: '',
           acceptedVariants: [],
           lateralityRequired: false,
@@ -418,7 +423,7 @@ function Editor() {
           colour: 'white',
           thicknessPct: DEFAULT_THICKNESS_PCT,
         },
-      ]);
+      ];
       setAddedIds((s) => new Set(s).add(id));
       setSelected(id);
       return next;
@@ -494,7 +499,12 @@ function Editor() {
     setConfirm({
       message: `Remove answer ${a.letter} — "${a.officialAnswer}"? The wording of every other answer stays exactly as it is.`,
       onYes: () => {
-        setAnswers((prev) => reletter(prev.filter((x) => x.id !== a.id)));
+        /* Filter only. The surviving labels keep their own letters, so
+           removing B from A,B,C leaves A,C — never A,B with C's answer slid
+           into B's place. The letters are printed on the film and every one
+           has been checked against its anatomy by hand; closing the gap would
+           re-point a question at a structure it was not asking about. */
+        setAnswers((prev) => prev.filter((x) => x.id !== a.id));
         setSelected(null);
         setConfirm(null);
       },

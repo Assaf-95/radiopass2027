@@ -15,6 +15,8 @@
     "atlas:report": "node --import ./scripts/ts-register.mjs scripts/atlas-report.ts",
     "atlas:validate": "node --import ./scripts/ts-register.mjs scripts/atlas-validate.ts",
     "questions:validate": "node --import ./scripts/ts-register.mjs scripts/questions-validate.ts",
+    "anatomy:verify": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts",
+    "anatomy:baseline": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts --write",
     "serve": "node server/server.mjs"
   },
   "dependencies": {

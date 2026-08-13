@@ -51,20 +51,25 @@ export function validateQuestions(questions: Question[]): ValidationIssue[] {
           (l, i) => i === 0 || LETTER_SEQUENCE.indexOf(l) > LETTER_SEQUENCE.indexOf(q.labels[i - 1])
         );
         if (!allUpperLetters || !ascending) {
-          const expected = LETTER_SEQUENCE.slice(0, q.labels.length);
-          add('error', 'non-sequential-labels', `Labels are ${q.labels.join(', ')}; expected ${expected.join(', ')}.`);
-        } else if (q.labels.join(',') !== LETTER_SEQUENCE.slice(0, q.labels.length).join(',')) {
-          // Ascending letters with a gap (A, C, D, E). Some source images
-          // genuinely skip a letter — usually because two sub-questions ask
-          // about the same arrow. Closing the gap here would desync the
-          // answer fields from the letters printed on the image, which is
-          // worse, so this is surfaced for review rather than auto-fixed.
+          /* Letters out of order, or not letters at all, still indicates a real
+             defect — the display order would not match the reading order. */
           add(
-            'warning',
-            'label-gap',
-            `Labels ${q.labels.join(', ')} skip a letter. Confirm this matches the printed image before changing.`
+            'error',
+            'non-ascending-labels',
+            `Labels are ${q.labels.join(', ')}; they must be capital letters in ascending order.`
           );
         }
+        /* A GAP IS NOT A DEFECT. "A, C, E" is valid and is not reported at all.
+           Two ways it arises, both legitimate: a source image genuinely skips a
+           letter, and — since label identity became protected — deleting a
+           label in the editor deliberately leaves the survivors' letters alone,
+           so removing B from A,B,C is meant to give A,C.
+
+           This previously warned and asked the author to "confirm before
+           changing". Closing a gap is now the thing that must never happen: the
+           letters are printed on the film and each has been checked against its
+           anatomy by hand, so renumbering would re-point a question at a
+           structure it was not asking about. */
       }
     }
 

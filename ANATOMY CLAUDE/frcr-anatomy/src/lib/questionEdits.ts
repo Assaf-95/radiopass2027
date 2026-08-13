@@ -6,22 +6,30 @@
    any edit can be reverted by deleting its override, and a question that was
    never edited costs nothing.
 
-   The editing model deliberately differs from the on-disk shape in one way.
-   On disk, answers are keyed by their display letter:
+   THE LABEL-TO-ANSWER MAPPING IS PROTECTED DATA. The owner has checked every
+   anatomy image against its labels by hand and declared the result correct.
+   Nothing here may re-letter, renumber, remap, merge or infer any part of it.
+   Only a deliberate edit made through the editor may change it, and
+   scripts/anatomy-mapping.ts fails the build if anything else does.
+
+   The editing model differs from the on-disk shape in one way. On disk,
+   answers are keyed by their display letter:
 
        answers: { "A": {...}, "B": {...}, "C": {...} }
        labels:  ["A", "B", "C"]
 
-   That binding is positional: delete label B and every remaining answer has
-   to be re-keyed, which is exactly how a correct answer silently migrates
-   onto the wrong structure. While editing, each answer instead carries a
-   stable id that never changes:
+   Read naively that binding looks positional, which is exactly how a correct
+   answer silently migrates onto the wrong structure. While editing, each
+   answer instead carries a stable id that never changes:
 
        [{ id: "ans_3", letter: "C", officialAnswer: "Median nerve" }, ...]
 
-   Deleting an entry re-letters the *display* only; the id-to-answer binding
-   is untouched. The on-disk shape is rebuilt on save, so nothing downstream
-   needs to know this happened.  */
+   The letter travels WITH the record and is never recomputed. Delete B and
+   what remains is A and C — C does not become B. The gap is correct: these
+   letters are printed on the film, and closing the gap would re-point every
+   later question at a structure it was not asking about. The on-disk shape is
+   rebuilt on save from whatever letters the records carry, so a bank with a
+   gap round-trips unchanged.  */
 
 import type { Question, AnswerSpec, ImageOrientation } from '../types';
 import type { MarkerShape } from '../components/ImageViewer';
@@ -182,9 +190,28 @@ export function toEditableAnswers(q: Question): EditableAnswer[] {
 }
 
 /** Re-letters for display after a delete. Ids and text are untouched. */
-export function reletter(answers: EditableAnswer[]): EditableAnswer[] {
-  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  return answers.map((a, i) => ({ ...a, letter: A[i] ?? a.letter }));
+const LETTERS = 'ABCDEFGH';
+
+/**
+ * The first letter not currently in use.
+ *
+ * This replaces a `reletter()` that renumbered the whole list from A on every
+ * change. That was wrong, and wrong in the one way that matters here: deleting
+ * B slid C, D and E up into B, C and D, so a candidate who had been asked to
+ * name the structure at C was afterwards asked to name it at B. The letters are
+ * not an index into a list — they are printed on the film and the owner has
+ * checked every one of them against its anatomy by hand.
+ *
+ * Deleting a label now leaves a gap, on purpose. A, B, C minus B is A, C.
+ *
+ * A new label fills the lowest free letter, which is a deliberate act by the
+ * author: the record is created with no answer text and cannot be saved until
+ * they name it, so it can never silently inherit the meaning the letter used
+ * to carry.
+ */
+export function nextFreeLetter(answers: EditableAnswer[]): string {
+  const used = new Set(answers.map((a) => a.letter));
+  return [...LETTERS].find((l) => !used.has(l)) ?? '';
 }
 
 /** Layers an override onto the shipped question. Pure; never mutates. */
