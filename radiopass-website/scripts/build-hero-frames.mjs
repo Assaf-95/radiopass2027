@@ -28,9 +28,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SKULL_DIR = join(ROOT, 'public', 'images', 'hero', 'skull');
-const HERO_DIR = join(ROOT, 'public', 'images', 'hero');
-const MANIFEST = join(ROOT, 'src', 'data', 'heroFrames.ts');
+/* Anatomy media lives under public/anatomy/ since the merge. */
+const SKULL_DIR = join(ROOT, 'public', 'anatomy', 'images', 'hero', 'skull');
+const HERO_DIR = join(ROOT, 'public', 'anatomy', 'images', 'hero');
+const MANIFEST = join(ROOT, 'src', 'anatomy', 'data', 'heroFrames.ts');
 const INDEX_HTML = join(ROOT, 'index.html');
 
 /** Below this a ladder is ignored entirely — Home gates on the same number. */

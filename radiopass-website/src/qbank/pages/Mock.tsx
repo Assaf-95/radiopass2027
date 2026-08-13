@@ -67,6 +67,14 @@ type SavedAttempt = {
   index: number
   /** Epoch milliseconds at which the paper ends. */
   endsAt: number
+  /* Which sitting this is and what it was called. Without these a reload
+     remounted the component with fresh refs, so a paper resumed after a
+     refresh was filed in the history as "Built paper" even when it was
+     RadioPass Paper 1 — the score was right and its name was wrong, which is
+     worse than useless when comparing attempts. Optional so an attempt saved
+     before this change still restores. */
+  attemptId?: string
+  paper?: string
 }
 
 /** Every question a paper can be built from — the bank plus the fixed papers. */
@@ -202,6 +210,8 @@ export default function MockPage() {
     const restored = saved.questionIds.map((id) => ALL_QUESTIONS.get(id)!).filter(Boolean)
     if (restored.length !== saved.questionIds.length) return
     setPaper(restored)
+    attemptIdRef.current = saved.attemptId ?? `mock_${Date.now().toString(36)}`
+    paperNameRef.current = saved.paper ?? 'Built paper'
     setAnswers(saved.answers ?? {})
     setIndex(Math.min(saved.index ?? 0, restored.length - 1))
     setEndsAt(saved.endsAt)
@@ -266,7 +276,14 @@ export default function MockPage() {
      currently under the mouse. */
   useEffect(() => {
     if (phase !== 'running' || endsAt === null || paper.length === 0) return
-    saveAttempt({ questionIds: paper.map((q) => q.id), answers, index, endsAt })
+    saveAttempt({
+      questionIds: paper.map((q) => q.id),
+      answers,
+      index,
+      endsAt,
+      attemptId: attemptIdRef.current,
+      paper: paperNameRef.current,
+    })
   }, [phase, paper, answers, index, endsAt])
 
   const beginPaper = (questions: QbQuestion[], forMinutes: number, name = 'Built paper') => {
