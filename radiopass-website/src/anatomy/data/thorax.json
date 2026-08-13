@@ -254,9 +254,9 @@
     "flagForReview": null,
     "imageCrop": {
       "x": 0.128,
-      "y": 0.0,
+      "y": 0,
       "w": 0.744,
-      "h": 1.0
+      "h": 1
     }
   },
   {
@@ -1208,7 +1208,7 @@
     "flagForReview": "Question page carries a blank worksheet table (no leaked answers). Question image is a coned/cropped left-upper-chest and shoulder view.",
     "imageCrop": {
       "x": 0.258,
-      "y": 0.0,
+      "y": 0,
       "w": 0.484,
       "h": 0.62578
     }
@@ -1286,7 +1286,7 @@
     "flagForReview": "Question page carries a blank worksheet table (no leaked answers). Label E is not marked on the image; it is a text sub-question about the anatomical variant.",
     "imageCrop": {
       "x": 0.34067,
-      "y": 0.0,
+      "y": 0,
       "w": 0.32467,
       "h": 0.54578
     }
@@ -1361,7 +1361,7 @@
     "flagForReview": "Lateral chest radiograph. Question page carries a blank worksheet table (no leaked answers). Label E is not marked on the image; it is a text sub-question ('At what level does the trachea usually divide?').",
     "imageCrop": {
       "x": 0.33467,
-      "y": 0.0,
+      "y": 0,
       "w": 0.324,
       "h": 0.54489
     }
@@ -1983,10 +1983,10 @@
     "imagePath": "/images/thorax/p0060-clean.png",
     "flagForReview": "Image prints arrow labels A–D only; label E corresponds to the printed sub-question '(e) Which normal variant is present on this image?' in the worksheet box on the question page.",
     "imageCrop": {
-      "x": 0.0,
-      "y": 0.0,
-      "w": 1.0,
-      "h": 1.0
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1
     }
   },
   {
@@ -2381,7 +2381,7 @@
     "flagForReview": "Format E continuous atlas numbering 36–40 relabelled to A–E in printed order (36->A ... 40->E). Answer page 71 lies just outside the assigned 55–70 range and was consulted to complete this entry.",
     "imageCrop": {
       "x": 0.24067,
-      "y": 0.0,
+      "y": 0,
       "w": 0.51467,
       "h": 0.99467
     }
@@ -2427,5 +2427,813 @@
       "w": 0.94531,
       "h": 0.93878
     }
+  },
+  {
+    "id": "thorax-p0072",
+    "section": "thorax",
+    "questionNumber": 32,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 72,
+    "sourcePageAnswer": 73,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Aortopulmonary window",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "SVC",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left coracoid process",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left inferior pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Aortopulmonary window",
+      "SVC",
+      "Left coracoid process",
+      "Left inferior pulmonary artery",
+      "Right atrium"
+    ],
+    "imagePath": "/images/thorax/p0072.webp",
+    "flagForReview": "Source labels 61->A, 62->B, 63->C, 64->D, 65->E (printed order preserved). Read from Thorax.pdf page 72, answers on page 73. Reader's note: Frontal (PA) chest radiograph with an 'R' side marker top left. Labels are given here in the numeric order printed on the answer page; on the film itself the pointers are scattered (63 upper left of image, 61 mid, 62 with two arrows on the right paratracheal stripe, 64, 65). Label 62 has two arrowheads pointing at the same border. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0074",
+    "section": "thorax",
+    "questionNumber": 33,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 74,
+    "sourcePageAnswer": 75,
+    "caseLabel": null,
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Chest Radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Descending thoracic aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Stomach gas shadow",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Lateral border right lobe of thymus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Ossification centre of left coracoid process of the scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Right horizontal (minor) fissure",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The thymus is very variable in size and shape. It may be triangular when it abuts the horizontal fissure and often has a wavy outline. It never compresses or deviates other mediastinal structures, such as the trachea.",
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Descending thoracic aorta",
+      "Stomach gas shadow",
+      "Lateral border right lobe of thymus",
+      "Ossification centre of left coracoid process of the scapula",
+      "Right horizontal (minor) fissure"
+    ],
+    "imagePath": "/images/thorax/p0074.webp",
+    "flagForReview": "Source labels 66->A, 67->B, 68->C, 69->D, 70->E (printed order preserved). Read from Thorax.pdf page 74, answers on page 75. Reader's note: Infant/neonatal frontal chest and upper abdomen radiograph; the film carries printed markers 'L' and 'SUPINE' at top right. Labels listed in the numeric order printed on the answer page; on the film the pointers appear in the order 68, 69, 66, 70, 67 by position. Labels 68, 66 and 70 each use a bundle of three arrows. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0086",
+    "section": "thorax",
+    "questionNumber": 34,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 86,
+    "sourcePageAnswer": 87,
+    "caseLabel": "Case 6",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain radiograph. AP chest.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Azygos fissure",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Aortic arch",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Medial border of the left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right cardiophrenic angle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Interlobar artery",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The azygos fissure is seen in about 1% of the population. The azygos vein sits at the caudal aspect of the fissure.",
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Azygos fissure",
+      "Aortic arch",
+      "Medial border of the left scapula",
+      "Right cardiophrenic angle",
+      "Interlobar artery"
+    ],
+    "imagePath": "/images/thorax/p0086.webp",
+    "flagForReview": "Read from Thorax.pdf page 86, answers on page 87. Reader's note: TOKEN MISMATCH between the two pages: the film (p86) prints the pointer labels as capitals A, B, C, D, E, but the answer page (p87) prints them as a numbered list 1–5. I have kept the film's printed tokens A–E and mapped them in printed order (A=1 … E=5). The mapping is corroborated by the on-film caption 'Name the linear normal variant labelled A.' and answer 1 'Azygos fissure'. Labels A and C each have two arrows from a single label token; D's arrow runs from the label down to the right cardiophrenic angle. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0088",
+    "section": "thorax",
+    "questionNumber": 35,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 88,
+    "sourcePageAnswer": 89,
+    "caseLabel": "Case 1",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "PA chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right atrium",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Superior vena cava",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Left ventricle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Descending thoracic aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Right pectoralis minor",
+        "acceptedVariants": [],
+        "lateralityRequired": true,
+        "prompt": "Name the muscle that connects the structure labelled E and the thoracic cage."
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Right atrium",
+      "Superior vena cava",
+      "Left ventricle",
+      "Descending thoracic aorta",
+      "Right pectoralis minor"
+    ],
+    "imagePath": "/images/thorax/p0088.webp",
+    "flagForReview": "Read from Thorax.pdf page 88, answers on page 89. Reader's note: Same token mismatch as the preceding case: film prints A–E, answer page prints 1–5; mapped in printed order (A=1 … E=5). The caption printed under the film is 'Name the muscle that connects the structure labelled E and the thoracic cage.' — so answer 5, 'Right pectoralis minor', is the answer to that question (the muscle), not the name of the bony structure the E arrow points at (the right coracoid region). Transcribed as printed. Labels B and D each have two arrows from one token. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0090",
+    "section": "thorax",
+    "questionNumber": 36,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 90,
+    "sourcePageAnswer": 91,
+    "caseLabel": "Case 18",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "PA chest radiograph, child.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Ossification centre of the coracoid process of the left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Tip of the left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Right lower lobe pulmonary artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Left clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Proximal epiphysis of the left humerus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Ossification centre of the coracoid process of the left scapula",
+      "Tip of the left scapula",
+      "Right lower lobe pulmonary artery",
+      "Left clavicle",
+      "Proximal epiphysis of the left humerus"
+    ],
+    "imagePath": "/images/thorax/p0090.webp",
+    "flagForReview": "Read from Thorax.pdf page 90, answers on page 91. Reader's note: Same token mismatch: film prints A–E, answer page prints 1–5; mapped in printed order (A=1 … E=5). The film carries a side marker 'RIGHT' at the top left and no printed question caption. Note this answer page is headed 'Case 18' and so is the answer page on p93 — two different cases share the heading 'Case 18', presumably from two different atlases bound into the book. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0092",
+    "section": "thorax",
+    "questionNumber": 37,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 92,
+    "sourcePageAnswer": 93,
+    "caseLabel": "Case 18",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain radiograph. Lateral sternum.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Manubrium of sternum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Body of sternum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Trachea",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Breast",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Manubriosternal joint",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": null,
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Manubrium of sternum",
+      "Body of sternum",
+      "Trachea",
+      "Breast",
+      "Manubriosternal joint"
+    ],
+    "imagePath": "/images/thorax/p0092.webp",
+    "flagForReview": "Read from Thorax.pdf page 92, answers on page 93. Reader's note: Confidence low only because the printed answer box on p93 is cropped at its lower edge — line 5 'Manubriosternal joint' is still legible but its descenders are clipped, and any further text (teaching prose) below it would have been cut off and is not visible. Same token mismatch as the other cases: film prints A–E, answer page prints 1–5; mapped in printed order (A=1 … E=5). The film image itself is printed rotated/oblique (a lateral sternum view), with the label tokens appearing on the page in the order C, A, E, B, D top to bottom; printedLabels are given in the alphabetical/answer-list order A–E. This is the second answer page in this range headed 'Case 18' (see p91). Transcription confidence: low. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0106",
+    "section": "thorax",
+    "questionNumber": 38,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 106,
+    "sourcePageAnswer": 107,
+    "caseLabel": "Q7",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Chest radiograph in a neonate, AP projection",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right lobe of thymus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Secondary ossification centre of the coracoid process",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Pedicles of the vertebrae",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Lateral border of the scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left lobe of thymus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The major intra-thoracic anatomy of the newborn is largely similar to that of an adult with the notable exception of the thymus gland. The thymus is a lymphoid organ which is located within the anterior mediastinum; its relative volume is far greater in infants than in adults. On a frontal radiograph the thymus commonly creates an opacity extending from the mediastinum into one or both lung fields; however the classic description of a triangular 'sail' sign is not always seen. The normal thymus is not usually visible on a frontal radiograph beyond the age of five years.",
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Right lobe of thymus",
+      "Secondary ossification centre of the coracoid process",
+      "Pedicles of the vertebrae",
+      "Lateral border of the scapula",
+      "Left lobe of thymus"
+    ],
+    "imagePath": "/images/thorax/p0106.webp",
+    "flagForReview": "Source labels a->A, b->B, c->C, d->D, e->E (printed order preserved). Read from Thorax.pdf page 106, answers on page 107. Reader's note: The film (p106) prints the pointer labels as capitals A B C D E; the answer page (p107) prints them lowercase a b c d e. Tokens correspond one-to-one; the lowercase answer-page tokens are given here. On the film the labels appear in the visual order B, E, D, A, C. Labels A, C, D and E each have multiple leader lines. The film page carries no printed heading or question stems (the answer page supplies the case number). Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0108",
+    "section": "thorax",
+    "questionNumber": 39,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 108,
+    "sourcePageAnswer": 109,
+    "caseLabel": "Q8",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Right lateral chest radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left hemi-diaphragm",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Gas bubble in gastric fundus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "IVC",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Scapular spine",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Descending aorta",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The dome of the left hemi-diaphragm is typically at a level inferior to that of the right and does not extend to the anterior chest wall due to the position of the heart. Along with the presence or absence of the gastric air bubble, these are features that can allow differentiation between the two hemi-diaphragms on a lateral chest radiograph.\n\nThe aortic arch can be seen in profile as it courses towards the back of the chest, becoming the descending aorta at around the level of the fourth thoracic vertebra. The superior and inferior vena cava both terminate at the right atrium and therefore lie towards the front of the chest (within the 'middle' mediastinum), with the IVC penetrating the right hemi-diaphragm at the level of T8 vertebral body.\n\nTo minimize composite bone overlap from the humerus, patients are asked to lift their arms out of the line of projection. This usually results in the scapula rotating externally and therefore entering into the field of view.",
+    "references": [
+      "Padley S, MacDonald LS. Grainger & Allison's Diagnostic Radiology, Ch 12 – The Normal Chest, 5th Ed, Churchill Livingstone Elsevier, Edinburgh, 2008.",
+      "Ahmad N. Mastering AP and lateral positioning for chest x-ray. 2001 www.auntminnie.com"
+    ],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Left hemi-diaphragm",
+      "Gas bubble in gastric fundus",
+      "IVC",
+      "Scapular spine",
+      "Descending aorta"
+    ],
+    "imagePath": "/images/thorax/p0108.webp",
+    "flagForReview": "Source labels a->A, b->B, c->C, d->D, e->E (printed order preserved). Read from Thorax.pdf page 108, answers on page 109. Reader's note: The film (p108) prints capitals A B C D E; the answer page (p109) prints lowercase a b c d e — the lowercase answer-page tokens are given here. Discrepancy transcribed as printed, not corrected: the radiograph on p108 carries a burned-in side marker 'L' (verified by zooming), while the answer page describes it as a 'Right lateral chest radiograph'. Labels A and B are printed in black at the bottom of the film; C, D and E in white. The film page carries no printed heading or question stems. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0110",
+    "section": "thorax",
+    "questionNumber": 40,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 110,
+    "sourcePageAnswer": 111,
+    "caseLabel": "Q9",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Left lateral chest radiograph",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Cardiac incisura (cardiac fat pad)",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Trachea",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "C": {
+        "officialAnswer": "Costophrenic recess (or sulcus)",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Left subclavian artery",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Oblique (major) fissure of left lung",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The anterior aspect of the left lung base may come to lie in contact with the apex of the heart or more commonly with the epicardial fat pad. The latter of these will displace the lung from the antero-medial chest wall and can be mistaken for a mass lesion. The size and morphology of this fat pad can be variable, with rounded, angular and straight configurations described.\n\nThe costophrenic recess (or costophrenic sulcus) forms the inferior margin of the pleural cavity on both sides. Depth and location of this recess is dependant on, among other things, patient size, age and respiratory health. The lateral recess is seen readily on frontal radiographs, whereas the posterior aspect is best visualized using a lateral projection. On the right side, the posterior recess has been shown to be, on average, 3cm lower than the lateral costophrenic recess with its inferior aspect at the level of the L1 vertebral body.\n\nBoth the left subclavian and right brachiocephalic arteries travel postero-superiorly in the upper thorax and can be seen as they cross the air-filled trachea. The margin of the left subclavian artery can be seen to follow a gentle curve across the posterior aspect of the trachea. In contrast, the brachiocephalic artery has a slightly convex appearance in most people. The silhouette of both vessels should have only slightly curved margins and any striking linear convexity within this region could be the result of an underlying mass lesion.",
+    "references": [
+      "Oh JK, Ahm MJ, Kim HL, Park SH, Shin E. Retrodiaphragmatic portion of the lung: how deep is the posterior costophrenic sulcus on posteroanterior chest radiography? Clinical Radiology 2009; 64:786–791.",
+      "Sussmann AR, Ko JP. Understanding chest radiographic anatomy with MDCT reformations. Clinical Radiology 2010; 65:155–166."
+    ],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Cardiac incisura (cardiac fat pad)",
+      "Trachea",
+      "Costophrenic recess (or sulcus)",
+      "Left subclavian artery",
+      "Oblique (major) fissure of left lung"
+    ],
+    "imagePath": "/images/thorax/p0110.webp",
+    "flagForReview": "Source labels a->A, b->B, c->C, d->D, e->E (printed order preserved). Read from Thorax.pdf page 110, answers on page 111. Reader's note: The film (p110) prints capitals A B C D E; the answer page (p111) prints lowercase a b c d e — the lowercase answer-page tokens are given here. Discrepancy transcribed as printed, not corrected: the radiograph on p110 carries a burned-in side marker 'R' while the answer page describes it as a 'Left lateral chest radiograph'. Label C on the film is a pair of short dashed bracket marks (marking the costophrenic recess) rather than leader lines. Second author of the first reference is printed 'Ahm MJ'. The film page carries no printed heading or question stems. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0114",
+    "section": "thorax",
+    "questionNumber": 41,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 114,
+    "sourcePageAnswer": 115,
+    "caseLabel": "Case 2.1",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain frontal chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Right main bronchus",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Right atrial border",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Spinous process T1",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Aortic arch",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "E": {
+        "officialAnswer": "Left ventricle border",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The bifurcation of the trachea lies at the level of the sternal angle (T5 level; T4 on inspiration, T6 on expiration). The trachea begins at C6 level at the lower border of the cricoid cartilage. The trachea is lined by ciliated columnar epithelium, is approximately 15cm long, 2cm in diameter, and made of 15–20 incomplete rings of cartilage which are completed posteriorly by the trachealis muscle.\n\nThe right atrium forms the right heart border and the superior and inferior vena cavae drain into its superior and inferior parts respectively.\n\nYou can identify structure C as the spinous process of T1, as the first ribs originate from this vertebra.\n\nThe aortic arch passes posteriorly from right to left to lie just left of T4. It is anterior to the trachea and arches over the left main bronchus and pulmonary artery. The left upper lobe lies anterior and to the left of the aortic arch. On the right are trachea, oesophagus, thoracic duct and body of T4 from front to back. The ligamentum arteriosum is the fibrous remnant of the ductus arteriosus which is connected to its inferior aspect. The aortic isthmus is the junction of the descending aorta with the arch. This is liable to injury in blunt trauma as it is fixed.\n\nThe left ventricle forms the left heart border.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 90.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 120.",
+      "Weber E, Netter FH, Vilensky JA, Carmichael SW. Netter's Concise Radiologic Anatomy. Philadelphia: Saunders/Elsevier, 2009: 183."
+    ],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Right main bronchus",
+      "Right atrial border",
+      "Spinous process T1",
+      "Aortic arch",
+      "Left ventricle border"
+    ],
+    "imagePath": "/images/thorax/p0114.webp",
+    "flagForReview": "Read from Thorax.pdf page 114, answers on page 115. Reader's note: This is the start of a different atlas bound into the book: the case heading 'Case 2.1' is printed in a grey banner above the film, labels are white circled capitals A–E with arrows, and the same capitals are used on the answer page. The film carries a burned-in 'R' marker at upper left. The description line 'Plain frontal chest radiograph.' is printed in italics with a full stop. Note that the very next film in this range is headed 'Case 2.27' (p116), so the case numbering in this scan is not sequential. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0116",
+    "section": "thorax",
+    "questionNumber": 42,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 116,
+    "sourcePageAnswer": 117,
+    "caseLabel": "Case 2.27",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Plain lateral chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Left atrial border",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "B": {
+        "officialAnswer": "Left scapula",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Trachea",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "D": {
+        "officialAnswer": "Right 8th rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Body of sternum",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      }
+    },
+    "teachingText": "The left atrium forms the left posterior heart border. The left ventricle can be identified as the most posterior and inferior of the cardiac chambers.\n\nThe lower trachea is supplied by branches of the bronchial artery. The upper trachea is supplied by the inferior thyroid artery. The arch of the aorta may be seen to indent the left side of the trachea just above the carina.\n\nThe sternum consists of three fused bones: manubrium, body of sternum and xiphoid process. Superiorly, the junction of the manubrium with the body of sternum is called the 'Angle of Louis'. This is at the level of T4/T5, where the 2nd rib articulates. This is the same level as the aortic arch and the carina.\n\nIn order to ascertain which rib is labelled, one can use the 'big rib sign'. On a well positioned left lateral chest radiograph, the left ribs are in contact with the film. The right ribs are farther from the film than the left, and are therefore magnified and look bigger.",
+    "references": [
+      "Weir J, Abrahams P. Imaging Atlas of Human Anatomy, 4th edn. Edinburgh: Mosby, 2010: 91.",
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 121.",
+      "Kurihara Y, Yakushiji YK, Matsumoto J et al. The ribs: anatomic and radiologic considerations. Radiographics 1999; 19:105-119."
+    ],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Left atrial border",
+      "Left scapula",
+      "Trachea",
+      "Right 8th rib",
+      "Body of sternum"
+    ],
+    "imagePath": "/images/thorax/p0116.webp",
+    "flagForReview": "Read from Thorax.pdf page 116, answers on page 117. Reader's note: Film page carries the header 'Case 2.27' and an orientation marker 'LEFT' burned into the image. Label order on the answer page is A-E; on the film the arrows are placed A (mid heart border), B (upper posterior), C (trachea), D (posterior rib, lower left of image), E (sternum). The Radiographics page range on the last reference is printed with an en dash (105-119). Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0118",
+    "section": "thorax",
+    "questionNumber": 43,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 118,
+    "sourcePageAnswer": 119,
+    "caseLabel": "Case 2.32",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "Frontal chest radiograph.",
+    "questionText": "Identify the structures labelled A–E.",
+    "labelStyle": "letter",
+    "labels": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "answers": {
+      "A": {
+        "officialAnswer": "Thymus",
+        "acceptedVariants": [],
+        "lateralityRequired": false
+      },
+      "B": {
+        "officialAnswer": "Left cardiophrenic angle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "C": {
+        "officialAnswer": "Ossification centre of left humeral head",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "D": {
+        "officialAnswer": "Right clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      },
+      "E": {
+        "officialAnswer": "Left posterior 5th rib",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The thymus is a soft structure of the lymphatic system which sits in the anterior mediastinum. It has left and right lobes. It is hugely variable in size and shape, and because of its soft density, the lateral edges may appear 'wavy' as they conform to the overlying ribs and intercostal spaces. Lung markings may be seen through it, and a normal thymus should never deviate other structures. The thymus normal involutes by around age 8, but may be seen as a small remnant of anterior mediastinal soft tissue on CT in adults.",
+    "references": [
+      "Ryan S, McNicholas M, Eustace SJ. Anatomy for Diagnostic Imaging, 3rd edn. Edinburgh: Saunders, 2010: 147-148."
+    ],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Thymus",
+      "Left cardiophrenic angle",
+      "Ossification centre of left humeral head",
+      "Right clavicle",
+      "Left posterior 5th rib"
+    ],
+    "imagePath": "/images/thorax/p0118.webp",
+    "flagForReview": "Read from Thorax.pdf page 118, answers on page 119. Reader's note: Frontal chest radiograph of an infant. The film page header reads 'Case 2.32' - note the case numbering jumps from 2.27 (p116) to 2.32 (p118), so intervening cases are not in this page range. The teaching text prints 'The thymus normal involutes by around age 8' - transcribed as printed, although 'normally' appears to be intended. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
+  },
+  {
+    "id": "thorax-p0120",
+    "section": "thorax",
+    "questionNumber": 44,
+    "sourceFile": "Thorax.pdf",
+    "sourcePageQuestion": 120,
+    "sourcePageAnswer": 121,
+    "caseLabel": "Question 6:",
+    "modalitySection": "Plain Film",
+    "imagingModality": "Radiograph",
+    "projection": "PA chest radiograph",
+    "questionText": "Identify the structure indicated by the arrow.",
+    "labelStyle": "single",
+    "labels": [
+      "Answer"
+    ],
+    "answers": {
+      "Answer": {
+        "officialAnswer": "Companion shadow beside the right clavicle",
+        "acceptedVariants": [],
+        "lateralityRequired": true
+      }
+    },
+    "teachingText": "The companion shadow is the skin and subcutaneous fat that are seen as a thin soft tissue stripe along the upper edge of the clavicle. It should not be mistaken for an abnormality.\n\nSimilar companion shadows can be formed by the ribs and scapulae. They are not always seen on a radiograph.",
+    "references": [],
+    "regionTags": [
+      "Chest"
+    ],
+    "structureTags": [
+      "Companion shadow beside the right clavicle"
+    ],
+    "imagePath": "/images/thorax/p0120.webp",
+    "flagForReview": "Read from Thorax.pdf page 120, answers on page 121. Reader's note: Different atlas style from the preceding cases. The film carries a single large black arrow pointing to the region above the right clavicle with NO printed label token, so printedLabels is empty; the single answer row is keyed to the word 'Answer' as printed on the answer page. The answer page heading reads 'Question 6: PA chest radiograph', from which the description is taken; the film page heading is just 'Question 6:'. The teaching text is printed as two bullet points. Added by batch ingest; not yet checked against the film by the owner.",
+    "labelsBurnedIn": true
   }
 ]
