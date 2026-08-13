@@ -12,32 +12,9 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase, supabaseConfigured } from './supabase'
 import { clearLocalCaches } from './syncedStore'
+import { PER_USER_KEYS } from './perUserKeys'
 
-/**
- * Local state that belongs to whoever was signed in, and must not outlive
- * them on a shared machine.
- *
- * Deliberately NOT here: the display preferences — sound, reduced motion,
- * the MRI reading mode. Those describe the device and the person sitting at
- * it, not the account, and wiping them on sign-out would be a worse
- * experience for no privacy gain.
- */
-const PER_USER_KEYS = [
-  /* Unlocks the authoring tools. It gates the interface only — every write is
-     re-checked server-side — but leaving it set would hand the next person an
-     admin-looking site. */
-  'radiopass.author.v1',
-  /* A mock paper part-way through, with the answers given so far. Unlike the
-     progress stores this has no Supabase copy, so it is genuinely discarded —
-     which is right: an unfinished exam belongs to the person sitting it, and
-     inheriting a stranger's half-written paper is not a feature. */
-  'radiopass.qbank.mock.v1',
-  /* The learner event log — mock history, module completions, activity dates.
-     It is a record of what one person did and must not follow them out of the
-     browser onto the next candidate, for exactly the reason the progress
-     stores must not. Written by both branches under one key. */
-  'radiopass.learner.events.v1',
-]
+
 
 type AuthResult = { error: string | null }
 type SignUpResult = AuthResult & { needsEmailConfirmation: boolean }

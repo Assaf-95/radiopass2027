@@ -75,7 +75,7 @@ export default function Home() {
     const questionId = getLastQuestion(meta.id);
     return {
       meta,
-      to: questionId ? `/section/${meta.id}/q/${questionId}` : `/section/${meta.id}`,
+      to: questionId ? `/anatomy/section/${meta.id}/q/${questionId}` : `/anatomy/section/${meta.id}`,
       at: last.at,
     };
   }, []);
@@ -99,7 +99,7 @@ export default function Home() {
       attempted: a.attempted + r.stats.attempted,
       structures: a.structures + r.stats.maxScore / 2,
       rawScore: a.rawScore + r.stats.rawScore,
-      attemptedMax: a.attemptedMax + (r.stats.attempted ? (r.stats.maxScore * r.stats.attempted) / Math.max(1, r.stats.total) : 0),
+      attemptedMax: a.attemptedMax + r.stats.attemptedMaxScore,
     }),
     { questions: 0, attempted: 0, structures: 0, rawScore: 0, attemptedMax: 0 }
   );

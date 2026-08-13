@@ -12,6 +12,7 @@
  * on every null would wipe the progress of everyone who never made an account.
  */
 
+import { DEVICE_PREFERENCE_KEYS, PER_USER_KEYS } from './perUserKeys'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type AuthCallback = (event: string, session: { user: { id: string } } | null) => void
@@ -135,5 +136,47 @@ describe('a synced store across a sign-out', () => {
 
     expect(store.read()).toEqual({ 'q-1': 2 })
     expect(localStorage.getItem(key)).not.toBeNull()
+  })
+})
+
+/**
+ * Sign-out must clear ANATOMY state too.
+ *
+ * Before the merge anatomy was a separate build with no account, so there was
+ * no boundary for its state to cross. There is one now: anatomy answers,
+ * scores, appeals, annotations and authoring privilege all live in the same
+ * browser under the same session, and leaving any behind shows the next
+ * candidate at a shared computer the previous one's work.
+ */
+describe('the sign-out key list covers both branches', () => {
+  it('names every anatomy store that belongs to one learner', () => {
+    for (const key of [
+      'frcr-anatomy-progress-v1',
+      'frcr-anatomy-disputes-v1',
+      'frcr-anatomy-last-question-v1',
+      'radiopass-activity-v1',
+      'radiopass-quiz-v1',
+      'radiopass-cxr-annotations-v1',
+      'radiopass-stack-annotations-v1',
+      'radiopass-admin-v1',
+      'radiopass-editor-session-v1',
+      'radiopass-question-edits-v1',
+      'frcr-anatomy-custom-questions-v1',
+    ]) {
+      expect(PER_USER_KEYS, key).toContain(key)
+    }
+  })
+
+  it('still covers the physics keys it always did', () => {
+    for (const key of ['radiopass.author.v1', 'radiopass.qbank.mock.v1', 'radiopass.learner.events.v1']) {
+      expect(PER_USER_KEYS, key).toContain(key)
+    }
+  })
+
+  it('leaves device preferences alone', () => {
+    // Wiping the theme on sign-out is a worse experience for no privacy gain.
+    for (const key of DEVICE_PREFERENCE_KEYS) {
+      expect(PER_USER_KEYS, key).not.toContain(key)
+    }
   })
 })

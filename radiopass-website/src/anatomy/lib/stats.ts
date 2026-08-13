@@ -10,6 +10,14 @@ export interface SectionStats {
   incorrect: number;
   rawScore: number;
   maxScore: number;
+  /** Marks available on the questions ACTUALLY ATTEMPTED.
+   *
+   *  maxScore covers the whole section, so rawScore/maxScore answers "how much
+   *  of this section have I banked", not "how accurate am I". Accuracy needs
+   *  this denominator, and approximating it pro-rata (maxScore x attempted /
+   *  total) is what let the home page print 110%: a question with more labels
+   *  than the section average scores above its own share. */
+  attemptedMaxScore: number;
   percentScore: number;
   completionPercent: number;
   flagged: number;
@@ -26,6 +34,7 @@ export function computeSectionStats(section: SectionId): SectionStats {
   let incorrect = 0;
   let rawScore = 0;
   let maxScore = 0;
+  let attemptedMaxScore = 0;
   let flagged = 0;
   let lateralityErrors = 0;
 
@@ -37,6 +46,9 @@ export function computeSectionStats(section: SectionId): SectionStats {
     if (p.status === 'submitted' && p.graded) {
       attempted++;
       rawScore += p.graded.totalScore;
+      /* The question's OWN maximum, taken from the marking that just ran, so
+         a hidden label never inflates the denominator. */
+      attemptedMaxScore += p.graded.maxScore;
       if (p.graded.overallResult === 'correct') fullyCorrect++;
       else if (p.graded.overallResult === 'partial') partiallyCorrect++;
       else if (p.graded.overallResult === 'incorrect') incorrect++;
@@ -62,6 +74,7 @@ export function computeSectionStats(section: SectionId): SectionStats {
     incorrect,
     rawScore,
     maxScore,
+    attemptedMaxScore,
     percentScore: maxScore > 0 ? Math.round((rawScore / maxScore) * 100) : 0,
     completionPercent: questions.length > 0 ? Math.round((attempted / questions.length) * 100) : 0,
     flagged,
