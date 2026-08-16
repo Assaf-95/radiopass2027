@@ -913,6 +913,14 @@ export default function ExamLabPage() {
 
         <p style={{ margin: 0, fontSize: 'var(--fs-support)', lineHeight: 'var(--lh-body)', color: 'var(--us-muted)' }}>
           <strong style={{ color: 'var(--us-text)' }}>{active.label}.</strong> {active.blurb}
+          {/* The bridge the module never had: this lab drills the concepts,
+              the main bank scores the marks — and progress there persists to
+              the account. One quiet sentence, not a second navigation. */}
+          {' '}For marked practice in the real exam format,{' '}
+          <Link to="/question-bank/ultrasound" style={{ color: 'var(--us-cyan)' }}>
+            open the ultrasound question bank
+          </Link>
+          .
         </p>
 
         {answeredCount > 0 && (

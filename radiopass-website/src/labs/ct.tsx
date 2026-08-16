@@ -60,7 +60,8 @@ const STEPS: LessonStep[] = [
   {
     id: 'gantry',
     title: 'A tube and an arc of detectors, spinning together',
-    body: 'The X-ray tube and a curved bank of detectors sit opposite each other on a ring and **rotate around the patient together**. A **fan-shaped beam** crosses the patient; whatever survives the crossing is caught on the far side. One rotation takes a fraction of a second — modern gantries spin faster than **0.3 s per turn**.',
+    watch: 'the tube and the detector arc: they never move apart — one rigid pair, circling the patient.',
+    body: 'A radiograph **superimposes** every organ along the ray into one flat shadow. CT exists to undo that: measure the patient from **hundreds of angles**, then compute the slice no single exposure can show.\n\nThe machine that does it: an X-ray tube and a curved bank of detectors sit opposite each other on a ring and **rotate around the patient together**. A **fan-shaped beam** crosses the patient; whatever survives is caught on the far side, faster than **0.3 s per turn**.',
     numbers: 'Rotation ≈ **0.25–0.5 s**; fan beam across the whole patient width.',
     draw: (ctx, w, h, p, t) => {
       const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.4
@@ -130,6 +131,113 @@ const STEPS: LessonStep[] = [
       ctx.stroke()
       sceneLabel(ctx, 'attenuation profile', gx + gw * 0.5, gy - 12, p, { align: 'center' })
       sceneLabel(ctx, 'one of hundreds of angles', cx, cy + s * 1.15, p * 0.8, { align: 'center', size: 10.5 })
+    },
+  },
+  {
+    id: 'reconstruction',
+    title: 'Back-projection — and why it must be filtered',
+    body: 'Smearing every profile back across the image plane rebuilds the object — but plain back-projection gives a **blurred** result (a 1/r haze). Convolving each profile with a **filter kernel** before smearing removes the blur: **filtered back-projection**. Modern scanners add **iterative reconstruction**, which models the noise and buys back dose.',
+    trap: 'Reconstruction choices change image quality, never the dose already delivered.',
+    draw: (ctx, w, h, p, t) => {
+      const y = h * 0.48, r = Math.min(w, h) * 0.13
+      // left: unfiltered smears
+      const cx1 = w * 0.3
+      const nProj = Math.floor(lerp(2, 14, smoothstep(seg(Math.min(t, 2.2), 0.2, 2))))
+      for (let i = 0; i < nProj; i++) {
+        const a = (i / 14) * Math.PI
+        ctx.save()
+        ctx.translate(cx1, y); ctx.rotate(a)
+        // a back-projected profile is smeared uniformly along its ray
+        ctx.fillStyle = rgba(ACC, 0.08)
+        ctx.fillRect(-r * 0.5, -r * 2.4, r, r * 4.8)
+        ctx.restore()
+      }
+      ctx.strokeStyle = rgba(INK, 0.35)
+      ctx.beginPath(); ctx.arc(cx1, y, r * 0.5, 0, Math.PI * 2); ctx.stroke()
+      sceneLabel(ctx, 'simple back-projection — blurred', cx1, y + r * 2.7, p, { align: 'center' })
+      // right: filtered result (sharp disc)
+      const cx2 = w * 0.7
+      ctx.fillStyle = rgba(ACC, 0.55 * p)
+      ctx.beginPath(); ctx.arc(cx2, y, r * 0.5, 0, Math.PI * 2); ctx.fill()
+      ctx.strokeStyle = rgba(INK, 0.7 * p)
+      ctx.lineWidth = 1.4
+      ctx.beginPath(); ctx.arc(cx2, y, r * 0.5, 0, Math.PI * 2); ctx.stroke()
+      sceneLabel(ctx, 'filtered back-projection — sharp', cx2, y + r * 3.15, p, { align: 'center' })
+      // arrow
+      ctx.strokeStyle = rgba(INK, 0.4 * p)
+      ctx.beginPath(); ctx.moveTo(w * 0.44, y); ctx.lineTo(w * 0.55, y); ctx.stroke()
+      ctx.beginPath(); ctx.moveTo(w * 0.55 - 7, y - 4); ctx.lineTo(w * 0.55, y); ctx.lineTo(w * 0.55 - 7, y + 4); ctx.stroke()
+      sceneLabel(ctx, 'kernel', w * 0.495, y - 12, p, { color: rgba(ACC, 0.9), align: 'center' })
+    },
+  },
+  {
+    id: 'hu',
+    title: 'The Hounsfield scale is anchored to water',
+    equation: 'HU = 1000 × (μ − μwater) / μwater',
+    equationNote: 'μ is the voxel’s **linear attenuation coefficient**. The scale reports it relative to water — a comparison, never an absolute measurement.',
+    body: 'Each voxel’s attenuation becomes a number on one shared scale. **Water sits at 0 by definition and air at −1000.** Because μ depends on beam energy, measured HU shift slightly with kVp — another reason the scale is a comparison, not a constant of nature.',
+    numbers: 'Air **−1000** · fat ≈ **−100** · water **0** · soft tissue **+20 to +50** · cortical bone **+1000+**.',
+    draw: (ctx, w, h, p) => {
+      const x0 = w * 0.12, x1 = w * 0.88, y = h * 0.44
+      const pos = (hu: number) => lerp(x0, x1, (hu + 1000) / 2200)
+      ctx.strokeStyle = rgba(INK, 0.35)
+      ctx.lineWidth = 2
+      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(lerp(x0, x1, p), y); ctx.stroke()
+      // soft tissue sits 40 HU from water — a second label row keeps the
+      // two from colliding at any stage width
+      const stops: [number, string, number][] = [[-1000, 'air', 0], [-100, 'fat', 0], [0, 'water', 0], [40, 'soft tissue', 1], [1000, 'bone', 0]]
+      stops.forEach(([hu, name, row], i) => {
+        const x = pos(hu)
+        const a = smoothstep(seg(p, 0.15 + i * 0.15, 0.35 + i * 0.15))
+        ctx.strokeStyle = hu === 0 ? rgba(ACC, 0.9 * a) : rgba(INK, 0.6 * a)
+        ctx.lineWidth = hu === 0 ? 2 : 1.2
+        const stretch = row ? 14 : 0
+        ctx.beginPath(); ctx.moveTo(x, y - 14 - stretch); ctx.lineTo(x, y + 14 + stretch); ctx.stroke()
+        sceneLabel(ctx, `${hu > 0 ? '+' : ''}${hu}`, x, y - 26 - stretch, a, { align: 'center', size: 12, color: hu === 0 ? rgba(ACC, 0.95) : undefined })
+        sceneLabel(ctx, name, x, y + 30 + stretch, a, { align: 'center' })
+      })
+      sceneLabel(ctx, 'relative to water — not absolute', w / 2, h * 0.78, seg(p, 0.7, 1), { align: 'center', size: 12 })
+    },
+  },
+  {
+    id: 'window',
+    title: 'Windowing spends the grey scale where you need it',
+    body: 'The display maps a chosen band of HU — the **window** — across the available grey levels. **Width controls contrast** (narrow = high contrast), **level sets the centre**. It is pure display: **the reconstructed numbers never change**, which is why one dataset serves brain, lung and bone settings.',
+    trap: 'Narrowing the width makes small HU differences **more** visible, not less.',
+    draw: (ctx, w, h, p) => {
+      const x0 = w * 0.12, x1 = w * 0.88, yTop = h * 0.24, yBot = h * 0.66
+      // HU axis
+      ctx.strokeStyle = rgba(INK, 0.3)
+      ctx.beginPath(); ctx.moveTo(x0, yBot); ctx.lineTo(x1, yBot); ctx.stroke()
+      sceneLabel(ctx, '−1000', x0, yBot + 16, 1, { align: 'center', size: 10 })
+      sceneLabel(ctx, '+1000', x1, yBot + 16, 1, { align: 'center', size: 10 })
+      // two windows: narrow (brain) and wide (lung-ish)
+      const win = (
+        centre: number, width: number, colour: string, label: string, a: number,
+        lx: number, ly: number, align: 'left' | 'center' | 'right',
+      ) => {
+        const cxp = lerp(x0, x1, (centre + 1000) / 2000)
+        // half the window width, mapped onto the 2000-HU axis
+        const half = (width / 2 / 2000) * (x1 - x0)
+        // ramp
+        ctx.strokeStyle = rgba(colour, 0.9 * a)
+        ctx.lineWidth = 1.6
+        ctx.beginPath()
+        ctx.moveTo(x0, yBot)
+        ctx.lineTo(cxp - half, yBot)
+        ctx.lineTo(cxp + half, yTop)
+        ctx.lineTo(x1, yTop)
+        ctx.stroke()
+        sceneLabel(ctx, label, lx, ly, a, { align, color: rgba(colour, 0.95) })
+      }
+      // Explicit, well-separated label spots — the two ramps share the plot,
+      // so centring both labels on their window centres makes them collide.
+      win(35, 160, ACC, 'narrow window — high contrast (brain)', smoothstep(seg(p, 0.1, 0.5)),
+        lerp(x0, x1, 1035 / 2000), yTop - 12, 'center')
+      win(-300, 1400, '#8FB8C9', 'wide window — bone / lung', smoothstep(seg(p, 0.4, 0.9)),
+        x0 + 8, lerp(yBot, yTop, 0.42), 'left')
+      sceneLabel(ctx, 'black', x0 - 4, yBot - 6, 1, { align: 'right', size: 10 })
+      sceneLabel(ctx, 'white', x0 - 4, yTop, 1, { align: 'right', size: 10 })
     },
   },
   {
@@ -428,43 +536,6 @@ const STEPS: LessonStep[] = [
     },
   },
   {
-    id: 'reconstruction',
-    title: 'Back-projection — and why it must be filtered',
-    body: 'Smearing every profile back across the image plane rebuilds the object — but plain back-projection gives a **blurred** result (a 1/r haze). Convolving each profile with a **filter kernel** before smearing removes the blur: **filtered back-projection**. Modern scanners add **iterative reconstruction**, which models the noise and buys back dose.',
-    trap: 'Reconstruction choices change image quality, never the dose already delivered.',
-    draw: (ctx, w, h, p, t) => {
-      const y = h * 0.48, r = Math.min(w, h) * 0.13
-      // left: unfiltered smears
-      const cx1 = w * 0.3
-      const nProj = Math.floor(lerp(2, 14, smoothstep(seg(Math.min(t, 2.2), 0.2, 2))))
-      for (let i = 0; i < nProj; i++) {
-        const a = (i / 14) * Math.PI
-        ctx.save()
-        ctx.translate(cx1, y); ctx.rotate(a)
-        // a back-projected profile is smeared uniformly along its ray
-        ctx.fillStyle = rgba(ACC, 0.08)
-        ctx.fillRect(-r * 0.5, -r * 2.4, r, r * 4.8)
-        ctx.restore()
-      }
-      ctx.strokeStyle = rgba(INK, 0.35)
-      ctx.beginPath(); ctx.arc(cx1, y, r * 0.5, 0, Math.PI * 2); ctx.stroke()
-      sceneLabel(ctx, 'simple back-projection — blurred', cx1, y + r * 2.7, p, { align: 'center' })
-      // right: filtered result (sharp disc)
-      const cx2 = w * 0.7
-      ctx.fillStyle = rgba(ACC, 0.55 * p)
-      ctx.beginPath(); ctx.arc(cx2, y, r * 0.5, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = rgba(INK, 0.7 * p)
-      ctx.lineWidth = 1.4
-      ctx.beginPath(); ctx.arc(cx2, y, r * 0.5, 0, Math.PI * 2); ctx.stroke()
-      sceneLabel(ctx, 'filtered back-projection — sharp', cx2, y + r * 3.15, p, { align: 'center' })
-      // arrow
-      ctx.strokeStyle = rgba(INK, 0.4 * p)
-      ctx.beginPath(); ctx.moveTo(w * 0.44, y); ctx.lineTo(w * 0.55, y); ctx.stroke()
-      ctx.beginPath(); ctx.moveTo(w * 0.55 - 7, y - 4); ctx.lineTo(w * 0.55, y); ctx.lineTo(w * 0.55 - 7, y + 4); ctx.stroke()
-      sceneLabel(ctx, 'kernel', w * 0.495, y - 12, p, { color: rgba(ACC, 0.9), align: 'center' })
-    },
-  },
-  {
     id: 'rows',
     title: 'Multi-detector CT: rows along the patient',
     body: 'Behind the fan, the detector is not one row but a **stack of rows along the patient axis** — 64, 128, 320. Each rotation covers a slab, not a slice, and rows can be **binned electronically** into thicker reconstructed slices. More rows: more coverage per rotation, faster studies, and — with wide cones — **cone-beam artefact** at the edges.',
@@ -537,74 +608,6 @@ const STEPS: LessonStep[] = [
     },
   },
   {
-    id: 'hu',
-    title: 'The Hounsfield scale is anchored to water',
-    body: 'Each voxel’s attenuation is expressed **relative to water**: HU = 1000 × (μ − μwater) / μwater. **Water sits at 0 by definition and air at −1000.** The scale is a comparison, not an absolute measurement — and because μ depends on beam energy, measured HU shift slightly with kVp.',
-    numbers: 'Air **−1000** · fat ≈ **−100** · water **0** · soft tissue **+20 to +50** · cortical bone **+1000+**.',
-    draw: (ctx, w, h, p) => {
-      const x0 = w * 0.12, x1 = w * 0.88, y = h * 0.44
-      const pos = (hu: number) => lerp(x0, x1, (hu + 1000) / 2200)
-      ctx.strokeStyle = rgba(INK, 0.35)
-      ctx.lineWidth = 2
-      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(lerp(x0, x1, p), y); ctx.stroke()
-      // soft tissue sits 40 HU from water — a second label row keeps the
-      // two from colliding at any stage width
-      const stops: [number, string, number][] = [[-1000, 'air', 0], [-100, 'fat', 0], [0, 'water', 0], [40, 'soft tissue', 1], [1000, 'bone', 0]]
-      stops.forEach(([hu, name, row], i) => {
-        const x = pos(hu)
-        const a = smoothstep(seg(p, 0.15 + i * 0.15, 0.35 + i * 0.15))
-        ctx.strokeStyle = hu === 0 ? rgba(ACC, 0.9 * a) : rgba(INK, 0.6 * a)
-        ctx.lineWidth = hu === 0 ? 2 : 1.2
-        const stretch = row ? 14 : 0
-        ctx.beginPath(); ctx.moveTo(x, y - 14 - stretch); ctx.lineTo(x, y + 14 + stretch); ctx.stroke()
-        sceneLabel(ctx, `${hu > 0 ? '+' : ''}${hu}`, x, y - 26 - stretch, a, { align: 'center', size: 12, color: hu === 0 ? rgba(ACC, 0.95) : undefined })
-        sceneLabel(ctx, name, x, y + 30 + stretch, a, { align: 'center' })
-      })
-      sceneLabel(ctx, 'relative to water — not absolute', w / 2, h * 0.78, seg(p, 0.7, 1), { align: 'center', size: 12 })
-    },
-  },
-  {
-    id: 'window',
-    title: 'Windowing spends the grey scale where you need it',
-    body: 'The display maps a chosen band of HU — the **window** — across the available grey levels. **Width controls contrast** (narrow = high contrast), **level sets the centre**. It is pure display: **the reconstructed numbers never change**, which is why one dataset serves brain, lung and bone settings.',
-    trap: 'Narrowing the width makes small HU differences **more** visible, not less.',
-    draw: (ctx, w, h, p) => {
-      const x0 = w * 0.12, x1 = w * 0.88, yTop = h * 0.24, yBot = h * 0.66
-      // HU axis
-      ctx.strokeStyle = rgba(INK, 0.3)
-      ctx.beginPath(); ctx.moveTo(x0, yBot); ctx.lineTo(x1, yBot); ctx.stroke()
-      sceneLabel(ctx, '−1000', x0, yBot + 16, 1, { align: 'center', size: 10 })
-      sceneLabel(ctx, '+1000', x1, yBot + 16, 1, { align: 'center', size: 10 })
-      // two windows: narrow (brain) and wide (lung-ish)
-      const win = (
-        centre: number, width: number, colour: string, label: string, a: number,
-        lx: number, ly: number, align: 'left' | 'center' | 'right',
-      ) => {
-        const cxp = lerp(x0, x1, (centre + 1000) / 2000)
-        // half the window width, mapped onto the 2000-HU axis
-        const half = (width / 2 / 2000) * (x1 - x0)
-        // ramp
-        ctx.strokeStyle = rgba(colour, 0.9 * a)
-        ctx.lineWidth = 1.6
-        ctx.beginPath()
-        ctx.moveTo(x0, yBot)
-        ctx.lineTo(cxp - half, yBot)
-        ctx.lineTo(cxp + half, yTop)
-        ctx.lineTo(x1, yTop)
-        ctx.stroke()
-        sceneLabel(ctx, label, lx, ly, a, { align, color: rgba(colour, 0.95) })
-      }
-      // Explicit, well-separated label spots — the two ramps share the plot,
-      // so centring both labels on their window centres makes them collide.
-      win(35, 160, ACC, 'narrow window — high contrast (brain)', smoothstep(seg(p, 0.1, 0.5)),
-        lerp(x0, x1, 1035 / 2000), yTop - 12, 'center')
-      win(-300, 1400, '#8FB8C9', 'wide window — bone / lung', smoothstep(seg(p, 0.4, 0.9)),
-        x0 + 8, lerp(yBot, yTop, 0.42), 'left')
-      sceneLabel(ctx, 'black', x0 - 4, yBot - 6, 1, { align: 'right', size: 10 })
-      sceneLabel(ctx, 'white', x0 - 4, yTop, 1, { align: 'right', size: 10 })
-    },
-  },
-  {
     id: 'noise',
     title: 'Noise is a photon-counting problem',
     body: 'Every voxel is a photon count, and counting statistics rule it: **noise ∝ 1/√(photons per voxel)**. More mAs, thicker slices or a softer kernel mean more photons averaged — less mottle. A bigger matrix or thinner slices starve each voxel. **To halve the noise you must quadruple the dose.**',
@@ -627,45 +630,6 @@ const STEPS: LessonStep[] = [
       patch(w * 0.3, 260, 'low dose — mottle', smoothstep(seg(p, 0, 0.4)))
       patch(w * 0.7, 2200, '4× dose — half the noise', smoothstep(seg(p, 0.3, 0.8)))
       sceneLabel(ctx, 'noise ∝ 1 / √dose', w / 2, h * 0.85, seg(p, 0.6, 1), { align: 'center', size: 13, color: rgba(ACC, 0.95) })
-    },
-  },
-  {
-    id: 'artefacts',
-    title: 'Beam hardening and partial volume',
-    body: 'A polychromatic beam **hardens** as it crosses dense tissue: the soft photons vanish first, the survivors are more penetrating, and the centre of a dense object reads **falsely low** — cupping, and streaks beside bone. Separately, any object **smaller than a voxel** has its HU **averaged with its neighbours**: partial volume.',
-    draw: (ctx, w, h, p) => {
-      // left: cupping profile
-      const gx = w * 0.12, gy = h * 0.22, gw = w * 0.3, gh = h * 0.4
-      axes(ctx, gx, gy, gw, gh)
-      ctx.beginPath()
-      for (let i = 0; i <= 60; i++) {
-        const f = i / 60
-        const ideal = f > 0.15 && f < 0.85 ? 0.7 : 0.05
-        const cup = ideal - (f > 0.15 && f < 0.85 ? Math.cos((f - 0.5) * 4.5) * 0.18 : 0)
-        const x = gx + f * gw
-        const y = gy + gh - cup * gh
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      }
-      ctx.strokeStyle = rgba(ACC, 0.9 * p)
-      ctx.lineWidth = 1.5
-      ctx.stroke()
-      // ideal dashed
-      ctx.setLineDash([4, 4])
-      ctx.strokeStyle = rgba(INK, 0.35 * p)
-      ctx.strokeRect(gx + gw * 0.15, gy + gh * 0.3, gw * 0.7, 0)
-      ctx.setLineDash([])
-      sceneLabel(ctx, 'measured HU across a uniform object — “cupping”', gx + gw / 2, gy + gh + 20, p, { align: 'center', size: 10.5 })
-      // right: partial volume grid
-      const px = w * 0.62, py = h * 0.24, cell = Math.min(w, h) * 0.06
-      for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
-        const inside = Math.hypot(c - 1.1, r - 1.4) < 1.15
-        const edge = !inside && Math.hypot(c - 1.1, r - 1.4) < 1.9
-        ctx.fillStyle = rgba(INK, inside ? 0.65 : edge ? 0.3 : 0.08)
-        ctx.fillRect(px + c * cell, py + r * cell, cell - 2, cell - 2)
-      }
-      ctx.strokeStyle = rgba(ACC, 0.8 * p)
-      ctx.beginPath(); ctx.arc(px + 1.35 * cell, py + 1.6 * cell, cell * 1.15, 0, Math.PI * 2); ctx.stroke()
-      sceneLabel(ctx, 'small object → averaged voxels', px + 2 * cell, py + 4 * cell + 20, p, { align: 'center', size: 10.5 })
     },
   },
   {
@@ -729,6 +693,45 @@ const STEPS: LessonStep[] = [
     },
   },
   {
+    id: 'artefacts',
+    title: 'Beam hardening and partial volume',
+    body: 'A polychromatic beam **hardens** as it crosses dense tissue: the soft photons vanish first, the survivors are more penetrating, and the centre of a dense object reads **falsely low** — cupping, and streaks beside bone. Separately, any object **smaller than a voxel** has its HU **averaged with its neighbours**: partial volume.',
+    draw: (ctx, w, h, p) => {
+      // left: cupping profile
+      const gx = w * 0.12, gy = h * 0.22, gw = w * 0.3, gh = h * 0.4
+      axes(ctx, gx, gy, gw, gh)
+      ctx.beginPath()
+      for (let i = 0; i <= 60; i++) {
+        const f = i / 60
+        const ideal = f > 0.15 && f < 0.85 ? 0.7 : 0.05
+        const cup = ideal - (f > 0.15 && f < 0.85 ? Math.cos((f - 0.5) * 4.5) * 0.18 : 0)
+        const x = gx + f * gw
+        const y = gy + gh - cup * gh
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+      }
+      ctx.strokeStyle = rgba(ACC, 0.9 * p)
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+      // ideal dashed
+      ctx.setLineDash([4, 4])
+      ctx.strokeStyle = rgba(INK, 0.35 * p)
+      ctx.strokeRect(gx + gw * 0.15, gy + gh * 0.3, gw * 0.7, 0)
+      ctx.setLineDash([])
+      sceneLabel(ctx, 'measured HU across a uniform object — “cupping”', gx + gw / 2, gy + gh + 20, p, { align: 'center', size: 10.5 })
+      // right: partial volume grid
+      const px = w * 0.62, py = h * 0.24, cell = Math.min(w, h) * 0.06
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+        const inside = Math.hypot(c - 1.1, r - 1.4) < 1.15
+        const edge = !inside && Math.hypot(c - 1.1, r - 1.4) < 1.9
+        ctx.fillStyle = rgba(INK, inside ? 0.65 : edge ? 0.3 : 0.08)
+        ctx.fillRect(px + c * cell, py + r * cell, cell - 2, cell - 2)
+      }
+      ctx.strokeStyle = rgba(ACC, 0.8 * p)
+      ctx.beginPath(); ctx.arc(px + 1.35 * cell, py + 1.6 * cell, cell * 1.15, 0, Math.PI * 2); ctx.stroke()
+      sceneLabel(ctx, 'small object → averaged voxels', px + 2 * cell, py + 4 * cell + 20, p, { align: 'center', size: 10.5 })
+    },
+  },
+  {
     id: 'capabilities',
     title: 'Isotropic voxels, MPR and dual energy',
     body: 'When voxels are **perfect cubes**, coronal, sagittal and oblique reformats carry **no resolution penalty** — that is isotropy. Acquire at **two energies** and materials separate by their attenuation behaviour: **iodine maps and virtual non-contrast** images without a second scan.',
@@ -787,6 +790,19 @@ export default function CtLab() {
           headline: 'A thousand shadows, one slice.',
           bigPicture:
             'CT is projection radiography asked from **every angle at once**: profiles in, filtered back-projection out, and the answer expressed in Hounsfield units **anchored to water**. The helix and the detector rows set how fast the volume is covered; **noise obeys 1/√mAs and reconstruction can never buy it back**; windowing spends the numbers on the display without touching the data. Dose lives in three names — CTDI, DLP, effective dose — and the exam expects all three.',
+          controls: [
+            { change: '**mAs** ↑', effect: 'noise ↓ (∝ 1/√mAs) · **dose ↑** — the fundamental CT bargain' },
+            { change: '**Slice thickness** ↓', effect: 'z-resolution ↑ · partial volume ↓ · **noise ↑** (fewer photons per voxel)' },
+            { change: '**Pitch** ↑ (other factors fixed)', effect: 'table travels further per rotation → coverage faster, **dose generally ↓**' },
+            { change: '**Window width** ↓', effect: 'displayed contrast ↑ — a display decision; **the data never change**' },
+            { change: '**Sharp kernel**', effect: 'spatial resolution ↑ · noise ↑ — reconstruction trades, never removes' },
+          ],
+          confuse: [
+            { a: '**Window width** — the HU range displayed (contrast)', b: '**Window level** — where that range is centred' },
+            { a: '**Acquisition** — decides the dose, forever', b: '**Reconstruction** — reshapes the data, never the dose already delivered' },
+            { a: '**CTDIvol** — dose intensity of the protocol (mGy)', b: '**DLP** — CTDIvol × scan length (mGy·cm), what E is estimated from' },
+            { a: '**HU** — attenuation relative to water', b: '**Raw μ** — the absolute coefficient, kV-dependent' },
+          ],
         },
       }}
       steps={STEPS}

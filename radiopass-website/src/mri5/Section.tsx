@@ -33,6 +33,7 @@ import {
   isValidElement,
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ReactElement,
   type ReactNode,
@@ -40,6 +41,7 @@ import {
 import { Link } from 'react-router-dom'
 
 import { HighYield as HighYieldNote } from '../design/primitives'
+import { record } from '../lib/learner'
 import { TaskCue, TaskGate, useTask } from '../labs/task'
 import { GROUPS, neighbours, sectionIndex, sectionPath, SECTIONS, SECTION_BY_SLUG } from './sections'
 import './mri5.css'
@@ -330,6 +332,35 @@ export function SectionPage({
     return () => { document.title = 'RadioPass — FRCR Part 1, Anatomy & Physics' }
   }, [meta])
 
+  /* The MRI module used to leave no trace on the learner's timeline — the
+     physics home could never say "Continue: Slice selection" and never mark
+     the module done. One started-event per section visit (contentId is the
+     section's own path, so Continue returns HERE), and one completed-event
+     when the final section's wrap-up is actually reached. */
+  const startedRef = useRef(false)
+  useEffect(() => {
+    if (startedRef.current || !meta) return
+    startedRef.current = true
+    record({
+      type: 'module.started',
+      subject: 'physics',
+      contentId: sectionPath(meta.slug),
+      topic: `MRI · ${meta.title}`,
+    })
+  }, [meta])
+
+  /* Reaching the FINAL section's wrap-up is the one moment "the MRI module is
+     complete" is unambiguously true. contentId is the module home, which is
+     the path the course spine lists — so the physics home's course view can
+     mark MRI done from the same record everything else uses. */
+  const completedRef = useRef(false)
+  useEffect(() => {
+    if (completedRef.current || !meta || next) return
+    if (step < total) return
+    completedRef.current = true
+    record({ type: 'module.completed', subject: 'physics', contentId: '/mri', topic: 'MRI' })
+  }, [meta, next, step, total])
+
   // A new section always starts at its own opening, never part-way through.
   useEffect(() => { setStep(-1); window.scrollTo({ top: 0, behavior: 'auto' }) }, [slug])
 
@@ -397,10 +428,17 @@ export function SectionPage({
           <strong>{prev.title}</strong>
         </Link>
       ) : <span />}
-      {next && (
+      {next ? (
         <Link to={sectionPath(next.slug)} className="m5-pager-link is-next">
           <small>{next.number} →</small>
           <strong>{next.title}</strong>
+        </Link>
+      ) : (
+        /* After the final section the module hands over to retrieval — the
+           learning→testing boundary, announced rather than jumped. */
+        <Link to="/question-bank/mri" className="m5-pager-link is-next">
+          <small>The module, complete →</small>
+          <strong>Practise MRI questions</strong>
         </Link>
       )}
     </nav>
@@ -503,7 +541,15 @@ export function SectionPage({
               <Link className="m5-btn m5-btn-solid" to={sectionPath(next.slug)}>
                 Next section: {next.title} →
               </Link>
-            ) : <span />
+            ) : (
+              /* 5.21's wrap-up used to render an empty span here — the module
+                 simply stopped, twenty-one sections deep, with no way onward.
+                 The end of the last section is the end of the MODULE, and the
+                 module's last act is the gate into its own practice. */
+              <Link className="m5-btn m5-btn-solid" to="/question-bank/mri">
+                Finish: practise MRI →
+              </Link>
+            )
           ) : (
             <button
               type="button"

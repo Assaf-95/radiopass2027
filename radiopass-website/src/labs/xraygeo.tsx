@@ -175,8 +175,8 @@ const GEO_STEPS: LessonStep[] = [
   },
   {
     id: 'odd',
-    title: 'ODD — the gap that does the damage',
-    body: '**ODD = SDD − SOD**: the air between the object and the detector, drawn on the scene in its own colour. Every geometric penalty in radiography — magnification, focal-spot blur — **scales with this gap**. Close the gap and both penalties shrink together.',
+    title: 'Object–detector distance (ODD)',
+    body: '**ODD = SDD − SOD**: the air between the object and the detector, drawn on the scene in its own colour. Every geometric penalty in radiography — magnification, focal-spot blur — **scales with this gap**. Close the gap and both penalties shrink together. The gap is what does the damage.',
     exam: 'ODD ÷ SOD = M − 1. Examiners love this substitution: it turns the unsharpness formula Ug = f × ODD/SOD into Ug = f × (M − 1), linking blur straight to magnification.',
     stage: magStage({
       hide: [GRAPH],
@@ -192,7 +192,9 @@ const GEO_STEPS: LessonStep[] = [
   },
   {
     id: 'mag',
-    title: 'Magnification: M = SDD ÷ SOD',
+    title: 'Magnification (M)',
+    equation: 'M = SDD ÷ SOD',
+    equationNote: 'Image size ÷ object size — similar triangles, set by **distances alone**.',
     predict: { q: 'Slide the patient toward the detector — what happens to magnification?', options: ['It falls', 'It rises', 'It stays the same'], answer: 0 },
     body: 'The diverging beam makes every shadow **larger than the object**: **M = SDD ÷ SOD**. Similar triangles, nothing more. **Drag SOD up** and the marker climbs the curve on the right: SOD grows toward SDD and **M sinks toward 1** — the shadow approaches honest size.',
     trap: 'M is set by **distances alone** — focal spot size, mA and kVp cannot touch it.',
@@ -212,7 +214,7 @@ const GEO_STEPS: LessonStep[] = [
   },
   {
     id: 'toward',
-    title: 'Object on the detector: honest size',
+    title: 'ODD near zero: magnification near 1',
     body: 'Radiography’s default position: anatomy **against the detector**. With ODD nearly zero, **M is nearly 1** and the shadow tells the truth — the projected image has shrunk back almost onto the object’s own size. The **PA chest** exists for exactly this reason: it lays the **heart**, an anterior structure, close to the detector.',
     stage: magStage({
       tall: true,
@@ -222,8 +224,8 @@ const GEO_STEPS: LessonStep[] = [
   },
   {
     id: 'away',
-    title: 'Object away from the detector: the shadow grows',
-    body: 'Now pull the object **away** from the detector and M climbs. An **AP chest magnifies the heart** — same heart, bigger gap. Done on purpose, with an **air gap**, magnification becomes a technique; done by accident, it becomes a misdiagnosis.',
+    title: 'Raising ODD: magnification climbs',
+    body: 'Now pull the object **away** from the detector — the shadow grows. An **AP chest magnifies the heart** — same heart, bigger gap. Done on purpose, with an **air gap**, magnification becomes a technique; done by accident, it becomes a misdiagnosis.',
     trap: 'The heart sits **anteriorly** — AP projection opens its ODD, so the cardiothoracic ratio is only honest on a **PA film**.',
     exam: 'The deliberate air gap earns a bonus: obliquely scattered photons from the patient miss a detector that stands well back, so an air gap also cleans up scatter — a grid substitute in chest and cervical spine technique.',
     stage: magStage({
@@ -257,7 +259,9 @@ const GEO_STEPS: LessonStep[] = [
   },
   {
     id: 'ug',
-    title: 'Geometric unsharpness: Ug = f × ODD ÷ SOD',
+    title: 'Geometric unsharpness (Ug)',
+    equation: 'Ug = f × ODD ÷ SOD',
+    equationNote: 'f is the **focal spot size** — it multiplies the blur, and appears nowhere in M.',
     predict: { q: 'Double the focal spot — what changes?', options: ['Magnification', 'Edge blur', 'Both'], answer: 1 },
     body: 'The penumbra has a size: **Ug = focal spot × ODD ÷ SOD**. The focal spot multiplies the **blur** and nothing else — there is no f anywhere in M. Run the focal-spot slider end to end and read the two numbers: the image **keeps its size** while its edge dissolves.',
     numbers: 'Broad focus **1.0–1.2 mm** · fine focus **0.5–0.6 mm** · mammography magnification spot **0.1 mm**.',
@@ -301,6 +305,17 @@ export default function XrayGeometryLesson() {
           headline: 'Two formulas, and who moved.',
           bigPicture:
             'Every geometry question is one of two formulas plus one discipline. **M = SDD ÷ SOD** sizes the shadow; **Ug = f × ODD ÷ SOD** blurs its edge. The discipline: never answer until you know **which of the three players physically moved** — the same “SID increased” means opposite things depending on whether the source stepped back or the object drifted forward. And the focal spot belongs to **unsharpness only**: it cannot magnify anything.',
+          controls: [
+            { change: 'Object moves **away from the detector** (ODD ↑, SDD fixed)', effect: 'SOD ↓ → **magnification ↑ and blur ↑** together' },
+            { change: 'Source moves **further back** (SOD ↑, ODD fixed)', effect: 'M sinks toward 1 and Ug shrinks — the AP-portable problem in reverse' },
+            { change: '**Focal spot** ↑', effect: '**Ug ↑ only** — the image keeps its size while its edge dissolves' },
+            { change: 'Deliberate **air gap**', effect: 'magnification technique + scatter misses the standing-back detector' },
+          ],
+          confuse: [
+            { a: '**Magnification** — size, from distances alone', b: '**Geometric unsharpness** — edge blur, the only place f appears' },
+            { a: '**SOD** — source to object · **SDD** — source to detector', b: '**ODD = SDD − SOD** — the gap both penalties scale with' },
+            { a: '**PA chest** — heart on the detector, honest ratio', b: '**AP chest** — anterior heart, open ODD, magnified silhouette' },
+          ],
         },
       }}
       steps={GEO_STEPS}
@@ -606,6 +621,16 @@ export function XrayInteractionsLesson() {
           headline: 'Where contrast, fog and dose are born.',
           bigPicture:
             'One photon, three fates. **Transmission** carries the image; **photoelectric absorption** creates contrast and deposits dose, falling away steeply with energy and rising with **Z³**; **Compton scatter** survives to fog the detector and barely cares about Z at all. Every choice of kV is a negotiation between those last two — and the crossover energy is where the negotiation tips.',
+          controls: [
+            { change: '**Photon energy (kV)** ↑', effect: 'photoelectric fraction falls steeply (∝ 1/E³) → **subject contrast ↓**, Compton takes over' },
+            { change: '**Tissue Z** ↑ (bone, contrast agents)', effect: 'photoelectric ∝ **Z³** — the whole reason iodine and barium work' },
+            { change: 'Thickness ↑', effect: 'exponential attenuation — each HVL halves what remains' },
+          ],
+          confuse: [
+            { a: '**Photoelectric** — photon vanishes, inner shell, ∝ Z³/E³, contrast and dose', b: '**Compton** — photon survives, outer electron, ∝ electron density, scatter fog' },
+            { a: '**Photoelectron** — ejected in photoelectric absorption', b: '**Recoil (Compton) electron** — set moving by scatter' },
+            { a: '**Attenuation** — everything removed from the beam', b: '**Absorption** — only the part that stays in the patient' },
+          ],
         },
       }}
       steps={INT_STEPS}

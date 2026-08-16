@@ -37,7 +37,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { clearToneMemory, isSoundOn, playOnce, setSoundOn, subscribeSound, unlockAudio } from '../lib/sound'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { record } from '../lib/learner'
-import { CommonTrap, HighYield } from '../design/primitives'
+import { CommonTrap, FormulaCard, HighYield } from '../design/primitives'
 import { COURSE_MODULES, coursePosition, moduleOrdinal, practiceHref } from '../physics/course'
 import { useReducedMotion } from '../home/fx'
 import './labs.css'
@@ -82,6 +82,14 @@ export type LessonStep = {
   /** Optional "the numbers" line — the values worth memorising. */
   numbers?: string
   /**
+   * The lesson's equation, given the structural treatment an equation earns —
+   * a FormulaCard, not bold text buried in a paragraph. `equationNote` names
+   * the variables or the one consequence worth attaching. Only for equations
+   * the exam actually asks; a lesson without one simply has none.
+   */
+  equation?: string
+  equationNote?: string
+  /**
    * Mechanism steps keep animating while shown instead of freezing — for
    * diagrams where the motion IS the teaching (e.g. CT translate–rotate).
    */
@@ -107,12 +115,20 @@ export type LessonMeta = {
    * chain in two or three sentences — how the concepts connect, which is the
    * one thing a step-at-a-time walk cannot show while it is happening.
    *
-   * Optional because the numbers/trap digests and the practice gate are
-   * derived automatically; without it the screen still closes the module
-   * properly, it just opens with the module title instead of a line written
-   * for the occasion.
+   * `controls` is the control→effect table — turn this, that happens — the
+   * single highest-yield revision structure in physics. `confuse` is the
+   * do-not-confuse list: pairs the exam trades on, stated side by side
+   * instead of left for the learner to infer across distant screens.
+   *
+   * All optional: the numbers/trap digests and the practice gate are derived
+   * automatically, and a module only carries the tables its physics earns.
    */
-  synthesis?: { headline?: string; bigPicture?: string }
+  synthesis?: {
+    headline?: string
+    bigPicture?: string
+    controls?: { change: string; effect: string }[]
+    confuse?: { a: string; b: string }[]
+  }
 }
 
 function Rich({ text }: { text: string }) {
@@ -246,6 +262,37 @@ function LessonSynthesis({
         <p className="lx-intro">
           {steps.length} concepts, each built on the one before. Here is what they add up to.
         </p>
+      )}
+
+      {/* Turn this → that happens. The night-before revision structure: every
+          console control the module taught, one line each. */}
+      {meta.synthesis?.controls && meta.synthesis.controls.length > 0 && (
+        <div className="lx-syn" aria-label="What happens if I change…">
+          <p className="lx-syn-title">What happens if I change…</p>
+          <ul>
+            {meta.synthesis.controls.map((c) => (
+              <li key={c.change}>
+                <span className="lx-syn-from"><Rich text={c.change} /></span>
+                <span className="lx-syn-what"><Rich text={c.effect} /></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* The pairs the exam trades on, stated side by side. */}
+      {meta.synthesis?.confuse && meta.synthesis.confuse.length > 0 && (
+        <div className="lx-syn lx-syn-traps" aria-label="Do not confuse">
+          <p className="lx-syn-title">Do not confuse</p>
+          <ul>
+            {meta.synthesis.confuse.map((c) => (
+              <li key={c.a}>
+                <span className="lx-syn-from"><Rich text={c.a} /></span>
+                <span className="lx-syn-what"><Rich text={c.b} /></span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {numbers.length > 0 && (
@@ -631,6 +678,13 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
                 so a learner finds them by shape rather than by reading. They
                 used to be 13px footnotes below a 17px explanation, which is
                 precisely backwards: this is the part that gets examined. */}
+            {/* An equation is level-2 material with its own shape — never
+                bold text drowning in a paragraph. */}
+            {step.equation && (
+              <FormulaCard formula={step.equation}>
+                {step.equationNote && <Rich text={step.equationNote} />}
+              </FormulaCard>
+            )}
             {step.numbers && (
               <HighYield label="The numbers"><Rich text={step.numbers} /></HighYield>
             )}

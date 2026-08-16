@@ -298,6 +298,18 @@ export default function FluoroLab() {
           headline: 'Live pictures, and what they cost.',
           bigPicture:
             'Everything follows from imaging **in real time**: the intensifier buys its brightness with flux gain times minification gain, ABC holds the display steady by **silently raising the dose rate** through thick anatomy, and every dose feature — pulsing, last-image-hold, collimation — exists because minutes of screening add up on the patient’s skin. When a question asks what changed, ask first what ABC did about it.',
+          controls: [
+            { change: '**Pulse rate** ↓', effect: 'temporal resolution ↓ · **dose ↓** — the everyday dose lever' },
+            { change: '**Magnification mode**', effect: 'smaller input field → minification gain ↓ → ABC raises exposure → **dose rate ↑**' },
+            { change: '**Patient thickness** ↑', effect: 'attenuation ↑ → **ABC silently raises the dose rate** to hold the display steady' },
+            { change: '**Last-image hold**', effect: 'the previous frame stays up — **zero additional exposure** while you look' },
+            { change: '**Screening time** ↑', effect: 'skin dose accumulates — the deterministic-injury variable' },
+          ],
+          confuse: [
+            { a: '**Flux gain** — more light photons per electron at the output phosphor', b: '**Minification gain** — same light squeezed onto a smaller output' },
+            { a: '**Image intensifier** — vacuum optics, distortions, minification', b: '**Flat panel** — no minification gain, no pincushion or S-distortion' },
+            { a: '**DSA subtraction** — removes stationary anatomy, vessels stand out', b: 'what it does NOT do — improve spatial resolution; noise actually **adds**' },
+          ],
         },
       }}
       steps={STEPS}

@@ -289,6 +289,18 @@ export default function XrayProductionLesson() {
           headline: 'One electron, and everything it explains.',
           bigPicture:
             'Heat frees electrons; **kV decides how hard each one hits, mA decides how many arrive**. At the anode almost all of that energy becomes heat — the braking that remains draws the continuous curve, and the K-shell holes stamp tungsten’s two fixed lines on top of it. Every control on the console is a handle on one of those steps, nothing more.',
+          controls: [
+            { change: '**kVp** ↑', effect: 'electron energy ↑ → **maximum and mean photon energy ↑**, output ↑ (~kV²), penetration ↑' },
+            { change: '**mA / mAs** ↑', effect: 'electron number ↑ → **photon quantity ↑** — no photon’s energy changes' },
+            { change: '**Filament temperature** ↑', effect: 'denser space charge → more electrons available → this IS the mA control' },
+            { change: '**Anode rotation**', effect: 'spreads the same heat over a track — a heat solution, not an image factor' },
+            { change: '**Filtration** ↑', effect: 'soft photons removed → quantity ↓, mean energy ↑, **maximum unchanged**' },
+          ],
+          confuse: [
+            { a: '**mA** — how many electrons per second', b: '**kV** — how much energy each one carries' },
+            { a: '**Bremsstrahlung** — braking at the nucleus, continuous spectrum', b: '**Characteristic** — K-shell vacancy, fixed lines that never move' },
+            { a: '**Actual focal spot** — the physical impact area (heat)', b: '**Effective focal spot** — its projection toward the image (sharpness)' },
+          ],
         },
       }}
       steps={PRODUCTION_STEPS}
@@ -317,8 +329,8 @@ const SPECTRUM_STEPS: LessonStep[] = [
       'An electron accelerated through 100 kV arrives with exactly 100 keV. The most it can do is surrender all of it in a single braking event, so no photon can exceed that. This is the Duane–Hunt limit, and it is why the endpoint is the one feature of the curve that reports the kV directly.',
     exam:
       'The endpoint in keV equals the peak tube kilovoltage numerically. Nothing downstream — mAs, filtration, target material, distance — can move it. Any exam option that shifts maximum photon energy by a non-kV factor is wrong by construction.',
-    title: 'The endpoint is the kV — no photon can beat it',
-    body: 'The curve dies at **exactly the tube’s kilovoltage**: a 90 kV tube cannot emit a photon above **90 keV**, because no electron carried more energy than that into the target. The endpoint photon is the rare electron that gave **everything to a single braking event**.',
+    title: 'Maximum photon energy equals the set kVp',
+    body: 'The curve dies at **exactly the tube’s kilovoltage**: a 90 kV tube cannot emit a photon above **90 keV**, because no electron carried more energy than that into the target. The endpoint photon is the rare electron that gave **everything to a single braking event**. No photon can beat the kV.',
     trap: 'Maximum photon energy (keV) = **tube potential (kV)** — numerically equal, always.',
     stage: simStage({ sim: SPEC, focus: ['#kvpSlider'], set: { ...W_TARGET, '#kvpSlider': 100 }, tall: true }),
   },
@@ -428,6 +440,16 @@ export function XraySpectrumLesson() {
           headline: 'One curve, three handles.',
           bigPicture:
             'Read every exam option against the same three moves. **mAs** scales the curve and touches nothing else. **Filtration** carves away the soft end — quantity down, mean up, maximum untouched. **kV alone moves the endpoint**, and it drags quantity and mean up with it. The spikes never move at all: their positions belong to the target metal.',
+          controls: [
+            { change: '**mAs** ↑', effect: 'quantity ↑ · mean energy **unchanged** · maximum **unchanged**' },
+            { change: '**kVp** ↑', effect: 'quantity ↑ (~kV²) · mean energy ↑ · **maximum energy ↑ — the only control that moves it**' },
+            { change: '**Filtration** ↑', effect: 'quantity ↓ · mean energy ↑ (hardened) · maximum **unchanged**' },
+            { change: '**Target Z** ↑', effect: 'output ↑ (∝ Z) · characteristic lines move to **that element’s** energies · maximum unchanged' },
+          ],
+          confuse: [
+            { a: '**Maximum energy** — the endpoint, set by kV alone', b: '**Mean energy** — ⅓–½ of it, what actually penetrates' },
+            { a: '**Quantity** — photons in the beam, the area under the curve', b: '**Quality** — how penetrating they are, where the curve sits' },
+          ],
         },
       }}
       steps={SPECTRUM_STEPS}

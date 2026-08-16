@@ -394,6 +394,17 @@ export default function MammoLab() {
           headline: 'One imaging problem, every answer.',
           bigPicture:
             'Hold the problem and the machine explains itself: **tiny soft-tissue differences and microcalcifications** demand low energies, high resolution and merciless dose discipline. Compression wins on **every axis at once** — thickness, scatter, dose, motion, overlap. The Mo/Rh targets shape the spectrum to the task; the small focal spot and the air gap make magnification views possible. Nothing on this machine is an accident.',
+          controls: [
+            { change: '**Compression** ↑', effect: 'thickness ↓ → scatter ↓ → contrast ↑ · dose ↓ · motion ↓ · overlap ↓ · sharper geometry — **every axis at once**' },
+            { change: '**Photon energy** too high', effect: 'differential attenuation ↓ → **subject contrast collapses**' },
+            { change: '**Photon energy** too low', effect: 'penetration ↓ → **absorbed dose climbs** — the optimisation is a balance' },
+            { change: '**Magnification view**', effect: 'object elevated → OID ↑ → M ↑ · needs the **0.1 mm focal spot** · the air gap replaces the grid' },
+          ],
+          confuse: [
+            { a: '**Low-energy spectrum** — buys soft-tissue contrast', b: '**Small focal spot** — buys geometric sharpness; different jobs' },
+            { a: '**Grid** — scatter control in contact imaging, costs dose', b: '**Air gap** — scatter control in magnification, no grid needed' },
+            { a: '**Tomosynthesis** — separates superimposed tissue in depth', b: 'what it does NOT do — beat 2D mammography’s in-plane resolution' },
+          ],
         },
       }}
       steps={STEPS}

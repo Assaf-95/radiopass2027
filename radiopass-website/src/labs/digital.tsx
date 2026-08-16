@@ -291,6 +291,17 @@ export default function DigitalLab() {
           headline: 'Photon in, number out.',
           bigPicture:
             'Three roads from absorption to signal: the CR plate **stores** the image until a red laser asks for it back; the indirect panel converts to **light first**; the direct panel goes **straight to charge**. Once the image is numbers, processing can rescue brightness from almost any exposure — which is exactly why **a good-looking image proves nothing about dose**, and why the exposure indicator, not the display, is the honest witness.',
+          controls: [
+            { change: '**Pixel size** ↓ (fixed FOV, matrix ↑)', effect: 'spatial resolution potential ↑ · fewer photons per pixel → **SNR ↓**' },
+            { change: '**Bit depth** ↑', effect: 'more grey levels per pixel — dynamic range representation, not resolution' },
+            { change: '**Exposure** ↑ beyond need', effect: 'the image still looks fine — only the **exposure indicator** tells the truth (dose creep)' },
+            { change: '**Processing**', effect: 'reshapes what was captured — it can never invent photons that were not' },
+          ],
+          confuse: [
+            { a: '**CR** — photostimulable storage phosphor, read LATER by a red laser', b: '**DR** — immediate readout; CR is never caesium iodide' },
+            { a: '**Indirect DR** — CsI scintillator → light → photodiode', b: '**Direct DR** — amorphous selenium → charge, no light step at all' },
+            { a: '**MTF** — how faithfully detail transfers across spatial frequencies', b: '**DQE** — how efficiently X-ray information becomes signal versus noise' },
+          ],
         },
       }}
       steps={STEPS}
