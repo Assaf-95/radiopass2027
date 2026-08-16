@@ -74,6 +74,95 @@
 .lx-finish { padding-top: var(--sp-9); }
 .lx-next { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; margin-top: var(--sp-6); }
 
+/* ---- course orientation -------------------------------------------------
+   Which part of the syllabus, which lesson of the module. Quiet on purpose:
+   orientation must never compete with the title it orients. */
+.lx-course-line {
+  display: flex; justify-content: center; gap: var(--sp-2);
+  font-size: var(--fs-meta); color: var(--text-tertiary);
+  letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 var(--sp-3);
+}
+.lx-course-line span:first-child { color: var(--lx-accent); }
+.lx-bar-course {
+  font-size: var(--fs-meta); color: var(--text-tertiary);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+
+/* The mental map on a module's front door: the promise, numbered, left-aligned
+   inside the centred cover so it reads as content rather than decoration. */
+.lx-outcomes {
+  max-width: var(--container-narrow); margin: var(--sp-5) auto var(--sp-2);
+  text-align: left; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--sp-4) var(--sp-5);
+}
+.lx-outcomes-title {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--lx-accent); margin: 0 0 var(--sp-3);
+}
+.lx-outcomes ol { margin: 0; padding: 0 0 0 1.25em; }
+.lx-outcomes li {
+  font-size: var(--fs-support); line-height: var(--lh-body);
+  color: var(--text-secondary); padding: var(--sp-1) 0;
+}
+
+/* ---- the watch cue ------------------------------------------------------
+   One imperative line before the animation: what to look for. The label is
+   the accent so the eye catches it between title and prose. */
+.lx-watch {
+  display: flex; gap: var(--sp-2); align-items: baseline;
+  font-size: var(--fs-support); line-height: var(--lh-body);
+  color: var(--text-secondary); margin: 0 0 var(--sp-3);
+}
+.lx-watch b {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--lx-accent); flex: none;
+}
+
+/* ---- synthesis ----------------------------------------------------------
+   The module reassembled: derived digests of every step's numbers and traps,
+   then the practice gate. Left-aligned lists inside the centred cover. */
+.lx-syn {
+  max-width: var(--container-narrow); margin: var(--gap-section) auto 0;
+  text-align: left;
+}
+.lx-syn-title {
+  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--lx-accent); margin: 0 0 var(--sp-3);
+}
+.lx-syn-traps .lx-syn-title { color: var(--warning); }
+.lx-syn ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.lx-syn li {
+  display: grid; grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+  gap: var(--sp-4); padding: var(--sp-3) 0; border-bottom: 1px solid var(--border);
+}
+.lx-syn-from { font-size: var(--fs-meta); color: var(--text-tertiary); line-height: var(--lh-body); }
+.lx-syn-what { font-size: var(--fs-support); color: var(--text-secondary); line-height: var(--lh-body); }
+.lx-syn-what strong { color: var(--text-primary); font-weight: 600; }
+
+/* The boundary between learning and testing, made visible: a labelled gate
+   that says what the set covers before any question appears. */
+.lx-gate {
+  max-width: var(--container-narrow); margin: var(--gap-section) auto 0;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-6);
+}
+.lx-gate-title {
+  font-family: var(--font-display); font-size: var(--fs-card);
+  color: var(--text-primary); margin: 0 0 var(--sp-2);
+}
+.lx-gate-covers {
+  font-size: var(--fs-support); line-height: var(--lh-body);
+  color: var(--text-secondary); margin: 0; max-width: var(--measure-tight);
+  margin-inline: auto;
+}
+.lx-gate-covers strong { color: var(--text-primary); font-weight: 600; }
+.lx-gate .lx-next { margin-top: var(--sp-4); }
+
+@media (max-width: 640px) {
+  .lx-syn li { grid-template-columns: 1fr; gap: var(--sp-1); }
+  .lx-bar-course { display: none; }
+}
+
 /* ---------- the step screen ---------- */
 .lx-step { flex: 1; display: flex; flex-direction: column; max-width: var(--container-main); width: 100%; margin: 0 auto; padding: var(--sp-5) var(--gutter) var(--sp-6); }
 .lx-stage {

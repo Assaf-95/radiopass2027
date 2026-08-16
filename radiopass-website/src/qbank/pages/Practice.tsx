@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 
 import { questionsForSection } from '../data'
 import { QuestionCard } from '../QuestionCard'
@@ -65,7 +65,17 @@ export default function PracticePage() {
 }
 
 function SubjectPractice({ subject }: { subject: QbSubject }) {
-  const [sectionId, setSectionId] = useState<string>('all')
+  /* The section is a URL, not just a chip. This is what lets a module end
+     with "Practise mammography" and land HERE, on mammography's own eleven
+     questions, instead of on all 140 X-ray questions — the difference between
+     module-specific practice and a generic quiz. An unknown section id is
+     ignored rather than erroring: the URL came from a link that may outlive a
+     taxonomy change, and the whole subject is the right fallback. */
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requested = searchParams.get('section')
+  const [sectionId, setSectionId] = useState<string>(() =>
+    requested && subject.sections.some((s) => s.id === requested) ? requested : 'all',
+  )
   const pool = useMemo(() => poolFor(subject, sectionId), [subject, sectionId])
   const [index, setIndex] = useState(() => resumeIndex(pool))
   const [progressVersion, setProgressVersion] = useState(0)
@@ -88,10 +98,20 @@ function SubjectPractice({ subject }: { subject: QbSubject }) {
 
   const onMarksChanged = useCallback(() => setMarksVersion((v) => v + 1), [])
 
-  /** A chip switches the list, and every list opens where that list left off. */
+  /** A chip switches the list, and every list opens where that list left off.
+      The URL follows (replace, not push): a reload keeps the section, browser
+      Back still leaves the page rather than replaying every chip press. */
   const chooseSection = (id: string) => {
     setSectionId(id)
     setIndex(resumeIndex(poolFor(subject, id)))
+    setSearchParams(
+      (params) => {
+        if (id === 'all') params.delete('section')
+        else params.set('section', id)
+        return params
+      },
+      { replace: true },
+    )
   }
 
   const question = questions[Math.min(index, Math.max(0, questions.length - 1))]

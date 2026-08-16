@@ -38,6 +38,7 @@ import { clearToneMemory, isSoundOn, playOnce, setSoundOn, subscribeSound, unloc
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { record } from '../lib/learner'
 import { CommonTrap, HighYield } from '../design/primitives'
+import { COURSE_MODULES, coursePosition, moduleOrdinal, practiceHref } from '../physics/course'
 import { useReducedMotion } from '../home/fx'
 import './labs.css'
 import { TaskGate } from './task'
@@ -72,6 +73,12 @@ export type LessonStep = {
   exam?: string
   /** A quick prediction the animation then proves. Chips, not a quiz. */
   predict?: { q: string; options: string[]; answer: number }
+  /**
+   * What to look FOR in the animation — one imperative line ("Watch the
+   * count rate as the kV rises"). A diagram that moves rewards a viewer who
+   * knows what to watch; without the cue, motion is just decoration.
+   */
+  watch?: string
   /** Optional "the numbers" line — the values worth memorising. */
   numbers?: string
   /**
@@ -94,6 +101,18 @@ export type LessonMeta = {
   film?: { label: string; to: string }
   /** Optional scroll story — a static immersive page outside the SPA router. */
   story?: { label: string; href: string }
+  /**
+   * The module reassembled, for the closing screen. `headline` names what was
+   * just built ("One tube, one spectrum."); `bigPicture` restates the causal
+   * chain in two or three sentences — how the concepts connect, which is the
+   * one thing a step-at-a-time walk cannot show while it is happening.
+   *
+   * Optional because the numbers/trap digests and the practice gate are
+   * derived automatically; without it the screen still closes the module
+   * properly, it just opens with the module title instead of a line written
+   * for the occasion.
+   */
+  synthesis?: { headline?: string; bigPicture?: string }
 }
 
 function Rich({ text }: { text: string }) {
@@ -145,6 +164,168 @@ export function clearPings() { clearToneMemory() }
 /** A soft click for a named event. Each id fires once until the step resets. */
 export function lessonPing(id: string, freq = 1150) {
   playOnce(id, freq, 'pulse')
+}
+
+/**
+ * The closing screen: the module reassembled, then the gate into practice.
+ *
+ * This replaces a single generic sentence — "That is the whole story. N
+ * concepts, one at a time. Test them before they fade." — that was identical
+ * for every module and recapped nothing. A learner leaving a module got no
+ * record of what they had just been asked to remember, and the next click was
+ * an unannounced jump to Question 1.
+ *
+ * What it shows now, in order:
+ *
+ *   THE BIG PICTURE   authored, optional — the causal chain restated, which
+ *                     is the one thing a step-at-a-time walk cannot show
+ *                     while it is happening.
+ *   THE NUMBERS       every step's `numbers` line, harvested from the steps
+ *   DON'T WALK INTO   every step's `trap` line, likewise
+ *                     — both digests are derived, so they cannot drift out of
+ *                     date when a step is edited, and a module whose steps
+ *                     carry no numbers simply shows no numbers section.
+ *   THE PRACTICE GATE says exactly what the question set covers and where it
+ *                     leads, so learning and testing stop colliding without
+ *                     warning. Module-specific: mammography's gate opens
+ *                     mammography's own questions, not "X-ray questions".
+ *   WHAT COMES NEXT   the next lesson or module from the course spine — the
+ *                     chain no longer depends on each lab remembering its
+ *                     sibling (which is exactly how Spectrum lost Geometry).
+ */
+function LessonSynthesis({
+  meta,
+  steps,
+  course,
+  onRestart,
+}: {
+  meta: LessonMeta
+  steps: LessonStep[]
+  course: ReturnType<typeof coursePosition>
+  onRestart: () => void
+}) {
+  const numbers = steps.filter((s) => s.numbers)
+  const traps = steps.filter((s) => s.trap)
+
+  /* The spine's next lesson, labelled by whether it crosses a module
+     boundary. Falls back to nothing off-spine — meta.next still renders. */
+  const next = course?.next ?? null
+  const nextLabel = next
+    ? next.module.id === course!.module.id
+      ? `Next lesson: ${next.lesson.title}`
+      : `Next module: ${next.module.title}`
+    : null
+
+  const practice = course ? course.module.practice : null
+  const practiceTo = practice ? practiceHref(practice) : null
+  const factsTo = course?.module.facts ? `/fact-bank/${course.module.facts}` : null
+
+  /* The full practice gate belongs at the END of a module — that is the
+     learning→testing boundary the course choreographs. Mid-module, the next
+     lesson is the primary act and practice is offered quietly: a learner one
+     lesson into a four-lesson module has not yet built what the question set
+     examines. */
+  const endOfModule = !next || next.module.id !== course!.module.id
+
+  /* Hand-authored next-links that the spine or the gate now covers would
+     render as duplicate buttons; everything else (films, fact links on
+     off-spine lessons) still shows. */
+  const extras = meta.next.filter(
+    (n) => n.to !== practiceTo && n.to !== next?.lesson.path && n.to !== factsTo,
+  )
+
+  return (
+    <section className="lx-cover lx-finish">
+      <p className="lx-kicker">{meta.kicker}</p>
+      <h1>{meta.synthesis?.headline ?? `${meta.title}, in one piece.`}</h1>
+      {meta.synthesis?.bigPicture ? (
+        <p className="lx-intro">
+          <Rich text={meta.synthesis.bigPicture} />
+        </p>
+      ) : (
+        <p className="lx-intro">
+          {steps.length} concepts, each built on the one before. Here is what they add up to.
+        </p>
+      )}
+
+      {numbers.length > 0 && (
+        <div className="lx-syn" aria-label="The numbers to keep">
+          <p className="lx-syn-title">The numbers to keep</p>
+          <ul>
+            {numbers.map((s) => (
+              <li key={s.id}>
+                <span className="lx-syn-from">{s.title}</span>
+                <span className="lx-syn-what">
+                  <Rich text={s.numbers!} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {traps.length > 0 && (
+        <div className="lx-syn lx-syn-traps" aria-label="The traps">
+          <p className="lx-syn-title">Don't walk into</p>
+          <ul>
+            {traps.map((s) => (
+              <li key={s.id}>
+                <span className="lx-syn-from">{s.title}</span>
+                <span className="lx-syn-what">
+                  <Rich text={s.trap!} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {practice && practiceTo && endOfModule && (
+        <div className="lx-gate" aria-label="Ready to practise">
+          <p className="lx-gate-title">Ready to test it?</p>
+          <p className="lx-gate-covers">
+            The question set covers <strong>{practice.label.toLowerCase()}</strong> — marked
+            stem by stem, every answer explained.
+          </p>
+          <div className="lx-next">
+            <Link className="lx-btn lx-btn-solid" to={practiceTo}>
+              Start {course!.module.short} practice
+            </Link>
+            {factsTo && (
+              <Link className="lx-btn lx-btn-ghost" to={factsTo}>
+                The facts, condensed
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="lx-next">
+        {next && nextLabel && (
+          <Link
+            className={endOfModule ? 'lx-btn lx-btn-ghost' : 'lx-btn lx-btn-solid'}
+            to={next.lesson.path}
+          >
+            {nextLabel} →
+          </Link>
+        )}
+        {/* Mid-module, practice is an offer rather than a gate. */}
+        {practice && practiceTo && !endOfModule && (
+          <Link className="lx-btn lx-btn-ghost" to={practiceTo}>
+            Practise as you go
+          </Link>
+        )}
+        {extras.map((n) => (
+          <Link key={n.to} className="lx-btn lx-btn-ghost" to={n.to}>
+            {n.label}
+          </Link>
+        ))}
+        <button type="button" className="lx-btn lx-btn-ghost" onClick={onRestart}>
+          Start again
+        </button>
+      </div>
+    </section>
+  )
 }
 
 export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonStep[] }) {
@@ -291,6 +472,15 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
      while ← Back walks the concepts. */
   const navigate = useNavigate()
   const { pathname, search } = useLocation()
+
+  /* Where this lesson sits in the physics course — or null for a lesson that
+     is not on the spine (the MRI sequence lessons, anything experimental),
+     which then renders exactly as it always has. The course is looked up by
+     pathname rather than passed in meta so that no lab file has to know the
+     syllabus: reordering the course is an edit to course.ts alone. */
+  const course = coursePosition(pathname)
+  const multiLesson = course !== null && course.module.lessons.length > 1
+  const isModuleHome = course !== null && course.module.home === pathname
   useEffect(() => {
     const params = new URLSearchParams(search)
     const want = index >= 0 && index < steps.length ? String(index + 1) : null
@@ -325,14 +515,52 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
           <Link to={meta.backTo?.to ?? '/visual-lab'} className="lx-exit">← {meta.backTo?.label ?? 'Visual Lab'}</Link>
         </span>
         <span className="lx-bar-title">{meta.title}</span>
+        {/* Course position, only where there is a course to be positioned in.
+            Two grains on purpose: which lesson of the module, then which
+            concept of the lesson — "where am I" at both zoom levels. */}
+        {multiLesson && course && (
+          <span className="lx-bar-course">
+            Lesson {course.lessonIndex + 1} of {course.module.lessons.length}
+          </span>
+        )}
         <span className="lx-bar-count">{step ? `${index + 1} / ${steps.length}` : index < 0 ? 'Start' : 'Done'}</span>
       </header>
 
       {index < 0 && (
         <section className="lx-cover">
+          {/* Course orientation before module identity: which part of the
+              syllabus this is, and — inside a multi-lesson module — which
+              step of the sequence. A learner should never have to deduce the
+              curriculum from array order again. */}
+          {course && (
+            <p className="lx-course-line">
+              <span>{course.part.title}</span>
+              <span aria-hidden="true">·</span>
+              <span>
+                {multiLesson
+                  ? `${course.module.title} — lesson ${course.lessonIndex + 1} of ${course.module.lessons.length}`
+                  : `Module ${moduleOrdinal(course.module.id)} of ${COURSE_MODULES.length}`}
+              </span>
+            </p>
+          )}
           <p className="lx-kicker">{meta.kicker}</p>
           <h1>{meta.title}</h1>
           <p className="lx-intro"><Rich text={meta.intro} /></p>
+          {/* The mental map, on the module's own front door: the promise the
+              module then keeps, so the learner starts with a scaffold rather
+              than with the first isolated fact. Multi-lesson modules make
+              this promise on their hub instead — not repeated on every
+              lesson, or it would stop being read. */}
+          {isModuleHome && course && (
+            <div className="lx-outcomes">
+              <p className="lx-outcomes-title">By the end you should understand</p>
+              <ol>
+                {course.module.outcomes.map((o) => (
+                  <li key={o}>{o}</li>
+                ))}
+              </ol>
+            </div>
+          )}
           <p className="lx-count">{steps.length} concepts · one at a time · ← → to move</p>
           <div className="lx-cover-actions">
             <button type="button" className="lx-btn lx-btn-solid" onClick={() => go(0)}>Begin</button>
@@ -367,6 +595,15 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
           <div className="lx-panel">
             <p className="lx-step-no">{String(index + 1).padStart(2, '0')} — {meta.title}</p>
             <h2>{step.title}</h2>
+            {/* What to look FOR, stated before the looking. The animations
+                reward a viewer who knows what to watch; without the cue the
+                learner reads the prose first and the motion plays to nobody. */}
+            {step.watch && (
+              <p className="lx-watch">
+                <b>Watch</b>
+                <Rich text={step.watch} />
+              </p>
+            )}
             {step.predict && (
               <div className="lx-predict" role="group" aria-label="Predict before you look">
                 <span className="lx-predict-q">{step.predict.q}</span>
@@ -436,15 +673,7 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
       )}
 
       {index >= steps.length && (
-        <section className="lx-cover lx-finish">
-          <p className="lx-kicker">{meta.kicker}</p>
-          <h1>That is the whole story.</h1>
-          <p className="lx-intro">{steps.length} concepts, one at a time. Test them before they fade.</p>
-          <div className="lx-next">
-            {meta.next.map(n => <Link key={n.to} className="lx-btn lx-btn-solid" to={n.to}>{n.label}</Link>)}
-            <button type="button" className="lx-btn lx-btn-ghost" onClick={() => go(0)}>Start again</button>
-          </div>
-        </section>
+        <LessonSynthesis meta={meta} steps={steps} course={course} onRestart={() => go(0)} />
       )}
     </main>
   )
