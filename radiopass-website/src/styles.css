@@ -287,6 +287,20 @@
    pinned three-facts-per-screen reader — one column is how revision actually
    works, and a long fact no longer competes with two others for the screen. */
 .fbr-vertical{padding-top:8px;padding-bottom:40px}
+/* The topic's own head — identity before fact 01, and the reading-mode
+   switch. The hub card carried name/blurb/counts; now the page does too. */
+.fbr-head{max-width:var(--container-reading);margin:var(--sp-6) auto var(--sp-2);text-align:center}
+.fbr-head-kicker{display:flex;justify-content:center;align-items:center;gap:var(--sp-3);margin:0 0 var(--sp-3);font-size:var(--fs-meta);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fbr-head h1{font-family:var(--display);font-weight:380;font-size:var(--fs-page);margin:0 0 var(--sp-2);color:var(--ink)}
+.fbr-head-blurb{font-size:var(--fs-body);line-height:var(--lh-body);color:var(--text-secondary);max-width:var(--measure-tight);margin:0 auto var(--sp-3)}
+.fbr-mode{border:1px solid var(--border-strong);background:transparent;color:var(--muted);font:inherit;font-size:var(--fs-meta);padding:var(--sp-2) var(--sp-4);border-radius:999px;cursor:pointer;transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.fbr-mode:hover{color:var(--ink);border-color:var(--ink)}
+/* STUDY — one fact in a centred column, the reader in charge of pace. */
+.fbr-study{max-width:var(--container-reading);margin:0 auto;padding-top:var(--sp-5)}
+.fbr-where{font-size:var(--fs-meta);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums;margin:0 0 var(--sp-4)}
+.fbr-where b{color:var(--ink)}
+.fbr-row.is-solo{grid-template-columns:minmax(0,1fr);border-top:0;padding-top:0}
+.fbr-pager{display:flex;justify-content:space-between;gap:var(--sp-3);margin-top:var(--gap-section);padding-top:var(--sp-5);border-top:1px solid var(--border);flex-wrap:wrap}
 .fbr-list{list-style:none;margin:0;padding:0}
 .fbr-row{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--sp-2);align-items:start;
   padding:44px 0;border-top:1px solid rgba(242,238,230,.10)}

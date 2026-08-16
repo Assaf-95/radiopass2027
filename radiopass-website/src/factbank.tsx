@@ -28,6 +28,8 @@ function FbIcon({ name, size = 18, strokeWidth = 1.8 }: { name: FbIconName; size
 
 /* ---------- quick-reference visuals ---------- */
 
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
+
 function HuScale() {
   const stops = [
     { v: '-1000', label: 'Air', pos: 0 },
@@ -170,7 +172,7 @@ export const factTopics: FactTopic[] = [
     icon: 'bolt',
     blurb: 'Compton, photoelectric, kVp, filtration and tube geometry — the foundation everything else is built on.',
     heat: 5,
-    lab: { label: 'Try the dose & noise demo', to: '/visual-lab' },
+    lab: { label: 'Open the X-ray physics module', to: '/xray-lab' },
     facts: [
       { hot: true, t: 'Compton scatter uses loosely bound outer-shell electrons', d: 'Compton is an interaction with a **loosely bound outer-shell electron** — one so weakly held that, to a diagnostic photon, it might as well be **free**: the photon’s energy dwarfs its binding energy.\n\nCompton probability does **fall as energy rises** — but only gently. The reason it still ends up owning the diagnostic range is what its rival does: the **photoelectric effect collapses as 1/E³**, far faster. Compton drifts down; photoelectric falls off a cliff.\n\nSo across **general radiography and CT**, Compton is simply what is left standing in soft tissue.\n\n**The exception is mammography.** At **25–30 kVp** the energy is low enough that photoelectric has not yet collapsed — so there, in soft tissue, **photoelectric dominates**. That is the whole reason mammography can show soft-tissue detail at all.', visual: <InteractionCrossover/> },
       { hot: true, t: 'Compton probability depends on electron density, not atomic number', d: 'Fat, muscle and water pack almost exactly the **same electron density** — so Compton treats them almost identically, and **Z has no say at all**. That is precisely why soft-tissue contrast dies at high kVp.' },
@@ -194,7 +196,7 @@ export const factTopics: FactTopic[] = [
     icon: 'scan',
     blurb: 'Pitch, Hounsfield units, beam hardening and dose — the concepts that decide entire question sets.',
     heat: 5,
-    lab: { label: 'Open the CT dose studio', to: '/visual-lab' },
+    lab: { label: 'Open the CT lesson', to: '/ct-lab' },
     facts: [
       { hot: true, t: 'Pitch = table travel per rotation ÷ beam width', d: '**Table travel per rotation over beam width** — a pure, dimensionless ratio. Push it up and the helix stretches: the scan gets **faster and the dose gets lower**, and above 1 the gaps in the data must be interpolated.' },
       { hot: true, t: 'The Hounsfield unit is relative attenuation, not absolute', d: 'A Hounsfield unit is the voxel measured **against water** — anchored at **water = 0, air = −1000**. Carry the landmarks: fat ≈ **−100**, soft tissue **+20 to +50**, cortical bone **+1000 and beyond**.', visual: <HuScale/> },
@@ -266,7 +268,7 @@ export const factTopics: FactTopic[] = [
     icon: 'film',
     blurb: 'Why subtraction costs SNR, how CR plates actually work, and the storage arithmetic that keeps reappearing.',
     heat: 4,
-    lab: { label: 'Try the dose & noise demo', to: '/visual-lab' },
+    lab: { label: 'Open the fluoroscopy module', to: '/xray-lab/fluoroscopy' },
     facts: [
       { hot: true, t: 'DSA trades SNR for contrast', d: 'Subtract the mask and bone and soft tissue simply vanish — **contrast resolution soars**. But the noise of **both frames adds**, so SNR falls and quantum mottle rises. Spatial resolution is untouched; total dose is high because the frames are many.' },
       { hot: true, t: 'CR plates are photostimulable barium fluorohalide', d: 'CR is **photostimulable barium fluorohalide** — caesium iodide belongs to indirect flat panels and image intensifier inputs. A **red laser releases** the trapped electrons, the plate answers in **blue light**, and a photomultiplier reads it. The phosphor is continuous: **pixels exist only at readout**.' },
@@ -302,7 +304,7 @@ export const factTopics: FactTopic[] = [
     icon: 'atom',
     blurb: 'Tc-99m, the ideal tracer, gamma camera anatomy and coincidence detection — dense, factual and endlessly quizzed.',
     heat: 5,
-    lab: { label: 'Open the gamma camera lab', to: '/visual-lab' },
+    lab: { label: 'Open the nuclear medicine lesson', to: '/nm-lab' },
     facts: [
       { hot: true, t: 'Tc-99m: 140 keV, 6 hours, generator-eluted', d: 'The workhorse in three numbers: **140 keV, 6 hours, generator-eluted**. Isomeric transition gives a **pure, monoenergetic gamma with no particles**; it comes from a Mo-99/Tc-99m generator — **never a cyclotron** — and daughter Tc-99 is effectively stable on a human timescale.', visual: <HalfLifeChips/> },
       { hot: true, t: 'The ideal tracer: pure gamma, 100–250 keV, hours-long half-life', d: '**Pure gamma. 100–250 keV. A half-life of hours.** Beta emission deposits dose without ever reaching the camera — the ideal diagnostic agent has none. Match the half-life to the study and the energy to the crystal.' },
@@ -485,12 +487,37 @@ export function FactTopicPage() {
   return <FactTopicReader key={topic.id} topic={topic}/>
 }
 
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
+/**
+ * Where a topic's facts get tested. Subject-level where the topic spans
+ * several sections (xray), section-scoped where the bank has the exact
+ * grain (mammography). The fact bank used to have NO route to practice at
+ * all — the one direction the learning loop never closed.
+ */
+const TOPIC_PRACTICE: Record<string, { to: string; label: string }> = {
+  xray: { to: '/question-bank/xray', label: 'X-ray physics' },
+  ct: { to: '/question-bank/ct', label: 'CT' },
+  mri: { to: '/question-bank/mri', label: 'MRI' },
+  us: { to: '/question-bank/ultrasound', label: 'ultrasound' },
+  fluoro: { to: '/question-bank/xray?section=fluoroscopy', label: 'fluoroscopy' },
+  mammo: { to: '/question-bank/xray?section=mammography', label: 'mammography' },
+  nm: { to: '/question-bank/nm', label: 'nuclear medicine' },
+  protection: { to: '/question-bank/safety', label: 'safety & radiation' },
+}
+
+const READ_MODE_KEY = 'radiopass.factbank.readmode.v1'
 
 /**
- * The topic reader: three facts per screen, in large type, each one arriving
- * as the reader scrolls — then Next for the following trio. The final screen
- * shows every fact together (the classic grid) as the recap.
+ * The topic reader — one fact at a time by default.
+ *
+ * The pattern is the one approved on the ultrasound fact bank: the default
+ * view is a single concept in a centred column with "Fact 3 of 12" and
+ * Previous/Next, so revising is a sequence of decisions rather than a wall.
+ * "Read as one page" keeps the scrolling column for people who revise by
+ * sweep; the choice is remembered.
+ *
+ * Every topic now also opens with its own head (name, blurb, count — the hub
+ * card had all three and the page itself, absurdly, had none) and closes with
+ * the practice bridge the bank never had.
  */
 function FactTopicReader({ topic }: { topic: FactTopic }) {
   const ordered = useMemo(
@@ -500,10 +527,32 @@ function FactTopicReader({ topic }: { topic: FactTopic }) {
   const idx = factTopics.indexOf(topic)
   const prevTopic = factTopics[(idx + factTopics.length - 1) % factTopics.length]
   const nextTopic = factTopics[(idx + 1) % factTopics.length]
-  // The crossfade maths that drove the old pinned trio-reader (opacity/offset
-  // per fact, active index, progress bar) went with it when the topic page
-  // became a single scrolling column; `trio`/`pages` are kept because the
-  // parked reader below still references them.
+  const practice = TOPIC_PRACTICE[topic.id]
+
+  const [paged, setPaged] = useState(() => {
+    try { return localStorage.getItem(READ_MODE_KEY) !== 'all' } catch { return true }
+  })
+  const [at, setAt] = useState(0)
+  const setMode = (p: boolean) => {
+    setPaged(p)
+    try { localStorage.setItem(READ_MODE_KEY, p ? 'paged' : 'all') } catch { /* fine */ }
+  }
+
+  /* Left/right page the facts in study view; ignored while typing. */
+  useEffect(() => {
+    if (!paged) return
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null
+      if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return
+      if (e.key === 'ArrowRight') setAt(i => Math.min(ordered.length - 1, i + 1))
+      if (e.key === 'ArrowLeft') setAt(i => Math.max(0, i - 1))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [paged, ordered.length])
+
+  const fact = ordered[Math.min(at, ordered.length - 1)]
+  const atEnd = at >= ordered.length - 1
 
   return <main className="fact-bank fb-topic-page">
     <div className="fb-toolbar">
@@ -519,15 +568,29 @@ function FactTopicReader({ topic }: { topic: FactTopic }) {
       </div>
     </div>
 
-    {/* One fact per full-width block, read straight down. The trio-per-screen
-        reader pinned three facts at a time and paged between them; scrolling
-        one column is how people actually revise, and it lets a fact be as
-        long as it needs to be without competing for the screen. */}
     <div className="container fbr-vertical">
-      <ol className="fbr-list">
-        {ordered.map((fact, i) => (
-          <li key={fact.t} className={fact.hot ? 'fbr-row hot' : 'fbr-row'}>
-            <span className="fbr-num">{String(i + 1).padStart(2, '0')}</span>
+      {/* The topic's own head — name, blurb, count and the reading-mode
+          switch. The page used to open on fact 01 with no identity at all. */}
+      <header className="fbr-head">
+        <p className="fbr-head-kicker">
+          <span className="fb-tag">{topic.tag}</span>
+          <span>{ordered.length} facts · {ordered.filter(f => f.hot).length} high-yield</span>
+        </p>
+        <h1>{topic.name}</h1>
+        <p className="fbr-head-blurb">{topic.blurb}</p>
+        <button type="button" className="fbr-mode" onClick={() => setMode(!paged)}>
+          {paged ? 'Read as one page' : 'One fact at a time'}
+        </button>
+      </header>
+
+      {paged ? (
+        /* STUDY — one fact, centred, with its own visual where one exists.
+           The reader decides when the next idea arrives. */
+        <div className="fbr-study">
+          <p className="fbr-where">
+            Fact <b>{at + 1}</b> of {ordered.length}
+          </p>
+          <div key={fact.t} className={fact.hot ? 'fbr-row hot is-solo' : 'fbr-row is-solo'}>
             <div className="fbr-row-body">
               <h3>
                 {fact.hot && <span className="fbr-hot"><FbIcon name="flame" size={12}/>High-yield</span>}
@@ -536,23 +599,65 @@ function FactTopicReader({ topic }: { topic: FactTopic }) {
               <FactText text={fact.d}/>
               {fact.visual}
             </div>
-          </li>
-        ))}
-      </ol>
+          </div>
+          <nav className="fbr-pager" aria-label="Fact navigation">
+            <button type="button" className="button button-ghost" disabled={at === 0} onClick={() => setAt(i => Math.max(0, i - 1))}>
+              ← Previous
+            </button>
+            {atEnd ? (
+              practice ? (
+                <Link to={practice.to} className="button button-primary">
+                  Test these: {practice.label} questions →
+                </Link>
+              ) : (
+                <Link to={`/fact-bank/${nextTopic.id}`} className="button button-primary">
+                  Next: {nextTopic.name} →
+                </Link>
+              )
+            ) : (
+              <button type="button" className="button button-primary" onClick={() => setAt(i => Math.min(ordered.length - 1, i + 1))}>
+                Next →
+              </button>
+            )}
+          </nav>
+        </div>
+      ) : (
+        /* SWEEP — the whole topic as one column, for revision by reading. */
+        <ol className="fbr-list">
+          {ordered.map((f, i) => (
+            <li key={f.t} className={f.hot ? 'fbr-row hot' : 'fbr-row'}>
+              <span className="fbr-num">{String(i + 1).padStart(2, '0')}</span>
+              <div className="fbr-row-body">
+                <h3>
+                  {f.hot && <span className="fbr-hot"><FbIcon name="flame" size={12}/>High-yield</span>}
+                  {f.t}
+                </h3>
+                <FactText text={f.d}/>
+                {f.visual}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
 
-      {/* End of the topic: read it again, or move to the next fact bank. */}
+      {/* End of the topic: test it, read it again, or move on. */}
       <section className="fbr-end">
         <p className="fbr-end-kicker">End of {topic.name} · {ordered.length} facts</p>
-        <h2>Read it again, or move on.</h2>
+        <h2>Now make them score.</h2>
         <div className="fbr-end-actions">
+          {practice && (
+            <Link to={practice.to} className="button button-primary">
+              Practise {practice.label} →
+            </Link>
+          )}
           <button
             type="button"
             className="button button-ghost"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => { setAt(0); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
           >
             ↺ Read again
           </button>
-          <Link to={`/fact-bank/${nextTopic.id}`} className="button button-primary">
+          <Link to={`/fact-bank/${nextTopic.id}`} className="button button-ghost">
             Next fact bank: {nextTopic.name} →
           </Link>
         </div>
