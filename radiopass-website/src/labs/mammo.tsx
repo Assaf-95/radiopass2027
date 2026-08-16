@@ -385,11 +385,16 @@ export default function MammoLab() {
         kicker: 'X-ray techniques',
         accent: ACC,
         intro: 'A machine where **every design choice serves contrast and resolution at minimal dose** — ten ideas, each one drawn.',
-        next: [
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-          { label: 'Mammography facts', to: '/fact-bank/mammo' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* Practice and facts now arrive through the course spine — and the
+           practice gate opens mammography's OWN question section, not the
+           whole X-ray subject it used to dump learners into. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'One imaging problem, every answer.',
+          bigPicture:
+            'Hold the problem and the machine explains itself: **tiny soft-tissue differences and microcalcifications** demand low energies, high resolution and merciless dose discipline. Compression wins on **every axis at once** — thickness, scatter, dose, motion, overlap. The Mo/Rh targets shape the spectrum to the task; the small focal spot and the air gap make magnification views possible. Nothing on this machine is an accident.',
+        },
       }}
       steps={STEPS}
     />

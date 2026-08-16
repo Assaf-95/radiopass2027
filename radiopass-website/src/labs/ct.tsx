@@ -778,13 +778,16 @@ export default function CtLab() {
         kicker: 'Computed tomography',
         accent: ACC,
         intro: 'From a spinning tube to a dose report: the **sixteen ideas** CT questions are built from, each one drawn so you can see it.',
-        next: [
-          { label: 'Practise CT questions', to: '/question-bank/ct' },
-          { label: 'CT facts', to: '/fact-bank/ct' },
-        ],
-        backTo: { label: 'Visual Lab', to: '/visual-lab' },
+        /* Practice and facts arrive through the course spine. */
+        next: [],
+        backTo: { label: 'Physics course', to: '/physics' },
         film: { label: 'Watch the film', to: '/ct-lab/film' },
         story: { label: 'The scroll story', href: '/ct-story.html' },
+        synthesis: {
+          headline: 'A thousand shadows, one slice.',
+          bigPicture:
+            'CT is projection radiography asked from **every angle at once**: profiles in, filtered back-projection out, and the answer expressed in Hounsfield units **anchored to water**. The helix and the detector rows set how fast the volume is covered; **noise obeys 1/√mAs and reconstruction can never buy it back**; windowing spends the numbers on the display without touching the data. Dose lives in three names — CTDI, DLP, effective dose — and the exam expects all three.',
+        },
       }}
       steps={STEPS}
     />

@@ -640,12 +640,15 @@ export default function NmLab() {
         kicker: 'Gamma imaging & PET',
         accent: ACC,
         intro: 'From the generator to the PET ring: the **fourteen ideas** nuclear medicine questions are built from — each one drawn.',
-        next: [
-          { label: 'Practise NM questions', to: '/question-bank/nm' },
-          { label: 'Nuclear medicine facts', to: '/fact-bank/nm' },
-        ],
-        backTo: { label: 'Visual Lab', to: '/visual-lab' },
+        /* Practice and facts arrive through the course spine. */
+        next: [],
+        backTo: { label: 'Physics course', to: '/physics' },
         film: { label: 'Watch the film', to: '/nm-lab/film' },
+        synthesis: {
+          headline: 'The patient is the source.',
+          bigPicture:
+            'Everything inverts: the camera never fires a photon, it only **collects what decays**. Tc-99m earns its place with a 6-hour half-life, a clean 140 keV gamma and a generator on every site. The collimator buys geometry by **throwing most photons away**; SPECT adds rotation, PET replaces collimation with **coincidence**. And because the tracer is injected, the dose is **committed at that moment** — scanning longer never doses more.',
+        },
       }}
       steps={STEPS}
     />

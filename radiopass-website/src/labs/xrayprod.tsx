@@ -190,6 +190,7 @@ const PRODUCTION_STEPS: LessonStep[] = [
   {
     id: 'thermionic',
     title: 'Electrons boil off — thermionic emission',
+    watch: 'the cloud forming around the filament as the temperature climbs — before any high voltage exists.',
     body: 'At white heat, electrons near the wire’s surface gain enough thermal energy to **escape the metal entirely**. They hover around the filament as a cloud — the **space charge** — held nearby by the positive charge they left behind. This is **thermionic emission**: the hotter the filament, the denser the waiting cloud.',
     trap: 'Thermionic emission needs **heat, not high voltage** — the cloud forms with the kV switched off.',
     stage: simStage({ sim: TUBE, focus: ['#temperature'], set: { '#temperature': 2400 } }),
@@ -197,6 +198,7 @@ const PRODUCTION_STEPS: LessonStep[] = [
   {
     id: 'ma',
     title: 'Tube current — the mA',
+    watch: 'the number of electrons crossing per second as the mA rises — and what does not change about each one.',
     predict: { q: 'Double the tube current. Each individual electron…', options: ['hits harder', 'is unchanged — there are just more of them'], answer: 1 },
     body: 'Switch on the high voltage and the cloud is pulled across the tube: **electrons per second = the tube current**, measured in **mA**. The mA is set by the **filament temperature** — hotter filament, denser cloud, more electrons per second. What never changes with mA is the **energy each individual electron carries**.',
     trap: '**mA is quantity only.** It cannot change the energy of any single electron — or of any photon.',
@@ -222,6 +224,7 @@ const PRODUCTION_STEPS: LessonStep[] = [
     id: 'anode',
     title: 'The anode: a spinning tungsten target',
     loop: true,
+    watch: 'the focal track: each strike lands on fresh metal because the disc keeps turning.',
     body: 'The electron slams into the **anode** — tungsten, chosen for its **high atomic number (Z = 74)**, which makes X-ray production efficient, and its heat tolerance. The face is **angled**, and the whole disc **rotates** at thousands of rpm so every bombardment lands on fresh, cooler metal.',
     numbers: 'Tungsten **Z = 74** · melts at **3400 °C** · rotates at ~**3000–10 000 rpm**.',
     exam: 'The angled face is the line-focus principle at work: a broad actual focal spot (good for heat) projects as a small effective focal spot (good for sharpness). The anode angle — typically 7–17° — sets the ratio between the two.',
@@ -230,6 +233,7 @@ const PRODUCTION_STEPS: LessonStep[] = [
   {
     id: 'brems',
     title: 'Bremsstrahlung — braking radiation',
+    watch: 'the continuous curve build: every braking event adds a photon somewhere under the endpoint.',
     body: 'Inside the target our electron swings past a **tungsten nucleus**. The nucleus’s positive charge bends its path, the electron **decelerates, and the lost energy leaves as an X-ray photon**. Every electron brakes differently — a distant graze sheds little, a near head-on encounter sheds nearly everything — so the photons form a **continuous spectrum**.',
     trap: 'Bremsstrahlung is an interaction with the **nucleus** — not with orbital electrons.',
     stage: simStage({ sim: SPEC, focus: ['#kvpSlider'], set: { ...W_TARGET, '#kvpSlider': 90, '#masSlider': 100, '#filterSlider': 1 }, tall: true }),
@@ -237,6 +241,7 @@ const PRODUCTION_STEPS: LessonStep[] = [
   {
     id: 'characteristic',
     title: 'Characteristic radiation — the target’s fingerprint',
+    watch: 'the two sharp lines standing on the smooth curve — they appear at fixed energies, whatever the kV.',
     body: 'Sometimes the incoming electron instead **knocks a K-shell electron clean out of a tungsten atom**. An outer electron drops into the vacancy, and the energy difference leaves as a photon of **exactly fixed energy** — characteristic of tungsten, not of the kV. The K-lines sit near **59 and 67 keV**, and they cannot appear at all until the tube exceeds the K-shell binding energy of **69.5 keV**.',
     trap: 'Raising the kV makes the characteristic lines **taller, never higher in energy** — their position belongs to the target atom.',
     numbers: 'Tungsten K-binding **69.5 keV** · K-lines ≈ **59 & 67 keV**.',
@@ -276,11 +281,15 @@ export default function XrayProductionLesson() {
         kicker: 'X-ray physics',
         accent: ACC,
         intro: 'Follow **one electron** from the wall socket to the tube window — twelve ideas, each one drawn.',
-        next: [
-          { label: 'Next: read the spectrum', to: '/xray-lab/spectrum' },
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* The chain to Spectrum and the practice link now come from the course
+           spine; hand-authoring them here again would render duplicates. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'One electron, and everything it explains.',
+          bigPicture:
+            'Heat frees electrons; **kV decides how hard each one hits, mA decides how many arrive**. At the anode almost all of that energy becomes heat — the braking that remains draws the continuous curve, and the K-shell holes stamp tungsten’s two fixed lines on top of it. Every control on the console is a handle on one of those steps, nothing more.',
+        },
       }}
       steps={PRODUCTION_STEPS}
     />
@@ -331,6 +340,7 @@ const SPECTRUM_STEPS: LessonStep[] = [
     exam:
       'kVp affects BOTH quality and quantity: output scales roughly with kV squared, while the endpoint scales linearly. This is why kV is a blunt instrument for dose and mAs is the precise one — and why the 15% rule (a 15% kV rise roughly doubles output) exists.',
     title: 'Turn the kV up: the curve grows up AND right',
+    watch: 'both edges at once: the endpoint sliding right while the whole curve lifts.',
     body: 'Raising the kV gives **every electron more energy**: the endpoint slides right, the whole curve lifts, and the mean rises. **Quantity and quality increase together** — output climbs roughly with **kV²**.',
     trap: 'kV is the only routine control that **moves the endpoint**.',
     numbers: 'Quantity ∝ ~**kV²** · mean and maximum both rise.',
@@ -343,6 +353,7 @@ const SPECTRUM_STEPS: LessonStep[] = [
     exam:
       'Output is directly proportional to mAs — a genuinely linear relationship, unlike kV. This makes mAs the correct control for adjusting image noise at a fixed beam quality, and the reason mAs is what you halve or double when reasoning about dose.',
     title: 'Turn the mAs up: amplitude, nothing else',
+    watch: 'the endpoint. It will not move, however far the curve climbs.',
     predict: { q: 'Double the mAs. The endpoint…', options: ['moves right', 'stays exactly where it is'], answer: 1 },
     body: 'Doubling the mAs fires **twice as many electrons, each with unchanged energy**. The curve doubles in height at every point — **same shape, same mean, same endpoint**. Pure quantity, zero quality.',
     trap: '**mAs never changes any photon’s energy.** An option that moves the endpoint with mAs is the trap.',
@@ -355,6 +366,7 @@ const SPECTRUM_STEPS: LessonStep[] = [
     exam:
       'Filtration hardens the beam: quantity falls, mean energy and HVL rise, the endpoint is untouched. Regulations require at least 2.5 mm aluminium equivalent total filtration above 70 kV. Beam hardening is also the origin of the cupping artefact in CT.',
     title: 'Add filtration: the soft end is carved away',
+    watch: 'which side of the curve disappears — and which edge refuses to move.',
     predict: { q: 'Add 2 mm of aluminium. The mean energy…', options: ['falls', 'rises', 'is unchanged'], answer: 1 },
     body: 'A filter eats the **low-energy end** of the curve, because soft photons attenuate most readily. Total output falls — but the survivors are the penetrating ones, so **the mean rises while the maximum stays put**. The beam has been **hardened**.',
     trap: 'Filtration: quantity **down**, mean **up**, maximum **unchanged**.',
@@ -407,11 +419,16 @@ export function XraySpectrumLesson() {
         kicker: 'X-ray physics',
         accent: ACC,
         intro: 'One graph carries half the X-ray paper. Learn to read it — and to **predict how it moves** before the examiner asks.',
-        next: [
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-          { label: 'X-ray facts', to: '/fact-bank/xray' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* The chain to Geometry now comes from the course spine — this is the
+           very link whose absence used to break the four-lesson core in the
+           middle. Nothing hand-authored here can forget it again. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'One curve, three handles.',
+          bigPicture:
+            'Read every exam option against the same three moves. **mAs** scales the curve and touches nothing else. **Filtration** carves away the soft end — quantity down, mean up, maximum untouched. **kV alone moves the endpoint**, and it drags quantity and mean up with it. The spikes never move at all: their positions belong to the target metal.',
+        },
       }}
       steps={SPECTRUM_STEPS}
     />

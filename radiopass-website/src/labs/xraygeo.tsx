@@ -294,11 +294,14 @@ export default function XrayGeometryLesson() {
         kicker: 'X-ray physics',
         accent: ACC,
         intro: 'Three players and three distances decide the **size** and **sharpness** of every radiograph — before a single photon is absorbed.',
-        next: [
-          { label: 'Interactions in tissue', to: '/xray-lab/interactions' },
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* The chain to Interactions comes from the course spine now. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'Two formulas, and who moved.',
+          bigPicture:
+            'Every geometry question is one of two formulas plus one discipline. **M = SDD ÷ SOD** sizes the shadow; **Ug = f × ODD ÷ SOD** blurs its edge. The discipline: never answer until you know **which of the three players physically moved** — the same “SID increased” means opposite things depending on whether the source stepped back or the object drifted forward. And the focal spot belongs to **unsharpness only**: it cannot magnify anything.',
+        },
       }}
       steps={GEO_STEPS}
     />
@@ -595,11 +598,15 @@ export function XrayInteractionsLesson() {
         kicker: 'X-ray physics',
         accent: ACC,
         intro: 'Transmit, absorb or scatter: every pixel of contrast and every millisievert of dose comes down to **what one photon does inside the patient**.',
-        next: [
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-          { label: 'X-ray facts', to: '/fact-bank/xray' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* Last lesson of the core: the spine hands over to the machines and
+           the finish screen carries the module's practice gate. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'Where contrast, fog and dose are born.',
+          bigPicture:
+            'One photon, three fates. **Transmission** carries the image; **photoelectric absorption** creates contrast and deposits dose, falling away steeply with energy and rising with **Z³**; **Compton scatter** survives to fog the detector and barely cares about Z at all. Every choice of kV is a negotiation between those last two — and the crossover energy is where the negotiation tips.',
+        },
       }}
       steps={INT_STEPS}
     />

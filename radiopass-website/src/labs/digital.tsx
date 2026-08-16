@@ -279,11 +279,19 @@ export default function DigitalLab() {
         kicker: 'X-ray techniques',
         accent: ACC,
         intro: 'How the plate and the panel actually work — **eight ideas** from the phosphor to the exposure indicator, each one drawn.',
-        next: [
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-          { label: 'Digital imaging facts', to: '/fact-bank/fluoro' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* Practice and facts arrive through the course spine; the gate opens
+           the digital section's own questions. (The old hand-authored facts
+           link here pointed at /fact-bank/fluoro — the fluoroscopy topic —
+           which is where the digital-imaging facts happen to live, but a
+           button reading "Digital imaging facts" must not quietly change
+           subject. The spine's facts binding names the topic honestly.) */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'Photon in, number out.',
+          bigPicture:
+            'Three roads from absorption to signal: the CR plate **stores** the image until a red laser asks for it back; the indirect panel converts to **light first**; the direct panel goes **straight to charge**. Once the image is numbers, processing can rescue brightness from almost any exposure — which is exactly why **a good-looking image proves nothing about dose**, and why the exposure indicator, not the display, is the honest witness.',
+        },
       }}
       steps={STEPS}
     />

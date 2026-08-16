@@ -290,11 +290,15 @@ export default function FluoroLab() {
         kicker: 'X-ray techniques',
         accent: ACC,
         intro: 'Real-time imaging and the price it pays in dose: **seven ideas**, from the image intensifier to DSA — each one drawn.',
-        next: [
-          { label: 'Practise X-ray questions', to: '/question-bank/xray' },
-          { label: 'Fluoroscopy facts', to: '/fact-bank/fluoro' },
-        ],
-        backTo: { label: 'X-ray techniques', to: '/xray-lab' },
+        /* Practice and facts arrive through the course spine; the gate opens
+           fluoroscopy's own question section. */
+        next: [],
+        backTo: { label: 'X-ray physics', to: '/xray-lab' },
+        synthesis: {
+          headline: 'Live pictures, and what they cost.',
+          bigPicture:
+            'Everything follows from imaging **in real time**: the intensifier buys its brightness with flux gain times minification gain, ABC holds the display steady by **silently raising the dose rate** through thick anatomy, and every dose feature — pulsing, last-image-hold, collimation — exists because minutes of screening add up on the patient’s skin. When a question asks what changed, ask first what ABC did about it.',
+        },
       }}
       steps={STEPS}
     />
