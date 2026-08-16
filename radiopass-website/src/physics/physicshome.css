@@ -142,6 +142,56 @@
    them is enough structure and keeps the eye moving down rather than hunting
    around a mosaic. */
 
+/* ---- the course --------------------------------------------------------
+   The syllabus, parts in order. Same quiet row language as the practise
+   list below — the course is content, not a card wall. */
+.ph-course { margin-top: var(--gap-page); }
+.ph-course h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-section);
+  color: var(--text-primary);
+  margin: 0 0 var(--sp-5);
+}
+.ph-part { margin-bottom: var(--gap-section); }
+.ph-part h3 {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  font-size: var(--fs-card); font-weight: 600; color: var(--text-primary);
+  margin: 0 0 var(--sp-2);
+}
+.ph-part-no {
+  font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--accent);
+}
+.ph-part-blurb {
+  font-size: var(--fs-support); line-height: var(--lh-body);
+  color: var(--text-tertiary); margin: 0 0 var(--sp-4); max-width: var(--measure);
+}
+.ph-part ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.ph-part li { border-bottom: 1px solid var(--border); }
+.ph-part a {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 0.55fr) minmax(0, 1fr) auto;
+  gap: var(--sp-4); align-items: baseline;
+  padding: var(--sp-4) var(--sp-2); text-decoration: none; color: inherit;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur) var(--ease);
+}
+.ph-part a:hover { background: rgba(242, 238, 230, 0.03); }
+.ph-mod-state {
+  font-size: var(--fs-meta); color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums; text-align: center;
+}
+.ph-mod-state.is-done { color: var(--success); }
+.ph-part strong { font-size: var(--fs-body); font-weight: 600; color: var(--text-primary); }
+.ph-mod-blurb { font-size: var(--fs-support); line-height: var(--lh-body); color: var(--text-tertiary); }
+.ph-mod-meta { font-size: var(--fs-meta); color: var(--text-disabled); white-space: nowrap; }
+@media (max-width: 720px) {
+  .ph-part a { grid-template-columns: 28px minmax(0, 1fr); }
+  .ph-mod-blurb { grid-column: 2; }
+  .ph-mod-meta { display: none; }
+}
+
 .ph-destinations h2 {
   font-family: var(--font-display);
   font-weight: 340;

@@ -51,6 +51,8 @@ export type CourseModule = {
   id: string
   title: string
   short: string
+  /** One line for course listings — what this module is, not a sales pitch. */
+  blurb: string
   /** Index into COURSE_PARTS. */
   part: number
   /** The module's home surface — where ORIENT happens. */
@@ -120,6 +122,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'xray-core',
     title: 'X-ray physics',
     short: 'X-ray',
+    blurb: 'Four lessons: make the beam, describe it, project it, follow it into the patient.',
     part: 0,
     home: '/xray-lab',
     lessons: [
@@ -145,6 +148,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'digital',
     title: 'Digital radiography',
     short: 'Digital',
+    blurb: 'How an absorbed photon becomes a number — plate, panel, and the honest exposure indicator.',
     part: 1,
     home: '/xray-lab/digital',
     lessons: [{ path: '/xray-lab/digital', title: 'CR & digital radiography', short: 'Digital' }],
@@ -161,6 +165,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'fluoro',
     title: 'Fluoroscopy',
     short: 'Fluoro',
+    blurb: 'Real-time imaging, the intensifier’s bargain, and what automatic brightness quietly costs.',
     part: 1,
     home: '/xray-lab/fluoroscopy',
     lessons: [{ path: '/xray-lab/fluoroscopy', title: 'Fluoroscopy', short: 'Fluoroscopy' }],
@@ -177,6 +182,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'mammo',
     title: 'Mammography',
     short: 'Mammo',
+    blurb: 'The machine that pushes contrast, resolution and dose discipline to their limits.',
     part: 1,
     home: '/xray-lab/mammography',
     lessons: [{ path: '/xray-lab/mammography', title: 'Mammography', short: 'Mammography' }],
@@ -193,6 +199,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'ct',
     title: 'Computed tomography',
     short: 'CT',
+    blurb: 'Profiles into slices: reconstruction, the helix, Hounsfield units and the dose report.',
     part: 2,
     home: '/ct-lab',
     lessons: [{ path: '/ct-lab', title: 'CT physics', short: 'CT' }],
@@ -209,6 +216,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'nm',
     title: 'Nuclear medicine',
     short: 'NM',
+    blurb: 'The patient as the source — generator, gamma camera, SPECT and PET.',
     part: 2,
     home: '/nm-lab',
     lessons: [{ path: '/nm-lab', title: 'Nuclear medicine', short: 'NM' }],
@@ -225,6 +233,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'mri',
     title: 'Magnetic resonance',
     short: 'MRI',
+    blurb: 'Proton to k-space in 21 sections, every mechanism animated.',
     part: 3,
     home: '/mri',
     lessons: [{ path: '/mri', title: 'The MRI module', short: 'MRI' }],
@@ -241,6 +250,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'us',
     title: 'Ultrasound',
     short: 'US',
+    blurb: 'Pressure wave to Doppler in 21 experiments you drive yourself.',
     part: 3,
     home: '/ultrasound-lab',
     lessons: [{ path: '/ultrasound-lab', title: 'The ultrasound laboratory', short: 'Ultrasound' }],
@@ -257,6 +267,7 @@ export const COURSE_MODULES: CourseModule[] = [
     id: 'safety',
     title: 'Safety & radiation',
     short: 'Safety',
+    blurb: 'Legislation, dosimetry and radiobiology — the facts, then the questions.',
     part: 4,
     home: '/fact-bank/protection',
     lessons: [{ path: '/fact-bank/protection', title: 'Protection & legislation', short: 'Safety' }],

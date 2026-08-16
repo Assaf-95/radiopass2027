@@ -30,6 +30,7 @@ import { readQbProgress, readQbMarks } from '../qbank/Shell'
 import { readProgress as readUsProgress } from '../us/components/progress'
 import { completedModules, lastOfType } from '../lib/learner'
 import { QB_SUBJECTS } from '../qbank/types'
+import { COURSE_MODULES, COURSE_PARTS } from './course'
 import './physicshome.css'
 
 /* ------------------------------------------------------------------ *
@@ -109,15 +110,27 @@ function readSnapshot(): Snapshot {
 }
 
 /* ------------------------------------------------------------------ *
- * The five destinations
+ * The course, and where to practise it
  * ------------------------------------------------------------------ */
 
-const DESTINATIONS: { name: string; to: string; blurb: string }[] = [
-  {
-    name: 'Learning modules',
-    to: '/visual-lab',
-    blurb: 'Five exam areas taught one concept at a time — the mechanism drawn, then the rule that scores.',
-  },
+/**
+ * A module's standing in the learner's own record: which of its lessons have
+ * been completed. completedModules() carries pathnames, and the spine knows
+ * which pathnames belong to each module, so this is a set intersection —
+ * no new store, no second definition of "done".
+ *
+ * The two deep modules (MRI, ultrasound) list one lesson — their home — and
+ * track their own internal progress on their own surfaces; here they honestly
+ * report opened-or-not rather than pretending 21 sections are one tick.
+ */
+function moduleState(done: Set<string>, lessonPaths: string[]): { done: number; total: number } {
+  return {
+    done: lessonPaths.filter((p) => done.has(p)).length,
+    total: lessonPaths.length,
+  }
+}
+
+const PRACTICE_DESTINATIONS: { name: string; to: string; blurb: string }[] = [
   {
     name: 'Question bank',
     to: '/question-bank',
@@ -127,11 +140,6 @@ const DESTINATIONS: { name: string; to: string; blurb: string }[] = [
     name: 'Mock exams',
     to: '/question-bank/mock',
     blurb: 'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
-  },
-  {
-    name: 'Simulator labs',
-    to: '/ultrasound-lab',
-    blurb: 'Move the variable and watch the physics answer — every image computed live, nothing pre-rendered.',
   },
   {
     name: 'Progress & revision',
@@ -234,11 +242,75 @@ export default function PhysicsHome() {
         )}
       </section>
 
-      {/* --- Where everything lives --------------------------------------- */}
+      {/* --- The course ----------------------------------------------------
+          The syllabus itself, parts in order, each module carrying the
+          learner's own record. This replaced a flat list of five equal
+          "destinations": a course home that cannot show the course was the
+          clearest symptom of the pages-not-a-course problem. */}
+      <section className="ph-course" aria-labelledby="ph-course-h">
+        <h2 id="ph-course-h">The course</h2>
+        {COURSE_PARTS.map((part, pi) => {
+          const modules = COURSE_MODULES.filter((m) => m.part === pi)
+          if (modules.length === 0) return null
+          const done = new Set(completedModules('physics'))
+          return (
+            <div className="ph-part" key={part.id}>
+              <h3>
+                <span className="ph-part-no">Part {['I', 'II', 'III', 'IV', 'V'][pi]}</span>
+                {part.title}
+              </h3>
+              <p className="ph-part-blurb">{part.blurb}</p>
+              <ul>
+                {modules.map((m) => {
+                  const state = moduleState(done, m.lessons.map((l) => l.path))
+                  const isDeep = m.id === 'mri' || m.id === 'us'
+                  return (
+                    <li key={m.id}>
+                      <Link to={m.home}>
+                        <span className={state.done === state.total && state.done > 0 ? 'ph-mod-state is-done' : 'ph-mod-state'}>
+                          {state.done === state.total && state.done > 0
+                            ? '✓'
+                            : state.done > 0
+                            ? `${state.done}/${state.total}`
+                            : ''}
+                        </span>
+                        <strong>{m.title}</strong>
+                        <span className="ph-mod-blurb">{m.blurb}</span>
+                        <span className="ph-mod-meta">
+                          {isDeep
+                            ? '21 stages'
+                            : state.total > 1
+                            ? `${state.total} lessons`
+                            : ''}
+                        </span>
+                      </Link>
+                    </li>
+                  )
+                })}
+                {/* Part V closes into the exam itself. */}
+                {part.id === 'safety' && (
+                  <li>
+                    <Link to="/question-bank/mock">
+                      <span className="ph-mod-state" />
+                      <strong>Mock papers</strong>
+                      <span className="ph-mod-blurb">
+                        Three fixed papers and papers you build yourself, against the clock.
+                      </span>
+                      <span className="ph-mod-meta" />
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )
+        })}
+      </section>
+
+      {/* --- Practise ------------------------------------------------------ */}
       <section className="ph-destinations" aria-labelledby="ph-dest-h">
-        <h2 id="ph-dest-h">Physics</h2>
+        <h2 id="ph-dest-h">Practise</h2>
         <ul>
-          {DESTINATIONS.map((d) => (
+          {PRACTICE_DESTINATIONS.map((d) => (
             <li key={d.to}>
               <Link to={d.to}>
                 <strong>{d.name}</strong>
@@ -258,6 +330,7 @@ export default function PhysicsHome() {
         <Link to="/mri-lab/motion">MRI in motion</Link>
         <Link to="/ultrasound-lab/motion">Ultrasound in motion</Link>
         <Link to="/study-plan">Six-week plan</Link>
+        <Link to="/adrenal-adenoma">Adrenal adenoma tool</Link>
       </section>
 
       <footer className="ph-foot">
