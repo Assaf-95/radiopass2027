@@ -542,7 +542,7 @@ T ≈ 1 − R = ${(transmitted * 100).toFixed(2)} %`
               showTrap ? (
                 <>
                   “Reflection occurs when there is a difference in tissue <b>densities</b>” is{' '}
-                  <b>FALSE</b> (high-yield recall). It is a difference in <b>impedance</b>, which needs
+                  <b>FALSE</b> (high-yield). It is a difference in <b>impedance</b>, which needs
                   speed as well. And impedance is measured in <b>rayls</b>, never decibels.
                 </>
               ) : undefined
@@ -570,12 +570,12 @@ T ≈ 1 − R = ${(transmitted * 100).toFixed(2)} %`
             <TrapNote>
               Acoustic impedance is <em>not</em> affected by probe frequency, and it is <em>not</em>{' '}
               the sum of the attenuation of the tissues. Both appear as false stems in the
-              recall question on what affects acoustic impedance. It is also intrinsic — it does not
+              question on what affects acoustic impedance. It is also intrinsic — it does not
               change because the tissue is moving.
             </TrapNote>
 
             <SourceNote>
-              The recall collection marks “15% of ultrasound is reflected at a soft tissue–fluid interface”{' '}
+              The question bank marks “15% of ultrasound is reflected at a soft tissue–fluid interface”{' '}
               <b>FALSE</b>. Working it through with Z ≈ 1.63 and 1.48 MRayl gives roughly{' '}
               <b>0.2%</b> — two orders of magnitude below the figure in the stem. Select soft tissue
               → water above and read the number off the stage.

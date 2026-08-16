@@ -304,11 +304,18 @@ function Table({ table }: { table: ComparisonTable }) {
  * One concept
  * ------------------------------------------------------------------ */
 
-/** The recall year, if the source records one. Shown as a sentence rather
- *  than as a badge — it is provenance, and it reads as provenance. */
-function recallYear(source: string): string | null {
-  const m = source.match(/Recall\s+(\d{4})/i)
-  return m ? m[1] : null
+/**
+ * The source line, cleaned for display: exam-history provenance ("Recall
+ * 2024") is an internal prioritisation signal and is never shown to the
+ * learner. It stays in the data, where it decides prominence — the course
+ * should feel like it knows which distinctions matter, not say how.
+ */
+function displaySource(source: string): string {
+  return source
+    .split('·')
+    .map((part) => part.trim())
+    .filter((part) => !/^recall\b/i.test(part))
+    .join(' · ')
 }
 
 function Concept({
@@ -328,7 +335,6 @@ function Concept({
   const calculators = equationsFor(fact.id)
   const isTrap = fact.priority.includes('trap') || Boolean(fact.distractor)
   const isSafety = fact.priority.includes('safety') || fact.category === 'safety'
-  const year = recallYear(fact.source)
 
   return (
     <article className="usf-concept" id={fact.id} aria-label={fact.fact}>
@@ -407,8 +413,7 @@ function Concept({
             question: how far should I trust this, and where did it come from. */}
         <Fold title={fact.clarify ? 'Source — and a correction' : 'Where this comes from'}>
           {fact.clarify && <p className="usf-clarify">{renderBold(fact.clarify)}</p>}
-          <p className="usf-source">{fact.source}</p>
-          {year && <p className="usf-source-note">Reported in a {year} sitting.</p>}
+          <p className="usf-source">{displaySource(fact.source)}</p>
           {fact.weight && fact.weight > 1 && (
             <p className="usf-source-note">Tested by {fact.weight} separate questions in the bank.</p>
           )}

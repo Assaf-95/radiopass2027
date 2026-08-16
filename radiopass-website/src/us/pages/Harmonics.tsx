@@ -510,7 +510,7 @@ distortion at ${state.observeDepthCm.toFixed(1)} cm ∝ amplitude × distance = 
             trap={
               showTrap ? (
                 <>
-                  Two favourites from the recall collection: the probe does <b>NOT</b> transmit the
+                  Two favourites from the question bank: the probe does <b>NOT</b> transmit the
                   harmonic — tissue creates it (QBank Q412); and harmonic imaging improves{' '}
                   <b>contrast</b> resolution, not lateral resolution (QBank Q422).
                 </>

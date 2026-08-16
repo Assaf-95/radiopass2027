@@ -632,7 +632,7 @@ depth = c t / 2  ≈ 13 µs per cm`
               showTrap ? (
                 <>
                   “The velocity of ultrasound is dependent on frequency” is <b>FALSE</b> — and it is
-                  the most repeated ultrasound trap in the recall bank (and it also appears in the
+                  the most repeated ultrasound trap in the question bank (and it also appears in the
                   collection). Speed belongs to the medium.
                 </>
               ) : undefined

@@ -114,7 +114,7 @@ const ARTEFACTS: ArtefactEntry[] = [
     assumption: 'Attenuation is uniform and predictable',
     recognition: 'A bright band immediately deep to an anechoic, thin-walled lesion.',
     fix: 'Nothing to fix — exploit it. Enhancement is a reassuring sign that a lesion is truly fluid.',
-    trap: 'The recall collection pairs this with shadowing: enhancement is the LOW-attenuation failure, shadowing the HIGH-attenuation one. Never let a stem attribute shadowing to a cyst.',
+    trap: 'The question bank pairs this with shadowing: enhancement is the LOW-attenuation failure, shadowing the HIGH-attenuation one. Never let a stem attribute shadowing to a cyst.',
     sceneKind: 'enhancement',
     deltas: [
       { label: 'Attenuation inside the cyst ↓↓', dir: 'down' },

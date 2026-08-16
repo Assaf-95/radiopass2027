@@ -873,7 +873,7 @@ Footprint ${probe.footprintMm} mm vs rib space ${RIB_GAP_MM} mm → ${derived.fi
 
             <SourceNote>
               The probe descriptions here follow QBank Q412 and Q446, and the frequency
-              trade-off is a high-yield recall concept tested repeatedly (QBank Q238, Q413). The
+              trade-off is a high-yield concept tested repeatedly (QBank Q238, Q413). The
               published typical ranges differ slightly between textbooks, so each range is labelled
               on the stage as typical rather than absolute.
             </SourceNote>

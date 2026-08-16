@@ -588,7 +588,7 @@ frame rate = PRF / (lines × zones) = ${derived.prf.toFixed(0)} / (${LINES_PER_F
                 <>
                   “A higher frequency makes the beam spread more” is <b>FALSE</b>. Higher
                   frequency means shorter λ, a <b>longer</b> near field and <b>less</b>{' '}
-                  divergence. The recall bank repeatedly tests that resolution is best on the
+                  divergence. The question bank repeatedly tests that resolution is best on the
                   central axis at the focal zone (QBank Q239, Q382).
                 </>
               ) : undefined
@@ -631,7 +631,7 @@ frame rate = PRF / (lines × zones) = ${derived.prf.toFixed(0)} / (${LINES_PER_F
             <SourceNote>
               The near-field and divergence formulae are standard physics for an unfocused
               circular aperture; real focused arrays behave differently either side of the focus,
-              which is what the focused waist model shows. QBank Q239 and Q382 (high-yield recall)
+              which is what the focused waist model shows. QBank Q239 and Q382 (high-yield)
               test that resolution is best on the central axis at the focus, and QBank Q289 and
               Q446 supply the frame-rate arithmetic used here.
             </SourceNote>

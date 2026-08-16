@@ -965,7 +965,7 @@ penetration ≈ ${derived.penetration.toFixed(1)} cm at ${state.frequencyMHz.toF
             </p>
             <p>
               <strong>Frame rate</strong> has exactly four levers: depth, sector width, line
-              density and focal zones. The recall collection lists PRF, frame rate and focal zone
+              density and focal zones. The question bank lists PRF, frame rate and focal zone
               as explicitly <b>operator-controlled</b> — image optimisation is an active skill, not
               a preset.
             </p>
@@ -989,7 +989,7 @@ penetration ≈ ${derived.penetration.toFixed(1)} cm at ${state.frequencyMHz.toF
             </TrapNote>
 
             <SourceNote>
-              QBank Q289 (high-yield recall) lists PRF, frame rate and focal zone as operator
+              QBank Q289 (high-yield) lists PRF, frame rate and focal zone as operator
               controls; QBank Q446 carries the frame-rate levers; QBank Q379 covers TGC as
               depth-dependent receive gain. The gain-versus-power distinction and the
               “lowest output that answers the question” habit follow the safety sources used by the{' '}

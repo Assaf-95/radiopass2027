@@ -2,7 +2,7 @@
  * Module 3 — Reflection.
  *
  * The angle laboratory. One rule — the angle of reflection equals the angle of
- * incidence — and everything the recall bank hangs off it: why brightness dies
+ * incidence — and everything the question bank hangs off it: why brightness dies
  * as the probe tilts, why a rough surface is forgiving, why parenchyma looks
  * the same from every angle, and why a tendon fakes a tear the moment the beam
  * is off perpendicular.

@@ -763,7 +763,7 @@ Temperature rise (educational model)
             </SourceNote>
 
             <SourceNote title="Source clarification — the obstetric numbers">
-              QBank Q32 and Q323 (high-yield recall) give <b>3.0</b> as the obstetric ceiling and
+              QBank Q32 and Q323 (high-yield) give <b>3.0</b> as the obstetric ceiling and
               place the start of time restriction at <b>TI 0.7</b> rather than 0.5. Published
               guidance actually gives <em>graded</em> maximum scanning times that shorten as TI rises
               above 0.7, rather than a single number. The two figures the sources emphasise are the

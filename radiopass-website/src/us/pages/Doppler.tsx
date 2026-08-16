@@ -674,7 +674,7 @@ v  = Δf c / (2 f₀ cos θ) = ${
                 <>
                   “The Doppler shift is directly proportional to the <b>angle</b>” is <b>FALSE</b> —
                   it follows the <b>cosine</b> of the angle, and this is among the most repeated
-                  statements in the recall collection. Also FALSE: “the effect is greatest at right
+                  statements in the question bank. Also FALSE: “the effect is greatest at right
                   angles” — it is greatest when the beam is <b>parallel</b> to flow.
                 </>
               ) : undefined

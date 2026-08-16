@@ -835,9 +835,9 @@ const MODES: { id: ModeId; label: string; blurb: string }[] = [
   },
   {
     id: 'recall',
-    label: 'Recall-priority',
+    label: 'High-yield first',
     blurb:
-      'Only the high-yield recall questions, ordered so the most heavily tested concepts come first.',
+      'Only the high-yield questions, ordered so the most heavily tested concepts come first.',
   },
 ]
 

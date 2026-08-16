@@ -153,7 +153,7 @@ const STEPS: GuidedStep<State>[] = [
         <>
           A completely physiological <b>30 cm/s</b> at 6 cm depth, 5 MHz, and a modest scale:
           the shift is <b>{shift.toFixed(0)} Hz</b> against a Nyquist limit of{' '}
-          <b>{nyquistLimitHz(state.prfHz).toFixed(0)} Hz</b> — aliased. The recall collection makes
+          <b>{nyquistLimitHz(state.prfHz).toFixed(0)} Hz</b> — aliased. The question bank makes
           exactly this point: aliasing is <b>not</b> proof of pathological velocity.
         </>
       )
@@ -604,7 +604,7 @@ samples/cycle = PRF / Δf = ${
             </TrapNote>
 
             <SourceNote>
-              QBank Q119, Q210, Q322 and Q422 (high-yield recall) carry the Nyquist and aliasing
+              QBank Q119, Q210, Q322 and Q422 (high-yield) carry the Nyquist and aliasing
               stems, including the 30 cm/s physiological example. QBank Q422's printed explanation
               of the angle fix contradicts itself — it suggests <em>reducing</em> the angle, which
               would raise cos θ and make aliasing <b>worse</b>; the exam verdict (not an accepted

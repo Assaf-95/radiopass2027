@@ -924,7 +924,7 @@ frame rate = PRF/(lines × zones) = ${derived.prf.toFixed(0)}/(${derived.lines} 
 
             <SourceNote>
               The axial rule and its independence from depth, diameter, PRF and focusing follow
-              QBank Q321, Q352 and Q238 (high-yield recall); typical axial values of 0.5–1 mm are
+              QBank Q321, Q352 and Q238 (high-yield); typical axial values of 0.5–1 mm are
               from QBank Q352. The frame-rate levers — depth, sector width, line density and
               focal zones — are tested in QBank Q446 and Q289, which also list PRF, frame rate
               and focal zone as operator controls.

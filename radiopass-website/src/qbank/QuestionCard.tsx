@@ -173,16 +173,13 @@ export function QuestionCard({
         <span className="qb-qnumber">
           Question {number} / {total}
         </span>
+        {/* Exam-history provenance is an INTERNAL prioritisation signal and is
+            never shown: no "recall", no sitting year. The learner sees only
+            that a question is high-yield — the course knows which distinctions
+            matter without saying how it knows. The year and source stay in the
+            data, where they weight prominence, ordering and feedback depth. */}
         <span className={isRecall ? 'qb-qsource is-recall' : 'qb-qsource'}>
-          {isRecall ? 'High-yield recall' : question.source}
-          {/* Which sitting this was remembered from. Recovered provenance — it
-              was dropped in a migration and restored from the archive, and it
-              is the one thing a candidate most wants to know about a recall.
-              'Collection' means a curated set rather than one paper, so it is
-              not worth printing. */}
-          {question.year && question.year !== 'Collection' && (
-            <span className="qb-qyear"> · {question.year}</span>
-          )}
+          {isRecall ? 'High-yield' : question.source}
         </span>
       </div>
 

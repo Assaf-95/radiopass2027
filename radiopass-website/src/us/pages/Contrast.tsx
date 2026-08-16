@@ -174,7 +174,7 @@ const STEPS: GuidedStep<State>[] = [
         Bubble gas cores are ready-made <b>cavitation nuclei</b>, so cavitation happens far more
         readily with contrast on board. <b>BMUS</b> guidance is that <b>MI above 0.7</b> should not
         be used once a contrast agent is on board; above that line caution applies and scanning
-        time should be limited — the recall collection tests that number with contrast specifically.
+        time should be limited — the question bank tests that number with contrast specifically.
       </>
     ),
   },
@@ -479,7 +479,7 @@ export default function ContrastPage() {
               explanation={
                 <>
                   At 3 MHz the wavelength is about <b>{wavelengthMm(ASSUMED_SPEED, 3).toFixed(2)} mm</b>{' '}
-                  — hundreds of times a 3 µm bubble. The recall collection marks the
+                  — hundreds of times a 3 µm bubble. The question bank marks the
                   diameter-equals-wavelength stem <b>FALSE</b> (QBank Q203): bubbles work by{' '}
                   <b>resonating and oscillating nonlinearly</b>, not by matching the wavelength.
                   Their size is also unrelated to the piezoelectric element thickness.
@@ -540,7 +540,7 @@ f_res ≈ constant / diameter → ${state.bubbleDiameterUm.toFixed(1)} µm rings
               showTrap ? (
                 <>
                   “Microbubbles have a diameter equal to the wavelength” — <b>FALSE</b>, a
-                  high-yield recall stem (QBank Q203). They are micrometres against hundreds of
+                  high-yield stem (QBank Q203). They are micrometres against hundreds of
                   micrometres, and their size is equally unrelated to the piezo element thickness.
                   And bubbles are <b>not</b> routinely imaged at high MI: high MI kills them.
                 </>
@@ -572,13 +572,13 @@ f_res ≈ constant / diameter → ${state.bubbleDiameterUm.toFixed(1)} µm rings
 
             <TrapNote>
               Keep the two “bubble size” lies apart: diameter ≠ wavelength, and diameter ≠
-              piezoelectric element thickness. Both appear as distractors on the same recall
+              piezoelectric element thickness. Both appear as distractors on the same high-yield
               question, and both fail the same way — the bubble is <em>micrometres</em>; the
               wavelength and the element are hundreds of micrometres.
             </TrapNote>
 
             <SourceNote>
-              QBank Q203 (high-yield recall) anchors the size fact; Q323 and Q21 carry the low-MI
+              QBank Q203 (high-yield) anchors the size fact; Q323 and Q21 carry the low-MI
               imaging, cavitation and MI 0.7 caution stems. The regime thresholds drawn here (0.1
               and 0.7) are the teaching figures those questions use — real behaviour is a continuum
               that also depends on bubble size and pulse length.

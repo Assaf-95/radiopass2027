@@ -402,7 +402,9 @@ export type FactPriority =
 
 const PRIORITY_LABEL: Record<FactPriority, string> = {
   core: 'Core principle',
-  recall: 'High-yield recall',
+  /* Internally 'recall' — the label never says so: exam-history provenance
+     is a prioritisation signal, not a learner-facing category. */
+  recall: 'High-yield',
   trap: 'Common exam trap',
   equation: 'Equation',
   number: 'Numerical fact',
