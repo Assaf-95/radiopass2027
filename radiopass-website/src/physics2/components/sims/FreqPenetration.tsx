@@ -22,8 +22,11 @@ function seededNoise(x: number, y: number): number {
 
 export function FreqPenetration() {
   const [frequency, setFrequency] = useState(5)
-  const penetration = penetrationDepthCm(ALPHA, frequency, 100)
+  // The same dynamic range the display's noise floor uses, so the number,
+  // the dashed line and what the eye sees all agree.
+  const penetration = penetrationDepthCm(ALPHA, frequency, -NOISE_DB)
   const axial = axialResolutionMm(2, wavelengthMm(1540, frequency))
+  const penetrationLabel = penetration > DEPTH_CM ? `> ${DEPTH_CM} cm` : `${penetration.toFixed(1)} cm`
 
   const canvasRef = (canvas: HTMLCanvasElement | null) => {
     if (!canvas) return
@@ -70,16 +73,18 @@ export function FreqPenetration() {
       ctx.fillRect(w - 14, y, 8, 1)
       ctx.fillText(String(d), w - 30, y + 3)
     }
-    const py = (Math.min(penetration, DEPTH_CM) / DEPTH_CM) * h
-    ctx.strokeStyle = 'rgba(176,134,31,0.9)'
-    ctx.setLineDash([5, 4])
-    ctx.beginPath()
-    ctx.moveTo(0, py)
-    ctx.lineTo(w, py)
-    ctx.stroke()
-    ctx.setLineDash([])
-    ctx.fillStyle = 'rgba(176,134,31,1)'
-    ctx.fillText(`penetration ${penetration.toFixed(1)} cm`, 8, py - 6)
+    if (penetration <= DEPTH_CM) {
+      const py = (penetration / DEPTH_CM) * h
+      ctx.strokeStyle = 'rgba(176,134,31,0.9)'
+      ctx.setLineDash([5, 4])
+      ctx.beginPath()
+      ctx.moveTo(0, py)
+      ctx.lineTo(w, py)
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.fillStyle = 'rgba(176,134,31,1)'
+      ctx.fillText(`penetration ${penetration.toFixed(1)} cm`, 8, py - 6)
+    }
   }
 
   return (
@@ -109,7 +114,7 @@ export function FreqPenetration() {
           />
         </label>
         <p className="v2-ctwin-read">
-          Penetration <b>{penetration.toFixed(1)} cm</b> · axial resolution ≈{' '}
+          Penetration <b>{penetrationLabel}</b> · axial resolution ≈{' '}
           <b>{axial.toFixed(2)} mm</b>. The echo pays ≈ {ALPHA} dB/cm/MHz <i>each way</i>, so every
           megahertz makes every centimetre more expensive: the pins drown one by one while the near
           field sharpens. This one trade decides every probe choice.
