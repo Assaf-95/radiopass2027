@@ -246,7 +246,12 @@ export default function PhysicsHome() {
           The syllabus itself, parts in order, each module carrying the
           learner's own record. This replaced a flat list of five equal
           "destinations": a course home that cannot show the course was the
-          clearest symptom of the pages-not-a-course problem. */}
+          clearest symptom of the pages-not-a-course problem.
+
+          Each part carries its modality's instrument mark — the same drawn
+          vocabulary as the laboratory cards, compressed to an emblem. The
+          mark is the only coloured element in the header; everything else
+          stays in the ink. */}
       <section className="ph-course" aria-labelledby="ph-course-h">
         <h2 id="ph-course-h">The course</h2>
         {COURSE_PARTS.map((part, pi) => {
@@ -255,11 +260,16 @@ export default function PhysicsHome() {
           const done = new Set(completedModules('physics'))
           return (
             <div className="ph-part" key={part.id}>
-              <h3>
-                <span className="ph-part-no">Part {['I', 'II', 'III', 'IV', 'V'][pi]}</span>
-                {part.title}
-              </h3>
-              <p className="ph-part-blurb">{part.blurb}</p>
+              <div className="ph-part-head">
+                <PartMark id={part.id} />
+                <div>
+                  <h3>
+                    <span className="ph-part-no">Part {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][pi]}</span>
+                    {part.title}
+                  </h3>
+                  <p className="ph-part-blurb">{part.blurb}</p>
+                </div>
+              </div>
               <ul>
                 {modules.map((m) => {
                   const state = moduleState(done, m.lessons.map((l) => l.path))
@@ -325,6 +335,13 @@ export default function PhysicsHome() {
           and are not peers of the five destinations above — putting them there
           would say the branch has seven equal parts when it has five. */}
       <section className="ph-secondary" aria-label="Also in Physics">
+        {/* The alternative experience. It had no door anywhere on the site —
+            deliberate while it was unfinished, and simply undiscoverable once
+            it was worth showing. Marked as a preview so nobody mistakes it for
+            the finished course. */}
+        <Link to="/physics-v2" className="ph-secondary-new">
+          Physics V2 — the new experience
+        </Link>
         <Link to="/fact-bank">Fact bank</Link>
         <Link to="/ultrasound-lab/facts">Ultrasound facts</Link>
         <Link to="/mri-lab/motion">MRI in motion</Link>
@@ -342,4 +359,113 @@ export default function PhysicsHome() {
       </footer>
     </main>
   )
+}
+
+/* ------------------------------------------------------------------ *
+ * The instrument marks
+ *
+ * One emblem per course part, drawn in the modality's own colour and in the
+ * same thin-stroke vocabulary as the laboratory card art: a wiggle for the
+ * photon, the tube–patient–detector triangle, the gantry ring, the gamma
+ * dot grid, the precession cone, the wave, the trefoil. The mark is the
+ * physics, compressed — not decoration.
+ * ------------------------------------------------------------------ */
+
+function PartMark({ id }: { id: string }) {
+  const common = {
+    className: 'ph-mark',
+    viewBox: '0 0 48 48',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.3,
+    'aria-hidden': true,
+  } as const
+  switch (id) {
+    case 'matter': // a photon arriving at an atom
+      return (
+        <svg {...common} style={{ color: '#A8CBEA' }}>
+          <path d="M4 24 q3 -5 6 0 t6 0 t6 0" opacity=".85" />
+          <circle cx="33" cy="24" r="3" fill="currentColor" stroke="none" opacity=".9" />
+          <ellipse cx="33" cy="24" rx="11" ry="4.5" opacity=".45" />
+          <ellipse cx="33" cy="24" rx="11" ry="4.5" transform="rotate(60 33 24)" opacity=".45" />
+          <ellipse cx="33" cy="24" rx="11" ry="4.5" transform="rotate(-60 33 24)" opacity=".45" />
+        </svg>
+      )
+    case 'xray': // tube, diverging beam, detector
+      return (
+        <svg {...common} style={{ color: '#A8CBEA' }}>
+          <circle cx="24" cy="8" r="3" fill="currentColor" stroke="none" opacity=".9" />
+          <path d="M24 11 L12 36 M24 11 L36 36" opacity=".5" />
+          <path d="M24 11 L24 36" opacity=".25" />
+          <ellipse cx="24" cy="26" rx="7" ry="4.5" opacity=".45" />
+          <path d="M10 40 L38 40" strokeWidth="2.2" opacity=".8" />
+        </svg>
+      )
+    case 'ct': // the gantry: ring, patient, tube on the ring
+      return (
+        <svg {...common} style={{ color: '#D9A84E' }}>
+          <circle cx="24" cy="26" r="16" opacity=".55" />
+          <ellipse cx="24" cy="26" rx="8" ry="5.5" opacity=".45" />
+          <circle cx="24" cy="10" r="2.6" fill="currentColor" stroke="none" opacity=".9" />
+          <path d="M24 12.5 L17 22 M24 12.5 L31 22" opacity=".35" />
+        </svg>
+      )
+    case 'nm': // the gamma camera's dot image — counts, some missing
+      return (
+        <svg {...common} style={{ color: '#A8CBEA' }}>
+          {[0, 1, 2, 3].flatMap((r) =>
+            [0, 1, 2, 3].map((c) => (
+              <circle
+                key={`${r}${c}`}
+                cx={12 + c * 8}
+                cy={12 + r * 8}
+                r="2.1"
+                fill="currentColor"
+                stroke="none"
+                opacity={(r + c) % 3 === 2 ? 0.2 : 0.75}
+              />
+            )),
+          )}
+        </svg>
+      )
+    case 'mri': // B₀ and the precessing vector
+      return (
+        <svg {...common} style={{ color: '#A99EDB' }}>
+          <path d="M24 42 L24 8" strokeDasharray="2 4" opacity=".5" />
+          <path d="M21 11 L24 6 L27 11" opacity=".6" />
+          <ellipse cx="24" cy="18" rx="11" ry="3.5" opacity=".45" />
+          <path d="M24 42 L33 16" strokeWidth="1.8" opacity=".9" />
+          <circle cx="33" cy="16" r="2.4" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'us': // the wave, deepening
+      return (
+        <svg {...common} style={{ color: '#7BCBC4' }}>
+          {[10, 16, 22, 28, 34, 40].map((x, i) => (
+            <path
+              key={x}
+              d={`M${x} ${24 - [7, 12, 16, 12, 7, 4][i]} L${x} ${24 + [7, 12, 16, 12, 7, 4][i]}`}
+              strokeWidth="2.4"
+              opacity={0.85 - i * 0.1}
+            />
+          ))}
+        </svg>
+      )
+    case 'safety': // the trefoil, thin-stroke
+      return (
+        <svg {...common} style={{ color: '#D9A84E' }}>
+          <circle cx="24" cy="24" r="3.4" opacity=".85" />
+          {[90, 210, 330].map((a) => (
+            <path
+              key={a}
+              d="M24 17.5 A6.5 6.5 0 0 1 29.6 20.75 L34.8 17.75 A12.5 12.5 0 0 0 24 11.5 Z"
+              transform={`rotate(${a} 24 24)`}
+              opacity=".7"
+            />
+          ))}
+        </svg>
+      )
+    default:
+      return null
+  }
 }

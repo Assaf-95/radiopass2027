@@ -13,6 +13,7 @@
 
 import type { V2Topic } from '../types'
 import { PixelMatrix } from '../components/sims/PixelMatrix'
+import { CrReaderStages, DrConversionStacks } from '../components/sims/CrReader'
 
 export const DIGITAL: V2Topic = {
   id: 'digital',
@@ -42,6 +43,17 @@ export const DIGITAL: V2Topic = {
         {
           kind: 'prose',
           text: 'The plate is a **photostimulable phosphor** — barium fluorohalide (BaFBr), europium-doped. Absorbed X-rays promote electrons into **metastable traps**, and that trapped pattern **is** the latent image. The phosphor is a continuous sheet: **there are no pixels until it is read**.\n\nIn the reader, a **red laser** rasters across the plate. Each trapped electron it releases falls back and emits **blue light**, collected point by point by a **photomultiplier tube** and digitised. The stimulating and emitted colours must differ so a filter can separate them — that separation is what makes a storage phosphor readable at all.\n\nThe traps leak from the moment of exposure. A few hours is fine; **half a day to a week means severe fading**. After readout the plate is **flooded with bright white light** to empty every trap — erased and ready for thousands of reuses. Plates die of mechanical wear and laser desensitisation, not of a fixed exposure count.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <CrReaderStages />,
+            title: 'The CR reader, assembled one part at a time',
+            annotation: 'red in · blue out · PMT',
+            caption:
+              'The laboratory’s own reader, built in front of you. Step through the seven stages in order — plate, laser and mirror, blue light, light guide and PMT, ADC, erase lamp — and each one adds the next component to the machine while everything already taught stays on screen. The last stage runs the whole reader on a loop: watch one line of image appear per sweep, and the flood lamp wipe the plate when the last line lands.',
+          },
         },
         {
           kind: 'numbers',
@@ -77,6 +89,17 @@ export const DIGITAL: V2Topic = {
         {
           kind: 'prose',
           text: '**Indirect DR**: a **CsI scintillator** turns each absorbed X-ray into a burst of light, and an amorphous-silicon **photodiode/TFT array** underneath turns the light into stored charge, read out row by row through the thin-film transistor switches. CsI is grown as **columnar needles** that guide the light downwards like fibre optics, limiting the sideways spread that would otherwise blur every edge.\n\n**Direct DR**: a layer of **amorphous selenium** is a photoconductor — the X-ray creates electron–hole pairs directly, and an applied bias field pulls the charge **straight down** to the pixel electrodes. No light step, no lateral spread: direct conversion is **intrinsically sharp**.\n\nEither way the panel is a rigid matrix with no electron optics, so the geometric distortions of image intensifiers — pincushion, S-distortion — are **physically impossible**, not merely rare.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrConversionStacks />,
+            title: 'One photon, two stacks',
+            annotation: 'CsI → light → charge  ·  a-Se → charge',
+            caption:
+              'Watch the same X-ray land on each panel. On the left it becomes light first, and the light spreads a little sideways on its way down to the photodiodes; on the right it becomes charge at once and the bias field marches it straight down. The proof is the pair of signal profiles at the bottom — compare their widths: one conversion fewer is one blur fewer.',
+          },
         },
         {
           kind: 'compare',

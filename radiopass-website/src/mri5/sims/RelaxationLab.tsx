@@ -32,26 +32,31 @@ import { Choice, Readout, Sim, Slider, type SimDraw } from '../Sim'
  * Physics
  * ------------------------------------------------------------------ */
 
-export type TissueId = 'fat' | 'white' | 'grey' | 'muscle' | 'csf' | 'water'
+export type TissueId = 'fat' | 'muscle' | 'csf'
 
-export type Tissue = { id: TissueId; label: string; t1: number; t2: number }
+export type Tissue = { id: TissueId; label: string; t1: number; t2: number; colour: string }
+
+/* The tissue colours, fixed across every MRI diagram so the same tissue is
+   the same colour wherever it appears: fat yellow, muscle red, CSF blue. */
+export const TISSUE_COLOUR = { fat: '#E8C547', muscle: '#D9615C', csf: '#5FA8E8' } as const
 
 /**
  * Representative relaxation times at 1.5 T, in milliseconds.
  *
  * They are field-dependent — T1 lengthens as B₀ rises, T2 barely moves — so
- * every number here is quoted for 1.5 T and nothing else. Pure water is listed
- * with T1 ≈ T2 because in a free liquid the two processes become the same
- * process; that is why CSF, which is nearly free water, has by far the longest
- * values in the table.
+ * every number here is quoted for 1.5 T and nothing else.
+ *
+ * THREE tissues, not six. The picker used to offer white matter, grey matter
+ * and pure water as well, and they cost more than they taught here: this
+ * instrument is about the SHAPE of the two curves, and fat (short T1),
+ * muscle (middling T1, short T2) and CSF (long both) already span the whole
+ * range. The near-identical white/grey pair only matters where the exam uses
+ * it — image weighting — and the weighting laboratory still carries them.
  */
 export const TISSUES: Tissue[] = [
-  { id: 'fat', label: 'Fat', t1: 260, t2: 80 },
-  { id: 'white', label: 'White matter', t1: 600, t2: 80 },
-  { id: 'grey', label: 'Grey matter', t1: 900, t2: 100 },
-  { id: 'muscle', label: 'Muscle', t1: 870, t2: 45 },
-  { id: 'csf', label: 'CSF', t1: 4000, t2: 2000 },
-  { id: 'water', label: 'Water', t1: 3000, t2: 3000 },
+  { id: 'fat', label: 'Fat', t1: 260, t2: 80, colour: TISSUE_COLOUR.fat },
+  { id: 'muscle', label: 'Muscle', t1: 870, t2: 45, colour: TISSUE_COLOUR.muscle },
+  { id: 'csf', label: 'CSF', t1: 4000, t2: 2000, colour: TISSUE_COLOUR.csf },
 ]
 
 /** Longitudinal magnetisation as a fraction of M₀, t ms after an ideal 90°. */
@@ -346,8 +351,15 @@ function drawVectorPanel(
 function drawPlots(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, w: number, h: number,
-  s: Snapshot, t1: number, t2: number, windowMs: number, pulsed: boolean,
+  s: Snapshot, series: Tissue[], windowMs: number, pulsed: boolean,
 ) {
+  /* One tissue selected → its own curve, its own colour, with the 63%/37%
+     construction marked. Several → the same two panels carrying one curve per
+     tissue, which is the only way to SEE that CSF recovers slowly and fat
+     fast. The marks are dropped there: three of them overlap into noise. */
+  const solo = series.length === 1
+  const t1 = series[0].t1
+  const t2 = series[0].t2
   const padL = 36
   const padR = 14
   const padT = 4
@@ -372,11 +384,11 @@ function drawPlots(
     headingShort: string,
     constant: string,
     colour: string,
-    f: (ms: number) => number,
     markFrac: number,
     markMs: number,
     markText: string,
     axisLabels: boolean,
+    curves: { colour: string; label: string; f: (ms: number) => number; constant: string }[],
   ) => {
     const bottom = top + plotH
 
@@ -412,24 +424,39 @@ function drawPlots(
     }
 
     /* the curve — faint ahead of the playhead, bright behind it */
-    const trace = (from: number, to: number, alpha: number, width: number) => {
+    const trace = (
+      curveF: (ms: number) => number, curveColour: string,
+      from: number, to: number, alpha: number, width: number,
+    ) => {
       if (to <= from) return
-      ctx.strokeStyle = rgba(colour, alpha)
+      ctx.strokeStyle = rgba(curveColour, alpha)
       ctx.lineWidth = width
       ctx.beginPath()
       const n = 120
       for (let i = 0; i <= n; i += 1) {
         const ms = from + ((to - from) * i) / n
-        const p = { x: xOf(ms), y: yOf(top, f(ms)) }
+        const p = { x: xOf(ms), y: yOf(top, curveF(ms)) }
         i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)
       }
       ctx.stroke()
     }
-    trace(0, windowMs, 0.26, 1.6)
-    if (pulsed) trace(0, Math.min(s.tMs, windowMs), 0.95, 2.2)
+    for (const c of curves) {
+      trace(c.f, c.colour, 0, windowMs, 0.26, 1.6)
+      if (pulsed) trace(c.f, c.colour, 0, Math.min(s.tMs, windowMs), 0.95, 2.2)
+    }
+
+    /* In compare mode the constants cannot live in the heading — each curve
+       carries its own, keyed by colour, at the right-hand edge. */
+    if (!solo) {
+      ctx.textAlign = 'right'
+      curves.forEach((c, i) => {
+        ctx.fillStyle = rgba(c.colour, 0.95)
+        ctx.fillText(`${c.label} · ${c.constant}`, left + plotW, top + headH + 9 + i * 12)
+      })
+    }
 
     /* the marked point — 63% at t = T1, or 37% at t = T2 */
-    if (pulsed && markMs <= windowMs) {
+    if (solo && pulsed && markMs <= windowMs) {
       const mxp = xOf(markMs)
       const myp = yOf(top, markFrac)
       ctx.strokeStyle = rgba(C.amber, 0.55)
@@ -447,7 +474,7 @@ function drawPlots(
       const flip = mxp + 10 + tw > left + plotW
       ctx.textAlign = flip ? 'right' : 'left'
       ctx.fillText(markText, mxp + (flip ? -8 : 8), myp - 11)
-    } else if (pulsed) {
+    } else if (solo && pulsed) {
       ctx.fillStyle = rgba(C.amber, 0.8)
       ctx.textAlign = 'right'
       ctx.fillText(`${markText} — past this window`, left + plotW - 4, top + headH + 10)
@@ -469,25 +496,35 @@ function drawPlots(
     top1,
     'LONGITUDINAL RECOVERY   M_z(t) = M₀ (1 − e^−t/T1)',
     'LONGITUDINAL RECOVERY   M_z',
-    `T1 = ${t1} ms`,
-    MZC,
-    pulsed ? (ms) => mzAt(ms, t1) : () => 1,
+    solo ? `T1 = ${t1} ms` : 'one curve per tissue',
+    solo ? series[0].colour : MZC,
     RECOVERED_AT_T1,
     t1,
     `63% at t = T1`,
     false,
+    series.map((t) => ({
+      colour: t.colour,
+      label: t.label,
+      constant: `T1 ${t.t1} ms`,
+      f: pulsed ? (ms: number) => mzAt(ms, t.t1) : () => 1,
+    })),
   )
   panel(
     top2,
     'TRANSVERSE DECAY   M_xy(t) = M_xy(0) e^−t/T2',
     'TRANSVERSE DECAY   M_xy',
-    `T2 = ${t2} ms`,
-    MXYC,
-    pulsed ? (ms) => mxyAt(ms, t2) : () => 0,
+    solo ? `T2 = ${t2} ms` : 'one curve per tissue',
+    solo ? series[0].colour : MXYC,
     REMAINING_AT_T2,
     t2,
     `37% at t = T2`,
     true,
+    series.map((t) => ({
+      colour: t.colour,
+      label: t.label,
+      constant: `T2 ${t.t2} ms`,
+      f: pulsed ? (ms: number) => mxyAt(ms, t.t2) : () => 0,
+    })),
   )
 
   if (!pulsed) {
@@ -522,8 +559,10 @@ function drawPlots(
     ctx.fillStyle = rgba(colour, 0.95)
     ctx.fillText(text, ph + (flip ? -9 : 9), dy - 10)
   }
-  dot(top1, mzAt(s.tMs, t1), MZC)
-  dot(top2, mxyAt(s.tMs, t2), MXYC)
+  for (const t of series) {
+    dot(top1, mzAt(s.tMs, t.t1), t.colour)
+    dot(top2, mxyAt(s.tMs, t.t2), t.colour)
+  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -531,11 +570,15 @@ function drawPlots(
  * ------------------------------------------------------------------ */
 
 export function RelaxationLab() {
-  const [tissueId, setTissueId] = useState<TissueId>('grey')
+  const [tissueId, setTissueId] = useState<TissueId | 'all'>('fat')
   const [windowMs, setWindowMs] = useState(1200)
   const [rf, setRf] = useState<'apply' | 'none'>('apply')
 
-  const tissue = TISSUES.find((t) => t.id === tissueId) ?? TISSUES[2]
+  const tissue = TISSUES.find((t) => t.id === tissueId) ?? TISSUES[0]
+  /* 'all' plots the three together — the only way to compare how fast each
+     recovers. Everything that needs ONE tissue (the vector, the readouts,
+     the window hint) keeps using `tissue`. */
+  const series = tissueId === 'all' ? TISSUES : [tissue]
   const t1 = tissue.t1
   const t2 = tissue.t2
   const pulsed = rf === 'apply'
@@ -612,8 +655,8 @@ export function RelaxationLab() {
     else { ctx.moveTo(14, vh); ctx.lineTo(w - 14, vh) }
     ctx.stroke()
 
-    drawPlots(ctx, gx, gy, gw, gh, s, t1, t2, windowMs, pulsed)
-  }, [snap, stillHost, t1, t2, windowMs, pulsed])
+    drawPlots(ctx, gx, gy, gw, gh, s, series, windowMs, pulsed)
+  }, [snap, stillHost, t1, t2, windowMs, pulsed, tissueId])
 
   const caption = useMemo(() => (frame: { t: number; still: boolean }) => {
     if (!pulsed) {
@@ -662,7 +705,10 @@ export function RelaxationLab() {
           <Choice
             label="Tissue at 1.5 T"
             value={tissueId}
-            options={TISSUES.map((t) => ({ value: t.id, label: t.label }))}
+            options={[
+              ...TISSUES.map((t) => ({ value: t.id, label: t.label })),
+              { value: 'all', label: 'Compare all three' },
+            ]}
             onChange={setTissueId}
           />
           <Slider

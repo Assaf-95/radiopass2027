@@ -13,6 +13,7 @@
 
 import type { V2Topic } from '../types'
 import { CtWindowing } from '../components/sims/CtWindowing'
+import { CtBackProjection, CtGenerations, CtHelixPitch, CtRingArtefact } from '../components/sims/CtScenes'
 
 export const CT: V2Topic = {
   id: 'ct',
@@ -44,16 +45,14 @@ export const CT: V2Topic = {
           text: 'A radiograph superimposes every organ along the ray into one flat shadow. CT undoes that: an X-ray tube and a curved **detector arc** sit opposite each other on a ring and rotate around the patient together, a **fan beam** crossing the patient in under half a second per turn. At each angle the detectors record how much of the beam survived along every ray — an **attenuation profile** — and one rotation collects hundreds of them.\n\nThe **generations** name how that geometry evolved. First generation: one pencil beam, one detector, **translate–rotate** — minutes per slice. Second: a small fan and a short detector row, still translate–rotate but far fewer sweeps. Third: the fan widened to cover the whole patient, **tube and detector arc rotating together** — the rotate–rotate design inside almost every scanner today. Fourth: a complete **stationary detector ring** with only the tube rotating inside it — detector-hungry and now largely historical.\n\nSmearing every profile back across the image plane rebuilds the object, but plain back-projection leaves a **1/r blur**. Convolving each profile with a **filter kernel** before smearing removes it — **filtered back-projection**. Modern scanners add **iterative reconstruction**, which models the noise statistically and removes it, holding diagnostic quality at substantially lower mAs.',
         },
         {
-          kind: 'compare',
-          title: 'The two reconstructions',
-          a: 'Filtered back-projection',
-          b: 'Iterative reconstruction',
-          rows: [
-            ['Method', 'convolve each profile with a kernel, smear back', 'model the noise, refine the image repeatedly'],
-            ['Noise at a given dose', 'set by the kernel chosen', 'lower — the statistical model removes it'],
-            ['Dose implication', 'the historical reference', 'diagnostic quality at substantially lower mAs'],
-            ['Cost', 'fast, well understood', 'computation — and an over-smoothed texture if pushed'],
-          ],
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <CtGenerations />,
+            title: 'The four generations, one at a time',
+            annotation: 'pencil → fan → ring',
+            caption: 'Pick a generation and watch what actually moves. In the first two the tube and detector translate all the way across the patient before every rotation; in the third the translation is gone and the pair simply spins together; in the fourth only the tube moves, inside a ring that never does. The “Showing” line names the geometry on screen.',
+          },
         },
         {
           kind: 'numbers',
@@ -63,6 +62,28 @@ export const CT: V2Topic = {
             { label: 'First generation', value: 'pencil beam, translate–rotate — minutes per slice' },
             { label: 'Third generation', value: 'tube and arc rotate together — today’s geometry' },
             { label: 'Fourth generation', value: 'stationary detector ring — only the tube moves' },
+          ],
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <CtBackProjection />,
+            title: 'Back-projection, profile by profile',
+            annotation: 'blur ∝ 1/r',
+            caption: 'Count the profiles arriving: each one is smeared uniformly back along its own rays, and the object appears — inside a haze that will not go away however many angles are added. That haze is the 1/r blur. Watch the last frames, where the kernel is applied and the same data resolve into a sharp disc.',
+          },
+        },
+        {
+          kind: 'compare',
+          title: 'The two reconstructions',
+          a: 'Filtered back-projection',
+          b: 'Iterative reconstruction',
+          rows: [
+            ['Method', 'convolve each profile with a kernel, smear back', 'model the noise, refine the image repeatedly'],
+            ['Noise at a given dose', 'set by the kernel chosen', 'lower — the statistical model removes it'],
+            ['Dose implication', 'the historical reference', 'diagnostic quality at substantially lower mAs'],
+            ['Cost', 'fast, well understood', 'computation — and an over-smoothed texture if pushed'],
           ],
         },
         {
@@ -142,6 +163,16 @@ export const CT: V2Topic = {
           kind: 'equation',
           formula: 'pitch = table travel per rotation / total beam collimation',
           note: 'dimensionless; typical body scanning ≈ 1–1.5',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <CtHelixPitch />,
+            title: 'The helix, wound by pitch',
+            annotation: 'pitch = travel ÷ beam width',
+            caption: 'Drag the pitch and watch the helix rewind: below 1 the turns crowd together and overlap, above 1 they separate and the same patient length is covered in fewer rotations. Read the line underneath for what the scanner must then do about the space between the turns — and for the condition attached to the dose saving.',
+          },
         },
         {
           kind: 'relationship',
@@ -254,6 +285,16 @@ export const CT: V2Topic = {
         {
           kind: 'prose',
           text: 'A polychromatic beam **hardens** as it crosses dense tissue: the soft photons vanish first, the survivors are more penetrating, and the reconstruction — which assumes one attenuation per material — reads the centre of a dense uniform object **falsely low**. That is **cupping**, and between dense bones it becomes dark streaks (the classic site is the posterior fossa). Filtration, calibration and correction software all push against it.\n\n**Partial volume**: any object smaller than a voxel has its HU **averaged with its neighbours** — thicker slices make it worse, and helical interpolation adds a little more. **Motion** breaks the assumption that every profile describes the same patient, giving blur and streaks. A **ring artefact** points at the machine, not the patient: in third-generation rotate–rotate geometry a faulty detector element sees the same radius all rotation long and traces a ring.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <CtRingArtefact />,
+            title: 'Why a dead detector draws a ring',
+            annotation: 'same radius at every angle',
+            caption: 'Follow the single faulty channel, marked red, as the arc rotates with the tube. Its ray passes the isocentre at the same distance whatever the angle — so its error lands on one circle, over and over, and the ring you can see accumulating is drawn into the image. This is third-generation geometry; in a fourth-generation stationary ring the same fault corrupts whole projections and streaks instead.',
+          },
         },
         {
           kind: 'relationship',

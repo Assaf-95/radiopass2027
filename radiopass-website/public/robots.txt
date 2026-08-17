@@ -1,0 +1,9 @@
+# RadioPass is not launched yet. This file keeps the preview deployment out
+# of Google and every other crawler, so a work-in-progress build cannot be
+# found by candidates — or by competitors — before it is ready.
+#
+# REMOVE THIS FILE (or change Disallow to Allow) ON THE DAY YOU GO LIVE,
+# otherwise the real site will never appear in search results.
+
+User-agent: *
+Disallow: /

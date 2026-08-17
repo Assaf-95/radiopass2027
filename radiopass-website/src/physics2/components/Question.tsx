@@ -124,26 +124,32 @@ export function V2Question({
               </span>
               <p className="v2-stem-text">{stem.text}</p>
 
-              {!submitted ? (
-                <span className="v2-tf" role="group" aria-label={`Statement ${stem.label}: true or false`}>
-                  <button
-                    type="button"
-                    className={picked === true ? 'on' : ''}
-                    aria-pressed={picked === true}
-                    onClick={() => pick(stem.label, true)}
-                  >
-                    True
-                  </button>
-                  <button
-                    type="button"
-                    className={picked === false ? 'on' : ''}
-                    aria-pressed={picked === false}
-                    onClick={() => pick(stem.label, false)}
-                  >
-                    False
-                  </button>
-                </span>
-              ) : (
+              {/* The choice stays on screen after marking. Replacing it with a
+                  verdict deleted the one thing the learner wants to see — what
+                  they actually answered — and left them to reconstruct it from
+                  the wording. The buttons simply freeze: the pressed one keeps
+                  its state, tinted by whether it was right. */}
+              <span className="v2-answerbox">
+              <span className="v2-tf" role="group" aria-label={`Statement ${stem.label}: true or false`}>
+                {[true, false].map((value) => {
+                  const isPicked = picked === value
+                  const mark = submitted && isPicked ? (right ? ' is-right' : wrong ? ' is-wrong' : '') : ''
+                  return (
+                    <button
+                      key={String(value)}
+                      type="button"
+                      className={`${isPicked ? 'on' : ''}${mark}`}
+                      aria-pressed={isPicked}
+                      disabled={submitted}
+                      onClick={() => pick(stem.label, value)}
+                    >
+                      {value ? 'True' : 'False'}
+                    </button>
+                  )
+                })}
+              </span>
+
+              {submitted && (
                 <span className={`v2-verdict ${right ? 'ok' : wrong ? 'no' : ''}`}>
                   {stem.answer === null ? (
                     <>
@@ -153,11 +159,12 @@ export function V2Question({
                   ) : (
                     <>
                       <b>{right ? 'Correct' : 'Incorrect'}</b>
-                      <small>statement is {stem.answer ? 'true' : 'false'}</small>
+                      <small>the statement is {stem.answer ? 'true' : 'false'}</small>
                     </>
                   )}
                 </span>
               )}
+              </span>
 
               {submitted && stem.explanation && (
                 <p className="v2-explain">{cleanExplanation(stem.explanation)}</p>

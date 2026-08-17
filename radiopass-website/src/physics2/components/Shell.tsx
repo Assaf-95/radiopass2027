@@ -51,7 +51,7 @@ export function V2Shell({
               Syllabus
             </NavLink>
             <NavLink to="/physics-v2/questions" className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
-              Questions
+              Question bank
             </NavLink>
             <NavLink to="/physics-v2/review" className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
               Review

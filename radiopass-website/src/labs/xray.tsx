@@ -109,7 +109,7 @@ export default function XrayHub() {
 
       <section className="lx-cover">
         <p className="lx-course-line">
-          <span>The beam</span>
+          <span>Matter and radiation</span>
           <span aria-hidden="true">·</span>
           <span>Part I of the physics course</span>
         </p>
@@ -166,7 +166,7 @@ export default function XrayHub() {
       </section>
 
       <section className="lx-cover lx-designs">
-        <p className="lx-kicker">Part II · The machines</p>
+        <p className="lx-kicker">Part II · X-ray imaging</p>
         <h2>Then the machines that use it.</h2>
         <p className="lx-intro">
           Each is its own module with its own practice — digital radiography, then real-time

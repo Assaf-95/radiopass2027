@@ -93,10 +93,14 @@ createServer(async (req, res) => {
   let file = await fileOrNull(direct)
 
   if (!file && !extname(urlPath.split('?')[0])) {
-    const shell = urlPath.startsWith('/anatomy')
-      ? join(bundle, 'anatomy', 'index.html')
-      : join(bundle, 'index.html')
-    file = await fileOrNull(shell)
+    /* One shell for everything. This used to send /anatomy/* to
+       anatomy/index.html, which was right when anatomy was a separate bundle
+       and wrong the moment the two merged: there is no anatomy/index.html any
+       more, so every anatomy deep link 404'd here — while the same link worked
+       on the real host, because .htaccess and _redirects both fall back to the
+       single shell. The checker that exists to vouch for the bundle was the
+       only thing rejecting it. */
+    file = await fileOrNull(join(bundle, 'index.html'))
   }
 
   if (!file) {

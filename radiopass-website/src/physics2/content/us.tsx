@@ -16,6 +16,8 @@
 import type { V2Topic } from '../types'
 import { FreqPenetration } from '../components/sims/FreqPenetration'
 import { DopplerAliasing } from '../components/sims/DopplerAliasing'
+import { UsImpedance } from '../components/sims/UsImpedance'
+import { UsArtefacts } from '../components/sims/UsArtefacts'
 
 export const US: V2Topic = {
   id: 'us',
@@ -93,6 +95,16 @@ export const US: V2Topic = {
           kind: 'equation',
           formula: 'Z = ρ c · R = ((Z₂ − Z₁) / (Z₂ + Z₁))²',
           note: 'swap the two media and R is unchanged — the mismatch is what matters',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <UsImpedance />,
+            title: 'Reflection at one boundary',
+            annotation: 'R = ((Z₂ − Z₁)/(Z₂ + Z₁))²',
+            caption: 'The drawing shows one beam in soft tissue meeting one interface: the incident arrow arrives, and the reflected and transmitted arrows share it according to R. Choose the second medium and read the computed R — fluid barely echoes, bone echoes hard, and air turns nearly everything back, which is the whole case for gel.',
+          },
         },
         {
           kind: 'compare',
@@ -271,6 +283,16 @@ export const US: V2Topic = {
         {
           kind: 'prose',
           text: 'Break the **uniform attenuation** assumption and you get the pair the exam loves to swap: **shadowing** behind strong attenuators or reflectors — clean and anechoic behind stone and bone, dirty and noisy behind gas — and **posterior enhancement** behind weak attenuators, the over-bright band that certifies a cyst as fluid.\n\nBreak **straight-line travel** and structures appear where they are not. A strong smooth reflector — classically the diaphragm — bounces the beam onto a second target and back; the extra time is drawn as extra depth, and a **mirror image** appears beyond the reflector. **Refraction** at curved boundaries bends the beam, leaving narrow **edge shadows** at cyst margins and laterally misplaced or duplicated structures. Break the **main-beam** assumption and **side lobes** or grating lobes paint off-axis reflectors onto the beam axis — the spurious echoes inside a clean bladder.\n\nBreak the **1540 m/s** assumption and depths are simply wrong: through slower fat the echo is late and the structure is drawn **too deep**; faster tissue draws it too shallow — displacement along the beam axis. **Reverberation** between two strong parallel interfaces stacks equally spaced, fading copies; **comet-tail** is its tightly spaced form, while **ring-down** is different physics — a continuous resonant emission from trapped fluid between gas bubbles. **Range ambiguity** is the price of pushing PRF too high: a deep echo from the previous pulse is credited to the new one and placed falsely shallow.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <UsArtefacts />,
+            title: 'The artefact gallery',
+            annotation: 'four assumptions · each artefact = one broken',
+            caption: 'The laboratory\'s own artefact scenes, one at a time: pick an artefact by name and the stage draws how it forms, with a "Showing" line saying exactly what is on screen. Tick "reveal the true path" to see where the beam really went (amber) against where the machine assumed it went (dashed).',
+          },
         },
         {
           kind: 'relationship',

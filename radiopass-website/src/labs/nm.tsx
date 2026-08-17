@@ -24,7 +24,8 @@ const FLOOD = Array.from({ length: 240 }, () => ({ x: rnd(), y: rnd(), a: 0.25 +
    Shared between the lesson steps (loop: true) and the film. */
 
 /** SPECT: two heads orbit forever, ticking off the angles they have covered. */
-const drawSpect = (ctx: CanvasRenderingContext2D, w: number, h: number, p: number, t: number) => {
+// Exported for Physics V2, which mounts this scene in its own canvas host.
+export const drawSpect = (ctx: CanvasRenderingContext2D, w: number, h: number, p: number, t: number) => {
   const cx = w / 2, cy = h * 0.45, R = Math.min(w, h) * 0.32
   ctx.strokeStyle = rgba(INK, 0.18)
   ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke()
@@ -768,6 +769,61 @@ export function drawGammaCamera(ctx: CanvasRenderingContext2D, w: number, h: num
   }
 }
 
+/** The three planar acquisitions side by side: counts accumulating in one
+ *  static frame, a time–activity curve drawing itself, and the gated bins
+ *  cycling with the ECG. Lifted out of its lesson step unchanged so Physics
+ *  V2 can mount the same scene in its own canvas host. */
+export const drawModes = (ctx: CanvasRenderingContext2D, w: number, h: number, p: number, t: number) => {
+  // static: accumulating counts patch
+  const sx = w * 0.16, sy = h * 0.3, ss = Math.min(w, h) * 0.11
+  ctx.strokeStyle = rgba(INK, 0.35)
+  ctx.strokeRect(sx - ss, sy - ss, ss * 2, ss * 2)
+  const fill = clamp((t % 6) / 5)
+  ctx.fillStyle = rgba(ACC, 0.12 + fill * 0.45)
+  ctx.fillRect(sx - ss + 2, sy - ss + 2, ss * 2 - 4, ss * 2 - 4)
+  sceneLabel(ctx, 'static — counts accumulate', sx, sy + ss + 18, p, { align: 'center', size: 10.5 })
+  // dynamic: time-activity curve drawing repeatedly
+  const gx = w * 0.4, gy = sy - ss, gw = w * 0.2, gh = ss * 2
+  ctx.strokeStyle = rgba(INK, 0.3)
+  ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + gh); ctx.lineTo(gx + gw, gy + gh); ctx.stroke()
+  const prog = (t % 6) / 6
+  ctx.beginPath()
+  for (let i = 0; i <= 80 * prog; i++) {
+    const f = i / 80
+    const v = Math.pow(f * 3.2, 1.6) * Math.exp(-f * 3.2)
+    const x = gx + f * gw, y = gy + gh - v * gh * 1.4
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+  }
+  ctx.strokeStyle = rgba(ACC, 0.9)
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+  ctx.lineWidth = 1
+  sceneLabel(ctx, 'dynamic — time–activity curve', gx + gw / 2, sy + ss + 18, p, { align: 'center', size: 10.5 })
+  // gated: ECG with cycling bins
+  const ex = w * 0.7, ew = w * 0.22, ey = sy
+  ctx.strokeStyle = rgba(INK, 0.5)
+  ctx.beginPath()
+  for (let i = 0; i <= 100; i++) {
+    const f = i / 100
+    const cyc = (f * 2) % 1
+    let v = 0
+    if (cyc > 0.1 && cyc < 0.14) v = -0.15
+    else if (cyc >= 0.14 && cyc < 0.2) v = 1 - Math.abs(cyc - 0.17) / 0.03
+    else if (cyc > 0.32 && cyc < 0.44) v = 0.25 * Math.sin(((cyc - 0.32) / 0.12) * Math.PI)
+    const x = ex + f * ew, y = ey - v * 30
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+  }
+  ctx.stroke()
+  const bins = 8
+  const active = Math.floor(((t * 2) % 1) * bins)
+  for (let b = 0; b < bins; b++) {
+    const bx = ex + (b / bins) * (ew / 2)
+    ctx.fillStyle = b === active ? rgba(ACC, 0.8) : rgba(INK, 0.18)
+    ctx.fillRect(bx, ey + 26, ew / 2 / bins - 2, 10)
+  }
+  sceneLabel(ctx, 'gated — 8–16 bins per cardiac cycle', ex + ew / 2, sy + ss + 18, p, { align: 'center', size: 10.5 })
+}
+
 const STEPS: LessonStep[] = [
   {
     id: 'tc99m',
@@ -1052,56 +1108,7 @@ const STEPS: LessonStep[] = [
     loop: true,
     title: 'Static, dynamic, gated',
     body: 'Three ways to acquire: **static** — one frame, counts simply accumulate; **dynamic** — frame after frame, giving **time–activity curves** (the renogram); and **gated** — the ECG slices each cardiac cycle into **8–16 bins**, and every heartbeat adds counts to its bins until an average beat emerges sharp enough to measure ejection fraction.',
-    draw: (ctx, w, h, p, t) => {
-      // static: accumulating counts patch
-      const sx = w * 0.16, sy = h * 0.3, ss = Math.min(w, h) * 0.11
-      ctx.strokeStyle = rgba(INK, 0.35)
-      ctx.strokeRect(sx - ss, sy - ss, ss * 2, ss * 2)
-      const fill = clamp((t % 6) / 5)
-      ctx.fillStyle = rgba(ACC, 0.12 + fill * 0.45)
-      ctx.fillRect(sx - ss + 2, sy - ss + 2, ss * 2 - 4, ss * 2 - 4)
-      sceneLabel(ctx, 'static — counts accumulate', sx, sy + ss + 18, p, { align: 'center', size: 10.5 })
-      // dynamic: time-activity curve drawing repeatedly
-      const gx = w * 0.4, gy = sy - ss, gw = w * 0.2, gh = ss * 2
-      ctx.strokeStyle = rgba(INK, 0.3)
-      ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + gh); ctx.lineTo(gx + gw, gy + gh); ctx.stroke()
-      const prog = (t % 6) / 6
-      ctx.beginPath()
-      for (let i = 0; i <= 80 * prog; i++) {
-        const f = i / 80
-        const v = Math.pow(f * 3.2, 1.6) * Math.exp(-f * 3.2)
-        const x = gx + f * gw, y = gy + gh - v * gh * 1.4
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      }
-      ctx.strokeStyle = rgba(ACC, 0.9)
-      ctx.lineWidth = 1.5
-      ctx.stroke()
-      ctx.lineWidth = 1
-      sceneLabel(ctx, 'dynamic — time–activity curve', gx + gw / 2, sy + ss + 18, p, { align: 'center', size: 10.5 })
-      // gated: ECG with cycling bins
-      const ex = w * 0.7, ew = w * 0.22, ey = sy
-      ctx.strokeStyle = rgba(INK, 0.5)
-      ctx.beginPath()
-      for (let i = 0; i <= 100; i++) {
-        const f = i / 100
-        const cyc = (f * 2) % 1
-        let v = 0
-        if (cyc > 0.1 && cyc < 0.14) v = -0.15
-        else if (cyc >= 0.14 && cyc < 0.2) v = 1 - Math.abs(cyc - 0.17) / 0.03
-        else if (cyc > 0.32 && cyc < 0.44) v = 0.25 * Math.sin(((cyc - 0.32) / 0.12) * Math.PI)
-        const x = ex + f * ew, y = ey - v * 30
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-      }
-      ctx.stroke()
-      const bins = 8
-      const active = Math.floor(((t * 2) % 1) * bins)
-      for (let b = 0; b < bins; b++) {
-        const bx = ex + (b / bins) * (ew / 2)
-        ctx.fillStyle = b === active ? rgba(ACC, 0.8) : rgba(INK, 0.18)
-        ctx.fillRect(bx, ey + 26, ew / 2 / bins - 2, 10)
-      }
-      sceneLabel(ctx, 'gated — 8–16 bins per cardiac cycle', ex + ew / 2, sy + ss + 18, p, { align: 'center', size: 10.5 })
-    },
+    draw: drawModes,
   },
   {
     id: 'spect',
