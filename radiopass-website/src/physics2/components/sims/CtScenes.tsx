@@ -135,8 +135,16 @@ const TURNS_AT_UNIT_PITCH = 6
  * canvas has to be remounted for a new pitch to be drawn at all. Everyone else
  * keeps the running helix and simply watches it rewind.
  */
+/* The `typeof window.matchMedia !== 'function'` half is not defensive padding:
+   this runs at module scope, so importing physics2/topics.ts pulls it in
+   wherever the topic registry is read — including jsdom, which supplies a
+   window without matchMedia. Without it, ANY test that touches V2 topics dies
+   on import, which is what the mapping validator in the merge audit needs to
+   do. Same guard as src/us/components/Guided.tsx:33. */
 const REDUCED_MOTION =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function pitchReading(pitch: number): string {
   if (pitch < 1) {

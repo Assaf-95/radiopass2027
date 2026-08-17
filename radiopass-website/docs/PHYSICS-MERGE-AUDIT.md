@@ -72,7 +72,7 @@ The nine-topic engine is the course. It is route-agnostic in every part that mat
 `outcomes[]` from `course.ts` (it exists in both and will drift).
 
 **One id collision must be resolved first:** V1 module id is `xray-core`, V2 topic id is `xray`.
-`src/labs/xray.tsx:32` does `moduleById('xray-core')!` — a non-null assertion that throws on rename.
+`src/labs/xray.tsx:92` does `moduleById('xray-core')!` — a non-null assertion that throws on rename.
 Recommend renaming the **V2 topic** to `xray-core` is wrong (it's the public URL slug); instead keep
 topic id `xray` and fix the single assertion in `xray.tsx`. The other eight ids already match.
 
@@ -447,6 +447,18 @@ files import. Then the validator runs under the project's existing
 `node --import ./scripts/ts-register.mjs` pattern instead of needing a Vite server (Node's type-stripping
 has no JSX), and the mapping surface becomes editable without touching JSX.
 
+**A second, independent reason to lift it — found by running the code, 17 Aug.** The sims reached
+through `topics.ts` touch browser globals at *module* scope, so importing the registry anywhere
+without a real browser throws before a single row can be read. `CtScenes.tsx:139` guarded
+`window.matchMedia` with `typeof window !== 'undefined'` alone, which passes under jsdom — jsdom has
+a `window`, but no `matchMedia` — and killed every test that imports a topic. Fixed in the same
+commit as this note, using the guard already standard in this codebase
+(`src/us/components/Guided.tsx:33`, `src/home/scenes/ProtonHero.tsx:407`): also check
+`typeof window.matchMedia === 'function'`. `src/physics2/topics.test.ts` now imports the registry
+with no jsdom shims, so a repeat fails in CI rather than at the moment the validator is written.
+Until the metadata is lifted, **any module-scope browser call in any sim breaks the whole registry**
+— which is the structural argument for the lift, not just an inconvenience.
+
 ### Validation script
 
 `scripts/physics-map-validate.ts`, wired as `npm run physics:map`, modelled on the existing
@@ -605,7 +617,7 @@ names progress honesty as non-negotiable.
 **R4 — Two syllabus registries with two id vocabularies.** `src/physics/course.ts` (9 modules in 7
 parts, keyed to lesson pathnames; `xray-core`) vs `src/physics2/topics.ts` (9 topics keyed to
 `qbTopics`; `xray`). Same nine subjects. `course.ts:1-17` was written specifically to end the
-"two authors for 'next topic'" problem; keeping both re-creates it. `src/labs/xray.tsx:32`'s
+"two authors for 'next topic'" problem; keeping both re-creates it. `src/labs/xray.tsx:92`'s
 `moduleById('xray-core')!` throws on rename. `src/labs/lesson.tsx:41` imports `coursePosition`,
 `moduleOrdinal`, `practiceHref` and `COURSE_MODULES.length` for the "Module N of 9" header, the
 prev/next pager that crosses module boundaries, and the practice gate — **deleting `COURSE_MODULES`
@@ -663,7 +675,7 @@ Rebase all 32 `/physics-v2` strings behind a single `PHYSICS_ROOT` constant. Add
 Delete `Shell.tsx:86` and `physics/Home.tsx:342-344`. Fold `physics2/pages/Home.tsx` into
 `physics/Home.tsx`. Merge the two registries: add `part` and `lessons[]` to `V2Topic`, keep
 `coursePosition()` on unchanged pathnames, remap `PartMark`'s `matter`→`xray`, fix
-`labs/xray.tsx:32`, drop the duplicate `outcomes[]`. Convert the three `<a href="/question-bank/mock">`
+`labs/xray.tsx:92`, drop the duplicate `outcomes[]`. Convert the three `<a href="/question-bank/mock">`
 to `<Link to="/physics/mock">`. Add the reserved-slug test. **Lesson pathnames unchanged.**
 
 **Phase 3 — one honest progress model.**
