@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { XraySpectrum } from '../components/sims/XraySpectrum'
 
 export const XRAY: V2Topic = {
   id: 'xray',
@@ -124,15 +125,11 @@ export const XRAY: V2Topic = {
         {
           kind: 'sim',
           sim: {
-            kind: 'iframe',
-            src: '/visuals/xray-beam-quality.html',
+            kind: 'element',
+            element: <XraySpectrum />,
             title: 'The spectrum, live',
-            annotation: 'kVp · mAs · filtration · target',
-            caption: 'Drag kVp and watch the endpoint follow it while the characteristic lines refuse to move. Then drag mAs — pure amplitude. Then move the target off tungsten and watch the lines jump.',
-            hide: ['.eyebrow', 'h1', '.subtitle', '.explanation-card', '.mode-bar'],
-            click: ['#modeManual'],
-            css: '.app{display:flex;flex-direction:column;gap:12px;padding:10px 14px}.visual-panel{order:0}.info-panel{order:1;max-width:none}.info-scroll{padding:0}',
-            height: 660,
+            annotation: 'target · kVp · mAs · filtration',
+            caption: 'The graph is the beam leaving the tube: photon energy across, relative intensity up. Drag the tube potential and watch the endpoint follow it while the characteristic lines refuse to move. Drag mAs — pure amplitude, same shape. Add filtration and watch the low-energy end disappear, pulling the mean up while the endpoint stands still.',
           },
         },
         {

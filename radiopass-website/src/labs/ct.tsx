@@ -419,6 +419,24 @@ const STEPS: LessonStep[] = [
       }
       const pos = fanShot(angle, offNow, shotAlpha > 0 ? 0.15 + 0.35 * shotAlpha : 0)
       glowDot(ctx, pos.tx, pos.ty, 6)
+      // The short detector row rides opposite the tube, facing the beam —
+      // rigidly linked, translating and rotating as one assembly. One
+      // element sits at the far end of each fan ray.
+      for (let j = -2; j <= 2; j++) {
+        const a2 = angle + (j / 2) * fan
+        const ex = pos.tx + Math.cos(a2) * R * 2
+        const ey = pos.ty + Math.sin(a2) * R * 2
+        ctx.save()
+        ctx.translate(ex, ey)
+        ctx.rotate(a2)
+        ctx.fillStyle = rgba(INK, 0.9)
+        // deliberately small: a SHORT row is second generation's whole point,
+        // against third generation's wide arc.
+        ctx.fillRect(-2, -4.5, 4, 9)
+        ctx.restore()
+      }
+      sceneLabel(ctx, 'tube', pos.tx - 10, pos.ty - 10, p, { align: 'right', color: rgba(ACC, 0.9) })
+      sceneLabel(ctx, 'detector row', pos.tx + Math.cos(angle) * R * 2 + 10, pos.ty + Math.sin(angle) * R * 2 + 12, p)
 
       sceneLabel(ctx, status, cx, h * 0.09, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
       sceneLabel(ctx, 'still translate–rotate — but far fewer sweeps', cx, h * 0.9, p, { align: 'center', size: 11 })
@@ -429,7 +447,7 @@ const STEPS: LessonStep[] = [
     id: 'gen3',
     loop: true,
     title: 'Third generation: tube and detectors rotate together',
-    body: 'Widen the fan until it covers the **whole patient** and pair it with a **curved detector arc** — and translation disappears entirely. **Tube and arc rotate together**, continuously. This rotate–rotate design is the geometry inside almost every scanner today.',
+    body: 'Widen the fan until it covers the **whole patient** and pair it with a **curved arc of many small detectors** — hundreds of individual elements, not one large one — and translation disappears entirely. **Tube and detector arc rotate together**, continuously. This rotate–rotate design is the geometry inside almost every scanner today.',
     trap: 'A faulty detector element in **this** geometry draws a **ring artefact** — the element sees the same radius all rotation long.',
     draw: (ctx, w, h, p, t) => {
       const cx = w / 2, cy = h * 0.48, Rp = Math.min(w, h) * 0.2, R = Rp * 2.1
@@ -465,14 +483,22 @@ const STEPS: LessonStep[] = [
           ctx.stroke()
         }
       }
-      // hardware
-      ctx.strokeStyle = rgba(INK, 0.9)
-      ctx.lineWidth = 5
-      ctx.beginPath(); ctx.arc(cx, cy, R, a1, a2); ctx.stroke()
-      ctx.lineWidth = 1
+      // hardware: the arc is an ARRAY — several hundred small detectors in
+      // real scanners. Drawn as discrete elements so nobody reads it as one
+      // large detector that happens to be curved.
+      const nDetectors = 34
+      for (let i = 0; i < nDetectors; i++) {
+        const a = a1 + ((i + 0.5) / nDetectors) * (a2 - a1)
+        ctx.save()
+        ctx.translate(cx + Math.cos(a) * R, cy + Math.sin(a) * R)
+        ctx.rotate(a)
+        ctx.fillStyle = rgba(INK, 0.9)
+        ctx.fillRect(-2.5, -((a2 - a1) * R) / nDetectors / 2 + 0.6, 5, ((a2 - a1) * R) / nDetectors - 1.2)
+        ctx.restore()
+      }
       glowDot(ctx, tx, ty, 7 + pulse * 2)
       sceneLabel(ctx, 'no translation — just rotation', cx, h * 0.09, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
-      sceneLabel(ctx, 'the fan covers the whole patient; the arc follows the tube', cx, h * 0.9, p, { align: 'center', size: 11 })
+      sceneLabel(ctx, 'the fan covers the whole patient; the array of detectors follows the tube', cx, h * 0.9, p, { align: 'center', size: 11 })
     },
   },
   {
@@ -773,6 +799,27 @@ const STEPS: LessonStep[] = [
   },
 ]
 
+/**
+ * A lesson step's diagram, by id. Resolved once at module load, so anything
+ * re-hosting a scene holds the very same function the lesson runs — the
+ * drawings are never copied, adapted or re-timed — and a renamed step fails
+ * loudly here instead of handing a host an undefined draw function.
+ */
+function lessonDraw(id: string): StepDraw {
+  const draw = STEPS.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`CT lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+
+/**
+ * The four scanner generations, exported for Physics V2's film plate. Same
+ * loops, same geometry, same labels — only the surround differs.
+ */
+export const drawGen1 = lessonDraw('gen1')
+export const drawGen2 = lessonDraw('gen2')
+export const drawGen3 = lessonDraw('gen3')
+export const drawGen4 = lessonDraw('gen4')
+
 export default function CtLab() {
   return (
     <LessonPage
@@ -815,16 +862,8 @@ export default function CtLab() {
  * original procedural drawings, played through like a video.
  * ================================================================== */
 
-/**
- * Replays a lesson diagram inside the film. A lesson step's diagram is optional
- * now that a step can host a live instrument instead, so this fails loudly
- * rather than handing the film an undefined draw function.
- */
-const stepDraw = (id: string): StepDraw => {
-  const draw = STEPS.find((s) => s.id === id)?.draw
-  if (!draw) throw new Error(`CT film scene "${id}" has no lesson diagram to replay`)
-  return draw
-}
+/** Replays a lesson diagram inside the film — the same lookup, one name. */
+const stepDraw = lessonDraw
 
 const FILM_SCENES: FilmScene[] = [
   {
@@ -1013,66 +1052,7 @@ const FILM_SCENES: FilmScene[] = [
     title: 'Helical scanning',
     caption: 'The table moves while the gantry spins, so the beam traces a helix along the patient.',
     dur: 10,
-    draw: (ctx, w, h, _p, t) => {
-      const y = h * 0.44, len = w * 0.6, x0 = w * 0.2
-      const cycle = Math.floor(t / 8)
-      const frac = (t / 8) % 1
-      const turns = 6
-      // table
-      ctx.strokeStyle = rgba(INK, 0.25)
-      ctx.lineWidth = 1
-      ctx.beginPath(); ctx.moveTo(x0 - 24, y + 52); ctx.lineTo(x0 + len + 30, y + 52); ctx.stroke()
-      // body cylinder, head to the right
-      ctx.strokeStyle = rgba(INK, 0.35)
-      ctx.lineWidth = 1.2
-      ctx.beginPath(); ctx.moveTo(x0, y - 34); ctx.lineTo(x0 + len, y - 34); ctx.stroke()
-      ctx.beginPath(); ctx.moveTo(x0, y + 34); ctx.lineTo(x0 + len, y + 34); ctx.stroke()
-      ctx.beginPath(); ctx.ellipse(x0 + len, y, 12, 34, 0, 0, Math.PI * 2); ctx.stroke()
-      // the moving parts fade out and back in at the cycle wrap — no teleport
-      const tc = t % 8
-      const env = Math.min(easeIO(tc / 0.45), easeIO((8 - tc) / 0.55))
-      ctx.save()
-      ctx.globalAlpha = env
-      // the helix traced so far — two passes, back segments dim, front bright
-      ctx.lineWidth = 1.6
-      const nPts = Math.floor(240 * frac)
-      for (const frontPass of [false, true]) {
-        ctx.strokeStyle = rgba(ACC, frontPass ? 0.9 : 0.25)
-        ctx.beginPath()
-        let pen = false
-        for (let i = 0; i <= nPts; i++) {
-          const f = i / 240
-          const ph2 = f * turns * Math.PI * 2
-          const front = Math.cos(ph2) > 0
-          if (front === frontPass) {
-            const x = x0 + f * len
-            const yy = y + Math.sin(ph2) * 34
-            pen ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy)
-            pen = true
-          } else pen = false
-        }
-        ctx.stroke()
-      }
-      // the gantry ring, sweeping the volume — in the scanner it is the
-      // table that slides; the relative motion is identical
-      const rx = x0 + frac * len
-      ctx.strokeStyle = rgba(INK, 0.55)
-      ctx.lineWidth = 1.2
-      ctx.beginPath(); ctx.ellipse(rx, y, 11, 46, 0, 0, Math.PI * 2); ctx.stroke()
-      // the tube on the ring
-      const ph = frac * turns * Math.PI * 2
-      const dotX = rx + Math.cos(ph) * 11
-      const dotY = y + Math.sin(ph) * 46
-      glowDot(ctx, dotX, dotY, 5, Math.cos(ph) > 0 ? 1 : 0.45)
-      ctx.restore()
-      lessonPing(`hel-${cycle}-${Math.floor(frac * turns)}`, 980)
-      // z arrow
-      ctx.strokeStyle = rgba(INK, 0.5)
-      ctx.beginPath(); ctx.moveTo(x0 + len * 0.32, y + 74); ctx.lineTo(x0 + len * 0.68, y + 74); ctx.stroke()
-      ctx.beginPath(); ctx.moveTo(x0 + len * 0.68 - 7, y + 70); ctx.lineTo(x0 + len * 0.68, y + 74); ctx.lineTo(x0 + len * 0.68 - 7, y + 78); ctx.stroke()
-      sceneLabel(ctx, 'relative table travel (z) — the scan advances', x0 + len / 2, y + 92, 1, { align: 'center' })
-      sceneLabel(ctx, 'pitch = table travel per rotation ÷ beam width', w / 2, h * 0.1, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
-    },
+    draw: drawHelicalScan,
   },
   {
     id: 'backprojection',
@@ -1243,3 +1223,95 @@ export function CtFilm() {
     />
   )
 }
+
+/**
+ * Helical scanning: the table advancing while the gantry spins, so the beam
+ * traces a helix along the patient.
+ *
+ * `turns` is how many rotations that helix makes over the patient length on
+ * screen. Fewer turns over the same length means the table travelled further
+ * per rotation — which is exactly what a higher pitch is. The film calls this
+ * with the five arguments every scene gets and receives the original six-turn
+ * helix unchanged; Physics V2 passes a sixth so its pitch control can stretch
+ * and crowd the same drawing.
+ */
+export function drawHelicalScan(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  _p: number,
+  t: number,
+  turns = 6,
+) {
+  const y = h * 0.44, len = w * 0.6, x0 = w * 0.2
+  const cycle = Math.floor(t / 8)
+  const frac = (t / 8) % 1
+  // table
+  ctx.strokeStyle = rgba(INK, 0.25)
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(x0 - 24, y + 52); ctx.lineTo(x0 + len + 30, y + 52); ctx.stroke()
+  // body cylinder, head to the right
+  ctx.strokeStyle = rgba(INK, 0.35)
+  ctx.lineWidth = 1.2
+  ctx.beginPath(); ctx.moveTo(x0, y - 34); ctx.lineTo(x0 + len, y - 34); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(x0, y + 34); ctx.lineTo(x0 + len, y + 34); ctx.stroke()
+  ctx.beginPath(); ctx.ellipse(x0 + len, y, 12, 34, 0, 0, Math.PI * 2); ctx.stroke()
+  // the moving parts fade out and back in at the cycle wrap — no teleport
+  const tc = t % 8
+  const env = Math.min(easeIO(tc / 0.45), easeIO((8 - tc) / 0.55))
+  ctx.save()
+  ctx.globalAlpha = env
+  // the helix traced so far — two passes, back segments dim, front bright
+  ctx.lineWidth = 1.6
+  const nPts = Math.floor(240 * frac)
+  for (const frontPass of [false, true]) {
+    ctx.strokeStyle = rgba(ACC, frontPass ? 0.9 : 0.25)
+    ctx.beginPath()
+    let pen = false
+    for (let i = 0; i <= nPts; i++) {
+      const f = i / 240
+      const ph2 = f * turns * Math.PI * 2
+      const front = Math.cos(ph2) > 0
+      if (front === frontPass) {
+        const x = x0 + f * len
+        const yy = y + Math.sin(ph2) * 34
+        pen ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy)
+        pen = true
+      } else pen = false
+    }
+    ctx.stroke()
+  }
+  // the gantry ring, sweeping the volume — in the scanner it is the
+  // table that slides; the relative motion is identical
+  const rx = x0 + frac * len
+  ctx.strokeStyle = rgba(INK, 0.55)
+  ctx.lineWidth = 1.2
+  ctx.beginPath(); ctx.ellipse(rx, y, 11, 46, 0, 0, Math.PI * 2); ctx.stroke()
+  // the tube on the ring
+  const ph = frac * turns * Math.PI * 2
+  const dotX = rx + Math.cos(ph) * 11
+  const dotY = y + Math.sin(ph) * 46
+  glowDot(ctx, dotX, dotY, 5, Math.cos(ph) > 0 ? 1 : 0.45)
+  ctx.restore()
+  lessonPing(`hel-${cycle}-${Math.floor(frac * turns)}`, 980)
+  // z arrow
+  ctx.strokeStyle = rgba(INK, 0.5)
+  ctx.beginPath(); ctx.moveTo(x0 + len * 0.32, y + 74); ctx.lineTo(x0 + len * 0.68, y + 74); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(x0 + len * 0.68 - 7, y + 70); ctx.lineTo(x0 + len * 0.68, y + 74); ctx.lineTo(x0 + len * 0.68 - 7, y + 78); ctx.stroke()
+  sceneLabel(ctx, 'relative table travel (z) — the scan advances', x0 + len / 2, y + 92, 1, { align: 'center' })
+  sceneLabel(ctx, 'pitch = table travel per rotation ÷ beam width', w / 2, h * 0.1, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
+}
+
+/**
+ * A film scene's drawing, by id — the counterpart of `lessonDraw` for the
+ * scenes that exist only in the film. Resolved once, at module load.
+ */
+function filmDraw(id: string): StepDraw {
+  const draw = FILM_SCENES.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`CT film scene "${id}" does not exist`)
+  return draw
+}
+
+/** Two more film scenes Physics V2 re-hosts, drawn exactly as the film draws them. */
+export const drawBackProjection = filmDraw('backprojection')
+export const drawRingArtefact = filmDraw('ring')

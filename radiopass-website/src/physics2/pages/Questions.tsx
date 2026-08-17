@@ -42,43 +42,34 @@ export default function V2Questions() {
             {answered} of {QB_TOTALS.questions} answered
           </span>
         </div>
-        <div className="v2-review-grid">
-          {rows.map(({ topic, standing }) => (
-            <div key={topic.id} className="v2-review-row">
-              <span className="n">{String(topic.num).padStart(2, '0')}</span>
-              <span>
-                <h3>{topic.title}</h3>
-              </span>
-              <span className="acc">
-                {standing.answered}/{standing.total}
-                {standing.accuracy !== null && ` · ${Math.round(standing.accuracy * 100)}%`}
-              </span>
-              <span className="acts">
-                {standing.unseen > 0 ? (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=unseen`}>
-                    Unseen <b style={{ color: 'var(--v2-ink-2)' }}>{standing.unseen}</b>
-                  </Link>
-                ) : (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=again`}>
-                    Again
-                  </Link>
-                )}
-                {standing.wrong > 0 && (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=wrong`}>
-                    Wrong <b>{standing.wrong}</b>
-                  </Link>
-                )}
-                {standing.flagged > 0 && (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=flagged`}>
-                    Flagged {standing.flagged}
-                  </Link>
-                )}
-                <Link className="v2-chip" to={`/physics-v2/${topic.id}`}>
-                  Primer
+        {/* One row per topic: the syllabus title at full size, the pool's
+            standing in two plain numbers, and a single door in. The session
+            itself decides what to serve first (unseen, then the rest) — the
+            learner is not asked to choose a filter before starting. */}
+        <div className="v2-qb-list">
+          {rows.map(({ topic, standing }) => {
+            const pct = standing.total > 0 ? Math.round((standing.answered / standing.total) * 100) : 0
+            return (
+              <div key={topic.id} className="v2-qb-row">
+                <div className="v2-qb-main">
+                  <span className="v2-qb-num">{String(topic.num).padStart(2, '0')}</span>
+                  <h3>{topic.title}</h3>
+                </div>
+                <div className="v2-qb-stats">
+                  <b>{standing.total} questions</b>
+                  <span className="v2-qb-bar" role="img" aria-label={`${pct}% answered`}>
+                    <i style={{ width: `${pct}%` }} />
+                  </span>
+                  <small>
+                    {pct}% done · {standing.total - standing.answered} to go
+                  </small>
+                </div>
+                <Link className="v2-qb-start" to={`/physics-v2/${topic.id}/practice`}>
+                  Start now
                 </Link>
-              </span>
-            </div>
-          ))}
+              </div>
+            )
+          })}
         </div>
 
         <div className="v2-doors" style={{ marginTop: 34 }}>

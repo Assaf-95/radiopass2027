@@ -132,57 +132,73 @@ export default function V2TopicPage() {
           </ol>
         </section>
 
-        <div className="v2-gate" style={{ borderBottom: 'none' }}>
-          <Link className="v2-btn v2-btn-solid" to={`/physics-v2/${topic.id}/practice?filter=${standing.unseen > 0 ? 'unseen' : 'again'}`}>
-            Practise the whole topic
-          </Link>
-          {standing.wrong > 0 && (
-            <Link className="v2-btn v2-btn-quiet" to={`/physics-v2/${topic.id}/practice?filter=wrong`}>
-              Re-test {standing.wrong} wrong
-            </Link>
-          )}
-        </div>
+        {/* The end of a chapter is two steps in order, not a menu: test what
+            you just read, then go to the next chapter. Everything else that
+            used to live here — re-test chips, laboratory doors, a previous
+            link competing with the next one — is either quiet or gone, because
+            offering six exits at the finish line is how a course stops feeling
+            like a course. */}
+        <section className="v2-finish" aria-label="Finish this topic">
+          <ol className="v2-finish-steps">
+            <li>
+              <span className="v2-finish-n">1</span>
+              <div>
+                <strong>Test it</strong>
+                <small>{standing.total} questions on this topic, marked and explained.</small>
+              </div>
+              <Link
+                className="v2-btn v2-btn-solid"
+                to={`/physics-v2/${topic.id}/practice?filter=${standing.unseen > 0 ? 'unseen' : 'again'}`}
+              >
+                Practise now
+              </Link>
+            </li>
+            {topic.num < V2_TOPICS.length ? (
+              <li>
+                <span className="v2-finish-n">2</span>
+                <div>
+                  <strong>
+                    Then: {String(topic.num + 1).padStart(2, '0')} · {V2_TOPICS[topic.num].title}
+                  </strong>
+                  <small>{V2_TOPICS[topic.num].tagline}</small>
+                </div>
+                <Link className="v2-btn v2-btn-solid" to={`/physics-v2/${V2_TOPICS[topic.num].id}`}>
+                  Next topic →
+                </Link>
+              </li>
+            ) : (
+              <li>
+                <span className="v2-finish-n">2</span>
+                <div>
+                  <strong>That is the whole syllabus</strong>
+                  <small>Everything answered wrong, gathered for one last pass.</small>
+                </div>
+                <Link className="v2-btn v2-btn-solid" to="/physics-v2/review">
+                  Open review →
+                </Link>
+              </li>
+            )}
+          </ol>
 
-        {topic.labs && topic.labs.length > 0 && (
-          <div className="v2-labs">
-            {topic.labs.map((lab) =>
+          <p className="v2-finish-aside">
+            {topic.num > 1 && (
+              <Link to={`/physics-v2/${V2_TOPICS[topic.num - 2].id}`}>
+                ← Back to {V2_TOPICS[topic.num - 2].title}
+              </Link>
+            )}
+            {topic.labs?.map((lab) =>
               lab.to.endsWith('.html') ? (
-                <a key={lab.to} href={lab.to} className="v2-door" target="_blank" rel="noreferrer">
-                  <strong>{lab.label}</strong>
-                  <span>Opens the full instrument.</span>
+                <a key={lab.to} href={lab.to} target="_blank" rel="noreferrer">
+                  {lab.label}
                 </a>
               ) : (
-                <a key={lab.to} href={lab.to} className="v2-door">
-                  <strong>{lab.label}</strong>
-                  <span>Go deeper in the existing laboratory.</span>
+                <a key={lab.to} href={lab.to}>
+                  {lab.label}
                 </a>
               ),
             )}
-          </div>
-        )}
-
-        {/* The course is a sequence: every topic ends at the door of the next. */}
-        <nav className="v2-pager" aria-label="Course order">
-          {topic.num > 1 ? (
-            <Link to={`/physics-v2/${V2_TOPICS[topic.num - 2].id}`} className="v2-pager-link prev">
-              <small>Previous · {String(topic.num - 1).padStart(2, '0')}</small>
-              <strong>{V2_TOPICS[topic.num - 2].title}</strong>
-            </Link>
-          ) : (
-            <span />
-          )}
-          {topic.num < V2_TOPICS.length ? (
-            <Link to={`/physics-v2/${V2_TOPICS[topic.num].id}`} className="v2-pager-link next">
-              <small>Next topic · {String(topic.num + 1).padStart(2, '0')}</small>
-              <strong>{V2_TOPICS[topic.num].title} →</strong>
-            </Link>
-          ) : (
-            <Link to="/physics-v2/review" className="v2-pager-link next">
-              <small>End of the syllabus</small>
-              <strong>Open Review →</strong>
-            </Link>
-          )}
-        </nav>
+          </p>
+        </section>
       </main>
     </V2Shell>
   )

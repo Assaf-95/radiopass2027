@@ -84,34 +84,50 @@ export type CoursePart = {
  * The syllabus
  * ------------------------------------------------------------------ */
 
+/* The part titles follow the syllabus headings the candidate will meet in the
+   textbooks and the exam — the owner's explicit instruction (Aug 2026). The
+   only heading not on his list is nuclear medicine, which cannot honestly be
+   filed under any of the six and so keeps its own part, in teaching order. */
 export const COURSE_PARTS: CoursePart[] = [
   {
-    id: 'beam',
-    title: 'The beam',
+    id: 'matter',
+    title: 'Matter and radiation',
     blurb:
       'Where X-rays come from, what the spectrum means, what matter does to the beam, and how a projection becomes an image. Everything else in the exam stands on these four.',
   },
   {
-    id: 'machines',
-    title: 'The machines',
+    id: 'xray',
+    title: 'X-ray imaging',
     blurb:
       'The same beam, engineered three ways: the everyday digital detector, the live fluoroscopy chain, and mammography — where contrast, dose and resolution are pushed to their limits.',
   },
   {
-    id: 'slices',
-    title: 'Slices and tracers',
+    id: 'ct',
+    title: 'Computed tomography',
     blurb:
-      'Ionising imaging beyond the projection: CT reconstructs the beam into slices; nuclear medicine turns the patient into the source.',
+      'Profiles reconstructed into slices: the generations, the helix, Hounsfield units and the dose report.',
   },
   {
-    id: 'fields',
-    title: 'Fields and waves',
+    id: 'nm',
+    title: 'Nuclear medicine',
     blurb:
-      'The two non-ionising modalities, each a full module: magnetic resonance from proton to k-space, and ultrasound from pressure wave to Doppler.',
+      'The patient becomes the source: the generator, the gamma camera, SPECT and PET.',
+  },
+  {
+    id: 'mri',
+    title: 'Magnetic resonance imaging',
+    blurb:
+      'From proton to k-space, every mechanism animated — one causal chain from the bore to the image.',
+  },
+  {
+    id: 'us',
+    title: 'Ultrasound imaging',
+    blurb:
+      'From pressure wave to Doppler, in experiments you drive yourself.',
   },
   {
     id: 'safety',
-    title: 'Safety and the exam',
+    title: 'Radiation hazards and protection',
     blurb:
       'Legislation, dosimetry and radiobiology — then the mock papers, sat against the clock.',
   },
@@ -217,7 +233,7 @@ export const COURSE_MODULES: CourseModule[] = [
     title: 'Nuclear medicine',
     short: 'NM',
     blurb: 'The patient as the source — generator, gamma camera, SPECT and PET.',
-    part: 2,
+    part: 3,
     home: '/nm-lab',
     lessons: [{ path: '/nm-lab', title: 'Nuclear medicine', short: 'NM' }],
     practice: { subject: 'nm', label: 'Nuclear medicine' },
@@ -234,7 +250,7 @@ export const COURSE_MODULES: CourseModule[] = [
     title: 'Magnetic resonance',
     short: 'MRI',
     blurb: 'Proton to k-space in 21 sections, every mechanism animated.',
-    part: 3,
+    part: 4,
     home: '/mri',
     lessons: [{ path: '/mri', title: 'The MRI module', short: 'MRI' }],
     practice: { subject: 'mri', label: 'MRI' },
@@ -251,7 +267,7 @@ export const COURSE_MODULES: CourseModule[] = [
     title: 'Ultrasound',
     short: 'US',
     blurb: 'Pressure wave to Doppler in 21 experiments you drive yourself.',
-    part: 3,
+    part: 5,
     home: '/ultrasound-lab',
     lessons: [{ path: '/ultrasound-lab', title: 'The ultrasound laboratory', short: 'Ultrasound' }],
     practice: { subject: 'ultrasound', label: 'Ultrasound' },
@@ -268,7 +284,7 @@ export const COURSE_MODULES: CourseModule[] = [
     title: 'Safety & radiation',
     short: 'Safety',
     blurb: 'Legislation, dosimetry and radiobiology — the facts, then the questions.',
-    part: 4,
+    part: 6,
     home: '/fact-bank/protection',
     lessons: [{ path: '/fact-bank/protection', title: 'Protection & legislation', short: 'Safety' }],
     practice: { subject: 'safety', label: 'Legislation, protection, radiobiology and dosimetry' },

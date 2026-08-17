@@ -154,18 +154,38 @@
   margin: 0 0 var(--sp-5);
 }
 .ph-part { margin-bottom: var(--gap-section); }
+
+/* The part header: the modality's instrument mark beside the syllabus title.
+   The mark is the only coloured element — the title stays in the ink, set in
+   the display face so the seven parts read as chapters of one book. */
+.ph-part-head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: var(--sp-4);
+  align-items: start;
+  margin-bottom: var(--sp-4);
+}
+.ph-mark {
+  width: 44px;
+  height: 44px;
+  margin-top: 2px;
+  opacity: 0.9;
+}
 .ph-part h3 {
-  display: flex; align-items: baseline; gap: var(--sp-3);
-  font-size: var(--fs-card); font-weight: 600; color: var(--text-primary);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-section); font-weight: 400; letter-spacing: -0.005em;
+  color: var(--text-primary);
   margin: 0 0 var(--sp-2);
 }
 .ph-part-no {
   font-size: var(--fs-meta); font-weight: 700; letter-spacing: 0.16em;
   text-transform: uppercase; color: var(--accent);
+  font-family: var(--font-body, Inter, system-ui, sans-serif);
 }
 .ph-part-blurb {
   font-size: var(--fs-support); line-height: var(--lh-body);
-  color: var(--text-tertiary); margin: 0 0 var(--sp-4); max-width: var(--measure);
+  color: var(--text-tertiary); margin: 0; max-width: var(--measure);
 }
 .ph-part ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .ph-part li { border-bottom: 1px solid var(--border); }
@@ -190,6 +210,8 @@
   .ph-part a { grid-template-columns: 28px minmax(0, 1fr); }
   .ph-mod-blurb { grid-column: 2; }
   .ph-mod-meta { display: none; }
+  .ph-part-head { grid-template-columns: 34px minmax(0, 1fr); gap: var(--sp-3); }
+  .ph-mark { width: 34px; height: 34px; }
 }
 
 .ph-destinations h2 {
@@ -304,6 +326,18 @@
 }
 
 .ph-secondary a:hover {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+/* The V2 door: the one link in this row that is not a familiar destination,
+   so it carries the accent rather than the quiet grey. */
+.ph-secondary a.ph-secondary-new {
+  color: var(--accent);
+  border-bottom-color: rgba(217, 168, 78, 0.45);
+  font-weight: 600;
+}
+.ph-secondary a.ph-secondary-new:hover {
   color: var(--text-primary);
   border-bottom-color: var(--accent);
 }

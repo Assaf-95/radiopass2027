@@ -224,6 +224,20 @@
     :where(h1,h2,h3,h4,p,li,label,button,.note,.card,.explanation,.status,.step-text,.description){overflow-wrap:anywhere;word-break:normal}
     :where(img,svg,canvas){max-width:100%}
     @media(max-width:700px){:where(.controls,.actions,.buttons,.button-row,.nav,.toolbar){flex-wrap:wrap}:where(button,select,input){max-width:100%}}
+    .effect-note {
+      margin: 14px 0 0;
+      padding: 11px 13px;
+      border: 1px solid #252c36;
+      border-left: 3px solid #E8A33D;
+      border-radius: 8px;
+      background: #12161d;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #c0c9d4;
+    }
+    .effect-note b { color: #f0f4f8; }
+    .effect-note .mag { color: #5FB8E8; font-weight: 700; }
+    .effect-note .blur { color: #E8A33D; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -268,14 +282,16 @@
           </g>
 
           <g id="projectionGroup">
-            <rect id="projectionBlur" x="930" y="224" width="60" height="120" rx="10" fill="#2f5f93" fill-opacity="0.24" />
-            <rect id="projectionCore" x="936" y="240" width="48" height="88" rx="10" fill="#90a2b7" fill-opacity="0.72" />
-            <rect id="projectionEdge" x="936" y="240" width="48" height="88" rx="10" fill="none" stroke="#90a2b7" stroke-opacity="0.45" stroke-width="8" filter="url(#edgeBlur)" />
+            <rect id="projectionBlur" x="930" y="224" width="60" height="120" rx="10" fill="#E8A33D" fill-opacity="0.30" />
+            <rect id="projectionCore" x="936" y="240" width="48" height="88" rx="10" fill="#5FB8E8" fill-opacity="0.78" />
+            <rect id="projectionEdge" x="936" y="240" width="48" height="88" rx="10" fill="none" stroke="#E8A33D" stroke-opacity="0.75" stroke-width="8" filter="url(#edgeBlur)" />
           </g>
 
           <g id="rayLegend">
-            <line x1="706" y1="56" x2="750" y2="56" stroke="#8a949f" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="1 7" />
-            <text x="758" y="60" fill="#c0c9d4" font-size="12" font-weight="700">Penumbra rays / blur boundary</text>
+            <rect x="706" y="48" width="16" height="16" rx="4" fill="#5FB8E8" fill-opacity="0.85" />
+            <text x="730" y="61" fill="#c0c9d4" font-size="12" font-weight="700">Image size = magnification</text>
+            <rect x="706" y="74" width="16" height="16" rx="4" fill="#E8A33D" fill-opacity="0.85" />
+            <text x="730" y="87" fill="#c0c9d4" font-size="12" font-weight="700">Blurred edge = geometric unsharpness</text>
           </g>
 
           <g id="distanceLayer"></g>
@@ -328,6 +344,8 @@
             <input id="focalSlider" type="range" min="0.1" max="2.0" step="0.05" value="1.0" />
           </div>
 
+          <p id="effectNote" class="effect-note"></p>
+
         </section>
 
         <section class="graph-wrap">
@@ -357,6 +375,8 @@
       const objectShape = document.getElementById("objectShape");
       const objectHit = document.getElementById("objectHit");
       const objectLabel = document.getElementById("objectLabel");
+      const effectNote = document.getElementById("effectNote");
+      let lastMoved = null;
       const projectionBlur = document.getElementById("projectionBlur");
       const projectionCore = document.getElementById("projectionCore");
       const projectionEdge = document.getElementById("projectionEdge");
@@ -520,7 +540,7 @@
 
       function drawBeams(geom, projection) {
         let markup = "";
-        const penumbraColor = "#8a949f";
+        const penumbraColor = "#E8A33D";
 
         const penumbraRays = [
           { sy: geom.focalTopY, oy: projection.objTop, dy: projection.yTopFromFocalTop },
@@ -704,6 +724,35 @@
         updateControlLabels();
         updateScene(physics);
         updateGraph(physics);
+        updateEffectNote(physics);
+      }
+
+      /* Which control did the learner just move, and what did it actually
+         change? Focal spot changes blur ALONE — the commonest confusion this
+         diagram exists to settle — so the note names the quantity that moved
+         and the one that did not. */
+      function updateEffectNote(physics) {
+        if (!effectNote) { return; }
+        const mag = physics.magnification.toFixed(2);
+        const blur = physics.unsharpMm.toFixed(2);
+        const M = '<span class="mag">magnification</span>';
+        const U = '<span class="blur">geometric unsharpness</span>';
+        let text;
+        if (lastMoved === "focal") {
+          text = 'You moved the <b>focal spot</b>: ' + U + ' is now <b>' + blur +
+            ' mm</b> — a bigger focal spot blurs the edge. ' + M +
+            ' has not changed at all (still <b>' + mag + '&times;</b>): it is pure geometry, SID &divide; SOD.';
+        } else if (lastMoved === "sod") {
+          text = 'You moved the <b>object</b>: ' + M + ' is now <b>' + mag + '&times;</b> and ' + U +
+            ' <b>' + blur + ' mm</b>. Both move together here — closer to the detector shrinks the image and sharpens the edge.';
+        } else if (lastMoved === "sid") {
+          text = 'You moved the <b>tube</b>: ' + M + ' is now <b>' + mag + '&times;</b> and ' + U +
+            ' <b>' + blur + ' mm</b>. A longer SID lowers both — which is why a long focus&ndash;detector distance is the sharpest geometry.';
+        } else {
+          text = M + ' <b>' + mag + '&times;</b> &middot; ' + U + ' <b>' + blur +
+            ' mm</b>. Move any control and this line says which of the two changed — and which did not.';
+        }
+        effectNote.innerHTML = text;
       }
 
       function queueRender() {
@@ -717,6 +766,7 @@
       function bindControls() {
         sidSlider.addEventListener("input", function () {
           state.sidCm = parseFloat(sidSlider.value);
+          lastMoved = "sid";
           syncSodSliderBounds();
           queueRender();
         });
@@ -724,11 +774,13 @@
         sodSlider.addEventListener("input", function () {
           state.sodCm = clamp(parseFloat(sodSlider.value), SCENE.sodMinCm, currentSodMax());
           sodSlider.value = state.sodCm.toFixed(1);
+          lastMoved = "sod";
           queueRender();
         });
 
         focalSlider.addEventListener("input", function () {
           state.focalSpotMm = parseFloat(focalSlider.value);
+          lastMoved = "focal";
           queueRender();
         });
       }

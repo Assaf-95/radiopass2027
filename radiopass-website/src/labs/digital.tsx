@@ -29,7 +29,7 @@ const NOISE = Array.from({ length: 160 }, () => ({ x: rnd(), y: rnd() }))
    step's component assembles itself in, finished components stay, anything
    not yet taught is simply absent. The last step runs the whole reader. */
 
-type CrPart = 'plate' | 'laser' | 'light' | 'collect' | 'adc' | 'lamp'
+export type CrPart = 'plate' | 'laser' | 'light' | 'collect' | 'adc' | 'lamp'
 const CR_ORDER: CrPart[] = ['plate', 'laser', 'light', 'collect', 'adc', 'lamp']
 
 /* The plate in oblique view: front edge A→B, depth vector d. The laser
@@ -88,8 +88,9 @@ function crArrowHead(ctx: CanvasRenderingContext2D, x: number, y: number, ang: n
   ctx.stroke()
 }
 
-function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus: CrPart | 'all', p: number, t: number) {
+export function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus: CrPart | 'all', p: number, t: number) {
   const g = crRig(w, h)
+  ctx.lineWidth = 1 // a prior step may have left a different width on the shared context
   const fi = focus === 'all' ? CR_ORDER.length : CR_ORDER.indexOf(focus)
   const fade = 0.3 + 0.7 * p
   const fs = Math.min(1, Math.max(0.82, w / 700))
@@ -137,7 +138,7 @@ function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus
       ctx.strokeStyle = rgba(INK, 0.5 * a)
       ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(ex, ey); ctx.stroke()
       crArrowHead(ctx, ex, ey, Math.atan2(ey - by, ex - bx), 0.7 * a, INK)
-      sceneLabel(ctx, 'plate translates', bx + 4, by + 8, a, { size: 9.5 * fs })
+      sceneLabel(ctx, 'plate translates', (bx + ex) / 2 + 4, ey + 14, a, { align: 'center', size: 9.5 * fs })
       // trapped electrons — the latent image, waiting to be asked for
       const eraseF = focus === 'lamp' ? smoothstep(seg(q, 0.4, 0.85)) : erasing ? smoothstep((tc - LINE * ROWS) / (ERASE * 0.6)) : 0
       for (let k = 0; k < ROWS; k++) {
@@ -236,7 +237,7 @@ function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus
           ctx.lineTo(tp.x, tp.y)
           ctx.stroke()
         }
-        if (flood > 0.9) lessonPing(`cr-erase-${Math.floor(t / CYC)}`, 640)
+        if (flood > 0.9 && focus === 'all') lessonPing(`cr-erase-${Math.floor(t / CYC)}`, 640)
       }
     }
   }
@@ -281,10 +282,11 @@ function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus
   /* -- the legend: what travels, appearing as the lesson makes it exist -- */
   {
     const intro: Record<string, number> = { red: 1, blue: 2, signal: 3 }
+    // rows sit below the caption band so the two can never collide on phones
     const rows: [string, string, number][] = [
-      ['red', 'red laser — stimulates', h * 0.055],
-      ['blue', 'blue light — the signal', h * 0.115],
-      ['signal', 'electrical signal', h * 0.175],
+      ['red', 'red laser — stimulates', h * 0.115],
+      ['blue', 'blue light — the signal', h * 0.175],
+      ['signal', 'electrical signal', h * 0.235],
     ]
     const lx = w * 0.63, sw = 26
     for (const [key, name, y] of rows) {
@@ -375,6 +377,86 @@ function drawCrReader(ctx: CanvasRenderingContext2D, w: number, h: number, focus
       1,
     )
   }
+}
+
+/* The indirect/direct comparison, drawn once and shared: the lesson step
+   below and the Physics V2 digital chapter mount the same scene. */
+export function drawDrCompare(ctx: CanvasRenderingContext2D, w: number, h: number, p: number, t: number) {
+  const q = clamp(t / 3.2)
+  const fs = Math.min(1, Math.max(0.82, w / 700))
+  const stack = (cx: number, indirect: boolean, a0: number) => {
+    if (a0 <= 0.01) return
+    const sw = w * 0.15, y1 = h * 0.3, layerH = h * 0.14, cellY = h * 0.52
+    // x-rays falling
+    for (let i = 0; i < 3; i++) {
+      const x = cx - sw * 0.6 + i * sw * 0.6
+      const fall = smoothstep(seg(q, 0.1 + i * 0.05, 0.3 + i * 0.05))
+      ctx.strokeStyle = rgba(INK, 0.55 * a0 * fall)
+      ctx.beginPath(); ctx.moveTo(x, h * 0.1); ctx.lineTo(x, lerp(h * 0.1, y1 - 3, fall)); ctx.stroke()
+    }
+    sceneLabel(ctx, 'X-rays', cx, h * 0.07, a0, { align: 'center', size: 9.5 * fs })
+    // converter layer
+    ctx.fillStyle = rgba(indirect ? BLUE : AMBER, 0.1 * a0)
+    ctx.strokeStyle = rgba(INK, 0.45 * a0)
+    ctx.fillRect(cx - sw, y1, sw * 2, layerH)
+    ctx.strokeRect(cx - sw, y1, sw * 2, layerH)
+    sceneLabel(ctx, indirect ? 'scintillator (CsI) — X-ray → light' : 'photoconductor (a-Se) — X-ray → charge', cx, y1 + layerH + 12, a0, { align: 'center', size: 9.5 * fs })
+    // what happens inside: light spreads, charge does not
+    const act = smoothstep(seg(q, 0.35, 0.65))
+    if (act > 0) {
+      if (indirect) {
+        ctx.fillStyle = rgba('#FFFFFF', 0.8 * a0 * act)
+        ctx.beginPath(); ctx.arc(cx, y1 + layerH * 0.35, 3, 0, Math.PI * 2); ctx.fill()
+        for (const dx of [-0.5, -0.2, 0.2, 0.5]) {
+          ctx.strokeStyle = rgba(BLUE, 0.7 * a0 * act)
+          ctx.setLineDash([2, 4])
+          ctx.beginPath()
+          ctx.moveTo(cx, y1 + layerH * 0.35)
+          ctx.lineTo(cx + sw * dx * act, y1 + layerH + (cellY - y1 - layerH) * 0.9 * act)
+          ctx.stroke()
+          ctx.setLineDash([])
+        }
+      } else {
+        ctx.strokeStyle = rgba(AMBER, 0.8 * a0 * act)
+        ctx.setLineDash([6, 4])
+        ctx.beginPath()
+        ctx.moveTo(cx, y1 + layerH * 0.3)
+        ctx.lineTo(cx, y1 + layerH * 0.3 + (cellY - y1) * 0.75 * act)
+        ctx.stroke()
+        ctx.setLineDash([])
+      }
+    }
+    // pixel/TFT row
+    const ga = smoothstep(seg(q, 0.25, 0.5))
+    for (let i = 0; i < 9; i++) {
+      const x = cx - sw + i * (sw * 2 / 9)
+      ctx.strokeStyle = rgba(INK, 0.45 * a0 * ga)
+      ctx.strokeRect(x + 1, cellY, sw * 2 / 9 - 2, h * 0.05)
+    }
+    sceneLabel(ctx, indirect ? 'photodiodes + TFT — light → charge' : 'TFT array — read the charge', cx, cellY + h * 0.05 + 12, a0 * ga, { align: 'center', size: 9.5 * fs })
+    // the resulting signal profile: wide vs tight
+    const pa = smoothstep(seg(q, 0.6, 0.9))
+    if (pa > 0) {
+      const base = h * 0.85, spread = indirect ? sw * 0.55 : sw * 0.22
+      ctx.beginPath()
+      for (let i = 0; i <= 60; i++) {
+        const f = (i / 60) * 2 - 1
+        const x = cx + f * sw
+        const v = Math.exp(-((f * sw) ** 2) / (2 * spread * spread))
+        const y = base - v * h * 0.1 * pa
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+      }
+      ctx.strokeStyle = rgba(ACC, 0.9 * a0)
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+      ctx.lineWidth = 1
+      sceneLabel(ctx, indirect ? 'signal — spread' : 'signal — tight', cx, h * 0.9, a0 * pa, { align: 'center', size: 9.5 * fs, color: rgba(ACC, 0.9) })
+    }
+  }
+  stack(w * 0.27, true, smoothstep(seg(p, 0, 0.4)))
+  stack(w * 0.73, false, smoothstep(seg(p, 0.25, 0.6)))
+  sceneLabel(ctx, 'two conversions', w * 0.27, h * 0.16, seg(q, 0.7, 0.95), { align: 'center', size: 10.5 * fs })
+  sceneLabel(ctx, 'one conversion', w * 0.73, h * 0.16, seg(q, 0.7, 0.95), { align: 'center', size: 10.5 * fs })
 }
 
 const STEPS: LessonStep[] = [
@@ -539,85 +621,8 @@ const STEPS: LessonStep[] = [
   {
     id: 'dr-compare',
     title: 'Two roads to a number',
-    body: 'Side by side. The **indirect** panel converts twice — X-ray to **light** in the scintillator, light to **charge** in the photodiodes — and the light spreads a little sideways on the way down. The **direct** panel converts once: X-ray straight to **charge** in the photoconductor, held on course by the bias field. One conversion fewer is one blur fewer, so the direct panel\'s signal profile stays **tighter**.',
-    numbers: 'DQE: CR ≈ **30%** · DR ≈ **65%**.',
-    draw: (ctx, w, h, p, t) => {
-      const q = clamp(t / 3.2)
-      const fs = Math.min(1, Math.max(0.82, w / 700))
-      const stack = (cx: number, indirect: boolean, a0: number) => {
-        if (a0 <= 0.01) return
-        const sw = w * 0.15, y1 = h * 0.3, layerH = h * 0.14, cellY = h * 0.52
-        // x-rays falling
-        for (let i = 0; i < 3; i++) {
-          const x = cx - sw * 0.6 + i * sw * 0.6
-          const fall = smoothstep(seg(q, 0.1 + i * 0.05, 0.3 + i * 0.05))
-          ctx.strokeStyle = rgba(INK, 0.55 * a0 * fall)
-          ctx.beginPath(); ctx.moveTo(x, h * 0.1); ctx.lineTo(x, lerp(h * 0.1, y1 - 3, fall)); ctx.stroke()
-        }
-        sceneLabel(ctx, 'X-rays', cx, h * 0.07, a0, { align: 'center', size: 9.5 * fs })
-        // converter layer
-        ctx.fillStyle = rgba(indirect ? BLUE : AMBER, 0.1 * a0)
-        ctx.strokeStyle = rgba(INK, 0.45 * a0)
-        ctx.fillRect(cx - sw, y1, sw * 2, layerH)
-        ctx.strokeRect(cx - sw, y1, sw * 2, layerH)
-        sceneLabel(ctx, indirect ? 'scintillator (CsI) — X-ray → light' : 'photoconductor (a-Se) — X-ray → charge', cx, y1 + layerH + 12, a0, { align: 'center', size: 9.5 * fs })
-        // what happens inside: light spreads, charge does not
-        const act = smoothstep(seg(q, 0.35, 0.65))
-        if (act > 0) {
-          if (indirect) {
-            ctx.fillStyle = rgba('#FFFFFF', 0.8 * a0 * act)
-            ctx.beginPath(); ctx.arc(cx, y1 + layerH * 0.35, 3, 0, Math.PI * 2); ctx.fill()
-            for (const dx of [-0.5, -0.2, 0.2, 0.5]) {
-              ctx.strokeStyle = rgba(BLUE, 0.7 * a0 * act)
-              ctx.setLineDash([2, 4])
-              ctx.beginPath()
-              ctx.moveTo(cx, y1 + layerH * 0.35)
-              ctx.lineTo(cx + sw * dx * act, y1 + layerH + (cellY - y1 - layerH) * 0.9 * act)
-              ctx.stroke()
-              ctx.setLineDash([])
-            }
-          } else {
-            ctx.strokeStyle = rgba(AMBER, 0.8 * a0 * act)
-            ctx.setLineDash([6, 4])
-            ctx.beginPath()
-            ctx.moveTo(cx, y1 + layerH * 0.3)
-            ctx.lineTo(cx, y1 + layerH * 0.3 + (cellY - y1) * 0.75 * act)
-            ctx.stroke()
-            ctx.setLineDash([])
-          }
-        }
-        // pixel/TFT row
-        const ga = smoothstep(seg(q, 0.25, 0.5))
-        for (let i = 0; i < 9; i++) {
-          const x = cx - sw + i * (sw * 2 / 9)
-          ctx.strokeStyle = rgba(INK, 0.45 * a0 * ga)
-          ctx.strokeRect(x + 1, cellY, sw * 2 / 9 - 2, h * 0.05)
-        }
-        sceneLabel(ctx, indirect ? 'photodiodes + TFT — light → charge' : 'TFT array — read the charge', cx, cellY + h * 0.05 + 12, a0 * ga, { align: 'center', size: 9.5 * fs })
-        // the resulting signal profile: wide vs tight
-        const pa = smoothstep(seg(q, 0.6, 0.9))
-        if (pa > 0) {
-          const base = h * 0.85, spread = indirect ? sw * 0.55 : sw * 0.22
-          ctx.beginPath()
-          for (let i = 0; i <= 60; i++) {
-            const f = (i / 60) * 2 - 1
-            const x = cx + f * sw
-            const v = Math.exp(-((f * sw) ** 2) / (2 * spread * spread))
-            const y = base - v * h * 0.1 * pa
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-          }
-          ctx.strokeStyle = rgba(ACC, 0.9 * a0)
-          ctx.lineWidth = 1.5
-          ctx.stroke()
-          ctx.lineWidth = 1
-          sceneLabel(ctx, indirect ? 'signal — spread' : 'signal — tight', cx, h * 0.9, a0 * pa, { align: 'center', size: 9.5 * fs, color: rgba(ACC, 0.9) })
-        }
-      }
-      stack(w * 0.27, true, smoothstep(seg(p, 0, 0.4)))
-      stack(w * 0.73, false, smoothstep(seg(p, 0.25, 0.6)))
-      sceneLabel(ctx, 'two conversions', w * 0.27, h * 0.16, seg(q, 0.7, 0.95), { align: 'center', size: 10.5 * fs })
-      sceneLabel(ctx, 'one conversion', w * 0.73, h * 0.16, seg(q, 0.7, 0.95), { align: 'center', size: 10.5 * fs })
-    },
+    body: 'You have met both stacks — now watch the **same photon** land on each. On the left it becomes light first, and light **spreads a little sideways** on its way down to the photodiodes; on the right it becomes charge at once, and the bias field marches it **straight down**. The proof is the pair of **signal profiles** at the bottom: one conversion fewer is one blur fewer, so the direct panel\'s stays **tighter**.',
+    draw: drawDrCompare,
   },
   {
     id: 'matrix',
@@ -679,7 +684,8 @@ const STEPS: LessonStep[] = [
   {
     id: 'mtf',
     title: 'MTF and DQE: quality as curves',
-    body: 'The **MTF** says how much contrast survives at each spatial frequency — 1 is perfect, and every blur pulls it down. The **DQE** says how efficiently the detector uses the dose it is given. Between them they are the honest description of any detector.',
+    body: 'The **MTF** says how much contrast survives at each spatial frequency — 1 is perfect, and every blur pulls it down. The **DQE** (detective quantum efficiency) says how efficiently the detector uses the dose it is given. Between them they are the honest description of any detector.',
+    numbers: 'DQE: CR ≈ **30%** · flat-panel DR ≈ **65%**.',
     draw: (ctx, w, h, p) => {
       const gx = w * 0.16, gy = h * 0.16, gw = w * 0.62, gh = h * 0.5
       axes(ctx, gx, gy, gw, gh)

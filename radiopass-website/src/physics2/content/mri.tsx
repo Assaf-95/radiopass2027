@@ -16,6 +16,12 @@ import type { V2Topic } from '../types'
 import { PrecessionAndLarmorSim } from '../../mri5/sims/PrecessionAndLarmor'
 import { WeightingLab } from '../../mri5/sims/WeightingLab'
 import { KSpaceExplorer } from '../../mri5/sims/KSpaceExplorer'
+import { RelaxationLab } from '../../mri5/sims/RelaxationLab'
+import { SpinEchoSimulator } from '../../mri5/sims/SpinEchoSimulator'
+import { InversionRecoverySim } from '../../mri5/sims/InversionRecovery'
+import { SliceSelectionSim } from '../../mri5/sims/SliceSelection'
+import { ArtefactGallery } from '../../mri5/sims/ArtefactGallery'
+import { SafetyZonesSim } from '../../mri5/sims/SafetyZones'
 
 export const MRI: V2Topic = {
   id: 'mri',
@@ -59,8 +65,8 @@ export const MRI: V2Topic = {
         },
         {
           kind: 'equation',
-          formula: 'f₀ = γ̄ B₀ · γ̄(¹H) = 42.58 MHz/T',
-          note: '63.87 MHz at 1.5 T · 127.74 MHz at 3 T — field decides frequency, and nothing else does',
+          formula: 'f₀ = γ̄ B₀',
+          note: 'for hydrogen γ̄ = 42.58 MHz/T — 63.87 MHz at 1.5 T, 127.74 MHz at 3 T. Field decides frequency, and nothing else does.',
         },
         {
           kind: 'numbers',
@@ -97,6 +103,16 @@ export const MRI: V2Topic = {
         {
           kind: 'prose',
           text: '**T1 is spin–lattice** relaxation: the spins hand energy back to the surrounding molecular lattice and M_z climbs back towards M₀. At **t = T1 the recovery is 63% done** — a time constant, not a finish line. **T2 is spin–spin** relaxation: no net energy is lost; the precessing spins exchange phase with each other and the transverse signal fades. At **t = T2, 37% of it still remains**. Both numbers are e⁻¹.\n\nIn every tissue **T2 is shorter than or equal to T1**, because anything that hands energy to the lattice also disturbs phase. And in any real magnet the signal dies faster still: static field inhomogeneity adds its own dephasing (T2′), giving **1/T2* = 1/T2 + 1/T2′** — so **T2* is always shorter than T2**. The raw signal after a single 90° pulse is the **free induction decay (FID)**, and its envelope falls at T2*, which is the reason the spin echo sequence exists at all.\n\nThe T2′ part is fixed in space, so it is reversible — a 180° pulse can undo it. The true T2 part is random in time, and no pulse can ever bring it back.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <RelaxationLab />,
+            title: 'The relaxation laboratory',
+            annotation: '63% recovered at T1 · 37% left at T2',
+            caption: 'Run the two clocks side by side: M_z climbs its recovery curve while M_xy falls down its decay curve — at the same time, independently. Read each tissue\'s 63% and 37% marks off the curves, then swap tissues and watch both curves move.',
+          },
         },
         {
           kind: 'compare',
@@ -141,6 +157,26 @@ export const MRI: V2Topic = {
         {
           kind: 'prose',
           text: 'After the 90° pulse, spins in slightly stronger field lead and spins in weaker field lag. The **180° pulse at TE/2** flips the fan over: the leaders are placed behind and, still being fast, catch up — the signal re-forms as an **echo at TE**, with the T2′ loss undone. The echo amplitude is **e^(−TE/T2)**: field inhomogeneity has dropped out of it entirely. The FID decays at T2*; the train of echo peaks decays at true T2.\n\n**Gradient echo** drops the 180°. The echo is made by **reversing the readout gradient**, and a gradient reversal undoes only the phase that gradient itself created — static field offsets, chemical shift and susceptibility are never undone, so the signal sits on the **T2\\* envelope**. The flip angle is **below 90°**, leaving M₀cos α still along z, so the next excitation need not wait for full recovery: that, not the missing 180°, is where the speed comes from. The largest steady-state signal for a given TR and T1 comes at the **Ernst angle**, arccos(e^(−TR/T1)). The price of the speed is maximum vulnerability to metal, air and field inhomogeneity — with the compensation of **low SAR**.\n\n**Inversion recovery** starts with a 180°, waits **TI**, then excites. A tissue whose M_z is crossing zero at that moment contributes nothing: with TR much longer than T1, the null sits at **TI = 0.693 × T1**. **STIR** (TI ≈ 150–180 ms at 1.5 T) nulls fat; **FLAIR** (TI ≈ 2000–2500 ms in practice) nulls CSF while a long TE keeps the image T2-weighted. STIR nulls a **T1**, not fat specifically — gadolinium-enhanced tissue has a short T1 too, so STIR after contrast quietly deletes the very tissue the injection was for; use chemically selective fat saturation instead.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SpinEchoSimulator />,
+            title: 'The spin echo, spin by spin',
+            annotation: '180° at TE/2 · echo at TE · e^(−TE/T2)',
+            caption: 'Watch the fan open — fast spins ahead, slow behind — then fire the 180° and watch it flip the fan so the fast ones catch up. The echo re-forms at TE, and its peak sits on the true T2 curve, not the faster T2* one.',
+          },
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <InversionRecoverySim />,
+            title: 'The inversion recovery null',
+            annotation: 'TI = 0.693 × T1 (TR ≫ T1)',
+            caption: 'Slide TI and watch each tissue\'s recovery curve cross zero at its own moment. Park TI on fat\'s crossing and you have STIR; park it on CSF\'s and you have FLAIR — the tissue whose M_z is at zero when the 90° fires simply vanishes.',
+          },
         },
         {
           kind: 'compare',
@@ -234,7 +270,21 @@ export const MRI: V2Topic = {
         },
         {
           kind: 'prose',
-          text: '**Slice selection**: with a gradient along z, a frequency-selective RF pulse excites only the band whose Larmor frequencies it contains. Slice **position** is set by the RF centre frequency; slice **thickness** by RF bandwidth ÷ (γ̄ × gradient strength). Everything outside the slice stays longitudinal and silent.\n\n**Frequency encoding**: a readout gradient during sampling makes each column precess at its own frequency, and the Fourier transform separates them — one readout resolves every column. **Phase encoding**: a gradient lobe switched on and off before the readout leaves no frequency difference behind, but the **phase it created stays**; its area is stepped once per TR, and each step fills **one line of k-space**. That is why **scan time = TR × phase-encoding steps × NSA**, and why resolution is expensive along phase and nearly free along frequency.\n\n**K-space is not a map of the anatomy.** Position in it is the area under the gradients, k = γ̄∫G dt; each sample holds one spatial-frequency pattern laid across the whole slice and contributes to every pixel. The **centre** (low spatial frequencies — the ky = 0 line is acquired with the phase gradient off) carries **signal and contrast**; the **periphery** carries **edges and detail**. The sample spacing sets the field of view (FOV = 1/Δk); the extent sets the resolution (pixel = 1/(2·k_max)).',
+          text: '**Slice selection**: with a gradient along z, a frequency-selective RF pulse excites only the band whose Larmor frequencies it contains. Slice **position** is set by the RF centre frequency; slice **thickness** by RF bandwidth ÷ (γ̄ × gradient strength). Everything outside the slice stays longitudinal and silent.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SliceSelectionSim />,
+            title: 'Slice selection',
+            annotation: 'thickness = RF bandwidth ÷ (γ̄ · G)',
+            caption: 'Move the RF centre frequency and the slice walks along the patient; widen the bandwidth or weaken the gradient and the same pulse excites a thicker slab. Only the band whose Larmor frequencies the pulse contains answers.',
+          },
+        },
+        {
+          kind: 'prose',
+          text: '**Frequency encoding**: a readout gradient during sampling makes each column precess at its own frequency, and the Fourier transform separates them — one readout resolves every column. **Phase encoding**: a gradient lobe switched on and off before the readout leaves no frequency difference behind, but the **phase it created stays**; its area is stepped once per TR, and each step fills **one line of k-space**. That is why **scan time = TR × phase-encoding steps × NSA**, and why resolution is expensive along phase and nearly free along frequency.\n\n**K-space is not a map of the anatomy.** Position in it is the area under the gradients, k = γ̄∫G dt; each sample holds one spatial-frequency pattern laid across the whole slice and contributes to every pixel. The **centre** (low spatial frequencies — the ky = 0 line is acquired with the phase gradient off) carries **signal and contrast**; the **periphery** carries **edges and detail**. The sample spacing sets the field of view (FOV = 1/Δk); the extent sets the resolution (pixel = 1/(2·k_max)).',
         },
         {
           kind: 'sim',
@@ -283,6 +333,16 @@ export const MRI: V2Topic = {
           text: 'Signal follows the **number of protons in the voxel**, so SNR rises with voxel volume, slice thickness and (roughly in proportion) **B₀**. It rises only as **√NSA** — doubling SNR by averaging costs **four times** the scan time — and as **1/√(receiver bandwidth)**: a narrow bandwidth is the cheapest SNR on the console, paid for in chemical shift and a longer minimum TE. A finer matrix at **fixed FOV** means smaller voxels and lower SNR; and the standard false stem — extra phase-encoding steps cost **scan time, not TE**.\n\nArtefacts have a geography. **Motion ghosts and wrap-around (aliasing) lie along the phase-encoding direction**, because that axis is built one line per TR across the whole scan, while a frequency line is read in milliseconds and routinely oversampled. **Chemical shift misregistration lies along the frequency-encoding direction**: fat precesses about **3.5 ppm below water** — ≈220 Hz at 1.5 T, ≈440 Hz at 3 T — so fat is displaced by Δf ÷ (bandwidth per pixel), worse at higher field and narrower bandwidth. The same fat–water gap used deliberately is in/out-of-phase (Dixon) imaging, the classic move for adrenal adenoma.\n\n**Susceptibility** artefact — distortion and signal voids at metal and air interfaces — is worst on **gradient echo and EPI**, at long TE and high field, because only a 180° pulse cancels static field offsets. **Gibbs (truncation) ringing** comes from cutting k-space off, not from the patient: ripples parallel to sharp edges, finer as the matrix grows.',
         },
         {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ArtefactGallery />,
+            title: 'The artefact gallery',
+            annotation: 'each artefact = one broken assumption',
+            caption: 'Step through the gallery: motion ghosts marching along the phase axis, wrap-around folding the anatomy back in, chemical shift displacing fat along the frequency axis, susceptibility blooming around metal. Every one is an encoding assumption failing in its own predictable direction — read each step\'s caption for which.',
+          },
+        },
+        {
           kind: 'relationship',
           title: 'The SNR levers',
           rows: [
@@ -327,6 +387,16 @@ export const MRI: V2Topic = {
         {
           kind: 'prose',
           text: '**The static field is always on.** A superconducting magnet carries a persistent current: cutting mains power removes the gradients, the RF and the lights, and changes B₀ **not at all**. Attractive force follows **magnetisation × the spatial gradient of the field**, so it is zero at isocentre (where the field is highest but flat) and climbs savagely at the bore mouth — the projectile hazard never switches off. The **0.5 mT (5 gauss)** contour is the boundary for uncontrolled public access — pacemaker wearers stay outside it — and active shielding pulls that line in close while making the gradient at it steeper.\n\n**Switched gradients** induce electric fields in tissue through **dB/dt**: peripheral nerve stimulation, felt at the periphery where the gradient field is largest, and acoustic noise from Lorentz forces on the coils — hearing protection is for everyone who stays in the room. **RF** deposits energy as heat, measured as **SAR (W/kg)**: it scales with the **square of B₀ and the square of flip angle** — roughly four times greater at 3 T than at 1.5 T for the same pulse — and the whole-body normal-mode limit (2 W/kg, IEC 60601-2-33) exists to hold the core temperature rise to **0.5 °C** — first-level controlled mode (4 W/kg) allows up to 1 °C. Burns come from **conductive loops and skin-to-skin contact**, not bulk heating.\n\nA **quench** boils the helium — about **700 litres of gas per litre of liquid** — up the quench pipe if all goes well, into the room if it does not: the danger is **asphyxiation**, and the helium is not flammable. It is the only thing that removes the field, which is exactly why it is an emergency control and not an off switch. Labelling: **MR Safe** means unconditionally safe — no fine print; anything safe only within stated field, gradient or SAR limits is **MR Conditional**, including many modern implants.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SafetyZonesSim />,
+            title: 'The fringe field and its zones',
+            annotation: '0.5 mT (5 gauss) — the public line',
+            caption: 'Walk the corridor toward the bore and watch the field climb — and with it, the force on anything ferromagnetic. The 0.5 mT contour is where the public stops; the force is worst not at isocentre but at the bore mouth, where the field changes fastest.',
+          },
         },
         {
           kind: 'compare',

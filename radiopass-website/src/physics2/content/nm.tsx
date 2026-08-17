@@ -13,7 +13,7 @@
  */
 
 import type { V2Topic } from '../types'
-import { GammaCameraChain, PetCoincidence } from '../components/sims/NmScenes'
+import { GammaCameraBuild, NmAcquisition, PetCoincidence } from '../components/sims/NmScenes'
 
 export const NM: V2Topic = {
   id: 'nm',
@@ -85,10 +85,10 @@ export const NM: V2Topic = {
           kind: 'sim',
           sim: {
             kind: 'element',
-            element: <GammaCameraChain/>,
-            title: 'One photon through the whole chain',
-            annotation: 'collimator → crystal → PMT → PHA',
-            caption: 'Watch one photon at a time: emission, collimation, the crystal flash, the light guide, the PMT avalanche, the position logic — and one dot landing on the image. Every third photon scatters in the patient and the PHA throws it away.',
+            element: <GammaCameraBuild/>,
+            title: 'The camera, built one component at a time',
+            annotation: 'collimator → crystal → light guide → PMT → Anger → PHA',
+            caption: 'Press a component by name and it assembles onto the bench and animates its own job — the septa absorbing the oblique rays, the crystal flashing, the dynode ladder doubling, the tubes sharing the flash, the PHA killing the short pulse. Everything already taught stays on the bench; anything still to come is absent. The last stage runs the finished camera live, one photon at a time.',
             flush: true,
           },
         },
@@ -165,6 +165,17 @@ export const NM: V2Topic = {
         {
           kind: 'prose',
           text: 'Three planar modes. **Static**: one frame, counts simply accumulate. **Dynamic**: frame after frame, giving **time–activity curves** — the renogram. **Gated**: the ECG slices each cardiac cycle into **8–16 bins**, and every heartbeat adds counts to its bins until an average beat emerges sharp enough to measure ejection fraction.\n\n**SPECT** orbits the camera heads around the patient, collecting a projection at each angle, then reconstructs slices — **overlying activity disappears**, which is a gain in **contrast**; spatial resolution is not improved. Rotation invites its own artefacts: **centre-of-rotation errors** and patient motion.\n\nProjections become slices the same two ways as CT. **Filtered back-projection** is fast but ugly at low counts; **iterative reconstruction** guesses an image, computes what the camera would have seen, compares, updates and repeats — it models the physics and forgives poor statistics, which is why it has taken over.\n\nA photon born at the **centre** of the patient crosses far more tissue than one born at the surface, so uncorrected SPECT and PET **under-count the deep structures**. Hybrid scanners fix it with the **CT attenuation map**: every voxel’s counts are scaled by the tissue its photons had to cross. Without attenuation correction, quantification lies.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <NmAcquisition/>,
+            title: 'Binning the counts, then rotating',
+            annotation: 'gated: 8–16 bins · SPECT: contrast ↑, resolution unchanged',
+            caption: 'Pick the acquisition by name. In planar mode watch the same counts treated three ways — one frame filling, a time–activity curve drawing itself, the gated bins cycling with the ECG. Switch to SPECT and follow the two heads round: each tick is a projection angle collected, and with opposed heads every angle is covered within half a rotation.',
+            flush: true,
+          },
         },
         {
           kind: 'compare',

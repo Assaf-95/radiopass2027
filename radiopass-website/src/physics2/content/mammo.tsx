@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { XraySpectrum } from '../components/sims/XraySpectrum'
 
 export const MAMMO: V2Topic = {
   id: 'mammo',
@@ -83,15 +84,11 @@ export const MAMMO: V2Topic = {
         {
           kind: 'sim',
           sim: {
-            kind: 'iframe',
-            src: '/visuals/xray-beam-quality.html',
+            kind: 'element',
+            element: <XraySpectrum initialTarget="Mo" initialKvp={28} />,
             title: 'Shape the spectrum yourself',
             annotation: 'target · kVp · filtration',
-            caption: 'Drop the kVp to the high twenties and slide the target off tungsten: the characteristic lines jump to the target’s own energies — exactly the photons mammography is built around.',
-            hide: ['.eyebrow', 'h1', '.subtitle', '.explanation-card', '.mode-bar'],
-            click: ['#modeManual'],
-            css: '.app{display:flex;flex-direction:column;gap:12px;padding:10px 14px}.visual-panel{order:0}.info-panel{order:1;max-width:none}.info-scroll{padding:0}',
-            height: 640,
+            caption: 'The graph opens where mammography works: molybdenum at 28 kVp. Its characteristic lines sit at 17.5 and 19.6 keV — exactly the photons the technique is built around. Switch the target to tungsten and watch them vanish from the mammographic range entirely.',
           },
         },
         {

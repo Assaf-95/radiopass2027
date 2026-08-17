@@ -393,14 +393,16 @@ export function Sim({
           {readouts && <dl className="m5-readouts">{readouts}</dl>}
 
           <div className="m5-transport" onKeyDown={onKey} role="group" aria-label={`${label} — playback`}>
-            <button type="button" className="m5-tbtn" onClick={() => goStep(-1)} aria-label="Previous step" title="Previous step">◀︎</button>
+            {/* Step buttons carry the bar of the classic skip glyph so they
+                cannot be mistaken for play, which is a bare triangle. */}
+            <button type="button" className="m5-tbtn" onClick={() => goStep(-1)} aria-label="Previous step" title="Previous step">❙◀︎</button>
             <button
               type="button"
               className="m5-tbtn m5-tbtn-primary"
               onClick={() => setPlaying((p) => !p)}
               aria-label={playing ? 'Pause' : 'Play'}
             >{playing ? '❙❙' : '▶'}</button>
-            <button type="button" className="m5-tbtn" onClick={() => goStep(1)} aria-label="Next step" title="Next step">▶︎</button>
+            <button type="button" className="m5-tbtn" onClick={() => goStep(1)} aria-label="Next step" title="Next step">▶︎❙</button>
             <button type="button" className="m5-tbtn" onClick={reset} aria-label="Reset to the start" title="Reset">↺</button>
 
             {/* Scrubbing and playback speed are for someone already inspecting

@@ -330,7 +330,7 @@
 .v2-section-head { display: flex; align-items: baseline; gap: 13px; }
 .v2-section-head i { font-style: normal; font-family: var(--v2-mono); font-size: 13.5px; color: var(--v2-bronze); }
 .v2-section-head h2 { font-family: var(--v2-serif); font-weight: 500; font-size: clamp(21px, 2.6vw, 25px); margin: 0; }
-.v2-section-blurb { margin: 6px 0 0 37px; font-size: 13.5px; color: var(--v2-ink-3); }
+.v2-section-blurb { margin: 6px 0 0 37px; font-size: 14px; color: var(--v2-ink-3); }
 .v2-section-body { margin-top: 18px; display: grid; gap: 18px; }
 
 /* Primer blocks */
@@ -357,8 +357,8 @@
   background: var(--v2-paper-high);
   max-width: 640px;
 }
-.v2-equation b { font-family: var(--v2-mono); font-weight: 600; font-size: 16.5px; letter-spacing: 0.01em; }
-.v2-equation span { font-size: 13px; color: var(--v2-ink-2); }
+.v2-equation b { font-family: var(--v2-mono); font-weight: 680; font-size: clamp(19px, 2.4vw, 23px); letter-spacing: 0.01em; }
+.v2-equation span { font-size: 14px; color: var(--v2-ink-2); }
 
 .v2-rel { max-width: 640px; }
 .v2-rel table { width: 100%; border-collapse: collapse; }
@@ -389,7 +389,7 @@
 .v2-numbers dl { margin: 0; display: grid; grid-template-columns: 1fr auto; }
 .v2-numbers dt, .v2-numbers dd { border-top: 1px dotted var(--v2-line-strong); padding: 7px 0; margin: 0; font-size: 14px; }
 .v2-numbers dt { color: var(--v2-ink-2); padding-right: 26px; }
-.v2-numbers dd { font-family: var(--v2-mono); font-size: 13px; color: var(--v2-ink); text-align: right; white-space: nowrap; }
+.v2-numbers dd { font-family: var(--v2-mono); font-size: 14px; color: var(--v2-ink); text-align: right; white-space: nowrap; }
 
 .v2-trap {
   display: flex;
@@ -412,7 +412,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 550;
   color: var(--v2-ink-2);
   padding: 4px 0;
@@ -621,6 +621,18 @@
 .v2-tf button + button { border-left: 1px solid var(--v2-line-strong); }
 .v2-tf button:hover { background: rgba(0, 0, 0, 0.045); }
 .v2-tf button.on { background: var(--v2-ink); color: var(--v2-paper-high); }
+/* Frozen after marking: the answer the learner gave stays exactly where they
+   left it, tinted by whether it was right. Disabled must not mean faded —
+   this is the thing they are looking for. */
+.v2-tf button:disabled { cursor: default; opacity: 1; }
+.v2-tf button:disabled:hover { background: transparent; }
+.v2-tf button.on:disabled:hover { background: var(--v2-ink); }
+.v2-tf button.on.is-right, .v2-tf button.on.is-right:disabled:hover { background: var(--v2-green); color: #fff; }
+.v2-tf button.on.is-wrong, .v2-tf button.on.is-wrong:disabled:hover { background: var(--v2-red); color: #fff; }
+.v2-tf button:disabled:not(.on) { color: var(--v2-ink-3); }
+
+/* The answer cell: the frozen choice, and the verdict beside it. */
+.v2-answerbox { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
 
 .v2-verdict { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; text-align: right; }
 .v2-verdict b { font-size: 13px; font-weight: 600; }
@@ -889,11 +901,125 @@
   .v2-continue { display: none; }
   .v2-session-bar { top: 0; }
   .v2-stem { grid-template-columns: 22px 1fr; }
-  .v2-tf { grid-column: 2; justify-self: start; }
+  .v2-answerbox { grid-column: 2; justify-self: start; justify-content: flex-start; }
   .v2-verdict { grid-column: 2; align-items: flex-start; text-align: left; }
   .v2-explain { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .v2-root * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* A named checkbox in a sim's control column — the artefact gallery's
+   reveal toggle. Inline, unlike the block slider labels. */
+.v2-uscheck { display: flex !important; gap: 8px; align-items: flex-start; cursor: pointer; }
+.v2-uscheck input { margin-top: 3px; accent-color: var(--v2-bronze-bright); }
+.v2-uscheck span { font-size: 12.5px; line-height: 1.45; color: var(--v2-film-dim); letter-spacing: 0; text-transform: none; }
+
+/* ------------------------------------------------------------------ *
+ * V1 MRI simulations inside film plates.
+ *
+ * The mri5 components read their palette from tokens defined on .m5-root,
+ * an ancestor that exists only in the V1 module — embedded here without it,
+ * every label fell back to the paper ink and vanished on the dark film.
+ * The film plate now carries the tokens itself, tuned to the film ground so
+ * every control name reads clearly.
+ * ------------------------------------------------------------------ */
+.v2-plate {
+  --m5-bg: var(--v2-film);
+  --m5-panel: rgba(240, 240, 235, 0.05);
+  --m5-panel-2: rgba(240, 240, 235, 0.09);
+  --m5-line: rgba(240, 240, 235, 0.14);
+  --m5-line-2: rgba(240, 240, 235, 0.24);
+  --m5-ink: var(--v2-film-text);
+  --m5-mut: var(--v2-film-dim);
+  --m5-dim: #8a9098;
+  --m5-read: #cdd1d7;
+  --m5-mri: #A99EDB;
+  --m5-field: #a8cbea;
+  --m5-warm: var(--v2-bronze-bright);
+  --m5-good: #7BCBC4;
+  --m5-bad: #E0955A;
+  --text-primary: var(--v2-film-text);
+  --text-secondary: #cdd1d7;
+  --text-tertiary: var(--v2-film-dim);
+  color: var(--v2-film-text);
+}
+
+/* ------------------------------------------------------------------ *
+ * The question bank list: the syllabus titles at full size, the pool's
+ * standing in two plain numbers, and one door in per topic.
+ * ------------------------------------------------------------------ */
+.v2-qb-list { display: flex; flex-direction: column; }
+.v2-qb-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 1px solid var(--v2-line);
+}
+.v2-qb-row:last-child { border-bottom: 1px solid var(--v2-line); }
+.v2-qb-main { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+.v2-qb-num { font-family: var(--v2-mono); font-size: 13px; color: var(--v2-bronze); }
+.v2-qb-row h3 {
+  font-family: var(--v2-serif);
+  font-weight: 500;
+  font-size: clamp(21px, 2.8vw, 27px);
+  margin: 0;
+  color: var(--v2-ink);
+}
+.v2-qb-stats { display: flex; flex-direction: column; gap: 5px; }
+.v2-qb-stats b { font-family: var(--v2-mono); font-weight: 500; font-size: 14px; color: var(--v2-ink); }
+.v2-qb-bar { display: block; height: 4px; border-radius: 2px; background: var(--v2-line-strong); overflow: hidden; }
+.v2-qb-bar i { display: block; height: 100%; background: var(--v2-bronze); border-radius: 2px; }
+.v2-qb-stats small { font-size: 12.5px; color: var(--v2-ink-3); }
+.v2-qb-start {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: var(--v2-ink);
+  color: var(--v2-paper);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s var(--v2-ease, ease);
+}
+.v2-qb-start:hover { background: var(--v2-bronze); color: var(--v2-paper); }
+@media (max-width: 640px) {
+  .v2-qb-row { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .v2-qb-start { justify-self: start; }
+}
+
+/* ------------------------------------------------------------------ *
+ * The end of a chapter: two numbered steps in order — test what you
+ * just read, then go to the next chapter — and everything else quiet.
+ * ------------------------------------------------------------------ */
+.v2-finish { margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--v2-line-strong); }
+.v2-finish-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.v2-finish-steps li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid var(--v2-line);
+  border-radius: 10px;
+  background: var(--v2-paper-high);
+}
+.v2-finish-n {
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--v2-ink); color: var(--v2-paper);
+  font-family: var(--v2-mono); font-size: 12.5px; font-weight: 600;
+}
+.v2-finish-steps strong { display: block; font-size: 16px; font-weight: 600; color: var(--v2-ink); }
+.v2-finish-steps small { display: block; margin-top: 3px; font-size: 13px; line-height: 1.5; color: var(--v2-ink-3); }
+.v2-finish-aside { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 0; }
+.v2-finish-aside a { font-size: 13px; color: var(--v2-ink-3); text-decoration: none; border-bottom: 1px solid transparent; }
+.v2-finish-aside a:hover { color: var(--v2-bronze); border-bottom-color: var(--v2-bronze); }
+@media (max-width: 640px) {
+  .v2-finish-steps li { grid-template-columns: 26px minmax(0, 1fr); }
+  .v2-finish-steps li .v2-btn { grid-column: 2; justify-self: start; }
 }

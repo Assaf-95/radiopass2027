@@ -12,6 +12,8 @@
 
 import type { V2Topic } from '../types'
 import { FluoroAbc } from '../components/sims/FluoroAbc'
+import { FluoroIntensifier } from '../components/sims/FluoroIntensifier'
+import { IiDistortion, DsaSubtraction } from '../components/sims/FluoroScenes'
 
 export const FLUORO: V2Topic = {
   id: 'fluoro',
@@ -70,6 +72,16 @@ export const FLUORO: V2Topic = {
           text: 'X-rays strike a **caesium iodide (CsI) input phosphor**, whose needle-like columnar crystals channel the light forwards with little lateral spread. A **photocathode** (an antimony–caesium compound) in intimate contact converts that light into electrons, and **25–30 kV** across the vacuum accelerates them onto a small **output phosphor** (zinc cadmium sulphide), focused on the way by **electrostatic lenses**.\n\nThe brightness gain has two factors. **Flux gain**: each accelerated electron releases many more light photons at the output than were needed to free it — the energy comes from the accelerating voltage. **Minification gain**: the same image is squeezed from a large input face onto a small output, so brightness rises as the ratio of areas — (input diameter / output diameter)². The product is a **brightness gain of the order of 5000×** — enough to watch in real time at a low dose rate.\n\nBecause brightness gain compares two things that cannot be measured in the same units, the specified quantity is the **conversion factor**: output screen luminance divided by input air kerma rate (cd·m⁻² per µGy·s⁻¹). It falls as the intensifier ages — an old II quietly demands more dose for the same picture.',
         },
         {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <FluoroIntensifier />,
+            title: 'The intensifier, assembled one component at a time',
+            annotation: '25–30 kV · gain ≈ 5000×',
+            caption: 'The tube is built in front of you: pick a component by name and it assembles itself onto the drawing, with everything already taught left in place and everything not yet reached absent. Read the "Showing" line as each piece appears, then finish on "The whole tube, live" and follow one X-ray all the way through — light in the needles, an electron across the crossover, a flash on the small output disc.',
+          },
+        },
+        {
           kind: 'equation',
           formula: 'Brightness gain = flux gain × minification gain',
           note: 'minification gain = (input diameter / output diameter)²',
@@ -108,6 +120,16 @@ export const FLUORO: V2Topic = {
         {
           kind: 'prose',
           text: 'Steering electrons across a vacuum has three classic costs. **Pincushion distortion**: peripheral parts of the image are magnified more than the centre, so straight lines bow outward. **S-distortion**: external magnetic fields — including the Earth’s — bend the electron paths, skewing straight lines into an S. **Vignetting**: the periphery of the image arrives dimmer than the centre. In a full II system the final limit on spatial resolution is usually the **TV camera chain**, not the intensifier itself.\n\nA **flat-panel detector** is a rigid matrix of detector elements read out by thin-film transistors (TFT). Nothing is accelerated, nothing is focused, so the geometry is true, brightness is uniform, and the bulky vacuum tower above the patient disappears. There is also no minification gain to lose — which matters when magnification modes are compared. Digital fluoroscopy systems apply a **logarithmic conversion** so that pixel values track attenuation.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <IiDistortion />,
+            title: 'One test grid, two receptors',
+            annotation: 'periphery magnified more than the centre',
+            caption: 'The same square grid is drawn on each receptor. Follow any straight line out to the edge of the intensifier image and watch it bow outward — the periphery is magnified more than the centre, which is pincushion distortion, and the same peripheral weakness is why the edges also arrive dimmer. On the flat panel the grid stays square, because nothing is being steered.',
+          },
         },
         {
           kind: 'compare',
@@ -217,6 +239,16 @@ export const FLUORO: V2Topic = {
         {
           kind: 'prose',
           text: 'Take a **mask** image before contrast arrives, then subtract it from every live frame: bone and soft tissue — identical in both — vanish, and **only the iodine-filled vessels remain**. The images are converted **logarithmically** before subtraction, so the difference signal reflects the iodine itself rather than whatever anatomy happens to lie over it. Small vessels invisible against the spine become obvious against a blank field: **contrast resolution is transformed**.\n\nThe ledger has a debit side. The quantum noise in the mask and the live frame is uncorrelated, so subtraction **adds it in quadrature** — the subtracted frame is about **√2 times noisier** than either parent when they are equally noisy, and SNR falls. That is why DSA frames are acquired at a much higher dose per frame than plain fluoroscopy, and why the total study dose is high: the frames are many and none of them is cheap.\n\nAny patient movement between mask and run means the anatomy no longer cancels: **misregistration artefact** paints ghost edges across the image. The remedies are operational — remask after movement, or **pixel-shift** the mask into registration.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DsaSubtraction />,
+            title: 'Mask, run, difference',
+            annotation: 'run − mask, after log conversion',
+            caption: 'Compare the three panels in order. Everything that appears identically in the mask and the run — bone, soft tissue — cancels to nothing, and only the iodine column survives into the third panel. Then look at what did not change: the vessel edges are exactly as sharp as they were, because subtraction is arithmetic done after the detector has already fixed the spatial resolution.',
+          },
         },
         {
           kind: 'relationship',
