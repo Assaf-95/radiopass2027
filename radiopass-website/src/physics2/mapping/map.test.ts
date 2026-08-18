@@ -6,6 +6,12 @@
  * break, without anyone remembering to run the script.
  */
 
+/* FIRST — the topic registry pulls in all nine content files and every
+   mounted simulation, one of which reads window.matchMedia at module scope;
+   jsdom needs the shim in place before that import evaluates. Same pattern,
+   same reason, as physics/routes.test.ts. */
+import '../../mri/test/setup'
+
 import { describe, expect, it } from 'vitest'
 
 import { QB_QUESTIONS } from '../../qbank/data'

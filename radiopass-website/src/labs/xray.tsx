@@ -45,8 +45,6 @@ const DESIGNS: { href: string; name: string; blurb: string }[] = [
     blurb: 'A walk through what the beam does inside tissue, one step at a time.' },
   { href: '/visuals/diagrams-1-5.html', name: 'Atoms & X-ray production',
     blurb: 'Atomic structure, characteristic radiation and bremsstrahlung.' },
-  { href: '/visuals/xray-spectrum-simulator.html', name: 'The emission spectrum, live',
-    blurb: 'Tungsten against molybdenum: kVp, mA, filtration and generator, each with a note on what it just changed.' },
   { href: '/visuals/xray-beam-quality.html', name: 'Beam quality & filtration',
     blurb: 'kVp, HVL and filtration — what hardens the beam and what it costs.' },
   { href: '/visuals/radiographic-magnification.html', name: 'Magnification & geometry',

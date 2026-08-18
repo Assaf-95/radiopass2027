@@ -18,7 +18,10 @@ import { useState } from 'react'
 import { drawGammaCamera, drawModes, drawPet, drawSpect } from '../../../labs/nm'
 import { DrawCanvas } from './DrawCanvas'
 
-export function GammaCameraChain() {
+/* Internal: the 'all' stage of GammaCameraBuild below. Was exported with no
+   outside consumer, which made it read as an orphan API — it is not dead, it
+   is simply not public. */
+function GammaCameraChain() {
   return (
     <DrawCanvas
       draw={(ctx, w, h, p, t) => drawGammaCamera(ctx, w, h, 'all', p, t)}

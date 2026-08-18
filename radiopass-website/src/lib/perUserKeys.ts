@@ -31,8 +31,10 @@ export const PER_USER_KEYS: readonly string[] = [
   /* The learner event log — mock history, module completions, activity dates.
      Written by both branches under one key. */
   'radiopass.learner.events.v1',
-  /* Physics V2's resume position ("continue where you left off" in the
-     alternative experience). Local-only, but it is one person's place. */
+  /* The Continue chip's label cache. The POSITION lives on the shared learner
+     timeline (module.started events, synced); this key only remembers the
+     human label that goes with it ("CT · Dose — question 3"). Local-only and
+     presentation-only, but it is still one person's place. */
   'radiopass.physics2.v1',
 
   /* --- Anatomy ---------------------------------------------------------- */

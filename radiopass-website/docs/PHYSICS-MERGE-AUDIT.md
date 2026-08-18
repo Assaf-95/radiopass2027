@@ -708,7 +708,7 @@ Verified: `tsc` clean, `oxlint` clean, **223 tests pass** (16 new in `src/physic
 production build clean, and the routes, redirects, chrome and both progress records checked live in
 the browser.
 
-**Phase 3 — one honest progress model.**
+**Phase 3 — one honest progress model.** — **LANDED 18 Aug 2026** (commit `62c1916`).
 Ship `QbAttempt` v2 + `QbStanding` with lazy `sanitize`-hook migration and the per-question attempts
 union in the merge function. Drop the write-once guard; add `mode`; record mocks. Retire `noteVisit`
 into `record({type:'module.started'})` so course reading reaches the shared timeline and Continue has
@@ -716,14 +716,54 @@ one author. Subscribe the dashboard to the stores so a synced device is not stal
 "laboratories opened" and "modules completed"; derive the "21 stages" literal; fix
 `answered` to count against the bank; make `readSnapshot` surface real mock history.
 
-**Phase 4 — the auditable mapping.**
+*As shipped:* everything above, plus mock papers now write `mode:'mock'` attempts into the question
+record (blanks excluded), and the two accuracies are labelled everywhere ("X% now · Y% first time,
+cold"). `standingOf()` in `qbank/Shell.tsx` is the single policy definition; 17 unit tests in
+`src/qbank/attempts.test.ts` cover the migration (never writes on read, idempotent, undated legacy
+records), the policy (re-test fixes, mastery needs two full-mark passes, 0-of-0 is neither mastered
+nor wrong), and the mirror (legacy fields track the latest attempt so old builds stop calling a
+fixed question wrong). One deviation: `noteVisit` still writes the local key — as a LABEL cache only
+(the Continue chip's human text); the position itself is authored solely by `module.started` on the
+synced timeline, throttled to one event per surface per page load.
+
+**Phase 4 — the auditable mapping.** — **LANDED 18 Aug 2026** (commit `a8297dc`).
 Lift section metadata into `src/physics2/mapping/sections.ts`. Bootstrap `questionMap.ts` from the
 current resolver with `by` provenance. Ship `scripts/physics-map-validate.ts` as `npm run physics:map`,
 wired into `scripts/run-tests.sh` with E1-E6 failing and W1-W3 reporting. Work the ~164-row review
 list. Fill or waive the seven empty sections; re-home `b35`, `b248`, `b443`. Remove the "High-yield"
 chip (`Question.tsx:98`) and fix the missing `filter` at `Questions.tsx:67`.
 
-**Phase 5 — embed the simulations, one topic at a time, in syllabus order.**
+*As shipped:* §5's unverified figures re-derived first and reproduced exactly (240/180/47, 117
+disagreements, 245 ambiguous, 23 orphan tags, 106/172 concept misses). Concepts and pool bindings
+lifted too (`mapping/concepts.ts`, `TOPIC_POOLS`), so the whole matching surface is Node-readable.
+`assign.ts` is a pure lookup with no fallback; the concept under a wrong answer also comes from the
+map. Twelve rows hand-reviewed, not the full 164: five formerly-empty sections filled from misfiled
+questions (`digital/quality`, `mammo/energy`, `mammo/spectrum`, `mammo/geometry`, `nm/performance`),
+two waived with reasons (`digital/processing`, `fluoro/chain`), `b443`+`b35` re-homed to safety with
+`overrideTopic`, `b248` kept in NM deliberately (its stem is collimation; only its title says MRI).
+**W1 stands at 455 unreviewed rows — that is the remaining editorial debt, printed on every test
+run.** Bootstrap regeneration refuses without `--force`, and `mapping/map.test.ts` trips if the
+hand-reviewed rows are ever regenerated away.
+
+**Phase 5 — embed the simulations.** — **LANDED 18 Aug 2026** (commit `9beaca8`), two named gaps.
+
+*As shipped:* 60 new mounts. X-ray +7 (photon lottery, three fates, μ, HVL, exponential, focal-spot
+page, beam-quality page) · Digital +6 (both panel routes, matrix, dose creep, MTF/DQE, processing)
+· Fluoro +4 (chain, ABC, pulsed+LIH, skin dose) · Mammo +10 (all ten drawings) · NM +12 (generator,
+ideal tracer, decay film, collimator, PHA, performance, SPECT ×3 including the never-consumed
+`drawSpect`, PET detail, committed dose) · MRI +29 (every propless mri5 instrument, mounted at its
+section) · US: the artefact picker extended from 8 to all 19 kinds · Safety +2 (interaction
+probability, room shielding, both `diagrams-6-10.html` panels with `hide[]`). Draw exports use the
+`lessonDraw`-resolver pattern (fails at module load on a renamed step); nm's film scenes get a
+`filmDraw` twin placed below `FILM_SCENES` (TDZ). Six topics' `labs[]` retired.
+
+*Skipped, deliberately:* **CT's draw exports** — `labs/ct.tsx` is held mid-edit by the concurrent
+workflow and R9 says coordinate before touching it; its four already-exported scenes remain the
+topic's sims and its `labs[]` stays. **US contract-C wrappers** — the scene state lives in the
+driver pages and re-hosting is real wrapper work per scene; `us.tsx` keeps its laboratory door.
+Both are the §3 table's remaining rows.
+
+Original plan for reference: 
 Work the §3 table. Per topic: export the lab draws (one line each, `labs/ct.tsx:808` is the pattern),
 mount them as `kind:'element'` sims at the named section, then delete that topic's `labs[]` array.
 Start with **X-ray** (proves the D-contract `InstrumentFrame` path), then **Digital** and
@@ -734,7 +774,21 @@ sims, largest volume, least risk), then **Ultrasound** (contract C — budget wr
 extend the `UsArtefacts` picker to the 11 unused kinds first as the cheap win), then **Safety** (mount
 the `diagrams-6-10.html` shielding panel; accept that no dedicated safety lab exists).
 
-**Phase 6 — retire and document.**
+**Phase 6 — retire and document.** — **LANDED 18 Aug 2026.**
+
+*As shipped:* `DESIGN.md` rewritten as the merged spec. `xray-spectrum-simulator.html` and its hub
+entry retired (superseded by the native `XraySpectrum`). `GammaCameraChain` turned out to be alive —
+it is the 'all' stage of `GammaCameraBuild` — so it was made internal rather than deleted. The final
+grep finds no learner-facing "V2" (symbol names like `V2Shell` are internal and deliberately NOT
+renamed — a mechanical rename of ~50 symbols buys no learner value and risks the working tree the
+other workflow is editing). Stale comments fixed in phases 2–3.
+
+*Kept, with the condition recorded:* `components/Shell.tsx` (the §7 table's own condition — "only
+once one merged chrome exists" — is not yet met; the course pages still render their own header) and
+`radiopass.physics2.v1` + its `perUserKeys.ts` entry (now a label cache only; the position lives on
+the synced timeline — remove both only if the chip is ever fed from somewhere else).
+
+Original plan for reference:
 Delete the §7 list in dependency order. Remove `radiopass.physics2.v1` and its `perUserKeys.ts:36`
 entry once the resume migration has shipped and settled. Strip the dead `.v2-labs`/`.v2-pager` rules.
 Rewrite `src/physics2/DESIGN.md` as the merged spec. Fix the stale comments in `physics/Home.tsx`
