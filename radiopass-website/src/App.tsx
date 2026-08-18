@@ -654,7 +654,12 @@ function FAQ() {
 function LoginPage() {
   const { user, signUp, signIn, configured } = useAuth()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  /* ?mode=signup opens straight onto the create-account form — the free
+     sample's gates land here, and a visitor who just clicked "sign up"
+     should not be met by a login form with one more link to find. */
+  const [mode, setMode] = useState<'login' | 'signup'>(() =>
+    new URLSearchParams(window.location.search).get('mode') === 'signup' ? 'signup' : 'login',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)

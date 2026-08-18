@@ -135,7 +135,9 @@ describe('E — full RadioPass entitlement', () => {
   it('is never blocked by trial logic, configured or not', () => {
     // The regression this guards: gating on "is it in the trial?" before
     // checking entitlement, which locks paying customers out of what they own.
-    expect(trialIsConfigured(TRIAL)).toBe(false)
+    // The trial IS configured now, which makes this the live case, not the
+    // hypothetical one.
+    expect(trialIsConfigured(TRIAL)).toBe(true)
     expect(isAllowed(physicsLab, full)).toBe(true)
     expect(isAllowed({ branch: 'anatomy', kind: 'module', id: 'anything' }, full)).toBe(true)
   })
@@ -158,19 +160,39 @@ describe('F — admin', () => {
   })
 })
 
-describe('the trial configuration, while empty', () => {
-  it('reports itself as unconfigured', () => {
-    expect(trialIsConfigured(TRIAL)).toBe(false)
+describe('the trial configuration, as chosen', () => {
+  /* The owner chose the free sample on 18 Aug 2026: the opening sections of
+     X-ray and MRI, and one free question set. These tests pin that choice —
+     a stray edit that frees a whole kind, or empties the sample, fails here
+     rather than on the live page. */
+
+  it('reports itself as configured', () => {
+    expect(trialIsConfigured(TRIAL)).toBe(true)
   })
 
-  it('lists nothing for either branch, so no fake cards can render', () => {
+  it('frees named physics items only — nothing in anatomy', () => {
     expect(trialContents('anatomy', TRIAL)).toEqual([])
-    expect(trialContents('physics', TRIAL)).toEqual([])
+    const physics = trialContents('physics', TRIAL)
+    const byKind = new Map(physics.map((row) => [row.kind, row.ids]))
+    expect(byKind.get('module')).toEqual([
+      'xray/foundations',
+      'xray/tube',
+      'xray/spectrum',
+      'mri/signal',
+    ])
+    expect(byKind.get('questions')).toEqual(['x57', 'b417', 'b415', 'x53', 'b385'])
+    // Named ids, never `true` — the free page renders this list, and a whole
+    // kind cannot fit on one page.
+    for (const [, ids] of byKind) expect(Array.isArray(ids)).toBe(true)
   })
 
-  it('frees nothing at all', () => {
+  it('frees the named items and nothing beyond them', () => {
     const trial = entitlementOf(['account', 'trial'])
-    for (const r of [atlas, anatomyQuestions, physicsLab, physicsQuestions, physicsMock]) {
+    expect(isAllowed({ branch: 'physics', kind: 'module', id: 'xray/tube' }, trial)).toBe(true)
+    expect(isAllowed({ branch: 'physics', kind: 'questions', id: 'x57' }, trial)).toBe(true)
+    // Everything unnamed stays shut: other modules, mocks, anatomy.
+    expect(isAllowed({ branch: 'physics', kind: 'module', id: 'ct/dose' }, trial)).toBe(false)
+    for (const r of [atlas, anatomyQuestions, physicsLab, physicsMock]) {
       expect(isAllowed(r, trial), `${r.branch}/${r.kind}`).toBe(false)
     }
   })
