@@ -11,7 +11,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 
 import { questionsForSection } from '../data'
 import { QuestionCard } from '../QuestionCard'
-import { QbShell, readQbMarks, readQbProgress, recordQbScore } from '../Shell'
+import { QbShell, readQbMarks, readQbProgress, recordQbScore, standingOf } from '../Shell'
 import { QB_SUBJECTS, type QbQuestion } from '../types'
 
 type ReviewId = 'unseen' | 'incorrect' | 'flagged' | 'favourite'
@@ -60,7 +60,9 @@ export default function ReviewPage() {
     return unique.filter((q) => {
       const attempt = progress[q.id]
       if (id === 'unseen') return !attempt
-      if (id === 'incorrect') return !!attempt && attempt.correct < attempt.outOf
+      /* "Latest attempt fell short", not "was ever wrong" — otherwise a
+         question the candidate has since fixed never leaves this list. */
+      if (id === 'incorrect') return standingOf(attempt).needsReview
       if (id === 'flagged') return !!marks[q.id]?.flagged
       return !!marks[q.id]?.favourite
     })
@@ -68,7 +70,7 @@ export default function ReviewPage() {
 
   const onScored = useCallback(
     (qid: string, correct: number, outOf: number, choices: Record<string, boolean>) => {
-      recordQbScore(qid, correct, outOf, choices, questions.find((q) => q.id === qid)?.topic)
+      recordQbScore(qid, correct, outOf, choices, questions.find((q) => q.id === qid)?.topic, 'retest')
       setVersion((v) => v + 1)
     },
     [questions],

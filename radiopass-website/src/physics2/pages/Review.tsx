@@ -83,8 +83,8 @@ export default function V2Review() {
                 </h3>
               </span>
               <span className="acc">
-                {standing.accuracy !== null
-                  ? `${standing.answered}/${standing.total} · ${Math.round(standing.accuracy * 100)}%`
+                {standing.latestAccuracy !== null
+                  ? `${standing.answered}/${standing.total} · ${Math.round(standing.latestAccuracy * 100)}% now`
                   : 'not started'}
               </span>
               <span className="acts">

@@ -6,10 +6,16 @@
  * then the governing principle (the concept registry), then the one key point,
  * then the way back into the primer section that teaches it.
  *
- * Two modes. 'bank': a prior submission replays read-only, a new one is
- * recorded permanently. 'retest': always a fresh sheet, marked locally,
- * and the permanent record is never rewritten (recordQbScore is first-write-
- * wins, so calling it for an already-answered question is a no-op).
+ * Two modes. 'bank': a prior submission replays read-only, so revisiting a
+ * question you have answered shows what you answered rather than a blank
+ * sheet, and cannot accidentally re-score it. 'retest': always a fresh sheet.
+ *
+ * Both are recorded. The store keeps a question's attempts in order and
+ * derives its standing from them, so a re-test that gets it right genuinely
+ * fixes the question — it leaves the re-test pool and stops dragging its
+ * topic's figures down. What a re-test cannot do is rewrite the FIRST sitting:
+ * that attempt stays exactly as it was, and it is the one the cold-accuracy
+ * number is built from.
  */
 
 import { useEffect, useRef, useState } from 'react'
@@ -85,9 +91,13 @@ export function V2Question({
   const submit = () => {
     if (!allAnswered || submitted) return
     setSubmitted(true)
-    // First-write-wins in the shared store: a bank submission becomes the
-    // permanent record; a re-test of an already-answered question does not.
-    recordQbScore(question.id, correct, outOf, choices, question.topic)
+    /* Every attempt is recorded now, tagged with which kind it was. The store
+       used to keep only the first and silently drop the rest, which meant a
+       candidate could re-test a question they had learned and watch it stay
+       wrong for ever. What re-testing does NOT do is overwrite the first
+       sitting: that is kept as its own attempt and is what the cold-accuracy
+       figure is built from. */
+    recordQbScore(question.id, correct, outOf, choices, question.topic, mode === 'retest' ? 'retest' : 'bank')
     onSubmitted?.(question, correct, outOf)
   }
 

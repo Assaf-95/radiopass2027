@@ -52,7 +52,19 @@ export default function V2TopicPage() {
               <b>
                 {standing.answered} / {standing.total} answered
               </b>
-              {standing.accuracy !== null && <small>{Math.round(standing.accuracy * 100)}% accuracy so far</small>}
+              {/* Both numbers, both named. The first is what a cold sitting
+                  produced and never moves again; the second is where the
+                  candidate stands now, and is the one re-testing changes.
+                  Only shown once they differ — before any re-test they are
+                  the same number and printing it twice reads as an error. */}
+              {standing.latestAccuracy !== null && (
+                <small>
+                  {Math.round(standing.latestAccuracy * 100)}% now
+                  {standing.firstAccuracy !== null &&
+                    Math.round(standing.firstAccuracy * 100) !== Math.round(standing.latestAccuracy * 100) &&
+                    ` · ${Math.round(standing.firstAccuracy * 100)}% first time`}
+                </small>
+              )}
               <span className="v2-meter" aria-hidden="true">
                 <i style={{ width: `${standing.total ? (standing.answered / standing.total) * 100 : 0}%` }} />
               </span>

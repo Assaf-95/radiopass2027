@@ -34,11 +34,19 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
+import { useEffect, useState } from 'react'
+
 import { QB_QUESTIONS, QB_TOTALS } from '../qbank/data'
-import { readQbProgress, readQbMarks } from '../qbank/Shell'
+import {
+  readQbProgress,
+  readQbMarks,
+  standingOf,
+  subscribeQbProgress,
+} from '../qbank/Shell'
 import { readProgress as readUsProgress } from '../us/components/progress'
-import { completedModules, lastOfType } from '../lib/learner'
-import { QB_SUBJECTS } from '../qbank/types'
+import { US_STAGES } from '../us/components/Layout'
+import { SECTIONS as MRI_SECTIONS } from '../mri5/sections'
+import { completedModules, lastOfType, mockHistory } from '../lib/learner'
 import { V2_TOPICS } from '../physics2/topics'
 import { topicStanding } from '../physics2/lib/derive'
 import { COURSE_PARTS } from './course'
@@ -50,16 +58,26 @@ import './physicshome.css'
  * ------------------------------------------------------------------ */
 
 type Snapshot = {
+  /** Questions in the BANK that have been attempted. Never the store's size. */
   answered: number
-  correct: number
-  outOf: number
+  /** Stem marks on first sittings — immutable. */
+  firstCorrect: number
+  firstOutOf: number
+  /** Stem marks on the most recent sitting of each — moves with re-testing. */
+  latestCorrect: number
+  latestOutOf: number
   flagged: number
-  labsVisited: number
-  /** The subject with the most recent submitted answer, if any. */
-  lastSubject: { id: string; name: string; at: string } | null
-  /** The most recent module the learner opened, if that is newer. */
+  /** Ultrasound experiment pages opened, out of the real total. */
+  usStagesVisited: number
+  /** MRI sections opened, out of the real total. */
+  mriSectionsVisited: number
+  /** Lessons finished, out of the number the course actually declares. */
+  lessonsDone: number
+  lessonsTotal: number
+  /** Finished mock papers, newest first. */
+  mocks: ReturnType<typeof mockHistory>
+  /** The most recent lesson or section the learner opened. */
   lastModule: { path: string; topic?: string; at: string } | null
-  modulesCompleted: number
   hasActivity: boolean
 }
 
@@ -68,57 +86,104 @@ function readSnapshot(): Snapshot {
   const marks = readQbMarks()
   const us = readUsProgress()
 
-  const entries = Object.entries(progress)
-  let correct = 0
-  let outOf = 0
-  for (const [, a] of entries) {
-    correct += a.correct
-    outOf += a.outOf
-  }
-
-  /* The most recently submitted question, resolved back to its subject. Only
-     attempts that actually carry a timestamp count — attempts recorded before
-     submittedAt existed are still valid scores, they simply cannot date
-     themselves, and guessing a date for them would be inventing history. */
-  let lastId: string | null = null
-  let lastAt = ''
-  for (const [id, a] of entries) {
-    if (a.submittedAt && a.submittedAt > lastAt) {
-      lastAt = a.submittedAt
-      lastId = id
+  /* Counted against the BANK, not against the store.
+     `Object.keys(progress).length` is the raw store size, which includes any
+     id that has since left the bank — ids come out of a fingerprint dedupe, so
+     that is a real possibility — and the dashboard would cheerfully print
+     "470 of 467 answered". Intersecting with the bank cannot exceed it. */
+  let answered = 0
+  let firstCorrect = 0
+  let firstOutOf = 0
+  let latestCorrect = 0
+  let latestOutOf = 0
+  for (const q of QB_QUESTIONS) {
+    const s = standingOf(progress[q.id])
+    if (s.attemptCount === 0) continue
+    answered += 1
+    if (s.firstAttempt) {
+      firstCorrect += s.firstAttempt.correct
+      firstOutOf += s.firstAttempt.outOf
     }
-  }
-
-  let lastSubject: Snapshot['lastSubject'] = null
-  if (lastId) {
-    const question = QB_QUESTIONS.find((q) => q.id === lastId)
-    const subject = question
-      ? QB_SUBJECTS.find((s) => s.sections.some((sec) => sec.topics.includes(question.topic)))
-      : undefined
-    if (subject) lastSubject = { id: subject.id, name: subject.name, at: lastAt }
+    if (s.latestAttempt) {
+      latestCorrect += s.latestAttempt.correct
+      latestOutOf += s.latestAttempt.outOf
+    }
   }
 
   const flagged = Object.values(marks).filter((m) => m.flagged).length
 
-  /* The other half of "where was I": a lesson the learner opened but did not
-     answer questions in leaves no trace in the progress store, only on the
-     timeline. Continue picks whichever of the two is genuinely more recent. */
+  /* Where was I. A lesson the learner opened but answered no questions in
+     leaves no trace in the progress store, only on the timeline — and since
+     the course engine now records module.started too, this one event type is
+     the single author of Continue for both the laboratories and the primers.
+     There is no second candidate to arbitrate against any more. */
   const moduleEvent = lastOfType('module.started', 'physics')
   const lastModule = moduleEvent
     ? { path: moduleEvent.contentId, topic: moduleEvent.topic, at: moduleEvent.at }
     : null
 
+  /* Lessons, not "modules". completedModules() returns pathnames, and the
+     dashboard used to print that array's length as "modules completed" — so a
+     learner four lessons into X-ray alone read "4 modules completed" while the
+     list below showed one tick. It also counted off-spine routes, so it could
+     exceed nine. Intersecting with the spine gives a number that means what it
+     says and cannot run past its own denominator. */
+  const spine = new Set(V2_TOPICS.flatMap((t) => t.lessons.map((l) => l.path)))
+  const done = completedModules('physics')
+  const lessonsDone = done.filter((path) => spine.has(path)).length
+
+  /* "Laboratories opened" counted us.visited, whose only writer is the
+     ultrasound layout — so it counted ULTRASOUND EXPERIMENT PAGES. Opening
+     /ct-lab or /nm-lab contributed nothing, and a learner who finished
+     ultrasound read "21 laboratories opened". Named for what it is now, and
+     given the denominator that makes it legible. */
+  const usPaths = new Set(US_STAGES.map((s) => s.path))
+  const usStagesVisited = us.visited.filter((p) => usPaths.has(p)).length
+
+  const mriPaths = new Set(MRI_SECTIONS.map((s) => `/mri/${s.slug}`))
+  const mriSectionsVisited = done.filter((p) => mriPaths.has(p)).length
+
+  const mocks = mockHistory('physics')
+
   return {
-    answered: entries.length,
-    correct,
-    outOf,
+    answered,
+    firstCorrect,
+    firstOutOf,
+    latestCorrect,
+    latestOutOf,
     flagged,
-    labsVisited: us.visited.length,
-    lastSubject,
+    usStagesVisited,
+    mriSectionsVisited,
+    lessonsDone,
+    lessonsTotal: spine.size,
+    mocks,
     lastModule,
-    modulesCompleted: completedModules('physics').length,
-    hasActivity: entries.length > 0 || us.visited.length > 0 || lastModule !== null,
+    hasActivity:
+      answered > 0 || usStagesVisited > 0 || mocks.length > 0 || lastModule !== null,
   }
+}
+
+/**
+ * The snapshot, kept current.
+ *
+ * It used to be `useMemo(readSnapshot, [])` — read once at mount and never
+ * again. Every store is synced, and `pullAndMerge` resolves AFTER mount, so on
+ * a new device or a cold sign-in the dashboard painted the pre-sync numbers
+ * and kept them until a manual reload. A candidate with a full record was
+ * shown the empty state and told "nothing recorded yet". That reads as data
+ * loss, and it is the first thing they see.
+ *
+ * Every store has always exposed subscribe(); nothing used it.
+ */
+function useSnapshot(): Snapshot {
+  const [snap, setSnap] = useState(readSnapshot)
+  useEffect(() => {
+    const refresh = () => setSnap(readSnapshot())
+    // A sync can land between the first render and this effect.
+    refresh()
+    return subscribeQbProgress(refresh)
+  }, [])
+  return snap
 }
 
 /* ------------------------------------------------------------------ *
@@ -192,18 +257,24 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 export default function PhysicsHome() {
-  const s = useMemo(readSnapshot, [])
-  const accuracy = s.outOf > 0 ? Math.round((s.correct / s.outOf) * 100) : null
+  const s = useSnapshot()
+  const pct = (c: number, o: number) => (o > 0 ? Math.round((c / o) * 100) : null)
+  const firstAccuracy = pct(s.firstCorrect, s.firstOutOf)
+  const latestAccuracy = pct(s.latestCorrect, s.latestOutOf)
 
-  /* The nine topics with their standing, computed once. Each topic's pool is
-     resolved from the shared question record, so these are the same numbers
-     the topic page and Review show — not a second reckoning of the same work. */
+  /* The nine topics with their standing. Each topic's pool is resolved from
+     the shared question record, so these are the same numbers the topic page
+     and Review show — not a second reckoning of the same work. Recomputed
+     whenever the snapshot changes, so a sync landing after mount repaints the
+     rows as well as the headline. */
   const topics = useMemo(
     () => V2_TOPICS.map((topic) => ({ topic, standing: topicStanding(topic) })),
-    [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [s],
   )
   const wrong = topics.reduce((n, t) => n + t.standing.wrong, 0)
-  const done = useMemo(() => new Set(completedModules('physics')), [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const done = useMemo(() => new Set(completedModules('physics')), [s])
 
   return (
     <main className="ph">
@@ -230,42 +301,74 @@ export default function PhysicsHome() {
 
         {s.hasActivity ? (
           <>
+            {/* Every label here says exactly which quantity it is. Four of
+                these used to be mislabelled rather than wrong — the numbers
+                were real, they simply did not measure what they claimed. */}
             <div className="ph-stats">
               <Stat value={`${s.answered}`} label={`of ${QB_TOTALS.questions} questions answered`} />
-              {accuracy !== null && <Stat value={`${accuracy}%`} label={`${s.correct} of ${s.outOf} statements correct`} />}
-              {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
-              {s.labsVisited > 0 && <Stat value={`${s.labsVisited}`} label="laboratories opened" />}
-              {s.modulesCompleted > 0 && (
-                <Stat value={`${s.modulesCompleted}`} label="modules completed" />
+              {latestAccuracy !== null && (
+                <Stat
+                  value={`${latestAccuracy}%`}
+                  label={`${s.latestCorrect} of ${s.latestOutOf} statements right, latest attempt`}
+                />
               )}
+              {/* The exam predictor. Only worth its own tile once re-testing
+                  has moved the two apart; identical numbers side by side just
+                  look like a bug. */}
+              {firstAccuracy !== null && firstAccuracy !== latestAccuracy && (
+                <Stat value={`${firstAccuracy}%`} label="first time, cold" />
+              )}
+              {s.lessonsDone > 0 && (
+                <Stat value={`${s.lessonsDone}`} label={`of ${s.lessonsTotal} lessons finished`} />
+              )}
+              {s.usStagesVisited > 0 && (
+                <Stat
+                  value={`${s.usStagesVisited}`}
+                  label={`of ${US_STAGES.length} ultrasound experiments opened`}
+                />
+              )}
+              {s.mriSectionsVisited > 0 && (
+                <Stat
+                  value={`${s.mriSectionsVisited}`}
+                  label={`of ${MRI_SECTIONS.length} MRI sections read`}
+                />
+              )}
+              {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
             </div>
 
-            {/* One Continue, pointing at whichever activity is genuinely the
-                most recent — a lesson or a subject in the bank. Never both,
-                and never a guess when there is no history at all. */}
-            {(() => {
-              const useModule =
-                s.lastModule && (!s.lastSubject || s.lastModule.at > s.lastSubject.at)
-              if (useModule && s.lastModule) {
-                return (
-                  <Link className="ph-continue" to={s.lastModule.path}>
-                    <span className="ph-continue-label">Continue</span>
-                    <span className="ph-continue-name">
-                      {s.lastModule.topic ?? 'Your last lesson'}
-                    </span>
-                    <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
-                  </Link>
-                )
-              }
-              if (!s.lastSubject) return null
-              return (
-                <Link className="ph-continue" to={`/question-bank/${s.lastSubject.id}`}>
-                  <span className="ph-continue-label">Continue</span>
-                  <span className="ph-continue-name">{s.lastSubject.name}</span>
-                  <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
-                </Link>
-              )
-            })()}
+            {/* Mock papers. These WERE recorded all along — Mock.tsx has
+                emitted mock.completed since the log existed — and the
+                dashboard simply never asked. Showing the most recent, with the
+                count, because one score with no history is a fact and a
+                history is a trend. */}
+            {s.mocks.length > 0 && (
+              <p className="ph-mocks">
+                {s.mocks.length} mock paper{s.mocks.length === 1 ? '' : 's'} sat · latest{' '}
+                <strong>
+                  {s.mocks[0].correct}/{s.mocks[0].outOf}
+                </strong>{' '}
+                ({Math.round((s.mocks[0].correct / Math.max(1, s.mocks[0].outOf)) * 100)}%) on{' '}
+                {s.mocks[0].paper}
+              </p>
+            )}
+
+            {/* ONE Continue, with one author.
+                There used to be two candidates arbitrated on a timestamp — the
+                last lesson, and the last question-bank subject — because the
+                course engine recorded nothing to the shared timeline and had
+                to be inferred from question activity. It records
+                module.started now, so the timeline knows about primers,
+                lessons and sections alike, and the arbitration is gone with
+                the ambiguity that needed it. */}
+            {s.lastModule && (
+              <Link className="ph-continue" to={s.lastModule.path}>
+                <span className="ph-continue-label">Continue</span>
+                <span className="ph-continue-name">
+                  {s.lastModule.topic ?? 'Where you left off'}
+                </span>
+                <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
+              </Link>
+            )}
           </>
         ) : (
           /* No activity. Say that, and give one obvious first step — never a
@@ -338,10 +441,10 @@ export default function PhysicsHome() {
                         <span className="ph-mod-meta">
                           {standing.answered > 0
                             ? `${standing.answered}/${standing.total} answered${
-                                standing.accuracy !== null
-                                  ? ` · ${Math.round(standing.accuracy * 100)}%`
+                                standing.latestAccuracy !== null
+                                  ? ` · ${Math.round(standing.latestAccuracy * 100)}% now`
                                   : ''
-                              }`
+                              }${standing.wrong > 0 ? ` · ${standing.wrong} to fix` : ''}`
                             : `${standing.total} questions`}
                         </span>
                       </Link>
