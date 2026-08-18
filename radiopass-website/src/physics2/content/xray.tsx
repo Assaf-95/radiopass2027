@@ -14,6 +14,10 @@ import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { SECTIONS } from '../mapping/sections'
 import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from the X-ray core — the same functions the
+   /xray-lab lessons run; see the export note in labs/xraygeo.tsx. */
+import { drawPhotonEnters, drawThreeFates, drawExponential, drawMu, drawHvl } from '../../labs/xraygeo'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
 
 /** This topic's matching rules. The primer below is what stays here. */
@@ -48,6 +52,26 @@ export const XRAY: V2Topic = {
           kind: 'detail',
           summary: 'Why intensity cannot ionise when photon energy is too low',
           text: 'Ionisation is a single-photon event: one photon hands its whole energy to one electron. If that energy is below the binding energy, no number of photons changes the outcome — doubling intensity doubles how many photons arrive, not what each can do. This is the photoelectric argument Einstein was cited for, and the exam leans on it whenever a stem confuses beam intensity with photon energy.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPhotonEnters} height={320} label='One photon entering tissue — billions play the same lottery and the image is the census of what got through' />,
+            title: 'One photon, one lottery ticket',
+            caption: 'Every exposure fires billions of photons into tissue, and each plays the same lottery alone. The image is nothing but the census of what reached the far side — so the whole of image formation hides inside the fate of one photon.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawThreeFates} height={340} label='The three fates: a photon transmitted to the detector, one absorbed mid-slab, one scattered away obliquely' />,
+            title: 'Transmit, absorb, scatter',
+            caption: 'Transmitted photons draw the image. Absorbed photons vanish inside — they buy contrast and pay in dose. Scattered photons change direction and survive to fog the image. Every property of a radiograph traces back to this three-way split.',
+          },
         },
       ],
     },
@@ -97,6 +121,17 @@ export const XRAY: V2Topic = {
             { label: 'Typical broad / fine focal spots', value: '1.0–1.2 / 0.3–0.6 mm' },
             { label: 'Effective focal spot', value: 'actual × sin(anode angle)' },
           ],
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/xray-focal-spot-unsharpness.html',
+            title: 'The line-focus principle, live',
+            annotation: 'anode angle · effective spot · penumbra',
+            caption: 'Steepen the anode angle and watch the effective focal spot shrink while the actual filament area — and its heat capacity — stays the same. Then move the object away from the detector and watch the penumbra grow: the same geometry decides both.',
+          },
         },
       ],
     },
@@ -167,6 +202,38 @@ export const XRAY: V2Topic = {
           kind: 'detail',
           summary: 'Why quantity and quality move in opposite directions',
           text: 'A filter is just matter, and attenuation is strongest at low photon energies (the photoelectric 1/E³ dependence). So the filter takes proportionally more from the soft end of the spectrum than the hard end: total photon count falls, while the survivors are on average harder. The same logic explains why the patient is a filter too — the beam that exits a patient is harder than the one that entered.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawExponential} height={320} label='Exponential attenuation: each centimetre removes the same fraction, the beam thinning towards zero but never reaching it' />,
+            title: 'The same fraction every centimetre',
+            annotation: 'I = I₀ e^(−μx)',
+            caption: 'Each centimetre removes the same fraction of whatever arrives — never the same number. A thousand photons become five hundred, then two-fifty, then one-two-five: I = I₀e^(−μx), a beam that thins forever and never quite reaches zero.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawMu} height={320} label='The linear attenuation coefficient: dense high-Z tissue stopping more per centimetre, and μ falling as photon energy rises' />,
+            title: 'μ — how stoppable tissue is',
+            caption: 'The fraction removed per centimetre is the linear attenuation coefficient μ. Dense, high-Z, easy-to-stop tissue has a large μ; and for any tissue, μ falls as photon energy rises — which is why a harder beam penetrates further.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawHvl} height={320} label='Half-value layer: each layer halves the beam, two leave a quarter, three an eighth' />,
+            title: 'The HVL compounds',
+            annotation: 'HVL = 0.693 / μ',
+            caption: 'The HVL is the thickness that cuts the beam to half — the working measure of beam quality, because a harder beam has a longer HVL. Halving compounds: two layers leave a quarter, three an eighth.',
+          },
         },
       ],
     },
@@ -300,6 +367,17 @@ export const XRAY: V2Topic = {
             { label: 'Grid ratio, typical general work', value: '8:1 – 12:1' },
           ],
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/xray-beam-quality.html',
+            title: 'Beam quality and filtration',
+            annotation: 'kVp · HVL · added filtration',
+            caption: 'Raise the filtration and watch the low-energy end of the spectrum disappear: the beam hardens, HVL lengthens, and the photons that would only have dosed skin never leave the tube head.',
+          },
+        },
       ],
     },
   ],
@@ -317,8 +395,8 @@ export const XRAY: V2Topic = {
     'Grids buy contrast with dose (Bucky factor 3–5×); air gaps buy contrast with magnification.',
     'Quantum mottle ∝ 1/√dose: halving noise costs four times the dose.',
   ],
-  labs: [
-    { label: 'X-ray laboratory — the guided lessons', to: '/xray-lab' },
-    { label: 'Open the spectrum instrument full-screen', to: '/visuals/xray-beam-quality.html' },
-  ],
+  /* The deep-lesson doors that used to sit here are gone: the lesson diagrams
+     are embedded above, at the section each one teaches. The four /xray-lab
+     lessons remain the guided path and are reached from the dashboard. */
+  labs: [],
 }

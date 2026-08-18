@@ -15,6 +15,16 @@ import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { SECTIONS } from '../mapping/sections'
 import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from /xray-lab/digital — same functions. */
+import {
+  drawDrIndirect,
+  drawDrDirect,
+  drawMatrix,
+  drawDynamicRange,
+  drawMtf,
+  drawProcessing,
+} from '../../labs/digital'
 import { PixelMatrix } from '../components/sims/PixelMatrix'
 import { CrReaderStages, DrConversionStacks } from '../components/sims/CrReader'
 
@@ -116,6 +126,26 @@ export const DIGITAL: V2Topic = {
           summary: 'Sharper is not the same as more dose-efficient',
           text: 'MTF and DQE part company here. a-Se wins on MTF — no light to spread. But DQE also needs absorption, and at general radiography energies selenium (K-edge 12.7 keV) captures a smaller fraction of the beam than CsI (K-edges 33 and 36 keV). So CsI panels usually carry the higher DQE in general work, while selenium’s sharpness and low-energy absorption make it the natural mammography detector.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawDrIndirect} height={340} label='The indirect flat panel: CsI needles turning X-rays into guided light, a photodiode array beneath turning light into charge' />,
+            title: 'Indirect: convert twice',
+            caption: 'An indirect panel converts twice — a CsI scintillator turns X-rays into light, and the photodiode/TFT array beneath turns light into charge, read out row by row. The CsI grows as columnar needles that guide the light down like fibre optics, limiting the sideways spread.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawDrDirect} height={340} label='The direct flat panel: amorphous selenium converting X-rays straight to charge, pulled down by the bias field with no sideways spread' />,
+            title: 'Direct: convert once',
+            caption: 'A direct panel uses amorphous selenium: the X-ray creates charge directly in the photoconductor and the applied field pulls it straight down to the pixel electrodes. No light, no sideways spread — which is why direct conversion is the sharper of the two.',
+          },
+        },
       ],
     },
     {
@@ -163,6 +193,17 @@ export const DIGITAL: V2Topic = {
           kind: 'trap',
           text: 'Doubling the matrix side does not double the storage — it quadruples it: 512² → 1024² is four times the pixels.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawMatrix} height={340} label='Pixel size as field of view over matrix, and storage scaling with the square of the matrix side' />,
+            title: 'The matrix arithmetic',
+            annotation: 'pixel = FOV / matrix',
+            caption: 'Pixel size = field of view ÷ matrix, and resolution can never beat the detector element. Storage scales with the square of the matrix side and linearly with bit depth — double the matrix and the file quadruples.',
+          },
+        },
       ],
     },
     {
@@ -194,6 +235,17 @@ export const DIGITAL: V2Topic = {
           kind: 'detail',
           summary: 'The deviation index, quantified',
           text: 'DI = 10 × log₁₀(EI / EI target). Zero means on target; +3 means roughly double the intended detector dose, −3 roughly half. It is the number that turns “watch the exposure indicator” into an auditable habit.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawDynamicRange} height={340} label='Film’s narrow S-curve against the digital detector’s wide linear response — and the dose creep it invites' />,
+            title: 'The response that hides overexposure',
+            annotation: 'dose creep',
+            caption: 'Film had a narrow S-curve: miss the exposure and the image died. A digital detector responds linearly across a huge range, so processing rescues almost any exposure — which means overexposure LOOKS perfect. The exposure indicator, not the image, is what tells the truth about dose. That is dose creep.',
+          },
         },
       ],
     },
@@ -234,6 +286,16 @@ export const DIGITAL: V2Topic = {
           kind: 'trap',
           text: 'A high-MTF detector can still be dose-inefficient: MTF ignores noise entirely. Only DQE folds sharpness and noise into a single statement about dose.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawMtf} height={340} label='MTF falling with spatial frequency, and DQE measuring how efficiently the detector spends its dose' />,
+            title: 'MTF and DQE, side by side',
+            caption: 'The MTF says how much contrast survives at each spatial frequency — 1 is perfect, every blur pulls it down. The DQE says how efficiently the detector uses the dose it is given. Direct panels win MTF; high-DQE panels buy the same image for less dose. Two different questions, two different winners.',
+          },
+        },
       ],
     },
     {
@@ -261,6 +323,16 @@ export const DIGITAL: V2Topic = {
           kind: 'trap',
           text: 'Processing cannot rescue SNR: if the photons were never detected, no algorithm restores the information — smoothing merely hides mottle by discarding detail.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawProcessing} height={340} label='Display-side processing re-presenting the data: windowing, edge enhancement and smoothing, none of them adding information' />,
+            title: 'Processing re-presents, never improves',
+            caption: 'Windowing, edge enhancement and noise smoothing are display-side: they re-present the data, never improve it. An underexposed image keeps its quantum mottle whatever the processing does — and a dead pixel row is corrected by interpolation, not resurrection.',
+          },
+        },
       ],
     },
   ],
@@ -279,5 +351,7 @@ export const DIGITAL: V2Topic = {
     'MTF = contrast surviving at each spatial frequency, limiting resolution at ≈10%; DQE = SNR²out/SNR²in ≤ 1 — the dose-efficiency figure.',
     'Processing is display-side and can never add photons: an underexposed image keeps its quantum mottle whatever the algorithm.',
   ],
-  labs: [{ label: 'CR & digital radiography — the guided lesson', to: '/xray-lab/digital' }],
+  /* Embedded above at cr, panels, sampling, latitude, quality and processing;
+     the guided lesson remains at /xray-lab/digital via the dashboard. */
+  labs: [],
 }

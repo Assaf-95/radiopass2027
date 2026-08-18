@@ -25,6 +25,38 @@ import { InversionRecoverySim } from '../../mri5/sims/InversionRecovery'
 import { SliceSelectionSim } from '../../mri5/sims/SliceSelection'
 import { ArtefactGallery } from '../../mri5/sims/ArtefactGallery'
 import { SafetyZonesSim } from '../../mri5/sims/SafetyZones'
+/* The rest of the module's propless instruments, mounted at the section that
+   teaches each one. Zero adaptation: these are the same components the /mri
+   module runs, imported as they are. */
+import { MriAxes } from '../../mri5/sims/MriAxes'
+import { ProtonLabSim } from '../../mri5/sims/ProtonLab'
+import { ResonanceB1Sim } from '../../mri5/sims/ResonanceB1'
+import { FlipAngleSim } from '../../mri5/sims/FlipAngle'
+import { FidSimulator } from '../../mri5/sims/FidSimulator'
+import { PhaseCoherenceAndSignalSim } from '../../mri5/sims/PhaseCoherenceAndSignal'
+import { T2vsT2Star } from '../../mri5/sims/T2vsT2Star'
+import { TrTeDiagram } from '../../mri5/sims/TrTeDiagram'
+import { EchoTrainSim } from '../../mri5/sims/EchoTrain'
+import { SeVsGreSim } from '../../mri5/sims/SeVsGreSim'
+import { ErnstAngleSim } from '../../mri5/sims/ErnstAngleSim'
+import { SusceptibilityBloomSim } from '../../mri5/sims/SusceptibilityBloomSim'
+import { SequenceFamilyMap } from '../../mri5/sims/SequenceFamilyMap'
+import { GadoliniumSim } from '../../mri5/sims/GadoliniumSim'
+import { RelaxivityCurve } from '../../mri5/sims/RelaxivityCurve'
+import { BbbEnhancement } from '../../mri5/sims/BbbEnhancement'
+import { LocalisationProblem } from '../../mri5/sims/LocalisationProblem'
+import { FrequencyEncodingSim } from '../../mri5/sims/FrequencyEncoding'
+import { PhaseEncodingSim } from '../../mri5/sims/PhaseEncodingSim'
+import { ReceiverBandwidthSim } from '../../mri5/sims/ReceiverBandwidth'
+import { EncodingMap } from '../../mri5/sims/EncodingMap'
+import { ImageQualityLab } from '../../mri5/sims/ImageQualityLab'
+import { DiffusionSim } from '../../mri5/sims/DiffusionSim'
+import { AdcMapSim } from '../../mri5/sims/AdcMap'
+import { TofSim } from '../../mri5/sims/TofSim'
+import { PhaseContrastSim } from '../../mri5/sims/PhaseContrastSim'
+import { SpectrumSim } from '../../mri5/sims/SpectrumSim'
+import { ScannerCrossSection } from '../../mri5/sims/ScannerCrossSection'
+import { ShieldingShiftSim } from '../../mri5/sims/ShieldingShift'
 
 /** This topic's matching rules. The primer below is what stays here. */
 const S = SECTIONS.mri
@@ -83,6 +115,66 @@ export const MRI: V2Topic = {
           summary: 'Why each nucleus has its own frequency',
           text: 'γ̄ is a constant unique to each nucleus — 42.58 MHz/T for ¹H, different for ³¹P, ²³Na and the rest. That is what makes MRI selective: at any one field strength, an RF pulse at the hydrogen Larmor frequency talks to hydrogen and to nothing else. It is also why ω₀ = γB₀ (angular frequency, rad/s) and f₀ = γ̄B₀ (ordinary frequency, Hz) both appear in books — they differ by 2π, and γ̄ = γ/2π.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <MriAxes />,
+            title: 'The axes, first',
+            caption: 'Longitudinal is along B₀; transverse is the plane the signal lives in. Every sentence in this topic uses these two words — fix them before anything else.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ProtonLabSim />,
+            title: 'Spins in the bore',
+            caption: 'Drop protons into the field and watch the tiny excess align with B₀ — a few per million, and that excess is the entire net magnetisation the scanner works with.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ResonanceB1Sim />,
+            title: 'The resonance condition',
+            caption: 'The B₁ pulse only talks to spins precessing at its own frequency. Detune it and nothing happens; match the Larmor frequency and the magnetisation answers. That matching IS resonance.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <FlipAngleSim />,
+            title: 'The flip angle',
+            caption: 'Hold B₁ on longer, or stronger, and the magnetisation tips further — 90° lays it fully into the transverse plane. The flip angle is a duration × amplitude product, not a magic setting.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <FidSimulator />,
+            title: 'The FID',
+            caption: 'Switch the pulse off and watch the transverse magnetisation precess and decay — the free induction decay, the raw voltage in the coil that every image is refined from.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <PhaseCoherenceAndSignalSim />,
+            title: 'Coherence is the signal',
+            caption: 'A million spins pointing the same way in the transverse plane add; let them fan out and the sum dies with no energy lost anywhere. Signal is phase agreement — which is why T2 processes cost signal without costing energy.',
+          },
+        },
       ],
     },
     {
@@ -131,6 +223,27 @@ export const MRI: V2Topic = {
         {
           kind: 'trap',
           text: 'T2 relaxation loses no energy — coherence, not energy, is what decays. Energy loss is the definition of T1, and conflating the two is a standard false stem.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <T2vsT2Star />,
+            title: 'T2 against T2*',
+            annotation: 'T2* < T2',
+            caption: 'Two decays side by side: the irreversible spin–spin loss (T2) and the faster combined decay with field inhomogeneity added (T2*). The gap between the curves is exactly what a 180° pulse can win back.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <TrTeDiagram />,
+            title: 'TR and TE on one clock',
+            caption: 'The two timings drawn on the sequence clock: TR sets how much T1 recovery happens between excitations, TE sets how much T2 decay happens before the echo is read. Every weighting in the next section is just choices of these two.',
+          },
         },
       ],
     },
@@ -196,6 +309,56 @@ export const MRI: V2Topic = {
           summary: 'Echo trains, and the wider sequence family',
           text: 'Turbo (fast) spin echo collects several 180° echoes per excitation, each filling one k-space line; the echo that fills the centre line defines the effective TE and hence the weighting. Diffusion-weighted imaging adds a pair of strong gradients that cancel for stationary spins and fail to cancel for wandering ones, so signal loss maps water mobility. Time-of-flight MRA saturates the stationary slice and lets fresh unsaturated blood arrive bright. All of them are the same experiment — excite, encode, listen — with one element changed.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <EchoTrainSim />,
+            title: 'The echo train',
+            caption: 'One excitation, a train of 180° pulses, an echo after each — turbo spin echo. Watch each echo come back smaller: the train rides down the T2 curve, and where you place the centre of k-space decides the effective TE.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SeVsGreSim />,
+            title: 'Spin echo against gradient echo',
+            caption: 'The 180° pulse recovers dephasing from field inhomogeneity; a gradient reversal cannot — it only unwinds what the gradient itself did. That single difference is why SE is T2 and GRE is T2*, and why GRE is fast but bloom-prone.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ErnstAngleSim />,
+            title: 'The Ernst angle',
+            caption: 'At short TR a 90° pulse wastes magnetisation that has no time to recover. Drop the flip angle and steady-state signal rises to a maximum — the Ernst angle — before falling again. Gradient-echo imaging lives on this curve.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SusceptibilityBloomSim />,
+            title: 'Susceptibility bloom',
+            caption: 'A metal clip or a bleed distorts the local field, and without a 180° pulse the distortion dephases everything around it — the black bloom that grows with TE on gradient echo, and the same effect SWI turns into a diagnostic tool.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SequenceFamilyMap />,
+            title: 'The family tree',
+            caption: 'Every named sequence hangs off two branches — spin echo or gradient echo — with preparation modules bolted on. Place any acronym the exam throws at you on this map before reasoning about it.',
+          },
+        },
       ],
     },
     {
@@ -237,6 +400,37 @@ export const MRI: V2Topic = {
           kind: 'detail',
           summary: 'Why protocols are not copied between field strengths',
           text: 'Relaxation times are field-dependent: T1 lengthens appreciably at 3 T while T2 changes comparatively little. A TR that gave clean T1 contrast at 1.5 T sits differently on the 3 T recovery curves, so timings are re-optimised, not transplanted. The signal equation itself also assumes a clean 90°–180° spin echo with TR ≫ TE; gradient echo replaces the T2 term with T2* and adds flip angle as a contrast control.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <GadoliniumSim />,
+            title: 'What gadolinium actually does',
+            caption: 'Gadolinium is not seen — its seven unpaired electrons churn the local field and shorten the T1 of nearby water protons. Watch recovery speed up where the agent goes: the enhancement is the water, not the metal.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <RelaxivityCurve />,
+            title: 'Relaxivity',
+            annotation: '1/T1 = 1/T1₀ + r₁·[Gd]',
+            caption: 'Observed relaxation rate rises linearly with concentration; the slope is the relaxivity r₁. This one line is the dose–response of contrast MRI.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <BbbEnhancement />,
+            title: 'The blood–brain barrier',
+            caption: 'Intact barrier: gadolinium stays intravascular and normal brain barely enhances. Break the barrier — tumour, infection, infarct — and agent leaks into the interstitium, T1 shortens, and the lesion lights up. Enhancement maps barrier failure.',
+          },
         },
       ],
     },
@@ -294,6 +488,56 @@ export const MRI: V2Topic = {
           summary: 'Why acquisition order decides which contrast wins',
           text: 'Ordering changes when each line is collected, not how many. Because contrast lives in the centre lines, the image reports whatever the magnetisation was doing while they were filled: centric ordering samples the centre first to catch an arterial gadolinium bolus; in a turbo spin echo train the echo that fills the centre defines the effective TE; in inversion recovery the nulling is judged at the moment the centre lines are acquired, not at the start of the train.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <LocalisationProblem />,
+            title: 'The problem, stated',
+            caption: 'Every proton in the bore answers at the same frequency — the coil hears one voice with no way to tell where any of it came from. Everything in this section exists to break that symmetry.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <FrequencyEncodingSim />,
+            title: 'Frequency encoding',
+            caption: 'Switch a gradient on during readout and position becomes pitch: left of centre answers low, right answers high. One Fourier transform of the received signal is a projection of the patient.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <PhaseEncodingSim />,
+            title: 'Phase encoding',
+            caption: 'A brief gradient pulse before readout leaves each row with a different remembered phase. One pulse gives one phase pattern — which is why the second direction costs a repetition per row, and why phase encoding owns the scan time.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ReceiverBandwidthSim />,
+            title: 'Receiver bandwidth',
+            caption: 'Widen the receiver bandwidth and readout is faster but more noise is let in; narrow it and SNR improves while chemical shift artefact grows. One dial, three consequences — a classic exam trade.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <EncodingMap />,
+            title: 'The three gradients, one map',
+            caption: 'Slice select during the pulse, phase before readout, frequency during it — the complete localisation recipe on one diagram. This is the picture to reconstruct in the exam when a question names any gradient.',
+          },
+        },
       ],
     },
     {
@@ -346,6 +590,66 @@ export const MRI: V2Topic = {
           summary: 'Why the two matrix directions cost differently',
           text: 'Doubling the frequency matrix at fixed FOV halves the voxel and the SNR, but the extra samples are read within the same readout window — no time cost. Doubling the phase matrix also halves the voxel, but each new line is a separate excitation averaging into every pixel, worth √2 back: SNR falls by only √2, while scan time doubles. Same resolution gain, different bills — which is why the phase matrix is the one protocols trim.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ImageQualityLab />,
+            title: 'The quality triangle',
+            caption: 'SNR, resolution, and scan time — pull any corner and the others move. Every protocol decision the exam asks about (matrix, FOV, NEX, bandwidth, slice thickness) is a walk around this triangle.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DiffusionSim />,
+            title: 'Diffusion weighting',
+            caption: 'Two strong gradients bracket a 180° pulse: stationary water rephases and keeps its signal; water that wandered between the pulses does not. Restricted diffusion — stroke, abscess, dense tumour — stays bright.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <AdcMapSim />,
+            title: 'The ADC map',
+            caption: 'The b-values fit an exponential per voxel; its decay constant is the ADC. True restriction is DWI-bright AND ADC-dark — the map is what separates it from T2 shine-through.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <TofSim />,
+            title: 'Time-of-flight MRA',
+            caption: 'Saturate a slab with rapid pulses and stationary tissue goes dark; blood flowing in arrives unsaturated and bright. Angiography without a drop of contrast — and the reason slow or in-plane flow disappears.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <PhaseContrastSim />,
+            title: 'Phase-contrast flow',
+            caption: 'A bipolar gradient leaves moving spins with a phase shift proportional to velocity. Phase becomes a speedometer: direction, speed, even flow quantification — and aliasing when velocity exceeds the VENC.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SpectrumSim />,
+            title: 'Spectroscopy',
+            caption: 'Suppress the water peak and the metabolites appear, each at its chemical-shift position: NAA, creatine, choline, lactate. The exam wants the pattern — choline up and NAA down reads tumour.',
+          },
+        },
       ],
     },
     {
@@ -394,6 +698,26 @@ export const MRI: V2Topic = {
           kind: 'trap',
           text: 'The Faraday cage blocks RF only — it is powerless against the static fringe field. And the emergency power-off does not touch B₀: only a quench removes the field.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ScannerCrossSection />,
+            title: 'The machine, layer by layer',
+            caption: 'The cryostat, the main windings, the gradient coils, the RF body coil and the bore liner in cross-section. Each safety hazard in this section belongs to exactly one of these layers — place it before reasoning about it.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <ShieldingShiftSim />,
+            title: 'Shielding the fringe field',
+            caption: 'Passive iron and active counter-windings pull the 0.5 mT line in toward the magnet. Drag the shielding and watch Zone IV shrink — the controlled area is a designed object, not an accident of the building.',
+          },
+        },
       ],
     },
   ],
@@ -412,8 +736,7 @@ export const MRI: V2Topic = {
     'Ghosts and wrap lie along the phase-encoding direction, because that axis is built one line per TR.',
     'Safety: 0.5 mT (5 gauss) public line; SAR ∝ B₀² × flip², ≈4× at 3 T, 2 W/kg normal mode; quench = 700 L helium gas per litre, asphyxiation risk; B₀ never off.',
   ],
-  labs: [
-    { label: 'The full MRI module — 21 sections', to: '/mri' },
-    { label: 'The MRI sequence laboratory', to: '/mri-lab' },
-  ],
+  /* All of the module's propless instruments are mounted above at the section
+     each teaches. The full guided module remains at /mri via the dashboard. */
+  labs: [],
 }

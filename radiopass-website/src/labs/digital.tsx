@@ -5,7 +5,7 @@
  */
 
 import { C, rgba, clamp, lerp, seg, smoothstep, sceneLabel, mulberry32 } from '../home/fx'
-import { LessonPage, lessonPing, type LessonStep } from './lesson'
+import { LessonPage, lessonPing, type LessonStep, type StepDraw } from './lesson'
 
 const ACC = '#8FB8C9'
 const INK = C.ink
@@ -736,6 +736,25 @@ const STEPS: LessonStep[] = [
     },
   },
 ]
+
+/**
+ * Lesson diagrams re-hosted by RADIOPASS PHYSICS topic 02.
+ *
+ * Same resolver pattern as ct.tsx: the film plates hold the very functions the
+ * lesson runs — never copied, never re-timed — and a renamed step id fails at
+ * module load instead of handing the topic page an undefined draw.
+ */
+function lessonDraw(id: string): StepDraw {
+  const draw = STEPS.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`Digital lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+export const drawDrIndirect = lessonDraw('dr-indirect')
+export const drawDrDirect = lessonDraw('dr-direct')
+export const drawMatrix = lessonDraw('matrix')
+export const drawDynamicRange = lessonDraw('dynamic-range')
+export const drawMtf = lessonDraw('mtf')
+export const drawProcessing = lessonDraw('processing')
 
 export default function DigitalLab() {
   return (

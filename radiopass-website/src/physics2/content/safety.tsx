@@ -58,6 +58,19 @@ export const SAFETY: V2Topic = {
           kind: 'trap',
           text: 'Effective dose is never assigned to a gram of tissue or to a single organ — “the effective dose to the skin” is a nonsense phrase. Organ-level statements use absorbed or equivalent dose.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/diagrams-6-10.html',
+            title: 'Interaction probability against photon energy',
+            annotation: 'PE ∝ Z³/E³ · crossover ≈25–30 keV',
+            caption: 'Step through the crossing curves: photoelectric falling as E³, Compton barely moving, and the crossover in soft tissue at roughly 25–30 keV. Which interaction dominates decides contrast, dose and shielding alike — one graph, three exam chapters.',
+            hide: ['header.hero', '#d6', '#d8', '#d9', '#d10'],
+            height: 640,
+          },
+        },
       ],
     },
     {
@@ -239,6 +252,19 @@ export const SAFETY: V2Topic = {
           kind: 'detail',
           summary: 'Radioactive waste answers to the environmental agencies',
           text: 'Radioactive waste — gaseous releases and patient excreta included — is regulated by the environmental agencies, not local authorities. Solid waste sits in decay storage for roughly ten half-lives before disposal; discharge to the sewer is strictly limited; and ARSAC licenses the administration of radiopharmaceuticals. After a diagnostic Tc-99m study, breastfeeding usually continues with little or no interruption.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/diagrams-6-10.html',
+            title: 'The X-ray room, shielded',
+            annotation: 'primary · secondary · controlled area',
+            caption: 'Walk the layout: primary barriers where the beam can point, secondary barriers for scatter and leakage everywhere else, the operator behind the protective screen, and the controlled area drawn around it all. Distance, shielding and where you stand are the whole of staff protection.',
+            hide: ['header.hero', '#d6', '#d7', '#d8', '#d10'],
+            height: 640,
+          },
         },
       ],
     },

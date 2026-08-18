@@ -14,6 +14,9 @@ import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { SECTIONS } from '../mapping/sections'
 import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from /xray-lab/fluoroscopy — same functions. */
+import { drawChain, drawAbc, drawPulsed, drawSkinDose } from '../../labs/fluoro'
 import { FluoroAbc } from '../components/sims/FluoroAbc'
 import { FluoroIntensifier } from '../components/sims/FluoroIntensifier'
 import { IiDistortion, DsaSubtraction } from '../components/sims/FluoroScenes'
@@ -50,6 +53,16 @@ export const FLUORO: V2Topic = {
             { change: 'Tube far from the skin', effect: 'entrance dose spread over more area — peak skin dose ↓' },
             { change: 'Collimation ↓ field', effect: 'less tissue irradiated — scatter ↓, DAP ↓, contrast ↑' },
           ],
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawChain} height={340} label='The live imaging chain: under-couch tube, patient, receptor and display running continuously' />,
+            title: 'The chain, running live',
+            caption: 'Fluoroscopy is radiography running continuously: an under-couch tube, the patient, and a receptor — historically an image intensifier, now usually a flat panel — feeding a live display. Everything about the design follows from having to stay on.',
+          },
         },
       ],
     },
@@ -174,6 +187,16 @@ export const FLUORO: V2Topic = {
           kind: 'trap',
           text: 'ABC holds the IMAGE constant, not the dose. A steady picture over thick anatomy is precisely the sign that the dose rate has gone up, not that it is safe.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawAbc} height={340} label='Automatic brightness control: the feedback loop holding the display steady while the dose rate silently rises over thicker tissue' />,
+            title: 'What ABC holds constant',
+            caption: 'A sensor watches the image brightness; when the view moves over thicker tissue the loop raises kV and/or mA to hold the display steady. The picture never changes — but the dose rate silently does. Panning across a patient is a dose programme you cannot see.',
+          },
+        },
       ],
     },
     {
@@ -205,6 +228,28 @@ export const FLUORO: V2Topic = {
           kind: 'detail',
           summary: 'Why fluoroscopy is where deterministic effects become real',
           text: 'Deterministic injuries have thresholds — below them nothing happens, above them severity grows with dose. Plain radiography delivers milligray to the skin and never approaches them; fluoroscopy delivers tens of milligray per minute to the same entrance field, so minutes of screening multiply into gray. That is why the deterministic vocabulary (erythema, epilation, threshold) belongs to fluoroscopy stems, while radiography stems stay in the stochastic world of risk per millisievert.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPulsed} height={340} label='Pulsed fluoroscopy: the beam firing at reduced frame rates with last image hold keeping a picture on screen between pulses' />,
+            title: 'Pulse the beam',
+            annotation: 'pulsed · LIH',
+            caption: 'The eye needs far fewer frames than continuous exposure provides. Pulse the beam — 15, 7.5, even 3 pulses per second — and dose falls roughly with the frame rate, with last image hold keeping a picture on screen between pulses. Dose features, not conveniences.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawSkinDose} height={340} label='Skin dose geometry: collimation, detector close, tube far, and the beam moved so no single patch of skin pays the whole bill' />,
+            title: 'Defending the skin',
+            annotation: 'erythema ≈2–5 Gy',
+            caption: 'Long procedures put deterministic injuries in reach — erythema needs only 2–5 Gy at one patch of skin. The defences are geometric: collimate, keep the detector close and the tube far, avoid magnification, and move the beam so no single patch pays the whole bill.',
+          },
         },
       ],
     },
@@ -261,7 +306,7 @@ export const FLUORO: V2Topic = {
     'DAP conversion: 1 cGy·cm² = 1 µGy·m²; a barium enema runs to tens of Gy·cm².',
     'DSA: contrast resolution ↑, noise adds (SNR ↓, ≈ √2× for equal frames), spatial resolution unchanged; movement gives misregistration.',
   ],
-  labs: [
-    { label: 'Fluoroscopy — the guided lesson', to: '/xray-lab/fluoroscopy' },
-  ],
+  /* Embedded above at chain, intensifier, distortion, abc, dose and dsa;
+     the guided lesson remains at /xray-lab/fluoroscopy via the dashboard. */
+  labs: [],
 }

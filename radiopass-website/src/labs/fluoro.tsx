@@ -4,7 +4,7 @@
  */
 
 import { C, rgba, clamp, lerp, seg, smoothstep, sceneLabel } from '../home/fx'
-import { LessonPage, lessonPing, type LessonStep } from './lesson'
+import { LessonPage, lessonPing, type LessonStep, type StepDraw } from './lesson'
 
 const ACC = '#E0955A'
 const INK = C.ink
@@ -716,6 +716,18 @@ const STEPS: LessonStep[] = [
     draw: drawDsaPanels,
   },
 ]
+
+/** Lesson diagrams re-hosted by RADIOPASS PHYSICS topic 03 — same functions,
+ *  resolved at module load so a renamed step fails loudly here. */
+function lessonDraw(id: string): StepDraw {
+  const draw = STEPS.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`Fluoroscopy lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+export const drawChain = lessonDraw('chain')
+export const drawAbc = lessonDraw('abc')
+export const drawPulsed = lessonDraw('pulsed')
+export const drawSkinDose = lessonDraw('skin')
 
 export default function FluoroLab() {
   return (

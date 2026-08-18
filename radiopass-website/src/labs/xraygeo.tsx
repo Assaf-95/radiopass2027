@@ -15,7 +15,7 @@
  */
 
 import { C, rgba, clamp, lerp, seg, smoothstep, sceneLabel } from '../home/fx'
-import { LessonPage, lessonPing, type LessonStep } from './lesson'
+import { LessonPage, lessonPing, type LessonStep, type StepDraw } from './lesson'
 import { SimFrame, type SimFrameProps } from './simframe'
 
 const easeIO = (v: number) => { const c = clamp(v); return c * c * (3 - 2 * c) }
@@ -604,6 +604,20 @@ const INT_STEPS: LessonStep[] = [
     stage: tourStage({ to: 10, graph: true }),
   },
 ]
+
+/** Lesson diagrams re-hosted by RADIOPASS PHYSICS topic 01. Two step arrays
+ *  live in this file (geometry and interactions), so the resolver takes both.
+ *  Placed after both are declared; a renamed step id fails at module load. */
+function lessonDraw(id: string): StepDraw {
+  const draw = [...GEO_STEPS, ...INT_STEPS].find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`X-ray lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+export const drawPhotonEnters = lessonDraw('enter')
+export const drawThreeFates = lessonDraw('fates')
+export const drawExponential = lessonDraw('expo')
+export const drawMu = lessonDraw('mu')
+export const drawHvl = lessonDraw('hvl')
 
 export function XrayInteractionsLesson() {
   return (

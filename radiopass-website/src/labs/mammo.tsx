@@ -4,7 +4,7 @@
  */
 
 import { C, rgba, lerp, seg, smoothstep, sceneLabel } from '../home/fx'
-import { LessonPage, type LessonStep } from './lesson'
+import { LessonPage, type LessonStep, type StepDraw } from './lesson'
 
 const ACC = '#D9909F'
 const INK = C.ink
@@ -376,6 +376,31 @@ const STEPS: LessonStep[] = [
     },
   },
 ]
+
+/**
+ * Lesson diagrams re-hosted by RADIOPASS PHYSICS topic 04.
+ *
+ * Every drawing in this module was unreachable from the course: the topic
+ * embedded one spectrum sim and linked here for the rest, and nothing in this
+ * file was exported. Ten purpose-built scenes — the low-energy argument,
+ * the shaped spectrum, compression, the geometry pair, grids, resolution,
+ * CNR and the tomosynthesis sweep — sat finished and invisible.
+ */
+function lessonDraw(id: string): StepDraw {
+  const draw = STEPS.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`Mammography lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+export const drawWhyLow = lessonDraw('why-low')
+export const drawTargetFilter = lessonDraw('target-filter')
+export const drawPairs = lessonDraw('pairs')
+export const drawCompression = lessonDraw('compression')
+export const drawTubeGeometry = lessonDraw('tube-geometry')
+export const drawGridAec = lessonDraw('grid-aec')
+export const drawMagnification = lessonDraw('magnification')
+export const drawResolution = lessonDraw('resolution')
+export const drawCnr = lessonDraw('cnr')
+export const drawTomoDose = lessonDraw('tomo-dose')
 
 export default function MammoLab() {
   return (

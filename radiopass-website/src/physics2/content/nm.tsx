@@ -16,6 +16,23 @@ import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { SECTIONS } from '../mapping/sections'
 import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from /nm-lab — same functions. drawSpect was
+   exported with no consumer; SPECT was absent from this topic until now. */
+import {
+  drawSpect,
+  drawDecay,
+  drawTc99m,
+  drawGenerator,
+  drawIdealTracer,
+  drawCollimator,
+  drawPha,
+  drawPerformance,
+  drawSpectRecon,
+  drawAttenuation,
+  drawPetDetail,
+  drawNmDose,
+} from '../../labs/nm'
 import { GammaCameraBuild, NmAcquisition, PetCoincidence } from '../components/sims/NmScenes'
 
 /** This topic's matching rules. The primer below is what stays here. */
@@ -61,6 +78,48 @@ export const NM: V2Topic = {
           summary: 'Why the generator regrows — and why the daughter never quite catches the parent',
           text: 'After each elution the Tc-99m activity climbs back as the Mo-99 on the column keeps decaying, approaching a transient equilibrium with the parent; it is close to its maximum by about 24 hours, which is why elution is a morning ritual. Only about 87% of Mo-99 decays pass through the metastable state — the rest go straight to Tc-99 — so the daughter activity always sits a little below the parent’s.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawTc99m} height={340} label='Tc-99m decaying by isomeric transition: one 140 keV gamma, no particles, half of them gone every six hours' />,
+            title: 'The workhorse decay',
+            annotation: '140 keV · 6 h',
+            caption: 'Tc-99m decays by isomeric transition — the nucleus simply sheds excess energy as a single 140 keV gamma photon, with no particles. The 6-hour half-life matches a working day, and the daughter is effectively stable.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawGenerator} height={340} label='The Mo-99/Tc-99m generator: the parent bound to the alumina column, saline elution washing the technetium off' />,
+            title: 'Milking the generator',
+            annotation: 'Mo-99 66 h → Tc-99m',
+            caption: 'Reactor-made molybdenum-99 (half-life 66 hours) sits on an alumina column, continuously decaying into Tc-99m. Flushing saline through — elution — washes the technetium off while the parent stays bound. Activity regrows towards equilibrium between milkings, which is why the first morning elution is the biggest.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawIdealTracer} height={340} label='The ideal tracer checklist: pure gamma emission, 100–250 keV, a half-life matched to the study, ready chemistry' />,
+            title: 'What an ideal tracer looks like',
+            caption: 'Pure gamma emission — particles deposit dose but never reach the camera. An energy the camera likes, 100–250 keV. A half-life matched to the study, and chemistry that labels the molecule you actually want to follow. Tc-99m scores on every line, which is why it owns the specialty.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawDecay} height={320} label='The decay scheme drawn as a film: the metastable state dropping to ground by emitting one gamma photon' />,
+            title: 'Isomeric transition, watched',
+            caption: 'The metastable nucleus drops to its ground state by emitting one gamma photon — watch the transition repeat. No beta, no alpha: nothing but the photon the camera wants.',
+          },
+        },
       ],
     },
     {
@@ -104,6 +163,28 @@ export const NM: V2Topic = {
           summary: 'Why the image is just a dot map',
           text: 'One accepted photon becomes one dot at (X, Y), and that is all a gamma camera image is — a map of accepted photons, built one count at a time. It is why counting statistics rule the modality: the image is noise-limited long before it is resolution-limited, and every photon the collimator throws away is paid for in acquisition time.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawCollimator} height={340} label='The parallel-hole collimator selecting only straight photons: obliques absorbed by the septa, sensitivity paid for resolution' />,
+            title: 'The collimator’s bargain',
+            annotation: 'accepts ~1 in 10⁴',
+            caption: 'Only photons travelling straight down the holes reach the crystal; everything oblique is absorbed by the lead septa. That is what makes the image mean anything — and it throws away well over 99% of the photons the patient emits. Resolution is bought with sensitivity.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPha} height={340} label='The pulse-height analyser gating the energy spectrum: the 140 keV photopeak accepted, the scatter smear rejected' />,
+            title: 'The energy window',
+            annotation: 'photopeak ±10%',
+            caption: 'Plot every pulse the camera measures: a photopeak at 140 keV from clean photons, and a smear of lower-energy scattered ones that would only fog the image. The pulse-height analyser accepts a ±10% window around the peak and rejects the rest.',
+          },
+        },
       ],
     },
     {
@@ -138,6 +219,17 @@ export const NM: V2Topic = {
         {
           kind: 'trap',
           text: 'Distance from a parallel-hole collimator costs resolution, not counts — its sensitivity is roughly independent of distance, a favourite true/false statement.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPerformance} height={340} label='System resolution against distance from the collimator: intrinsic 3–5 mm degrading to 10–15 mm at clinical distances' />,
+            title: 'Resolution, and where it goes',
+            annotation: 'system ≈10–15 mm',
+            caption: 'Intrinsic resolution — crystal plus electronics — is 3–5 mm, but through a collimator at clinical distances the system resolution is realistically 10–15 mm, and it degrades with every centimetre of separation. Position the patient close. Daily flood-field images catch non-uniformity before it becomes a clinical artefact.',
+          },
         },
       ],
     },
@@ -178,6 +270,37 @@ export const NM: V2Topic = {
         {
           kind: 'trap',
           text: 'The CT in SPECT/CT and PET/CT is first of all the attenuation map, not a bonus diagnostic scan — honest quantification depends on it.',
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawSpect} height={340} label='SPECT acquisition: two camera heads orbiting the patient, ticking off projection angles for reconstruction' />,
+            title: 'SPECT — the orbit',
+            annotation: 'projections → slices',
+            caption: 'Rotate the camera heads around the patient and collect projections at each angle — the same geometric idea as CT, at nuclear medicine count rates. The projections reconstruct into slices, and the orbit is why SPECT sees at depth what planar imaging superimposes.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawSpectRecon} height={340} label='Projections becoming slices: filtered back-projection against the iterative guess-compare-update loop' />,
+            title: 'Two ways to a slice',
+            caption: 'Filtered back-projection is fast but ugly at low counts. Iterative reconstruction guesses an image, computes what the camera would have seen, compares, updates — and repeats until the guess explains the data. Low-count nuclear medicine is exactly where iteration earns its cost.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawAttenuation} height={340} label='Attenuation in SPECT: photons from deep structures absorbed on the way out, and the CT map that corrects for it' />,
+            title: 'The depth problem',
+            caption: 'Photons from deep structures are attenuated on their way out, so uncorrected slices underestimate activity at depth. A CT attenuation map — the CT of SPECT-CT — tells the reconstruction exactly how much each ray lost, and the correction restores the deep counts.',
+          },
         },
       ],
     },
@@ -225,6 +348,17 @@ export const NM: V2Topic = {
           summary: 'What time-of-flight actually buys',
           text: 'The two photons do not reach the ring at exactly the same instant: the difference in arrival times says where along the line of response the annihilation sat (c·Δt/2 — a few hundred picoseconds of timing narrows it to several centimetres). That is not enough to skip reconstruction; instead, concentrating each event’s probability along its line raises the effective signal-to-noise, most usefully in large patients.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPetDetail} height={340} label='PET detection detail: dense fast crystals, the coincidence timing window, randoms and scatter corrections' />,
+            title: 'Catching 511 keV pairs',
+            annotation: 'LSO/LYSO · ToF',
+            caption: 'Stopping 511 keV photons needs dense, fast crystals — BGO stops well but is slow; LSO/LYSO are the modern balance. Random coincidences (two unrelated photons inside the timing window) and scatter must be corrected, and time-of-flight narrows down where on the line the annihilation happened.',
+          },
+        },
       ],
     },
     {
@@ -256,6 +390,17 @@ export const NM: V2Topic = {
           kind: 'trap',
           text: 'A statement that scanning for longer increases the patient’s dose is always false in nuclear medicine — the dose was committed at injection. Longer half-life or slower clearance: more dose. More camera time: none.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawNmDose} height={340} label='Committed dose: once injected, dose depends on physical half-life and biological clearance — imaging longer adds nothing' />,
+            title: 'The dose is committed at injection',
+            annotation: 'effective t½',
+            caption: 'Once the tracer is in, the dose depends on physical half-life and biological clearance — nothing else. Imaging longer adds zero. Encourage hydration and voiding to speed clearance, and remember the patient is the source: around PET patients the 511 keV photons make distance and time the tools.',
+          },
+        },
       ],
     },
   ],
@@ -274,8 +419,7 @@ export const NM: V2Topic = {
     'SUV = tissue concentration ÷ (injected activity / body weight); ≈2.5 and above suggests malignancy but cannot separate inflammation from tumour.',
     'Dose is committed at injection — longer imaging adds zero; around PET patients, distance and time protect, lead aprons barely help at 511 keV.',
   ],
-  labs: [
-    { label: 'Nuclear medicine — the focused lesson', to: '/nm-lab' },
-    { label: 'Watch the NM film', to: '/nm-lab/film' },
-  ],
+  /* Embedded above: the tracer, camera, performance, SPECT, PET and dose
+     scenes, including drawSpect which previously had no consumer anywhere. */
+  labs: [],
 }
