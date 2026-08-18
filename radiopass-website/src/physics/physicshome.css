@@ -332,12 +332,3 @@
 
 /* The V2 door: the one link in this row that is not a familiar destination,
    so it carries the accent rather than the quiet grey. */
-.ph-secondary a.ph-secondary-new {
-  color: var(--accent);
-  border-bottom-color: rgba(217, 168, 78, 0.45);
-  font-weight: 600;
-}
-.ph-secondary a.ph-secondary-new:hover {
-  color: var(--text-primary);
-  border-bottom-color: var(--accent);
-}

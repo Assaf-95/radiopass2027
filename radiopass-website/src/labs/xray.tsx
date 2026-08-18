@@ -30,6 +30,7 @@
 import { Link } from 'react-router-dom'
 import { completedModules } from '../lib/learner'
 import { moduleById, practiceHref } from '../physics/course'
+import { outcomesForModule } from '../physics/outcomes'
 import './labs.css'
 
 /* The existing visual-lab designs, brought under X-ray rather than rebuilt.
@@ -89,7 +90,12 @@ const MACHINES = [
 ]
 
 export default function XrayHub() {
-  const xrayCore = moduleById('xray-core')!
+  /* Looked up by name, so a rename in course.ts is a possibility this page has
+     to survive. It used to assert non-null, which turned a one-word edit in
+     another file into a blank screen here — the module supplies the outcome
+     list and the practice link, neither of which is the reason a learner opened
+     the X-ray hub. Missing, the page drops those two blocks and still works. */
+  const xrayCore = moduleById('xray-core')
   /* The learner's own record: module.completed events carry the pathname. */
   const done = new Set(completedModules('physics'))
   const nextUp = CORE.find((c) => !done.has(c.to)) ?? null
@@ -123,7 +129,7 @@ export default function XrayHub() {
         <div className="lx-outcomes">
           <p className="lx-outcomes-title">By the end of the core you should understand</p>
           <ol>
-            {xrayCore.outcomes.map((o) => (
+            {outcomesForModule('xray-core').map((o) => (
               <li key={o}>{o}</li>
             ))}
           </ol>
@@ -156,9 +162,11 @@ export default function XrayHub() {
         </ol>
 
         <div className="lx-next" style={{ marginTop: 'var(--sp-5)' }}>
-          <Link className="lx-btn lx-btn-ghost" to={practiceHref(xrayCore.practice)}>
-            Practise the core
-          </Link>
+          {xrayCore && (
+            <Link className="lx-btn lx-btn-ghost" to={practiceHref(xrayCore.practice)}>
+              Practise the core
+            </Link>
+          )}
           <Link className="lx-btn lx-btn-ghost" to="/fact-bank/xray">
             The facts, condensed
           </Link>

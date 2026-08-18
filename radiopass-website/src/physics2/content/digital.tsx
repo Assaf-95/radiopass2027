@@ -12,6 +12,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { PixelMatrix } from '../components/sims/PixelMatrix'
 import { CrReaderStages, DrConversionStacks } from '../components/sims/CrReader'
 
@@ -22,13 +23,7 @@ export const DIGITAL: V2Topic = {
   short: 'Digital',
   tagline: 'Catch the photons, turn them into numbers, and keep the numbers honest about dose.',
   qbTopics: ['Digital Imaging'],
-  outcomes: [
-    'how a CR plate stores an exposure and gives it back to a red laser',
-    'the two flat-panel routes from photon to charge, and why direct conversion is sharper but not automatically more dose-efficient',
-    'the pixel, matrix and bit-depth arithmetic behind resolution, file size and noise',
-    'why a digital image can look perfect at the wrong dose, and which number tells the truth',
-    'what MTF and DQE each measure, and which one is the dose-efficiency figure',
-  ],
+  outcomes: TOPIC_OUTCOMES.digital,
   sections: [
     {
       id: 'cr',

@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useEffect, useState, type ChangeEvent, type ComponentType, type CSSProperties, type FormEvent, type ReactNode } from 'react'
-import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { LEGACY_PHYSICS_ROOT, PHYSICS_HREF, PHYSICS_ROOT } from './physics/routes'
 import { MoreDetail } from './design/primitives'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
@@ -151,15 +152,18 @@ const AdminConsole = lazyImport(() => import('./portal/Admin'))
 // 450ms handover must not spend that time fetching its own chunk — lazy, the
 // visitor saw the generic loading fallback instead of the crossing.
 
-/* Physics V2 — the alternative experience, mounted beside the existing one so
-   the two can be compared. It renders its own chrome (see hasOwnChrome) and
-   shares the question-bank record, but no V1 surface links to it and deleting
-   src/physics2 plus these four routes removes it completely. */
-const V2Home = lazyImport(() => import('./physics2/pages/Home'))
-const V2TopicPage = lazyImport(() => import('./physics2/pages/Topic'))
-const V2Practice = lazyImport(() => import('./physics2/pages/Practice'))
-const V2Review = lazyImport(() => import('./physics2/pages/Review'))
-const V2Questions = lazyImport(() => import('./physics2/pages/Questions'))
+/* The course engine. Nine topics, each a primer with its simulations embedded
+   and its own slice of the question bank bound to it.
+
+   It was built at /physics-v2 as an alternative experience to be compared
+   against the existing site; that comparison is over and the two are one
+   product. The pages are unchanged in kind — they still render their own
+   chrome (see hasOwnChrome) and still share the one question-bank record — but
+   they now answer under /physics, and the old addresses redirect. */
+const CourseTopicPage = lazyImport(() => import('./physics2/pages/Topic'))
+const CoursePractice = lazyImport(() => import('./physics2/pages/Practice'))
+const CourseReview = lazyImport(() => import('./physics2/pages/Review'))
+const CourseQuestions = lazyImport(() => import('./physics2/pages/Questions'))
 
 // The question bank shares the homepage's editorial design system and renders
 // its own shell, so the site chrome stands down on its routes.
@@ -276,6 +280,41 @@ function ScrollToTop() {
 }
 
 /**
+ * The course engine's old address, forwarded to its new one.
+ *
+ * ONE component rather than five <Navigate> elements, because four of the five
+ * cases carry state in the part of the URL a plain redirect throws away:
+ *
+ *   /physics-v2/xray/practice?section=tube&filter=again
+ *   /physics-v2/xray#geometry
+ *
+ * The query IS the question set — drop it and the learner who followed their
+ * own stored Continue link lands in a different set of questions than the one
+ * they left, with nothing on screen to say so. The hash is how question
+ * feedback returns to the section that teaches the answer.
+ *
+ * These arrive from three places, all of them real: a bookmark, the static HTML
+ * under /public that leaves the SPA and comes back by hardcoded href, and —
+ * the one that matters — Continue positions written into localStorage before
+ * the merge, which are stored as full paths including the query.
+ */
+function LegacyCourseRedirect() {
+  const location = useLocation()
+  const rest = location.pathname.slice(LEGACY_PHYSICS_ROOT.length).replace(/\/+$/, '')
+  return (
+    <Navigate
+      replace
+      to={{
+        // The bare root was the syllabus, which is now the dashboard itself.
+        pathname: rest === '' ? PHYSICS_HREF.home : `${PHYSICS_ROOT}${rest}`,
+        search: location.search,
+        hash: location.hash,
+      }}
+    />
+  )
+}
+
+/**
  * Routes that render their own navigation and so must not get the shared
  * header and footer.
  *
@@ -291,7 +330,14 @@ function hasOwnChrome(pathname: string): boolean {
      own chrome and moved to '/physics/tour', which IS listed. */
   const exact = ['/', '/physics/tour', '/admin', '/ultrasound-lab', '/mri', '/anatomy']
   const trees = [
-    '/physics-v2',
+    /* Trailing slash, and it is load-bearing. Everything UNDER /physics is the
+       course engine, which brings its own header; bare '/physics' is the
+       dashboard, which must keep the shared one (see the note above). A tree
+       entry of '/physics' would match both and strip the dashboard's header.
+       '/physics/tour' is listed exactly above and is now also covered here —
+       harmless, and left in place so removing this line cannot silently give
+       the cinematic page two headers. */
+    '/physics/',
     '/question-bank',
     '/ct-lab',
     '/nm-lab',
@@ -742,7 +788,28 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/physics-v2" element={<V2Home/>}/><Route path="/physics-v2/review" element={<V2Review/>}/><Route path="/physics-v2/questions" element={<V2Questions/>}/><Route path="/physics-v2/:topicId" element={<V2TopicPage/>}/><Route path="/physics-v2/:topicId/practice" element={<V2Practice/>}/><Route path="/question-bank" element={<QbIndex/>}/><Route path="/question-bank/mock" element={<QbMock/>}/><Route path="/question-bank/review/:filterId" element={<QbReview/>}/><Route path="/question-bank/:subjectId" element={<QbPractice/>}/><Route path="/fact-bank" element={<FactBankPage/>}/><Route path="/fact-bank/:topicId" element={<FactTopicPage/>}/><Route path="/ct-lab" element={<CtLab/>}/><Route path="/ct-lab/film" element={<CtFilm/>}/><Route path="/nm-lab" element={<NmLab/>}/><Route path="/nm-lab/film" element={<NmFilm/>}/><Route path="/mri-lab/motion" element={<MriMotion/>}/><Route path="/ultrasound-lab/motion" element={<UsMotion/>}/><Route path="/xray-lab" element={<XrayHub/>}/><Route path="/xray-lab/production" element={<XrayProductionLesson/>}/><Route path="/xray-lab/spectrum" element={<XraySpectrumLesson/>}/><Route path="/xray-lab/geometry" element={<XrayGeometryLesson/>}/><Route path="/xray-lab/interactions" element={<XrayInteractionsLesson/>}/><Route path="/xray-lab/mammography" element={<MammoLab/>}/><Route path="/xray-lab/fluoroscopy" element={<FluoroLab/>}/><Route path="/xray-lab/digital" element={<DigitalLab/>}/><Route path="/visual-lab" element={<VisualLabPage/>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/>
+    {/* RADIOPASS PHYSICS. The dashboard above, the course engine here.
+        Paths are written out rather than built from PHYSICS_ROOT on purpose:
+        this table is the definition of what exists, labLink.test.ts reads it
+        as text to prove no link in the product points at a route that is not
+        here, and routes.test.ts checks the constant still agrees with it.
+
+        The topic slug is a catch-all one segment under /physics, sitting
+        alongside five static siblings. React Router ranks static above
+        dynamic, so 'review' reaches Review rather than a topic named review —
+        but only until someone names a topic 'review'. routes.test.ts fails the
+        build if a topic id ever collides. */}
+    <Route path="/physics/course" element={<Navigate to={PHYSICS_HREF.home} replace/>}/>
+    <Route path="/physics/questions" element={<CourseQuestions/>}/>
+    <Route path="/physics/review" element={<CourseReview/>}/>
+    <Route path="/physics/mock" element={<QbMock/>}/>
+    <Route path="/physics/:topicId" element={<CourseTopicPage/>}/>
+    <Route path="/physics/:topicId/practice" element={<CoursePractice/>}/>
+    {/* The address the course engine used to answer on. Bookmarks, the static
+        pages under /public, and Continue positions stored before the merge. */}
+    <Route path="/physics-v2/*" element={<LegacyCourseRedirect/>}/>
+    <Route path="/question-bank" element={<QbIndex/>}/><Route path="/question-bank/mock" element={<QbMock/>}/><Route path="/question-bank/review/:filterId" element={<QbReview/>}/><Route path="/question-bank/:subjectId" element={<QbPractice/>}/><Route path="/fact-bank" element={<FactBankPage/>}/><Route path="/fact-bank/:topicId" element={<FactTopicPage/>}/><Route path="/ct-lab" element={<CtLab/>}/><Route path="/ct-lab/film" element={<CtFilm/>}/><Route path="/nm-lab" element={<NmLab/>}/><Route path="/nm-lab/film" element={<NmFilm/>}/><Route path="/mri-lab/motion" element={<MriMotion/>}/><Route path="/ultrasound-lab/motion" element={<UsMotion/>}/><Route path="/xray-lab" element={<XrayHub/>}/><Route path="/xray-lab/production" element={<XrayProductionLesson/>}/><Route path="/xray-lab/spectrum" element={<XraySpectrumLesson/>}/><Route path="/xray-lab/geometry" element={<XrayGeometryLesson/>}/><Route path="/xray-lab/interactions" element={<XrayInteractionsLesson/>}/><Route path="/xray-lab/mammography" element={<MammoLab/>}/><Route path="/xray-lab/fluoroscopy" element={<FluoroLab/>}/><Route path="/xray-lab/digital" element={<DigitalLab/>}/><Route path="/visual-lab" element={<VisualLabPage/>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
     {/* Chapter 5 — the taught module. Nested so the navigator persists across
         every section instead of remounting on each one. */}
     <Route path="/mri" element={<MriModule/>}>

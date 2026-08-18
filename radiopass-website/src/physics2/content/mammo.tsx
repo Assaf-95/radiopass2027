@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
 
 export const MAMMO: V2Topic = {
@@ -20,13 +21,7 @@ export const MAMMO: V2Topic = {
   short: 'Mammo',
   tagline: 'Every design choice serves contrast and resolution at minimal dose.',
   qbTopics: ['Mammography'],
-  outcomes: [
-    'why the whole machine lives at 17–20 keV, and what that choice buys and costs',
-    'how target, filter and K-edge conspire to cut a near-monoenergetic spectrum from bremsstrahlung',
-    'what one squeeze of the compression paddle wins on every axis at once',
-    'why magnification views drop the grid and demand the 0.1 mm focal spot',
-    'what tomosynthesis fixes, and the resolution claim it cannot make',
-  ],
+  outcomes: TOPIC_OUTCOMES.mammo,
   sections: [
     {
       id: 'energy',

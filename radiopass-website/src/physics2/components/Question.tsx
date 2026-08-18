@@ -19,6 +19,7 @@ import { isBankQuestion } from '../../qbank/data'
 import { readQbMarks, readQbProgress, recordQbScore, toggleQbMark } from '../../qbank/Shell'
 import type { QbQuestion } from '../../qbank/types'
 import { cleanExplanation } from '../lib/clean'
+import { topicHref } from '../../physics/routes'
 import { sectionOf } from '../lib/assign'
 import type { Concept, V2Topic } from '../types'
 
@@ -255,7 +256,7 @@ export function V2Question({
 
           {section && (
             <p className="v2-reread">
-              <Link className="v2-link" to={`/physics-v2/${topic.id}#${section.id}`}>
+              <Link className="v2-link" to={topicHref(topic.id, section.id)}>
                 Reread §{topic.num}.{sectionIndex} {section.title} →
               </Link>
             </p>

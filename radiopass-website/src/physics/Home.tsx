@@ -15,11 +15,20 @@
  * dressed as progress.
  *
  * Two things are deliberately NOT shown:
- *   - mock performance, because finished papers are not yet recorded anywhere
- *     (the mock store holds one in-flight attempt and clears it on submission);
+ *   - mock performance. Finished papers ARE recorded — Mock.tsx emits
+ *     mock.completed and learner.ts keeps the history — but the papers write
+ *     nothing back to the question record, so a candidate who sat three of
+ *     them still reads "0 answered" here. Surfacing the history before that is
+ *     fixed would put two contradictory accounts of the same work on one
+ *     screen. Both halves land together in the progress pass;
  *   - any single "exam readiness" percentage, which would need a defensible
  *     methodology and currently has none.
- * Both are noted in the report rather than faked here.
+ *
+ * THE COURSE SECTION IS THE MERGE. This page used to list nine modules linking
+ * to nine laboratories, while a second dashboard at /physics-v2 listed the same
+ * nine subjects as topics linking to their primers. One product, one list: the
+ * rows below are the topics, and each carries both records — the lessons its
+ * learner has finished, and how its slice of the question bank is going.
  */
 
 import { useMemo } from 'react'
@@ -30,7 +39,10 @@ import { readQbProgress, readQbMarks } from '../qbank/Shell'
 import { readProgress as readUsProgress } from '../us/components/progress'
 import { completedModules, lastOfType } from '../lib/learner'
 import { QB_SUBJECTS } from '../qbank/types'
-import { COURSE_MODULES, COURSE_PARTS } from './course'
+import { V2_TOPICS } from '../physics2/topics'
+import { topicStanding } from '../physics2/lib/derive'
+import { COURSE_PARTS } from './course'
+import { PHYSICS_HREF, topicHref } from './routes'
 import './physicshome.css'
 
 /* ------------------------------------------------------------------ *
@@ -130,23 +142,41 @@ function moduleState(done: Set<string>, lessonPaths: string[]): { done: number; 
   }
 }
 
-const PRACTICE_DESTINATIONS: { name: string; to: string; blurb: string }[] = [
-  {
-    name: 'Question bank',
-    to: '/question-bank',
-    blurb: 'True-or-false stems in the real format, each one corrected and explained where you answered it.',
-  },
-  {
-    name: 'Mock exams',
-    to: '/question-bank/mock',
-    blurb: 'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
-  },
-  {
-    name: 'Progress & revision',
-    to: '/question-bank/review/incorrect',
-    blurb: 'Everything you answered wrong, everything you flagged, and the topics worth another pass.',
-  },
-]
+/**
+ * The three practice doors, absorbed from the second dashboard.
+ *
+ * They pointed at /question-bank/* — the older surfaces, which do the same
+ * three jobs against the same shared record but outside the course. One
+ * product means one door each, and the course's own Review knows which topic
+ * a wrong answer belongs to, which the generic review list does not.
+ *
+ * `count` is a real number or nothing: the door never claims work exists that
+ * the learner's record does not contain.
+ */
+function practiceDestinations(wrong: number): { name: string; to: string; blurb: string }[] {
+  return [
+    {
+      name: 'Question bank',
+      to: PHYSICS_HREF.questions,
+      blurb:
+        'True-or-false stems in the real format, each one corrected and explained where you answered it.',
+    },
+    {
+      name: 'Mock exams',
+      to: PHYSICS_HREF.mock,
+      blurb:
+        'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
+    },
+    {
+      name: 'Review',
+      to: PHYSICS_HREF.review,
+      blurb:
+        wrong > 0
+          ? `${wrong} question${wrong === 1 ? '' : 's'} answered wrong and ready to re-test, with the topics worth another pass.`
+          : 'Everything you answer wrong gathers here for re-testing, topic by topic.',
+    },
+  ]
+}
 
 /* ------------------------------------------------------------------ *
  * Page
@@ -164,6 +194,16 @@ function Stat({ value, label }: { value: string; label: string }) {
 export default function PhysicsHome() {
   const s = useMemo(readSnapshot, [])
   const accuracy = s.outOf > 0 ? Math.round((s.correct / s.outOf) * 100) : null
+
+  /* The nine topics with their standing, computed once. Each topic's pool is
+     resolved from the shared question record, so these are the same numbers
+     the topic page and Review show — not a second reckoning of the same work. */
+  const topics = useMemo(
+    () => V2_TOPICS.map((topic) => ({ topic, standing: topicStanding(topic) })),
+    [],
+  )
+  const wrong = topics.reduce((n, t) => n + t.standing.wrong, 0)
+  const done = useMemo(() => new Set(completedModules('physics')), [])
 
   return (
     <main className="ph">
@@ -243,10 +283,18 @@ export default function PhysicsHome() {
       </section>
 
       {/* --- The course ----------------------------------------------------
-          The syllabus itself, parts in order, each module carrying the
-          learner's own record. This replaced a flat list of five equal
+          The syllabus itself, parts in order, each topic carrying the
+          learner's own record. This replaced a flat list of equal
           "destinations": a course home that cannot show the course was the
           clearest symptom of the pages-not-a-course problem.
+
+          A row is a TOPIC now, not a laboratory. The distinction matters: the
+          topic is where the primer, the simulations and that subject's slice
+          of the question bank all meet, so it is the one address that can
+          honestly answer "how am I doing on nuclear medicine". The
+          laboratories are still there, at the same URLs they always had, but
+          they are reached through the topic that teaches them rather than
+          competing with it for the same row.
 
           Each part carries its modality's instrument mark — the same drawn
           vocabulary as the laboratory cards, compressed to an emblem. The
@@ -255,9 +303,8 @@ export default function PhysicsHome() {
       <section className="ph-course" aria-labelledby="ph-course-h">
         <h2 id="ph-course-h">The course</h2>
         {COURSE_PARTS.map((part, pi) => {
-          const modules = COURSE_MODULES.filter((m) => m.part === pi)
-          if (modules.length === 0) return null
-          const done = new Set(completedModules('physics'))
+          const inPart = topics.filter((t) => t.topic.part === pi)
+          if (inPart.length === 0) return null
           return (
             <div className="ph-part" key={part.id}>
               <div className="ph-part-head">
@@ -271,36 +318,40 @@ export default function PhysicsHome() {
                 </div>
               </div>
               <ul>
-                {modules.map((m) => {
-                  const state = moduleState(done, m.lessons.map((l) => l.path))
-                  const isDeep = m.id === 'mri' || m.id === 'us'
+                {inPart.map(({ topic, standing }) => {
+                  /* Two independent records, and the row shows whichever the
+                     learner has actually made. The tick is lesson completion,
+                     keyed by pathname on the shared timeline; the meta column
+                     is the question pool. A learner who has read everything
+                     and answered nothing sees a tick and no numbers, which is
+                     the truth about where they are. */
+                  const state = moduleState(done, topic.lessons.map((l) => l.path))
+                  const finished = state.total > 0 && state.done === state.total
                   return (
-                    <li key={m.id}>
-                      <Link to={m.home}>
-                        <span className={state.done === state.total && state.done > 0 ? 'ph-mod-state is-done' : 'ph-mod-state'}>
-                          {state.done === state.total && state.done > 0
-                            ? '✓'
-                            : state.done > 0
-                            ? `${state.done}/${state.total}`
-                            : ''}
+                    <li key={topic.id}>
+                      <Link to={topicHref(topic.id)}>
+                        <span className={finished ? 'ph-mod-state is-done' : 'ph-mod-state'}>
+                          {finished ? '✓' : state.done > 0 ? `${state.done}/${state.total}` : ''}
                         </span>
-                        <strong>{m.title}</strong>
-                        <span className="ph-mod-blurb">{m.blurb}</span>
+                        <strong>{topic.title}</strong>
+                        <span className="ph-mod-blurb">{topic.tagline}</span>
                         <span className="ph-mod-meta">
-                          {isDeep
-                            ? '21 stages'
-                            : state.total > 1
-                            ? `${state.total} lessons`
-                            : ''}
+                          {standing.answered > 0
+                            ? `${standing.answered}/${standing.total} answered${
+                                standing.accuracy !== null
+                                  ? ` · ${Math.round(standing.accuracy * 100)}%`
+                                  : ''
+                              }`
+                            : `${standing.total} questions`}
                         </span>
                       </Link>
                     </li>
                   )
                 })}
-                {/* Part V closes into the exam itself. */}
+                {/* The last part closes into the exam itself. */}
                 {part.id === 'safety' && (
                   <li>
-                    <Link to="/question-bank/mock">
+                    <Link to={PHYSICS_HREF.mock}>
                       <span className="ph-mod-state" />
                       <strong>Mock papers</strong>
                       <span className="ph-mod-blurb">
@@ -320,7 +371,7 @@ export default function PhysicsHome() {
       <section className="ph-destinations" aria-labelledby="ph-dest-h">
         <h2 id="ph-dest-h">Practise</h2>
         <ul>
-          {PRACTICE_DESTINATIONS.map((d) => (
+          {practiceDestinations(wrong).map((d) => (
             <li key={d.to}>
               <Link to={d.to}>
                 <strong>{d.name}</strong>
@@ -332,16 +383,9 @@ export default function PhysicsHome() {
       </section>
 
       {/* Secondary. The fact bank and the cinematic tour are worth reaching
-          and are not peers of the five destinations above — putting them there
-          would say the branch has seven equal parts when it has five. */}
+          and are not peers of the three destinations above — putting them
+          there would say the branch has ten equal parts when it has three. */}
       <section className="ph-secondary" aria-label="Also in Physics">
-        {/* The alternative experience. It had no door anywhere on the site —
-            deliberate while it was unfinished, and simply undiscoverable once
-            it was worth showing. Marked as a preview so nobody mistakes it for
-            the finished course. */}
-        <Link to="/physics-v2" className="ph-secondary-new">
-          Physics V2 — the new experience
-        </Link>
         <Link to="/fact-bank">Fact bank</Link>
         <Link to="/ultrasound-lab/facts">Ultrasound facts</Link>
         <Link to="/mri-lab/motion">MRI in motion</Link>

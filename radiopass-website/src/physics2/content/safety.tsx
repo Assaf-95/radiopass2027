@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { InverseSquare } from '../components/sims/InverseSquare'
 
 export const SAFETY: V2Topic = {
@@ -20,13 +21,7 @@ export const SAFETY: V2Topic = {
   short: 'Safety',
   tagline: 'Grays into sieverts, thresholds against probabilities, and the two regulations that divide the work.',
   qbTopics: ['Legislation & Radiation Protection', 'Radiation Biology & Dosimetry'],
-  outcomes: [
-    'the chain from absorbed gray to effective sievert, and which quantity answers which question',
-    'why deterministic effects have thresholds and stochastic effects have only probabilities — with the numbers attached',
-    'how radiation actually injures cells: free radicals, LET and the sensitive phases of the cell cycle',
-    'who does what under IRR17 and IR(ME)R 2017, and which regulation protects whom',
-    'the dose limits, typical doses and pregnancy rules the paper tests as bare numbers',
-  ],
+  outcomes: TOPIC_OUTCOMES.safety,
   sections: [
     {
       id: 'quantities',

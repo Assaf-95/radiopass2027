@@ -12,6 +12,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 
 import { PrecessionAndLarmorSim } from '../../mri5/sims/PrecessionAndLarmor'
 import { WeightingLab } from '../../mri5/sims/WeightingLab'
@@ -30,13 +31,7 @@ export const MRI: V2Topic = {
   short: 'MRI',
   tagline: 'Line up the protons, tip them, listen to the echo — then encode where it came from.',
   qbTopics: ['MRI'],
-  outcomes: [
-    'why a patient in a magnet becomes a radio source, and what the Larmor equation fixes',
-    'how TR and TE cut two families of exponentials into T1, T2 or PD weighting',
-    'what the 180° pulse recovers and what it never can — the spin echo / gradient echo divide',
-    'how three gradients turn one voltage into an image, and why contrast lives at the centre of k-space',
-    'the four hazards of the machine, and which part of it owns each one',
-  ],
+  outcomes: TOPIC_OUTCOMES.mri,
   sections: [
     {
       id: 'signal',

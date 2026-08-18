@@ -12,6 +12,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { CtWindowing } from '../components/sims/CtWindowing'
 import { CtBackProjection, CtGenerations, CtHelixPitch, CtRingArtefact } from '../components/sims/CtScenes'
 
@@ -22,12 +23,7 @@ export const CT: V2Topic = {
   short: 'CT',
   tagline: 'Measure the patient from every angle, compute the slice, then account for the numbers and the dose.',
   qbTopics: ['CT'],
-  outcomes: [
-    'how hundreds of attenuation profiles become one slice, and why plain back-projection must be filtered',
-    'what a Hounsfield unit actually measures, and why windowing changes the display but never the data',
-    'pitch, detector rows and the helix — and the exact condition under which raising pitch lowers dose',
-    'the CTDIvol → DLP → effective dose chain, and the assumption behind every classic artefact',
-  ],
+  outcomes: TOPIC_OUTCOMES.ct,
   sections: [
     {
       id: 'acquisition',

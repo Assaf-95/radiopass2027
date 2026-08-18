@@ -12,13 +12,14 @@ import { V2Shell } from '../components/Shell'
 import { V2_TOPICS } from '../topics'
 import { topicStanding } from '../lib/derive'
 import { QB_TOTALS } from '../../qbank/data'
+import { PHYSICS_HREF, practiceHref } from '../../physics/routes'
 
 export default function V2Questions() {
   const rows = V2_TOPICS.map((topic) => ({ topic, standing: topicStanding(topic) }))
   const answered = rows.reduce((n, r) => n + r.standing.answered, 0)
 
   return (
-    <V2Shell title="Questions" visit={{ path: '/physics-v2/questions', label: 'Question bank' }}>
+    <V2Shell title="Questions" visit={{ path: PHYSICS_HREF.questions, label: 'Question bank' }}>
       <header className="v2-masthead">
         <div className="v2-wrap">
           <p className="v2-eyebrow">Question bank</p>
@@ -43,9 +44,12 @@ export default function V2Questions() {
           </span>
         </div>
         {/* One row per topic: the syllabus title at full size, the pool's
-            standing in two plain numbers, and a single door in. The session
-            itself decides what to serve first (unseen, then the rest) — the
-            learner is not asked to choose a filter before starting. */}
+            standing in two plain numbers, and a single door in. The row's own
+            standing picks what that door opens — the unseen questions while any
+            are left, and otherwise the whole pool again as a re-test, so a
+            finished topic still starts a session instead of landing the learner
+            on "nothing unseen is left". Nobody is asked to choose a filter
+            before starting. */}
         <div className="v2-qb-list">
           {rows.map(({ topic, standing }) => {
             const pct = standing.total > 0 ? Math.round((standing.answered / standing.total) * 100) : 0
@@ -64,8 +68,11 @@ export default function V2Questions() {
                     {pct}% done · {standing.total - standing.answered} to go
                   </small>
                 </div>
-                <Link className="v2-qb-start" to={`/physics-v2/${topic.id}/practice`}>
-                  Start now
+                <Link
+                  className="v2-qb-start"
+                  to={practiceHref(topic.id, { filter: standing.unseen > 0 ? 'unseen' : 'again' })}
+                >
+                  {standing.unseen > 0 ? 'Start now' : 'Test again'}
                 </Link>
               </div>
             )
@@ -73,11 +80,11 @@ export default function V2Questions() {
         </div>
 
         <div className="v2-doors" style={{ marginTop: 34 }}>
-          <a href="/question-bank/mock" className="v2-door">
+          <Link to={PHYSICS_HREF.mock} className="v2-door">
             <strong>Mock papers</strong>
             <span>Timed papers in the real format — fixed papers or built from the bank.</span>
-          </a>
-          <Link to="/physics-v2/review" className="v2-door">
+          </Link>
+          <Link to={PHYSICS_HREF.review} className="v2-door">
             <strong>Review</strong>
             <span>Everything answered wrong, gathered for re-testing.</span>
           </Link>

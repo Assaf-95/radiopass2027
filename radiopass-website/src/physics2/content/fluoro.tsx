@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { FluoroAbc } from '../components/sims/FluoroAbc'
 import { FluoroIntensifier } from '../components/sims/FluoroIntensifier'
 import { IiDistortion, DsaSubtraction } from '../components/sims/FluoroScenes'
@@ -22,13 +23,7 @@ export const FLUORO: V2Topic = {
   short: 'Fluoro',
   tagline: 'Watch the beam live, pay for it by the minute, subtract what does not move.',
   qbTopics: ['Fluoroscopy'],
-  outcomes: [
-    'how an image intensifier turns a faint X-ray pattern into a watchable picture, and where its gain comes from',
-    'which distortions belong to electron optics, and why a flat panel cannot have them',
-    'what automatic brightness control holds constant — and what it silently raises to do it',
-    'the dose features — pulsing, last image hold, collimation — and the deterministic skin risk they defend against',
-    'what DSA subtraction improves, what it worsens, and what it leaves untouched',
-  ],
+  outcomes: TOPIC_OUTCOMES.fluoro,
   sections: [
     {
       id: 'chain',

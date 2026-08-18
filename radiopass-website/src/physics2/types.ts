@@ -9,6 +9,7 @@
 
 import type { ReactNode } from 'react'
 import type { QbTopic } from '../qbank/types'
+import type { CourseLesson } from '../physics/course'
 
 /** A simulation mounted inside a film plate. */
 export type V2Sim =
@@ -108,4 +109,30 @@ export type V2Topic = {
   essentials: string[]
   /** Doors into the V1 deep laboratories, framed as "go deeper". */
   labs?: { label: string; to: string }[]
+}
+
+/**
+ * A topic joined to its place in the course spine.
+ *
+ * The site had two syllabus registries describing the same nine subjects: this
+ * one, keyed to question-bank topics, and physics/course.ts, keyed to the
+ * lesson pathnames that carry the completion telemetry. Two registries means
+ * two authors for "what comes next", which is the exact problem course.ts was
+ * written to end.
+ *
+ * They are joined rather than merged, and in one direction only. A topic is the
+ * unit of study; the course spine contributes where it sits (`part`) and which
+ * bespoke lessons belong to it (`lessons`). The join happens in topics.ts, so
+ * course.ts stays a leaf that the lab chunks can import without dragging 3,500
+ * lines of primer and every embedded simulation in behind it.
+ *
+ * `lessons` is not a link list. Those pathnames ARE the keys the learner's
+ * module.completed events are recorded under, which is what lets the dashboard
+ * show a real tick against a topic.
+ */
+export type CourseTopic = V2Topic & {
+  /** Index into COURSE_PARTS. */
+  part: number
+  /** The topic's bespoke lessons, by their frozen pathnames. */
+  lessons: CourseLesson[]
 }

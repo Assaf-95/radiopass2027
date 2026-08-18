@@ -14,6 +14,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { FreqPenetration } from '../components/sims/FreqPenetration'
 import { DopplerAliasing } from '../components/sims/DopplerAliasing'
 import { UsImpedance } from '../components/sims/UsImpedance'
@@ -26,13 +27,7 @@ export const US: V2Topic = {
   short: 'US',
   tagline: 'Make a pressure wave, time its echoes, read the shifts — and know which assumption broke when the image lies.',
   qbTopics: ['Ultrasound'],
-  outcomes: [
-    'why the medium owns the speed of sound, and what the scanner’s 1540 m/s assumption silently builds into every image',
-    'what happens at an interface — reflection from the impedance mismatch, refraction from a speed difference — and why gel exists',
-    'the resolution trio, and the frequency-versus-penetration trade that decides every probe choice',
-    'the Doppler equation’s four inputs, the cosine, and which anti-aliasing fixes genuinely work',
-    'what MI and TI each warn about, and the numbers that govern contrast and obstetric scanning',
-  ],
+  outcomes: TOPIC_OUTCOMES.us,
   sections: [
     {
       id: 'waves',

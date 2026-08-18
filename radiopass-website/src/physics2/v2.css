@@ -503,8 +503,6 @@
   color: var(--v2-bronze);
 }
 
-.v2-labs { padding: 8px 0 60px; display: flex; flex-wrap: wrap; gap: 12px; }
-
 /* ------------------------------------------------------------------ *
  * Buttons
  * ------------------------------------------------------------------ */
@@ -779,37 +777,6 @@
   color: var(--v2-ink-2);
 }
 .v2-note { font-size: 12.5px; color: var(--v2-ink-3); line-height: 1.55; max-width: 60ch; }
-
-/* ------------------------------------------------------------------ *
- * Topic pager — the course as a sequence
- * ------------------------------------------------------------------ */
-
-.v2-pager {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  border-top: 1px solid var(--v2-line-strong);
-  margin-top: 8px;
-  padding: 20px 0 56px;
-}
-.v2-pager-link { display: block; max-width: 46%; }
-.v2-pager-link.next { text-align: right; margin-left: auto; }
-.v2-pager-link small {
-  display: block;
-  font-family: var(--v2-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--v2-ink-3);
-  margin-bottom: 4px;
-}
-.v2-pager-link strong {
-  font-family: var(--v2-serif);
-  font-weight: 500;
-  font-size: 19px;
-  color: var(--v2-ink);
-}
-.v2-pager-link:hover strong { color: var(--v2-bronze); }
 
 /* ------------------------------------------------------------------ *
  * Embedded V2 sims (rendered on film — dark internals)

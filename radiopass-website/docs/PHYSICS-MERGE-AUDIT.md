@@ -656,7 +656,7 @@ audit's dependency order.
 Topic order throughout: **X-ray → Digital → Fluoroscopy → Mammography → CT → Nuclear medicine → MRI →
 Ultrasound → Safety.**
 
-**Phase 2 — one shell, one route tree, no "V2".**
+**Phase 2 — one shell, one route tree, no "V2".** — **LANDED 17 Aug 2026.**
 Rebase all 32 `/physics-v2` strings behind a single `PHYSICS_ROOT` constant. Add the five
 `<Navigate replace>` redirects, preserving `location.search` on the practice route. Swap the
 `hasOwnChrome` entry `/physics-v2` → `/physics/` (trailing slash; `/physics` bare stays off).
@@ -665,6 +665,48 @@ Delete `Shell.tsx:86` and `physics/Home.tsx:342-344`. Fold `physics2/pages/Home.
 `coursePosition()` on unchanged pathnames, remap `PartMark`'s `matter`→`xray`, fix
 `labs/xray.tsx:32`, drop the duplicate `outcomes[]`. Convert the three `<a href="/question-bank/mock">`
 to `<Link to="/physics/mock">`. Add the reserved-slug test. **Lesson pathnames unchanged.**
+
+*What actually shipped, where it differs from the above:*
+
+- **`src/physics/routes.ts`** holds `PHYSICS_ROOT`, `PHYSICS_HREF`, `RESERVED_SLUGS`,
+  `topicHref()` and `practiceHref()`. The `<Route>` table in `App.tsx` deliberately keeps
+  **literal** path strings — `labLink.test.ts` parses it as text (R6), so building paths from the
+  constant there would make that guard pass vacuously. `routes.test.ts` asserts the constant and
+  the table agree instead.
+- **One `/physics-v2/*` redirect component**, not five `<Navigate>`s. It preserves `search` **and**
+  `hash` — `Review.tsx` links to `#essentials`, so a hash-dropping redirect breaks that too.
+  Verified in the browser for all eight cases.
+- **`/physics/course` is a redirect to `/physics`**, not a page. Folding the second dashboard in
+  leaves nothing for it to render; the URL is kept because §6 named it.
+- **`PartMark`'s `matter`→`xray` remap was not needed.** The dashboard still groups by
+  `COURSE_PARTS`, so the emblem keys on the unchanged part id. R5 is avoided by construction —
+  `routes.test.ts` now asserts every part id has a `case` in the switch so it stays that way.
+- **`V2Topic` keeps its name**; the joined shape is a new `CourseTopic = V2Topic & { part, lessons }`
+  in `types.ts`, assembled in `topics.ts`. Zero edits to the nine content files' type annotations.
+  Renaming the `V2*` symbols is Phase 6's grep pass.
+- **`outcomes[]` could not simply be deleted.** The two copies had *already* drifted, and the
+  `course.ts` copy is read by `labs/lesson.tsx` and `labs/xray.tsx` — pointing those at the topic
+  would pull all nine primers into every lab chunk. The text now lives in one leaf file,
+  `src/physics/outcomes.ts` (plain strings, no imports), read by both sides. The V2 wording won.
+- **`labs/xray.tsx`'s `moduleById('xray-core')!`** is now an ordinary lookup; the page drops the
+  outcomes block and the practice link if it ever misses, instead of white-screening.
+- **`.v2-labs` and `.v2-pager`** removed (§7 "Now"; grep-confirmed orphaned).
+- Also done, both being comments in blocks that were rewritten anyway: the "five destinations"/
+  "five parts" staleness, and the false "mocks are not recorded anywhere" note at `Home.tsx:17-22`.
+
+*Left standing for later phases, deliberately:* R2 (the dashboard's Continue and the course
+header's Continue are still two mechanisms — Phase 3); the dashboard's Continue still points at
+`/question-bank/:subject` when the bank is the most recent activity (Phase 3); `Questions.tsx:67`'s
+missing `filter` and the "High-yield" chip (Phase 4); the site header's own `Mock exams` link still
+targets `/question-bank/mock`, which still resolves.
+
+*One new cost:* `/physics` now imports `topics.ts` to show real standing, so the dashboard shares
+the ~270 kB `assign` chunk with the topic pages. Phase 4's `mapping/sections.ts` extraction is what
+makes it light again.
+
+Verified: `tsc` clean, `oxlint` clean, **223 tests pass** (16 new in `src/physics/routes.test.ts`),
+production build clean, and the routes, redirects, chrome and both progress records checked live in
+the browser.
 
 **Phase 3 — one honest progress model.**
 Ship `QbAttempt` v2 + `QbStanding` with lazy `sanitize`-hook migration and the per-question attempts

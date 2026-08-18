@@ -11,6 +11,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
 
 export const XRAY: V2Topic = {
@@ -20,12 +21,7 @@ export const XRAY: V2Topic = {
   short: 'X-ray',
   tagline: 'Make the beam, describe it, follow it into the patient, project the image.',
   qbTopics: ['Radiography & X-ray Physics'],
-  outcomes: [
-    'how electrons become X-ray photons at the anode, and where the other 99% of the energy goes',
-    'what the spectrum graph shows, and what kVp, mAs, filtration and the target each do to it',
-    'the three fates of a photon in tissue, and where photoelectric hands over to Compton',
-    'why magnification and unsharpness are different things with different causes',
-  ],
+  outcomes: TOPIC_OUTCOMES.xray,
   sections: [
     {
       id: 'foundations',

@@ -13,6 +13,7 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { GammaCameraBuild, NmAcquisition, PetCoincidence } from '../components/sims/NmScenes'
 
 export const NM: V2Topic = {
@@ -22,12 +23,7 @@ export const NM: V2Topic = {
   short: 'NM',
   tagline: 'The patient becomes the source: elute the tracer, select the straight photons, build the image one count at a time.',
   qbTopics: ['Nuclear Medicine'],
-  outcomes: [
-    'why Tc-99m owns the specialty: the generator, the 6-hour half-life and the clean 140 keV gamma',
-    'the gamma camera chain layer by layer, and which job each layer does',
-    'what the collimator buys, what it charges, and why PET refuses to pay it',
-    'how SPECT and PET become slices, what SUV measures, and why the dose is committed at injection',
-  ],
+  outcomes: TOPIC_OUTCOMES.nm,
   sections: [
     {
       id: 'tracer',

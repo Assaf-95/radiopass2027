@@ -12,6 +12,7 @@ import { V2Shell } from '../components/Shell'
 import { V2_TOPICS } from '../topics'
 import { topicStanding, wrongQuestions } from '../lib/derive'
 import { readQbProgress } from '../../qbank/Shell'
+import { PHYSICS_HREF, practiceHref, topicHref } from '../../physics/routes'
 
 export default function V2Review() {
   const progress = readQbProgress()
@@ -40,7 +41,7 @@ export default function V2Review() {
     .slice(0, 10)
 
   return (
-    <V2Shell title="Review" visit={{ path: '/physics-v2/review', label: 'Review' }}>
+    <V2Shell title="Review" visit={{ path: PHYSICS_HREF.review, label: 'Review' }}>
       <header className="v2-masthead">
         <div className="v2-wrap">
           <p className="v2-eyebrow">Review</p>
@@ -78,7 +79,7 @@ export default function V2Review() {
               <span className="n">{String(topic.num).padStart(2, '0')}</span>
               <span>
                 <h3>
-                  <Link to={`/physics-v2/${topic.id}`}>{topic.title}</Link>
+                  <Link to={topicHref(topic.id)}>{topic.title}</Link>
                 </h3>
               </span>
               <span className="acc">
@@ -88,20 +89,20 @@ export default function V2Review() {
               </span>
               <span className="acts">
                 {standing.wrong > 0 ? (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=wrong`}>
+                  <Link className="v2-chip" to={practiceHref(topic.id, { filter: 'wrong' })}>
                     Re-test <b>{standing.wrong}</b>
                   </Link>
                 ) : (
                   <span className="v2-chip is-empty">Nothing to fix</span>
                 )}
                 {standing.flagged > 0 && (
-                  <Link className="v2-chip" to={`/physics-v2/${topic.id}/practice?filter=flagged`}>
+                  <Link className="v2-chip" to={practiceHref(topic.id, { filter: 'flagged' })}>
                     Flagged {standing.flagged}
                   </Link>
                 )}
                 <Link
                   className="v2-chip"
-                  to={`/physics-v2/${topic.id}#essentials`}
+                  to={topicHref(topic.id, 'essentials')}
                 >
                   Essentials
                 </Link>
