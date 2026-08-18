@@ -13,8 +13,13 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { PixelMatrix } from '../components/sims/PixelMatrix'
 import { CrReaderStages, DrConversionStacks } from '../components/sims/CrReader'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.digital
 
 export const DIGITAL: V2Topic = {
   id: 'digital',
@@ -26,10 +31,7 @@ export const DIGITAL: V2Topic = {
   outcomes: TOPIC_OUTCOMES.digital,
   sections: [
     {
-      id: 'cr',
-      title: 'Computed radiography',
-      blurb: 'A phosphor plate that remembers the exposure until a laser asks for it back.',
-      kw: /photostimulable|storage phosphor|\bCR\b|computed radiograph|barium fluor|BaFBr|red laser|blue light|photomultiplier|latent image|plate reader|erasure|fading/i,
+      ...S.cr,
       primer: [
         {
           kind: 'principle',
@@ -72,10 +74,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
     {
-      id: 'panels',
-      title: 'Flat-panel DR: indirect and direct',
-      blurb: 'Two routes from photon to charge — one through light, one straight down.',
-      kw: /flat.?panel|c(a)?esium iodide|\bCsI\b|scintillat|photodiode|\bTFT\b|thin.?film|amorphous|selenium|a.?Se\b|direct (conversion|digital|DR)|indirect/i,
+      ...S.panels,
       primer: [
         {
           kind: 'principle',
@@ -120,10 +119,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
     {
-      id: 'sampling',
-      title: 'Pixels, matrix and bit depth',
-      blurb: 'The arithmetic that sets resolution, file size and noise.',
-      kw: /pixel|matrix|bit.?depth|grey.?level|gray.?level|nyquist|sampl|alias|file size|storage|kilobyte|megabyte|field of view/i,
+      ...S.sampling,
       primer: [
         {
           kind: 'principle',
@@ -170,11 +166,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
     {
-      id: 'latitude',
-      title: 'Dynamic range and dose creep',
-      blurb: 'What digital buys over film — and the silent price.',
-      kw: /dynamic range|latitude|exposure ind|deviation index|dose creep|over.?expos|under.?expos|\bfilm\b|s.?curve|characteristic curve|\bAEC\b|automatic exposure/i,
-      fallback: true,
+      ...S.latitude,
       primer: [
         {
           kind: 'principle',
@@ -206,10 +198,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
     {
-      id: 'quality',
-      title: 'MTF, DQE and noise',
-      blurb: 'Quality written as curves: what survives, and at what dose.',
-      kw: /\bMTF\b|modulation transfer|\bDQE\b|detective quantum|quantum mottle|\bSNR\b|signal.?to.?noise|spatial frequenc|line pairs|lp\/?mm|limiting resolution|\bnoise\b/i,
+      ...S.quality,
       primer: [
         {
           kind: 'principle',
@@ -248,10 +237,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
     {
-      id: 'processing',
-      title: 'Processing and digital artefacts',
-      blurb: 'The display can be reshaped; the photon count cannot.',
-      kw: /process|window|edge enhanc|histogram|smooth|dead (pixel|row|detector)|ghost|artefact|artifact|flat.?field|uniformity|interpolat/i,
+      ...S.processing,
       primer: [
         {
           kind: 'principle',
@@ -278,75 +264,7 @@ export const DIGITAL: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'cr-readout',
-      title: 'CR readout',
-      rule: 'A CR plate stores the exposure as electrons in metastable traps; a scanning red laser releases them, the plate emits blue light, and a photomultiplier tube reads it.',
-      why: 'The stimulating and emitted wavelengths must differ so a filter can separate them — that is what makes a storage phosphor readable.',
-      confusion: 'Caesium iodide is the scintillator of indirect DR and image intensifiers; CR is barium fluorohalide.',
-      match: /photostimulable|storage phosphor|barium fluor|BaFBr|red laser|blue light|computed radiograph|\bCR plate/i,
-    },
-    {
-      id: 'cr-fading',
-      title: 'The latent image fades',
-      rule: 'CR traps leak from the moment of exposure: read within a few hours — half a day to a week means severe fading — then erase with bright white light for reuse.',
-      confusion: 'Plate life ends by mechanical wear and laser desensitisation, not by a fixed count of exposures.',
-      match: /fad(e|ing)|latent image|eras(e|ure)/i,
-    },
-    {
-      id: 'indirect-direct',
-      title: 'Indirect versus direct conversion',
-      rule: 'Indirect DR converts twice — X-ray to light in CsI, light to charge in a photodiode — while direct DR converts once, X-ray to charge in amorphous selenium under a bias field.',
-      why: 'The light step spreads sideways (columnar CsI needles limit it), whereas drifting charge follows the field lines straight down — so direct conversion is intrinsically sharper.',
-      confusion: 'Sharper is not more dose-efficient: at general radiography energies CsI absorbs more of the beam, so indirect panels usually carry the higher DQE.',
-      match: /c(a)?esium iodide|\bCsI\b|selenium|a.?Se\b|scintillat|photodiode|\bTFT\b|indirect|direct conversion/i,
-    },
-    {
-      id: 'pixel-arithmetic',
-      title: 'The pixel arithmetic',
-      rule: 'Pixel size = FOV ÷ matrix; grey levels = 2^bit depth; storage ∝ matrix² × bit depth — doubling the matrix side quadruples the file.',
-      why: 'Pixels tile the field of view, so their count grows with the square of the side; bits multiply the cost of every pixel.',
-      confusion: 'Bit depth grades intensity, not sharpness — more grey levels never improve spatial resolution.',
-      match: /pixel size|\bmatrix\b|bit.?depth|grey.?level|gray.?level|file size|storage|megabyte|kilobyte/i,
-    },
-    {
-      id: 'nyquist',
-      title: 'The Nyquist limit',
-      rule: 'A sampled image cannot represent spatial frequencies above 1/(2 × pixel size); detail beyond that folds back into the image as aliasing.',
-      why: 'Two samples per cycle is the minimum needed to record a variation at all.',
-      match: /nyquist|alias|sampling (frequency|limit|interval)|limiting (spatial )?resolution/i,
-    },
-    {
-      id: 'dose-creep',
-      title: 'Dynamic range and dose creep',
-      rule: 'A digital detector is linear across a wide dynamic range, so display brightness is decoupled from exposure — overexposure looks perfect, and only the exposure indicator shows it.',
-      why: 'Processing windows whatever signal arrives; the image carries no visible evidence of excess dose.',
-      confusion: 'Underexposure is not silent — it shows as quantum mottle. It is overexposure that hides.',
-      match: /dynamic range|latitude|dose creep|exposure ind|deviation index|over.?expos/i,
-    },
-    {
-      id: 'mtf',
-      title: 'MTF',
-      rule: 'MTF is the fraction of contrast surviving at each spatial frequency: 1 is perfect, every blur pulls it down, and the system MTF is the product of its components.',
-      confusion: 'MTF says nothing about noise — a sharp detector can still waste dose.',
-      match: /\bMTF\b|modulation transfer|spatial frequenc/i,
-    },
-    {
-      id: 'dqe',
-      title: 'DQE',
-      rule: 'DQE = SNR²out / SNR²in as a function of spatial frequency: how efficiently the detector turns dose into image quality, with a perfect detector at 1.',
-      why: 'A higher-DQE detector reaches the same image SNR at lower dose — it is the dose-efficiency figure of merit.',
-      match: /\bDQE\b|detective quantum/i,
-    },
-    {
-      id: 'processing-limit',
-      title: 'Processing cannot add information',
-      rule: 'Windowing, edge enhancement and smoothing re-present captured data; they can never restore photons that were not detected.',
-      confusion: 'Smoothing hides mottle by discarding detail — SNR is fixed at exposure, not at the workstation.',
-      match: /window|edge enhanc|smooth|post.?process|processing|histogram/i,
-    },
-  ],
+  concepts: CONCEPTS.digital,
   essentials: [
     'CR = photostimulable barium fluorohalide (BaFBr): the trapped electrons are the latent image, and pixels exist only at readout.',
     'CR readout: red laser in, blue light out, photomultiplier tube collects; bright white light erases the plate for reuse.',

@@ -12,7 +12,12 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { InverseSquare } from '../components/sims/InverseSquare'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.safety
 
 export const SAFETY: V2Topic = {
   id: 'safety',
@@ -24,10 +29,7 @@ export const SAFETY: V2Topic = {
   outcomes: TOPIC_OUTCOMES.safety,
   sections: [
     {
-      id: 'quantities',
-      title: 'Dose quantities and units',
-      blurb: 'Three quantities, two units, and a strict rule about which answers which question.',
-      kw: /absorbed dose|equivalent dose|effective dose|weighting factor|dose.area|\bDAP\b|entrance surface|\bESD\b|kerma|\bgray\b|sievert|Gy.?cm/i,
+      ...S.quantities,
       primer: [
         {
           kind: 'principle',
@@ -59,10 +61,7 @@ export const SAFETY: V2Topic = {
       ],
     },
     {
-      id: 'radiobiology',
-      title: 'How radiation damages cells',
-      blurb: 'Free radicals, LET, and why some cells and some moments are more vulnerable.',
-      kw: /free radical|radiolysis|direct action|indirect action|\bLET\b|linear energy transfer|\bRBE\b|relative biological|cell cycle|mitosis|mitotic|radiosensitiv|oxygen|dose.?rate|\bDNA\b|chromosom/i,
+      ...S.radiobiology,
       primer: [
         {
           kind: 'principle',
@@ -90,11 +89,7 @@ export const SAFETY: V2Topic = {
       ],
     },
     {
-      id: 'effects',
-      title: 'Deterministic and stochastic effects',
-      blurb: 'Threshold and severity against probability — and the risk numbers attached to each.',
-      tags: ['deterministic-stochastic-effects'],
-      kw: /deterministic|stochastic|tissue reaction|threshold|erythema|epilation|cataract|lens opacit|heredit|cancer risk|1 in \d|risk coefficient|linear no.threshold|\bLNT\b/i,
+      ...S.effects,
       primer: [
         {
           kind: 'principle',
@@ -133,12 +128,7 @@ export const SAFETY: V2Topic = {
       ],
     },
     {
-      id: 'legislation',
-      title: 'IRR17 and IR(ME)R 2017',
-      blurb: 'Two regulations, two enforcers, and the roles the paper never tires of swapping.',
-      tags: ['irmer-irr'],
-      fallback: true,
-      kw: /IRR ?(20)?17|IR\(ME\)R|IRMER|ionising radiations? regulations|medical exposure|referrer|practitioner|\boperator\b|employer|justif|optimis|ALARP|controlled area|supervised area|classified|\bRPA\b|\bRPS\b|local rules|\bDRLs?\b|diagnostic reference|\bCQC\b|\bHSE\b|entitle|written procedure|reportable|overexposure/i,
+      ...S.legislation,
       primer: [
         {
           kind: 'principle',
@@ -172,10 +162,7 @@ export const SAFETY: V2Topic = {
       ],
     },
     {
-      id: 'limits',
-      title: 'Dose limits, typical doses and pregnancy',
-      blurb: 'The numbers the paper tests bare — limits for people, typical doses for perspective.',
-      kw: /dose limits?|20 ?mSv|\b1 ?mSv|\b6 ?mSv|500 ?mSv|150 ?mSv|\bpublic\b|pregnan|f(o|oe)tus|f(o|oe)tal|conceptus|declaration|background|natural radiation|chest (x.?ray|radiograph)|CT head|CT abdomen|bone scan|barium enema/i,
+      ...S.limits,
       primer: [
         {
           kind: 'principle',
@@ -214,10 +201,7 @@ export const SAFETY: V2Topic = {
       ],
     },
     {
-      id: 'staff',
-      title: 'Dosimetry and protecting the worker',
-      blurb: 'Where staff dose actually comes from, and the instruments that record it.',
-      kw: /dosimet|film badge|\bTLD\b|thermoluminescen|electronic personal|\bEPD\b|lead apron|\bapron\b|leakage|time, distance|shield|radioactive waste|excreta|ARSAC|decay storage/i,
+      ...S.staff,
       primer: [
         {
           kind: 'principle',
@@ -259,82 +243,7 @@ export const SAFETY: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'dose-chain',
-      title: 'Gray to sievert',
-      rule: 'Absorbed dose (Gy) × radiation weighting factor = equivalent dose (Sv); summing organ equivalent doses × tissue weighting factors gives effective dose (Sv).',
-      why: 'Effective dose is the uniform whole-body dose carrying the same stochastic risk as the actual partial-body exposure — a currency for comparing examinations.',
-      confusion: 'For X-rays wR = 1, so mGy and mSv are numerically equal — but effective dose is never assigned to a single organ or a gram of tissue.',
-      match: /absorbed dose|equivalent dose|effective dose|weighting factor/i,
-    },
-    {
-      id: 'det-vs-stoch',
-      title: 'Deterministic versus stochastic',
-      rule: 'Deterministic effects have thresholds and worsen with dose; stochastic effects have no threshold and dose raises only their probability.',
-      why: 'Tissue reactions need enough cells killed to injure the tissue; a cancer can start from one surviving damaged cell, so no dose is assumed safe.',
-      confusion: 'The severity of a stochastic effect is independent of the dose that caused it — a bigger dose makes cancer more likely, not worse.',
-      match: /deterministic|stochastic|tissue reaction|no.threshold/i,
-    },
-    {
-      id: 'risk-numbers',
-      title: 'The risk coefficients',
-      rule: 'Nominal fatal cancer risk ≈ 5% per sievert — about 1 in 20,000 per mSv for adults; children run roughly 2–3 times higher.',
-      confusion: 'Hereditary risk is far smaller than the cancer risk — and “1 in 300 per mSv” is wrong by two orders of magnitude.',
-      match: /1 in \d|cancer risk|heredit|risk coefficient|per (mSv|millisievert|sievert)/i,
-    },
-    {
-      id: 'irmer-roles',
-      title: 'The IR(ME)R duty holders',
-      rule: 'The referrer supplies the clinical information, the practitioner justifies, the operator optimises and performs, and the employer owns the procedures and DRLs.',
-      why: 'Each duty holder answers for their own role, and one person may hold more than one.',
-      confusion: 'The practitioner need only be an entitled, adequately trained registered healthcare professional — not necessarily a doctor. And it is the practitioner, never the referrer, who justifies.',
-      match: /referrer|practitioner|\boperator\b|duty holder|justificat|entitle/i,
-    },
-    {
-      id: 'irr-areas',
-      title: 'Designated areas and classification',
-      rule: 'A controlled area is designated where annual effective dose is likely to exceed 6 mSv (or special procedures are required); classification follows likely exposure above 6 mSv or three-tenths of any dose limit.',
-      why: 'The employer designates areas with the RPA’s advice; the RPS supervises the local rules inside them.',
-      confusion: 'The controlled-area number is 6 mSv — not 1 (that is the supervised area) and not 3. Entering a controlled area does not by itself classify a worker.',
-      match: /controlled area|supervised area|classified|designat/i,
-    },
-    {
-      id: 'no-patient-limits',
-      title: 'No dose limits for patients',
-      rule: 'Medical exposures have no dose limits — patients are protected by justification and optimisation, with DRLs as reference points, not limits.',
-      why: 'A justified examination benefits the patient; a limit could deny that benefit. DRLs flag unusually high typical doses and may be exceeded in a justified individual case.',
-      match: /\bDRLs?\b|diagnostic reference|dose limit.{0,40}(patient|medical)|medical exposure.{0,40}limit/i,
-    },
-    {
-      id: 'pregnancy-rule',
-      title: 'Pregnancy at work',
-      rule: 'From the written declaration of pregnancy, the dose to the fetus must be unlikely to exceed 1 mSv for the remainder of the pregnancy.',
-      confusion: 'The 1 mSv is a fetal dose, not a maternal one — and it does not automatically bar work in fluoroscopy or nuclear medicine.',
-      match: /pregnan|f(o|oe)tus|f(o|oe)tal|conceptus|declaration/i,
-    },
-    {
-      id: 'indirect-action',
-      title: 'Direct and indirect action',
-      rule: 'Most X-ray damage to DNA is indirect — via free radicals produced by radiolysis of water — with direct ionisation of DNA the minority.',
-      why: 'X-rays are low-LET: their sparse ionisations mostly hit water, which is most of the cell. High-LET radiation damages DNA directly and irreparably.',
-      match: /free radical|radiolysis|indirect action|direct action/i,
-    },
-    {
-      id: 'let-rbe',
-      title: 'LET and RBE',
-      rule: 'LET is energy deposited per unit path length; RBE compares doses for equal biological effect and rises with LET, peaking near 100 keV/µm.',
-      confusion: 'Beyond the peak, extra LET is overkill — energy wasted on cells already dead — so RBE falls again rather than rising forever.',
-      match: /\bLET\b|linear energy transfer|\bRBE\b|relative biological/i,
-    },
-    {
-      id: 'apron-scatter',
-      title: 'Staff dose is scatter',
-      rule: 'Staff exposure comes from scatter off the patient — about 0.1% of the entrance dose rate at 1 m — and a lead apron attenuates scatter, never the primary beam.',
-      why: 'Time, distance and shielding are the controls; the inverse square law makes distance the cheapest of the three.',
-      match: /lead apron|\bapron\b|scatter.{0,40}(staff|1 ?m)|time.{0,15}distance/i,
-    },
-  ],
+  concepts: CONCEPTS.safety,
   essentials: [
     'Absorbed dose (Gy) × wR = equivalent dose (Sv); Σ(organ dose × wT) = effective dose (Sv). For X-rays wR = 1.',
     'Deterministic: threshold, severity rises with dose. Stochastic: no threshold, probability rises, severity does not.',

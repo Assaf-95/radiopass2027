@@ -581,7 +581,6 @@
   text-transform: uppercase;
   color: var(--v2-ink-3);
 }
-.v2-qmeta .hy { color: var(--v2-bronze); }
 .v2-qtitle {
   font-family: var(--v2-serif);
   font-weight: 490;

@@ -15,10 +15,15 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { FreqPenetration } from '../components/sims/FreqPenetration'
 import { DopplerAliasing } from '../components/sims/DopplerAliasing'
 import { UsImpedance } from '../components/sims/UsImpedance'
 import { UsArtefacts } from '../components/sims/UsArtefacts'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.us
 
 export const US: V2Topic = {
   id: 'us',
@@ -30,11 +35,7 @@ export const US: V2Topic = {
   outcomes: TOPIC_OUTCOMES.us,
   sections: [
     {
-      id: 'waves',
-      title: 'The wave and its speed',
-      blurb: 'A mechanical wave whose speed belongs to the tissue, not the machine.',
-      tags: ['wave-frequency-period'],
-      kw: /wavelength|speed of sound|velocity of (ultra)?sound|propagation (speed|velocity)|1540|longitudinal|compressib|mechanical (pressure )?wave|20 ?kHz|audible/i,
+      ...S.waves,
       primer: [
         {
           kind: 'principle',
@@ -72,11 +73,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'impedance',
-      title: 'Impedance and interfaces',
-      blurb: 'Echoes are made at boundaries — by the mismatch, never by either tissue alone.',
-      tags: ['ultrasound-acoustic-impedance'],
-      kw: /impedanc|rayl|reflect|refract|snell|critical angle|coupling|gel\b|interface|mismatch/i,
+      ...S.impedance,
       primer: [
         {
           kind: 'principle',
@@ -125,10 +122,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'attenuation',
-      title: 'Attenuation and compensation',
-      blurb: 'What the tissue takes on the way, and what the machine gives back on the way out.',
-      kw: /attenuat|absorption|dB\/cm|time.?gain|TGC|penetrat|output power|receiver gain|acoustic window/i,
+      ...S.attenuation,
       primer: [
         {
           kind: 'principle',
@@ -165,10 +159,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'transducer',
-      title: 'The transducer, the pulse and resolution',
-      blurb: 'Element thickness sets the frequency, damping sets the pulse, and the pulse sets the sharpness.',
-      kw: /piezo|transducer|crystal|element|matching layer|damping|backing|bandwidth|q.?factor|resonan|array|probe|footprint|spatial pulse length|axial|lateral|elevation|slice thickness|resolution|focal zone|frame rate|near.?field|far.?field|divergen|beam width|aperture|duty factor|pulse.?echo|pulse repetition/i,
+      ...S.transducer,
       primer: [
         {
           kind: 'principle',
@@ -223,11 +214,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'doppler',
-      title: 'Doppler and aliasing',
-      blurb: 'Four inputs, one cosine, and a sampling limit at half the PRF.',
-      tags: ['doppler-angle'],
-      kw: /doppler|nyquist|alias|\bPRF\b|colou?r flow|spectral|duplex|triplex|continuous.?wave|pulsed.?wave|\bCW\b|\bPW\b|baseline|insonation/i,
+      ...S.doppler,
       primer: [
         {
           kind: 'principle',
@@ -265,11 +252,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'artefacts',
-      title: 'Artefacts',
-      blurb: 'Every artefact is one of the machine’s assumptions being broken.',
-      kw: /artefact|artifact|shadow|enhancement|reverberat|comet|ring.?down|mirror|side.?lobe|grating|speckle|anisotrop|twinkle|range ambiguity|speed error|misregist/i,
-      fallback: true,
+      ...S.artefacts,
       primer: [
         {
           kind: 'principle',
@@ -312,11 +295,7 @@ export const US: V2Topic = {
       ],
     },
     {
-      id: 'safety',
-      title: 'Safety — the two indices',
-      blurb: 'MI warns about bubbles, TI about heat. Neither is a measurement of harm.',
-      tags: ['ultrasound-mi-ti'],
-      kw: /mechanical index|thermal index|\bMI\b|\bTI[SBC]?\b|cavitat|heating|thermal|bioeffect|safety|obstetric|f(oe|e)tal|ALAR[AP]|prudent|microbubble|contrast agent/i,
+      ...S.safety,
       primer: [
         {
           kind: 'principle',
@@ -357,93 +336,7 @@ export const US: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'speed-medium',
-      title: 'The medium owns the speed',
-      rule: 'Propagation speed is set by the stiffness and density of the medium — c = 1/√(κρ) — never by the transducer frequency.',
-      why: 'Changing the frequency changes the wavelength (λ = c/f), because c is fixed by the tissue. The scanner assumes 1540 m/s for everything.',
-      confusion: 'Bone is fast because it is stiff, not because it is dense — stiffness rises faster than density.',
-      match: /speed of sound|velocity of (ultra)?sound|propagation (speed|velocity)|1540|compressib/i,
-    },
-    {
-      id: 'impedance-mismatch',
-      title: 'Impedance and the mismatch',
-      rule: 'Z = ρc, in rayls; the reflected fraction is R = ((Z₂ − Z₁)/(Z₂ + Z₁))² — set by the mismatch, not by either impedance alone.',
-      why: 'Similar impedances transmit almost everything; the tissue–air step reflects over 99%, which is what gel abolishes.',
-      confusion: 'Reflection needs an impedance difference, not a density difference — and impedance is unaffected by frequency.',
-      match: /impedanc|rayl|reflect(ion|ed|s)?\b|coupling|gel\b/i,
-    },
-    {
-      id: 'refraction-speed',
-      title: 'Refraction needs speed and obliquity',
-      rule: 'Refraction requires BOTH oblique incidence and a speed difference — sin θ₁/c₁ = sin θ₂/c₂; at normal incidence there is none.',
-      why: 'Impedance governs reflection; speed governs refraction. They are related processes with different masters.',
-      confusion: 'Refraction does not depend on frequency — lowering the transmit frequency does not reduce a refraction artefact.',
-      match: /refract|snell|critical angle|oblique/i,
-    },
-    {
-      id: 'attenuation-rule',
-      title: 'The attenuation budget',
-      rule: 'Soft tissue attenuates at roughly 0.5–1 dB/cm/MHz, mainly by absorption — loss grows with both depth and frequency.',
-      why: 'The frequency term is the penetration problem: a higher-frequency beam pays more per centimetre, so deep echoes vanish into the noise sooner.',
-      confusion: 'Attenuation is mostly absorption to heat, not reflection and scatter — and it has no relationship to acoustic impedance.',
-      match: /attenuat|absorption|dB\/cm|penetrat/i,
-    },
-    {
-      id: 'gain-vs-power',
-      title: 'Gain versus output power',
-      rule: 'Gain and TGC amplify received echoes — patient exposure unchanged; output power changes what enters the patient, and MI and TI with it.',
-      why: 'TGC is a depth-dependent receive-side correction for attenuation; it brightens noise along with signal and puts nothing back into the beam.',
-      match: /\bgain\b|TGC|time.?gain|output power/i,
-    },
-    {
-      id: 'resolution-owners',
-      title: 'Which control owns which resolution',
-      rule: 'Axial resolution = SPL/2, owned by frequency and damping, independent of depth; lateral resolution = beam width, owned by aperture and focus, best at the focus.',
-      why: 'The pulse length does not change as the pulse travels, so axial resolution holds at every depth. The beam width does change — so lateral resolution does not.',
-      confusion: 'Diameter, focusing, PRF and depth all leave axial resolution untouched — they are the classic false stems.',
-      match: /axial|lateral|elevation|slice thickness|spatial pulse length|beam width|resolution/i,
-    },
-    {
-      id: 'thickness-frequency',
-      title: 'Thickness sets the frequency',
-      rule: 'The element resonates when its thickness is half a wavelength in the crystal — thicker element, lower frequency, longer wavelength; the matching layer is a quarter-wavelength at the geometric-mean impedance.',
-      why: 'Diameter sets the aperture and therefore the beam — it has no say in the resonant frequency.',
-      match: /thickness|resonan|crystal|piezo|matching layer|half.?wavelength|quarter.?wavelength/i,
-    },
-    {
-      id: 'damping-chain',
-      title: 'The damping chain',
-      rule: 'More damping → fewer cycles → shorter pulse → wider bandwidth → lower Q → better axial resolution → lower sensitivity.',
-      why: 'Every consequence follows from the shorter pulse; the cost is that a shorter pulse carries less energy, so weak deep echoes are harder to hear.',
-      match: /damping|backing|bandwidth|q.?factor|ring.?down time|cycles per pulse/i,
-    },
-    {
-      id: 'doppler-cosine',
-      title: 'The Doppler cosine',
-      rule: 'Δf = 2 f₀ v cos θ / c — the shift follows the cosine of the beam–flow angle: maximal parallel to flow, halved at 60°, zero at 90°.',
-      why: 'Only the velocity component along the beam produces a shift. Past 60° the cosine changes so steeply that small angle errors become large velocity errors.',
-      confusion: 'Vessel diameter, beam intensity and PRF are not in the equation — and the shift is greatest parallel to flow, not perpendicular.',
-      match: /doppler (shift|equation|angle)|cos|insonation|beam.?flow angle/i,
-    },
-    {
-      id: 'nyquist',
-      title: 'The Nyquist limit',
-      rule: 'A pulsed system displays shifts only up to PRF/2; anything beyond wraps — and PRF is itself capped by imaging depth.',
-      why: 'Sampling must catch each cycle of the shift at least twice. Genuine fixes raise the limit (PRF up, depth down) or shrink the shift (lower f₀); baseline shift only moves the display, and CW removes sampling altogether at the cost of range resolution.',
-      confusion: 'Aliasing occurs at ordinary physiological velocities — it does not prove a stenosis, and raising the transmit frequency makes it more likely.',
-      match: /nyquist|alias|\bPRF\b|velocity scale|baseline/i,
-    },
-    {
-      id: 'mi-vs-ti',
-      title: 'MI versus TI',
-      rule: 'MI = p₋/√f estimates cavitation potential (caution 0.7 with contrast, 0.3 neonatal lung); TI estimates heating (restrict time above 0.7, obstetric ceiling 3.0).',
-      why: 'Cavitation needs gas nuclei and peak negative pressure; heating comes from absorption, so it concentrates at bone and is relieved by perfusion.',
-      confusion: 'TI is a ratio to the power for a 1 °C rise — an index, not a measured temperature.',
-      match: /mechanical index|thermal index|cavitat|\bTI[SBC]?\b|\bMI\b|heating|obstetric/i,
-    },
-  ],
+  concepts: CONCEPTS.us,
   essentials: [
     'The medium owns the speed: air 330, fat 1450, soft tissue 1540 (assumed), muscle 1580, cortical bone ≈4080 m/s — frequency changes λ, never c.',
     'Z = ρc in rayls; R = ((Z₂ − Z₁)/(Z₂ + Z₁))². Soft tissue–air reflects >99% (hence gel); soft tissue–fluid ≈0.2%.',

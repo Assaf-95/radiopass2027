@@ -26,7 +26,7 @@ import { readQbMarks, readQbProgress, recordQbScore, toggleQbMark } from '../../
 import type { QbQuestion } from '../../qbank/types'
 import { cleanExplanation } from '../lib/clean'
 import { topicHref } from '../../physics/routes'
-import { sectionOf } from '../lib/assign'
+import { conceptIdFor, sectionOf } from '../lib/assign'
 import type { Concept, V2Topic } from '../types'
 
 type Choices = Record<string, boolean>
@@ -37,9 +37,15 @@ export function scoreStems(question: QbQuestion, choices: Choices) {
   return { correct, outOf: scorable.length }
 }
 
+/**
+ * The governing principle, from the checked-in map. This was a first-regex-
+ * wins scan of the topic's concepts, with the same silent-arbitrary problem
+ * the section matcher had; the map records one concept id per question, and
+ * the regexes remain only as the bootstrap that seeded it.
+ */
 function conceptFor(topic: V2Topic, question: QbQuestion): Concept | null {
-  const text = `${question.title} ${question.stems.map((s) => s.text).join(' ')}`
-  return topic.concepts.find((c) => c.match.test(text)) ?? null
+  const id = conceptIdFor(question.id)
+  return id ? (topic.concepts.find((c) => c.id === id) ?? null) : null
 }
 
 export function V2Question({
@@ -106,7 +112,6 @@ export function V2Question({
     setMarks(all[question.id] ?? {})
   }
 
-  const highYield = question.source.toLowerCase().includes('recall')
   const concept = submitted && correct < outOf ? conceptFor(topic, question) : null
   const section = sectionOf(topic, question.id)
   const sectionIndex = section ? topic.sections.findIndex((s) => s.id === section.id) + 1 : 0
@@ -118,7 +123,11 @@ export function V2Question({
           Question {number} / {total}
         </span>
         {section && <span>{section.title}</span>}
-        {highYield && <span className="hy">High-yield</span>}
+        {/* No provenance chip. "High-yield" here was literally
+            source.includes('recall') — a 1:1 proxy for which questions came
+            from exam recalls, which DESIGN.md says must stay silent. It also
+            told the candidate nothing: in this bank the recalls are the rule,
+            not the exception. */}
       </div>
 
       <h2 className="v2-qtitle">{question.title}</h2>

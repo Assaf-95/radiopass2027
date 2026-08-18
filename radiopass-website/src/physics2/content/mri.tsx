@@ -13,6 +13,8 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 
 import { PrecessionAndLarmorSim } from '../../mri5/sims/PrecessionAndLarmor'
 import { WeightingLab } from '../../mri5/sims/WeightingLab'
@@ -24,6 +26,9 @@ import { SliceSelectionSim } from '../../mri5/sims/SliceSelection'
 import { ArtefactGallery } from '../../mri5/sims/ArtefactGallery'
 import { SafetyZonesSim } from '../../mri5/sims/SafetyZones'
 
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.mri
+
 export const MRI: V2Topic = {
   id: 'mri',
   num: 7,
@@ -34,11 +39,7 @@ export const MRI: V2Topic = {
   outcomes: TOPIC_OUTCOMES.mri,
   sections: [
     {
-      id: 'signal',
-      title: 'Spins, precession and resonance',
-      blurb: 'Where the signal comes from before anything is imaged.',
-      tags: ['mri-b0-precession-rf-recovery-overview', 'mri-larmor-precession', 'mri-rf-excitation'],
-      kw: /larmor|precess|gyromagnetic|resonan|flip angle|net magnetis|\bB0\b|\bB₀\b|42\.5|63\.8|127\.7|hydrogen nucle|spin excess|\bB1\b|\bB₁\b|90° pulse/i,
+      ...S.signal,
       primer: [
         {
           kind: 'principle',
@@ -85,11 +86,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'relaxation',
-      title: 'Relaxation: T1, T2 and T2*',
-      blurb: 'Two independent processes running at once, and a third rate the magnet adds.',
-      tags: ['mri-magnetisation-recovery', 'mri-t2-t2star-signal', 'mri-dephasing'],
-      kw: /relaxation|spin.?lattice|spin.?spin|longitudinal|transverse (decay|magnetis)|free induction|\bFID\b|T2\*|dephas|63%|37%|recovery curve/i,
+      ...S.relaxation,
       primer: [
         {
           kind: 'principle',
@@ -138,12 +135,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'sequences',
-      title: 'Spin echo, gradient echo and inversion recovery',
-      blurb: 'Three ways of running the same experiment, and what each one buys.',
-      tags: ['mri-dephasing-step-sequence', 'mri-t2-dephasing-spin-echo', 'mri-spin-echo', 'mri-refocusing'],
-      kw: /spin echo|gradient echo|\bGRE\b|refocus|180[°º]? ?(pulse|rf)|echo train|turbo|inversion recovery|\bSTIR\b|\bFLAIR\b|null (point|time|tissue)|\bTI\b|ernst|diffusion|\bDWI\b|time.of.flight|angiograph|\bMRA\b|spectroscop|steady.?state/i,
-      fallback: true,
+      ...S.sequences,
       primer: [
         {
           kind: 'principle',
@@ -207,11 +199,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'weighting',
-      title: 'TR, TE and image weighting',
-      blurb: 'Two timings decide which tissue property the picture is a picture of.',
-      tags: ['mri-tissue-signal'],
-      kw: /weight|\bTR\b|\bTE\b|proton density|\bPD[- ]?weight|repetition time|echo time|gadolinium|contrast agent|relaxivity|CSF (bright|dark)|fat (bright|dark)/i,
+      ...S.weighting,
       primer: [
         {
           kind: 'principle',
@@ -253,11 +241,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'encoding',
-      title: 'Spatial encoding and k-space',
-      blurb: 'One coil returns one number — three gradients turn it into an image.',
-      tags: ['mri-gradients-kspace'],
-      kw: /k.?space|phase.?encod|frequency.?encod|slice select|readout gradient|fourier|field of view|\bFOV\b|matrix|scan time|centric|spatial (frequency|encoding|resolution)/i,
+      ...S.encoding,
       primer: [
         {
           kind: 'principle',
@@ -313,11 +297,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'quality',
-      title: 'Image quality and artefacts',
-      blurb: 'The SNR trades, and the predictable directions in which encoding fails.',
-      tags: ['mri-chemical-shift', 'mri-artifacts'],
-      kw: /\bSNR\b|signal.to.noise|noise|\bNSA\b|\bNEX\b|averag|receiver bandwidth|chemical shift|artefact|artifact|ghost|wrap|alias|susceptibilit|gibbs|truncation|magic angle|motion|voxel/i,
+      ...S.quality,
       primer: [
         {
           kind: 'principle',
@@ -369,11 +349,7 @@ export const MRI: V2Topic = {
       ],
     },
     {
-      id: 'safety',
-      title: 'Safety: the four hazards',
-      blurb: 'The static field, the gradients, the RF and the cryogens — each with its own failure mode.',
-      tags: ['mri-sar'],
-      kw: /\bSAR\b|safety|quench|projectile|ferromagnet|pacemaker|implant|fringe|5.?gauss|0\.5 mT|dB\/dt|nerve stimulation|acoustic|hearing|helium|cryogen|MR (safe|conditional)|burn|zone/i,
+      ...S.safety,
       primer: [
         {
           kind: 'principle',
@@ -421,88 +397,7 @@ export const MRI: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'larmor',
-      title: 'The Larmor equation',
-      rule: 'Precession frequency is set by the field alone: f₀ = γ̄B₀, with γ̄ = 42.58 MHz/T for hydrogen — 63.87 MHz at 1.5 T, 127.74 MHz at 3 T.',
-      why: 'γ̄ is a constant unique to each nucleus, so a straight line through the origin links field to frequency: 3 T precesses exactly twice as fast as 1.5 T.',
-      confusion: 'ω₀ = γB₀ is the angular frequency in rad/s; f₀ = γ̄B₀ is the ordinary frequency in Hz — they differ by 2π.',
-      match: /larmor|gyromagnetic|precess|42\.5|63\.8|127\.7/i,
-    },
-    {
-      id: 'spin-echo-t2star',
-      title: 'What the 180° pulse recovers',
-      rule: 'A 180° pulse reverses the phase from static field inhomogeneity (T2′), so the spin echo decays at true T2; any sequence without one decays at the faster T2*.',
-      why: 'Static offsets are fixed in space, so mirrored phase is exactly unwound. Spin–spin dephasing is random in time — there is no fixed phase to mirror, so T2 loss is never refocused.',
-      confusion: 'A gradient reversal undoes only the phase that gradient created — long-TE gradient echo is T2*-weighted, never T2-weighted.',
-      match: /spin echo|gradient echo|\bGRE\b|refocus|180[°º]? ?(pulse|rf)|T2\*|susceptibilit/i,
-    },
-    {
-      id: 'ir-null',
-      title: 'Inversion recovery and the null',
-      rule: 'IR nulls the tissue whose Mz crosses zero at the excitation: TI ≈ 0.693 × T1 when TR is long — fat near 150–180 ms (STIR), CSF near 2000–2500 ms (FLAIR).',
-      why: 'After a 180° inversion, recovery is exponential with T1, so each tissue has its own zero-crossing time and the operator chooses which one to catch.',
-      confusion: 'STIR nulls a T1, not fat specifically — gadolinium-enhanced tissue has a short T1 too, so STIR after contrast deletes the enhancement.',
-      match: /inversion|\bSTIR\b|\bFLAIR\b|null|\bTI\b/i,
-    },
-    {
-      id: 'weighting',
-      title: 'TR, TE and weighting',
-      rule: 'TR controls T1 contrast and TE controls T2 contrast: short TR + short TE → T1W, long TR + long TE → T2W, long TR + short TE → PD.',
-      why: 'Signal = PD × (1 − e^(−TR/T1)) × e^(−TE/T2) — TR decides where the recovery curves are cut, TE where the decay curves are cut.',
-      confusion: 'Short TR with long TE is the unused corner: the two effects favour opposite tissues, so contrast largely cancels and signal is poor.',
-      match: /weight|\bTR\b|\bTE\b|proton density|repetition time|echo time/i,
-    },
-    {
-      id: 't1-vs-t2',
-      title: 'T1 versus T2',
-      rule: 'T1 (spin–lattice recovery, 63% done at t = T1) and T2 (spin–spin decay, 37% left at t = T2) run simultaneously and independently, and T2 never exceeds T1.',
-      why: 'T1 hands energy to the lattice; T2 loses only phase coherence. Anything that hands energy away also disturbs phase, so T2 ≤ T1 in every tissue.',
-      confusion: 'The two numbers are e⁻¹ definitions of time constants, not finish lines — recovery and decay continue beyond them.',
-      match: /\bT1\b|\bT2\b|relaxation|spin.?lattice|spin.?spin|longitudinal|transverse/i,
-    },
-    {
-      id: 'kspace-centre',
-      title: 'The centre of k-space',
-      rule: 'The centre of k-space carries signal and contrast, the periphery carries edge detail — and no sample corresponds to a place in the patient.',
-      why: 'Each sample is one spatial-frequency pattern laid across the whole slice: coarse patterns near the centre report tissue contrast, fine patterns at the edge report boundaries.',
-      confusion: 'The centre of k-space is not the centre of the image — every sample contributes to every pixel.',
-      match: /k.?space|phase.?encod|frequency.?encod|fourier|centric|spatial frequenc/i,
-    },
-    {
-      id: 'artefact-axes',
-      title: 'The artefact axes',
-      rule: 'Motion ghosts and wrap-around lie along the phase-encoding direction; chemical shift misregistration lies along the frequency-encoding direction.',
-      why: 'The phase axis is built one line per TR across the whole scan, so anything that changes between lines smears along it. Fat’s ≈3.5 ppm offset (≈220 Hz at 1.5 T) is a frequency error, so it displaces fat along the frequency axis.',
-      confusion: 'Chemical shift worsens with higher field and narrower receiver bandwidth — and gadolinium has nothing to do with it.',
-      match: /chemical shift|ghost|wrap|alias|artefact|artifact|motion|3\.5 ppm|220 Hz/i,
-    },
-    {
-      id: 'snr-trades',
-      title: 'The SNR trades',
-      rule: 'SNR ∝ voxel volume × √(phase steps × NSA ÷ receiver bandwidth) — resolution and speed are always bought with signal or time.',
-      why: 'Signal counts the protons in the voxel; noise falls as the square root of how long the scanner spent measuring. Doubling SNR by averaging therefore costs four times the time.',
-      confusion: 'More phase-encoding steps cost scan time, not TE — and at fixed FOV a finer matrix lowers SNR.',
-      match: /\bSNR\b|signal.to.noise|noise|\bNSA\b|\bNEX\b|averag|bandwidth|voxel/i,
-    },
-    {
-      id: 'sar',
-      title: 'SAR',
-      rule: 'SAR is RF energy deposited as heat, in W/kg: it scales with the square of B₀ and the square of flip angle — roughly 4× greater at 3 T than at 1.5 T.',
-      why: 'The RF hazard is heating; limits (2 W/kg whole-body in normal mode) hold the core temperature rise to 0.5 °C. Burns come from conductive loops and skin contact, not bulk heating.',
-      confusion: 'SAR belongs to the RF system — not to the gradients (nerve stimulation, noise) or the static field (projectiles).',
-      match: /\bSAR\b|W\/kg|rf (heating|burn|power)|specific absorption/i,
-    },
-    {
-      id: 'static-field',
-      title: 'The static field never switches off',
-      rule: 'B₀ is a persistent superconducting current: mains power does not affect it, and only a quench removes the field.',
-      why: 'Attractive force follows magnetisation × the spatial field gradient, so it is zero at isocentre and greatest at the bore mouth; the 0.5 mT (5 gauss) contour bounds public access.',
-      confusion: 'A quench vents ≈700 L of helium gas per litre of liquid — the danger is asphyxiation, not fire — which is why it is an emergency control, not an off switch.',
-      match: /quench|projectile|ferromagnet|fringe|5.?gauss|0\.5 mT|superconduct|persistent current|helium/i,
-    },
-  ],
+  concepts: CONCEPTS.mri,
   essentials: [
     'f₀ = γ̄B₀ with γ̄ = 42.58 MHz/T: 63.87 MHz at 1.5 T, 127.74 MHz at 3 T.',
     'T1 = spin–lattice, 63% recovered at t = T1. T2 = spin–spin, 37% remaining at t = T2. T2 ≤ T1 always; T2* < T2 always (1/T2* = 1/T2 + 1/T2′).',

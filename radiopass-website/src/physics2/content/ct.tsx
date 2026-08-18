@@ -13,8 +13,13 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { CtWindowing } from '../components/sims/CtWindowing'
 import { CtBackProjection, CtGenerations, CtHelixPitch, CtRingArtefact } from '../components/sims/CtScenes'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.ct
 
 export const CT: V2Topic = {
   id: 'ct',
@@ -26,11 +31,7 @@ export const CT: V2Topic = {
   outcomes: TOPIC_OUTCOMES.ct,
   sections: [
     {
-      id: 'acquisition',
-      title: 'Acquisition and reconstruction',
-      blurb: 'Profiles in, mathematics out — and four generations of machine to collect them.',
-      kw: /generation|translate.?rotate|rotate.?rotate|gantry|back.?projection|filtered|iterative|reconstruct|kernel|fan beam|detector (arc|ring)|attenuation profile|projection/i,
-      fallback: true,
+      ...S.acquisition,
       primer: [
         {
           kind: 'principle',
@@ -94,11 +95,7 @@ export const CT: V2Topic = {
       ],
     },
     {
-      id: 'hu-window',
-      title: 'Hounsfield units and windowing',
-      blurb: 'One scale anchored to water; one display decision that never touches the data.',
-      tags: ['ct-windowing'],
-      kw: /hounsfield|\bhu\b|window(ing| width| level)?|grey.?scale|attenuation (value|number)/i,
+      ...S['hu-window'],
       primer: [
         {
           kind: 'principle',
@@ -141,11 +138,7 @@ export const CT: V2Topic = {
       ],
     },
     {
-      id: 'helical',
-      title: 'MDCT, the helix and pitch',
-      blurb: 'Rows along the patient, a table that never stops, and one dimensionless ratio.',
-      tags: ['ct-pitch-dose'],
-      kw: /pitch|helical|spiral|table (travel|feed|speed|movement)|detector row|multi.?detector|mdct|cone.?beam|isotropic|reformat|multiplanar|\bmpr\b|dual.?energy|spectral|virtual non.?contrast|iodine map/i,
+      ...S.helical,
       primer: [
         {
           kind: 'principle',
@@ -192,10 +185,7 @@ export const CT: V2Topic = {
       ],
     },
     {
-      id: 'noise-quality',
-      title: 'Noise, resolution and the quality trades',
-      blurb: 'Every voxel is a photon count, and the square root rules it.',
-      kw: /noise|mottle|snr|signal.?to.?noise|matrix|pixel|spatial resolution|lp\/?mm|line.?pairs|sharp kernel|smooth kernel|photon starvation/i,
+      ...S['noise-quality'],
       primer: [
         {
           kind: 'principle',
@@ -227,11 +217,7 @@ export const CT: V2Topic = {
       ],
     },
     {
-      id: 'dose',
-      title: 'Dose: CTDIvol, DLP and optimisation',
-      blurb: 'Three names on the dose report, and the machinery that keeps them down.',
-      tags: ['ct-dose-profile'],
-      kw: /ctdi|\bdlp\b|dose.?length|effective dose|\bmsv\b|k.?factor|ssde|bow.?tie|tube current modulation|automatic exposure|ma modulation|dose profile|shield/i,
+      ...S.dose,
       primer: [
         {
           kind: 'principle',
@@ -268,11 +254,7 @@ export const CT: V2Topic = {
       ],
     },
     {
-      id: 'artefacts',
-      title: 'Artefacts',
-      blurb: 'Each one is a reconstruction assumption caught failing.',
-      tags: ['ct-beam-hardening'],
-      kw: /artefact|artifact|beam.?harden|cupping|partial volume|streak|\bring\b|motion|metal|photon starvation|windmill/i,
+      ...S.artefacts,
       primer: [
         {
           kind: 'principle',
@@ -309,87 +291,7 @@ export const CT: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'pitch',
-      title: 'Helical pitch',
-      rule: 'Pitch = table travel per rotation ÷ total beam width — dimensionless; above 1 the helix stretches for faster coverage with interpolated gaps.',
-      why: 'The ratio compares how far the patient moves each turn with how much the beam covers, so it directly states overlap (<1) or gaps (>1).',
-      confusion: 'Raising pitch lowers dose only at fixed mA — automatic exposure control raises the current to hold noise, cancelling most of the saving.',
-      match: /pitch|table (travel|feed|speed)|helical|spiral/i,
-    },
-    {
-      id: 'hounsfield',
-      title: 'The Hounsfield scale',
-      rule: 'HU = 1000 × (μ − μwater)/μwater: attenuation relative to water, with water 0 and air −1000 by definition.',
-      why: 'The scale is a comparison, not an absolute — and because μ depends on beam energy, measured HU shift slightly with kVp.',
-      confusion: 'Only water and air are fixed points; bone at +1000 is typical, not a definition.',
-      match: /hounsfield|\bhu\b|attenuation (value|number)/i,
-    },
-    {
-      id: 'windowing',
-      title: 'Windowing',
-      rule: 'Window width sets displayed contrast and level sets the centre — a display decision that never changes the reconstructed numbers.',
-      why: 'The grey scale is spent entirely inside the window, so a narrow width steepens contrast while everything outside clips to black or white.',
-      confusion: 'Narrowing the width makes small HU differences more visible, not less.',
-      match: /window/i,
-    },
-    {
-      id: 'noise-sqrt',
-      title: 'Noise and the square root',
-      rule: 'CT noise ∝ 1/√(photons per voxel): halving the noise costs four times the dose.',
-      why: 'Every voxel is a photon count, and counting statistics make the fluctuation scale with the square root of the count.',
-      confusion: 'A larger matrix at a fixed FOV means smaller pixels, fewer photons each, and lower per-pixel SNR — resolution is bought with noise.',
-      match: /noise|mottle|square root|quadrupl|√/i,
-    },
-    {
-      id: 'dose-chain',
-      title: 'CTDIvol, DLP and effective dose',
-      rule: 'CTDIvol (mGy) is output to a standard phantom; × scan length gives DLP (mGy·cm); × body-region k-factor estimates effective dose (mSv).',
-      why: 'Each step adds what the last one lacked — length, then the radiosensitivity of the region scanned.',
-      confusion: 'CTDIvol is not the patient’s dose: it ignores patient size, which is what SSDE corrects.',
-      match: /ctdi|\bdlp\b|dose.?length|k.?factor|effective dose|ssde/i,
-    },
-    {
-      id: 'beam-hardening',
-      title: 'Beam hardening',
-      rule: 'Dense tissue strips the soft photons first, so the surviving beam is more penetrating and the centre of a dense object reads falsely low — cupping.',
-      why: 'Reconstruction assumes one attenuation coefficient per material; a beam whose mean energy rises en route breaks that assumption.',
-      confusion: 'The centre reads falsely LOW, not high — and streaks beside dense bone are the same physics.',
-      match: /harden|cupping/i,
-    },
-    {
-      id: 'partial-volume',
-      title: 'Partial volume',
-      rule: 'Any object smaller than a voxel has its HU averaged with its neighbours inside that voxel.',
-      why: 'A voxel reports one number for everything it contains; thicker slices contain more, so they average more.',
-      confusion: 'Helical interpolation slightly broadens the slice profile, worsening partial volume — the helix never scans a truly flat slice.',
-      match: /partial.?volume|averag/i,
-    },
-    {
-      id: 'reconstruction',
-      title: 'Filtered back-projection and iterative reconstruction',
-      rule: 'Plain back-projection leaves a 1/r blur; convolving each profile with a kernel first removes it, and iterative reconstruction models the noise to buy back dose.',
-      why: 'The kernel’s negative side-lobes cancel the overlapping smears of neighbouring rays; the iterative model removes noise statistically rather than averaging it away.',
-      confusion: 'Reconstruction changes image quality, never the dose already delivered — dose is fixed at acquisition.',
-      match: /back.?projection|filtered|iterative|kernel|reconstruct/i,
-    },
-    {
-      id: 'generations',
-      title: 'Scanner generations',
-      rule: 'Third generation: tube and detector arc rotate together. Fourth: a stationary detector ring with only the tube rotating.',
-      why: 'The generations track the removal of translation — pencil beam sweeps became a fan wide enough to cover the whole patient in one view.',
-      confusion: 'The ring artefact belongs to third generation: a faulty element there sees the same radius all rotation long.',
-      match: /generation|translate.?rotate|rotate.?rotate|stationary (ring|detector)|detector ring|pencil beam/i,
-    },
-    {
-      id: 'isotropic',
-      title: 'Isotropic voxels',
-      rule: 'Isotropic voxels are perfect cubes, so reformats in any plane — coronal, sagittal, oblique — carry no resolution penalty.',
-      why: 'Resolution differs between planes only if the voxel has a long axis; a cube has none.',
-      match: /isotrop|reformat|multiplanar|\bmpr\b/i,
-    },
-  ],
+  concepts: CONCEPTS.ct,
   essentials: [
     'HU = 1000 × (μ − μwater)/μwater: water 0 and air −1000 by definition; fat ≈ −100, soft tissue +20 to +50, cortical bone +1000+.',
     'Windowing is display only — width sets contrast, level sets the centre, and the reconstructed numbers never change; narrow width = higher displayed contrast.',

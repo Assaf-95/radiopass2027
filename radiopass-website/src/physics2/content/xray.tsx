@@ -12,7 +12,12 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.xray
 
 export const XRAY: V2Topic = {
   id: 'xray',
@@ -24,11 +29,7 @@ export const XRAY: V2Topic = {
   outcomes: TOPIC_OUTCOMES.xray,
   sections: [
     {
-      id: 'foundations',
-      title: 'Matter and radiation',
-      blurb: 'The vocabulary everything else is written in.',
-      tags: ['wave-frequency-period'],
-      kw: /atomic|electron shell|binding energy|electromagnetic|wavelength|frequency|photon energy|ionis/i,
+      ...S.foundations,
       primer: [
         {
           kind: 'principle',
@@ -51,11 +52,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'tube',
-      title: 'The tube and X-ray production',
-      blurb: 'Boil off electrons, accelerate them, stop them in tungsten.',
-      tags: ['line-focus-principle'],
-      kw: /filament|thermionic|anode|cathode|rotat|tungsten target|focal track|space charge|tube (current|voltage)|heat|stator|rotor|line focus|heel/i,
+      ...S.tube,
       primer: [
         {
           kind: 'principle',
@@ -104,11 +101,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'spectrum',
-      title: 'The spectrum',
-      blurb: 'One graph the exam redraws every year.',
-      tags: ['xray-beam-quality'],
-      kw: /spectrum|bremsstrahlung|characteristic|duane|maximum (photon )?energy|keV|kvp/i,
+      ...S.spectrum,
       primer: [
         {
           kind: 'principle',
@@ -145,10 +138,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'filtration',
-      title: 'Filtration and beam quality',
-      blurb: 'Removing the photons the patient would otherwise absorb.',
-      kw: /filtrat|half.?value|hvl|beam quality|harden|aluminium|copper/i,
+      ...S.filtration,
       primer: [
         {
           kind: 'principle',
@@ -181,11 +171,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'interactions',
-      title: 'Interactions with matter',
-      blurb: 'Three fates, two mechanisms, one crossover.',
-      tags: ['xray-guided-interactions', 'compton-scatter', 'photoelectric-effect', 'exponential-attenuation'],
-      kw: /photoelectric|compton|scatter|attenuat|absor(b|ption)|k.?edge|interaction|transmit/i,
+      ...S.interactions,
       primer: [
         {
           kind: 'principle',
@@ -236,11 +222,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'geometry',
-      title: 'Projection geometry',
-      blurb: 'A point source, a shadow, and two different kinds of blur.',
-      tags: ['radiographic-magnification', 'xray-focal-spot-unsharpness', 'beam-divergence-isocentre'],
-      kw: /magnif|unsharp|penumbra|focal spot size|SID|SOD|OID|FFD|air gap|distortion|geometr/i,
+      ...S.geometry,
       primer: [
         {
           kind: 'principle',
@@ -289,11 +271,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'quality',
-      title: 'Scatter, grids and image quality',
-      blurb: 'Keeping the fog off the image, and naming the kinds of blur.',
-      kw: /grid|bucky|scatter reject|contrast|noise|mottle|quantum|sharpness|resolution|collimat/i,
-      fallback: true,
+      ...S.quality,
       primer: [
         {
           kind: 'principle',
@@ -325,76 +303,7 @@ export const XRAY: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'kvp-vs-mas',
-      title: 'kVp versus mAs',
-      rule: 'kVp changes both photon quantity and quality; mAs changes quantity only.',
-      why: 'Each electron arrives with more energy at higher kVp, so the whole spectrum shifts and grows (≈ kV²). mAs only counts electrons, so it scales the curve without moving it.',
-      confusion: 'Output ∝ kV² but maximum photon energy = kVp exactly — the square law is about quantity, never the endpoint.',
-      match: /kvp|kilovolt|tube voltage|mas\b|tube current|quantity.*quality/i,
-    },
-    {
-      id: 'filtration',
-      title: 'Filtration',
-      rule: 'Filtration reduces photon quantity and raises mean energy — the beam gets smaller and harder together.',
-      why: 'Attenuation is strongest at low photon energies, so the filter takes proportionally more from the soft end of the spectrum.',
-      confusion: 'The maximum photon energy does not move with filtration; only the kVp sets the endpoint.',
-      match: /filtrat|half.?value|hvl|harden/i,
-    },
-    {
-      id: 'focal-spot',
-      title: 'Focal spot and geometry',
-      rule: 'Focal spot size affects geometric unsharpness (Ug = f·OID/SOD), not magnification (M = SID/SOD).',
-      why: 'Magnification is pure similar-triangles geometry of distances. The focal spot’s width only smears each edge into a penumbra.',
-      confusion: 'A fine focal spot does not shrink the image — it sharpens it.',
-      match: /focal spot|unsharp|penumbra|magnif|\bSOD\b|\bSID\b|\bOID\b|\bFFD\b/i,
-    },
-    {
-      id: 'pe-vs-compton',
-      title: 'Photoelectric versus Compton',
-      rule: 'Photoelectric ∝ Z³/E³ and gives contrast; Compton follows electron density and gives scatter.',
-      why: 'Photoelectric needs the photon energy to sit just above a binding energy, so it is exquisitely material- and energy-sensitive. Compton involves quasi-free electrons, which all tissues have in similar measure.',
-      confusion: 'Compton probability is nearly independent of atomic number — a favourite false stem attaches Z-dependence to it.',
-      match: /photoelectric|compton|scatter(ing|ed)?\b/i,
-    },
-    {
-      id: 'characteristic',
-      title: 'Characteristic radiation',
-      rule: 'Characteristic energies belong to the target: fixed lines that appear only above the K-shell binding energy and move only if the target material changes.',
-      why: 'The photon carries the difference between two shell binding energies — a property of the atom, not of the tube voltage.',
-      match: /characteristic|k.?shell|k.?line/i,
-    },
-    {
-      id: 'attenuation',
-      title: 'Exponential attenuation',
-      rule: 'Each thickness removes the same fraction of the beam: I = I₀e^(−μx), and HVL = 0.693/μ.',
-      why: 'Every photon’s chance of interacting per centimetre is independent of how many photons accompany it.',
-      confusion: 'Two HVLs leave 25%, not 0% — attenuation never reaches zero.',
-      match: /attenuat|exponential|hvl|half.?value/i,
-    },
-    {
-      id: 'heel',
-      title: 'The anode heel effect',
-      rule: 'Beam intensity is lower on the anode side, because shallow-angle photons are absorbed by the target itself.',
-      confusion: 'It is the anode side that is weaker — put the cathode over the thicker anatomy.',
-      match: /heel/i,
-    },
-    {
-      id: 'line-focus',
-      title: 'The line-focus principle',
-      rule: 'Effective focal spot = actual focal spot × sin(target angle): a long heat track projects as a small optical source.',
-      why: 'Heat capacity needs area; sharpness needs a point. The bevel buys both at once.',
-      match: /line.?focus|effective focal|anode angle|target angle/i,
-    },
-    {
-      id: 'production-heat',
-      title: 'Where the energy goes',
-      rule: 'About 99% of the electron energy becomes heat at the anode; roughly 1% becomes X-rays.',
-      why: 'Bremsstrahlung is an inefficient process at diagnostic energies; efficiency rises with kVp and target Z but never escapes single digits.',
-      match: /99%|per ?cent.*heat|heat.*anode|efficiency/i,
-    },
-  ],
+  concepts: CONCEPTS.xray,
   essentials: [
     'Maximum photon energy (keV) = kVp. Mean energy ≈ ⅓–½ of maximum.',
     'kVp ↑ → quantity ↑ (≈kV²) AND quality ↑. mAs ↑ → quantity only.',

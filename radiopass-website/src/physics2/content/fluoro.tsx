@@ -12,9 +12,14 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { FluoroAbc } from '../components/sims/FluoroAbc'
 import { FluoroIntensifier } from '../components/sims/FluoroIntensifier'
 import { IiDistortion, DsaSubtraction } from '../components/sims/FluoroScenes'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.fluoro
 
 export const FLUORO: V2Topic = {
   id: 'fluoro',
@@ -26,10 +31,7 @@ export const FLUORO: V2Topic = {
   outcomes: TOPIC_OUTCOMES.fluoro,
   sections: [
     {
-      id: 'chain',
-      title: 'The live imaging chain',
-      blurb: 'Radiography running continuously, and the geometry that makes it survivable.',
-      kw: /under.?couch|over.?couch|imaging chain|real.?time|live (image|display|imaging)|screening room|staff dose|operator dose|receptor.{0,30}(close|distance)/i,
+      ...S.chain,
       primer: [
         {
           kind: 'principle',
@@ -52,11 +54,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'intensifier',
-      title: 'Inside the image intensifier',
-      blurb: 'Light, electrons, light again — and two gains multiplied together.',
-      tags: ['fluoroscopy-image-intensifier'],
-      kw: /image intensifier|input phosphor|output phosphor|photocathode|minification|brightness gain|flux gain|conversion factor|electrostatic|caesium iodide|\bCsI\b/i,
+      ...S.intensifier,
       primer: [
         {
           kind: 'principle',
@@ -103,10 +101,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'distortion',
-      title: 'II distortions versus flat panels',
-      blurb: 'The price of bending electrons — and the detector that pays none of it.',
-      kw: /pincushion|s[- ]?distortion|vignett|flat[- ]?panel|\bTFT\b|geometric distortion|TV camera/i,
+      ...S.distortion,
       primer: [
         {
           kind: 'principle',
@@ -145,10 +140,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'abc',
-      title: 'Automatic brightness control',
-      blurb: 'The feedback loop that keeps the picture steady — and what it quietly spends.',
-      kw: /automatic brightness|\bABC\b|brightness control|automatic dose[- ]rate|magnification mode|electronic magnif|mag\.? mode/i,
+      ...S.abc,
       primer: [
         {
           kind: 'principle',
@@ -185,11 +177,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'dose',
-      title: 'Dose features and the skin',
-      blurb: 'Rate × time: the levers that cut it, and the deterministic injury waiting at the end.',
-      kw: /pulsed?|pulse rate|last[- ]image|\bLIH\b|entrance dose|skin (dose|injur|burn)|deterministic|erythema|epilation|\bDAP\b|dose[- ]area|screening time|mGy\/min|Gy.?cm/i,
-      fallback: true,
+      ...S.dose,
       primer: [
         {
           kind: 'principle',
@@ -221,11 +209,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'dsa',
-      title: 'DSA: digital subtraction angiography',
-      blurb: 'Subtract everything that does not move — and read the ledger honestly.',
-      tags: ['dsa-subtraction-noise'],
-      kw: /subtract|digital subtraction|\bDSA\b|mask (image|frame)|misregistration|pixel[- ]shift|road[- ]?map/i,
+      ...S.dsa,
       primer: [
         {
           kind: 'principle',
@@ -262,70 +246,7 @@ export const FLUORO: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'brightness-gain',
-      title: 'Brightness gain',
-      rule: 'Brightness gain = flux gain × minification gain, with minification gain = (input diameter / output diameter)².',
-      why: 'Acceleration at 25–30 kV makes each electron yield far more light at the output than freed it (flux gain); squeezing the image onto a smaller output phosphor concentrates that light further (minification gain).',
-      confusion: 'Minification brightens but adds no information — image statistics are fixed at the input phosphor, so mottle cannot be gained away.',
-      match: /brightness gain|flux gain|minification|conversion factor|output phosphor/i,
-    },
-    {
-      id: 'ii-chain',
-      title: 'The intensifier chain',
-      rule: 'X-rays → light at the CsI input phosphor → electrons at the photocathode → accelerated at 25–30 kV through electrostatic lenses → light at the output phosphor.',
-      why: 'Each conversion exists to reach a form that can be amplified: light frees electrons, electrons can be accelerated, and acceleration is where the energy gain enters.',
-      confusion: 'Photomultiplier tubes are not in the chain — they belong to gamma cameras and CR readers.',
-      match: /input phosphor|photocathode|electrostatic|caesium iodide|\bCsI\b|photomultiplier/i,
-    },
-    {
-      id: 'ii-distortion',
-      title: 'Distortions of electron optics',
-      rule: 'Pincushion distortion, S-distortion and vignetting are faults of the intensifier’s electron optics; a flat panel has no electron optics and can show none of them.',
-      why: 'Peripheral electron paths are focused less perfectly than central ones (pincushion, vignetting), and external magnetic fields bend the paths bodily (S-distortion). A rigid TFT matrix accelerates nothing.',
-      match: /pincushion|s[- ]?distortion|vignett|distort/i,
-    },
-    {
-      id: 'abc',
-      title: 'Automatic brightness control',
-      rule: 'ABC holds displayed brightness constant by raising kV and/or mA — over thicker anatomy the picture stays the same while the dose rate rises.',
-      why: 'The feedback loop senses output brightness only, so it restores the display by whatever exposure it takes, silently.',
-      confusion: 'Recovering with kV costs iodine contrast (the spectrum leaves the 33 keV K-edge behind); recovering with mA costs dose.',
-      match: /automatic brightness|\bABC\b|brightness control/i,
-    },
-    {
-      id: 'mag-mode',
-      title: 'Magnification mode and dose',
-      rule: 'Selecting a smaller input field lowers minification gain, so ABC raises the exposure — magnification mode increases the dose rate.',
-      why: 'Less minification means a dimmer output for the same input dose; the feedback loop makes up the difference, classically as the inverse square of the field diameter.',
-      match: /magnification mode|electronic magnif|smaller (input )?(field|format)|mag\.? mode/i,
-    },
-    {
-      id: 'pulsed-lih',
-      title: 'Pulsed fluoroscopy and last image hold',
-      rule: 'Pulsing cuts dose roughly in proportion to pulse rate at a fixed dose per pulse; last image hold displays the previous frame at zero additional exposure.',
-      why: 'The eye tolerates far fewer frames than a continuous beam supplies, so beam-off time is nearly free — the cost is temporal resolution.',
-      confusion: 'In practice dose per pulse is often raised to keep each frame quiet, so the saving is slightly less than proportional.',
-      match: /pulse[ds]?\b|pulse rate|last[- ]image|\bLIH\b|frames? per second/i,
-    },
-    {
-      id: 'skin-dose',
-      title: 'Deterministic skin dose',
-      rule: 'Skin injury is deterministic: erythema needs about 2–5 Gy at one skin patch, and at entrance dose rates of 10–50 mGy/min long procedures can get there.',
-      why: 'Threshold effects care about the dose to one place — which is why varying the beam entry angle, collimating and keeping the tube far from the skin all work.',
-      confusion: 'DAP is a whole-beam quantity; peak skin dose, not DAP, is the deterministic variable.',
-      match: /skin (dose|injur|burn)|erythema|deterministic|epilation|\bDAP\b|dose[- ]area/i,
-    },
-    {
-      id: 'dsa-snr',
-      title: 'What subtraction trades',
-      rule: 'DSA raises contrast resolution and lowers SNR — the uncorrelated noise of mask and run adds in quadrature — while spatial resolution is unchanged.',
-      why: 'Subtraction removes anatomy, not noise: the stationary signal cancels, the random part of both frames survives and combines.',
-      confusion: 'Spatial resolution lives in the detector, not the arithmetic; movement between mask and run gives misregistration, cured by remasking or pixel-shifting.',
-      match: /subtract|\bDSA\b|misregistration|mask (image|frame)|pixel[- ]shift/i,
-    },
-  ],
+  concepts: CONCEPTS.fluoro,
   essentials: [
     'Image intensifier chain: X-rays → CsI input phosphor → light → photocathode → electrons → 25–30 kV acceleration → output phosphor.',
     'Brightness gain = flux gain × minification gain ≈ 5000×; minification gain = (input/output diameter)².',

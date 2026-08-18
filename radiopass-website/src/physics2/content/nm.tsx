@@ -14,7 +14,12 @@
 
 import type { V2Topic } from '../types'
 import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
 import { GammaCameraBuild, NmAcquisition, PetCoincidence } from '../components/sims/NmScenes'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.nm
 
 export const NM: V2Topic = {
   id: 'nm',
@@ -26,10 +31,7 @@ export const NM: V2Topic = {
   outcomes: TOPIC_OUTCOMES.nm,
   sections: [
     {
-      id: 'tracer',
-      title: 'Tc-99m and the generator',
-      blurb: 'The workhorse nuclide, where it comes from, and what makes a tracer ideal.',
-      kw: /tc.?99m|technetium|molybden|mo.?99|generator|elut|isomeric|radiopharmaceutical|ideal.{0,12}(tracer|radionuclide)|i.?123|cyclotron|140\s?keV/i,
+      ...S.tracer,
       primer: [
         {
           kind: 'principle',
@@ -62,12 +64,7 @@ export const NM: V2Topic = {
       ],
     },
     {
-      id: 'camera',
-      title: 'The gamma camera chain',
-      blurb: 'Collimator → crystal → light guide → PM tubes → Anger logic → PHA.',
-      tags: ['gamma-camera-collimator'],
-      kw: /collimator|septa|na.?i\b|sodium iodide|scintillat|thallium|light guide|optical (grease|coupling)|photomultiplier|photocathode|dynode|anger|position (logic|signal)|pulse height|\bpha\b|photopeak|z.?pulse|energy (window|resolution)|fwhm/i,
-      fallback: true,
+      ...S.camera,
       primer: [
         {
           kind: 'principle',
@@ -110,10 +107,7 @@ export const NM: V2Topic = {
       ],
     },
     {
-      id: 'performance',
-      title: 'Resolution, sensitivity and the collimator’s bill',
-      blurb: 'The trade every collimator makes, and the numbers a camera actually achieves.',
-      kw: /intrinsic|system resolution|spatial resolution|resolution.{0,40}sensitivit|sensitivit.{0,40}resolution|uniformity|flood.?field|linearity|bar (pattern|phantom)|line source|quality (control|assurance)|dead.?time|count rate|(hole|collimator).{0,30}(length|diameter)|distance.{0,30}(resolution|collimator)|resolution.{0,30}distance/i,
+      ...S.performance,
       primer: [
         {
           kind: 'principle',
@@ -148,11 +142,7 @@ export const NM: V2Topic = {
       ],
     },
     {
-      id: 'acquisition',
-      title: 'Modes, SPECT and attenuation correction',
-      blurb: 'Binning counts in time, then rotating the camera into tomography.',
-      tags: ['spect-acquisition'],
-      kw: /\bspect\b|single.?photon emission|static|dynamic|gated|renogram|time.?activity|ejection fraction|projection|filtered back.?projection|iterative|reconstruct|attenuation correction|centre.of.rotation|orbit/i,
+      ...S.acquisition,
       primer: [
         {
           kind: 'principle',
@@ -192,11 +182,7 @@ export const NM: V2Topic = {
       ],
     },
     {
-      id: 'pet',
-      title: 'PET: coincidence replaces the collimator',
-      blurb: 'Two photons, one instant — collimation by electronics, not lead.',
-      tags: ['pet-coincidence'],
-      kw: /\bpet\b|positron|annihilat|511|coinciden|time.?of.?flight|\btof\b|\blso\b|lyso|\bbgo\b|f.?18|fdg|fluorodeoxyglucose|non.?collinear|randoms/i,
+      ...S.pet,
       primer: [
         {
           kind: 'principle',
@@ -242,11 +228,7 @@ export const NM: V2Topic = {
       ],
     },
     {
-      id: 'quant',
-      title: 'SUV and the committed dose',
-      blurb: 'What the number means, what fools it, and why the dose is fixed at injection.',
-      tags: ['suv'],
-      kw: /\bsuv\b|standardi[sz]ed uptake|uptake value|blood glucose|committed|hydration|voiding|effective half.?life|biological (half.?life|clearance)/i,
+      ...S.quant,
       primer: [
         {
           kind: 'principle',
@@ -277,82 +259,7 @@ export const NM: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'generator',
-      title: 'The Mo-99/Tc-99m generator',
-      rule: 'Mo-99 (66 h) decays on the alumina column into Tc-99m (6 h); elution washes the daughter off while the parent stays bound, and the activity regrows between elutions.',
-      why: 'The parent–daughter pair approach transient equilibrium, so a generator supports daily elution for about a week.',
-      confusion: 'Tc-99m is generator-produced, never cyclotron-produced — cyclotrons make the proton-rich nuclides such as F-18 and I-123.',
-      match: /generator|molybden|mo.?99|elut/i,
-    },
-    {
-      id: 'tc99m',
-      title: 'Tc-99m in three numbers',
-      rule: 'Tc-99m emits a single 140 keV gamma by isomeric transition, with a 6-hour half-life and no particulate emission.',
-      why: 'Pure gamma emission wastes no dose on particles the camera can never see, and 140 keV suits the NaI(Tl) crystal and collimator design.',
-      match: /tc.?99m|technetium|isomeric|140\s?keV/i,
-    },
-    {
-      id: 'ideal-tracer',
-      title: 'The ideal tracer',
-      rule: 'The ideal diagnostic tracer emits pure gamma at 100–250 keV with a half-life matched to the study; the pharmaceutical decides where it goes, the nuclide how it is seen.',
-      confusion: 'Beta or other particulate emission adds patient dose but never reaches the camera — in a diagnostic agent it is a defect, not a feature.',
-      match: /ideal (radio)?(tracer|nuclide|pharmaceutical)|pure gamma|particulate|beta emission/i,
-    },
-    {
-      id: 'collimator-trade',
-      title: 'The collimator’s trade',
-      rule: 'The parallel-hole collimator forms the image by selecting near-parallel photons: longer, narrower holes buy resolution with sensitivity, and resolution worsens with distance while sensitivity stays roughly constant.',
-      why: 'No lens exists for gamma rays — absorption in the septa is the only optics, so sharpness is always paid for in counts.',
-      confusion: 'Distance from a parallel-hole collimator costs resolution, not counts — and scatter rejection belongs to the pulse height analyser, not the collimator.',
-      match: /collimator|septa|parallel.?hole/i,
-    },
-    {
-      id: 'crystal',
-      title: 'NaI(Tl) and crystal thickness',
-      rule: 'The NaI(Tl) crystal converts each accepted gamma into a flash of light: a thin crystal (6–13 mm) keeps the flash tight for resolution, a thicker one stops more photons but smears it.',
-      why: 'The flash’s spread at the photomultiplier face is part of intrinsic resolution, so thickness trades sensitivity against sharpness.',
-      match: /na.?i\b|sodium iodide|scintillat|thallium|crystal thickness/i,
-    },
-    {
-      id: 'anger-pha',
-      title: 'Anger logic and the PHA',
-      rule: 'Position is a weighted average of every PM tube’s share of the flash (X, Y); the summed Z-pulse measures energy, and the PHA accepts only pulses within about ±10% of the 140 keV photopeak.',
-      why: 'A photon that scattered in the patient arrives with less energy, so the energy window removes the fog the collimator cannot.',
-      confusion: 'The tube array is not a pixel grid — the position comes from comparing shares, not from which tube fired.',
-      match: /anger|position logic|pulse height|\bpha\b|photopeak|z.?pulse|energy window|photomultiplier|dynode/i,
-    },
-    {
-      id: 'spect',
-      title: 'What SPECT wins',
-      rule: 'SPECT reconstructs orbiting projections into slices: overlying activity disappears, so it wins contrast over planar imaging — not spatial resolution.',
-      confusion: 'Uncorrected reconstruction under-counts deep structures — the CT of SPECT/CT and PET/CT is there as the attenuation map.',
-      match: /\bspect\b|single.?photon emission|filtered back|iterative|attenuation correction/i,
-    },
-    {
-      id: 'pet-coincidence',
-      title: 'Coincidence detection',
-      rule: 'PET detects the two 511 keV annihilation photons (~180° apart) in electronic coincidence — no lead collimator, which is why its sensitivity far exceeds SPECT’s.',
-      why: 'Two hits inside the timing window define a line of response; localisation costs no counts, only electronics.',
-      confusion: 'PET resolution (4–8 mm) is floored by positron range and non-collinearity — the decay happens a millimetre or two from the annihilation.',
-      match: /positron|annihilat|coinciden|511|time.?of.?flight|\blso\b|lyso|\bbgo\b/i,
-    },
-    {
-      id: 'suv',
-      title: 'SUV',
-      rule: 'SUV = tissue activity concentration ÷ (injected activity / body weight); values around 2.5 and above suggest malignancy, but SUV is fooled by uptake time, blood glucose and scanner calibration.',
-      confusion: 'SUV alone cannot separate inflammation from tumour — both take up FDG.',
-      match: /\bsuv\b|standardi[sz]ed uptake|uptake value|glucose/i,
-    },
-    {
-      id: 'dose-committed',
-      title: 'The dose is committed at injection',
-      rule: 'Once the tracer is injected, patient dose is set by physical half-life and biological clearance — imaging for longer adds nothing.',
-      why: 'The activity decays and clears on its own schedule; the camera only watches. Hydration and voiding reduce dose by speeding clearance.',
-      match: /committed|inject/i,
-    },
-  ],
+  concepts: CONCEPTS.nm,
   essentials: [
     'Tc-99m: single 140 keV gamma by isomeric transition, 6 h half-life, no particulate emission.',
     'Mo-99 parent: 66 h, reactor-made, bound to the alumina column; elution removes the Tc-99m and the activity regrows — one generator serves about a week.',

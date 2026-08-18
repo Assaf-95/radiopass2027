@@ -25,6 +25,11 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# The physics question map gates the run: an unmapped question, a row pointing
+# at a section that no longer exists, or a primer left with no practice gate is
+# a release-blocking state, and this is the harness every release runs.
+(cd "$PROJECT_DIR" && node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts --errors-only)
+
 case "$PROJECT_DIR" in
   *:*)
     ;;
