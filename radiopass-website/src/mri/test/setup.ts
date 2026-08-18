@@ -21,7 +21,12 @@ if (!('ResizeObserver' in globalThis)) {
     ResizeObserverStub
 }
 
-if (!('matchMedia' in window)) {
+/* Guarded on being CALLABLE, not on the name being present. jsdom declares
+   matchMedia on window and leaves it undefined, so `'matchMedia' in window` is
+   true while `window.matchMedia(...)` throws — which made this shim silently
+   dead for the one thing it names. Nothing caught it until a test imported a
+   module that reads the media query at module scope. */
+if (typeof window.matchMedia !== 'function') {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({

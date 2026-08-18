@@ -14,6 +14,7 @@ import { PrimerBlocks } from '../components/Primer'
 import { topicById, V2_TOPICS } from '../topics'
 import { assignments } from '../lib/assign'
 import { sectionStanding, topicStanding } from '../lib/derive'
+import { PHYSICS_HREF, practiceHref, topicHref } from '../../physics/routes'
 
 export default function V2TopicPage() {
   const { topicId } = useParams()
@@ -27,7 +28,7 @@ export default function V2TopicPage() {
     if (el) el.scrollIntoView({ block: 'start' })
   }, [hash, topic?.id])
 
-  if (!topic) return <Navigate to="/physics-v2" replace />
+  if (!topic) return <Navigate to={PHYSICS_HREF.home} replace />
 
   const standing = topicStanding(topic)
   const assigned = assignments(topic)
@@ -35,14 +36,14 @@ export default function V2TopicPage() {
   return (
     <V2Shell
       title={topic.title}
-      visit={{ path: `/physics-v2/${topic.id}`, label: `${topic.short} — primer` }}
+      visit={{ path: topicHref(topic.id), label: `${topic.short} — primer` }}
     >
       <header className="v2-topichead">
         <div className="v2-wrap">
           <div className="v2-topichead-row">
             <div>
               <p className="v2-eyebrow">
-                Topic {String(topic.num).padStart(2, '0')} · <Link to="/physics-v2">Syllabus</Link>
+                Topic {String(topic.num).padStart(2, '0')} · <Link to={PHYSICS_HREF.home}>Syllabus</Link>
               </p>
               <h1 className="v2-display">{topic.title}</h1>
               <p className="v2-lede">{topic.tagline}</p>
@@ -51,7 +52,19 @@ export default function V2TopicPage() {
               <b>
                 {standing.answered} / {standing.total} answered
               </b>
-              {standing.accuracy !== null && <small>{Math.round(standing.accuracy * 100)}% accuracy so far</small>}
+              {/* Both numbers, both named. The first is what a cold sitting
+                  produced and never moves again; the second is where the
+                  candidate stands now, and is the one re-testing changes.
+                  Only shown once they differ — before any re-test they are
+                  the same number and printing it twice reads as an error. */}
+              {standing.latestAccuracy !== null && (
+                <small>
+                  {Math.round(standing.latestAccuracy * 100)}% now
+                  {standing.firstAccuracy !== null &&
+                    Math.round(standing.firstAccuracy * 100) !== Math.round(standing.latestAccuracy * 100) &&
+                    ` · ${Math.round(standing.firstAccuracy * 100)}% first time`}
+                </small>
+              )}
               <span className="v2-meter" aria-hidden="true">
                 <i style={{ width: `${standing.total ? (standing.answered / standing.total) * 100 : 0}%` }} />
               </span>
@@ -99,7 +112,7 @@ export default function V2TopicPage() {
                 <div className="v2-gate">
                   <Link
                     className="v2-btn"
-                    to={`/physics-v2/${topic.id}/practice?section=${section.id}&filter=${filter}`}
+                    to={practiceHref(topic.id, { section: section.id, filter })}
                   >
                     {st.unseen > 0 ? `Test this section — ${st.unseen} unseen` : 'Practise this section again'}
                   </Link>
@@ -111,7 +124,7 @@ export default function V2TopicPage() {
                   {st.wrong > 0 && (
                     <Link
                       className="v2-link"
-                      to={`/physics-v2/${topic.id}/practice?section=${section.id}&filter=wrong`}
+                      to={practiceHref(topic.id, { section: section.id, filter: 'wrong' })}
                     >
                       Re-test the {st.wrong} you missed →
                     </Link>
@@ -148,7 +161,7 @@ export default function V2TopicPage() {
               </div>
               <Link
                 className="v2-btn v2-btn-solid"
-                to={`/physics-v2/${topic.id}/practice?filter=${standing.unseen > 0 ? 'unseen' : 'again'}`}
+                to={practiceHref(topic.id, { filter: standing.unseen > 0 ? 'unseen' : 'again' })}
               >
                 Practise now
               </Link>
@@ -162,7 +175,7 @@ export default function V2TopicPage() {
                   </strong>
                   <small>{V2_TOPICS[topic.num].tagline}</small>
                 </div>
-                <Link className="v2-btn v2-btn-solid" to={`/physics-v2/${V2_TOPICS[topic.num].id}`}>
+                <Link className="v2-btn v2-btn-solid" to={topicHref(V2_TOPICS[topic.num].id)}>
                   Next topic →
                 </Link>
               </li>
@@ -173,7 +186,7 @@ export default function V2TopicPage() {
                   <strong>That is the whole syllabus</strong>
                   <small>Everything answered wrong, gathered for one last pass.</small>
                 </div>
-                <Link className="v2-btn v2-btn-solid" to="/physics-v2/review">
+                <Link className="v2-btn v2-btn-solid" to={PHYSICS_HREF.review}>
                   Open review →
                 </Link>
               </li>
@@ -182,7 +195,7 @@ export default function V2TopicPage() {
 
           <p className="v2-finish-aside">
             {topic.num > 1 && (
-              <Link to={`/physics-v2/${V2_TOPICS[topic.num - 2].id}`}>
+              <Link to={topicHref(V2_TOPICS[topic.num - 2].id)}>
                 ← Back to {V2_TOPICS[topic.num - 2].title}
               </Link>
             )}

@@ -111,7 +111,20 @@ export type TrialConfig = {
 
 export const TRIAL: TrialConfig = {
   /* Branch home pages are open to everyone anyway (see PUBLIC_KINDS), so the
-     trial does not need to name them. Nothing else is configured yet. */
+     trial does not need to name them.
+
+     CHOSEN by the owner, 18 Aug 2026: the free sample is the OPENING of the
+     two flagship topics — where X-rays come from, and where the MR signal
+     comes from — plus one free question set. The ids below are
+     topic/section pairs from src/physics2/mapping/sections.ts and bank
+     question ids; /free-trial renders exactly this list and gates
+     progression past it behind a free account. */
+  module: {
+    physics: ['xray/foundations', 'xray/tube', 'xray/spectrum', 'mri/signal'],
+  },
+  questions: {
+    physics: ['x57', 'b417', 'b415', 'x53', 'b385'],
+  },
 }
 
 /** Whether the owner has configured anything for the trial at all. */

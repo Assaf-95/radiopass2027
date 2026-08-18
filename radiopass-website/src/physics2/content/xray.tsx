@@ -11,7 +11,18 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from the X-ray core — the same functions the
+   /xray-lab lessons run; see the export note in labs/xraygeo.tsx. */
+import { drawPhotonEnters, drawThreeFates, drawExponential, drawMu, drawHvl } from '../../labs/xraygeo'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
+import { SodiumAtom } from '../components/sims/SodiumAtom'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.xray
 
 export const XRAY: V2Topic = {
   id: 'xray',
@@ -20,20 +31,26 @@ export const XRAY: V2Topic = {
   short: 'X-ray',
   tagline: 'Make the beam, describe it, follow it into the patient, project the image.',
   qbTopics: ['Radiography & X-ray Physics'],
-  outcomes: [
-    'how electrons become X-ray photons at the anode, and where the other 99% of the energy goes',
-    'what the spectrum graph shows, and what kVp, mAs, filtration and the target each do to it',
-    'the three fates of a photon in tissue, and where photoelectric hands over to Compton',
-    'why magnification and unsharpness are different things with different causes',
-  ],
+  outcomes: TOPIC_OUTCOMES.xray,
   sections: [
     {
-      id: 'foundations',
-      title: 'Matter and radiation',
-      blurb: 'The vocabulary everything else is written in.',
-      tags: ['wave-frequency-period'],
-      kw: /atomic|electron shell|binding energy|electromagnetic|wavelength|frequency|photon energy|ionis/i,
+      ...S.foundations,
       primer: [
+        /* The course's first object, before its first sentence. Everything in
+           the exam stands on this picture, and a candidate who can turn it
+           over owns it in a way that a candidate who has read it does not. */
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SodiumAtom />,
+            title: 'Sodium — 11 protons, 12 neutrons, 2-8-1',
+            annotation: 'drag to turn · K · L · M',
+            caption:
+              'Turn it over. The nucleus carries all the mass and all the positive charge; the electrons sit in shells at fixed binding energies, K innermost and most tightly bound. Those are orbits as DRAWN, not as they are — a shell is an energy level, and the Bohr picture is the one the exam asks about. The K shell is where characteristic radiation, the K-edge and the photoelectric effect all begin, so it is worth knowing which ring is which before the next section fires an electron at a tungsten anode.',
+            flush: true,
+          },
+        },
         {
           kind: 'principle',
           text: 'X-rays are electromagnetic photons. Their energy is set by frequency alone — E = hf — and only photons above about 10 keV are useful for imaging.',
@@ -52,14 +69,30 @@ export const XRAY: V2Topic = {
           summary: 'Why intensity cannot ionise when photon energy is too low',
           text: 'Ionisation is a single-photon event: one photon hands its whole energy to one electron. If that energy is below the binding energy, no number of photons changes the outcome — doubling intensity doubles how many photons arrive, not what each can do. This is the photoelectric argument Einstein was cited for, and the exam leans on it whenever a stem confuses beam intensity with photon energy.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPhotonEnters} height={320} label='One photon entering tissue — billions play the same lottery and the image is the census of what got through' />,
+            title: 'One photon, one lottery ticket',
+            caption: 'Every exposure fires billions of photons into tissue, and each plays the same lottery alone. The image is nothing but the census of what reached the far side — so the whole of image formation hides inside the fate of one photon.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawThreeFates} height={340} label='The three fates: a photon transmitted to the detector, one absorbed mid-slab, one scattered away obliquely' />,
+            title: 'Transmit, absorb, scatter',
+            caption: 'Transmitted photons draw the image. Absorbed photons vanish inside — they buy contrast and pay in dose. Scattered photons change direction and survive to fog the image. Every property of a radiograph traces back to this three-way split.',
+          },
+        },
       ],
     },
     {
-      id: 'tube',
-      title: 'The tube and X-ray production',
-      blurb: 'Boil off electrons, accelerate them, stop them in tungsten.',
-      tags: ['line-focus-principle'],
-      kw: /filament|thermionic|anode|cathode|rotat|tungsten target|focal track|space charge|tube (current|voltage)|heat|stator|rotor|line focus|heel/i,
+      ...S.tube,
       primer: [
         {
           kind: 'principle',
@@ -105,14 +138,21 @@ export const XRAY: V2Topic = {
             { label: 'Effective focal spot', value: 'actual × sin(anode angle)' },
           ],
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/xray-focal-spot-unsharpness.html',
+            title: 'The line-focus principle, live',
+            annotation: 'anode angle · effective spot · penumbra',
+            caption: 'Steepen the anode angle and watch the effective focal spot shrink while the actual filament area — and its heat capacity — stays the same. Then move the object away from the detector and watch the penumbra grow: the same geometry decides both.',
+          },
+        },
       ],
     },
     {
-      id: 'spectrum',
-      title: 'The spectrum',
-      blurb: 'One graph the exam redraws every year.',
-      tags: ['xray-beam-quality'],
-      kw: /spectrum|bremsstrahlung|characteristic|duane|maximum (photon )?energy|keV|kvp/i,
+      ...S.spectrum,
       primer: [
         {
           kind: 'principle',
@@ -149,10 +189,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'filtration',
-      title: 'Filtration and beam quality',
-      blurb: 'Removing the photons the patient would otherwise absorb.',
-      kw: /filtrat|half.?value|hvl|beam quality|harden|aluminium|copper/i,
+      ...S.filtration,
       primer: [
         {
           kind: 'principle',
@@ -182,14 +219,42 @@ export const XRAY: V2Topic = {
           summary: 'Why quantity and quality move in opposite directions',
           text: 'A filter is just matter, and attenuation is strongest at low photon energies (the photoelectric 1/E³ dependence). So the filter takes proportionally more from the soft end of the spectrum than the hard end: total photon count falls, while the survivors are on average harder. The same logic explains why the patient is a filter too — the beam that exits a patient is harder than the one that entered.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawExponential} height={320} label='Exponential attenuation: each centimetre removes the same fraction, the beam thinning towards zero but never reaching it' />,
+            title: 'The same fraction every centimetre',
+            annotation: 'I = I₀ e^(−μx)',
+            caption: 'Each centimetre removes the same fraction of whatever arrives — never the same number. A thousand photons become five hundred, then two-fifty, then one-two-five: I = I₀e^(−μx), a beam that thins forever and never quite reaches zero.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawMu} height={320} label='The linear attenuation coefficient: dense high-Z tissue stopping more per centimetre, and μ falling as photon energy rises' />,
+            title: 'μ — how stoppable tissue is',
+            caption: 'The fraction removed per centimetre is the linear attenuation coefficient μ. Dense, high-Z, easy-to-stop tissue has a large μ; and for any tissue, μ falls as photon energy rises — which is why a harder beam penetrates further.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawHvl} height={320} label='Half-value layer: each layer halves the beam, two leave a quarter, three an eighth' />,
+            title: 'The HVL compounds',
+            annotation: 'HVL = 0.693 / μ',
+            caption: 'The HVL is the thickness that cuts the beam to half — the working measure of beam quality, because a harder beam has a longer HVL. Halving compounds: two layers leave a quarter, three an eighth.',
+          },
+        },
       ],
     },
     {
-      id: 'interactions',
-      title: 'Interactions with matter',
-      blurb: 'Three fates, two mechanisms, one crossover.',
-      tags: ['xray-guided-interactions', 'compton-scatter', 'photoelectric-effect', 'exponential-attenuation'],
-      kw: /photoelectric|compton|scatter|attenuat|absor(b|ption)|k.?edge|interaction|transmit/i,
+      ...S.interactions,
       primer: [
         {
           kind: 'principle',
@@ -240,11 +305,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'geometry',
-      title: 'Projection geometry',
-      blurb: 'A point source, a shadow, and two different kinds of blur.',
-      tags: ['radiographic-magnification', 'xray-focal-spot-unsharpness', 'beam-divergence-isocentre'],
-      kw: /magnif|unsharp|penumbra|focal spot size|SID|SOD|OID|FFD|air gap|distortion|geometr/i,
+      ...S.geometry,
       primer: [
         {
           kind: 'principle',
@@ -293,11 +354,7 @@ export const XRAY: V2Topic = {
       ],
     },
     {
-      id: 'quality',
-      title: 'Scatter, grids and image quality',
-      blurb: 'Keeping the fog off the image, and naming the kinds of blur.',
-      kw: /grid|bucky|scatter reject|contrast|noise|mottle|quantum|sharpness|resolution|collimat/i,
-      fallback: true,
+      ...S.quality,
       primer: [
         {
           kind: 'principle',
@@ -326,79 +383,21 @@ export const XRAY: V2Topic = {
             { label: 'Grid ratio, typical general work', value: '8:1 – 12:1' },
           ],
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'iframe',
+            src: '/visuals/xray-beam-quality.html',
+            title: 'Beam quality and filtration',
+            annotation: 'kVp · HVL · added filtration',
+            caption: 'Raise the filtration and watch the low-energy end of the spectrum disappear: the beam hardens, HVL lengthens, and the photons that would only have dosed skin never leave the tube head.',
+          },
+        },
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'kvp-vs-mas',
-      title: 'kVp versus mAs',
-      rule: 'kVp changes both photon quantity and quality; mAs changes quantity only.',
-      why: 'Each electron arrives with more energy at higher kVp, so the whole spectrum shifts and grows (≈ kV²). mAs only counts electrons, so it scales the curve without moving it.',
-      confusion: 'Output ∝ kV² but maximum photon energy = kVp exactly — the square law is about quantity, never the endpoint.',
-      match: /kvp|kilovolt|tube voltage|mas\b|tube current|quantity.*quality/i,
-    },
-    {
-      id: 'filtration',
-      title: 'Filtration',
-      rule: 'Filtration reduces photon quantity and raises mean energy — the beam gets smaller and harder together.',
-      why: 'Attenuation is strongest at low photon energies, so the filter takes proportionally more from the soft end of the spectrum.',
-      confusion: 'The maximum photon energy does not move with filtration; only the kVp sets the endpoint.',
-      match: /filtrat|half.?value|hvl|harden/i,
-    },
-    {
-      id: 'focal-spot',
-      title: 'Focal spot and geometry',
-      rule: 'Focal spot size affects geometric unsharpness (Ug = f·OID/SOD), not magnification (M = SID/SOD).',
-      why: 'Magnification is pure similar-triangles geometry of distances. The focal spot’s width only smears each edge into a penumbra.',
-      confusion: 'A fine focal spot does not shrink the image — it sharpens it.',
-      match: /focal spot|unsharp|penumbra|magnif|\bSOD\b|\bSID\b|\bOID\b|\bFFD\b/i,
-    },
-    {
-      id: 'pe-vs-compton',
-      title: 'Photoelectric versus Compton',
-      rule: 'Photoelectric ∝ Z³/E³ and gives contrast; Compton follows electron density and gives scatter.',
-      why: 'Photoelectric needs the photon energy to sit just above a binding energy, so it is exquisitely material- and energy-sensitive. Compton involves quasi-free electrons, which all tissues have in similar measure.',
-      confusion: 'Compton probability is nearly independent of atomic number — a favourite false stem attaches Z-dependence to it.',
-      match: /photoelectric|compton|scatter(ing|ed)?\b/i,
-    },
-    {
-      id: 'characteristic',
-      title: 'Characteristic radiation',
-      rule: 'Characteristic energies belong to the target: fixed lines that appear only above the K-shell binding energy and move only if the target material changes.',
-      why: 'The photon carries the difference between two shell binding energies — a property of the atom, not of the tube voltage.',
-      match: /characteristic|k.?shell|k.?line/i,
-    },
-    {
-      id: 'attenuation',
-      title: 'Exponential attenuation',
-      rule: 'Each thickness removes the same fraction of the beam: I = I₀e^(−μx), and HVL = 0.693/μ.',
-      why: 'Every photon’s chance of interacting per centimetre is independent of how many photons accompany it.',
-      confusion: 'Two HVLs leave 25%, not 0% — attenuation never reaches zero.',
-      match: /attenuat|exponential|hvl|half.?value/i,
-    },
-    {
-      id: 'heel',
-      title: 'The anode heel effect',
-      rule: 'Beam intensity is lower on the anode side, because shallow-angle photons are absorbed by the target itself.',
-      confusion: 'It is the anode side that is weaker — put the cathode over the thicker anatomy.',
-      match: /heel/i,
-    },
-    {
-      id: 'line-focus',
-      title: 'The line-focus principle',
-      rule: 'Effective focal spot = actual focal spot × sin(target angle): a long heat track projects as a small optical source.',
-      why: 'Heat capacity needs area; sharpness needs a point. The bevel buys both at once.',
-      match: /line.?focus|effective focal|anode angle|target angle/i,
-    },
-    {
-      id: 'production-heat',
-      title: 'Where the energy goes',
-      rule: 'About 99% of the electron energy becomes heat at the anode; roughly 1% becomes X-rays.',
-      why: 'Bremsstrahlung is an inefficient process at diagnostic energies; efficiency rises with kVp and target Z but never escapes single digits.',
-      match: /99%|per ?cent.*heat|heat.*anode|efficiency/i,
-    },
-  ],
+  concepts: CONCEPTS.xray,
   essentials: [
     'Maximum photon energy (keV) = kVp. Mean energy ≈ ⅓–½ of maximum.',
     'kVp ↑ → quantity ↑ (≈kV²) AND quality ↑. mAs ↑ → quantity only.',
@@ -412,8 +411,8 @@ export const XRAY: V2Topic = {
     'Grids buy contrast with dose (Bucky factor 3–5×); air gaps buy contrast with magnification.',
     'Quantum mottle ∝ 1/√dose: halving noise costs four times the dose.',
   ],
-  labs: [
-    { label: 'X-ray laboratory — the guided lessons', to: '/xray-lab' },
-    { label: 'Open the spectrum instrument full-screen', to: '/visuals/xray-beam-quality.html' },
-  ],
+  /* The deep-lesson doors that used to sit here are gone: the lesson diagrams
+     are embedded above, at the section each one teaches. The four /xray-lab
+     lessons remain the guided path and are reached from the dashboard. */
+  labs: [],
 }

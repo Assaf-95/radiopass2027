@@ -15,6 +15,7 @@ import { topicById, V2_TOPICS } from '../topics'
 import { assignments } from '../lib/assign'
 import { readQbMarks, readQbProgress } from '../../qbank/Shell'
 import type { QbQuestion } from '../../qbank/types'
+import { PHYSICS_HREF, practiceHref, topicHref } from '../../physics/routes'
 
 /** 'again' = the whole pool as a fresh re-test (permanent record untouched). */
 type Filter = 'unseen' | 'wrong' | 'flagged' | 'all' | 'again'
@@ -60,12 +61,12 @@ export default function V2Practice() {
   const resultsRef = useRef<Map<string, SessionResult>>(new Map())
   const [, bump] = useState(0)
 
-  if (!topic) return <Navigate to="/physics-v2" replace />
+  if (!topic) return <Navigate to={PHYSICS_HREF.home} replace />
 
   const mode: 'bank' | 'retest' =
     filter === 'wrong' || filter === 'flagged' || filter === 'again' ? 'retest' : 'bank'
   const section = sectionId === 'all' ? null : topic.sections.find((s) => s.id === sectionId)
-  const backTo = `/physics-v2/${topic.id}`
+  const backTo = topicHref(topic.id)
   const sessionLabel =
     (section ? `${topic.short} · ${section.title}` : topic.title) +
     (filter === 'wrong' || filter === 'again' ? ' · re-test' : filter === 'flagged' ? ' · flagged' : '')
@@ -168,7 +169,7 @@ export default function V2Practice() {
                 return (
                   <Link
                     className={missed.length > 0 ? 'v2-btn' : 'v2-btn v2-btn-solid'}
-                    to={`/physics-v2/${topic.id}#${nextSection.id}`}
+                    to={topicHref(topic.id, nextSection.id)}
                   >
                     Continue to §{topic.num}.{sectionIndex + 2} {nextSection.title}
                   </Link>
@@ -178,7 +179,7 @@ export default function V2Practice() {
                 return (
                   <Link
                     className={missed.length > 0 ? 'v2-btn' : 'v2-btn v2-btn-solid'}
-                    to={`/physics-v2/${nextTopic.id}`}
+                    to={topicHref(nextTopic.id)}
                   >
                     Next topic: {nextTopic.title}
                   </Link>
@@ -189,7 +190,7 @@ export default function V2Practice() {
             <Link className="v2-btn v2-btn-quiet" to={backTo}>
               Back to {topic.title}
             </Link>
-            <Link className="v2-btn v2-btn-quiet" to="/physics-v2/review">
+            <Link className="v2-btn v2-btn-quiet" to={PHYSICS_HREF.review}>
               Open Review
             </Link>
           </div>
@@ -203,7 +204,7 @@ export default function V2Practice() {
     <V2Shell
       title={`${topic.title} — practice`}
       visit={{
-        path: `/physics-v2/${topic.id}/practice?section=${sectionId}&filter=${filter}`,
+        path: practiceHref(topic.id, { section: sectionId, filter }),
         label: `${sessionLabel} — question ${index + 1}`,
       }}
     >

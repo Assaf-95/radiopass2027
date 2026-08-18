@@ -5,7 +5,7 @@
 
 import { C, rgba, clamp, lerp, seg, smoothstep, sceneLabel, mulberry32 } from '../home/fx'
 import { FilmPage, type FilmScene } from './cinema'
-import { LessonPage, lessonPing, type LessonStep } from './lesson'
+import { LessonPage, lessonPing, type LessonStep, type StepDraw } from './lesson'
 
 const ACC = '#A8CBEA'
 const INK = C.ink
@@ -1280,6 +1280,25 @@ const STEPS: LessonStep[] = [
   },
 ]
 
+/** Lesson diagrams re-hosted by RADIOPASS PHYSICS topic 06 — same functions,
+ *  resolved at module load so a renamed step fails loudly here. drawSpect is
+ *  exported at the top of this file the same way. */
+function lessonDraw(id: string): StepDraw {
+  const draw = STEPS.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`NM lesson step "${id}" has no diagram to replay`)
+  return draw
+}
+export const drawTc99m = lessonDraw('tc99m')
+export const drawGenerator = lessonDraw('generator')
+export const drawIdealTracer = lessonDraw('ideal')
+export const drawCollimator = lessonDraw('collimator')
+export const drawPha = lessonDraw('pha')
+export const drawPerformance = lessonDraw('performance')
+export const drawSpectRecon = lessonDraw('spect-recon')
+export const drawAttenuation = lessonDraw('attenuation')
+export const drawPetDetail = lessonDraw('pet-detail')
+export const drawNmDose = lessonDraw('dose')
+
 export default function NmLab() {
   return (
     <LessonPage
@@ -1519,6 +1538,16 @@ const FILM_SCENES: FilmScene[] = [
     draw: drawPet,
   },
 ]
+
+/** Film scenes share the draw signature; the decay scheme lives there rather
+ *  than in the lesson steps. Declared BELOW FILM_SCENES — a module-load call
+ *  above it would hit the const before it exists. */
+function filmDraw(id: string): StepDraw {
+  const draw = FILM_SCENES.find((s) => s.id === id)?.draw
+  if (!draw) throw new Error(`NM film scene "${id}" has no drawing to replay`)
+  return draw
+}
+export const drawDecay = filmDraw('decay')
 
 export function NmFilm() {
   return (

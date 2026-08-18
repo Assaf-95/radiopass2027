@@ -1,5 +1,7 @@
 import { Component, lazy, Suspense, useEffect, useState, type ChangeEvent, type ComponentType, type CSSProperties, type FormEvent, type ReactNode } from 'react'
-import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { LEGACY_PHYSICS_ROOT, PHYSICS_HREF, PHYSICS_ROOT } from './physics/routes'
+import { RequireAccess } from './portal/Gate'
 import { MoreDetail } from './design/primitives'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
@@ -151,15 +153,18 @@ const AdminConsole = lazyImport(() => import('./portal/Admin'))
 // 450ms handover must not spend that time fetching its own chunk — lazy, the
 // visitor saw the generic loading fallback instead of the crossing.
 
-/* Physics V2 — the alternative experience, mounted beside the existing one so
-   the two can be compared. It renders its own chrome (see hasOwnChrome) and
-   shares the question-bank record, but no V1 surface links to it and deleting
-   src/physics2 plus these four routes removes it completely. */
-const V2Home = lazyImport(() => import('./physics2/pages/Home'))
-const V2TopicPage = lazyImport(() => import('./physics2/pages/Topic'))
-const V2Practice = lazyImport(() => import('./physics2/pages/Practice'))
-const V2Review = lazyImport(() => import('./physics2/pages/Review'))
-const V2Questions = lazyImport(() => import('./physics2/pages/Questions'))
+/* The course engine. Nine topics, each a primer with its simulations embedded
+   and its own slice of the question bank bound to it.
+
+   It was built at /physics-v2 as an alternative experience to be compared
+   against the existing site; that comparison is over and the two are one
+   product. The pages are unchanged in kind — they still render their own
+   chrome (see hasOwnChrome) and still share the one question-bank record — but
+   they now answer under /physics, and the old addresses redirect. */
+const CourseTopicPage = lazyImport(() => import('./physics2/pages/Topic'))
+const CoursePractice = lazyImport(() => import('./physics2/pages/Practice'))
+const CourseReview = lazyImport(() => import('./physics2/pages/Review'))
+const CourseQuestions = lazyImport(() => import('./physics2/pages/Questions'))
 
 // The question bank shares the homepage's editorial design system and renders
 // its own shell, so the site chrome stands down on its routes.
@@ -276,6 +281,41 @@ function ScrollToTop() {
 }
 
 /**
+ * The course engine's old address, forwarded to its new one.
+ *
+ * ONE component rather than five <Navigate> elements, because four of the five
+ * cases carry state in the part of the URL a plain redirect throws away:
+ *
+ *   /physics-v2/xray/practice?section=tube&filter=again
+ *   /physics-v2/xray#geometry
+ *
+ * The query IS the question set — drop it and the learner who followed their
+ * own stored Continue link lands in a different set of questions than the one
+ * they left, with nothing on screen to say so. The hash is how question
+ * feedback returns to the section that teaches the answer.
+ *
+ * These arrive from three places, all of them real: a bookmark, the static HTML
+ * under /public that leaves the SPA and comes back by hardcoded href, and —
+ * the one that matters — Continue positions written into localStorage before
+ * the merge, which are stored as full paths including the query.
+ */
+function LegacyCourseRedirect() {
+  const location = useLocation()
+  const rest = location.pathname.slice(LEGACY_PHYSICS_ROOT.length).replace(/\/+$/, '')
+  return (
+    <Navigate
+      replace
+      to={{
+        // The bare root was the syllabus, which is now the dashboard itself.
+        pathname: rest === '' ? PHYSICS_HREF.home : `${PHYSICS_ROOT}${rest}`,
+        search: location.search,
+        hash: location.hash,
+      }}
+    />
+  )
+}
+
+/**
  * Routes that render their own navigation and so must not get the shared
  * header and footer.
  *
@@ -291,7 +331,14 @@ function hasOwnChrome(pathname: string): boolean {
      own chrome and moved to '/physics/tour', which IS listed. */
   const exact = ['/', '/physics/tour', '/admin', '/ultrasound-lab', '/mri', '/anatomy']
   const trees = [
-    '/physics-v2',
+    /* Trailing slash, and it is load-bearing. Everything UNDER /physics is the
+       course engine, which brings its own header; bare '/physics' is the
+       dashboard, which must keep the shared one (see the note above). A tree
+       entry of '/physics' would match both and strip the dashboard's header.
+       '/physics/tour' is listed exactly above and is now also covered here —
+       harmless, and left in place so removing this line cannot silently give
+       the cinematic page two headers. */
+    '/physics/',
     '/question-bank',
     '/ct-lab',
     '/nm-lab',
@@ -608,7 +655,12 @@ function FAQ() {
 function LoginPage() {
   const { user, signUp, signIn, configured } = useAuth()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  /* ?mode=signup opens straight onto the create-account form — the free
+     sample's gates land here, and a visitor who just clicked "sign up"
+     should not be met by a login form with one more link to find. */
+  const [mode, setMode] = useState<'login' | 'signup'>(() =>
+    new URLSearchParams(window.location.search).get('mode') === 'signup' ? 'signup' : 'login',
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -616,8 +668,15 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
-  // Landing on /login while already signed in just takes you home.
-  useEffect(() => { if (user) navigate('/', { replace: true }) }, [user, navigate])
+  /* Where to go once signed in. The access gates send people here with
+     ?next=<the page they were opening>; landing them back on the home page
+     instead would lose the very place they created the account to reach.
+     Only same-site paths are honoured — a full URL in next is ignored. */
+  useEffect(() => {
+    if (!user) return
+    const next = new URLSearchParams(window.location.search).get('next')
+    navigate(next && next.startsWith('/') && !next.startsWith('//') ? next : '/', { replace: true })
+  }, [user, navigate])
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -742,53 +801,74 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/physics-v2" element={<V2Home/>}/><Route path="/physics-v2/review" element={<V2Review/>}/><Route path="/physics-v2/questions" element={<V2Questions/>}/><Route path="/physics-v2/:topicId" element={<V2TopicPage/>}/><Route path="/physics-v2/:topicId/practice" element={<V2Practice/>}/><Route path="/question-bank" element={<QbIndex/>}/><Route path="/question-bank/mock" element={<QbMock/>}/><Route path="/question-bank/review/:filterId" element={<QbReview/>}/><Route path="/question-bank/:subjectId" element={<QbPractice/>}/><Route path="/fact-bank" element={<FactBankPage/>}/><Route path="/fact-bank/:topicId" element={<FactTopicPage/>}/><Route path="/ct-lab" element={<CtLab/>}/><Route path="/ct-lab/film" element={<CtFilm/>}/><Route path="/nm-lab" element={<NmLab/>}/><Route path="/nm-lab/film" element={<NmFilm/>}/><Route path="/mri-lab/motion" element={<MriMotion/>}/><Route path="/ultrasound-lab/motion" element={<UsMotion/>}/><Route path="/xray-lab" element={<XrayHub/>}/><Route path="/xray-lab/production" element={<XrayProductionLesson/>}/><Route path="/xray-lab/spectrum" element={<XraySpectrumLesson/>}/><Route path="/xray-lab/geometry" element={<XrayGeometryLesson/>}/><Route path="/xray-lab/interactions" element={<XrayInteractionsLesson/>}/><Route path="/xray-lab/mammography" element={<MammoLab/>}/><Route path="/xray-lab/fluoroscopy" element={<FluoroLab/>}/><Route path="/xray-lab/digital" element={<DigitalLab/>}/><Route path="/visual-lab" element={<VisualLabPage/>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/>
+    {/* RADIOPASS PHYSICS. The dashboard above, the course engine here.
+        Paths are written out rather than built from PHYSICS_ROOT on purpose:
+        this table is the definition of what exists, labLink.test.ts reads it
+        as text to prove no link in the product points at a route that is not
+        here, and routes.test.ts checks the constant still agrees with it.
+
+        The topic slug is a catch-all one segment under /physics, sitting
+        alongside five static siblings. React Router ranks static above
+        dynamic, so 'review' reaches Review rather than a topic named review —
+        but only until someone names a topic 'review'. routes.test.ts fails the
+        build if a topic id ever collides. */}
+    <Route path="/physics/course" element={<Navigate to={PHYSICS_HREF.home} replace/>}/>
+    <Route path="/physics/questions" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><CourseQuestions/></RequireAccess>}/>
+    <Route path="/physics/review" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><CourseReview/></RequireAccess>}/>
+    <Route path="/physics/mock" element={<RequireAccess resource={{ branch: 'physics', kind: 'mock' }}><QbMock/></RequireAccess>}/>
+    <Route path="/physics/:topicId" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><CourseTopicPage/></RequireAccess>}/>
+    <Route path="/physics/:topicId/practice" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><CoursePractice/></RequireAccess>}/>
+    {/* The address the course engine used to answer on. Bookmarks, the static
+        pages under /public, and Continue positions stored before the merge. */}
+    <Route path="/physics-v2/*" element={<LegacyCourseRedirect/>}/>
+    <Route path="/question-bank" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><QbIndex/></RequireAccess>}/><Route path="/question-bank/mock" element={<RequireAccess resource={{ branch: 'physics', kind: 'mock' }}><QbMock/></RequireAccess>}/><Route path="/question-bank/review/:filterId" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><QbReview/></RequireAccess>}/><Route path="/question-bank/:subjectId" element={<RequireAccess resource={{ branch: 'physics', kind: 'questions' }}><QbPractice/></RequireAccess>}/><Route path="/fact-bank" element={<RequireAccess resource={{ branch: 'physics', kind: 'facts' }}><FactBankPage/></RequireAccess>}/><Route path="/fact-bank/:topicId" element={<RequireAccess resource={{ branch: 'physics', kind: 'facts' }}><FactTopicPage/></RequireAccess>}/><Route path="/ct-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><CtLab/></RequireAccess>}/><Route path="/ct-lab/film" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><CtFilm/></RequireAccess>}/><Route path="/nm-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><NmLab/></RequireAccess>}/><Route path="/nm-lab/film" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><NmFilm/></RequireAccess>}/><Route path="/mri-lab/motion" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriMotion/></RequireAccess>}/><Route path="/ultrasound-lab/motion" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsMotion/></RequireAccess>}/><Route path="/xray-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><XrayHub/></RequireAccess>}/><Route path="/xray-lab/production" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><XrayProductionLesson/></RequireAccess>}/><Route path="/xray-lab/spectrum" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><XraySpectrumLesson/></RequireAccess>}/><Route path="/xray-lab/geometry" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><XrayGeometryLesson/></RequireAccess>}/><Route path="/xray-lab/interactions" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><XrayInteractionsLesson/></RequireAccess>}/><Route path="/xray-lab/mammography" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><MammoLab/></RequireAccess>}/><Route path="/xray-lab/fluoroscopy" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><FluoroLab/></RequireAccess>}/><Route path="/xray-lab/digital" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><DigitalLab/></RequireAccess>}/><Route path="/visual-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><VisualLabPage/></RequireAccess>}/><Route path="/study-plan" element={<StudyPlanPage/>}/><Route path="/free-trial" element={<FreeTrialPage/>}/><Route path="/pricing" element={<PricingContent/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/reset-password" element={<ResetPasswordPage/>}/><Route path="/about" element={<InfoPage type="about"/>}/><Route path="/privacy" element={<InfoPage type="privacy"/>}/><Route path="/terms" element={<InfoPage type="terms"/>}/>
     {/* Chapter 5 — the taught module. Nested so the navigator persists across
         every section instead of remounting on each one. */}
-    <Route path="/mri" element={<MriModule/>}>
+    <Route path="/mri" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><MriModule/></RequireAccess>}>
       <Route index element={<MriModuleHome/>}/>
       <Route path=":slug" element={<MriSection/>}/>
     </Route>
-    <Route path="/mri-lab/course" element={<MriCourse/>}/>
-    <Route path="/mri-lab/core" element={<MriCoreLesson/>}/>
-    <Route path="/mri-lab/encoding" element={<MriEncodingLesson/>}/>
-    <Route path="/mri-lab/learn/t1-spin-echo" element={<SeqT1/>}/>
-    <Route path="/mri-lab/learn/t2-spin-echo" element={<SeqT2/>}/>
-    <Route path="/mri-lab/learn/proton-density" element={<SeqPd/>}/>
-    <Route path="/mri-lab/learn/flair" element={<SeqFlair/>}/>
-    <Route path="/mri-lab/learn/stir" element={<SeqStir/>}/>
-    <Route path="/mri-lab/learn/gradient-echo" element={<SeqGre/>}/>
-    <Route path="/mri-lab" element={<MriFoundations/>}/>
-    <Route path="/mri-lab/t1-spin-echo" element={<MriT1SpinEcho/>}/>
-    <Route path="/mri-lab/t2-spin-echo" element={<MriT2SpinEcho/>}/>
-    <Route path="/mri-lab/proton-density" element={<MriProtonDensity/>}/>
-    <Route path="/mri-lab/flair" element={<MriFlair/>}/>
-    <Route path="/mri-lab/stir" element={<MriStir/>}/>
-    <Route path="/mri-lab/gradient-echo" element={<MriGradientEcho/>}/>
-    <Route path="/mri-lab/laboratory" element={<MriFreeLab/>}/>
-    <Route path="/mri-lab/comparison" element={<MriComparison/>}/>
-    <Route path="/mri-lab/challenge" element={<MriChallenge/>}/>
-    <Route path="/ultrasound-lab/focus" element={<UsFocusCourse/>}/><Route path="/ultrasound-lab" element={<UsFundamentals/>}/>
-    <Route path="/ultrasound-lab/impedance" element={<UsImpedance/>}/>
-    <Route path="/ultrasound-lab/reflection" element={<UsReflection/>}/>
-    <Route path="/ultrasound-lab/refraction" element={<UsRefraction/>}/>
-    <Route path="/ultrasound-lab/attenuation" element={<UsAttenuation/>}/>
-    <Route path="/ultrasound-lab/pulse-echo" element={<UsPulseEcho/>}/>
-    <Route path="/ultrasound-lab/transducer" element={<UsTransducer/>}/>
-    <Route path="/ultrasound-lab/beam" element={<UsBeam/>}/>
-    <Route path="/ultrasound-lab/resolution" element={<UsResolution/>}/>
-    <Route path="/ultrasound-lab/controls" element={<UsControls/>}/>
-    <Route path="/ultrasound-lab/doppler" element={<UsDoppler/>}/>
-    <Route path="/ultrasound-lab/aliasing" element={<UsAliasing/>}/>
-    <Route path="/ultrasound-lab/artefacts" element={<UsArtefacts/>}/>
-    <Route path="/ultrasound-lab/harmonics" element={<UsHarmonics/>}/>
-    <Route path="/ultrasound-lab/contrast" element={<UsContrast/>}/>
-    <Route path="/ultrasound-lab/elastography" element={<UsElastography/>}/>
-    <Route path="/ultrasound-lab/safety" element={<UsSafety/>}/>
-    <Route path="/ultrasound-lab/probes" element={<UsProbes/>}/>
-    <Route path="/ultrasound-lab/qa" element={<UsQa/>}/>
-    <Route path="/ultrasound-lab/exam" element={<UsExamLab/>}/>
-    <Route path="/ultrasound-lab/facts" element={<UsFactBank/>}/>
+    <Route path="/mri-lab/course" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriCourse/></RequireAccess>}/>
+    <Route path="/mri-lab/core" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriCoreLesson/></RequireAccess>}/>
+    <Route path="/mri-lab/encoding" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriEncodingLesson/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/t1-spin-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqT1/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/t2-spin-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqT2/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/proton-density" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqPd/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/flair" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqFlair/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/stir" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqStir/></RequireAccess>}/>
+    <Route path="/mri-lab/learn/gradient-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'module' }}><SeqGre/></RequireAccess>}/>
+    <Route path="/mri-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriFoundations/></RequireAccess>}/>
+    <Route path="/mri-lab/t1-spin-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriT1SpinEcho/></RequireAccess>}/>
+    <Route path="/mri-lab/t2-spin-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriT2SpinEcho/></RequireAccess>}/>
+    <Route path="/mri-lab/proton-density" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriProtonDensity/></RequireAccess>}/>
+    <Route path="/mri-lab/flair" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriFlair/></RequireAccess>}/>
+    <Route path="/mri-lab/stir" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriStir/></RequireAccess>}/>
+    <Route path="/mri-lab/gradient-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriGradientEcho/></RequireAccess>}/>
+    <Route path="/mri-lab/laboratory" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriFreeLab/></RequireAccess>}/>
+    <Route path="/mri-lab/comparison" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriComparison/></RequireAccess>}/>
+    <Route path="/mri-lab/challenge" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><MriChallenge/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/focus" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsFocusCourse/></RequireAccess>}/><Route path="/ultrasound-lab" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsFundamentals/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/impedance" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsImpedance/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/reflection" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsReflection/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/refraction" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsRefraction/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/attenuation" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsAttenuation/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/pulse-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsPulseEcho/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/transducer" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsTransducer/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/beam" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsBeam/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/resolution" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsResolution/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/controls" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsControls/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/doppler" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsDoppler/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/aliasing" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsAliasing/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/artefacts" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsArtefacts/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/harmonics" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsHarmonics/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/contrast" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsContrast/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/elastography" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsElastography/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/safety" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsSafety/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/probes" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsProbes/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/qa" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsQa/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/exam" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsExamLab/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/facts" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsFactBank/></RequireAccess>}/>
     <Route path="*" element={<NotFound/>}/></Routes></Suspense></RouteErrorBoundary><Footer/></>
 }
 

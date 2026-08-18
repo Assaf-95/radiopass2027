@@ -66,12 +66,10 @@ export type CourseModule = {
   practice: CoursePractice
   /** Fact-bank topic id — the must-remember layer this module closes into. */
   facts?: string
-  /**
-   * The opening mental map: what the learner will understand by the end.
-   * Shown at ORIENT, so the module starts as a promise rather than as the
-   * first isolated fact.
-   */
-  outcomes: string[]
+  /* The opening mental map — "what you will understand by the end" — is NOT
+     here. It was written on both this module and its topic, and the two copies
+     drifted. It now has one home: TOPIC_OUTCOMES in physics/outcomes.ts, read
+     through outcomesForModule(module.id). */
 }
 
 export type CoursePart = {
@@ -153,12 +151,6 @@ export const COURSE_MODULES: CourseModule[] = [
       label: 'Production, spectrum, geometry and interactions',
     },
     facts: 'xray',
-    outcomes: [
-      'how electrons become X-ray photons at the anode, and where the 99% goes',
-      'what the spectrum graph shows, and what kVp, mAs, filtration and target each do to it',
-      'why magnification and unsharpness are different things with different causes',
-      'the three fates of a photon in tissue, and where photoelectric hands over to Compton',
-    ],
   },
   {
     id: 'digital',
@@ -170,12 +162,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/xray-lab/digital', title: 'CR & digital radiography', short: 'Digital' }],
     practice: { subject: 'xray', section: 'digital', label: 'Computed and digital radiography' },
     facts: 'fluoro',
-    outcomes: [
-      'how an absorbed X-ray becomes a number: CR plate, indirect DR, direct DR',
-      'what pixel size, matrix and bit depth actually limit',
-      'why an acceptable-looking image does not prove an acceptable dose',
-      'what MTF and DQE measure, and which detector wins each',
-    ],
   },
   {
     id: 'fluoro',
@@ -187,12 +173,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/xray-lab/fluoroscopy', title: 'Fluoroscopy', short: 'Fluoroscopy' }],
     practice: { subject: 'xray', section: 'fluoroscopy', label: 'Fluoroscopy and DSA' },
     facts: 'fluoro',
-    outcomes: [
-      'the live imaging chain, and what the image intensifier trades to get gain',
-      'what automatic brightness control holds constant — and what it silently raises',
-      'why pulsed operation and last-image-hold are dose features, not conveniences',
-      'how DSA subtracts, and what misregistration does to it',
-    ],
   },
   {
     id: 'mammo',
@@ -204,12 +184,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/xray-lab/mammography', title: 'Mammography', short: 'Mammography' }],
     practice: { subject: 'xray', section: 'mammography', label: 'Mammography' },
     facts: 'mammo',
-    outcomes: [
-      'why breast imaging needs low energies, and what that costs',
-      'every one of compression’s wins — thickness, scatter, dose, motion, overlap',
-      'target–filter pairs, and why the spectrum is shaped so deliberately',
-      'what magnification views change geometrically, and why they need the small focal spot',
-    ],
   },
   {
     id: 'ct',
@@ -221,12 +195,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/ct-lab', title: 'CT physics', short: 'CT' }],
     practice: { subject: 'ct', label: 'Computed tomography' },
     facts: 'ct',
-    outcomes: [
-      'how attenuation profiles become a slice — and why reconstruction can never fix dose',
-      'pitch, rows and the helix: what multi-slice actually buys',
-      'the Hounsfield scale and windowing, without the narrow-window trap',
-      'noise, artefacts, and the dose metrics the exam asks for by name',
-    ],
   },
   {
     id: 'nm',
@@ -238,12 +206,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/nm-lab', title: 'Nuclear medicine', short: 'NM' }],
     practice: { subject: 'nm', label: 'Nuclear medicine' },
     facts: 'nm',
-    outcomes: [
-      'why Tc-99m is the workhorse, and how the generator delivers it',
-      'the gamma camera chain, and what the collimator throws away to get an image',
-      'SPECT and PET as geometry: what rotating and coincidence each solve',
-      'why dose is committed at injection — the moment, not the scan, is the exposure',
-    ],
   },
   {
     id: 'mri',
@@ -255,12 +217,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/mri', title: 'The MRI module', short: 'MRI' }],
     practice: { subject: 'mri', label: 'MRI' },
     facts: 'mri',
-    outcomes: [
-      'from B₀ to net magnetisation to precession — the causal chain, in order',
-      'what RF resonance is, and where the signal actually comes from',
-      'T1, T2 and T2★ as processes, then TR and TE as the levers that weight them',
-      'gradients, spatial encoding and k-space — the part everyone fails first',
-    ],
   },
   {
     id: 'us',
@@ -272,12 +228,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/ultrasound-lab', title: 'The ultrasound laboratory', short: 'Ultrasound' }],
     practice: { subject: 'ultrasound', label: 'Ultrasound' },
     facts: 'us',
-    outcomes: [
-      'the pressure wave, impedance and every interface rule the exam asks',
-      'transducers, beams and the three resolutions — and what frequency trades',
-      'Doppler, the Nyquist limit, and why aliasing happens at ordinary velocities',
-      'artefacts as physics: each one is a broken assumption you can name',
-    ],
   },
   {
     id: 'safety',
@@ -289,12 +239,6 @@ export const COURSE_MODULES: CourseModule[] = [
     lessons: [{ path: '/fact-bank/protection', title: 'Protection & legislation', short: 'Safety' }],
     practice: { subject: 'safety', label: 'Legislation, protection, radiobiology and dosimetry' },
     facts: 'protection',
-    outcomes: [
-      'IRR17 and IR(ME)R: who is responsible for what, by name',
-      'dose quantities and their units, without mixing absorbed and effective',
-      'deterministic versus stochastic — thresholds, severity, probability',
-      'the numbers: limits, backgrounds and typical doses the exam expects cold',
-    ],
   },
 ]
 

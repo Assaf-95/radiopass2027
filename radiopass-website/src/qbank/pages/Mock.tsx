@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom'
 import { QB_QUESTIONS } from '../data'
 import { MOCK_PAPERS, type MockPaper } from '../data/mocks'
 import { QuestionCard, scoreQuestion, type StemChoice } from '../QuestionCard'
-import { QbShell } from '../Shell'
+import { QbShell, recordQbScore } from '../Shell'
 import { mockHistory, record } from '../../lib/learner'
 import { QB_SUBJECTS, type QbQuestion, type QbTopic } from '../types'
 
@@ -250,6 +250,24 @@ export default function MockPage() {
         questionCount: sat.length,
         perTopic,
       })
+
+      /* And into the question record, which mocks never reached.
+         The paper was written to the timeline above, but the timeline only
+         answers "how did that sitting go" — the per-question store is what
+         every other surface reads. So sitting three forty-question papers
+         left the dashboard reading "0 of 467 answered", Review empty, and
+         every topic "not started": two hours of exam conditions, invisible
+         everywhere except one history line.
+         Tagged 'mock', so a paper never masquerades as a cold first sitting
+         of a question the candidate had already learned. Only questions the
+         candidate actually attempted are recorded; a blank left blank when
+         the clock ran out is not an answer and must not be marked as one. */
+      for (const q of sat) {
+        const row = marked.perQuestion[q.id]
+        if (!row) continue
+        if (Object.keys(sheet[q.id] ?? {}).length === 0) continue
+        recordQbScore(q.id, row.correct, row.outOf, sheet[q.id], q.topic, 'mock')
+      }
 
       window.scrollTo({ top: 0 })
     },

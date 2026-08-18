@@ -6,10 +6,16 @@
  * then the governing principle (the concept registry), then the one key point,
  * then the way back into the primer section that teaches it.
  *
- * Two modes. 'bank': a prior submission replays read-only, a new one is
- * recorded permanently. 'retest': always a fresh sheet, marked locally,
- * and the permanent record is never rewritten (recordQbScore is first-write-
- * wins, so calling it for an already-answered question is a no-op).
+ * Two modes. 'bank': a prior submission replays read-only, so revisiting a
+ * question you have answered shows what you answered rather than a blank
+ * sheet, and cannot accidentally re-score it. 'retest': always a fresh sheet.
+ *
+ * Both are recorded. The store keeps a question's attempts in order and
+ * derives its standing from them, so a re-test that gets it right genuinely
+ * fixes the question — it leaves the re-test pool and stops dragging its
+ * topic's figures down. What a re-test cannot do is rewrite the FIRST sitting:
+ * that attempt stays exactly as it was, and it is the one the cold-accuracy
+ * number is built from.
  */
 
 import { useEffect, useRef, useState } from 'react'
@@ -19,7 +25,8 @@ import { isBankQuestion } from '../../qbank/data'
 import { readQbMarks, readQbProgress, recordQbScore, toggleQbMark } from '../../qbank/Shell'
 import type { QbQuestion } from '../../qbank/types'
 import { cleanExplanation } from '../lib/clean'
-import { sectionOf } from '../lib/assign'
+import { topicHref } from '../../physics/routes'
+import { conceptIdFor, sectionOf } from '../lib/assign'
 import type { Concept, V2Topic } from '../types'
 
 type Choices = Record<string, boolean>
@@ -30,9 +37,15 @@ export function scoreStems(question: QbQuestion, choices: Choices) {
   return { correct, outOf: scorable.length }
 }
 
+/**
+ * The governing principle, from the checked-in map. This was a first-regex-
+ * wins scan of the topic's concepts, with the same silent-arbitrary problem
+ * the section matcher had; the map records one concept id per question, and
+ * the regexes remain only as the bootstrap that seeded it.
+ */
 function conceptFor(topic: V2Topic, question: QbQuestion): Concept | null {
-  const text = `${question.title} ${question.stems.map((s) => s.text).join(' ')}`
-  return topic.concepts.find((c) => c.match.test(text)) ?? null
+  const id = conceptIdFor(question.id)
+  return id ? (topic.concepts.find((c) => c.id === id) ?? null) : null
 }
 
 export function V2Question({
@@ -84,9 +97,13 @@ export function V2Question({
   const submit = () => {
     if (!allAnswered || submitted) return
     setSubmitted(true)
-    // First-write-wins in the shared store: a bank submission becomes the
-    // permanent record; a re-test of an already-answered question does not.
-    recordQbScore(question.id, correct, outOf, choices, question.topic)
+    /* Every attempt is recorded now, tagged with which kind it was. The store
+       used to keep only the first and silently drop the rest, which meant a
+       candidate could re-test a question they had learned and watch it stay
+       wrong for ever. What re-testing does NOT do is overwrite the first
+       sitting: that is kept as its own attempt and is what the cold-accuracy
+       figure is built from. */
+    recordQbScore(question.id, correct, outOf, choices, question.topic, mode === 'retest' ? 'retest' : 'bank')
     onSubmitted?.(question, correct, outOf)
   }
 
@@ -95,7 +112,6 @@ export function V2Question({
     setMarks(all[question.id] ?? {})
   }
 
-  const highYield = question.source.toLowerCase().includes('recall')
   const concept = submitted && correct < outOf ? conceptFor(topic, question) : null
   const section = sectionOf(topic, question.id)
   const sectionIndex = section ? topic.sections.findIndex((s) => s.id === section.id) + 1 : 0
@@ -107,7 +123,11 @@ export function V2Question({
           Question {number} / {total}
         </span>
         {section && <span>{section.title}</span>}
-        {highYield && <span className="hy">High-yield</span>}
+        {/* No provenance chip. "High-yield" here was literally
+            source.includes('recall') — a 1:1 proxy for which questions came
+            from exam recalls, which DESIGN.md says must stay silent. It also
+            told the candidate nothing: in this bank the recalls are the rule,
+            not the exception. */}
       </div>
 
       <h2 className="v2-qtitle">{question.title}</h2>
@@ -255,7 +275,7 @@ export function V2Question({
 
           {section && (
             <p className="v2-reread">
-              <Link className="v2-link" to={`/physics-v2/${topic.id}#${section.id}`}>
+              <Link className="v2-link" to={topicHref(topic.id, section.id)}>
                 Reread §{topic.num}.{sectionIndex} {section.title} →
               </Link>
             </p>

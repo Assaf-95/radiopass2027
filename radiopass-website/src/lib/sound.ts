@@ -73,6 +73,29 @@ if (typeof window !== 'undefined') {
   window.addEventListener('keydown', onFirstGesture, { once: false })
 }
 
+/**
+ * A host that runs scenes ambiently holds one of these for as long as it is
+ * mounted, and tones stay silent while any is held.
+ *
+ * The lesson player earns its clicks: one scene on screen, the learner driving
+ * it, and a mute button in the header. A Physics V2 film plate is a different
+ * thing — a chapter mounts several looping scenes at once, none of them the
+ * one the learner is reading, and the page carries no mute. Four click tracks
+ * at a time is noise with no way out, so those hosts silence tones while they
+ * own the screen. The stored preference is never written, so leaving the page
+ * restores exactly whatever the learner chose in the laboratories.
+ */
+let suspensions = 0
+export function suspendTones(): () => void {
+  suspensions += 1
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    suspensions -= 1
+  }
+}
+
 export type ToneShape = 'ping' | 'pulse' | 'sweep' | 'thud'
 
 /**
@@ -80,7 +103,7 @@ export type ToneShape = 'ping' | 'pulse' | 'sweep' | 'thud'
  * a soundtrack, and it has to survive being triggered many times a minute.
  */
 export function playTone(freq = 880, shape: ToneShape = 'ping', gain = 0.05) {
-  if (!enabled || !ctx || !unlocked || ctx.state !== 'running') return
+  if (!enabled || suspensions > 0 || !ctx || !unlocked || ctx.state !== 'running') return
   try {
     const now = ctx.currentTime
     const osc = ctx.createOscillator()

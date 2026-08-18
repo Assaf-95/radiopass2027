@@ -118,6 +118,19 @@
   color: var(--accent);
 }
 
+/* Mock history. One quiet line above Continue, not a tile: a paper sat weeks
+   ago is context for today's work, not today's work. */
+.ph-mocks {
+  margin: 0 0 var(--sp-4);
+  font-size: var(--fs-support);
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+.ph-mocks strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 /* The honest empty state. Not an error, not a zero-filled dashboard. */
 .ph-empty {
   display: flex;
@@ -332,12 +345,3 @@
 
 /* The V2 door: the one link in this row that is not a familiar destination,
    so it carries the accent rather than the quiet grey. */
-.ph-secondary a.ph-secondary-new {
-  color: var(--accent);
-  border-bottom-color: rgba(217, 168, 78, 0.45);
-  font-weight: 600;
-}
-.ph-secondary a.ph-secondary-new:hover {
-  color: var(--text-primary);
-  border-bottom-color: var(--accent);
-}

@@ -11,9 +11,18 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* Lesson diagrams re-hosted from /xray-lab/fluoroscopy — same functions. */
+import { drawChain, drawAbc, drawPulsed, drawSkinDose } from '../../labs/fluoro'
 import { FluoroAbc } from '../components/sims/FluoroAbc'
 import { FluoroIntensifier } from '../components/sims/FluoroIntensifier'
 import { IiDistortion, DsaSubtraction } from '../components/sims/FluoroScenes'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.fluoro
 
 export const FLUORO: V2Topic = {
   id: 'fluoro',
@@ -22,19 +31,10 @@ export const FLUORO: V2Topic = {
   short: 'Fluoro',
   tagline: 'Watch the beam live, pay for it by the minute, subtract what does not move.',
   qbTopics: ['Fluoroscopy'],
-  outcomes: [
-    'how an image intensifier turns a faint X-ray pattern into a watchable picture, and where its gain comes from',
-    'which distortions belong to electron optics, and why a flat panel cannot have them',
-    'what automatic brightness control holds constant — and what it silently raises to do it',
-    'the dose features — pulsing, last image hold, collimation — and the deterministic skin risk they defend against',
-    'what DSA subtraction improves, what it worsens, and what it leaves untouched',
-  ],
+  outcomes: TOPIC_OUTCOMES.fluoro,
   sections: [
     {
-      id: 'chain',
-      title: 'The live imaging chain',
-      blurb: 'Radiography running continuously, and the geometry that makes it survivable.',
-      kw: /under.?couch|over.?couch|imaging chain|real.?time|live (image|display|imaging)|screening room|staff dose|operator dose|receptor.{0,30}(close|distance)/i,
+      ...S.chain,
       primer: [
         {
           kind: 'principle',
@@ -54,14 +54,20 @@ export const FLUORO: V2Topic = {
             { change: 'Collimation ↓ field', effect: 'less tissue irradiated — scatter ↓, DAP ↓, contrast ↑' },
           ],
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawChain} height={340} label='The live imaging chain: under-couch tube, patient, receptor and display running continuously' />,
+            title: 'The chain, running live',
+            caption: 'Fluoroscopy is radiography running continuously: an under-couch tube, the patient, and a receptor — historically an image intensifier, now usually a flat panel — feeding a live display. Everything about the design follows from having to stay on.',
+          },
+        },
       ],
     },
     {
-      id: 'intensifier',
-      title: 'Inside the image intensifier',
-      blurb: 'Light, electrons, light again — and two gains multiplied together.',
-      tags: ['fluoroscopy-image-intensifier'],
-      kw: /image intensifier|input phosphor|output phosphor|photocathode|minification|brightness gain|flux gain|conversion factor|electrostatic|caesium iodide|\bCsI\b/i,
+      ...S.intensifier,
       primer: [
         {
           kind: 'principle',
@@ -108,10 +114,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'distortion',
-      title: 'II distortions versus flat panels',
-      blurb: 'The price of bending electrons — and the detector that pays none of it.',
-      kw: /pincushion|s[- ]?distortion|vignett|flat[- ]?panel|\bTFT\b|geometric distortion|TV camera/i,
+      ...S.distortion,
       primer: [
         {
           kind: 'principle',
@@ -150,10 +153,7 @@ export const FLUORO: V2Topic = {
       ],
     },
     {
-      id: 'abc',
-      title: 'Automatic brightness control',
-      blurb: 'The feedback loop that keeps the picture steady — and what it quietly spends.',
-      kw: /automatic brightness|\bABC\b|brightness control|automatic dose[- ]rate|magnification mode|electronic magnif|mag\.? mode/i,
+      ...S.abc,
       primer: [
         {
           kind: 'principle',
@@ -187,14 +187,20 @@ export const FLUORO: V2Topic = {
           kind: 'trap',
           text: 'ABC holds the IMAGE constant, not the dose. A steady picture over thick anatomy is precisely the sign that the dose rate has gone up, not that it is safe.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawAbc} height={340} label='Automatic brightness control: the feedback loop holding the display steady while the dose rate silently rises over thicker tissue' />,
+            title: 'What ABC holds constant',
+            caption: 'A sensor watches the image brightness; when the view moves over thicker tissue the loop raises kV and/or mA to hold the display steady. The picture never changes — but the dose rate silently does. Panning across a patient is a dose programme you cannot see.',
+          },
+        },
       ],
     },
     {
-      id: 'dose',
-      title: 'Dose features and the skin',
-      blurb: 'Rate × time: the levers that cut it, and the deterministic injury waiting at the end.',
-      kw: /pulsed?|pulse rate|last[- ]image|\bLIH\b|entrance dose|skin (dose|injur|burn)|deterministic|erythema|epilation|\bDAP\b|dose[- ]area|screening time|mGy\/min|Gy.?cm/i,
-      fallback: true,
+      ...S.dose,
       primer: [
         {
           kind: 'principle',
@@ -223,14 +229,32 @@ export const FLUORO: V2Topic = {
           summary: 'Why fluoroscopy is where deterministic effects become real',
           text: 'Deterministic injuries have thresholds — below them nothing happens, above them severity grows with dose. Plain radiography delivers milligray to the skin and never approaches them; fluoroscopy delivers tens of milligray per minute to the same entrance field, so minutes of screening multiply into gray. That is why the deterministic vocabulary (erythema, epilation, threshold) belongs to fluoroscopy stems, while radiography stems stay in the stochastic world of risk per millisievert.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPulsed} height={340} label='Pulsed fluoroscopy: the beam firing at reduced frame rates with last image hold keeping a picture on screen between pulses' />,
+            title: 'Pulse the beam',
+            annotation: 'pulsed · LIH',
+            caption: 'The eye needs far fewer frames than continuous exposure provides. Pulse the beam — 15, 7.5, even 3 pulses per second — and dose falls roughly with the frame rate, with last image hold keeping a picture on screen between pulses. Dose features, not conveniences.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawSkinDose} height={340} label='Skin dose geometry: collimation, detector close, tube far, and the beam moved so no single patch of skin pays the whole bill' />,
+            title: 'Defending the skin',
+            annotation: 'erythema ≈2–5 Gy',
+            caption: 'Long procedures put deterministic injuries in reach — erythema needs only 2–5 Gy at one patch of skin. The defences are geometric: collimate, keep the detector close and the tube far, avoid magnification, and move the beam so no single patch pays the whole bill.',
+          },
+        },
       ],
     },
     {
-      id: 'dsa',
-      title: 'DSA: digital subtraction angiography',
-      blurb: 'Subtract everything that does not move — and read the ledger honestly.',
-      tags: ['dsa-subtraction-noise'],
-      kw: /subtract|digital subtraction|\bDSA\b|mask (image|frame)|misregistration|pixel[- ]shift|road[- ]?map/i,
+      ...S.dsa,
       primer: [
         {
           kind: 'principle',
@@ -267,70 +291,7 @@ export const FLUORO: V2Topic = {
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'brightness-gain',
-      title: 'Brightness gain',
-      rule: 'Brightness gain = flux gain × minification gain, with minification gain = (input diameter / output diameter)².',
-      why: 'Acceleration at 25–30 kV makes each electron yield far more light at the output than freed it (flux gain); squeezing the image onto a smaller output phosphor concentrates that light further (minification gain).',
-      confusion: 'Minification brightens but adds no information — image statistics are fixed at the input phosphor, so mottle cannot be gained away.',
-      match: /brightness gain|flux gain|minification|conversion factor|output phosphor/i,
-    },
-    {
-      id: 'ii-chain',
-      title: 'The intensifier chain',
-      rule: 'X-rays → light at the CsI input phosphor → electrons at the photocathode → accelerated at 25–30 kV through electrostatic lenses → light at the output phosphor.',
-      why: 'Each conversion exists to reach a form that can be amplified: light frees electrons, electrons can be accelerated, and acceleration is where the energy gain enters.',
-      confusion: 'Photomultiplier tubes are not in the chain — they belong to gamma cameras and CR readers.',
-      match: /input phosphor|photocathode|electrostatic|caesium iodide|\bCsI\b|photomultiplier/i,
-    },
-    {
-      id: 'ii-distortion',
-      title: 'Distortions of electron optics',
-      rule: 'Pincushion distortion, S-distortion and vignetting are faults of the intensifier’s electron optics; a flat panel has no electron optics and can show none of them.',
-      why: 'Peripheral electron paths are focused less perfectly than central ones (pincushion, vignetting), and external magnetic fields bend the paths bodily (S-distortion). A rigid TFT matrix accelerates nothing.',
-      match: /pincushion|s[- ]?distortion|vignett|distort/i,
-    },
-    {
-      id: 'abc',
-      title: 'Automatic brightness control',
-      rule: 'ABC holds displayed brightness constant by raising kV and/or mA — over thicker anatomy the picture stays the same while the dose rate rises.',
-      why: 'The feedback loop senses output brightness only, so it restores the display by whatever exposure it takes, silently.',
-      confusion: 'Recovering with kV costs iodine contrast (the spectrum leaves the 33 keV K-edge behind); recovering with mA costs dose.',
-      match: /automatic brightness|\bABC\b|brightness control/i,
-    },
-    {
-      id: 'mag-mode',
-      title: 'Magnification mode and dose',
-      rule: 'Selecting a smaller input field lowers minification gain, so ABC raises the exposure — magnification mode increases the dose rate.',
-      why: 'Less minification means a dimmer output for the same input dose; the feedback loop makes up the difference, classically as the inverse square of the field diameter.',
-      match: /magnification mode|electronic magnif|smaller (input )?(field|format)|mag\.? mode/i,
-    },
-    {
-      id: 'pulsed-lih',
-      title: 'Pulsed fluoroscopy and last image hold',
-      rule: 'Pulsing cuts dose roughly in proportion to pulse rate at a fixed dose per pulse; last image hold displays the previous frame at zero additional exposure.',
-      why: 'The eye tolerates far fewer frames than a continuous beam supplies, so beam-off time is nearly free — the cost is temporal resolution.',
-      confusion: 'In practice dose per pulse is often raised to keep each frame quiet, so the saving is slightly less than proportional.',
-      match: /pulse[ds]?\b|pulse rate|last[- ]image|\bLIH\b|frames? per second/i,
-    },
-    {
-      id: 'skin-dose',
-      title: 'Deterministic skin dose',
-      rule: 'Skin injury is deterministic: erythema needs about 2–5 Gy at one skin patch, and at entrance dose rates of 10–50 mGy/min long procedures can get there.',
-      why: 'Threshold effects care about the dose to one place — which is why varying the beam entry angle, collimating and keeping the tube far from the skin all work.',
-      confusion: 'DAP is a whole-beam quantity; peak skin dose, not DAP, is the deterministic variable.',
-      match: /skin (dose|injur|burn)|erythema|deterministic|epilation|\bDAP\b|dose[- ]area/i,
-    },
-    {
-      id: 'dsa-snr',
-      title: 'What subtraction trades',
-      rule: 'DSA raises contrast resolution and lowers SNR — the uncorrelated noise of mask and run adds in quadrature — while spatial resolution is unchanged.',
-      why: 'Subtraction removes anatomy, not noise: the stationary signal cancels, the random part of both frames survives and combines.',
-      confusion: 'Spatial resolution lives in the detector, not the arithmetic; movement between mask and run gives misregistration, cured by remasking or pixel-shifting.',
-      match: /subtract|\bDSA\b|misregistration|mask (image|frame)|pixel[- ]shift/i,
-    },
-  ],
+  concepts: CONCEPTS.fluoro,
   essentials: [
     'Image intensifier chain: X-rays → CsI input phosphor → light → photocathode → electrons → 25–30 kV acceleration → output phosphor.',
     'Brightness gain = flux gain × minification gain ≈ 5000×; minification gain = (input/output diameter)².',
@@ -345,7 +306,7 @@ export const FLUORO: V2Topic = {
     'DAP conversion: 1 cGy·cm² = 1 µGy·m²; a barium enema runs to tens of Gy·cm².',
     'DSA: contrast resolution ↑, noise adds (SNR ↓, ≈ √2× for equal frames), spatial resolution unchanged; movement gives misregistration.',
   ],
-  labs: [
-    { label: 'Fluoroscopy — the guided lesson', to: '/xray-lab/fluoroscopy' },
-  ],
+  /* Embedded above at chain, intensifier, distortion, abc, dose and dsa;
+     the guided lesson remains at /xray-lab/fluoroscopy via the dashboard. */
+  labs: [],
 }

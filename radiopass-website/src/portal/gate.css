@@ -1,0 +1,89 @@
+/**
+ * The gate page. Site dark theme (the tokens are global), one paper card in
+ * the course's own material — the same pairing as the free sample, so the
+ * ask looks like the product it is asking for.
+ */
+
+.gate {
+  min-height: 78vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(28px, 6vw, 64px) 20px;
+}
+.gate-wait {
+  min-height: 60vh;
+}
+
+.gate-card {
+  width: min(560px, 100%);
+  background: #fbfbf8;
+  color: #1c1d1f;
+  border-radius: 14px;
+  padding: clamp(30px, 5vw, 46px) clamp(24px, 4.5vw, 44px) clamp(26px, 4vw, 38px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.gate-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  text-decoration: none;
+  margin-bottom: 22px;
+}
+.gate-brand b {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #1c1d1f;
+}
+.gate-brand span {
+  font-family: Fraunces, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #8a6d3b;
+}
+
+.gate-card h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(23px, 3.4vw, 30px);
+  line-height: 1.16;
+  margin: 0 0 14px;
+}
+.gate-card h1 span {
+  color: #55575c;
+}
+.gate-card p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #55575c;
+  margin: 0 0 22px;
+  max-width: 44ch;
+  margin-inline: auto;
+}
+
+.gate-cta {
+  display: block;
+  background: #1c1d1f;
+  color: #fbfbf8;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 13px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.gate-cta:hover {
+  background: #000;
+}
+
+.gate-alt {
+  margin: 14px 0 0 !important;
+  font-size: 13px;
+  color: #898c92;
+}
+.gate-alt a {
+  color: #8a6d3b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

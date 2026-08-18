@@ -11,7 +11,29 @@
  */
 
 import type { V2Topic } from '../types'
+import { TOPIC_OUTCOMES } from '../../physics/outcomes'
+import { SECTIONS } from '../mapping/sections'
+import { CONCEPTS } from '../mapping/concepts'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* The ten lesson diagrams, re-hosted at the section that teaches each one.
+   These are the very functions the /xray-lab/mammography lesson runs — see
+   the export note in labs/mammo.tsx. */
+import {
+  drawWhyLow,
+  drawTargetFilter,
+  drawPairs,
+  drawCompression,
+  drawTubeGeometry,
+  drawGridAec,
+  drawMagnification,
+  drawResolution,
+  drawCnr,
+  drawTomoDose,
+} from '../../labs/mammo'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
+
+/** This topic's matching rules. The primer below is what stays here. */
+const S = SECTIONS.mammo
 
 export const MAMMO: V2Topic = {
   id: 'mammo',
@@ -20,19 +42,10 @@ export const MAMMO: V2Topic = {
   short: 'Mammo',
   tagline: 'Every design choice serves contrast and resolution at minimal dose.',
   qbTopics: ['Mammography'],
-  outcomes: [
-    'why the whole machine lives at 17–20 keV, and what that choice buys and costs',
-    'how target, filter and K-edge conspire to cut a near-monoenergetic spectrum from bremsstrahlung',
-    'what one squeeze of the compression paddle wins on every axis at once',
-    'why magnification views drop the grid and demand the 0.1 mm focal spot',
-    'what tomosynthesis fixes, and the resolution claim it cannot make',
-  ],
+  outcomes: TOPIC_OUTCOMES.mammo,
   sections: [
     {
-      id: 'energy',
-      title: 'Why mammography lives at low energy',
-      blurb: 'The one place on the energy axis where breast tissues can be told apart.',
-      kw: /photoelectric|photon energy|\bkev\b|low.?energy|soft.?tissue contrast|subject contrast|crossover/i,
+      ...S.energy,
       primer: [
         {
           kind: 'principle',
@@ -65,13 +78,20 @@ export const MAMMO: V2Topic = {
           kind: 'trap',
           text: 'The general-radiography rule “Compton dominates in soft tissue” holds only above the ≈25–30 keV crossover. At mammographic energies photoelectric dominates — that is the whole reason the technique works.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawWhyLow} height={340} label='Photoelectric against Compton probability across photon energy, with the mammographic working band marked below the soft-tissue crossover' />,
+            title: 'Why the machine lives at 17–20 keV',
+            caption: 'Two curves against photon energy: the photoelectric probability falling steeply as E cubed, and Compton barely caring. Gland, fat and tumour differ so little that only the photoelectric effect can amplify the difference — and it only dominates below the ≈25–30 keV crossover. The working band sits exactly there.',
+          },
+        },
       ],
     },
     {
-      id: 'spectrum',
-      title: 'Target, filter and the shaped spectrum',
-      blurb: 'Characteristic lines put photons where they are wanted; a K-edge removes the rest.',
-      kw: /molybdenum|rhodium|tungsten|\bmo\s*\/\s*(mo|rh)\b|\bw\s*\/\s*rh\b|k.?edge|beryllium|target|filter|spectrum|characteristic/i,
+      ...S.spectrum,
       primer: [
         {
           kind: 'principle',
@@ -114,14 +134,30 @@ export const MAMMO: V2Topic = {
           kind: 'trap',
           text: 'The tube window is beryllium, not glass — at these energies a glass envelope would act as a filter and swallow the beam before it reached the patient.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawTargetFilter} height={340} label='A molybdenum spectrum being cut by its own k-edge filter: characteristic lines at 17.5 and 19.6 keV survive, the continuum above 20 keV is removed' />,
+            title: 'The Mo target and its own k-edge',
+            caption: 'The Mo target emits its characteristic lines at 17.5 and 19.6 keV — exactly the working band. Then a Mo filter uses its own k-edge at 20 keV to cut the photons just above the lines: the useless high-energy continuum vanishes and the lines stand almost alone. A near-monoenergetic beam, carved from bremsstrahlung.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawPairs} height={340} label='The three target–filter pairs — Mo/Mo, Mo/Rh, W/Rh — each spectrum matched to the breast it suits' />,
+            title: 'Choosing the pair',
+            caption: 'One pair does not fit every breast. Mo/Mo suits small fatty breasts; Mo/Rh hardens the beam slightly for thicker ones; modern digital units favour W/Rh, a tungsten continuum shaped by the rhodium k-edge at 23.2 keV. Watch the spectrum shift as the pair changes.',
+          },
+        },
       ],
     },
     {
-      id: 'compression',
-      title: 'Compression',
-      blurb: 'One paddle, every axis at once.',
-      tags: ['mammography-compression'],
-      kw: /compress|paddle|breast thickness/i,
+      ...S.compression,
       primer: [
         {
           kind: 'principle',
@@ -146,13 +182,20 @@ export const MAMMO: V2Topic = {
           kind: 'trap',
           text: 'The verb is spreads: compression does not magnify the breast, and it lowers dose rather than raising it. Options attaching either to the paddle are wrong.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawCompression} height={340} label='Compression spreading the breast: thickness falls, overlapping structures separate, scatter and dose drop together' />,
+            title: 'One squeeze, every win at once',
+            caption: 'Compression spreads tissue instead of magnifying it, and everything improves at once: a thinner part needs less dose, generates less scatter, holds still, and structures that overlapped come apart. The exam asks for every one of these wins by name.',
+          },
+        },
       ],
     },
     {
-      id: 'geometry',
-      title: 'Tube geometry, focal spots and magnification views',
-      blurb: 'The heel effect put to work, and the smallest focal spots in radiology.',
-      kw: /heel|cathode|anode|chest wall|focal spot|magnif|air.?gap|unsharp|penumbra/i,
+      ...S.geometry,
       primer: [
         {
           kind: 'principle',
@@ -183,14 +226,31 @@ export const MAMMO: V2Topic = {
           kind: 'trap',
           text: 'A magnification factor below 1 is physically impossible with a diverging beam — minification is a nonsense option. And it is the cathode, not the anode, over the chest wall.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawTubeGeometry} height={340} label='The tilted mammography tube: cathode over the chest wall, the heel effect matched to breast thickness' />,
+            title: 'The tube is tilted on purpose',
+            annotation: 'cathode · chest wall · heel effect',
+            caption: 'The cathode sits over the chest wall, where the breast is thickest, so the heel effect delivers its stronger beam exactly there. Focal spots are tiny — 0.3 mm for contact views, 0.1 mm for magnification — because microcalcifications leave no room for geometric blur.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawMagnification} height={340} label='A magnification view: the breast lifted toward the tube on a stand, the air gap rejecting scatter, the 0.1 mm focal spot doing the work' />,
+            title: 'Magnification views',
+            caption: 'Lift the breast toward the tube and the image magnifies ×1.5–2. The air gap under the breast lets scatter miss the detector, so the grid is dropped — and the geometric blur that magnification invites is held down by switching to the 0.1 mm focal spot. Geometry, air gap and focal spot are one decision.',
+          },
+        },
       ],
     },
     {
-      id: 'quality',
-      title: 'Grid, AEC and image quality',
-      blurb: 'The dose that pays for contrast, and the noise that decides visibility.',
-      kw: /grid|bucky|\baec\b|automatic exposure|resolution|lp.?\/?.?mm|line.?pair|microcalcif|noise|mottle|\bcnr\b|contrast.?to.?noise|\bdqe\b|film.?screen/i,
-      fallback: true,
+      ...S.quality,
       primer: [
         {
           kind: 'principle',
@@ -219,14 +279,40 @@ export const MAMMO: V2Topic = {
           summary: 'Why the AEC sits behind the receptor, not in front',
           text: 'In general radiography the AEC chambers sit in front of the cassette, thin enough to be invisible at 60–120 kVp. At 17–20 keV nothing is invisible — a chamber in front would image itself onto every breast. So the mammographic sensor sits under the receptor and measures what has been transmitted, which is also exactly the quantity the image is made of.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawGridAec} height={340} label='The moving grid under a contact view, and the AEC sensor beneath the support ending the exposure' />,
+            title: 'The grid and the AEC',
+            caption: 'Even a compressed breast scatters, so contact views keep a moving grid and accept its dose penalty for the contrast. The AEC sensor sits under the support, measuring what actually penetrated — dense tissue keeps the exposure running longer, automatically.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawResolution} height={340} label='Resolution demands in mammography: microcalcifications a few hundred microns across against detector limits' />,
+            title: 'The sharpest imaging in radiology',
+            caption: 'Microcalcifications a few hundred microns across demand more resolution than anything else in the department. Film-screen reached about 15–20 lp/mm; digital mammography resolves about 5–10 and still outresolves every other modality while winning on contrast and dose.',
+          },
+        },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawCnr} height={340} label='Contrast-to-noise ratio deciding whether a microcalcification is visible at each dose level' />,
+            title: 'CNR decides visibility',
+            caption: 'A microcalcification is seen only if its contrast beats the noise around it. High-DQE digital detectors convert more of the arriving dose into signal, holding contrast-to-noise at doses film could not manage — this is the number the whole design serves.',
+          },
+        },
       ],
     },
     {
-      id: 'tomo',
-      title: 'Tomosynthesis and the dose that pays for screening',
-      blurb: 'Removing superimposition in depth, under a strict dose budget.',
-      tags: ['digital-breast-tomosynthesis'],
-      kw: /tomosynthesis|\bdbt\b|limited arc|projection|slice|mean glandular|\bmgd\b|synthe(sised|tic)|screening/i,
+      ...S.tomo,
       primer: [
         {
           kind: 'principle',
@@ -255,89 +341,21 @@ export const MAMMO: V2Topic = {
           summary: 'Synthetic 2D: why combining views need not double the dose',
           text: 'Screening with a 2D view plus tomosynthesis would double the exposure, so modern software reconstructs a synthesised 2D image from the tomosynthesis data itself. Where it is used, the separate 2D exposure — and its ≈2 mGy — can be dropped.',
         },
+      
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawTomoDose} height={340} label='The tomosynthesis sweep: a limited arc of low-dose projections reconstructed into slices, each 2D view costing about 2 mGy mean glandular dose' />,
+            title: 'The sweep, and the dose that pays for screening',
+            annotation: 'limited arc · slice stack · ≈2 mGy MGD',
+            caption: 'The tube sweeps a limited arc, taking low-dose projections that reconstruct into a stack of slices: overlapping tissue separates at in-plane sharpness a whisker below a standard view. Each 2D view costs about 2 mGy mean glandular dose — kept deliberately low because screening exposes healthy women, repeatedly.',
+          },
+        },
       ],
     },
   ],
-  concepts: [
-    {
-      id: 'compression-wins',
-      title: 'Compression',
-      rule: 'Compression improves dose, scatter, contrast, motion and overlap simultaneously — it spreads tissue, it does not magnify it.',
-      why: 'A thinner part needs fewer photons and generates less scatter; immobilisation removes motion blur; spreading pulls superimposed structures apart.',
-      confusion: 'The verb is spreads — any option crediting the paddle with magnifying the breast or raising the dose is wrong.',
-      match: /compress|paddle/i,
-    },
-    {
-      id: 'mammo-energy',
-      title: 'Why 17–20 keV',
-      rule: 'Mammography works at ≈17–20 keV (tube at 25–32 kVp) because only photoelectric absorption, rising steeply as energy falls, separates tissues that differ so little.',
-      why: 'Photoelectric probability ∝ Z³/E³; above the ≈25–30 keV crossover Compton takes over in soft tissue and subject contrast collapses.',
-      confusion: 'Lower is not automatically better — below the window, absorption in the breast raises dose and kills penetration faster than contrast improves.',
-      match: /\bkev\b|photon energy|photoelectric|low.?energy|soft.?tissue contrast/i,
-    },
-    {
-      id: 'target-filter',
-      title: 'Target–filter K-edge logic',
-      rule: 'The filter K-edge sits just above the useful photons: a Mo filter (K-edge 20 keV) passes the Mo lines at 17.5 and 19.6 keV and strips the bremsstrahlung above them.',
-      why: 'Attenuation jumps sharply at the K-edge, so a single element acts as a band-pass: transparent just below its edge, opaque just above.',
-      confusion: 'W/Rh has no useful tungsten characteristic lines in range — it is the continuum shaped by rhodium’s 23.2 keV K-edge that does the work.',
-      match: /molybdenum|rhodium|k.?edge|target|filter|beryllium/i,
-    },
-    {
-      id: 'tomo',
-      title: 'Tomosynthesis',
-      rule: 'Tomosynthesis removes superimposition by reconstructing slices from a limited-arc sweep of low-dose projections — it does not exceed 2D mammography’s in-plane resolution.',
-      why: 'Each projection sees the breast from a slightly different angle, so structures at different depths separate in reconstruction.',
-      confusion: 'The gain is depth separation, not sharpness; the sweep’s total MGD stays of the order of a single ≈2 mGy view.',
-      match: /tomosynthesis|\bdbt\b/i,
-    },
-    {
-      id: 'mag-air-gap',
-      title: 'Magnification views and the air gap',
-      rule: 'Magnification views (×1.5–2.0) drop the grid: the air gap lets scatter diverge past the detector and does the scatter control itself.',
-      why: 'Scattered photons leave the breast obliquely, and with a gap they simply miss — no grid, no Bucky dose penalty.',
-      confusion: 'A magnification factor below 1 is impossible with a diverging beam.',
-      match: /air.?gap|magnif/i,
-    },
-    {
-      id: 'focal-spots',
-      title: 'Focal spots',
-      rule: 'Mammography uses a 0.3 mm focal spot for contact views and 0.1 mm for magnification views.',
-      why: 'Geometric unsharpness Ug = f × OID/SOD: deliberately raising the breast (OID ↑) demands the smallest focal spot in radiology.',
-      match: /focal spot|0\.1\s?mm|0\.3\s?mm/i,
-    },
-    {
-      id: 'cathode-chest-wall',
-      title: 'Cathode over the chest wall',
-      rule: 'The cathode sits over the chest wall, so the heel effect sends the more intense part of the beam through the thickest tissue.',
-      why: 'Intensity falls towards the anode side because shallow-angle photons are absorbed in the target itself; mammography turns that liability into even exposure.',
-      confusion: 'It is the cathode — not the anode — over the chest wall.',
-      match: /heel|cathode|anode.*(side|end)|chest wall/i,
-    },
-    {
-      id: 'aec',
-      title: 'The mammographic AEC',
-      rule: 'The AEC sensor sits under the image receptor: it measures what the breast transmitted, ends the exposure when enough has arrived, and picks target–filter–kVp from a test pulse.',
-      why: 'Digital detectors forgive overexposure silently, so the AEC is what holds dose high enough to beat mottle and low enough to stay justified.',
-      confusion: 'Behind the receptor, not in front — at 17–20 keV a chamber in front would image itself.',
-      match: /\baec\b|automatic exposure|test pulse/i,
-    },
-    {
-      id: 'resolution',
-      title: 'The sharpest system in radiology',
-      rule: 'Film-screen mammography reached ~15–20 lp/mm and digital resolves ~5–10 — still ahead of general DR (3–5) and CT (1–2).',
-      why: 'Microcalcifications a few hundred microns across set the requirement; small focal spots, fine detectors, compression and short exposures deliver it.',
-      confusion: 'If a stem attaches 15 lp/mm to any other modality, the number belongs to mammography.',
-      match: /lp.?\/?.?mm|line.?pair|spatial resolution|sharpest|microcalcif/i,
-    },
-    {
-      id: 'cnr-noise',
-      title: 'CNR and dose',
-      rule: 'Visibility is decided by contrast-to-noise ratio, and noise follows photon statistics: halve the dose and CNR falls by √2.',
-      why: 'Quantum mottle ∝ 1/√dose. High-DQE digital detectors convert more of the arriving dose into signal, holding CNR at lower dose.',
-      match: /\bcnr\b|contrast.?to.?noise|noise|mottle|\bdqe\b|quantum/i,
-    },
-  ],
+  concepts: CONCEPTS.mammo,
   essentials: [
     'Working beam ≈17–20 keV from a tube at 25–32 kVp: photoelectric contrast for tissues that differ by almost nothing.',
     'Mo target lines at 17.5 and 19.6 keV; the Mo filter K-edge at 20 keV strips the bremsstrahlung just above them.',
@@ -352,5 +370,7 @@ export const MAMMO: V2Topic = {
     'Noise ∝ 1/√dose — halving the dose cuts CNR by √2; high DQE holds CNR at lower dose.',
     'Mean glandular dose ≈2 mGy per 2D view; tomosynthesis separates overlap in depth but does not beat 2D in-plane resolution.',
   ],
-  labs: [{ label: 'Mammography — the guided lesson', to: '/xray-lab/mammography' }],
+  /* All ten lesson drawings are embedded above, at the section each teaches;
+     the guided lesson remains at /xray-lab/mammography via the dashboard. */
+  labs: [],
 }

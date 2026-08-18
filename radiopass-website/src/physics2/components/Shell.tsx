@@ -1,13 +1,19 @@
 /**
- * The V2 chrome. One slim paper header — wordmark, three destinations, one
- * Continue chip — and a quiet footer that owns the account state and the door
- * back to the current site. Everything else on screen is content.
+ * The course chrome. One slim paper header — wordmark, three destinations, one
+ * Continue chip — and a quiet footer that owns the account state.
+ * Everything else on screen is content.
+ *
+ * The footer used to end with "Switch to the current site", which was honest
+ * while this was an alternative experience running beside the old one. There is
+ * no other site now: /physics is the same product's front door, reachable from
+ * the wordmark like any other page.
  */
 
 import { useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { QB_TOTALS } from '../../qbank/data'
+import { PHYSICS_HREF } from '../../physics/routes'
 import { readV2State, noteVisit } from '../lib/store'
 import '../v2.css'
 
@@ -42,21 +48,25 @@ export function V2Shell({
     <div className="v2-root">
       <header className="v2-header">
         <div className="v2-wrap v2-header-inner">
-          <Link to="/physics-v2" className="v2-brand" aria-label="RadioPass Physics home">
+          <Link to={PHYSICS_HREF.home} className="v2-brand" aria-label="RadioPass Physics home">
             <b>RADIOPASS</b>
             <span>Physics</span>
           </Link>
           <nav className="v2-nav" aria-label="Physics">
-            <NavLink to="/physics-v2" end className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
+            <NavLink to={PHYSICS_HREF.home} end className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
               Syllabus
             </NavLink>
-            <NavLink to="/physics-v2/questions" className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
+            <NavLink to={PHYSICS_HREF.questions} className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
               Question bank
             </NavLink>
-            <NavLink to="/physics-v2/review" className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
+            <NavLink to={PHYSICS_HREF.review} className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
               Review
             </NavLink>
-            <a href="/question-bank/mock">Mock exam</a>
+            {/* Was a plain <a>, which left the SPA and reloaded the whole app
+                to reach a route React Router already owns. */}
+            <NavLink to={PHYSICS_HREF.mock} className={({ isActive }: { isActive: boolean }) => (isActive ? 'is-on' : '')}>
+              Mock exam
+            </NavLink>
           </nav>
           {showContinue && (
             <Link to={resume.path} className="v2-continue" title={`Continue: ${resume.label}`}>
@@ -82,8 +92,6 @@ export function V2Shell({
                 <Link to="/login">Log in</Link> to keep progress across devices
               </>
             )}
-            {' · '}
-            <Link to="/physics">Switch to the current site</Link>
           </span>
         </div>
       </footer>

@@ -116,9 +116,14 @@ const SOLO: CSSProperties = { maxWidth: 560, margin: '0 auto' }
 export function CtBackProjection() {
   return (
     <div style={SOLO}>
+      {/* The payoff of this scene — the kernel applied, the haze resolving into
+          a sharp disc — arrives at 9 s of its 11 s cycle. A reduced-motion
+          visitor gets one frame, so it is taken from there rather than from the
+          default 3.4 s, where the picture is still a half-built haze. */}
       <DrawCanvas
         draw={drawBackProjection}
         height={340}
+        settledAt={9.6}
         label="Back-projection: profiles smeared back across the image plane one at a time, the disc emerging as a haze, then sharpening once the filter kernel is applied"
       />
     </div>
@@ -134,9 +139,15 @@ const TURNS_AT_UNIT_PITCH = 6
  * A reduced-motion visitor gets one settled frame instead of a loop, so the
  * canvas has to be remounted for a new pitch to be drawn at all. Everyone else
  * keeps the running helix and simply watches it rewind.
+ *
+ * Read at module load, so it has to survive being imported outside a browser:
+ * jsdom supplies a window but no matchMedia, and this file is reached by any
+ * test that touches the topic list.
  */
 const REDUCED_MOTION =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function pitchReading(pitch: number): string {
   if (pitch < 1) {

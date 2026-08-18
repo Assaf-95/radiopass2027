@@ -90,7 +90,7 @@ function SubjectPractice({ subject }: { subject: QbSubject }) {
 
   const onScored = useCallback(
     (id: string, correct: number, outOf: number, choices: Record<string, boolean>) => {
-      recordQbScore(id, correct, outOf, choices, questions.find((q) => q.id === id)?.topic)
+      recordQbScore(id, correct, outOf, choices, questions.find((q) => q.id === id)?.topic, 'bank')
       setProgressVersion((v) => v + 1)
     },
     [questions],

@@ -39,6 +39,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { record } from '../lib/learner'
 import { CommonTrap, FormulaCard, HighYield } from '../design/primitives'
 import { COURSE_MODULES, coursePosition, moduleOrdinal, practiceHref } from '../physics/course'
+import { outcomesForModule } from '../physics/outcomes'
 import { useReducedMotion } from '../home/fx'
 import './labs.css'
 import { TaskGate } from './task'
@@ -602,7 +603,7 @@ export function LessonPage({ meta, steps }: { meta: LessonMeta; steps: LessonSte
             <div className="lx-outcomes">
               <p className="lx-outcomes-title">By the end you should understand</p>
               <ol>
-                {course.module.outcomes.map((o) => (
+                {outcomesForModule(course.module.id).map((o) => (
                   <li key={o}>{o}</li>
                 ))}
               </ol>

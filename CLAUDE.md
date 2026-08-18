@@ -179,3 +179,36 @@ Channels that matter: **Telegram** (highest priority — large FRCR candidate gr
 **Reddit**, **Facebook**, **WhatsApp groups**, **Instagram**. Deliverables exist at
 `docs/RadioPass-Launch-Strategy.md`, `docs/RadioPass-Community-Map.docx`,
 `docs/RadioPass-Outreach-Pack.docx`. A professional email address is still outstanding.
+
+---
+
+## State as of 19 Aug 2026 — the physics merge landed
+
+All six phases of `radiopass-website/docs/PHYSICS-MERGE-AUDIT.md` are done (each phase heading
+there carries its commit hash), on branch `physics-visual-course-and-merge-audit`. Do not
+re-propose any of it:
+
+- **One product at `/physics`.** No learner-facing "V1"/"V2". `/physics-v2/*` redirects.
+  Route constants live in `src/physics/routes.ts`; `src/physics/routes.test.ts` fails the
+  build on drift.
+- **Progress model**: attempts accumulate per question (`QbAttempt` v2, lazy migration, never
+  rewritten on read). Re-tests clear wrong answers; mocks write to the question record; two
+  labelled accuracies (first/latest). Never reintroduce a single unlabelled "accuracy".
+- **Question→section mapping is a checked-in file**, `src/physics2/mapping/questionMap.ts`,
+  validated by `npm run physics:map` (E1–E6 gate the build via scripts/run-tests.sh).
+- **The free sample is decided and live at `/free-trial`**: X-ray §1.1–1.3 + MRI §7.1 + the
+  question set x57/b417/b415/x53/b385, configured in `TRIAL` in `src/lib/access.ts` and pinned
+  by tests. The gate wording is the owner's, verbatim: "Sign up if you would like to progress
+  to the next set."
+- **Deployment**: `npm run package` → `deploy/` is THE distribution (drop-in folder; Netlify
+  stays deleted). **Rebuild it after any change that should ship** — it is not rebuilt
+  automatically, and a stale bundle once carried an abandoned experiment.
+
+### 3D models (owner-made, in ~/Downloads) — the standing rule
+
+Only `sodium-atom.glb` is mounted (it opens X-ray §1.1). The others (tungsten, hydrogen-spin,
+rotating-anode tube, gamma-detector-head) are **paused by the owner's explicit correction**:
+adding several at once, restyled, looked bad and was reverted. The rule now: **one model at a
+time, rendered with its exported materials (no re-lighting, no re-texturing), and a screenshot
+shown to the owner BEFORE it is mounted in any topic.** `SIMPLEFY -atom.glb` is mislabelled
+physics (K2 L4 M8, no nucleus) — do not use it.

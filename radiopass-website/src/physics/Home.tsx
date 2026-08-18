@@ -15,22 +15,42 @@
  * dressed as progress.
  *
  * Two things are deliberately NOT shown:
- *   - mock performance, because finished papers are not yet recorded anywhere
- *     (the mock store holds one in-flight attempt and clears it on submission);
+ *   - mock performance. Finished papers ARE recorded — Mock.tsx emits
+ *     mock.completed and learner.ts keeps the history — but the papers write
+ *     nothing back to the question record, so a candidate who sat three of
+ *     them still reads "0 answered" here. Surfacing the history before that is
+ *     fixed would put two contradictory accounts of the same work on one
+ *     screen. Both halves land together in the progress pass;
  *   - any single "exam readiness" percentage, which would need a defensible
  *     methodology and currently has none.
- * Both are noted in the report rather than faked here.
+ *
+ * THE COURSE SECTION IS THE MERGE. This page used to list nine modules linking
+ * to nine laboratories, while a second dashboard at /physics-v2 listed the same
+ * nine subjects as topics linking to their primers. One product, one list: the
+ * rows below are the topics, and each carries both records — the lessons its
+ * learner has finished, and how its slice of the question bank is going.
  */
 
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
+import { useEffect, useState } from 'react'
+
 import { QB_QUESTIONS, QB_TOTALS } from '../qbank/data'
-import { readQbProgress, readQbMarks } from '../qbank/Shell'
+import {
+  readQbProgress,
+  readQbMarks,
+  standingOf,
+  subscribeQbProgress,
+} from '../qbank/Shell'
 import { readProgress as readUsProgress } from '../us/components/progress'
-import { completedModules, lastOfType } from '../lib/learner'
-import { QB_SUBJECTS } from '../qbank/types'
-import { COURSE_MODULES, COURSE_PARTS } from './course'
+import { US_STAGES } from '../us/components/Layout'
+import { SECTIONS as MRI_SECTIONS } from '../mri5/sections'
+import { completedModules, lastOfType, mockHistory } from '../lib/learner'
+import { V2_TOPICS } from '../physics2/topics'
+import { topicStanding } from '../physics2/lib/derive'
+import { COURSE_PARTS } from './course'
+import { PHYSICS_HREF, topicHref } from './routes'
 import './physicshome.css'
 
 /* ------------------------------------------------------------------ *
@@ -38,16 +58,26 @@ import './physicshome.css'
  * ------------------------------------------------------------------ */
 
 type Snapshot = {
+  /** Questions in the BANK that have been attempted. Never the store's size. */
   answered: number
-  correct: number
-  outOf: number
+  /** Stem marks on first sittings — immutable. */
+  firstCorrect: number
+  firstOutOf: number
+  /** Stem marks on the most recent sitting of each — moves with re-testing. */
+  latestCorrect: number
+  latestOutOf: number
   flagged: number
-  labsVisited: number
-  /** The subject with the most recent submitted answer, if any. */
-  lastSubject: { id: string; name: string; at: string } | null
-  /** The most recent module the learner opened, if that is newer. */
+  /** Ultrasound experiment pages opened, out of the real total. */
+  usStagesVisited: number
+  /** MRI sections opened, out of the real total. */
+  mriSectionsVisited: number
+  /** Lessons finished, out of the number the course actually declares. */
+  lessonsDone: number
+  lessonsTotal: number
+  /** Finished mock papers, newest first. */
+  mocks: ReturnType<typeof mockHistory>
+  /** The most recent lesson or section the learner opened. */
   lastModule: { path: string; topic?: string; at: string } | null
-  modulesCompleted: number
   hasActivity: boolean
 }
 
@@ -56,57 +86,104 @@ function readSnapshot(): Snapshot {
   const marks = readQbMarks()
   const us = readUsProgress()
 
-  const entries = Object.entries(progress)
-  let correct = 0
-  let outOf = 0
-  for (const [, a] of entries) {
-    correct += a.correct
-    outOf += a.outOf
-  }
-
-  /* The most recently submitted question, resolved back to its subject. Only
-     attempts that actually carry a timestamp count — attempts recorded before
-     submittedAt existed are still valid scores, they simply cannot date
-     themselves, and guessing a date for them would be inventing history. */
-  let lastId: string | null = null
-  let lastAt = ''
-  for (const [id, a] of entries) {
-    if (a.submittedAt && a.submittedAt > lastAt) {
-      lastAt = a.submittedAt
-      lastId = id
+  /* Counted against the BANK, not against the store.
+     `Object.keys(progress).length` is the raw store size, which includes any
+     id that has since left the bank — ids come out of a fingerprint dedupe, so
+     that is a real possibility — and the dashboard would cheerfully print
+     "470 of 467 answered". Intersecting with the bank cannot exceed it. */
+  let answered = 0
+  let firstCorrect = 0
+  let firstOutOf = 0
+  let latestCorrect = 0
+  let latestOutOf = 0
+  for (const q of QB_QUESTIONS) {
+    const s = standingOf(progress[q.id])
+    if (s.attemptCount === 0) continue
+    answered += 1
+    if (s.firstAttempt) {
+      firstCorrect += s.firstAttempt.correct
+      firstOutOf += s.firstAttempt.outOf
     }
-  }
-
-  let lastSubject: Snapshot['lastSubject'] = null
-  if (lastId) {
-    const question = QB_QUESTIONS.find((q) => q.id === lastId)
-    const subject = question
-      ? QB_SUBJECTS.find((s) => s.sections.some((sec) => sec.topics.includes(question.topic)))
-      : undefined
-    if (subject) lastSubject = { id: subject.id, name: subject.name, at: lastAt }
+    if (s.latestAttempt) {
+      latestCorrect += s.latestAttempt.correct
+      latestOutOf += s.latestAttempt.outOf
+    }
   }
 
   const flagged = Object.values(marks).filter((m) => m.flagged).length
 
-  /* The other half of "where was I": a lesson the learner opened but did not
-     answer questions in leaves no trace in the progress store, only on the
-     timeline. Continue picks whichever of the two is genuinely more recent. */
+  /* Where was I. A lesson the learner opened but answered no questions in
+     leaves no trace in the progress store, only on the timeline — and since
+     the course engine now records module.started too, this one event type is
+     the single author of Continue for both the laboratories and the primers.
+     There is no second candidate to arbitrate against any more. */
   const moduleEvent = lastOfType('module.started', 'physics')
   const lastModule = moduleEvent
     ? { path: moduleEvent.contentId, topic: moduleEvent.topic, at: moduleEvent.at }
     : null
 
+  /* Lessons, not "modules". completedModules() returns pathnames, and the
+     dashboard used to print that array's length as "modules completed" — so a
+     learner four lessons into X-ray alone read "4 modules completed" while the
+     list below showed one tick. It also counted off-spine routes, so it could
+     exceed nine. Intersecting with the spine gives a number that means what it
+     says and cannot run past its own denominator. */
+  const spine = new Set(V2_TOPICS.flatMap((t) => t.lessons.map((l) => l.path)))
+  const done = completedModules('physics')
+  const lessonsDone = done.filter((path) => spine.has(path)).length
+
+  /* "Laboratories opened" counted us.visited, whose only writer is the
+     ultrasound layout — so it counted ULTRASOUND EXPERIMENT PAGES. Opening
+     /ct-lab or /nm-lab contributed nothing, and a learner who finished
+     ultrasound read "21 laboratories opened". Named for what it is now, and
+     given the denominator that makes it legible. */
+  const usPaths = new Set(US_STAGES.map((s) => s.path))
+  const usStagesVisited = us.visited.filter((p) => usPaths.has(p)).length
+
+  const mriPaths = new Set(MRI_SECTIONS.map((s) => `/mri/${s.slug}`))
+  const mriSectionsVisited = done.filter((p) => mriPaths.has(p)).length
+
+  const mocks = mockHistory('physics')
+
   return {
-    answered: entries.length,
-    correct,
-    outOf,
+    answered,
+    firstCorrect,
+    firstOutOf,
+    latestCorrect,
+    latestOutOf,
     flagged,
-    labsVisited: us.visited.length,
-    lastSubject,
+    usStagesVisited,
+    mriSectionsVisited,
+    lessonsDone,
+    lessonsTotal: spine.size,
+    mocks,
     lastModule,
-    modulesCompleted: completedModules('physics').length,
-    hasActivity: entries.length > 0 || us.visited.length > 0 || lastModule !== null,
+    hasActivity:
+      answered > 0 || usStagesVisited > 0 || mocks.length > 0 || lastModule !== null,
   }
+}
+
+/**
+ * The snapshot, kept current.
+ *
+ * It used to be `useMemo(readSnapshot, [])` — read once at mount and never
+ * again. Every store is synced, and `pullAndMerge` resolves AFTER mount, so on
+ * a new device or a cold sign-in the dashboard painted the pre-sync numbers
+ * and kept them until a manual reload. A candidate with a full record was
+ * shown the empty state and told "nothing recorded yet". That reads as data
+ * loss, and it is the first thing they see.
+ *
+ * Every store has always exposed subscribe(); nothing used it.
+ */
+function useSnapshot(): Snapshot {
+  const [snap, setSnap] = useState(readSnapshot)
+  useEffect(() => {
+    const refresh = () => setSnap(readSnapshot())
+    // A sync can land between the first render and this effect.
+    refresh()
+    return subscribeQbProgress(refresh)
+  }, [])
+  return snap
 }
 
 /* ------------------------------------------------------------------ *
@@ -130,23 +207,41 @@ function moduleState(done: Set<string>, lessonPaths: string[]): { done: number; 
   }
 }
 
-const PRACTICE_DESTINATIONS: { name: string; to: string; blurb: string }[] = [
-  {
-    name: 'Question bank',
-    to: '/question-bank',
-    blurb: 'True-or-false stems in the real format, each one corrected and explained where you answered it.',
-  },
-  {
-    name: 'Mock exams',
-    to: '/question-bank/mock',
-    blurb: 'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
-  },
-  {
-    name: 'Progress & revision',
-    to: '/question-bank/review/incorrect',
-    blurb: 'Everything you answered wrong, everything you flagged, and the topics worth another pass.',
-  },
-]
+/**
+ * The three practice doors, absorbed from the second dashboard.
+ *
+ * They pointed at /question-bank/* — the older surfaces, which do the same
+ * three jobs against the same shared record but outside the course. One
+ * product means one door each, and the course's own Review knows which topic
+ * a wrong answer belongs to, which the generic review list does not.
+ *
+ * `count` is a real number or nothing: the door never claims work exists that
+ * the learner's record does not contain.
+ */
+function practiceDestinations(wrong: number): { name: string; to: string; blurb: string }[] {
+  return [
+    {
+      name: 'Question bank',
+      to: PHYSICS_HREF.questions,
+      blurb:
+        'True-or-false stems in the real format, each one corrected and explained where you answered it.',
+    },
+    {
+      name: 'Mock exams',
+      to: PHYSICS_HREF.mock,
+      blurb:
+        'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
+    },
+    {
+      name: 'Review',
+      to: PHYSICS_HREF.review,
+      blurb:
+        wrong > 0
+          ? `${wrong} question${wrong === 1 ? '' : 's'} answered wrong and ready to re-test, with the topics worth another pass.`
+          : 'Everything you answer wrong gathers here for re-testing, topic by topic.',
+    },
+  ]
+}
 
 /* ------------------------------------------------------------------ *
  * Page
@@ -162,8 +257,24 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 export default function PhysicsHome() {
-  const s = useMemo(readSnapshot, [])
-  const accuracy = s.outOf > 0 ? Math.round((s.correct / s.outOf) * 100) : null
+  const s = useSnapshot()
+  const pct = (c: number, o: number) => (o > 0 ? Math.round((c / o) * 100) : null)
+  const firstAccuracy = pct(s.firstCorrect, s.firstOutOf)
+  const latestAccuracy = pct(s.latestCorrect, s.latestOutOf)
+
+  /* The nine topics with their standing. Each topic's pool is resolved from
+     the shared question record, so these are the same numbers the topic page
+     and Review show — not a second reckoning of the same work. Recomputed
+     whenever the snapshot changes, so a sync landing after mount repaints the
+     rows as well as the headline. */
+  const topics = useMemo(
+    () => V2_TOPICS.map((topic) => ({ topic, standing: topicStanding(topic) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [s],
+  )
+  const wrong = topics.reduce((n, t) => n + t.standing.wrong, 0)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const done = useMemo(() => new Set(completedModules('physics')), [s])
 
   return (
     <main className="ph">
@@ -190,42 +301,74 @@ export default function PhysicsHome() {
 
         {s.hasActivity ? (
           <>
+            {/* Every label here says exactly which quantity it is. Four of
+                these used to be mislabelled rather than wrong — the numbers
+                were real, they simply did not measure what they claimed. */}
             <div className="ph-stats">
               <Stat value={`${s.answered}`} label={`of ${QB_TOTALS.questions} questions answered`} />
-              {accuracy !== null && <Stat value={`${accuracy}%`} label={`${s.correct} of ${s.outOf} statements correct`} />}
-              {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
-              {s.labsVisited > 0 && <Stat value={`${s.labsVisited}`} label="laboratories opened" />}
-              {s.modulesCompleted > 0 && (
-                <Stat value={`${s.modulesCompleted}`} label="modules completed" />
+              {latestAccuracy !== null && (
+                <Stat
+                  value={`${latestAccuracy}%`}
+                  label={`${s.latestCorrect} of ${s.latestOutOf} statements right, latest attempt`}
+                />
               )}
+              {/* The exam predictor. Only worth its own tile once re-testing
+                  has moved the two apart; identical numbers side by side just
+                  look like a bug. */}
+              {firstAccuracy !== null && firstAccuracy !== latestAccuracy && (
+                <Stat value={`${firstAccuracy}%`} label="first time, cold" />
+              )}
+              {s.lessonsDone > 0 && (
+                <Stat value={`${s.lessonsDone}`} label={`of ${s.lessonsTotal} lessons finished`} />
+              )}
+              {s.usStagesVisited > 0 && (
+                <Stat
+                  value={`${s.usStagesVisited}`}
+                  label={`of ${US_STAGES.length} ultrasound experiments opened`}
+                />
+              )}
+              {s.mriSectionsVisited > 0 && (
+                <Stat
+                  value={`${s.mriSectionsVisited}`}
+                  label={`of ${MRI_SECTIONS.length} MRI sections read`}
+                />
+              )}
+              {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
             </div>
 
-            {/* One Continue, pointing at whichever activity is genuinely the
-                most recent — a lesson or a subject in the bank. Never both,
-                and never a guess when there is no history at all. */}
-            {(() => {
-              const useModule =
-                s.lastModule && (!s.lastSubject || s.lastModule.at > s.lastSubject.at)
-              if (useModule && s.lastModule) {
-                return (
-                  <Link className="ph-continue" to={s.lastModule.path}>
-                    <span className="ph-continue-label">Continue</span>
-                    <span className="ph-continue-name">
-                      {s.lastModule.topic ?? 'Your last lesson'}
-                    </span>
-                    <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
-                  </Link>
-                )
-              }
-              if (!s.lastSubject) return null
-              return (
-                <Link className="ph-continue" to={`/question-bank/${s.lastSubject.id}`}>
-                  <span className="ph-continue-label">Continue</span>
-                  <span className="ph-continue-name">{s.lastSubject.name}</span>
-                  <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
-                </Link>
-              )
-            })()}
+            {/* Mock papers. These WERE recorded all along — Mock.tsx has
+                emitted mock.completed since the log existed — and the
+                dashboard simply never asked. Showing the most recent, with the
+                count, because one score with no history is a fact and a
+                history is a trend. */}
+            {s.mocks.length > 0 && (
+              <p className="ph-mocks">
+                {s.mocks.length} mock paper{s.mocks.length === 1 ? '' : 's'} sat · latest{' '}
+                <strong>
+                  {s.mocks[0].correct}/{s.mocks[0].outOf}
+                </strong>{' '}
+                ({Math.round((s.mocks[0].correct / Math.max(1, s.mocks[0].outOf)) * 100)}%) on{' '}
+                {s.mocks[0].paper}
+              </p>
+            )}
+
+            {/* ONE Continue, with one author.
+                There used to be two candidates arbitrated on a timestamp — the
+                last lesson, and the last question-bank subject — because the
+                course engine recorded nothing to the shared timeline and had
+                to be inferred from question activity. It records
+                module.started now, so the timeline knows about primers,
+                lessons and sections alike, and the arbitration is gone with
+                the ambiguity that needed it. */}
+            {s.lastModule && (
+              <Link className="ph-continue" to={s.lastModule.path}>
+                <span className="ph-continue-label">Continue</span>
+                <span className="ph-continue-name">
+                  {s.lastModule.topic ?? 'Where you left off'}
+                </span>
+                <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
+              </Link>
+            )}
           </>
         ) : (
           /* No activity. Say that, and give one obvious first step — never a
@@ -235,18 +378,30 @@ export default function PhysicsHome() {
               Nothing recorded yet. RadioPass tracks what you answer and where you have been, and
               this is where it will appear.
             </p>
-            <Link className="button button-primary" to="/visual-lab">
-              Start with the laboratories <span aria-hidden="true">&rarr;</span>
+            {/* The free sample, not a laboratory. The laboratories now ask
+                for an account, so pointing a first-time visitor at one would
+                make their very first click a wall — and the sample is the
+                thing built to be their first click. */}
+            <Link className="button button-primary" to="/free-trial">
+              Start with the free sample <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
         )}
       </section>
 
       {/* --- The course ----------------------------------------------------
-          The syllabus itself, parts in order, each module carrying the
-          learner's own record. This replaced a flat list of five equal
+          The syllabus itself, parts in order, each topic carrying the
+          learner's own record. This replaced a flat list of equal
           "destinations": a course home that cannot show the course was the
           clearest symptom of the pages-not-a-course problem.
+
+          A row is a TOPIC now, not a laboratory. The distinction matters: the
+          topic is where the primer, the simulations and that subject's slice
+          of the question bank all meet, so it is the one address that can
+          honestly answer "how am I doing on nuclear medicine". The
+          laboratories are still there, at the same URLs they always had, but
+          they are reached through the topic that teaches them rather than
+          competing with it for the same row.
 
           Each part carries its modality's instrument mark — the same drawn
           vocabulary as the laboratory cards, compressed to an emblem. The
@@ -255,9 +410,8 @@ export default function PhysicsHome() {
       <section className="ph-course" aria-labelledby="ph-course-h">
         <h2 id="ph-course-h">The course</h2>
         {COURSE_PARTS.map((part, pi) => {
-          const modules = COURSE_MODULES.filter((m) => m.part === pi)
-          if (modules.length === 0) return null
-          const done = new Set(completedModules('physics'))
+          const inPart = topics.filter((t) => t.topic.part === pi)
+          if (inPart.length === 0) return null
           return (
             <div className="ph-part" key={part.id}>
               <div className="ph-part-head">
@@ -271,36 +425,40 @@ export default function PhysicsHome() {
                 </div>
               </div>
               <ul>
-                {modules.map((m) => {
-                  const state = moduleState(done, m.lessons.map((l) => l.path))
-                  const isDeep = m.id === 'mri' || m.id === 'us'
+                {inPart.map(({ topic, standing }) => {
+                  /* Two independent records, and the row shows whichever the
+                     learner has actually made. The tick is lesson completion,
+                     keyed by pathname on the shared timeline; the meta column
+                     is the question pool. A learner who has read everything
+                     and answered nothing sees a tick and no numbers, which is
+                     the truth about where they are. */
+                  const state = moduleState(done, topic.lessons.map((l) => l.path))
+                  const finished = state.total > 0 && state.done === state.total
                   return (
-                    <li key={m.id}>
-                      <Link to={m.home}>
-                        <span className={state.done === state.total && state.done > 0 ? 'ph-mod-state is-done' : 'ph-mod-state'}>
-                          {state.done === state.total && state.done > 0
-                            ? '✓'
-                            : state.done > 0
-                            ? `${state.done}/${state.total}`
-                            : ''}
+                    <li key={topic.id}>
+                      <Link to={topicHref(topic.id)}>
+                        <span className={finished ? 'ph-mod-state is-done' : 'ph-mod-state'}>
+                          {finished ? '✓' : state.done > 0 ? `${state.done}/${state.total}` : ''}
                         </span>
-                        <strong>{m.title}</strong>
-                        <span className="ph-mod-blurb">{m.blurb}</span>
+                        <strong>{topic.title}</strong>
+                        <span className="ph-mod-blurb">{topic.tagline}</span>
                         <span className="ph-mod-meta">
-                          {isDeep
-                            ? '21 stages'
-                            : state.total > 1
-                            ? `${state.total} lessons`
-                            : ''}
+                          {standing.answered > 0
+                            ? `${standing.answered}/${standing.total} answered${
+                                standing.latestAccuracy !== null
+                                  ? ` · ${Math.round(standing.latestAccuracy * 100)}% now`
+                                  : ''
+                              }${standing.wrong > 0 ? ` · ${standing.wrong} to fix` : ''}`
+                            : `${standing.total} questions`}
                         </span>
                       </Link>
                     </li>
                   )
                 })}
-                {/* Part V closes into the exam itself. */}
+                {/* The last part closes into the exam itself. */}
                 {part.id === 'safety' && (
                   <li>
-                    <Link to="/question-bank/mock">
+                    <Link to={PHYSICS_HREF.mock}>
                       <span className="ph-mod-state" />
                       <strong>Mock papers</strong>
                       <span className="ph-mod-blurb">
@@ -320,7 +478,7 @@ export default function PhysicsHome() {
       <section className="ph-destinations" aria-labelledby="ph-dest-h">
         <h2 id="ph-dest-h">Practise</h2>
         <ul>
-          {PRACTICE_DESTINATIONS.map((d) => (
+          {practiceDestinations(wrong).map((d) => (
             <li key={d.to}>
               <Link to={d.to}>
                 <strong>{d.name}</strong>
@@ -332,16 +490,9 @@ export default function PhysicsHome() {
       </section>
 
       {/* Secondary. The fact bank and the cinematic tour are worth reaching
-          and are not peers of the five destinations above — putting them there
-          would say the branch has seven equal parts when it has five. */}
+          and are not peers of the three destinations above — putting them
+          there would say the branch has ten equal parts when it has three. */}
       <section className="ph-secondary" aria-label="Also in Physics">
-        {/* The alternative experience. It had no door anywhere on the site —
-            deliberate while it was unfinished, and simply undiscoverable once
-            it was worth showing. Marked as a preview so nobody mistakes it for
-            the finished course. */}
-        <Link to="/physics-v2" className="ph-secondary-new">
-          Physics V2 — the new experience
-        </Link>
         <Link to="/fact-bank">Fact bank</Link>
         <Link to="/ultrasound-lab/facts">Ultrasound facts</Link>
         <Link to="/mri-lab/motion">MRI in motion</Link>

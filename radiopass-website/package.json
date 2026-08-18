@@ -15,7 +15,8 @@
     "anatomy:baseline": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts --write",
     "questions:validate": "node --import ./scripts/ts-register.mjs scripts/questions-validate.ts",
     "atlas:validate": "node --import ./scripts/ts-register.mjs scripts/atlas-validate.ts",
-    "atlas:report": "node --import ./scripts/ts-register.mjs scripts/atlas-report.ts"
+    "atlas:report": "node --import ./scripts/ts-register.mjs scripts/atlas-report.ts",
+    "physics:map": "node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts"
   },
   "dependencies": {
     "@react-three/fiber": "^9.7.0",
