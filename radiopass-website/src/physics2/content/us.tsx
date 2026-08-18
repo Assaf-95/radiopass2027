@@ -21,6 +21,7 @@ import { FreqPenetration } from '../components/sims/FreqPenetration'
 import { DopplerAliasing } from '../components/sims/DopplerAliasing'
 import { UsImpedance } from '../components/sims/UsImpedance'
 import { UsArtefacts } from '../components/sims/UsArtefacts'
+import { UsTransducer, UsWave } from '../components/sims/UsStages'
 
 /** This topic's matching rules. The primer below is what stays here. */
 const S = SECTIONS.us
@@ -69,6 +70,18 @@ export const US: V2Topic = {
           kind: 'detail',
           summary: 'Why the speed formula carries a square root',
           text: 'c = 1/√(κρ), with κ the compressibility and ρ the density. A stiffer (less compressible) medium passes the disturbance on faster — but because the relationship is a square root, speed is not simply the reciprocal of compressibility, and doubling κ does not halve c. Compressibility and density are independent material properties, which is why the dense-means-slow intuition fails for bone.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <UsWave />,
+            title: 'The wave, and what owns its speed',
+            annotation: 'drag the frequency · four media',
+            caption:
+              'Sound is a mechanical wave, so it needs matter and the matter sets the speed — 1540 m/s in soft tissue, four times that in bone, a fifth of it in air. Change the medium and watch the wavelength change with it while the frequency stays exactly where you put it. The scanner assumes 1540 m/s no matter what, which is why fat measures slightly deep and why air stops the examination.',
+            flush: true,
+          },
         },
       ],
     },
@@ -211,6 +224,18 @@ export const US: V2Topic = {
           summary: 'The damping chain, link by link',
           text: 'More backing damping → fewer cycles per pulse → shorter spatial pulse length → wider bandwidth (a short pulse is built from many frequencies) → lower Q factor → better axial resolution → lower sensitivity, because a shorter pulse carries less energy and weak deep echoes are harder to detect. A continuous-wave probe is the opposite extreme: essentially one frequency, high Q, no imaging pulse at all. One control, six consequences — and the exam can start the chain at any link.',
         },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <UsTransducer />,
+            title: 'Inside the probe',
+            annotation: 'take it apart · change the damping',
+            caption:
+              'Pull it apart and look at the order: backing block, piezoelectric element, matching layer, lens. The backing block exists to STOP the crystal ringing — a short pulse is what buys axial resolution, and it is paid for in sensitivity and bandwidth. Turn the damping down and watch the pulse lengthen into exactly the ringing a good probe is built to prevent.',
+            flush: true,
+          },
+        },
       ],
     },
     {
@@ -351,5 +376,5 @@ export const US: V2Topic = {
     'MI = p₋/√f warns of cavitation: caution at 0.7 with contrast or gas bodies, 0.3 for neonatal lung.',
     'TI estimates heating and is not a temperature: restrict time above 0.7, obstetric ceiling 3.0; pulsed Doppler is the hottest mode, B-mode the gentlest.',
   ],
-  labs: [{ label: 'The ultrasound laboratory — 21 experiments', to: '/ultrasound-lab' }],
+  labs: [],
 }

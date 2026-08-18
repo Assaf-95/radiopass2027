@@ -34,6 +34,7 @@ import {
   drawNmDose,
 } from '../../labs/nm'
 import { GammaCameraBuild, NmAcquisition, PetCoincidence } from '../components/sims/NmScenes'
+import { GammaCameraHead } from '../components/sims/GammaCameraHead'
 
 /** This topic's matching rules. The primer below is what stays here. */
 const S = SECTIONS.nm
@@ -132,6 +133,22 @@ export const NM: V2Topic = {
         {
           kind: 'prose',
           text: 'The **lead collimator** is a slab of parallel holes. A photon travelling **along a hole** passes; anything oblique is absorbed by the **septa**. That is the camera’s only optics — each accepted photon says “I came from straight ahead”, which is what turns a spray of directions into **spatial localisation**.\n\nThe survivor crosses into a single slab of **thallium-activated sodium iodide — NaI(Tl)** — and stops, mainly by photoelectric absorption; its energy reappears as a **flash of light photons**. The slab is wide (about **60 × 50 cm**, which sets the field of view) but only **6–13 mm thick**: a **thin crystal keeps the flash tight** and protects spatial resolution, where a thicker one would stop more photons but smear the flash. A **light guide** or smear of optical grease couples crystal to tubes — an air gap would reflect the flash back.\n\nA flash of light is far too faint to measure, so each **photomultiplier tube** converts it: light frees photoelectrons at the **photocathode**, and a ladder of **dynodes**, each at a higher voltage, multiplies them into a measurable pulse — overall gain near **10⁶**. The flash is **shared**: tubes near the interaction see more light than distant ones, and the **Anger position logic** computes a weighted average of every tube’s signal to give the **X and Y position signals**. The tube array is not a pixel grid.\n\nSumming every tube’s signal gives the **Z-pulse**, proportional to the photon’s **energy**. The **pulse height analyser (PHA)** accepts only pulses inside a **window around the 140 keV photopeak, typically ±10%**: a photon that scattered in the patient arrives with less energy, so its short pulse is rejected before it can fog the image. How narrow the window can usefully be is set by the system’s **energy resolution** — the photopeak’s spread (FWHM) as a fraction of its energy, about **9–10%** for a gamma camera.',
+        },
+        /* The head itself, built up layer by layer along the photon's path.
+           The assembling 2D chain immediately below stays exactly as it is:
+           that one shows the mechanism firing, this one shows what the
+           mechanism is physically made of. Two directions on one story. */
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <GammaCameraHead />,
+            title: 'Inside the detector head',
+            annotation: 'drag to turn · 8 steps',
+            caption:
+              'Step through it in the order a photon meets it, and turn the head over at any stage. The thing worth feeling here is how much of the instrument is simply lead: the collimator absorbs everything not travelling straight down a hole and throws away over 99.9% of what the patient emits. Every other design decision in nuclear medicine — the long acquisitions, the noise, the thick crystal, PET refusing to use a collimator at all — is downstream of that slab.',
+            flush: true,
+          },
         },
         {
           kind: 'sim',

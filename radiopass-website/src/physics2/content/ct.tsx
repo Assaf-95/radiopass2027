@@ -16,6 +16,19 @@ import { TOPIC_OUTCOMES } from '../../physics/outcomes'
 import { SECTIONS } from '../mapping/sections'
 import { CONCEPTS } from '../mapping/concepts'
 import { CtWindowing } from '../components/sims/CtWindowing'
+import { DrawCanvas } from '../components/sims/DrawCanvas'
+/* The lesson's own diagrams, re-hosted rather than redrawn — same functions
+   the /ct-lab lesson runs, so the two can never drift apart. */
+import {
+  drawArtefacts,
+  drawBowtie,
+  drawConeBeam,
+  drawDoseMetrics,
+  drawGantry,
+  drawHu,
+  drawModulation,
+  drawNoise,
+} from '../../labs/ct'
 import { CtBackProjection, CtGenerations, CtHelixPitch, CtRingArtefact } from '../components/sims/CtScenes'
 
 /** This topic's matching rules. The primer below is what stays here. */
@@ -92,6 +105,28 @@ export const CT: V2Topic = {
           summary: 'Why simple back-projection blurs',
           text: 'Each back-projected profile is smeared uniformly along its own rays, so every point of the object receives contributions not just from itself but from every ray that passed near it — the density piles up as 1/r around each true point. The filter kernel is designed to cancel exactly that haze: it sharpens each profile with negative side-lobes so the smears of neighbouring rays subtract where they overlap.',
         },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawGantry} label="The gantry, turning" />,
+            title: 'The gantry, turning',
+            annotation: 'tube and detector, one rotation',
+            caption:
+              'The tube and its detector are bolted opposite each other and swing round the patient together. Every angle gives one profile — a shadow of everything in the way. The slice is computed from hundreds of them; nothing here is a photograph.',
+          },
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawBowtie} label="The bow-tie filter" />,
+            title: 'The bow-tie filter',
+            annotation: 'thicker at the edges',
+            caption:
+              'A body is thicker through the middle than at the sides, so an unfiltered beam over-exposes the edges to get enough through the centre. The bow-tie is shaped to even that out: it attenuates the periphery, flattening the dose across the field and cutting what the thin parts receive for nothing.',
+          },
+        },
       ],
     },
     {
@@ -134,6 +169,17 @@ export const CT: V2Topic = {
         {
           kind: 'trap',
           text: 'Narrowing the window width makes small HU differences MORE visible, not less — displayed contrast rises as the grey scale is spent on fewer HU. Lung windows sit around a level of −500 to −600.',
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawHu} label="The Hounsfield scale" />,
+            title: 'The Hounsfield scale',
+            annotation: 'water = 0 by definition',
+            caption:
+              'The scale is anchored, not measured: water is 0 and air is −1000 by definition, and every other tissue lands relative to them. That is why an HU means the same thing on any scanner — and why the numbers, unlike the window, are the data.',
+          },
         },
       ],
     },
@@ -182,6 +228,17 @@ export const CT: V2Topic = {
           summary: 'Why helical data must be interpolated',
           text: 'A single-slice axial scan collects a full rotation at one table position; a helix never does. Every projection belongs to a slightly different z, so the slice at any chosen position is computed from projections just above and just below it. The interpolation blurs the slice sensitivity profile — the reconstructed slice is slightly thicker than the nominal collimation — and anything small within it is averaged a little more aggressively.',
         },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawConeBeam} label="Cone beam and the helix" />,
+            title: 'Cone beam and the helix',
+            annotation: 'wider beam, more coverage, more penumbra',
+            caption:
+              'As detector rows multiply, the beam stops being a fan and becomes a cone. That buys coverage per rotation, and it costs: the outer rows see the beam at an angle, the reconstruction has to account for it, and the penumbra at each end of the scan is dose that images nothing.',
+          },
+        },
       ],
     },
     {
@@ -213,6 +270,17 @@ export const CT: V2Topic = {
             { label: 'Halving the noise', value: 'costs 4× the dose' },
             { label: 'CT limiting resolution', value: '≈ 1–2 lp/mm (mammography ≈ 15)' },
           ],
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawNoise} label="Noise and the square root" />,
+            title: 'Noise and the square root',
+            annotation: 'quadruple the dose to halve the noise',
+            caption:
+              'Noise falls as the square root of the dose, which is the least forgiving trade in CT: halving the visible noise costs four times the dose. It is why low-dose protocols look grainy and why iterative reconstruction — which buys some of that back computationally — mattered so much.',
+          },
         },
       ],
     },
@@ -251,6 +319,28 @@ export const CT: V2Topic = {
           kind: 'trap',
           text: 'Shielding placed inside the scanned volume misleads the tube current modulation and creates artefact — it does not protect. And CTDIvol is not the patient’s dose: SSDE exists precisely to correct it for size.',
         },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawDoseMetrics} label="CTDIvol and DLP" />,
+            title: 'CTDIvol and DLP',
+            annotation: 'the two numbers on the report',
+            caption:
+              'CTDIvol is the average dose in a standard phantom for this protocol — a property of the machine settings, not of the patient. Multiply by scan length and you get DLP, the total for the examination. Neither is the patient dose; effective dose comes from DLP times a body-region factor.',
+          },
+        },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawModulation} label="Tube current modulation" />,
+            title: 'Tube current modulation',
+            annotation: 'mA follows the patient',
+            caption:
+              'The tube current is varied continuously — around the rotation and along the patient — so shoulders get more and the abdomen less. It is the single most effective dose-saving feature on a modern scanner, and it is why a fixed-mA protocol is now hard to justify.',
+          },
+        },
       ],
     },
     {
@@ -288,6 +378,17 @@ export const CT: V2Topic = {
           kind: 'trap',
           text: 'A ring artefact means a faulty detector element in a third-generation scanner — the element measures the same radius throughout the rotation. In a fourth-generation stationary ring a faulty detector corrupts whole projections and draws streaks instead.',
         },
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <DrawCanvas draw={drawArtefacts} label="Beam hardening and partial volume" />,
+            title: 'Beam hardening and partial volume',
+            annotation: 'two broken assumptions',
+            caption:
+              'Reconstruction assumes a monoenergetic beam and that every voxel holds one tissue. Both are false. A polyenergetic beam hardens as it passes through, so dense structures streak; a voxel straddling two tissues reports their average, so a small dense object smears into its neighbours.',
+          },
+        },
       ],
     },
   ],
@@ -306,8 +407,5 @@ export const CT: V2Topic = {
     'Filtered back-projection needs the kernel to cancel 1/r blur; iterative reconstruction buys dose — but reconstruction never changes dose already delivered.',
     'Isotropic voxels make MPR lossless; dual energy separates materials (iodine maps, virtual non-contrast); CT resolution tops out at ≈ 1–2 lp/mm.',
   ],
-  labs: [
-    { label: 'CT — the focused lesson', to: '/ct-lab' },
-    { label: 'Watch the CT film', to: '/ct-lab/film' },
-  ],
+  labs: [],
 }

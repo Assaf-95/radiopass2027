@@ -828,6 +828,20 @@ export const drawGen2 = lessonDraw('gen2')
 export const drawGen3 = lessonDraw('gen3')
 export const drawGen4 = lessonDraw('gen4')
 
+/**
+ * The rest of the lesson's diagrams the CT topic re-hosts.
+ *
+ * Exports, not copies. Each names a step that already exists and is already
+ * drawn here; `lessonDraw` throws at module load if one is ever renamed, so a
+ * topic can never silently show a blank plate where a diagram used to be.
+ */
+export const drawGantry = lessonDraw('gantry')
+export const drawHu = lessonDraw('hu')
+export const drawNoise = lessonDraw('noise')
+export const drawDoseMetrics = lessonDraw('dose-metrics')
+export const drawModulation = lessonDraw('modulation')
+export const drawArtefacts = lessonDraw('artefacts')
+
 export default function CtLab() {
   return (
     <LessonPage
@@ -1334,3 +1348,5 @@ function filmDraw(id: string): StepDraw {
 /** Two more film scenes Physics V2 re-hosts, drawn exactly as the film draws them. */
 export const drawBackProjection = filmDraw('backprojection')
 export const drawRingArtefact = filmDraw('ring')
+export const drawBowtie = filmDraw('bowtie')
+export const drawConeBeam = filmDraw('conebeam')
