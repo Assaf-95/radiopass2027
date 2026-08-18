@@ -332,8 +332,10 @@ const STEPS: LessonStep[] = [
       glowDot(ctx, tube.x, tube.y, 6)
       ctx.fillStyle = rgba(INK, 0.9)
       ctx.fillRect(det.x - 5, det.y - 5, 10, 10)
-      sceneLabel(ctx, 'tube', tube.x - 10, tube.y - 10, p, { align: 'right', color: rgba(ACC, 0.9) })
-      sceneLabel(ctx, 'detector', det.x + 10, det.y + 10, p)
+      // Both labels ride the assembly out to the edge of the scan circle, so on
+      // a narrow canvas they are clamped back inside the frame rather than cut.
+      sceneLabel(ctx, 'tube', tube.x - 10, tube.y - 10, p, { align: 'right', color: rgba(ACC, 0.9), clampTo: w })
+      sceneLabel(ctx, 'detector', det.x + 10, det.y + 10, p, { clampTo: w })
 
       sceneLabel(ctx, status, cx, h * 0.09, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
       sceneLabel(ctx, `sweep ${k + 1} of ${sweeps} — the coverage builds ray by ray`, cx, h * 0.9, p, { align: 'center', size: 11 })
@@ -435,8 +437,10 @@ const STEPS: LessonStep[] = [
         ctx.fillRect(-2, -4.5, 4, 9)
         ctx.restore()
       }
-      sceneLabel(ctx, 'tube', pos.tx - 10, pos.ty - 10, p, { align: 'right', color: rgba(ACC, 0.9) })
-      sceneLabel(ctx, 'detector row', pos.tx + Math.cos(angle) * R * 2 + 10, pos.ty + Math.sin(angle) * R * 2 + 12, p)
+      // The row's label sits at the far end of the fan — the far side of the
+      // scan circle — so it is clamped back inside a narrow canvas.
+      sceneLabel(ctx, 'tube', pos.tx - 10, pos.ty - 10, p, { align: 'right', color: rgba(ACC, 0.9), clampTo: w })
+      sceneLabel(ctx, 'detector row', pos.tx + Math.cos(angle) * R * 2 + 10, pos.ty + Math.sin(angle) * R * 2 + 12, p, { clampTo: w })
 
       sceneLabel(ctx, status, cx, h * 0.09, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
       sceneLabel(ctx, 'still translate–rotate — but far fewer sweeps', cx, h * 0.9, p, { align: 'center', size: 11 })
@@ -498,7 +502,11 @@ const STEPS: LessonStep[] = [
       }
       glowDot(ctx, tx, ty, 7 + pulse * 2)
       sceneLabel(ctx, 'no translation — just rotation', cx, h * 0.09, 1, { align: 'center', size: 12, color: rgba(ACC, 0.95) })
-      sceneLabel(ctx, 'the fan covers the whole patient; the array of detectors follows the tube', cx, h * 0.9, p, { align: 'center', size: 11 })
+      // Two lines, not one: the whole sentence is 376 px at this size and the
+      // plate is often narrower than that, and a caption cut off mid-word
+      // teaches nothing. Split, each half fits.
+      sceneLabel(ctx, 'the fan covers the whole patient', cx, h * 0.9, p, { align: 'center', size: 11 })
+      sceneLabel(ctx, 'the array of detectors follows the tube', cx, h * 0.9 + 16, p, { align: 'center', size: 11 })
     },
   },
   {
@@ -1065,6 +1073,13 @@ const FILM_SCENES: FilmScene[] = [
       const cx = w * 0.5
       const total = 16
       const done = Math.min(total, Math.floor((cycle / 6.5) * total))
+      // The film cuts this scene at 11 s, but Physics V2 mounts it on a loop —
+      // so, exactly as the generation scenes do, the cycle fades out and back
+      // in. Without it all sixteen smears and the sharpened disc would vanish
+      // between one frame and the next and start rebuilding: a hard reset.
+      const env = Math.min(easeIO(cycle / 0.4), easeIO((11 - cycle) / 0.5))
+      ctx.save()
+      ctx.globalAlpha = env
       // accumulated smears
       for (let i = 0; i < done; i++) {
         const a = (i / total) * Math.PI
@@ -1086,9 +1101,12 @@ const FILM_SCENES: FilmScene[] = [
         ctx.restore()
         lessonPing(`bp-${Math.floor(t / 11)}-${done}`, 1150)
       }
-      // the object outline
+      ctx.restore()
+      // the object outline — the target itself never moves, so it never blinks
       ctx.strokeStyle = rgba(INK, 0.4)
       ctx.beginPath(); ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2); ctx.stroke()
+      ctx.save()
+      ctx.globalAlpha = env
       // after all angles: the kernel sharpens the disc
       const sharpen = smoothstep(seg(cycle, 7.2, 9))
       if (sharpen > 0) {
@@ -1101,9 +1119,10 @@ const FILM_SCENES: FilmScene[] = [
       sceneLabel(
         ctx,
         sharpen > 0.5 ? 'filtered back-projection — sharp' : `smearing profile ${Math.min(done + 1, total)} of ${total}`,
-        cx, cy + r * 2.8, 1,
-        { align: 'center', color: sharpen > 0.5 ? rgba(ACC, 0.95) : undefined },
+        cx, cy + r * 2.8, env,
+        { align: 'center', color: sharpen > 0.5 ? rgba(ACC, 0.95) : undefined, clampTo: w },
       )
+      ctx.restore()
     },
   },
   {

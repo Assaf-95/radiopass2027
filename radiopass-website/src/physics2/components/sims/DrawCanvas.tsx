@@ -6,23 +6,36 @@
  */
 
 import { useEffect, useRef } from 'react'
+import { suspendTones } from '../../../lib/sound'
 
 export type SceneDraw = (ctx: CanvasRenderingContext2D, w: number, h: number, p: number, t: number) => void
 
 const ease = (x: number) => x * x * (3 - 2 * x)
 
+/**
+ * Seconds into the scene the single reduced-motion frame is taken from. Late
+ * enough that a scene which assembles itself has finished assembling; a scene
+ * whose payoff arrives later than this says so with `settledAt`.
+ */
+const SETTLED_AT = 3.4
+
 export function DrawCanvas({
   draw,
   height = 420,
   label,
+  settledAt = SETTLED_AT,
 }: {
   draw: SceneDraw
   height?: number
   label: string
+  /** Where in the scene's own clock the one reduced-motion frame is taken. */
+  settledAt?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawRef = useRef(draw)
   drawRef.current = draw
+  const settledRef = useRef(settledAt)
+  settledRef.current = settledAt
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -30,28 +43,50 @@ export function DrawCanvas({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // A chapter mounts several of these at once and has no mute button, so the
+    // lesson's per-event clicks stay silent for as long as a plate is on
+    // screen. The learner's stored preference is left exactly as it was.
+    const resumeTones = suspendTones()
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const dpr = Math.min(2, window.devicePixelRatio || 1)
     let w = 0
     let h = 0
+
+    /** The one frame a reduced-motion visitor gets: the scene, settled. */
+    const settled = () => {
+      ctx.clearRect(0, 0, w, h)
+      drawRef.current(ctx, w, h, 1, settledRef.current)
+    }
+
+    // Assigning canvas.width wipes the bitmap even when the value is unchanged,
+    // and a ResizeObserver always delivers one observation of its own the
+    // moment it starts observing. So resize only when the size genuinely
+    // changed — and repaint immediately afterwards, or the single settled frame
+    // is erased a frame after it is drawn and nothing ever draws it again.
+    // (The same guard the lesson player carries, for the same reason.)
     const size = () => {
       const rect = canvas.getBoundingClientRect()
       w = rect.width
       h = rect.height
-      canvas.width = Math.round(w * dpr)
-      canvas.height = Math.round(h * dpr)
+      const pw = Math.round(w * dpr)
+      const ph = Math.round(h * dpr)
+      if (canvas.width === pw && canvas.height === ph) return
+      canvas.width = pw
+      canvas.height = ph
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      if (reduced) settled()
     }
     size()
-    const observer = new ResizeObserver(() => {
-      size()
-    })
+    const observer = new ResizeObserver(size)
     observer.observe(canvas)
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
-      ctx.clearRect(0, 0, w, h)
-      drawRef.current(ctx, w, h, 1, 3.4)
-      return () => observer.disconnect()
+      settled()
+      return () => {
+        observer.disconnect()
+        resumeTones()
+      }
     }
 
     let raf = 0
@@ -66,6 +101,7 @@ export function DrawCanvas({
     return () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
+      resumeTones()
     }
   }, [])
 

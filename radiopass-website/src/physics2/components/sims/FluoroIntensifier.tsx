@@ -19,46 +19,54 @@ import { useState } from 'react'
 import { drawII, type IiPart } from '../../../labs/fluoro'
 import { DrawCanvas } from './DrawCanvas'
 
-const STAGES: { focus: IiPart | 'all'; name: string; showing: string }[] = [
+/** `full` names the component inside a sentence, for the replay control. */
+const STAGES: { focus: IiPart | 'all'; name: string; full: string; showing: string }[] = [
   {
     focus: 'input',
     name: 'CsI input phosphor',
+    full: 'the CsI input phosphor',
     showing:
       'X-rays that survived the patient enter the evacuated envelope and strike the caesium iodide input phosphor. Its columnar needles pipe the light forwards instead of letting it spread sideways, and one absorbed X-ray becomes thousands of light photons.',
   },
   {
     focus: 'cathode',
     name: 'Photocathode',
+    full: 'the photocathode',
     showing:
       'The photocathode, in optical contact with the phosphor: the flash of light frees photoelectrons from it. From here to the far end of the tube the picture travels as electrons, which is what makes it amplifiable.',
   },
   {
     focus: 'optics',
     name: 'Electrostatic lenses',
+    full: 'the electrostatic lenses',
     showing:
       'Charged focusing electrodes steer every electron along a curved route through a single crossover point — which is why the image lands inverted and the electronics have to flip it back. The focusing is electrostatic; photomultiplier tubes are never in this chain.',
   },
   {
     focus: 'anode',
     name: 'Anode — 25–30 kV',
+    full: 'the anode at 25–30 kV',
     showing:
       'The anode accelerates each electron across the vacuum to 25–30 keV. The image is unchanged; every electron simply arrives carrying far more energy, and releases far more light when it lands. That is the flux gain.',
   },
   {
     focus: 'output',
     name: 'Output phosphor',
+    full: 'the output phosphor',
     showing:
       'The electrons land on an output phosphor about 25 mm across, from an input face of 250–300 mm. The same image squeezed onto a smaller area is brighter again — the minification gain, (input ÷ output diameter)² — and flux × minification is the ≈ 5000× total. A camera views the little disc.',
   },
   {
     focus: 'mag',
     name: 'Magnification mode',
+    full: 'magnification mode',
     showing:
       'Only the central part of the input face is used, refocused to fill the whole output. Less input area means less minification gain, so the picture dims and automatic brightness control raises the exposure to restore it — the zoom is bought with dose rate.',
   },
   {
     focus: 'all',
     name: 'The whole tube, live',
+    full: 'the whole tube, live',
     showing:
       'The finished intensifier running photon by photon: an X-ray arrives, a burst of light appears in the needles, an electron dashes through the crossover to the anode, and a flash lands on the small output disc — one blip on the live display, thousands of times brighter than the flash that started it.',
   },
@@ -66,13 +74,18 @@ const STAGES: { focus: IiPart | 'all'; name: string; showing: string }[] = [
 
 export function FluoroIntensifier() {
   const [idx, setIdx] = useState(0)
+  // Every component's reveal is over about three seconds after the canvas
+  // mounts — long before a learner scrolling down the chapter arrives at it.
+  // Bumping this on each press re-runs the assembly, so pressing the stage you
+  // are already on rebuilds it rather than doing nothing at all.
+  const [run, setRun] = useState(0)
   const stage = STAGES[idx]
 
   return (
     <div className="v2-ctwin" style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
       <div>
         <DrawCanvas
-          key={stage.focus}
+          key={`${idx}-${run}`}
           draw={(ctx, w, h, p, t) => drawII(ctx, w, h, stage.focus, p, t)}
           height={400}
           label={`Image intensifier in cross-section, showing ${stage.name}`}
@@ -84,10 +97,23 @@ export function FluoroIntensifier() {
         </label>
         <div className="v2-ctwin-presets" role="group" aria-label="Choose which component of the image intensifier to show">
           {STAGES.map((s, i) => (
-            <button key={s.focus} type="button" className={i === idx ? 'on' : ''} onClick={() => setIdx(i)}>
+            <button
+              key={s.focus}
+              type="button"
+              className={i === idx ? 'on' : ''}
+              onClick={() => {
+                setIdx(i)
+                setRun((r) => r + 1)
+              }}
+            >
               {s.name}
             </button>
           ))}
+        </div>
+        <div className="v2-ctwin-presets" role="group" aria-label="Replay the component now on the tube">
+          <button type="button" onClick={() => setRun((r) => r + 1)}>
+            Replay {stage.full}
+          </button>
         </div>
         <p className="v2-ctwin-read">
           <b>Showing:</b> {stage.showing}

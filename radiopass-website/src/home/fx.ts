@@ -73,10 +73,19 @@ export function rgba(hex: string, a: number) {
   return `rgba(${c[0]},${c[1]},${c[2]},${a})`
 }
 
-/** Small utility label drawn straight onto a scene canvas. */
+/**
+ * Small utility label drawn straight onto a scene canvas.
+ *
+ * `clampTo` is the canvas width, and is how a label anchored to something that
+ * travels — the detector on the far side of a rotating gantry, say — stays
+ * readable on a narrow plate. Without it the text simply runs off the edge and
+ * the learner sees "detec"; with it the text slides back inside the frame
+ * while the thing it names keeps its own position. Nothing moves unless the
+ * label would otherwise be cut.
+ */
 export function sceneLabel(
   ctx: CanvasRenderingContext2D, text: string, x: number, y: number, alpha: number,
-  opts: { color?: string; size?: number; align?: CanvasTextAlign; leader?: [number, number] } = {},
+  opts: { color?: string; size?: number; align?: CanvasTextAlign; leader?: [number, number]; clampTo?: number } = {},
 ) {
   if (alpha <= 0.01) return
   ctx.save()
@@ -88,9 +97,17 @@ export function sceneLabel(
   }
   ctx.font = `500 ${opts.size ?? 11}px Inter, system-ui, sans-serif`
   ctx.fillStyle = opts.color ?? rgba(C.ink, 0.72)
-  ctx.textAlign = opts.align ?? 'left'
+  const align = opts.align ?? 'left'
+  ctx.textAlign = align
   ctx.textBaseline = 'middle'
-  ctx.fillText(text, x + (opts.align === 'right' ? -6 : opts.align === 'center' ? 0 : 6), y)
+  let tx = x + (align === 'right' ? -6 : align === 'center' ? 0 : 6)
+  if (opts.clampTo) {
+    const tw = ctx.measureText(text).width
+    const left = align === 'right' ? tx - tw : align === 'center' ? tx - tw / 2 : tx
+    const pad = 6
+    tx += Math.max(pad, Math.min(left, opts.clampTo - pad - tw)) - left
+  }
+  ctx.fillText(text, tx, y)
   ctx.restore()
 }
 

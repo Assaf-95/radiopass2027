@@ -19,46 +19,54 @@ import { DrawCanvas } from './DrawCanvas'
 
 type Focus = CrPart | 'all'
 
-const STAGES: { focus: Focus; name: string; showing: string }[] = [
+/** `full` names the stage inside a sentence, for the replay control. */
+const STAGES: { focus: Focus; name: string; full: string; showing: string }[] = [
   {
     focus: 'plate',
     name: 'The plate goes in',
+    full: 'the plate going in',
     showing:
       'The exposed plate on its carriage. The amber dots are the latent image — trapped electrons, densest where the exposure was heaviest. The arrow is the slow scan: the plate feeding steadily through the reader. Nothing has touched the traps yet.',
   },
   {
     focus: 'laser',
     name: 'Red laser and mirror',
+    full: 'the red laser and mirror',
     showing:
       'A fine red laser and a rotating polygon mirror. One facet drags the spot right across the plate — the fast scan — and the amber dots go out behind it as their traps empty. Sweep across, plate steps on, sweep again: a raster over a plate that has no pixels of its own.',
   },
   {
     focus: 'light',
     name: 'Blue light comes out',
+    full: 'the blue light coming out',
     showing:
       'The spot parked on one point. The released electrons fall back to the ground state and give up their stored energy as blue light, leaving in every direction (dotted), in proportion to the local exposure. Red stimulates, blue is the signal — far enough apart in wavelength that a filter can pass one and block the other.',
   },
   {
     focus: 'collect',
     name: 'Light guide and PMT',
+    full: 'the light guide and PMT',
     showing:
       'A light guide lies along the whole scan line, catching that faint blue and funnelling it into the photomultiplier tube. What leaves the PMT (dashed) is an electrical signal — one measurement for every point the laser visits.',
   },
   {
     focus: 'adc',
     name: 'ADC — the image appears',
+    full: 'the ADC and the image store',
     showing:
       'The signal digitised by the analogue-to-digital converter and laid down line by line in the image store. This is where the pixels are born: pixel size is set by the laser spot and the sampling interval, not by the phosphor.',
   },
   {
     focus: 'lamp',
     name: 'Erase lamp',
+    full: 'the erase lamp',
     showing:
       'Reading does not empty every trap, so a flood lamp washes the plate with bright white light before it returns to its cassette — ready for thousands of reuses. Watch the remaining amber dots disappear; leave them there and they ghost onto the next image.',
   },
   {
     focus: 'all',
     name: 'The whole reader, running',
+    full: 'the whole reader, running',
     showing:
       'Everything at once, on a loop: the mirror sweeps the red spot line by line, each released blue flash is funnelled, amplified and digitised, and a new line of image lands — then the flood lamp wipes the plate while the finished image stays safe in the computer.',
   },
@@ -66,12 +74,17 @@ const STAGES: { focus: Focus; name: string; showing: string }[] = [
 
 export function CrReaderStages() {
   const [idx, setIdx] = useState(0)
+  // Each stage assembles itself in and is finished within about three seconds
+  // of being mounted — long before a learner scrolling down the chapter reaches
+  // it. Bumping this on every press re-runs the assembly, so the build is
+  // watchable on demand instead of only on the first visit to a stage.
+  const [run, setRun] = useState(0)
   const stage = STAGES[idx]
 
   return (
     <div className="v2-ctwin" style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
       <DrawCanvas
-        key={stage.focus}
+        key={`${idx}-${run}`}
         draw={(ctx, w, h, p, t) => drawCrReader(ctx, w, h, stage.focus, p, t)}
         height={400}
         label={`Computed radiography reader — ${stage.name}. ${stage.showing}`}
@@ -82,10 +95,23 @@ export function CrReaderStages() {
         </label>
         <div className="v2-ctwin-presets" role="group" aria-label="Choose which stage of the CR reader to show">
           {STAGES.map((s, i) => (
-            <button key={s.focus} type="button" className={i === idx ? 'on' : ''} onClick={() => setIdx(i)}>
+            <button
+              key={s.focus}
+              type="button"
+              className={i === idx ? 'on' : ''}
+              onClick={() => {
+                setIdx(i)
+                setRun((r) => r + 1)
+              }}
+            >
               {i + 1}. {s.name}
             </button>
           ))}
+        </div>
+        <div className="v2-ctwin-presets" role="group" aria-label="Replay the stage now on the bench">
+          <button type="button" onClick={() => setRun((r) => r + 1)}>
+            Replay {stage.full}
+          </button>
         </div>
         <p className="v2-ctwin-read">
           <b>Showing:</b> {stage.showing}
@@ -96,11 +122,25 @@ export function CrReaderStages() {
 }
 
 export function DrConversionStacks() {
+  // The comparison builds itself once and settles, so it too needs a way back
+  // to the start for anyone who arrived after it had finished.
+  const [run, setRun] = useState(0)
+
   return (
-    <DrawCanvas
-      draw={drawDrCompare}
-      height={380}
-      label="The same X-ray landing on an indirect panel and a direct panel: light spreading sideways through the caesium iodide to the photodiodes, charge drifting straight down through the amorphous selenium, and the two signal profiles that result — spread against tight"
-    />
+    <div>
+      <DrawCanvas
+        key={run}
+        draw={drawDrCompare}
+        height={380}
+        label="The same X-ray landing on an indirect panel and a direct panel: light spreading sideways through the caesium iodide to the photodiodes, charge drifting straight down through the amorphous selenium, and the two signal profiles that result — spread against tight"
+      />
+      <div className="v2-ctwin-side">
+        <div className="v2-ctwin-presets" role="group" aria-label="Replay the comparison">
+          <button type="button" onClick={() => setRun((r) => r + 1)}>
+            Replay both stacks, from the X-ray landing
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
