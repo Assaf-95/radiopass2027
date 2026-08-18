@@ -206,8 +206,9 @@ re-propose any of it:
 
 ### 3D models (owner-made, in ~/Downloads) — the standing rule
 
-Only `sodium-atom.glb` is mounted (it opens X-ray §1.1). The others (tungsten, hydrogen-spin,
-rotating-anode tube, gamma-detector-head) are **paused by the owner's explicit correction**:
+`sodium-atom.glb` opens X-ray §1.1 and `gamma-detector-head.glb` sits in NM §6.2, built up layer
+by layer along the photon's path. The rest (tungsten, hydrogen-spin, rotating-anode tube) are
+**paused by the owner's explicit correction**:
 adding several at once, restyled, looked bad and was reverted. The rule now: **one model at a
 time, rendered with its exported materials (no re-lighting, no re-texturing), and a screenshot
 shown to the owner BEFORE it is mounted in any topic.** `SIMPLEFY -atom.glb` is mislabelled
