@@ -989,3 +989,132 @@
   .v2-finish-steps li { grid-template-columns: 26px minmax(0, 1fr); }
   .v2-finish-steps li .v2-btn { grid-column: 2; justify-self: start; }
 }
+
+/* ------------------------------------------------------------------ *
+ * The sodium atom — the course's first object
+ *
+ * Lives on film like every other instrument, but unlike the canvases it is
+ * DRAGGABLE, and nothing about a dark rectangle says so. Hence the hand, and
+ * hence grab/grabbing cursors on the desktop where there is a cursor to
+ * change.
+ * ------------------------------------------------------------------ */
+
+.v2-atom-stage {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  min-height: 300px;
+  cursor: grab;
+  /* The drag is ours: without this a touch drag scrolls the chapter instead
+     of turning the atom, which feels like the model ignoring the finger. */
+  touch-action: none;
+  border-radius: 4px;
+}
+.v2-atom-stage:active {
+  cursor: grabbing;
+}
+.v2-atom-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* --- the hint ----------------------------------------------------- */
+
+.v2-atom-hint {
+  position: absolute;
+  inset: auto 0 14px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.9);
+  animation: v2-atom-hint-in 500ms ease-out both;
+}
+.v2-atom-hint-glyph {
+  display: block;
+  animation: v2-atom-swipe 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.v2-atom-hint-text {
+  font-family: var(--v2-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* The gesture, traced: the hand slides right while pressing down at the
+   middle of the stroke, which is what a swipe looks like from above. */
+@keyframes v2-atom-swipe {
+  0%   { transform: translateX(-38px) scale(0.96); opacity: 0; }
+  14%  { opacity: 1; }
+  50%  { transform: translateX(0) scale(1.03); opacity: 1; }
+  86%  { opacity: 1; }
+  100% { transform: translateX(38px) scale(0.96); opacity: 0; }
+}
+@keyframes v2-atom-hint-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Reduced motion: the hint still has to be READABLE, so it stays and simply
+   stops moving — the dashed arc and arrowhead carry the meaning on their own.
+   The atom stops drifting; dragging is unaffected, because a drag is the
+   visitor's own movement and was never the thing being suppressed. */
+.v2-atom-hint.is-still .v2-atom-hint-glyph,
+.v2-atom-hint.is-still {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v2-atom-hint,
+  .v2-atom-hint-glyph {
+    animation: none !important;
+  }
+}
+
+/* --- the legend --------------------------------------------------- */
+
+.v2-atom-key {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px 26px;
+  margin: 14px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--v2-line);
+}
+.v2-atom-key div {
+  display: grid;
+  gap: 2px;
+}
+.v2-atom-key dt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--v2-ink);
+}
+.v2-atom-key dd {
+  margin: 0 0 0 17px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--v2-ink-2);
+}
+.v2-atom-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+/* Taken from the model's own materials, so the legend and the object agree. */
+.v2-atom-dot.is-p { background: #b04a18; }
+.v2-atom-dot.is-n { background: #5b5757; }
+.v2-atom-dot.is-e { background: #ff8a3d; }
+.v2-atom-dot.is-k { background: transparent; border: 2px solid #6f6a6a; }
+
+@media (max-width: 560px) {
+  .v2-atom-stage {
+    aspect-ratio: 4 / 5;
+    min-height: 260px;
+  }
+}

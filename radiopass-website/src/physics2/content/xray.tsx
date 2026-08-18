@@ -19,6 +19,7 @@ import { DrawCanvas } from '../components/sims/DrawCanvas'
    /xray-lab lessons run; see the export note in labs/xraygeo.tsx. */
 import { drawPhotonEnters, drawThreeFates, drawExponential, drawMu, drawHvl } from '../../labs/xraygeo'
 import { XraySpectrum } from '../components/sims/XraySpectrum'
+import { SodiumAtom } from '../components/sims/SodiumAtom'
 
 /** This topic's matching rules. The primer below is what stays here. */
 const S = SECTIONS.xray
@@ -35,6 +36,21 @@ export const XRAY: V2Topic = {
     {
       ...S.foundations,
       primer: [
+        /* The course's first object, before its first sentence. Everything in
+           the exam stands on this picture, and a candidate who can turn it
+           over owns it in a way that a candidate who has read it does not. */
+        {
+          kind: 'sim',
+          sim: {
+            kind: 'element',
+            element: <SodiumAtom />,
+            title: 'Sodium — 11 protons, 12 neutrons, 2-8-1',
+            annotation: 'drag to turn · K · L · M',
+            caption:
+              'Turn it over. The nucleus carries all the mass and all the positive charge; the electrons sit in shells at fixed binding energies, K innermost and most tightly bound. Those are orbits as DRAWN, not as they are — a shell is an energy level, and the Bohr picture is the one the exam asks about. The K shell is where characteristic radiation, the K-edge and the photoelectric effect all begin, so it is worth knowing which ring is which before the next section fires an electron at a tungsten anode.',
+            flush: true,
+          },
+        },
         {
           kind: 'principle',
           text: 'X-rays are electromagnetic photons. Their energy is set by frequency alone — E = hf — and only photons above about 10 keV are useful for imaging.',
