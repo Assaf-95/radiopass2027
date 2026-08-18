@@ -378,8 +378,12 @@ export default function PhysicsHome() {
               Nothing recorded yet. RadioPass tracks what you answer and where you have been, and
               this is where it will appear.
             </p>
-            <Link className="button button-primary" to="/visual-lab">
-              Start with the laboratories <span aria-hidden="true">&rarr;</span>
+            {/* The free sample, not a laboratory. The laboratories now ask
+                for an account, so pointing a first-time visitor at one would
+                make their very first click a wall — and the sample is the
+                thing built to be their first click. */}
+            <Link className="button button-primary" to="/free-trial">
+              Start with the free sample <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
         )}
