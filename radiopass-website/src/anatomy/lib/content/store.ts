@@ -26,10 +26,44 @@
 
 import type { Question } from '../../types';
 import { applyEdit } from '../questionEdits';
-import { assetSrc, fetchContent } from './api';
+import { assetSrc, fetchContent, patchQuestion, uploadAsset } from './api';
+import { hasServerSession } from '../admin';
+import {
+  patchSupabaseQuestion,
+  readSupabaseOverlay,
+  supabaseAssetSrc,
+  uploadSupabaseAsset,
+} from './supabaseBackend';
 import { EMPTY_OVERLAY, type ContentOverlay, type ContentState, type QuestionOverlay } from './types';
 
 const CACHE_KEY = 'radiopass-content-cache-v1';
+
+/**
+ * Which store the overlay currently in `state` came from, and where a save
+ * would go.
+ *
+ * ONE backend is chosen per load; the two are never composed into a single
+ * document. That is a deliberate refusal. No editor page sends a whole patch —
+ * the film manager sends only `image`, the wording editor only `edit` — so any
+ * rule for preferring one document over another per question would drop the
+ * fields the other page had authored, and a rename would silently erase the
+ * marker geometry somebody had placed by hand. Choosing a source has no such
+ * failure mode.
+ *
+ * Node wins wherever it is configured, because a deployment that set
+ * ATLAS_ADMIN_PASSWORD meant it. Supabase is what makes authoring work
+ * everywhere else, including a plain static host.
+ */
+export type BackendId = 'node' | 'supabase' | 'none';
+
+let backend: BackendId = 'none';
+let backendWhy = '';
+let backendWritable = false;
+
+/** Where a save would go right now, and why it would be refused if it would. */
+export function contentBackend(): { id: BackendId; writable: boolean; why: string } {
+  return { id: backend, writable: backendWritable, why: backendWhy };
+}
 
 let state: ContentState = {
   overlay: EMPTY_OVERLAY,
@@ -86,6 +120,46 @@ export function setOverlay(overlay: ContentOverlay) {
   notify();
 }
 
+/**
+ * Saves one question patch to whichever backend is active, and installs the
+ * result.
+ *
+ * THIS IS THE ONLY SAVE PATH the editor pages should use. Before it existed,
+ * each page hand-rolled `hasServerSession() && contentState().online` and then
+ * chose a branch — which is how the wording editor came to show a "saves to
+ * this browser only" notice under a NARROWER condition than the one its save
+ * actually tested, so a stale token with an unreachable API wrote to
+ * localStorage and reported "Saved." with no caveat at all.
+ *
+ * It throws rather than silently falling back. A page that cannot save must
+ * say so before the author types the edit, not swallow it afterwards.
+ */
+export async function saveQuestionPatch(
+  questionId: string,
+  patch: Parameters<typeof patchQuestion>[1],
+): Promise<ContentOverlay> {
+  if (!loaded) await loadContent();
+  if (backend === 'supabase') {
+    const next = await patchSupabaseQuestion(questionId, patch);
+    setOverlay(next);
+    return next;
+  }
+  if (backend === 'node' && hasServerSession()) {
+    const next = await patchQuestion(questionId, patch);
+    setOverlay(next);
+    return next;
+  }
+  throw new Error(backendWhy || 'There is nowhere to save this change.');
+}
+
+/** Uploads a film to whichever store is active. */
+export async function uploadQuestionAsset(file: File): Promise<{ assetId: string; bytes: number }> {
+  if (!loaded) await loadContent();
+  if (backend === 'supabase') return uploadSupabaseAsset(file);
+  if (backend === 'node' && hasServerSession()) return uploadAsset(file);
+  throw new Error(backendWhy || 'There is nowhere to store this image.');
+}
+
 export function setEditingConfigured(value: boolean) {
   if (state.editingConfigured === value) return;
   state = { ...state, editingConfigured: value };
@@ -109,19 +183,60 @@ export function loadContent(force = false): Promise<ContentState> {
     notify();
   }
 
-  inflight = fetchContent().then((result) => {
-    state = {
-      overlay: result.overlay ?? (cached ?? EMPTY_OVERLAY),
-      editingConfigured: result.editingConfigured,
-      online: result.online,
-      error: result.error,
-    };
-    if (result.overlay) writeCache(result.overlay);
-    loaded = true;
-    inflight = null;
-    notify();
-    return state;
-  });
+  inflight = fetchContent()
+    .then(async (result) => {
+      /* The Node API is authoritative wherever it is actually set up to
+         accept writes. Where it is not — no server, or a server with no
+         editor password — the same overlay lives in Supabase, authorised by
+         the account's admin grant rather than by a shared password. */
+      if (result.online && result.editingConfigured) {
+        backend = 'node';
+        backendWritable = hasServerSession();
+        backendWhy = backendWritable ? '' : 'Sign in as editor to save changes.';
+        return {
+          overlay: result.overlay ?? cached ?? EMPTY_OVERLAY,
+          editingConfigured: result.editingConfigured,
+          online: result.online,
+          error: result.error,
+          fresh: !!result.overlay,
+        };
+      }
+
+      const sb = await readSupabaseOverlay();
+      if (sb.state.reachable) {
+        backend = 'supabase';
+        backendWritable = sb.state.writable;
+        backendWhy = sb.state.why;
+        return {
+          overlay: sb.overlay ?? cached ?? EMPTY_OVERLAY,
+          editingConfigured: sb.state.writable,
+          online: true,
+          error: null,
+          fresh: !!sb.overlay,
+        };
+      }
+
+      /* Neither store answered. The site runs on the bundled questions, which
+         is exactly how it behaved before online editing existed. */
+      backend = result.online ? 'node' : 'none';
+      backendWritable = false;
+      backendWhy = sb.state.why || result.error || 'No content service is reachable.';
+      return {
+        overlay: result.overlay ?? cached ?? EMPTY_OVERLAY,
+        editingConfigured: result.editingConfigured,
+        online: result.online,
+        error: result.error,
+        fresh: !!result.overlay,
+      };
+    })
+    .then(({ fresh, ...next }) => {
+      state = next;
+      if (fresh) writeCache(next.overlay);
+      loaded = true;
+      inflight = null;
+      notify();
+      return state;
+    });
 
   return inflight;
 }
@@ -167,7 +282,15 @@ export function applyOverlay(question: Question): Question {
     change('imageCrop', undefined);
     change('imageOrientation', undefined);
   } else if (patch.image?.assetId) {
-    change('imagePath', assetSrc(patch.image.assetId, patch.image.version));
+    /* Resolved through the store that holds the bytes. A Supabase-uploaded
+       film asked for from the Node API's /asset/ route is a 404 and a broken
+       image on the candidate's screen. */
+    change(
+      'imagePath',
+      patch.image.store === 'supabase'
+        ? supabaseAssetSrc(patch.image.assetId)
+        : assetSrc(patch.image.assetId, patch.image.version),
+    );
     /* An uploaded film is exactly what the editor chose to upload — there is
        no printed question stem to cut off it, so the crop that belonged to
        the scanned source page must not be carried over onto it. */

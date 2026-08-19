@@ -16,6 +16,7 @@ import type { Question, SectionId } from '../../types';
 import { getSectionQuestions } from '../../data/sections';
 import { getAllCustomQuestions } from '../customQuestions';
 import { editedQuestionIds, editsStorageBytes } from '../questionEdits';
+import { contentState } from '../content/store';
 import { recognitionCueFor } from '../grading';
 import { ATLAS_CHAPTERS, type ChapterId } from '../../data/atlas/chapters';
 import { buildAtlas } from './build';
@@ -45,7 +46,13 @@ function signature(): string {
   /* The byte count is what catches the SECOND edit to a question already in
      the list — the id set alone would not change, and the Atlas would keep
      showing the answer that was replaced. */
-  return `${getAllCustomQuestions().length}|${editedQuestionIds().length}|${editsStorageBytes()}`;
+  /* The overlay rev belongs here too. Without it, an edit saved to the
+     CONTENT SERVICE — a removed film, a replaced film, rewritten wording —
+     changed the Question Bank immediately and left the Atlas showing the old
+     record until a full page reload. That made removing a film look like it
+     had half worked, which is worse than not working: the author would
+     reasonably assume the removal had failed and do it again. */
+  return `${getAllCustomQuestions().length}|${editedQuestionIds().length}|${editsStorageBytes()}|${contentState().overlay.rev}`;
 }
 
 let cached: AtlasIndex | null = null;

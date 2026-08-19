@@ -30,9 +30,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { getSectionQuestions, getSectionMeta, getStaticSectionQuestions } from '../data/sections';
-import { hasServerSession } from '../lib/admin';
-import { patchQuestion } from '../lib/content/api';
-import { contentState, loadContent, overlayFor, setOverlay } from '../lib/content/store';
+import {
+  contentBackend,
+  contentState,
+  loadContent,
+  overlayFor,
+  saveQuestionPatch,
+  subscribeContent,
+} from '../lib/content/store';
 import {
   getEdit,
   saveEdit,
@@ -77,8 +82,13 @@ export default function QuestionWording() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [, setContentRev] = useState(0);
+  /* See ImageManager: contentBackend() is synchronous, so without a
+     subscription this page would keep showing its first, uninformed answer
+     about whether a save will land centrally. */
+  useEffect(() => subscribeContent(() => setContentRev((n) => n + 1)), []);
   useEffect(() => {
-    loadContent();
+    void loadContent();
   }, []);
 
   useEffect(() => {
@@ -142,22 +152,24 @@ export default function QuestionWording() {
     setError(null);
     try {
       const edit = mergedEdit();
-      if (hasServerSession() && contentState().online) {
+      /* ONE condition decides the branch AND the notice above. They were
+         written separately before, and the notice tested LESS than the save
+         did — so a stale token against an unreachable API wrote to this
+         browser only and still reported a plain "Saved." */
+      if (target.writable) {
         /* Sent as the whole document, which is what the API expects and what
            keeps a partial merge from resurrecting a label deleted elsewhere. */
         const { imageDataUrl, ...withoutImage } = edit;
         void imageDataUrl;
-        setOverlay(
-          await patchQuestion(resolved!.id, {
-            ifRev: contentState().overlay.rev,
-            action: 'wording edited',
-            edit: withoutImage,
-          }),
-        );
+        await saveQuestionPatch(resolved!.id, {
+          ifRev: contentState().overlay.rev,
+          action: 'wording edited',
+          edit: withoutImage,
+        });
       } else {
-        /* No API on this deployment: fall back to the browser-only override,
-           exactly as the other authoring pages do, so a static host still
-           has working tools. */
+        /* Nowhere central to save: fall back to the browser-only override, as
+           the other authoring pages do, so a static host still has working
+           tools. The notice above has already said this would happen. */
         const result = saveEdit(edit);
         if (!result.ok) throw new Error(result.reason);
       }
@@ -174,6 +186,7 @@ export default function QuestionWording() {
   }
 
   const stemChanged = stem !== (shipped?.questionText ?? '');
+  const target = contentBackend();
 
   return (
     <main className="qw">
@@ -194,10 +207,11 @@ export default function QuestionWording() {
         </nav>
       </header>
 
-      {!hasServerSession() && (
+      {!target.writable && (
         <p className="qw-note" role="status">
-          You are not signed in to the content service, so this saves to this browser only.
-          Sign in on the <Link to="/anatomy/admin">author page</Link> to save it for every device.
+          {target.why || 'There is nowhere central to save this.'} Until then this saves to{' '}
+          <strong>this browser only</strong> — sign in on the{' '}
+          <Link to="/anatomy/admin">author page</Link> to save it for every device.
         </p>
       )}
 

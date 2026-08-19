@@ -8,6 +8,14 @@ export interface OverlayImage {
   replacedAt?: string;
   /** Soft delete. Set = the film is shown nowhere, but nothing is destroyed. */
   removedAt?: string | null;
+  /**
+   * Which store holds the bytes. Stamped at upload time, because the two
+   * backends serve assets from different places and looking for a film in the
+   * store that does not have it yields a broken image rather than an error.
+   * Absent means the Node API, which was the only store that ever existed
+   * when the document was written.
+   */
+  store?: 'node' | 'supabase';
   previous?: { assetId?: string; sourcePath?: string } | null;
   /** Keep the crop and rotation that belonged to the film being replaced.
    *  Off by default: an uploaded image is already the film, with no printed

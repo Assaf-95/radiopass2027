@@ -21,8 +21,8 @@ import {
   toEditableAnswers, type EditableAnswer, type QuestionEdit,
 } from '../lib/questionEdits';
 import { NO_ORIENTATION, isOriented, remapMarker, type ImageOrientation, type SectionId } from '../types';
-import { hasServerSession } from '../lib/admin';
-import { patchQuestion, uploadAsset } from '../lib/content/api';
+import { patchQuestion } from '../lib/content/api';
+import { contentBackend, saveQuestionPatch, uploadQuestionAsset } from '../lib/content/store';
 import { contentState, loadContent, overlayFor, setOverlay } from '../lib/content/store';
 import './ReplaceImageEditor.css';
 
@@ -182,7 +182,12 @@ function Editor() {
      Both interfaces read that, so one save updates the Question Bank and
      every Atlas gallery at once. Without a service the page behaves exactly
      as it always has and says so. */
-  const live = hasServerSession() && contentState().online;
+  /* Whether a save lands centrally, taken from the backend the store actually
+     resolved rather than re-derived here. The two used to be able to disagree,
+     and this flag also gates the Asked / In-Atlas toggles — which are written
+     only by publish(), so where it was wrong those toggles were a silent
+     no-op rather than a disabled control. */
+  const live = contentBackend().writable;
   const published = questionId ? overlayFor(questionId) : undefined;
   const [publishing, setPublishing] = useState(false);
 
@@ -555,7 +560,7 @@ function Editor() {
         patch.image = { removedAt: new Date().toISOString() };
       } else if (newImage?.startsWith('data:')) {
         const file = await dataUrlToFile(newImage, `${questionId}.png`);
-        const { assetId } = await uploadAsset(file);
+        const { assetId } = await uploadQuestionAsset(file);
         patch.image = {
           assetId,
           /* A fresh version on every replacement, so no cache anywhere can
@@ -594,7 +599,7 @@ function Editor() {
         sequence: atlasMeta.sequence,
       };
 
-      setOverlay(await patchQuestion(questionId, patch));
+      setOverlay(await saveQuestionPatch(questionId, patch));
       setSavedOnce(true);
     } catch (error) {
       setSaveError(

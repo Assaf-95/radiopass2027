@@ -25,6 +25,7 @@
    =========================================================================== */
 
 import { sessionToken, setSessionToken, signIn as apiSignIn } from './content/api';
+import { isSupabaseAdmin } from './content/supabaseBackend';
 
 const KEY = 'radiopass-admin-v1';
 
@@ -32,6 +33,11 @@ const KEY = 'radiopass-admin-v1';
  *  the server accepts. */
 export function isAdmin(): boolean {
   if (hasServerSession()) return true;
+  /* An account holding the admin grant IS the author, and on a deployment
+     with no content server it is the only sign-in there is. Without this the
+     owner could hold every permission the database recognises and still be
+     turned away at the door by a localStorage flag he had never set. */
+  if (isSupabaseAdmin()) return true;
   try {
     return localStorage.getItem(KEY) === 'yes';
   } catch {

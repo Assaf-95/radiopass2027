@@ -64,23 +64,50 @@ export async function contentStoreStatus(): Promise<ContentStoreStatus> {
   if (!data.session) return { ready: false, reason: 'signed-out' }
   const { data: row } = await supabase
     .from('entitlements')
-    .select('grants')
+    .select('grants, expires_at')
     .eq('user_id', data.session.user.id)
     .maybeSingle()
   const grants = Array.isArray(row?.grants) ? (row.grants as string[]) : []
-  return grants.includes('admin') ? { ready: true } : { ready: false, reason: 'not-admin' }
+  /* `expires_at` is checked here because the DATABASE checks it. RLS admits a
+     write through public.is_content_admin(), which requires the grant to be
+     both present AND unexpired. Reading only `grants` made this function
+     disagree with the policy that actually decides: an author whose admin
+     grant had lapsed was shown an enabled Save button and a working form, and
+     found out it was refused only after typing the edit and pressing it.
+     That is the dead-button failure this status check exists to prevent, so
+     the two conditions have to stay identical. */
+  const expiry = row?.expires_at ? Date.parse(row.expires_at as string) : null
+  const live = expiry === null || Number.isNaN(expiry) || expiry > Date.now()
+  return grants.includes('admin') && live ? { ready: true } : { ready: false, reason: 'not-admin' }
 }
 
-/** One overlay document, or null when nothing has been edited yet. */
-export async function getJSON<T>(key: ContentKey): Promise<T | null> {
-  if (!supabase) return null
+/**
+ * A read that distinguishes "nothing saved yet" from "the read failed".
+ *
+ * getJSON below collapses both to null, which is right for a reader that just
+ * wants to fall back to the shipped content. It is DANGEROUS for a
+ * read-modify-write: a network blip or an RLS denial would look like an empty
+ * document, and writing the merge of that back would replace every other
+ * question's overlay with nothing. Any caller that intends to write must use
+ * this and abort when `ok` is false.
+ */
+export async function getJSONResult<T>(
+  key: ContentKey,
+): Promise<{ ok: true; data: T | null } | { ok: false; error: string }> {
+  if (!supabase) return { ok: false, error: 'No content backend is configured on this deployment.' }
   const { data, error } = await supabase
     .from('content_documents')
     .select('data')
     .eq('key', key)
     .maybeSingle()
-  if (error || !data) return null
-  return (data.data as T) ?? null
+  if (error) return { ok: false, error: error.message }
+  return { ok: true, data: data ? ((data.data as T) ?? null) : null }
+}
+
+/** One overlay document, or null when nothing has been edited yet. */
+export async function getJSON<T>(key: ContentKey): Promise<T | null> {
+  const result = await getJSONResult<T>(key)
+  return result.ok ? result.data : null
 }
 
 /**

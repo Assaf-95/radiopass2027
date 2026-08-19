@@ -28,9 +28,14 @@ import { Link, useParams } from 'react-router-dom';
 
 import { getSectionQuestions, getSectionMeta } from '../data/sections';
 import { assetUrl } from '../lib/assetUrl';
-import { hasServerSession } from '../lib/admin';
-import { patchQuestion } from '../lib/content/api';
-import { contentState, loadContent, overlayFor, setOverlay } from '../lib/content/store';
+import {
+  contentBackend,
+  contentState,
+  loadContent,
+  overlayFor,
+  saveQuestionPatch,
+  subscribeContent,
+} from '../lib/content/store';
 import type { SectionId } from '../types';
 import './ImageManager.css';
 
@@ -48,8 +53,13 @@ export default function ImageManager() {
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState('');
 
+  /* Subscribed, not just kicked off. contentBackend() is synchronous and
+     answers 'nothing resolved yet' until the probe returns, so a page that
+     only fired loadContent() rendered the generic fallback banner forever and
+     never told the author the real reason they could not save. */
+  useEffect(() => subscribeContent(() => setRev((n) => n + 1)), []);
   useEffect(() => {
-    loadContent();
+    void loadContent();
   }, []);
 
   /* `rev` is bumped after every write so the resolved list is rebuilt — the
@@ -71,22 +81,24 @@ export default function ImageManager() {
 
   const removedCount = questions.filter((q) => overlayFor(q.id)?.image?.removedAt).length;
 
-  const offline = !hasServerSession() || !contentState().online;
+  /* One source of truth for "can this actually be saved", derived from the
+     backend the store actually resolved — not from a hand-rolled guess that
+     could disagree with the save branch below. */
+  const target = contentBackend()
+  const offline = !target.writable;
 
   async function write(id: string, what: NonNullable<Pending>['what'], image: Record<string, unknown>) {
     setBusy({ id, what });
     setError(null);
     try {
-      setOverlay(
-        await patchQuestion(id, {
-          ifRev: contentState().overlay.rev,
-          action: what === 'rename' ? 'image renamed' : `image ${what}d`,
-          /* Merged onto whatever the overlay already holds for this film, so
-             renaming cannot drop the assetId and restoring cannot drop the
-             filename. */
-          image: { ...overlayFor(id)?.image, ...image },
-        }),
-      );
+      await saveQuestionPatch(id, {
+        ifRev: contentState().overlay.rev,
+        action: what === 'rename' ? 'image renamed' : `image ${what}d`,
+        /* Merged onto whatever the overlay already holds for this film, so
+           renaming cannot drop the assetId and restoring cannot drop the
+           filename. */
+        image: { ...overlayFor(id)?.image, ...image },
+      });
       setRev((n) => n + 1);
       setRenaming(null);
     } catch (err) {
@@ -118,7 +130,7 @@ export default function ImageManager() {
 
       {offline && (
         <p className="im-note" role="status">
-          You are not signed in to the content service, so films cannot be changed from here.{' '}
+          {target.why || 'Films cannot be changed from here.'}{' '}
           <Link to="/anatomy/admin">Sign in</Link> to manage them.
         </p>
       )}
