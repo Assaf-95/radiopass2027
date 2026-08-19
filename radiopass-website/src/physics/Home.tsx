@@ -29,7 +29,7 @@
  * learner has finished, and how its slice of the question bank is going.
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { QB_QUESTIONS, QB_TOTALS } from '../qbank/data'
@@ -48,6 +48,37 @@ import { topicStanding } from '../physics2/lib/derive'
 import { COURSE_PARTS } from './course'
 import { PHYSICS_HREF, topicHref } from './routes'
 import './physicshome.css'
+
+/* The sodium atom turning behind the page — the owner's model, driven by
+   scroll speed. Its own chunk, so the dashboard's first paint never waits on
+   three.js or a 400 kB model; it arrives a moment later or, if the fetch
+   fails, not at all. */
+const AtomScene = lazy(() => import('./AtomBackdrop'))
+
+/**
+ * Mounts the backdrop only where it belongs.
+ *
+ * Reduced motion gets NOTHING — not a paused canvas, not a still frame. The
+ * whole point of the object is that it responds to scrolling, and a visitor
+ * who has asked for less movement should not pay for a WebGL context and a
+ * model download to look at something that will never move.
+ */
+function AtomBackdrop() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => setShow(!query.matches)
+    apply()
+    query.addEventListener('change', apply)
+    return () => query.removeEventListener('change', apply)
+  }, [])
+  if (!show) return null
+  return (
+    <Suspense fallback={null}>
+      <AtomScene />
+    </Suspense>
+  )
+}
 
 /* ------------------------------------------------------------------ *
  * Reading the learner's own record
@@ -280,6 +311,7 @@ export default function PhysicsHome() {
 
   return (
     <main className="ph">
+      <AtomBackdrop />
       <header className="ph-head">
         <p className="ph-eyebrow">RadioPass · Physics</p>
         <h1>
