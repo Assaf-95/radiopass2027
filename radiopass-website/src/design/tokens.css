@@ -34,9 +34,14 @@
      Fraunces is the display voice: brand, page titles, the things that
      announce. Inter carries everything a learner actually reads. Mono is for
      data — DICOM overlays, window/level readouts, counts. */
-  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'RP Subscripts', 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Aliases the anatomy scope points at. It has to redeclare --font-display
+     and --font-mono inside .rp-anatomy for its own components, and a
+     self-reference there would resolve to nothing. */
+  --font-display-canonical: 'RP Subscripts', 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-mono-canonical: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   /* ---------------------------------------------------------------- type
      A learner reads this for hours. The floor for anything instructional is
@@ -102,11 +107,26 @@
 
   /* ------------------------------------------------------ surface levels
      Three depths, not a gradient per component. */
-  --bg-base: #0B0D10;
-  --bg-elevated: #101318;
-  --bg-interactive: #151A21;
-  --border: rgba(242, 238, 230, 0.1);
-  --border-strong: rgba(242, 238, 230, 0.22);
+  /* DARK, BUT NOT PITCH BLACK — the owner's words, and the distinction is
+     the whole point. The ground was #0B0D10, which is 4% off pure black: at
+     that level the page stops reading as a surface and starts reading as an
+     absence, panels sitting on it have nothing to sit on, and hours of
+     reading are genuinely harder than they need to be.
+
+     This is a true charcoal instead. Still unmistakably a dark theme, but a
+     surface with a colour, so a panel can be lighter than its ground and a
+     border can be seen. Pure black is kept for exactly one job below: the
+     film. */
+  --bg-base: #15181E;
+  --bg-elevated: #1C2028;
+  --bg-interactive: #252A33;
+
+  /* The film ground, and the ONLY place near-black belongs: image viewports,
+     radiographs, simulation plates. Nobody reads a film off a lit surround,
+     and now that the page is charcoal a film actually reads as a film. */
+  --film: #07080B;
+  --border: rgba(242, 238, 230, 0.12);
+  --border-strong: rgba(242, 238, 230, 0.26);
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;

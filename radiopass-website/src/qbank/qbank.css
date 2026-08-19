@@ -377,12 +377,18 @@
 }
 
 /* The statement the candidate has to weigh word by word. It was 15px. */
-.qb-stem-text { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text-primary); margin: 0; }
+/* The statement is read word by word and decided on — it gets the teaching
+   step, not the body step. It was 15px, then 17-19px; this is 18-21px. */
+.qb-stem-text { font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-primary); margin: 0; }
 
 .qb-tf { display: flex; gap: var(--sp-1); flex: none; }
 .qb-tf button {
-  font-family: var(--qb-sans); font-size: var(--fs-support); font-weight: 600;
-  color: var(--qb-mut); background: transparent;
+  /* --qb-mut is the FAINTEST text step, and these are not metadata — they are
+     the two things the candidate has to hit on every stem. At the tertiary
+     step against the old near-black ground they were genuinely hard to read.
+     Secondary, and a size up. */
+  font-family: var(--qb-sans); font-size: var(--fs-body); font-weight: 600;
+  color: var(--text-secondary); background: transparent;
   border: 1px solid var(--qb-line); border-radius: var(--radius-sm);
   padding: var(--sp-2) var(--sp-4); cursor: pointer; min-width: 76px; min-height: 44px;
   transition: color var(--dur-micro) var(--ease), border-color var(--dur-micro) var(--ease), background var(--dur-micro) var(--ease);
