@@ -141,6 +141,6 @@ describe('question to laboratory links', () => {
     for (const q of QB_QUESTIONS) byTopic.set(q.topic, (byTopic.get(q.topic) ?? 0) + 1)
     // Every topic the bank actually uses is a real modality, not a placeholder.
     expect([...byTopic.keys()].filter((t) => t === 'Other' || t === 'Basic Physics')).toEqual([])
-    expect(QB_QUESTIONS.length).toBeGreaterThan(400)
+    expect(QB_QUESTIONS.length).toBeGreaterThan(380)
   })
 })

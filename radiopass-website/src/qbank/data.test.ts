@@ -17,7 +17,7 @@ const VALID_TOPICS = new Set(
 
 describe('question bank data', () => {
   it('holds the full merged bank', () => {
-    expect(QB_TOTALS.questions).toBeGreaterThanOrEqual(467)
+    expect(QB_TOTALS.questions).toBeGreaterThanOrEqual(386)
     expect(QB_TOTALS.stems).toBeGreaterThanOrEqual(1495)
   })
 
@@ -99,40 +99,57 @@ describe('recovered recall provenance', () => {
   it('carries a sitting year for every question in the base collection', () => {
     const missing = base.filter((q) => !q.year).map((q) => q.id)
     expect(missing).toEqual([])
-    expect(base.length).toBe(453)
+    /* 453 before the recall fragments were rebuilt. 81 of them were single
+       statements split off one original exam question — b38 to b42 were five
+       chemical-shift fragments — and were re-joined into the questions they
+       came from. Fewer question SHELLS, more content: statements went from
+       1,425 to 1,606. Nothing was deleted that carried a statement of its
+       own. */
+    expect(base.length).toBe(372)
   })
 
   it('keeps the recovered year distribution exactly', () => {
     const years: Record<string, number> = {}
     for (const q of base) years[q.year!] = (years[q.year!] ?? 0) + 1
     expect(years).toEqual({
-      '2012': 29,
-      '2015': 15,
-      '2019': 19,
+      '2012': 28,
+      '2015': 13,
+      '2019': 17,
       '2020': 27,
-      '2022': 25,
-      '2023': 32,
-      '2024': 110,
-      '2025': 36,
+      '2022': 24,
+      '2023': 14,
+      '2024': 54,
+      '2025': 35,
       Collection: 160,
     })
   })
 
-  it('agrees with the stems about which questions are complete', () => {
-    // The strongest check available: completeFive came from the archive, the
-    // stem count is computed from today's data, and they must say the same
-    // thing. 201 both ways is what proves the join was sound.
+  it('never loses a statement from a question the archive called complete', () => {
+    /* This began as an equality: completeFive came from the archive, the stem
+       count is computed from today's data, and 201 both ways proved the join
+       was sound. The equality is gone, and deliberately — rebuilding the
+       recall fragments took many questions UP to five statements that the
+       archive never recorded as complete, so five-stem now exceeds
+       completeFive and always will.
+
+       What survives is the half that actually guards the data: every question
+       the archive called complete must STILL have its five statements. That
+       is the direction a bad edit would break, and it is checked as a subset
+       rather than as an equality. */
     const flagged = base.filter((q) => q.completeFive)
     const fiveStem = base.filter((q) => q.stems.length === 5)
     expect(flagged.length).toBe(201)
-    expect(fiveStem.length).toBe(201)
-    expect(flagged.map((q) => q.id).sort()).toEqual(fiveStem.map((q) => q.id).sort())
+    expect(fiveStem.length).toBe(266)
+    const shortened = flagged.filter((q) => q.stems.length !== 5).map((q) => q.id)
+    expect(shortened).toEqual([])
   })
 
   it('keeps the visual concept tags', () => {
     const tagged = base.filter((q) => q.visualTags && q.visualTags.length > 0)
     const tags = new Set(tagged.flatMap((q) => q.visualTags!))
-    expect(tagged.length).toBe(263)
+    /* 263 before the rebuild: 33 tagged fragments were absorbed into the
+       questions they came from, and a tag rides on the id that carried it. */
+    expect(tagged.length).toBe(230)
     expect(tags.size).toBe(42)
   })
 })

@@ -1,8 +1,8 @@
 {
-  "broken": 172,
+  "broken": 6,
   "counts": {
-    "echo": 145,
+    "echo": 6,
     "answer-leak": 0,
-    "commentary": 29
+    "commentary": 0
   }
 }
