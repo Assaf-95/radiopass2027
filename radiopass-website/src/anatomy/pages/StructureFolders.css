@@ -87,3 +87,83 @@
 .sf-names em { font-style: normal; margin-right: .5rem; padding: .1rem .4rem; border-radius: .3rem;
   background: color-mix(in srgb, currentColor 10%, transparent); }
 .sf-note { font-size: .85rem; opacity: .7; }
+
+/* --- Scanning the bank for repetition ---------------------------------- */
+
+.sf-scan {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.sf-scan h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.sf-scan-note {
+  margin: 0 0 1rem;
+  max-width: 68ch;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.sf-scan-result {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.sf-proposals {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  max-height: 30rem;
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+}
+
+.sf-proposals li {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.sf-proposal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.sf-proposal-alts {
+  font-size: 0.84rem;
+  color: var(--amber-accent);
+  line-height: 1.4;
+}
+
+.sf-proposal-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.sf-proposal-more {
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  border-bottom: none !important;
+}
+
+@media (max-width: 560px) {
+  .sf-proposals li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

@@ -40,6 +40,12 @@ import {
   type FolderDoc,
   type StructureFolder,
 } from '../lib/structureFolders'
+import {
+  alreadyFoldered,
+  proposedFolders,
+  structureKey,
+  type ScannedStructure,
+} from '../lib/structureScan'
 import './StructureFolders.css'
 
 /** Why an author cannot save, said in their language, with the way out. */
@@ -78,6 +84,8 @@ export default function StructureFolders() {
   const [selected, setSelected] = useState<string | null>(null)
   const [newName, setNewName] = useState('')
   const [filter, setFilter] = useState('')
+  const [scan, setScan] = useState<ScannedStructure[] | null>(null)
+  const [scanning, setScanning] = useState(false)
 
   useEffect(() => {
     void contentStoreStatus().then(setStatus)
@@ -85,6 +93,15 @@ export default function StructureFolders() {
   }, [])
 
   const suggestions = useMemo(() => (doc ? suggestMerges(doc) : []), [doc])
+
+  /* Proposals the author has not already acted on. Recomputed against the
+     live document so a folder just created drops out of the list rather than
+     sitting there inviting a duplicate. */
+  const proposals = useMemo(() => {
+    if (!scan || !doc) return []
+    const done = alreadyFoldered(doc.folders)
+    return scan.filter((item) => !done.has(structureKey(item.canonicalName)))
+  }, [scan, doc])
   const shown = useMemo(() => {
     if (!doc) return []
     const q = filter.trim().toLowerCase()
@@ -145,6 +162,88 @@ export default function StructureFolders() {
           Could not save: {error}
         </p>
       )}
+
+      <section className="sf-scan">
+        <h2>Find the repetition</h2>
+        <p className="sf-scan-note">
+          Reads all six sections and groups every structure by what it actually is, ignoring
+          case, word order and the usual exam synonyms. What comes back is the same bone
+          recorded under more than one wording, and structures that appear on several films.
+          Nothing is created until you say so.
+        </p>
+        <button
+          type="button"
+          className="sf-btn"
+          disabled={scanning}
+          onClick={() => {
+            setScanning(true)
+            /* Yielded to the browser first: this walks 501 questions and every
+               label on them, and doing it inside the click handler froze the
+               button in its un-pressed state for the whole scan — which reads
+               as a dead button rather than a slow one. */
+            setTimeout(() => {
+              setScan(proposedFolders())
+              setScanning(false)
+            }, 0)
+          }}
+        >
+          {scanning ? 'Reading the bank…' : scan ? 'Scan again' : 'Scan the question bank'}
+        </button>
+
+        {scan && (
+          <p className="sf-scan-result">
+            {proposals.length === 0
+              ? 'Nothing left to group — every structure the scan found is already in a folder.'
+              : `${proposals.length} structure${proposals.length === 1 ? '' : 's'} worth grouping. The ones recorded under more than one name are first.`}
+          </p>
+        )}
+
+        {proposals.length > 0 && (
+          <ul className="sf-proposals">
+            {proposals.slice(0, 60).map((item) => (
+              <li key={structureKey(item.canonicalName)}>
+                <div className="sf-proposal-body">
+                  <b>{item.canonicalName}</b>
+                  {item.names.length > 1 && (
+                    <span className="sf-proposal-alts">
+                      also written: {item.names.slice(1).join(' · ')}
+                    </span>
+                  )}
+                  <span className="sf-proposal-meta">
+                    {item.members.length} film{item.members.length === 1 ? '' : 's'}
+                    {item.names.length > 1 && ` · ${item.names.length} wordings`}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="sf-btn"
+                  disabled={busy || readOnly}
+                  onClick={() =>
+                    void run(async () => {
+                      const next = await createFolder(item.canonicalName, item.members)
+                      /* Every other wording is added as an accepted name, so
+                         grouping can only ever WIDEN what marks correct. */
+                      const made = next.folders[next.folders.length - 1]
+                      let doc = next
+                      for (const alt of item.names.slice(1)) {
+                        doc = await addAcceptedName(made.id, alt)
+                      }
+                      return doc
+                    })
+                  }
+                >
+                  Make a folder
+                </button>
+              </li>
+            ))}
+            {proposals.length > 60 && (
+              <li className="sf-proposal-more">
+                {proposals.length - 60} more below this — they appear once these are dealt with.
+              </li>
+            )}
+          </ul>
+        )}
+      </section>
 
       {suggestions.length > 0 && (
         <section className="sf-suggest" aria-label="Possible duplicates">
