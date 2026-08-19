@@ -6,11 +6,16 @@
  * no legend, nothing to click. It fills what was empty space to the side of
  * the course list with the object the whole syllabus stands on.
  *
- * THE SCROLL IS THE DRIVE. At rest the shells turn at their idle rates. As
- * the page scrolls, scroll SPEED is measured and added to the shell rates, so
- * the electrons whip round while the reader moves and settle back when they
- * stop. Direction is ignored deliberately: scrolling up spins them up too,
- * because the effect is about energy, not about which way the page went.
+ * THE SCROLL IS THE DRIVE, AND THE ELECTRONS ARE THE ONLY MOVING PART. The
+ * atom is held in one orientation; its shells turn slowly at rest, and scroll
+ * SPEED is added to them, so the electrons whip round while the reader moves
+ * and settle back when they stop. Direction is ignored deliberately:
+ * scrolling up spins them up too, because the effect is about energy, not
+ * about which way the page went.
+ *
+ * It is FAINT. You read straight through it — that is the point. It is the
+ * object the syllabus stands on, sitting behind the page, not an illustration
+ * competing with the course list.
  *
  * WHAT THIS DELIBERATELY IS NOT: a re-styling of the model. The materials,
  * the lighting rig and the scale are copied from the approved instrument
@@ -41,13 +46,17 @@ const MODEL = '/models/sodium-atom.glb'
    whipping round at rest, so scrolling could not make them visibly faster —
    the effect the whole thing exists for was invisible. Slow at rest is what
    gives the boost something to be fast against. */
-/** Radians per second the whole atom drifts. */
-const IDLE_SPIN = 0.06
+/* THE ATOM ITSELF DOES NOT TURN. The owner's correction: "the nuclear state
+   is what it is, and the electrons just spin on themselves." So the whole
+   object is held still — the nucleus keeps one orientation — and the only
+   movement on the page is the electrons going round their shells. Rotating
+   the whole group as well made the thing read as a spinning ornament rather
+   than as an atom with electrons in it. */
 /** Per-shell idle rates — outer shells slower, the Bohr picture turning. */
 const SHELL_SPIN: Record<string, number> = {
-  'K-shell': 0.18,
-  'L-shell': -0.1,
-  'M-shell': 0.06,
+  'K-shell': 0.1,
+  'L-shell': -0.055,
+  'M-shell': 0.035,
 }
 /** Scroll speed (px/s) that reaches the top of the boost curve.
 
@@ -147,16 +156,21 @@ function Atom({ energy }: { energy: React.RefObject<number> }) {
           const name = material.name
           if (name === 'electron') {
             cloned.emissive = new THREE.Color(cloned.color)
-            cloned.emissiveIntensity = 0.55
+            cloned.emissiveIntensity = 0.85
             cloned.roughness = 0.35
             cloned.metalness = 0.1
           } else if (name.endsWith('-orbit')) {
+            /* The rings carry most of the object's visual weight and the least
+               of its meaning — they were the part crossing the reading column.
+               Held right back here (they are not this faint in the
+               instrument), so what survives at backdrop opacity is the
+               electrons moving on them, which is the whole point. */
             cloned.emissive = new THREE.Color(cloned.color)
-            cloned.emissiveIntensity = 0.18
+            cloned.emissiveIntensity = 0.06
             cloned.roughness = 0.6
             cloned.metalness = 0
             cloned.transparent = true
-            cloned.opacity = 0.75
+            cloned.opacity = 0.3
           } else {
             cloned.roughness = 0.42
             cloned.metalness = 0.35
@@ -184,7 +198,6 @@ function Atom({ energy }: { energy: React.RefObject<number> }) {
     }
     const boost = 1 + e * (BOOST_MAX - 1)
 
-    if (root.current) root.current.rotation.y += IDLE_SPIN * boost * delta
     for (const shell of shells.current) {
       shell.rotation.y += (SHELL_SPIN[shell.name] ?? 0) * boost * delta
     }

@@ -357,39 +357,32 @@
 }
 
 /* ------------------------------------------------------- the atom backdrop
-   The owner's sodium model, turning behind the page and spinning up with
-   scroll speed (see AtomBackdrop.tsx).
+   The owner's sodium model, sitting behind the whole page.
 
-   It is scenery, so it obeys scenery's rules: fixed to the viewport, behind
-   everything, never clickable, and held to the right of the reading column
-   so it is never underneath the text. The page's own content sits above it
-   on z-index; .ph is given a stacking context so the -1 cannot escape behind
-   the page background and disappear. */
+   FAINT, AND YOU READ STRAIGHT THROUGH IT. It began as a distinct object off
+   to the right at half opacity, which made it a picture the page had to work
+   around. It is scenery: it holds one position while the page scrolls over
+   it, it is dim enough that the course list reads cleanly on top, and the
+   only thing that catches the eye is the electrons speeding up when you
+   scroll (see AtomBackdrop.tsx).
+
+   Fixed, so it stays with the reader the whole way down rather than
+   scrolling away after the first screen. Never clickable. .ph gets a
+   stacking context so the -1 cannot fall behind the page background. */
 .ph { position: relative; z-index: 0; }
 .ph-atom {
   position: fixed;
   z-index: -1;
   top: 50%;
-  right: max(-6vw, -120px);
-  transform: translateY(-50%);
-  width: min(46vw, 620px);
-  height: min(70vh, 620px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(150vh, 96vw);
+  height: min(96vh, 150vw);
   pointer-events: none;
-  /* Present, not competing. The emissive electrons carry at this level while
-     the nucleus stays a suggestion. */
-  opacity: 0.5;
+  /* Low enough to read a paragraph through, high enough that the electrons
+     are still visible when they move. */
+  opacity: 0.1;
 }
-/* Below the two-column threshold the content spans the full width, so the
-   atom would sit directly under the course list. It moves behind the top of
-   the page and fades further instead of being switched off — the movement is
-   the thing the reader is meant to catch out of the corner of their eye. */
 @media (max-width: 1100px) {
-  .ph-atom {
-    top: 0;
-    right: -18vw;
-    transform: none;
-    width: min(80vw, 460px);
-    height: min(46vh, 420px);
-    opacity: 0.3;
-  }
+  .ph-atom { width: 130vw; height: 70vh; opacity: 0.09; }
 }
