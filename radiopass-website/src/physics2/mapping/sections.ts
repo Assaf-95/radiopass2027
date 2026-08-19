@@ -495,3 +495,41 @@ export const TOPIC_POOLS: Record<string, string[]> = {
   us: ['Ultrasound'],
   safety: ['Legislation & Radiation Protection', 'Radiation Biology & Dosimetry'],
 }
+
+/**
+ * Topic number and title, as plain data.
+ *
+ * Duplicated from the content files on purpose, and guarded rather than
+ * trusted: a question surface needs to print "§1.2" without importing nine
+ * primer files and, with them, every simulation and the whole of three.js.
+ * afterword.test.ts asserts these agree with the content files' own values, so
+ * the copy cannot drift in silence.
+ */
+export const TOPIC_META: Record<string, { num: number; title: string; short: string }> = {
+  xray: { num: 1, title: 'X-ray physics', short: 'X-ray' },
+  digital: { num: 2, title: 'Digital radiography', short: 'Digital' },
+  fluoro: { num: 3, title: 'Fluoroscopy & DSA', short: 'Fluoro' },
+  mammo: { num: 4, title: 'Mammography', short: 'Mammo' },
+  ct: { num: 5, title: 'Computed tomography', short: 'CT' },
+  nm: { num: 6, title: 'Nuclear medicine & PET', short: 'NM' },
+  mri: { num: 7, title: 'Magnetic resonance', short: 'MRI' },
+  us: { num: 8, title: 'Ultrasound', short: 'US' },
+  safety: { num: 9, title: 'Protection, dose & legislation', short: 'Safety' },
+}
+
+/**
+ * Sections that teach with prose alone — no simulation exists for them.
+ *
+ * A question landing here must not be offered a button that downloads a
+ * chunk and then reveals an empty frame. Checked by afterword.test.ts against
+ * the content files, so filling one of these gaps automatically enables the
+ * button rather than requiring anyone to remember this list.
+ */
+export const SECTIONS_WITHOUT_SIM: readonly string[] = [
+  'safety/radiobiology',
+  'safety/effects',
+  'safety/legislation',
+  'safety/limits',
+  'us/attenuation',
+  'us/safety',
+]

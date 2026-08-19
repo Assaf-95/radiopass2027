@@ -325,7 +325,6 @@ export default function FreeTrial() {
                 question={question}
                 number={qIndex + 1}
                 total={freeQuestions.length}
-                topic={XRAY}
                 mode="bank"
                 onSubmitted={() => {
                   const now = freeQuestions.filter((q) => !!readQbProgress()[q.id]).length

@@ -227,7 +227,6 @@ export default function V2Practice() {
           question={question}
           number={index + 1}
           total={list.length}
-          topic={topic}
           mode={mode}
           onSubmitted={onSubmitted}
         />

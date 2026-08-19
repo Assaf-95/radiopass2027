@@ -19,15 +19,12 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-
 import { isBankQuestion } from '../../qbank/data'
 import { readQbMarks, readQbProgress, recordQbScore, toggleQbMark } from '../../qbank/Shell'
 import type { QbQuestion } from '../../qbank/types'
 import { cleanExplanation } from '../lib/clean'
-import { topicHref } from '../../physics/routes'
-import { conceptIdFor, sectionOf } from '../lib/assign'
-import type { Concept, V2Topic } from '../types'
+import { QuestionAfterword } from './QuestionAfterword'
+import { teachingFor } from '../mapping/lookup'
 
 type Choices = Record<string, boolean>
 
@@ -37,29 +34,16 @@ export function scoreStems(question: QbQuestion, choices: Choices) {
   return { correct, outOf: scorable.length }
 }
 
-/**
- * The governing principle, from the checked-in map. This was a first-regex-
- * wins scan of the topic's concepts, with the same silent-arbitrary problem
- * the section matcher had; the map records one concept id per question, and
- * the regexes remain only as the bootstrap that seeded it.
- */
-function conceptFor(topic: V2Topic, question: QbQuestion): Concept | null {
-  const id = conceptIdFor(question.id)
-  return id ? (topic.concepts.find((c) => c.id === id) ?? null) : null
-}
-
 export function V2Question({
   question,
   number,
   total,
-  topic,
   mode,
   onSubmitted,
 }: {
   question: QbQuestion
   number: number
   total: number
-  topic: V2Topic
   mode: 'bank' | 'retest'
   onSubmitted?: (question: QbQuestion, correct: number, outOf: number) => void
 }) {
@@ -107,14 +91,13 @@ export function V2Question({
     onSubmitted?.(question, correct, outOf)
   }
 
+  const teaching = teachingFor(question.id)
+
   const mark = (kind: 'flagged' | 'favourite') => {
     const all = toggleQbMark(question.id, kind)
     setMarks(all[question.id] ?? {})
   }
 
-  const concept = submitted && correct < outOf ? conceptFor(topic, question) : null
-  const section = sectionOf(topic, question.id)
-  const sectionIndex = section ? topic.sections.findIndex((s) => s.id === section.id) + 1 : 0
 
   return (
     <article className="v2-q" aria-label={`Question ${number} of ${total}`}>
@@ -122,7 +105,7 @@ export function V2Question({
         <span>
           Question {number} / {total}
         </span>
-        {section && <span>{section.title}</span>}
+        {teaching && <span>{teaching.sectionTitle}</span>}
         {/* No provenance chip. "High-yield" here was literally
             source.includes('recall') — a 1:1 proxy for which questions came
             from exam recalls, which DESIGN.md says must stay silent. It also
@@ -245,41 +228,13 @@ export function V2Question({
             </span>
           </div>
 
-          {concept && (
-            <div className="v2-concept">
-              <small>The governing principle</small>
-              <strong>{concept.rule}</strong>
-              {concept.why && (
-                <p>
-                  <b>Why · </b>
-                  {concept.why}
-                </p>
-              )}
-              {concept.confusion && (
-                <p>
-                  <b>Often confused · </b>
-                  {concept.confusion}
-                </p>
-              )}
-            </div>
-          )}
+          {/* The concept card and the "reread" link used to live here, in a
+              second implementation that the question bank never got. Both are
+              now in QuestionAfterword, rendered by this sheet AND by the bank
+              card, so the two surfaces cannot drift again — and the bank
+              finally shows the governing principle it has never shown. */}
+          <QuestionAfterword questionId={question.id} missed={correct < outOf} />
 
-          {question.keyPoint && (
-            <p className="v2-carry">
-              <span>
-                <em>Carry this: </em>
-                {question.keyPoint}
-              </span>
-            </p>
-          )}
-
-          {section && (
-            <p className="v2-reread">
-              <Link className="v2-link" to={topicHref(topic.id, section.id)}>
-                Reread §{topic.num}.{sectionIndex} {section.title} →
-              </Link>
-            </p>
-          )}
         </>
       )}
     </article>

@@ -1,0 +1,141 @@
+/**
+ * The block under a marked question.
+ *
+ * It has to sit convincingly on TWO surfaces with different palettes — the
+ * course's paper (.v2-root, light) and the question bank's dark editorial
+ * theme — so every colour here is taken from `currentColor` and a pair of
+ * locally-defined tokens that each host overrides. No literal ink, no literal
+ * paper: dropped into either surface it inherits rather than fights.
+ */
+
+.v2-aw {
+  --aw-ink: currentColor;
+  --aw-quiet: color-mix(in srgb, currentColor 62%, transparent);
+  --aw-faint: color-mix(in srgb, currentColor 12%, transparent);
+  --aw-accent: color-mix(in srgb, currentColor 78%, transparent);
+
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--aw-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* On the course's paper the bronze accent exists; use it where it does. */
+.v2-root .v2-aw {
+  --aw-accent: var(--v2-bronze);
+  --aw-quiet: var(--v2-ink-2);
+  --aw-faint: var(--v2-line);
+}
+
+/* --- the governing principle ---------------------------------------- */
+
+.v2-aw-principle {
+  padding: 16px 18px;
+  border-left: 3px solid var(--aw-accent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border-radius: 0 8px 8px 0;
+}
+
+.v2-aw-principle small {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--aw-accent);
+  margin-bottom: 8px;
+}
+
+.v2-aw-principle strong {
+  display: block;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.v2-aw-principle p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--aw-quiet);
+}
+
+.v2-aw-principle b {
+  color: var(--aw-accent);
+  font-weight: 600;
+}
+
+/* --- where it comes from -------------------------------------------- */
+
+.v2-aw-eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--aw-quiet);
+}
+
+.v2-aw-section {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.v2-aw-section b {
+  font-variant-numeric: tabular-nums;
+  color: var(--aw-accent);
+  margin-right: 4px;
+}
+
+.v2-aw-blurb {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--aw-quiet);
+  max-width: 62ch;
+}
+
+.v2-aw-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  align-items: center;
+}
+
+/* --- the instrument, once asked for --------------------------------- */
+
+.v2-aw-instrument {
+  /* Full width of the card: a simulation squeezed into a text measure is
+     unreadable, and these were authored to be looked at. */
+  margin-top: 4px;
+}
+
+.v2-aw-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--aw-quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-aw-loading {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--aw-quiet);
+}
+
+@media (max-width: 560px) {
+  .v2-aw-actions .v2-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .v2-aw-pager {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

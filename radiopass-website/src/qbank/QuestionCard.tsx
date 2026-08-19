@@ -24,6 +24,11 @@ import { HighYield } from '../design/primitives'
 import { isBankQuestion } from './data'
 import { readQbMarks, readQbProgress, toggleQbMark } from './Shell'
 import { labLinkFor, type QbQuestion } from './types'
+import { QuestionAfterword } from '../physics2/components/QuestionAfterword'
+/* Three stems in the bank still carry recall-merge scaffolding ("this line is
+   completed by the next stem…"). The course sheet has always stripped it; this
+   one showed it raw. */
+import { cleanExplanation } from '../physics2/lib/clean'
 
 export type StemChoice = Record<string, boolean>
 
@@ -243,7 +248,7 @@ export function QuestionCard({
               )}
 
               {marked && stem.explanation && (
-                <p className="qb-stem-explain">{stem.explanation}</p>
+                <p className="qb-stem-explain">{cleanExplanation(stem.explanation)}</p>
               )}
             </li>
           )
@@ -324,6 +329,13 @@ export function QuestionCard({
               <HighYield label="Take this into the exam">{question.keyPoint}</HighYield>
             </div>
           )}
+
+          {/* Everything the course knows about this question. Gated on
+              `marked`, so a mock paper in progress reveals nothing — the same
+              boolean every other piece of feedback on this card hangs off.
+              Renders nothing at all for a question with no map row, which is
+              every question in the three fixed papers. */}
+          <QuestionAfterword questionId={question.id} missed={correct < outOf} />
 
           <Link className="qb-lablink" to={lab.href}>
             Explore this in the {lab.label} →
