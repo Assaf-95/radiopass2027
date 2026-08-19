@@ -29,6 +29,7 @@ import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import Layout from './components/Layout'
 import RequireAdmin from './components/RequireAdmin'
+import StructureFolders from './pages/StructureFolders'
 import { contentLoaded, loadContent, subscribeContent } from './lib/content/store'
 import Home from './pages/Home'
 import SectionHub from './pages/SectionHub'
@@ -147,6 +148,15 @@ export default function AnatomyRoutes() {
           <Route path="atlas/:chapterId/:structureId" element={<AtlasStructure />} />
           <Route path="section/:sectionId" element={<SectionHub />} />
           <Route path="admin" element={<AdminLogin />} />
+          {/* Authoring: joining the structures the dataset records twice. */}
+          <Route
+            path="admin/structures"
+            element={
+              <RequireAdmin>
+                <StructureFolders />
+              </RequireAdmin>
+            }
+          />
           <Route
             path="section/:sectionId/custom"
             element={
