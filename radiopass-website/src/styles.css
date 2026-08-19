@@ -353,3 +353,20 @@
   /* Stacked: a vertical rule would read as a stray mark. */
   .nav-divider { width: 100%; height: 1px; margin: var(--sp-2) 0; }
 }
+
+/* The branch word beside the wordmark — "RADIOPASS Physics".
+   Lighter and untracked against the wordmark's 0.34em uppercase, so the
+   brand still reads as the brand and the branch reads as a qualifier
+   rather than part of the name. The anatomy header carries the identical
+   pair (.rpa-brand-branch) so both halves announce themselves the same
+   way in the same place. */
+.brand-branch{
+  font-family:var(--display);
+  font-size:var(--fs-support);
+  font-weight:380;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--muted);
+  margin-left:-4px;
+}
+@media (max-width:900px){.brand-branch{display:none}}

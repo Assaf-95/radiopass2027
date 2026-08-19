@@ -157,6 +157,10 @@ export default function Layout() {
                 marks it as current. */}
             <Link to="/anatomy" className="rpa-brand">
               <span className="rpa-brand-mark">RadioPass</span>
+              {/* The matching half of the physics header's wordmark, in the
+                  same place and the same type. Which half you are in is now
+                  said by the brand itself on both sides. */}
+              <span className="rpa-brand-branch">Anatomy</span>
             </Link>
 
             {/* ONE NAVIGATION LANGUAGE ACROSS BOTH BRANCHES.

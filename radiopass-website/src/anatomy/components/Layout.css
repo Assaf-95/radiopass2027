@@ -235,3 +235,22 @@
 @media (max-width: 900px) {
   .rp-anatomy .app-nav-divider { display: none; }
 }
+
+/* The branch word — the exact counterpart of .brand-branch in the physics
+   header. Same relationship to the wordmark on both sides: the serif face,
+   untracked and dimmed, so "RadioPass" stays the name and "Anatomy" reads
+   as which half of it you are in rather than part of the name. */
+.rp-anatomy .rpa-brand-branch {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  /* The nav is tight here; the branch links already say which half you are
+     in, so the qualifier goes rather than crushing the wordmark. */
+  .rp-anatomy .rpa-brand-branch { display: none; }
+}

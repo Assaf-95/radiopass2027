@@ -398,6 +398,7 @@ function Header() {
      the tools of the branch you are actually in, then the trial. The anatomy
      app's header carries the same first group and the same trial entry, so
      moving between the two builds does not feel like changing website. */
+  const { pathname } = useLocation()
   const branchLinks: [string, string][] = [
     ['Anatomy', ANATOMY_HREF],
     ['Physics', '/physics'],
@@ -411,6 +412,9 @@ function Header() {
      the question bank and the labs inside the modules, and carrying them up
      here made the two headers different lengths and different shapes, which
      is most of why the product read as two websites rather than one. */
+  /* The portal belongs to neither half, so it carries no branch word. */
+  const branch = pathname === '/' ? '' : 'Physics'
+
   const links: [string, string][] = [
     ['Learning modules', '/visual-lab'],
     ['Question bank', '/question-bank'],
@@ -422,6 +426,12 @@ function Header() {
       <Link to="/" className="brand" aria-label="RadioPass home">
         <span className="brand-mark"><span></span><span></span><span></span></span>
         <span>radio<span>pass</span></span>
+        {/* The half you are standing in, said by the wordmark itself.
+            Anatomy's header says "RadioPass Anatomy" in the same place and
+            the same type, so the two read as two sections of one product
+            rather than two products that happen to share a name. Absent on
+            the portal, which belongs to neither. */}
+        {branch && <span className="brand-branch">{branch}</span>}
       </Link>
       <nav className={open ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
         {/* The two branches. Anatomy is a plain <a> because it leaves this
