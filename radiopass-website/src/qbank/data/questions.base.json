@@ -1,7 +1,7 @@
 [
   {
     "id": "b1",
-    "title": "Regarding compton scatter",
+    "title": "Regarding Compton scatter",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -1203,7 +1203,7 @@
   },
   {
     "id": "b48",
-    "title": "Regarding compton effect happens when energy is lower than electron binding energy",
+    "title": "Regarding Compton effect happens when energy is lower than electron binding energy",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -1217,7 +1217,7 @@
   },
   {
     "id": "b51",
-    "title": "Concerning scattered radiation in radiography and fluoroscopy",
+    "title": "Regarding scattered radiation in radiography and fluoroscopy",
     "topic": "Radiation Biology & Dosimetry",
     "source": "recall",
     "stems": [
@@ -1521,7 +1521,7 @@
   },
   {
     "id": "b65",
-    "title": "Concerning positron emission tomography",
+    "title": "Regarding positron emission tomography",
     "topic": "Nuclear Medicine",
     "source": "recall",
     "stems": [
@@ -1649,7 +1649,7 @@
   },
   {
     "id": "b75",
-    "title": "Concerning radiofrequency shielding and cryogens in the MR scanner room",
+    "title": "Regarding radiofrequency shielding and cryogens in the MR scanner room",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -2029,7 +2029,7 @@
   },
   {
     "id": "b97",
-    "title": "Concerning beam quality and added filtration",
+    "title": "Regarding beam quality and added filtration",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -2105,7 +2105,7 @@
   },
   {
     "id": "b100",
-    "title": "In digital radiography, regarding matrix, pixel and image quality",
+    "title": "Regarding digital radiography: matrix, pixel and image quality",
     "topic": "Digital Imaging",
     "source": "recall",
     "stems": [
@@ -2653,7 +2653,7 @@
   },
   {
     "id": "b135",
-    "title": "Concerning aliasing in pulsed Doppler ultrasound",
+    "title": "Regarding aliasing in pulsed Doppler ultrasound",
     "topic": "Other",
     "source": "recall",
     "stems": [
@@ -3465,7 +3465,7 @@
   },
   {
     "id": "b183",
-    "title": "In computed radiography (CR)",
+    "title": "Regarding computed radiography (CR)",
     "topic": "Digital Imaging",
     "source": "recall",
     "stems": [
@@ -4539,7 +4539,7 @@
   },
   {
     "id": "b225",
-    "title": "Regarding compton effect",
+    "title": "Regarding Compton effect",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -5213,7 +5213,7 @@
   },
   {
     "id": "b249",
-    "title": "Regarding compton effect",
+    "title": "Regarding Compton effect",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -5613,7 +5613,7 @@
   },
   {
     "id": "b265",
-    "title": "Regarding compton scatter",
+    "title": "Regarding Compton scatter",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -6425,7 +6425,7 @@
   },
   {
     "id": "b291",
-    "title": "Concerning exposure limits and bioeffects in MRI",
+    "title": "Regarding exposure limits and bioeffects in MRI",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -6571,7 +6571,7 @@
   },
   {
     "id": "b295",
-    "title": "The photoelectric effect in x-ray studies",
+    "title": "Regarding the photoelectric effect in x-ray studies",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -6609,7 +6609,7 @@
   },
   {
     "id": "b296",
-    "title": "Compton scattering",
+    "title": "Regarding Compton scattering",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -6647,7 +6647,7 @@
   },
   {
     "id": "b297",
-    "title": "The effective focal spot of an x-ray tube",
+    "title": "Regarding the effective focal spot of an x-ray tube",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -6723,7 +6723,7 @@
   },
   {
     "id": "b299",
-    "title": "With regard to Computed Radiography (CR)",
+    "title": "Regarding Computed Radiography (CR)",
     "topic": "Digital Imaging",
     "source": "tutorials",
     "stems": [
@@ -6799,7 +6799,7 @@
   },
   {
     "id": "b301",
-    "title": "Concerning gamma camera imaging with Tc99m",
+    "title": "Regarding gamma camera imaging with Tc99m",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -6913,7 +6913,7 @@
   },
   {
     "id": "b304",
-    "title": "SPECT scans in nuclear medicine",
+    "title": "Regarding SPECT scans in nuclear medicine",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -6951,7 +6951,7 @@
   },
   {
     "id": "b305",
-    "title": "In modern PET scanners",
+    "title": "Regarding modern PET scanners",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -6989,7 +6989,7 @@
   },
   {
     "id": "b306",
-    "title": "Concerning the biological effects of ionising radiation",
+    "title": "Regarding the biological effects of ionising radiation",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -7065,7 +7065,7 @@
   },
   {
     "id": "b308",
-    "title": "Diagnostic Reference Levels (DRLs)",
+    "title": "Regarding Diagnostic Reference Levels (DRLs)",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -7141,7 +7141,7 @@
   },
   {
     "id": "b310",
-    "title": "In clinical CT scanning",
+    "title": "Regarding clinical CT scanning",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -7217,7 +7217,7 @@
   },
   {
     "id": "b312",
-    "title": "The noise recorded in a CT study is increased",
+    "title": "Regarding the noise recorded in a CT study is increased",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -7255,7 +7255,7 @@
   },
   {
     "id": "b313",
-    "title": "The CT dose index (CTDI)",
+    "title": "Regarding the CT dose index (CTDI)",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -7293,7 +7293,7 @@
   },
   {
     "id": "b314",
-    "title": "Patient doses delivered during CT imaging",
+    "title": "Regarding Patient doses delivered during CT imaging",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -7369,7 +7369,7 @@
   },
   {
     "id": "b316",
-    "title": "In MR imaging",
+    "title": "Regarding MR imaging",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -7407,7 +7407,7 @@
   },
   {
     "id": "b317",
-    "title": "During the spin echo pulse sequence",
+    "title": "Regarding the spin echo pulse sequence",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -7445,7 +7445,7 @@
   },
   {
     "id": "b318",
-    "title": "Gradient recalled echo pulse sequences",
+    "title": "Regarding Gradient recalled echo pulse sequences",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -7483,7 +7483,7 @@
   },
   {
     "id": "b319",
-    "title": "Ultrasonic waves",
+    "title": "Regarding Ultrasonic waves",
     "topic": "Basic Physics",
     "source": "tutorials",
     "stems": [
@@ -7711,7 +7711,7 @@
   },
   {
     "id": "b325",
-    "title": "Concerning x-ray interactions with matter",
+    "title": "Regarding x-ray interactions with matter",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -8015,7 +8015,7 @@
   },
   {
     "id": "b333",
-    "title": "Concerning radionuclide imaging",
+    "title": "Regarding radionuclide imaging",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -8053,7 +8053,7 @@
   },
   {
     "id": "b334",
-    "title": "In tomographic radionuclide imaging",
+    "title": "Regarding tomographic radionuclide imaging",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -8129,7 +8129,7 @@
   },
   {
     "id": "b336",
-    "title": "The Ionising Radiations Regulations 2017",
+    "title": "Regarding the Ionising Radiations Regulations 2017",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -8281,7 +8281,7 @@
   },
   {
     "id": "b340",
-    "title": "The effective dose to a patient for a radiographic examination",
+    "title": "Regarding the effective dose to a patient for a radiographic examination",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -8319,7 +8319,7 @@
   },
   {
     "id": "b341",
-    "title": "In Multi-slice CT",
+    "title": "Regarding Multi-slice CT",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -8357,7 +8357,7 @@
   },
   {
     "id": "b342",
-    "title": "Signal-to-Noise ratio (SNR) in CT scanning",
+    "title": "Regarding Signal-to-Noise ratio (SNR) in CT scanning",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -8395,7 +8395,7 @@
   },
   {
     "id": "b343",
-    "title": "Concerning the effective dose to the patient in CT",
+    "title": "Regarding the effective dose to the patient in CT",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -8471,7 +8471,7 @@
   },
   {
     "id": "b345",
-    "title": "The MR signal",
+    "title": "Regarding the MR signal",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -8585,7 +8585,7 @@
   },
   {
     "id": "b348",
-    "title": "The chemical shift artifact",
+    "title": "Regarding the chemical shift artifact",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -8699,7 +8699,7 @@
   },
   {
     "id": "b351",
-    "title": "In B-mode scanning",
+    "title": "Regarding B-mode scanning",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -8737,7 +8737,7 @@
   },
   {
     "id": "b352",
-    "title": "Axial resolution in a B-mode scan",
+    "title": "Regarding Axial resolution in a B-mode scan",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -8775,7 +8775,7 @@
   },
   {
     "id": "b353",
-    "title": "The frequency shift in Doppler ultrasound",
+    "title": "Regarding the frequency shift in Doppler ultrasound",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -8813,7 +8813,7 @@
   },
   {
     "id": "b354",
-    "title": "Electron binding energy in atoms",
+    "title": "Regarding Electron binding energy in atoms",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -8851,7 +8851,7 @@
   },
   {
     "id": "b355",
-    "title": "For x-ray interactions in soft tissue",
+    "title": "Regarding For x-ray interactions in soft tissue",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -9079,7 +9079,7 @@
   },
   {
     "id": "b361",
-    "title": "Concerning radioactive decay schemes",
+    "title": "Regarding radioactive decay schemes",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -9155,7 +9155,7 @@
   },
   {
     "id": "b363",
-    "title": "In nuclear medicine imaging",
+    "title": "Regarding nuclear medicine imaging",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -9193,7 +9193,7 @@
   },
   {
     "id": "b364",
-    "title": "In positron emission tomography using fluorine-18",
+    "title": "Regarding positron emission tomography using fluorine-18",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -9231,7 +9231,7 @@
   },
   {
     "id": "b365",
-    "title": "With regard to the standardised uptake value (SUV)",
+    "title": "Regarding the standardised uptake value (SUV)",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -9307,7 +9307,7 @@
   },
   {
     "id": "b367",
-    "title": "With regard to the Ionising Radiation Medical Exposure",
+    "title": "Regarding the Ionising Radiation Medical Exposure",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -9345,7 +9345,7 @@
   },
   {
     "id": "b368",
-    "title": "An effective dose of 6mSv",
+    "title": "Regarding an effective dose of 6mSv",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -9497,7 +9497,7 @@
   },
   {
     "id": "b372",
-    "title": "Comparing reconstruction techniques in CT imaging",
+    "title": "Regarding Comparing reconstruction techniques in CT imaging",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -9611,7 +9611,7 @@
   },
   {
     "id": "b375",
-    "title": "In MR imaging",
+    "title": "Regarding MR imaging",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -9649,7 +9649,7 @@
   },
   {
     "id": "b376",
-    "title": "During the acquisition of an MR image",
+    "title": "Regarding the acquisition of an MR image",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -9763,7 +9763,7 @@
   },
   {
     "id": "b379",
-    "title": "In diagnostic ultrasound",
+    "title": "Regarding diagnostic ultrasound",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -9801,7 +9801,7 @@
   },
   {
     "id": "b380",
-    "title": "Lateral resolution in a B-mode scan",
+    "title": "Regarding Lateral resolution in a B-mode scan",
     "topic": "Basic Physics",
     "source": "tutorials",
     "stems": [
@@ -9953,7 +9953,7 @@
   },
   {
     "id": "b384",
-    "title": "The photoelectric effect",
+    "title": "Regarding the photoelectric effect",
     "topic": "Mammography",
     "source": "tutorials",
     "stems": [
@@ -9991,7 +9991,7 @@
   },
   {
     "id": "b385",
-    "title": "Compton scattering",
+    "title": "Regarding Compton scattering",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10067,7 +10067,7 @@
   },
   {
     "id": "b387",
-    "title": "Scattered radiation in abdominal radiography can be reduced",
+    "title": "Regarding Scattered radiation in abdominal radiography can be reduced",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -10143,7 +10143,7 @@
   },
   {
     "id": "b389",
-    "title": "In CR imaging",
+    "title": "Regarding CR imaging",
     "topic": "Digital Imaging",
     "source": "tutorials",
     "stems": [
@@ -10219,7 +10219,7 @@
   },
   {
     "id": "b391",
-    "title": "In mammographic examinations",
+    "title": "Regarding mammographic examinations",
     "topic": "Mammography",
     "source": "tutorials",
     "stems": [
@@ -10409,7 +10409,7 @@
   },
   {
     "id": "b396",
-    "title": "The Ionising Radiations Regulations 2017 stipulate",
+    "title": "Regarding the Ionising Radiations Regulations 2017 stipulate",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -10523,7 +10523,7 @@
   },
   {
     "id": "b399",
-    "title": "The radiation dose to a patient from injected",
+    "title": "Regarding the radiation dose to a patient from injected",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10561,7 +10561,7 @@
   },
   {
     "id": "b400",
-    "title": "Radiation protection in nuclear medicine",
+    "title": "Regarding Radiation protection in nuclear medicine",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -10599,7 +10599,7 @@
   },
   {
     "id": "b401",
-    "title": "In clinical CT scanning",
+    "title": "Regarding clinical CT scanning",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10637,7 +10637,7 @@
   },
   {
     "id": "b402",
-    "title": "The following actions will increase the noise in a CT slice",
+    "title": "Regarding the following actions will increase the noise in a CT slice",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10675,7 +10675,7 @@
   },
   {
     "id": "b403",
-    "title": "Concerning multi-slice CT",
+    "title": "Regarding multi-slice CT",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10789,7 +10789,7 @@
   },
   {
     "id": "b406",
-    "title": "In clinical MR studies",
+    "title": "Regarding clinical MR studies",
     "topic": "Basic Physics",
     "source": "tutorials",
     "stems": [
@@ -10979,7 +10979,7 @@
   },
   {
     "id": "b411",
-    "title": "Concerning ultrasound imaging",
+    "title": "Regarding ultrasound imaging",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -11093,7 +11093,7 @@
   },
   {
     "id": "b414",
-    "title": "Filtration",
+    "title": "Regarding Filtration",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -11131,7 +11131,7 @@
   },
   {
     "id": "b415",
-    "title": "The quantity of X-ray photons emitted from an X-ray tube",
+    "title": "Regarding the quantity of X-ray photons emitted from an X-ray tube",
     "topic": "Mammography",
     "source": "tutorials",
     "stems": [
@@ -11169,7 +11169,7 @@
   },
   {
     "id": "b416",
-    "title": "With respect to radioactive decay processes",
+    "title": "Regarding With respect to radioactive decay processes",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -11245,7 +11245,7 @@
   },
   {
     "id": "b418",
-    "title": "In carrying out quality assurance checks on X-ray equipment",
+    "title": "Regarding carrying out quality assurance checks on X-ray equipment",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -11321,7 +11321,7 @@
   },
   {
     "id": "b420",
-    "title": "When X-rays interact with matter, the following statements are true",
+    "title": "Regarding When X-rays interact with matter, the following statements are true",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -11359,7 +11359,7 @@
   },
   {
     "id": "b421",
-    "title": "The following dosimetric quantities are approximately correct",
+    "title": "Regarding the following dosimetric quantities are approximately correct",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -11397,7 +11397,7 @@
   },
   {
     "id": "b422",
-    "title": "Concerning diagnostic ultrasound",
+    "title": "Regarding diagnostic ultrasound",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -11435,7 +11435,7 @@
   },
   {
     "id": "b423",
-    "title": "Under IRR (2017) an employee must become a classified worker if",
+    "title": "Regarding Under IRR (2017) an employee must become a classified worker if",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -11473,7 +11473,7 @@
   },
   {
     "id": "b424",
-    "title": "About CR systems",
+    "title": "Regarding About CR systems",
     "topic": "Digital Imaging",
     "source": "tutorials",
     "stems": [
@@ -11549,7 +11549,7 @@
   },
   {
     "id": "b426",
-    "title": "Principles of MRI",
+    "title": "Regarding Principles of MRI",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -11663,7 +11663,7 @@
   },
   {
     "id": "b429",
-    "title": "The photoelectric effect",
+    "title": "Regarding the photoelectric effect",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -11701,7 +11701,7 @@
   },
   {
     "id": "b430",
-    "title": "In computed tomography",
+    "title": "Regarding computed tomography",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -11777,7 +11777,7 @@
   },
   {
     "id": "b432",
-    "title": "Imaging geometry",
+    "title": "Regarding Imaging geometry",
     "topic": "Mammography",
     "source": "tutorials",
     "stems": [
@@ -11815,7 +11815,7 @@
   },
   {
     "id": "b433",
-    "title": "Concerning biological effects of ionising radiation",
+    "title": "Regarding biological effects of ionising radiation",
     "topic": "Radiation Biology & Dosimetry",
     "source": "tutorials",
     "stems": [
@@ -11853,7 +11853,7 @@
   },
   {
     "id": "b434",
-    "title": "Justification and optimisation",
+    "title": "Regarding Justification and optimisation",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -11891,7 +11891,7 @@
   },
   {
     "id": "b435",
-    "title": "Gamma Photons",
+    "title": "Regarding Gamma Photons",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -11929,7 +11929,7 @@
   },
   {
     "id": "b436",
-    "title": "The following are true of electromagnetic radiation",
+    "title": "Regarding the following are true of electromagnetic radiation",
     "topic": "Basic Physics",
     "source": "tutorials",
     "stems": [
@@ -11967,7 +11967,7 @@
   },
   {
     "id": "b437",
-    "title": "Radiation Protection",
+    "title": "Regarding Radiation Protection",
     "topic": "Legislation & Radiation Protection",
     "source": "tutorials",
     "stems": [
@@ -12005,7 +12005,7 @@
   },
   {
     "id": "b438",
-    "title": "In MRI",
+    "title": "Regarding MRI",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -12043,7 +12043,7 @@
   },
   {
     "id": "b439",
-    "title": "Concerning radiation dose in mammography",
+    "title": "Regarding radiation dose in mammography",
     "topic": "Mammography",
     "source": "tutorials",
     "stems": [
@@ -12081,7 +12081,7 @@
   },
   {
     "id": "b440",
-    "title": "With regards to Inversion recovery pulse sequence.",
+    "title": "Regarding Inversion recovery pulse sequence.",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -12157,7 +12157,7 @@
   },
   {
     "id": "b442",
-    "title": "In the production of X-rays",
+    "title": "Regarding the production of X-rays",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -12195,7 +12195,7 @@
   },
   {
     "id": "b443",
-    "title": "Concerning diagnostic reference levels (DRLs)",
+    "title": "Regarding diagnostic reference levels (DRLs)",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -12233,7 +12233,7 @@
   },
   {
     "id": "b444",
-    "title": "Scatter and grids",
+    "title": "Regarding Scatter and grids",
     "topic": "Digital Imaging",
     "source": "tutorials",
     "stems": [
@@ -12271,7 +12271,7 @@
   },
   {
     "id": "b445",
-    "title": "Noise in CT",
+    "title": "Regarding Noise in CT",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -12309,7 +12309,7 @@
   },
   {
     "id": "b446",
-    "title": "Concerning ultrasound transducers",
+    "title": "Regarding ultrasound transducers",
     "topic": "Ultrasound",
     "source": "tutorials",
     "stems": [
@@ -12347,7 +12347,7 @@
   },
   {
     "id": "b447",
-    "title": "Collimation and filtration in CT",
+    "title": "Regarding Collimation and filtration in CT",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -12385,7 +12385,7 @@
   },
   {
     "id": "b448",
-    "title": "In digital subtraction angiography the input dose rate to the patient",
+    "title": "Regarding digital subtraction angiography the input dose rate to the patient",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -12461,7 +12461,7 @@
   },
   {
     "id": "b450",
-    "title": "Spin echo pulse sequence",
+    "title": "Regarding Spin echo pulse sequence",
     "topic": "MRI",
     "source": "tutorials",
     "stems": [
@@ -12499,7 +12499,7 @@
   },
   {
     "id": "b451",
-    "title": "Nuclear Medicine",
+    "title": "Regarding Nuclear Medicine",
     "topic": "Fluoroscopy",
     "source": "tutorials",
     "stems": [
@@ -12537,7 +12537,7 @@
   },
   {
     "id": "b452",
-    "title": "The effective dose to a patient from a single radiograph under Automatic exposure control is as follows:",
+    "title": "Regarding the effective dose to a patient from a single radiograph under Automatic exposure control is as follows:",
     "topic": "Radiation Biology & Dosimetry",
     "source": "tutorials",
     "stems": [
@@ -12575,7 +12575,7 @@
   },
   {
     "id": "b453",
-    "title": "In a normal radiographic set up",
+    "title": "Regarding a normal radiographic set up",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
