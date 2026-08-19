@@ -31,7 +31,13 @@
   bottom: 0;
   z-index: 0;
   overflow: hidden;
-  background: #000000;
+  /* The same charcoal the rest of the product uses, not pure black.
+     A hardcoded #000 here made the anatomy front page a visibly different
+     colour from every other page in the site — the single loudest tell that
+     these were two websites rather than two halves of one. The skull reads
+     just as well against the charcoal, and the page now joins the physics
+     side instead of announcing itself. */
+  background: var(--bg);
   pointer-events: none;
   opacity: var(--stage-opacity, 1);
 }

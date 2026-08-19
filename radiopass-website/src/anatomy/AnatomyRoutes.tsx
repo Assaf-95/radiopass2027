@@ -13,9 +13,8 @@
  *   KEPT   the lazy boundaries exactly as they were. They were chosen with
  *          care — Home, SectionHub and QuestionPlayer are the path from the
  *          front page to answering a question and stay eager; the Atlas, the
- *          viewers, the scout and the editors load on demand. Merging must
- *          not put the 1,767-line volume builder or the authoring suite into
- *          the application's first download.
+ *          viewers and the editors load on demand. Merging must not put the
+ *          authoring suite into the application's first download.
  *   KEPT   the content-API boot, which resolves the server overlay before
  *          anything renders so a replaced image never flashes as the old one.
  *
@@ -45,10 +44,6 @@ const AtlasHome = lazy(() => import('./pages/AtlasHome'))
 const AtlasChapter = lazy(() => import('./pages/AtlasChapter'))
 const AtlasStructure = lazy(() => import('./pages/AtlasStructure'))
 
-/* The scout. Lazy for the same reason as the Atlas, and emphatically so: it
-   pulls in the 1,767-line procedural volume builder, the largest single module
-   in the anatomy tree, which must never sit on a first download. */
-const VolumeExplorer = lazy(() => import('./pages/VolumeExplorer'))
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Disputes = lazy(() => import('./pages/Disputes'))
@@ -159,7 +154,6 @@ export default function AnatomyRoutes() {
           <Route path="disputes" element={<Disputes />} />
           <Route path="mri/:studyId" element={<MriViewer />} />
           <Route path="cxr" element={<ChestXrayAtlas />} />
-          <Route path="volume" element={<VolumeExplorer />} />
           <Route path="atlas" element={<AtlasHome />} />
           <Route path="atlas/:chapterId" element={<AtlasChapter />} />
           <Route path="atlas/:chapterId/:structureId" element={<AtlasStructure />} />

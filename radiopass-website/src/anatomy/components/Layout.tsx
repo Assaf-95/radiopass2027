@@ -179,7 +179,6 @@ export default function Layout() {
                   overflowed the container by 97px. */}
               <Link to="/anatomy?goto=modules">Question bank</Link>
               <Link to="/anatomy/atlas">Atlas</Link>
-              <Link to="/anatomy/volume">Scout</Link>
               <Link to="/anatomy/dashboard">Progress</Link>
               {isAdmin() && <Link to="/anatomy/admin">Editor</Link>}
 
@@ -200,8 +199,12 @@ export default function Layout() {
                 {theme === 'dark' ? '☾' : '☀'}
               </button>
 
-              <Link className="app-cta" to="/anatomy?goto=modules">
-                Start Learning
+              {/* The same words and the same destination as the physics
+                  header. Two different primary buttons — "Start Learning"
+                  here, "Start free trial" there — made the two halves look
+                  like two products with two different offers. */}
+              <Link className="app-cta" to="/free-trial">
+                Start free trial
                 <span aria-hidden="true">→</span>
               </Link>
 

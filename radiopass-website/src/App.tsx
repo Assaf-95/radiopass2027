@@ -402,11 +402,19 @@ function Header() {
     ['Anatomy', ANATOMY_HREF],
     ['Physics', '/physics'],
   ]
+  /* THE SAME FOUR IDEAS ON BOTH SIDES, in the same order: what you study,
+     what you answer, how you are doing, and the trial.
+
+     Only the first differs by branch — "Learning modules" here, "Atlas" in
+     anatomy — because that is the one genuine difference between the two
+     halves. Mock exams and the simulator labs came out: mocks live inside
+     the question bank and the labs inside the modules, and carrying them up
+     here made the two headers different lengths and different shapes, which
+     is most of why the product read as two websites rather than one. */
   const links: [string, string][] = [
-    ['Modules', '/visual-lab'],
+    ['Learning modules', '/visual-lab'],
     ['Question bank', '/question-bank'],
-    ['Mock exams', '/question-bank/mock'],
-    ['Simulator labs', '/ultrasound-lab'],
+    ['Progress', '/physics#progress'],
   ]
 
   return <header className="site-header">

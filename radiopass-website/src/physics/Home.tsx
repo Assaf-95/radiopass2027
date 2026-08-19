@@ -296,7 +296,7 @@ export default function PhysicsHome() {
       </header>
 
       {/* --- The learner's own record, or an honest absence --------------- */}
-      <section className="ph-state" aria-labelledby="ph-state-h">
+      <section id="progress" className="ph-state" aria-labelledby="ph-state-h">
         <h2 id="ph-state-h" className="ph-sr">
           Your progress
         </h2>
