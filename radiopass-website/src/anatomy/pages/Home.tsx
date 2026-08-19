@@ -8,8 +8,13 @@ import { getLastQuestion } from '../lib/progress';
 import AnatomyJourney from '../components/AnatomyJourney';
 import SkullHero from '../components/SkullHero';
 import { HERO_FRAMES } from '../data/heroFrames';
-import { frameUrl } from '../lib/skullFrames';
 import type { SectionId } from '../types';
+/* The owner's sculpture renders (src/assets/sculpture, 1400px JPEGs),
+   presented with the shared .rp-sculpt treatment from styles.css. */
+import brainRender from '../../assets/sculpture/brain.jpg';
+import chestRender from '../../assets/sculpture/chest.jpg';
+import giRender from '../../assets/sculpture/gi.jpg';
+import mskRender from '../../assets/sculpture/msk.jpg';
 import './Home.css';
 
 /* A compile-time constant: whether the skull hero exists at all is decided
@@ -33,6 +38,26 @@ const CODES: Record<SectionId, string> = {
   'upper-limb': 'UL',
   'lower-limb': 'LL',
 };
+
+/* The sculpture gallery: the six regions as chapter entries in one composed
+   layout — three large renders, one supporting, and two typographic entries.
+   Craniocaudal order, alternating sides, so it reads as a collection rather
+   than six identical cards.
+
+   The owner will supply spine and upper-limb renders in the same style as
+   the existing four; until then those two regions are typographic entries
+   (hairline frame, region code, no image). renal.jpg is deliberately NOT
+   used here — it belongs to the homepage gallery. */
+/* Only the regions whose render exists. Spine and Upper Limb were carried
+   here as typographic plates standing in for missing artwork; a placeholder
+   is not a chapter entry, and two of them broke the set. Every region is
+   still reachable — the worklist below lists all six with their counts. */
+const GALLERY: { id: SectionId; art: string }[] = [
+  { id: 'head-neck', art: brainRender },
+  { id: 'thorax', art: chestRender },
+  { id: 'abdo-pelvis', art: giRender },
+  { id: 'lower-limb', art: mskRender },
+];
 
 /* Where each region sits on the journey's timeline, for ?region= deep links.
    The body runs head → thorax → abdomen → limbs over the pinned scroll. */
@@ -206,18 +231,56 @@ export default function Home() {
           design rather than presented as a moment ("I don't want to see the
           chest itself... just want it to be there as a design"). Fixed as an
           element, not background-attachment (which iOS never honoured);
-          z-index 0 keeps it under the hero's opaque black and under every
-          section's translucent ground. */}
-      {showSkull && HERO_FRAMES.chest && (
+          z-index 0 keeps it under the hero's opaque ground and under every
+          section's translucent ground. The source is the owner's chest
+          render, screen-blended so its black rectangle melts into the navy. */}
+      {showSkull && (
         <img
           className="home-chest-bg"
-          src={frameUrl(HERO_FRAMES.chest)}
+          src={chestRender}
           alt=""
           aria-hidden="true"
           decoding="async"
           loading="lazy"
         />
       )}
+
+      {/* THE SIX REGIONS AS A GALLERY. Chapter entries at varied scale —
+          the renders large, labels outside the object, negative space doing
+          the composition — each entry one Link to the same destination the
+          worklist row uses, carrying the same count the worklist reads.
+          Deliberately its own anchor: #modules stays on the worklist below
+          and ?goto=modules keeps landing there. */}
+      <section className="region-gallery" id="regions" aria-label="Regions">
+        <header className="rg-head">
+          <p className="rpa-eyebrow">The syllabus</p>
+          <h2>The regions</h2>
+        </header>
+        <div className="rg-grid">
+          {GALLERY.map(({ id, art }) => {
+            const row = rows.find((r) => r.meta.id === id);
+            if (!row) return null;
+            const count = row.stats.total;
+            return (
+              <Link key={id} to={`/anatomy/section/${id}`} className="rg-entry">
+                <span className="rp-sculpt rg-art">
+                  <img src={art} alt="" loading="lazy" decoding="async" />
+                </span>
+                <span className="rg-label">
+                  <span className="rg-code mono">{CODES[id]}</span>
+                  <span className="rg-title">{row.meta.title}</span>
+                  <span className="rg-count mono">
+                    {count > 0 ? `${count} cases` : 'not loaded yet'}
+                  </span>
+                  <span className="rg-enter mono" aria-hidden="true">
+                    Enter →
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Your standing, before anything else on the page.
           Nothing here is the catalogue's size — every figure is the reader's

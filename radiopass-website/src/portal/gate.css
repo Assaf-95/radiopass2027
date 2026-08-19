@@ -1,7 +1,14 @@
 /**
- * The gate page. Site dark theme (the tokens are global), one paper card in
- * the course's own material — the same pairing as the free sample, so the
- * ask looks like the product it is asking for.
+ * The gate page.
+ *
+ * This is the surface most first-time visitors meet, so it belongs to the
+ * RadioPass universe rather than standing apart from it: the environment
+ * ground, one quiet elevated panel, the display face, hairline rules. It
+ * used to be a cream paper card borrowed from the course sheet, which read
+ * as a different product interrupting this one.
+ *
+ * The WORDING is the owner's and is pinned by tests — only presentation
+ * changes here.
  */
 
 .gate {
@@ -16,11 +23,12 @@
 
 .gate-card {
   width: min(560px, 100%);
-  background: #fbfbf8;
-  color: #1c1d1f;
-  border-radius: 14px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
   padding: clamp(30px, 5vw, 46px) clamp(24px, 4.5vw, 44px) clamp(26px, 4vw, 38px);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-lg);
   text-align: center;
 }
 
@@ -32,58 +40,68 @@
   margin-bottom: 22px;
 }
 .gate-brand b {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: #1c1d1f;
+  font-family: var(--font-display);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--text-primary);
 }
 .gate-brand span {
-  font-family: Fraunces, Georgia, serif;
-  font-style: italic;
-  font-size: 14px;
-  color: #8a6d3b;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
 }
 
 .gate-card h1 {
-  font-family: Fraunces, Georgia, serif;
-  font-weight: 500;
-  font-size: clamp(23px, 3.4vw, 30px);
-  line-height: 1.16;
+  font-family: var(--font-display);
+  font-weight: 340;
+  font-size: var(--fs-section);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.01em;
   margin: 0 0 14px;
 }
+/* The second sentence — "The course is free with an account." — is the
+   reassurance, not the headline. Cool, one step back. */
 .gate-card h1 span {
-  color: #55575c;
+  color: var(--rim);
 }
 .gate-card p {
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: #55575c;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
   margin: 0 0 22px;
   max-width: 44ch;
   margin-inline: auto;
 }
 
+/* The one action on the page, so it carries the warm accent. */
 .gate-cta {
   display: block;
-  background: #1c1d1f;
-  color: #fbfbf8;
+  background: var(--core);
+  color: var(--ground-deep);
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--fs-support);
   padding: 13px 22px;
   border-radius: 8px;
   text-decoration: none;
+  transition: background var(--dur) var(--ease);
 }
 .gate-cta:hover {
-  background: #000;
+  background: var(--core-hot);
 }
 
 .gate-alt {
   margin: 14px 0 0 !important;
-  font-size: 13px;
-  color: #898c92;
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
 }
 .gate-alt a {
-  color: #8a6d3b;
+  color: var(--text-secondary);
   text-decoration: underline;
   text-underline-offset: 3px;
+  text-decoration-color: var(--hairline-lit);
+}
+.gate-alt a:hover {
+  color: var(--text-primary);
 }

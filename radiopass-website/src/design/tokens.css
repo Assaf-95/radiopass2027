@@ -14,6 +14,12 @@
  *   - Tertiary metadata is the ONLY thing allowed below 16px, and it has its
  *     own token (--fs-meta) so the exception is visible in review.
  *
+ * THE PALETTE IS THE 19 AUG 2026 UNIVERSAL REDESIGN — the owner's master
+ * colour system, verbatim. Deep cool navy environment, blue structure lines,
+ * ONE warm amber reserved for what is active or focal, and a strictly neutral
+ * black zone for diagnostic images. Roughly ten parts cool to one part warm:
+ * warm light means something important is active, never decoration.
+ *
  * The existing --ink/--muted/--lime/--display names are kept as aliases at the
  * bottom: several hundred rules reference them, and breaking those to rename a
  * colour would be churn with no reader-visible benefit.
@@ -23,24 +29,24 @@
   /* ------------------------------------------------------------ typefaces
      The product's three voices, declared once.
 
-     They were previously declared three times — --pt-serif/--pt-sans/--pt-mono
-     on the master homepage, --font-display/--font-mono in anatomy, and bare
-     'Inter' literals through the physics stylesheet — so the same product
-     spoke in a different voice depending on which surface you were standing
-     on. The branch homes are the clearest example: the master page and
-     anatomy set their headings in Fraunces while physics and the trial used
-     Inter, which is exactly the tell that says "two websites".
+     Archivo is the display voice — modern, architectural, controlled; the
+     same grotesk family as the wordmark, letterspaced caps for the brand and
+     light weights (300-400) for titles. It replaced Fraunces in the
+     universal redesign: the serif read as a journal, and the owner's brief
+     asks for architecture. Inter carries everything a learner actually
+     reads. Mono is for data — DICOM overlays, window/level readouts, counts.
 
-     Fraunces is the display voice: brand, page titles, the things that
-     announce. Inter carries everything a learner actually reads. Mono is for
-     data — DICOM overlays, window/level readouts, counts. */
-  --font-display: 'RP Subscripts', 'Fraunces', 'Iowan Old Style', Georgia, serif;
+     'RP Subscripts' stays FIRST in the display stack: it is a unicode-range
+     @font-face in styles.css claiming only subscript digits (U+2080-209C) so
+     B₀/T₁/T₂ render from a face that draws them correctly. Deleting it
+     silently breaks every physics heading. */
+  --font-display: 'RP Subscripts', 'Archivo', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   /* Aliases the anatomy scope points at. It has to redeclare --font-display
      and --font-mono inside .rp-anatomy for its own components, and a
      self-reference there would resolve to nothing. */
-  --font-display-canonical: 'RP Subscripts', 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-display-canonical: 'RP Subscripts', 'Archivo', 'Inter', system-ui, sans-serif;
   --font-mono-canonical: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   /* ---------------------------------------------------------------- type
@@ -100,33 +106,59 @@
 
   /* ----------------------------------------------------------- container */
   --container-wide: 1400px;
+  /* The one height every fixed bar and every content offset agrees on.
+     Thin and architectural — was 78px in the charcoal era. */
+  --header-h: 64px;
   --container-main: 1240px;
   --container-reading: 780px;
   --container-narrow: 640px;
   --gutter: clamp(16px, 3vw, 32px);
 
+  /* ------------------------------------------------------------- ground
+     The environment. Not a flat navy: pages paint the radial fall-off
+     (--ground-env) so the screen has depth without decoration. */
+  --ground-deep: #00030F;
+  --ground:      #030A18;
+  --ground-lift: #040C1A;
+  --ground-env: radial-gradient(
+    circle at 50% 38%,
+    var(--ground-lift) 0%,
+    var(--ground) 42%,
+    var(--ground-deep) 100%
+  );
+
   /* ------------------------------------------------------ surface levels
-     Three depths, not a gradient per component. */
-  /* DARK, BUT NOT PITCH BLACK — the owner's words, and the distinction is
-     the whole point. The ground was #0B0D10, which is 4% off pure black: at
-     that level the page stops reading as a surface and starts reading as an
-     absence, panels sitting on it have nothing to sit on, and hours of
-     reading are genuinely harder than they need to be.
+     Three depths, not a gradient per component. The ground is the deep
+     environment; a panel sits visibly on it; interaction lifts it once. */
+  --bg-base: var(--ground);
+  --bg-elevated: #0A1526;
+  --bg-interactive: #12203A;
+  --surface-hover: #12203A;
 
-     This is a true charcoal instead. Still unmistakably a dark theme, but a
-     surface with a colour, so a panel can be lighter than its ground and a
-     border can be seen. Pure black is kept for exactly one job below: the
-     film. */
-  --bg-base: #15181E;
-  --bg-elevated: #1C2028;
-  --bg-interactive: #252A33;
+  /* ---------------------------------------------------------- structure
+     The cool skeleton of every drawing and diagram: core lines, mid lines,
+     and the bright rim that catches the light. */
+  --structure-core: #305080;
+  --structure:      #4A6EA0;
+  --rim:            #A4D1EC;
+  /* The brightest focal point a screen may hold — beam, focus, wavefront. */
+  --beam:           #F5FCFF;
 
-  /* The film ground, and the ONLY place near-black belongs: image viewports,
-     radiographs, simulation plates. Nobody reads a film off a lit surround,
-     and now that the page is charcoal a film actually reads as a film. */
-  --film: #07080B;
-  --border: rgba(242, 238, 230, 0.12);
-  --border-strong: rgba(242, 238, 230, 0.26);
+  /* --------------------------------------------------- the diagnostic zone
+     HARD RULE: whenever a real radiograph, CT, MRI, ultrasound or fluoro
+     image appears, the product identity steps back. Pure black ground,
+     neutral chrome, neutral labels. No navy cast, no amber border, no glow.
+     --film keeps its historic name; it IS the dicom ground. */
+  --dicom-bg:     #000000;
+  --dicom-chrome: #1A1A1A;
+  --dicom-label:  #B4B4B4;
+  --film: var(--dicom-bg);
+
+  /* ------------------------------------------------------------ hairlines */
+  --hairline:     rgba(164, 209, 236, 0.14);
+  --hairline-lit: rgba(164, 209, 236, 0.32);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-lit);
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;
@@ -136,18 +168,27 @@
   /* --------------------------------------------------------------- text
      Four contrast steps. Instructional text never goes below --text-secondary:
      faint grey on black is where this site was losing readers. */
-  --text-primary: #F2EEE6;
-  --text-secondary: #C3C7CD;
-  --text-tertiary: #8B929B;
-  --text-disabled: #5C626B;
+  --text-primary: #E8ECF1;
+  --text-secondary: #BCC7D7;
+  --text-tertiary: #8FA3BC;
+  --text-disabled: #5A6E88;
+  /* The brief's own names for the same three steps. */
+  --text: var(--text-primary);
+  --text-dim: var(--text-tertiary);
+  --text-faint: var(--text-disabled);
 
   /* ------------------------------------------------------------ accents
-     Semantic roles, then the modality hues. One colour per modality was
-     already settled; this only gives the roles names. */
-  --accent: #D9A84E;
-  --accent-soft: rgba(217, 168, 78, 0.14);
+     ONE warm accent. --core is the luminous interior of the anatomy objects
+     brought into the interface, and it is spent only on what is active,
+     focal or currently true: the current step, the live control, the
+     Continue. Never on every heading, button, border and icon — the screen
+     stays roughly ten parts cool to one part warm. */
+  --core:     #D8A874;
+  --core-hot: #FFE6BA;
+  --accent: var(--core);
+  --accent-soft: rgba(216, 168, 116, 0.14);
   --success: #7FC8A9;
-  --warning: #D9A84E;
+  --warning: var(--core);
   --error: #C9776B;
   /* The approved X-ray blue, and the only correct value: it is what the anatomy
      app ships (index.css --mod-xray), what both plate canvases paint, and what
@@ -161,18 +202,38 @@
   --hue-us: #7BCBC4;
   --hue-nm: #E0955A;
 
+  /* ------------------------------------------------- the progress ramp
+     Eleven wedge steps from ground to rim. Use only where a ramp genuinely
+     encodes progress or intensity — never as decoration. */
+  --wedge-00: #00030F;
+  --wedge-01: #0B1524;
+  --wedge-02: #16263A;
+  --wedge-03: #213750;
+  --wedge-04: #2C4866;
+  --wedge-05: #37597C;
+  --wedge-06: #456A91;
+  --wedge-07: #567BA5;
+  --wedge-08: #6B8DB8;
+  --wedge-09: #85AFD2;
+  --wedge-10: #A4D1EC;
+
   /* ------------------------------------------------------------- motion
-     One easing, three durations. Educational animation sets its own timing;
-     interface motion does not get to. */
+     One easing for interface response, one glide for the slow, elegant
+     movements of scientific objects. Educational animation sets its own
+     timing; interface motion does not get to. */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
   --dur-micro: 150ms;
   --dur: 220ms;
   --dur-reveal: 380ms;
+  --dur-slow: 700ms;
 
-  /* ------------------------------------------------------------ shadows */
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
-  --glow-accent: 0 0 0 1px rgba(217, 168, 78, 0.4), 0 0 0 6px rgba(217, 168, 78, 0.08);
+  /* ------------------------------------------------------------ shadows
+     Very little conventional box shadow: depth comes from rim light and
+     surface luminance. These exist for floating chrome (menus, dialogs). */
+  --shadow: 0 10px 30px rgba(0, 0, 5, 0.5);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 5, 0.6);
+  --glow-accent: 0 0 0 1px rgba(216, 168, 116, 0.4), 0 0 0 6px rgba(216, 168, 116, 0.08);
 
   /* ---------------------------------------------- aliases, kept on purpose
      Several hundred existing rules reference these. Renaming them would be a
@@ -187,6 +248,64 @@
   --lime: var(--accent);
 }
 
+/* ------------------------------------------------------------ light mode
+   A genuine light design, not an inversion: soft pearl ground, mineral
+   grey surfaces, graphite text, the cool structure darkened so hairlines
+   and diagrams keep their weight, and the warm accent deepened to hold
+   WCAG AA on pearl. The diagnostic zone does not change — films are read
+   on black in either theme.
+
+   The attribute is stamped on <html> by the shared theme hook
+   (src/design/theme.tsx), persisted under localStorage 'radiopass-theme-v2'
+   — the key anatomy's toggle already owns. Dark is the default; only an
+   explicit toggle writes the key. */
+:root[data-theme='light'] {
+  --ground-deep: #E7EBF1;
+  --ground:      #F2F4F8;
+  --ground-lift: #F9FAFC;
+  --ground-env: radial-gradient(
+    circle at 50% 30%,
+    var(--ground-lift) 0%,
+    var(--ground) 48%,
+    var(--ground-deep) 100%
+  );
+  --bg-base: var(--ground);
+  --bg-elevated: #FFFFFF;
+  --bg-interactive: #E9EEF5;
+  --surface-hover: #E9EEF5;
+
+  --structure-core: #A9BCD4;
+  --structure:      #7C96B8;
+  --rim:            #2E5C8F;
+  --beam:           #0E1726;
+
+  --hairline:     rgba(23, 48, 84, 0.14);
+  --hairline-lit: rgba(23, 48, 84, 0.30);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-lit);
+
+  --text-primary: #16202E;
+  --text-secondary: #3D4E63;
+  --text-tertiary: #5B6E86;
+  --text-disabled: #90A0B4;
+
+  --core:     #96682A;
+  --core-hot: #7A5417;
+  --accent-soft: rgba(150, 104, 42, 0.12);
+  --success: #1F8A61;
+  --error: #B4483A;
+
+  --hue-xray: #3A6B96;
+  --hue-ct: #34638C;
+  --hue-mri: #5D4FA0;
+  --hue-us: #23726B;
+  --hue-nm: #A65E24;
+
+  --shadow: 0 10px 30px rgba(24, 40, 64, 0.14);
+  --shadow-lg: 0 24px 60px rgba(24, 40, 64, 0.18);
+  --glow-accent: 0 0 0 1px rgba(150, 104, 42, 0.4), 0 0 0 6px rgba(150, 104, 42, 0.08);
+}
+
 /* Breakpoints cannot be custom properties in a media query, so they live here
    as the single written record of what the numbers mean:
      1400  wide desktop      1280  desktop      1024  tablet landscape
@@ -196,5 +315,5 @@
    1512x982 laptop gives a page about 780px once chrome is subtracted. */
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --dur-micro: 0ms; --dur: 0ms; --dur-reveal: 0ms; }
+  :root { --dur-micro: 0ms; --dur: 0ms; --dur-reveal: 0ms; --dur-slow: 0ms; }
 }

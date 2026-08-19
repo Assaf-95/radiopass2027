@@ -18,15 +18,13 @@
    =========================================================================== */
 
 /* ===========================================================================
-   RadioPass Anatomy — the RadioPass house style, taken from the Physics
-   homepage itself (radiopass-website/src/home/home.css) rather than
-   re-invented.
+   RadioPass Anatomy — the RadioPass house style, from design/tokens.css
+   (the 19 Aug 2026 universal redesign) rather than re-invented.
 
-   Its system: near-black ground (#0B0D10), warm ivory type (#F2EEE6), one
-   amber accent (#D9A84E) used sparingly, Fraunces set LIGHT for display and
-   Inter for everything else. Buttons are 4px rectangles — ivory when solid,
-   hairline when ghost. The modality accents (x-ray blue, ultrasound teal,
-   MRI violet) come across too, so the two sites name imaging the same way.
+   Its system: deep navy environment, cool structure lines, ONE warm accent
+   (--core) spent only on what is active or focal, Archivo for display and
+   Inter for everything else. The modality hues come across from the shared
+   tokens too, so the two sites name imaging the same way.
 
    Monospace survives only in the data layer here, because this site has one
    — DICOM overlays, window/level readouts, study references.
@@ -36,33 +34,43 @@
      the same hexes, which meant the two halves could drift apart on a colour
      nobody had touched — and did, the moment the ground was lifted off pure
      black on the physics side only. Aliases now. */
-  --void: var(--film);            /* image viewport — the film, still near-black */
+  --void: var(--film);            /* image viewport — the film, black in BOTH themes */
   --bg: var(--bg-base);
-  --panel: var(--bg-elevated);
+  /* Via --surface, NOT var(--bg-elevated): this block re-points --bg-elevated
+     at --panel-2 further down for old component sheets, so reading it here
+     would silently make --panel and --panel-2 the same colour. */
+  --panel: var(--surface);
   --panel-2: var(--bg-interactive);
-  --panel-3: #2E343F;             /* hover, one step above --bg-interactive */
+  /* Hover, one step above --bg-interactive: the interactive surface lifted
+     toward the rim. (Percentages sum to 100 on purpose — color-mix scales
+     alpha down when they don't.) */
+  --panel-3: color-mix(in srgb, var(--bg-interactive) 92%, var(--rim) 8%);
 
-  --line: var(--border);
-  --line-strong: var(--border-strong);
+  /* Directly on the hairlines, NOT var(--border): --border is re-pointed at
+     --line further down for old component sheets, and reading it here would
+     make the pair a cycle (both invalid, borders falling to currentColor). */
+  --line: var(--hairline);
+  --line-strong: var(--hairline-lit);
 
-  --text: #F2EEE6;      /* --hm-ink */
-  --text-dim: #8B929B;  /* --hm-mut */
-  --text-faint: #62686F;
+  --text: var(--text-primary);
+  --text-dim: var(--text-tertiary);
+  --text-faint: var(--text-disabled);
 
-  /* The single amber accent. Kept under the old teal names so every component
-     sheet resolves without edits. */
-  --amber-accent: #D9A84E;
-  --teal: #D9A84E;
-  --teal-bright: #D9A84E;
-  --cyan: #E6C077;
-  --teal-bg: rgba(217, 168, 78, 0.12);
+  /* The single warm accent. Kept under the old amber/teal names so every
+     component sheet resolves without edits. */
+  --amber-accent: var(--accent);
+  --teal: var(--accent);
+  --teal-bright: var(--accent);
+  --cyan: var(--core-hot);
+  --teal-bg: var(--accent-soft);
 
   /* Physics gives each modality its own hue; the same three are used here so
      a chest film, an ultrasound and an MRI are colour-coded identically
-     across the two sites. */
-  --mod-xray: #A8CBEA;
-  --mod-us: #7BCBC4;
-  --mod-mri: #A99EDB;
+     across the two sites. Aliases of the shared tokens, so they re-value in
+     light mode without a local override. */
+  --mod-xray: var(--hue-xray);
+  --mod-us: var(--hue-us);
+  --mod-mri: var(--hue-mri);
 
   /* Result states. Amber for partial is deliberate: it reads as "adjust",
      not "fail", which is what a half mark means. */
@@ -89,50 +97,40 @@
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono-canonical);
 
-  /* Physics rounds buttons to 4px and panels to 8-10px. */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
+  /* The system's radii: 8px controls, 10/14 for real surfaces. --radius-lg
+     is NOT redeclared here — the global 14px applies. */
+  --radius-sm: 8px;
+  --radius-md: var(--radius);
 
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  /* --shadow and --shadow-lg are NOT redeclared — the global tokens apply
+     (and re-value in light mode). Only the small step is local. */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 5, 0.3);
   --shadow-md: var(--shadow);
-  --shadow-lg: var(--shadow);
   /* --hm-wrap is min(1200px, 100% - 96px). */
   --container: min(1200px, calc(100vw - 96px));
-  --header-h: 104px;
+  /* --header-h is NOT redeclared — every header is the global 64px. */
 
   /* Aliases kept so component CSS written against the old names still resolves. */
   --bg-elevated: var(--panel-2);
   --border: var(--line);
   --border-soft: var(--line);
-  --accent: var(--amber-accent);
   --accent-strong: var(--amber-accent);
   --accent-bg: var(--teal-bg);
-  --accent-contrast: #0B0D10;
+  --accent-contrast: var(--ground-deep);
   --text-muted: var(--text-dim);
 }
-/* Light box — the daytime variant. Not an inverted dark theme: it is the
-   printed-film look, warm paper with the same amber. */
+/* Light — the pearl/mineral system, not a warm-paper variant. Almost nothing
+   is declared here on purpose: the dark block above aliases the shared
+   tokens, and :root[data-theme='light'] in design/tokens.css re-values those
+   tokens, so ground, panels, hairlines, text, accent and modality hues all
+   follow without a local copy that could drift.
+
+   What stays local:
+   - --void is NOT re-valued: films are read on black in both themes, so it
+     keeps its dark-block value (the dicom ground).
+   - The 0/1/2 marking hues, deepened for pearl. Owner-decided semantics;
+     never fold them into the accent. */
 [data-theme='light'] .rp-anatomy {
-  --void: #0d1218;
-  --bg: #f6f4ef;
-  --panel: #ffffff;
-  --panel-2: #f1ede4;
-  --panel-3: #e8e2d6;
-  --line: rgba(20, 22, 26, 0.12);
-  --line-strong: rgba(20, 22, 26, 0.24);
-  --text: #14161a;
-  --text-dim: #5c6068;
-  --text-faint: #8a8f97;
-  --amber-accent: #9a6f19;
-  --teal: #9a6f19;
-  --teal-bright: #9a6f19;
-  --cyan: #b4862a;
-  --teal-bg: rgba(154, 111, 25, 0.1);
-  --mod-xray: #3a6b96;
-  --mod-us: #2c7d75;
-  --mod-mri: #5d4fa0;
   --green: #1f9c66;
   --green-bg: rgba(31, 156, 102, 0.1);
   --amber: #b9772a;
@@ -143,8 +141,7 @@
   --purple-bg: rgba(107, 91, 214, 0.12);
   --grey: #7d8fa3;
   --grey-bg: rgba(125, 143, 163, 0.16);
-  --shadow: 0 18px 44px rgba(20, 22, 26, 0.1);
-  --shadow-sm: 0 2px 8px rgba(20, 22, 26, 0.07);
+  --shadow-sm: 0 2px 8px rgba(24, 40, 64, 0.08);
   --accent-contrast: #ffffff;
 }
 .rp-anatomy * { box-sizing: border-box; }
@@ -159,9 +156,9 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-/* Fraunces set LIGHT, which is the whole voice of the Physics site: the
-   display face is large and quiet rather than heavy, and optical sizing does
-   the work at size. Physics uses 330 for the hero and 340 elsewhere. */
+/* The display face set LIGHT (Archivo via the canonical stack), which is the
+   whole voice of the site: large and quiet rather than heavy. Physics uses
+   330 for the hero and 340 elsewhere. */
 .rp-anatomy h1, .rp-anatomy h2, .rp-anatomy h3, .rp-anatomy h4 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
@@ -187,8 +184,9 @@
   font-variant-numeric: tabular-nums;
 }
 /* The Physics eyebrow, verbatim: Inter, 11px, very wide tracking, muted —
-   and preceded by a short amber rule, which is the one flourish that site
-   allows itself above a heading. */
+   and preceded by a short rule, which is the one flourish that site allows
+   itself above a heading. Cool, not amber: the warm accent is spent only on
+   what is active or focal, never on furniture. */
 .rp-anatomy .rpa-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -205,7 +203,7 @@
   width: 22px;
   height: 1px;
   margin-right: 12px;
-  background: var(--amber-accent);
+  background: var(--structure);
   vertical-align: middle;
 }
 /* --- Surfaces ------------------------------------------------------------ */
@@ -216,9 +214,9 @@
   box-shadow: var(--shadow);
 }
 /* --- Controls ------------------------------------------------------------
-   The Physics button: a 4px rectangle, Inter 14/600, and it lifts a pixel on
-   hover. Solid is ivory on charcoal — NOT amber; the accent is spent on the
-   one italic word in the headline, never on a button. */
+   The house button: an 8px rectangle, Inter 14/600, and it lifts a pixel on
+   hover. Solid is ink on ground — NOT amber; the accent is spent on what is
+   active or focal, never on a button. */
 .rp-anatomy .btn {
   display: inline-flex;
   align-items: center;
@@ -226,7 +224,7 @@
   gap: 9px;
   padding: 14px 26px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(242, 238, 230, 0.25);
+  border: 1px solid var(--hairline);
   background: transparent;
   color: var(--text);
   font-family: var(--font-sans);
@@ -235,7 +233,7 @@
   cursor: pointer;
   transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.25s;
 }
-.rp-anatomy .btn:hover:not(:disabled) { border-color: rgba(242, 238, 230, 0.55); transform: translateY(-1px); }
+.rp-anatomy .btn:hover:not(:disabled) { border-color: var(--hairline-lit); transform: translateY(-1px); }
 .rp-anatomy .btn:active:not(:disabled) { transform: translateY(0); }
 .rp-anatomy .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .rp-anatomy .btn-primary {
@@ -243,11 +241,12 @@
   border-color: var(--text);
   color: var(--bg);
 }
-.rp-anatomy .btn-primary:hover:not(:disabled) { background: #ffffff; border-color: #ffffff; }
-/* The third Physics button: no box at all, an amber underline. */
+.rp-anatomy .btn-primary:hover:not(:disabled) { background: var(--beam); border-color: var(--beam); }
+/* The third Physics button: no box at all, an accent underline — functional
+   amber, the affordance itself. */
 .rp-anatomy .btn-line {
   border: 0;
-  border-bottom: 1px solid rgba(217, 168, 78, 0.4);
+  border-bottom: 1px solid rgba(216, 168, 116, 0.4);
   border-radius: 0;
   padding: 10px 2px;
   color: var(--amber-accent);

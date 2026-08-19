@@ -127,9 +127,13 @@
 }
 .rp-anatomy .stop-hero .stop-panel > * { max-width: none; }
 /* --- Hero -----------------------------------------------------------------
-   Copied from .rpa-hero-copy on the Physics homepage: the wordmark at 0.55em
-   tracking, a Fraunces headline at weight 330 whose second line is italic
-   amber, an italic serif line beneath it, then the muted sentence. */
+   The display headline at weight 330 whose second line is upright and rim-lit
+   (the amber-italic grammar is retired), a display subline, then the muted
+   sentence.
+
+   THE HERO BAND IS DARK IN BOTH THEMES — films and heroes are read on dark —
+   so the copy colours here are the dark palette's literals on purpose, not
+   themed tokens that would flip to graphite on a band that never lightens. */
 .rp-anatomy .hero-title {
   margin: 0;
   font-family: var(--font-display);
@@ -138,26 +142,51 @@
   font-size: clamp(48px, 5.6vw, 82px);
   line-height: 1.06;
   letter-spacing: -0.015em;
-  color: #F7F4ED;
+  color: #E8ECF1;
 }
-/* The one place the accent is spent. */
+/* Display emphasis: upright, rim-lit. var(--rim) in dark; pinned to the same
+   hue in light because the band underneath stays dark. */
 .rp-anatomy .hero-title em {
-  font-style: italic;
-  color: var(--amber-accent);
+  font-style: normal;
+  color: var(--rim);
 }
+[data-theme='light'] .rp-anatomy .hero-title em { color: #A4D1EC; }
 .rp-anatomy .hero-eq {
   margin: 30px 0 0;
   font-family: var(--font-display);
-  font-style: italic;
+  font-style: normal;
   font-size: clamp(18px, 1.6vw, 22px);
-  color: rgba(242, 238, 230, 0.9);
+  color: rgba(232, 236, 241, 0.9);
 }
 .rp-anatomy .hero-sub {
   margin: 16px 0 0;
   max-width: 520px;
   font-size: 16px;
   line-height: 1.65;
-  color: #9AA0A8;
+  color: #8FA3BC;
+}
+/* The metaline and the skip control sit on the same dark band (their base
+   rules live in AnatomyJourney.css; this file is emitted later and wins the
+   tie). Cool, not amber — the accent is spent on Continue, not on furniture. */
+.rp-anatomy .hero-meta { color: #8FA3BC; }
+.rp-anatomy .journey-skip {
+  color: #8FA3BC;
+  border-bottom-color: rgba(164, 209, 236, 0.35);
+}
+.rp-anatomy .journey-skip:hover {
+  color: #E8ECF1;
+  border-bottom-color: rgba(164, 209, 236, 0.7);
+}
+/* The primary action on the dark band: pinned to the dark palette's ink in
+   light mode too, so the button does not become near-black on near-black. */
+[data-theme='light'] .rp-anatomy .skull-copy .btn-primary {
+  background: #E8ECF1;
+  border-color: #E8ECF1;
+  color: #030A18;
+}
+[data-theme='light'] .rp-anatomy .skull-copy .btn-primary:hover:not(:disabled) {
+  background: #F5FCFF;
+  border-color: #F5FCFF;
 }
 .rp-anatomy .rpa-hero-actions {
   display: flex;
@@ -181,16 +210,17 @@
   font-weight: 500;
   letter-spacing: 0.34em;
   text-transform: uppercase;
-  color: #8B929B;
+  color: #8FA3BC; /* dark-band literal: the hero stays dark in both themes */
   white-space: nowrap;
 }
 /* A table advancing, drawn rather than an icon: the line travels the way the
-   scan does the moment you start scrolling. */
+   scan does the moment you start scrolling. Rim light, not amber — motion
+   furniture is cool. */
 .rp-anatomy .cue-arrow {
   display: block;
   width: 1px;
   height: 46px;
-  background: linear-gradient(var(--amber-accent), transparent);
+  background: linear-gradient(rgba(164, 209, 236, 0.85), transparent);
   transform-origin: top;
   animation: hero-hint 2.4s ease-in-out infinite;
 }
@@ -587,7 +617,7 @@
   /* Translucent on purpose: the fixed chest layer beneath reads through as
      the section's ground. Panels and rows keep their own opaque surfaces, so
      text never sits on the image itself. */
-  background: rgba(7, 8, 11, 0.86);
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
   z-index: -1;
 }
 .rp-anatomy .worklist-head {
@@ -619,8 +649,9 @@
   border-radius: var(--radius-lg);
   transition: border-color 0.25s, background 0.25s, transform 0.25s;
 }
-.rp-anatomy .wl-row:hover { border-color: rgba(242, 238, 230, 0.22); background: var(--panel-2); transform: translateY(-2px); }
-.rp-anatomy .wl-row:hover .wl-action { color: var(--teal-bright); }
+.rp-anatomy .wl-row:hover { border-color: var(--hairline-lit); background: var(--panel-2); transform: translateY(-2px); }
+.rp-anatomy .wl-row:hover .wl-action { color: var(--rim); }
+/* The region code chip: cool. It is a label, not the active thing. */
 .rp-anatomy .wl-code {
   display: grid;
   place-items: center;
@@ -628,11 +659,11 @@
   height: 44px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
-  background: rgba(242, 238, 230, 0.05);
+  background: color-mix(in srgb, var(--rim) 7%, transparent);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--amber-accent);
+  color: var(--rim);
 }
 .rp-anatomy .wl-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .rp-anatomy .wl-title {
@@ -661,14 +692,15 @@
   background: var(--panel-3);
   overflow: hidden;
 }
-.rp-anatomy .wl-bar-fill { display: block; height: 100%; background: var(--teal-bright); }
+/* Live progress: the accent's place. */
+.rp-anatomy .wl-bar-fill { display: block; height: 100%; background: var(--accent); }
 .rp-anatomy .wl-pct { font-size: 11.5px; color: var(--text-faint); min-width: 36px; text-align: right; }
 .rp-anatomy .wl-action {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--amber-accent);
+  color: var(--text-dim);
   text-align: right;
   transition: color 0.14s ease;
 }
@@ -767,13 +799,173 @@
   width: auto;
   max-width: 90vw;
   object-fit: contain;
-  opacity: 0.15;
+  /* Screen BRIGHTENS, so this number is far lower than it looks: against a
+     near-black ground a screen-blended render at 0.15 still reads as a solid
+     object and collided with the gallery in front of it. This is scenery —
+     it must be felt, not seen, and never compete with a region entry.
+     In light mode screen against pearl takes it to almost nothing, which is
+     the right answer for a layer that is scenery. */
+  opacity: 0.025;
+  mix-blend-mode: screen;
   z-index: 0;
   pointer-events: none;
 }
 @media (max-width: 900px) {
-  .rp-anatomy .home-chest-bg { left: 50%; height: min(70vh, 640px); opacity: 0.12; }
+  .rp-anatomy .home-chest-bg { left: 50%; height: min(70vh, 640px); opacity: 0.02; }
 }
+
+/* --- Skull hero surround --------------------------------------------------
+   Overrides of SkullHero.css (emitted before this file, so every
+   same-specificity tie lands here). The section ground moves from #000 to
+   the environment, and the poster screen-blends so its baked black rectangle
+   melts into the navy. The skull itself — its mounting, size, copy — is
+   owner-decided and untouched. */
+.rp-anatomy .skull-hero,
+.rp-anatomy .skull-pin {
+  background: var(--ground-env);
+}
+.rp-anatomy .skull-poster {
+  mix-blend-mode: screen;
+}
+/* The legibility wash, retinted from black to the ground navy. */
+.rp-anatomy .skull-pin::before {
+  background: linear-gradient(
+    100deg,
+    rgba(3, 10, 24, 0.96) 0%,
+    rgba(3, 10, 24, 0.86) 26%,
+    rgba(3, 10, 24, 0.34) 48%,
+    rgba(3, 10, 24, 0.04) 64%
+  );
+}
+@media (max-width: 900px) {
+  .rp-anatomy .skull-pin::before {
+    background: linear-gradient(
+      180deg,
+      rgba(3, 10, 24, 0.4) 0%,
+      rgba(3, 10, 24, 0.08) 20%,
+      rgba(3, 10, 24, 0.68) 46%,
+      rgba(3, 10, 24, 0.94) 62%,
+      rgba(3, 10, 24, 0.98) 100%
+    );
+  }
+}
+/* In light mode this section DELIBERATELY stays a dark band — the skull is
+   read on dark like a film — so the environment is written out in the dark
+   palette's literals rather than left to tokens that would turn it pearl. */
+[data-theme='light'] .rp-anatomy .skull-hero,
+[data-theme='light'] .rp-anatomy .skull-pin {
+  background: radial-gradient(
+    circle at 50% 38%,
+    #040C1A 0%,
+    #030A18 42%,
+    #00030F 100%
+  );
+}
+
+/* --- The sculpture gallery ------------------------------------------------
+   Six regions as chapter entries in one composed, varied-scale layout: three
+   large renders, one supporting, two typographic entries (their renders are
+   still to come from the owner). Objects large, labels outside the object,
+   negative space doing the composition. Each entry is one Link to the same
+   destination the worklist row uses. */
+.rp-anatomy .region-gallery {
+  position: relative;
+  z-index: 1;
+  width: var(--container);
+  margin: 0 auto;
+  padding: clamp(56px, 8vw, 104px) 0 clamp(40px, 6vw, 80px);
+}
+.rp-anatomy .rg-head {
+  display: grid;
+  gap: 6px;
+  margin-bottom: clamp(32px, 4.5vw, 60px);
+}
+.rp-anatomy .rg-head h2 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-section);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+/* ONE EVEN ROW OF SPECIMENS. The first cut staggered four renders at
+   monumental scale against two typographic placeholders; the objects
+   dominated the page and the set never read as a set. Every region now gets
+   the same restrained stage and the same label, so the row reads as a
+   catalogue — which is both quieter and more elegant. */
+.rp-anatomy .rg-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(28px, 4vw, 48px) clamp(20px, 2.5vw, 32px);
+  align-items: stretch;
+}
+.rp-anatomy .rg-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  text-decoration: none;
+}
+.rp-anatomy .rg-art { width: 100%; height: 140px; }
+.rp-anatomy .rg-art img {
+  max-height: 140px;
+  width: auto;
+  object-fit: contain;
+}
+/* The label, outside the object: a hairline rule, then code — title — count. */
+.rp-anatomy .rg-label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: baseline;
+  margin-top: auto;
+  border-top: 1px solid var(--hairline);
+  padding-top: 13px;
+  transition: border-color var(--dur) var(--ease);
+}
+.rp-anatomy .rg-entry:hover .rg-label { border-top-color: var(--hairline-lit); }
+.rp-anatomy .rg-code {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--rim);
+}
+.rp-anatomy .rg-title {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 340;
+  font-size: var(--fs-card);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.rp-anatomy .rg-count {
+  grid-column: 2;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  color: var(--text-dim);
+}
+.rp-anatomy .rg-enter {
+  grid-column: 2;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.rp-anatomy .rg-entry:hover .rg-enter,
+.rp-anatomy .rg-entry:focus-visible .rg-enter { opacity: 1; color: var(--accent); }
+
+@media (max-width: 900px) {
+  .rp-anatomy .rg-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .rp-anatomy .rg-art, .rp-anatomy .rg-art img { height: 108px; max-height: 108px; }
+}
+
 /* ---------- your standing ----------
    Three figures, the first one twice the size of the others: the score is the
    answer to the question someone opened the page with, and the other two are
@@ -795,31 +987,33 @@
 .rp-anatomy .score-cell { min-width: 0; }
 .rp-anatomy .score-value {
   margin: 0;
-  font-family: var(--display, 'Fraunces', Georgia, serif);
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
   font-weight: 340;
   font-size: clamp(34px, 5vw, 58px);
   line-height: 1;
   letter-spacing: -0.02em;
 }
 .rp-anatomy .score-cell-lead .score-value { font-size: clamp(50px, 8vw, 92px); }
-.rp-anatomy .score-of { font-size: 0.46em; color: var(--muted, #8B929B); margin-left: 2px; }
+.rp-anatomy .score-of { font-size: 0.46em; color: var(--text-dim); margin-left: 2px; }
 .rp-anatomy .score-label {
   margin: 10px 0 0;
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--muted, #8B929B);
+  color: var(--text-dim);
 }
-.rp-anatomy .score-note { margin: 4px 0 0; font-size: 11px; color: var(--muted, #8B929B); opacity: 0.72; }
+.rp-anatomy .score-note { margin: 4px 0 0; font-size: 11px; color: var(--text-dim); opacity: 0.72; }
 .rp-anatomy .score-bar {
   display: block;
   margin-top: 12px;
   height: 3px;
   border-radius: 2px;
-  background: rgba(242, 238, 230, 0.12);
+  background: var(--hairline);
   overflow: hidden;
 }
-.rp-anatomy .score-bar-fill { display: block; height: 100%; background: var(--lime, #D9A84E); }
+/* The live progress fill: one of the few places the warm accent belongs. */
+.rp-anatomy .score-bar-fill { display: block; height: 100%; background: var(--accent); }
 /* The score sits between the count and the completion bar, so a row reads
    left to right as: which region, how much of it, how well. */
 .rp-anatomy .wl-score {
@@ -827,14 +1021,14 @@
   align-items: baseline;
   gap: 5px;
   font-size: 15px;
-  color: var(--ink, #F2EEE6);
+  color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 .rp-anatomy .wl-score small {
   font-size: 9.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--muted, #8B929B);
+  color: var(--text-dim);
 }
 @media (max-width: 760px) {
   .rp-anatomy .scoreband-grid { grid-template-columns: 1fr 1fr; row-gap: 26px; }
@@ -886,8 +1080,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: 1px;
-  background: var(--rule);
-  border-block: 1px solid var(--rule);
+  background: var(--hairline);
+  border-block: 1px solid var(--hairline);
 }
 .rp-anatomy .an-dest-item {
   display: flex;
@@ -899,7 +1093,7 @@
   transition: background 0.18s ease;
 }
 .rp-anatomy a.an-dest-item:hover {
-  background: var(--bg-raised, rgba(255, 255, 255, 0.03));
+  background: color-mix(in srgb, var(--rim) 5%, var(--bg));
 }
 .rp-anatomy .an-dest-item strong {
   font-family: var(--font-display);
@@ -947,5 +1141,5 @@
 
 .rp-anatomy .an-tools a:hover {
   color: var(--text);
-  border-bottom-color: var(--amber-accent);
+  border-bottom-color: var(--structure);
 }

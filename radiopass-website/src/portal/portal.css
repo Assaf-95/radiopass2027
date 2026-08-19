@@ -22,7 +22,7 @@
    =========================================================================== */
 
 .pt-root {
-  --pt-void: #07080B;
+  --pt-void: var(--film);
   /* The pt- names are kept — they are referenced by the console and the
      crossing as well as this page — but they now resolve to tokens rather
      than restating the palette. */
@@ -41,7 +41,7 @@
   --pt-amber: var(--accent);
   /* Not --hue-xray: this blue is also painted directly into the plate canvas
      as rgba(168,203,234,…) and the two must not drift apart. */
-  --pt-xray: #A8CBEA;
+  --pt-xray: var(--hue-xray);
   --pt-us: var(--hue-us);
   --pt-mri: var(--hue-mri);
 
@@ -67,7 +67,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.pt-root ::selection { background: rgba(217, 168, 78, 0.32); }
+.pt-root ::selection { background: rgba(216, 168, 116, 0.32); }
 .pt-root :focus-visible { outline: 2px solid var(--pt-amber); outline-offset: 3px; border-radius: 2px; }
 
 .pt-skip {
@@ -86,7 +86,7 @@
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(11, 13, 16, 0.86);
+  background: color-mix(in srgb, var(--ground) 80%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--pt-line);
@@ -155,7 +155,7 @@
   text-transform: uppercase;
   color: var(--pt-faint);
   border: 1px solid var(--pt-line);
-  border-radius: 4px;
+  border-radius: 8px;
   padding: var(--sp-2) var(--sp-3);
   background: transparent;
   cursor: pointer;
@@ -228,7 +228,7 @@
 }
 .pt-hero h1 em,
 .pt-close h2 em,
-.pt-admin-gate h1 em { font-style: italic; color: var(--pt-amber); }
+.pt-admin-gate h1 em { font-style: normal; color: var(--rim); }
 
 .pt-lede {
   max-width: var(--measure);
@@ -252,7 +252,7 @@
   min-height: 44px; /* touch target, same as the shared primitive */
   /* 4px, not --radius-sm: the square-ish button is part of the identity both
      sites share, and it is the one geometry the token file does not carry. */
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
   text-decoration: none;
@@ -260,10 +260,10 @@
               color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .pt-btn:hover { transform: translateY(-1px); }
-.pt-btn-solid { background: var(--pt-ink); color: #0B0D10; }
-.pt-btn-solid:hover { background: #fff; }
+.pt-btn-solid { background: var(--pt-ink); color: var(--ground); }
+.pt-btn-solid:hover { background: var(--beam); }
 .pt-btn-ghost { border-color: var(--pt-line-2); color: var(--pt-ink); background: transparent; }
-.pt-btn-ghost:hover { border-color: rgba(242, 238, 230, 0.55); }
+.pt-btn-ghost:hover { border-color: var(--hairline-lit); }
 
 /* ---------- hero ----------------------------------------------------------
    Centred over the line. The claim is one sentence; the proof is the drawing
@@ -491,9 +491,9 @@
   transition: border-color var(--dur) var(--ease);
 }
 .pt-door-anatomy:hover .pt-viewport,
-.pt-door-anatomy:focus-visible .pt-viewport { border-color: rgba(217, 168, 78, 0.45); }
+.pt-door-anatomy:focus-visible .pt-viewport { border-color: rgba(216, 168, 116, 0.45); }
 .pt-door-physics:hover .pt-viewport,
-.pt-door-physics:focus-visible .pt-viewport { border-color: rgba(168, 203, 234, 0.45); }
+.pt-door-physics:focus-visible .pt-viewport { border-color: rgba(164, 209, 236, 0.45); }
 
 /* The figure caption, set as a catalogue line under the drawing: it names the
    plate, which is orientation, so it stays at the metadata step. */
@@ -521,7 +521,7 @@
   content: '';
   position: absolute;
   inset: var(--sp-3);
-  border: 1px solid rgba(242, 238, 230, 0.07);
+  border: 1px solid var(--hairline);
   pointer-events: none;
 }
 .pt-door-art { display: block; width: 100%; height: 100%; }
@@ -535,15 +535,15 @@
   font-size: var(--fs-meta);
   letter-spacing: 0.14em;
   line-height: 1;
-  color: rgba(242, 238, 230, 0.34);
+  color: var(--hairline-lit);
   pointer-events: none;
 }
 .pt-vp-tl { top: var(--sp-5); left: var(--sp-5); }
 .pt-vp-tr { top: var(--sp-5); right: var(--sp-5); }
 .pt-vp-bl { bottom: var(--sp-5); left: var(--sp-5); }
 .pt-vp-br { bottom: var(--sp-5); right: var(--sp-5); }
-.pt-door-anatomy .pt-vp-tl { color: rgba(217, 168, 78, 0.6); }
-.pt-door-physics .pt-vp-tl { color: rgba(168, 203, 234, 0.6); }
+.pt-door-anatomy .pt-vp-tl { color: rgba(216, 168, 116, 0.6); }
+.pt-door-physics .pt-vp-tl { color: rgba(164, 209, 236, 0.6); }
 
 .pt-door-tag {
   font-family: var(--pt-mono);
@@ -577,7 +577,7 @@
   padding: var(--sp-1) var(--sp-2);
   white-space: nowrap;
 }
-.pt-chip-xray { color: var(--pt-xray); border-color: rgba(168, 203, 234, 0.25); }
+.pt-chip-xray { color: var(--pt-xray); border-color: rgba(164, 209, 236, 0.25); }
 .pt-chip-us   { color: var(--pt-us);   border-color: rgba(123, 203, 196, 0.25); }
 .pt-chip-mri  { color: var(--pt-mri);  border-color: rgba(169, 158, 219, 0.25); }
 
@@ -676,7 +676,7 @@
   min-width: 24px;
   margin: 0 var(--sp-3);
   transform: translateY(-4px);
-  border-bottom: 1px dotted rgba(242, 238, 230, 0.24);
+  border-bottom: 1px dotted var(--hairline-lit);
   transition: border-color var(--dur-micro) var(--ease);
 }
 /* A count, on the right of a leader — the textbook case for --fs-meta. */
@@ -691,7 +691,7 @@
 }
 
 .pt-index a:hover .pt-idx-label { color: var(--pt-amber); }
-.pt-index a:hover .pt-idx-leader { border-bottom-color: rgba(217, 168, 78, 0.5); }
+.pt-index a:hover .pt-idx-leader { border-bottom-color: rgba(216, 168, 116, 0.5); }
 .pt-index a:hover .pt-idx-note { color: var(--pt-mut); }
 
 /* Column totals — the ledger is summed at the foot, as a ledger is. */
@@ -790,7 +790,7 @@
   line-height: var(--lh-body);
   color: var(--pt-mut);
 }
-.pt-close-note a { color: var(--pt-amber); text-decoration: none; border-bottom: 1px solid rgba(217, 168, 78, 0.4); }
+.pt-close-note a { color: var(--pt-amber); text-decoration: none; border-bottom: 1px solid rgba(216, 168, 116, 0.4); }
 .pt-close-note a:hover { border-bottom-color: var(--pt-amber); }
 
 /* ---------- footer -------------------------------------------------------- */
@@ -863,7 +863,7 @@
 .pt-gate-form label { font-size: var(--fs-support); letter-spacing: 0.16em; text-transform: uppercase; color: var(--pt-mut); }
 .pt-gate-form input {
   padding: var(--sp-3) var(--sp-4);
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid var(--pt-line);
   background: var(--pt-surface-2);
   color: var(--pt-ink);
@@ -987,7 +987,7 @@
 .pt-crossing-note strong { color: var(--pt-amber); font-weight: 600; }
 .pt-crossing-rail {
   width: 180px; height: 2px; border-radius: 2px;
-  background: rgba(242, 238, 230, 0.1);
+  background: var(--hairline);
   overflow: hidden;
 }
 .pt-crossing-rail i {
@@ -1052,4 +1052,120 @@
     align-items: flex-start;
     gap: var(--sp-3);
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * The galleries (universal redesign, 19 Aug 2026; resized 19 Aug 2026)
+ *
+ * Two walls, one grammar: anatomy's rendered objects and physics' drawn
+ * signals in the SAME even row, at the same restrained size. The first
+ * cut gave anatomy a monumental staggered composition; at that scale the
+ * renders dominated the page and the two halves stopped matching. They are
+ * now specimens in a catalogue — small, equal, quiet, generously spaced —
+ * which is both more elegant and what makes physics its true equal.
+ * ------------------------------------------------------------------ */
+
+.pt-gallery-lede {
+  max-width: var(--measure);
+  color: var(--pt-mut);
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  margin: 0 0 var(--sp-7);
+}
+
+.pt-gallery {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-6) var(--sp-5);
+  /* Stretch, not end: the captions carry different numbers of lines, and
+     bottom-aligning whole entries left the rule above each caption at a
+     different height across the row. The caption is pushed down inside its
+     own entry instead, so every rule lands on one line. */
+  align-items: stretch;
+}
+
+.pt-obj, .pt-glyph {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+  color: var(--pt-ink);
+}
+
+/* The object's stage. One height for every specimen so the row reads as a
+   set; the object sits inside it at its own aspect. */
+.pt-obj .rp-sculpt { height: 132px; }
+.pt-obj .rp-sculpt img { max-height: 132px; width: auto; object-fit: contain; }
+
+/* The drawn signals get the same stage, so a diagram and a render carry
+   equal weight in the composition. */
+.pt-glyph-stage {
+  height: 132px;
+  display: grid;
+  place-items: center;
+}
+.pt-glyph-stage .rp-sig { width: min(100%, 168px); }
+
+/* The caption: object name in display type, region or signal as data, on
+   its own line so five columns never force a title to wrap mid-word. */
+.pt-obj-cap {
+  display: grid;
+  gap: 3px;
+  margin-top: auto;
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--sp-3);
+  min-width: 0;
+  transition: border-color var(--dur) var(--ease);
+}
+.pt-obj-cap b {
+  font-family: var(--pt-serif);
+  font-weight: 400;
+  font-size: var(--fs-support);
+  letter-spacing: 0.01em;
+}
+.pt-obj-cap i {
+  font-style: normal;
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+}
+/* The affordance is one quiet line that warms only on approach. */
+.pt-obj-go {
+  font-family: var(--pt-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--pt-faint);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pt-obj:hover .pt-obj-go, .pt-obj:focus-visible .pt-obj-go,
+.pt-glyph:hover .pt-obj-go, .pt-glyph:focus-visible .pt-obj-go {
+  opacity: 1;
+  color: var(--pt-amber);
+}
+.pt-obj:hover .pt-obj-cap, .pt-glyph:hover .pt-obj-cap { border-top-color: var(--hairline-lit); }
+
+/* The gallery's foot: the counted truth and the one door. */
+.pt-gallery-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+  border-top: 1px solid var(--hairline);
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+}
+
+@media (max-width: 900px) {
+  .pt-gallery { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .pt-gallery { grid-template-columns: repeat(2, 1fr); gap: var(--sp-5) var(--sp-4); }
+  .pt-obj .rp-sculpt, .pt-obj .rp-sculpt img, .pt-glyph-stage { height: 104px; max-height: 104px; }
+  .pt-gallery-foot { flex-direction: column; align-items: flex-start; }
+  .pt-gallery-foot .pt-btn { width: 100%; }
 }

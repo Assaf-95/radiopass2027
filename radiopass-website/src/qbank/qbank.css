@@ -22,7 +22,7 @@
  * a provenance tag — and nothing a candidate has to read to answer.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:wght@400;500;600&display=swap');
 
 .qb-root {
   --qb-bg: var(--bg-base);
@@ -52,7 +52,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.qb-root ::selection { background: rgba(217, 168, 78, 0.32); }
+.qb-root ::selection { background: rgba(216, 168, 116, 0.32); }
 .qb-root :focus-visible { outline: 2px solid var(--qb-amber); outline-offset: 3px; border-radius: 2px; }
 
 /* One width for the bank. Wide enough for a five-stem question, narrow enough
@@ -63,23 +63,27 @@
 
 .qb-nav {
   position: sticky; top: 0; z-index: 60;
-  background: rgba(11, 13, 16, 0.82);
+  background: color-mix(in srgb, var(--ground) 78%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(242, 238, 230, 0.07);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .qb-nav-inner {
   width: 100%; max-width: var(--container-wide);
   margin-inline: auto; padding-inline: var(--gutter);
-  height: 64px;
+  height: var(--header-h);
   display: flex; align-items: center; gap: var(--sp-5);
 }
 
+/* The brand is the shared <Logo/> lockup now (mark + wordmark, styled by
+   .rp-logo in styles.css); this link only carries and aligns it. */
 .qb-nav-brand {
-  font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.42em;
+  display: inline-flex; align-items: center;
   color: var(--qb-ink); text-decoration: none; flex: none;
 }
+
+.qb-nav .rp-theme-toggle { flex: none; }
 
 .qb-nav-links {
   display: flex; gap: var(--sp-5); flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none;
@@ -96,7 +100,9 @@
   font-size: var(--fs-support); font-weight: 500; color: var(--qb-mut);
   text-decoration: none; white-space: nowrap; transition: color var(--dur) var(--ease);
 }
-.qb-nav-links a:hover, .qb-nav-links a.is-on { color: var(--qb-ink); }
+.qb-nav-links a:hover { color: var(--qb-ink); }
+/* The one place in this bar the warm accent is earned: where you are now. */
+.qb-nav-links a.is-on { color: var(--qb-amber); }
 
 .qb-nav-cta {
   flex: none;
@@ -106,7 +112,7 @@
   padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-sm); text-decoration: none;
   transition: background var(--dur) var(--ease);
 }
-.qb-nav-cta:hover { background: #fff; }
+.qb-nav-cta:hover { background: var(--beam); }
 
 .qb-nav-account {
   flex: none; border: 0; background: transparent; cursor: pointer;
@@ -115,7 +121,7 @@
   transition: color var(--dur) var(--ease);
 }
 .qb-nav-account:hover { color: var(--qb-ink); }
-.qb-nav-account.is-cta { color: var(--qb-amber); font-weight: 600; }
+.qb-nav-account.is-cta { color: var(--rim); font-weight: 600; }
 @media (max-width: 900px) { .qb-nav-account { display: none; } }
 
 /* A dot, not a sentence — the tooltip carries the explanation. */
@@ -133,7 +139,8 @@
   margin: 0 0 var(--gap-heading-desc);
 }
 
-.qb-display em { font-style: italic; color: var(--qb-amber); }
+/* Display emphasis is upright and cool — the amber-italic grammar is retired. */
+.qb-display em { font-style: normal; color: var(--rim); }
 
 .qb-eyebrow {
   font-size: var(--fs-meta); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
@@ -141,7 +148,7 @@
 }
 .qb-eyebrow::before {
   content: ''; display: inline-block; width: 22px; height: 1px;
-  background: var(--qb-amber); vertical-align: middle; margin-right: var(--sp-3);
+  background: var(--rim); vertical-align: middle; margin-right: var(--sp-3);
 }
 
 .qb-lede { font-size: var(--fs-teach); line-height: var(--lh-body); color: var(--text-secondary); max-width: var(--measure); margin: 0; }
@@ -188,7 +195,7 @@
 }
 .qb-subject-card::before {
   content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
-  background: var(--qb-accent, var(--qb-amber)); opacity: 0.75;
+  background: var(--qb-accent, var(--rim)); opacity: 0.75;
 }
 .qb-subject-card:hover { border-color: var(--qb-line-strong); transform: translateY(-2px); background: var(--qb-surface-2); }
 
@@ -205,7 +212,7 @@
   margin-top: var(--sp-3);
   height: 3px;
   border-radius: 999px;
-  background: rgba(242, 238, 230, 0.1);
+  background: var(--hairline);
   overflow: hidden;
 }
 .qb-subject-progress i { display: block; height: 100%; background: var(--qb-amber); border-radius: 999px; }
@@ -218,18 +225,18 @@
   gap: var(--gap-cards);
   margin-top: var(--sp-5);
 }
+/* Not doors, just ways back in — so not boxes. Each is a hairline-ruled
+   column: a rule on top, whitespace between, the count carrying the weight. */
 .qb-review-card {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  padding: var(--card-pad);
-  border: 1px solid var(--qb-line);
-  border-radius: var(--radius);
-  background: var(--qb-panel, var(--bg-elevated));
+  padding: var(--sp-4) 0 0;
+  border-top: 1px solid var(--qb-line);
   text-decoration: none;
   transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-.qb-review-card:hover { border-color: var(--qb-line-strong); transform: translateY(-2px); }
+.qb-review-card:hover { border-top-color: var(--qb-line-strong); transform: translateY(-2px); }
 .qb-review-card strong {
   font-family: var(--qb-serif);
   font-weight: 340;
@@ -250,7 +257,9 @@
 .qb-accent-xray { --qb-accent: var(--qb-xray); }
 .qb-accent-us { --qb-accent: var(--qb-us); }
 .qb-accent-mri { --qb-accent: var(--qb-mri); }
-.qb-accent-amber { --qb-accent: var(--qb-amber); }
+/* The mock card's edge. The stripe is decoration, so it stays cool — the
+   card's warm light is its Begin link, same as every other door's. */
+.qb-accent-amber { --qb-accent: var(--rim); }
 
 /* ---------- practice page ---------- */
 
@@ -269,7 +278,7 @@
 }
 .qb-crumb a { color: var(--qb-mut); text-decoration: none; }
 .qb-crumb a:hover { color: var(--qb-ink); }
-.qb-crumb em { font-style: normal; color: var(--qb-amber); }
+.qb-crumb em { font-style: normal; color: var(--rim); }
 
 /* The section chips.
    X-ray carries five of them. Allowed to wrap, they took three lines on a
@@ -287,7 +296,7 @@
 .qb-sections-bar {
   padding: var(--sp-3) 0; margin-bottom: var(--sp-1);
   border-bottom: 1px solid var(--qb-line);
-  position: sticky; top: 64px; z-index: 40;
+  position: sticky; top: var(--header-h); z-index: 40;
   background: linear-gradient(180deg, var(--qb-bg) 78%, transparent);
 }
 .qb-sections-track {
@@ -323,9 +332,11 @@
 
 .qb-question { padding: var(--sp-4) 0 var(--gap-page); }
 
+/* A quiet surface, not a box: the stems inside carry the marking borders, and
+   a border here on top of theirs was the triple-box look. Depth is the
+   surface's own luminance against the environment. */
 .qb-qcard {
   background: var(--qb-surface);
-  border: 1px solid var(--qb-line);
   border-radius: var(--radius);
   padding: var(--card-pad-lg);
 }
@@ -336,7 +347,7 @@
   font-size: var(--fs-meta); letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--qb-mut); border: 1px solid var(--qb-line); border-radius: 20px; padding: 3px var(--sp-3);
 }
-.qb-qsource.is-recall { color: var(--qb-amber); border-color: rgba(217, 168, 78, 0.4); }
+.qb-qsource.is-recall { color: var(--qb-amber); border-color: color-mix(in srgb, var(--core) 40%, transparent); }
 
 /* Flag and favourite are controls, so they are legible; they are not the
    lesson, so they are grey and they sit after the question, not above it. */
@@ -349,7 +360,7 @@
   transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .qb-mark:hover { color: var(--qb-ink); border-color: var(--qb-line-strong); }
-.qb-mark.is-on { color: var(--qb-amber); border-color: rgba(217, 168, 78, 0.5); background: var(--accent-soft); }
+.qb-mark.is-on { color: var(--qb-amber); border-color: color-mix(in srgb, var(--core) 50%, transparent); background: var(--accent-soft); }
 
 /* LEVEL 1. Nothing else on this card is allowed to reach this size. */
 .qb-qtitle {
@@ -396,15 +407,21 @@
 .qb-tf button:hover { color: var(--qb-ink); border-color: var(--qb-line-strong); }
 .qb-tf button.is-picked { color: var(--bg-base); background: var(--qb-ink); border-color: var(--qb-ink); }
 
-/* After submission. An incorrect stem is unmistakably surrounded in red. */
-.qb-stem.is-right { border-color: rgba(127, 200, 169, 0.55); background: rgba(127, 200, 169, 0.05); }
+/* After submission. An incorrect stem is unmistakably surrounded in red.
+   Mixed from the semantic tokens rather than baked literals, so the hues
+   follow the theme: dark-mode mint/coral on navy surfaces, the deeper
+   light-mode pair on white. */
+.qb-stem.is-right {
+  border-color: color-mix(in srgb, var(--success) 55%, transparent);
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+}
 .qb-stem.is-wrong {
   border-color: var(--qb-red);
-  background: rgba(201, 119, 107, 0.08);
-  box-shadow: 0 0 0 1px var(--qb-red), 0 0 18px rgba(201, 119, 107, 0.18);
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+  box-shadow: 0 0 0 1px var(--qb-red), 0 0 18px color-mix(in srgb, var(--error) 18%, transparent);
 }
-.qb-stem.is-right .qb-stem-label { border-color: rgba(127, 200, 169, 0.6); color: var(--qb-green); }
-.qb-stem.is-wrong .qb-stem-label { border-color: rgba(201, 119, 107, 0.6); color: var(--qb-red); }
+.qb-stem.is-right .qb-stem-label { border-color: color-mix(in srgb, var(--success) 60%, transparent); color: var(--qb-green); }
+.qb-stem.is-wrong .qb-stem-label { border-color: color-mix(in srgb, var(--error) 60%, transparent); color: var(--qb-red); }
 
 .qb-verdict { font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.02em; flex: none; text-align: right; }
 .qb-verdict.is-right { color: var(--qb-green); }
@@ -436,7 +453,7 @@
 .qb-btn:hover { transform: translateY(-1px); }
 .qb-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .qb-btn-solid { background: var(--qb-ink); color: var(--bg-base); }
-.qb-btn-solid:hover:not(:disabled) { background: #fff; }
+.qb-btn-solid:hover:not(:disabled) { background: var(--beam); }
 .qb-btn-ghost { border-color: var(--qb-line-strong); color: var(--qb-ink); background: transparent; }
 .qb-btn-ghost:hover { border-color: var(--text-tertiary); }
 
@@ -466,12 +483,13 @@
    Only its spacing inside the card is set locally. */
 .qb-takeaway { margin-top: var(--gap-desc-main); }
 
+/* A pointer onward, not the active thing on the card — so cool, not amber. */
 .qb-lablink {
   margin-top: var(--sp-4); display: inline-flex; align-items: center; gap: var(--sp-2);
-  font-size: var(--fs-support); font-weight: 600; color: var(--qb-amber); text-decoration: none;
-  border-bottom: 1px solid rgba(217, 168, 78, 0.4); padding-bottom: 2px;
+  font-size: var(--fs-support); font-weight: 600; color: var(--rim); text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--rim) 40%, transparent); padding-bottom: 2px;
 }
-.qb-lablink:hover { border-bottom-color: var(--qb-amber); }
+.qb-lablink:hover { border-bottom-color: var(--rim); }
 
 /* Submission is final. Said once, last, quietly — it is housekeeping, but it
    is still a sentence someone has to read, so it is not shrunk below the floor. */
@@ -490,10 +508,16 @@
 
 /* ---------- mock page ---------- */
 
+/* Ruled sections, not boxes: each panel opens under its own hairline and the
+   whitespace does the separating. The bordered things inside (selects,
+   buttons) are the genuinely interactive surfaces. */
 .qb-mock-panel {
-  background: var(--qb-surface); border: 1px solid var(--qb-line); border-radius: var(--radius);
-  padding: var(--card-pad-lg); margin-bottom: var(--sp-4);
+  border-top: 1px solid var(--qb-line);
+  padding: var(--sp-6) 0 var(--sp-4);
+  margin-bottom: var(--sp-4);
 }
+/* The first panel sits straight under the hero's own rule — one rule is enough. */
+.qb-wrap > .qb-mock-panel:first-child { border-top: 0; padding-top: var(--sp-2); }
 .qb-mock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-4); margin: var(--sp-5) 0; }
 .qb-field label { display: block; font-size: var(--fs-support); font-weight: 600; color: var(--text-secondary); margin-bottom: var(--sp-2); }
 /* On a paper card the <label> is the paper's name — a card title, not a
@@ -515,7 +539,7 @@
 .qb-timer.is-low { color: var(--qb-red); }
 
 .qb-mockbar {
-  position: sticky; top: 64px; z-index: 40;
+  position: sticky; top: var(--header-h); z-index: 40;
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
   padding: var(--sp-3) 0; border-bottom: 1px solid var(--qb-line);
   background: linear-gradient(180deg, var(--qb-bg) 82%, transparent);
@@ -548,6 +572,7 @@
   .qb-hero { padding-top: var(--sp-6); }
   .qb-nav-inner { height: 56px; }
   .qb-sections-bar { top: 56px; }
+  .qb-mockbar { top: 56px; }
 
   .qb-qcard { padding: var(--card-pad); }
   .qb-pager { flex-wrap: wrap; }
@@ -582,7 +607,7 @@
 }
 
 .qb-mock-history li + li {
-  border-top: 1px solid var(--bg-interactive);
+  border-top: 1px solid var(--hairline);
 }
 
 .qb-mh-paper {
@@ -705,4 +730,18 @@
   background: var(--qb-green);
   border-color: var(--qb-green);
   color: var(--bg-base);
+}
+
+/* The subject rail takes the slack and scrolls inside its own mask; the
+   brand and the account group hold their size. Without min-width:0 the rail
+   refused to shrink and drove its last subjects under the account CTA. */
+.qb-nav .qb-nav-id,.qb-nav .qb-nav-account,.qb-nav .qb-nav-cta{flex:none}
+.qb-nav .qb-nav-links{flex:1 1 auto;min-width:0}
+
+/* On a phone inside the bank the wordmark is not doing any work — the
+   subject rail is. Below 560px the lockup drops to the mark alone so the
+   rail gets that width back instead of being masked off mid-word. */
+@media (max-width: 560px) {
+  .qb-nav .rp-logo-word { display: none; }
+  .qb-nav-inner { gap: var(--sp-3); }
 }

@@ -27,6 +27,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './portal.css'
+import { Logo } from '../design/logo'
+import { ThemeToggle } from '../design/theme'
+import { SIGNAL_GLYPHS } from '../design/signals'
+/* The anatomy visual family — the owner's approved renders (19 Aug 2026),
+   presented as sculptural objects, never labelled, never used in questions. */
+import imgBrain from '../assets/sculpture/brain.jpg'
+import imgChest from '../assets/sculpture/chest.jpg'
+import imgGi from '../assets/sculpture/gi.jpg'
+import imgRenal from '../assets/sculpture/renal.jpg'
+import imgMsk from '../assets/sculpture/msk.jpg'
 
 /* Anatomy is a route of this application now, not a second deployment, so
    these are ordinary internal paths and ordinary <Link>s: client-side
@@ -35,6 +45,19 @@ import './portal.css'
    old bookmark — AnatomyRoutes redirects it — but nothing in the product
    should still be MINTING that form. */
 const anatomy = (path = '') => `/anatomy${path}`
+
+/* The anatomy gallery: five sculptural objects, each the door to its region.
+   Two regions have no render yet (upper limb, spine) — the owner supplies
+   those in the same style; the gallery composition already leaves them room.
+   Kidneys and GI tract both belong to Abdomen & Pelvis and both say so:
+   the caption names the OBJECT first and the exam region under it. */
+const SCULPTURES: { key: string; img: string; name: string; region: string; to: string }[] = [
+  { key: 'brain', img: imgBrain, name: 'Brain', region: 'Head & Neck', to: anatomy('/section/head-neck') },
+  { key: 'chest', img: imgChest, name: 'Lungs', region: 'Thorax', to: anatomy('/section/thorax') },
+  { key: 'gi', img: imgGi, name: 'GI tract', region: 'Abdomen & Pelvis', to: anatomy('/section/abdo-pelvis') },
+  { key: 'renal', img: imgRenal, name: 'Kidneys', region: 'Abdomen & Pelvis', to: anatomy('/section/abdo-pelvis') },
+  { key: 'msk', img: imgMsk, name: 'Bone', region: 'Lower Limb', to: anatomy('/section/lower-limb') },
+]
 
 /* ------------------------------------------------------------------ *
  * The numbers
@@ -73,8 +96,26 @@ const EXAM_SPEC: { module: string; parts: string[] }[] = [
  * Shared drawing helpers
  * ------------------------------------------------------------------ */
 
-const IVORY = (a: number) => `rgba(242,238,230,${a})`
-const AMBER = (a: number) => `rgba(217,168,78,${a})`
+/* The canvas palette, read from the live tokens so the drawings follow the
+   theme. A canvas cannot read a custom property mid-stroke, so the two
+   channels are cached as "r,g,b" strings and refreshed when the theme
+   attribute changes (see HeroLine). The names are kept — IVORY was the
+   drawing ink of the charcoal era; it now resolves to the structure/rim
+   blue of the navy system, and AMBER to the one warm core. */
+const CANVAS_PAL = { ink: '164,209,236', warm: '216,168,116' }
+function refreshCanvasPalette() {
+  const cs = getComputedStyle(document.documentElement)
+  const rgb = (name: string, fallback: string) => {
+    const m = /^#([0-9a-f]{6})$/i.exec(cs.getPropertyValue(name).trim())
+    if (!m) return fallback
+    const n = parseInt(m[1], 16)
+    return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`
+  }
+  CANVAS_PAL.ink = rgb('--rim', CANVAS_PAL.ink)
+  CANVAS_PAL.warm = rgb('--core', CANVAS_PAL.warm)
+}
+const IVORY = (a: number) => `rgba(${CANVAS_PAL.ink},${a})`
+const AMBER = (a: number) => `rgba(${CANVAS_PAL.warm},${a})`
 
 /** Edge ruler ticks — the same on both plate viewports. */
 function ticks(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -280,8 +321,8 @@ function drawHeroLine(
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
   const fidMid = (path.fid0 + path.fid1) / 2
-  ctx.fillStyle = IVORY(0.5)
-  ctx.font = 'italic 340 17px Fraunces, "Iowan Old Style", Georgia, serif'
+  ctx.fillStyle = IVORY(0.55)
+  ctx.font = '320 17px Archivo, Inter, system-ui, sans-serif'
   ctx.fillText('the form', path.headMid, 0.875 * h)
   ctx.fillText('the signal', fidMid, 0.875 * h)
   ctx.fillStyle = IVORY(0.32)
@@ -301,6 +342,7 @@ function HeroLine() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    refreshCanvasPalette()
 
     let raf = 0
     let path: HeroPath | null = null
@@ -330,11 +372,19 @@ function HeroLine() {
     if (!reduced) {
       raf = requestAnimationFrame(frame)
     } else {
-      // A static draw races the webfonts; redraw once they land so the serif
-      // asides don't stay fallback Georgia forever.
+      // A static draw races the webfonts; redraw once they land so the
+      // labels don't stay in the fallback face forever.
       document.fonts?.ready?.then(() => { if (path) drawHeroLine(ctx, path, W, H, 0, true) })
     }
-    return () => { cancelAnimationFrame(raf); ro.disconnect() }
+    // Theme switches re-value --rim/--core; the continuous loop picks the
+    // refresh up on its next frame, and the reduced-motion static draw is
+    // repainted here explicitly.
+    const mo = new MutationObserver(() => {
+      refreshCanvasPalette()
+      if (reduced && path) drawHeroLine(ctx, path, W, H, 0, true)
+    })
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); mo.disconnect() }
   }, [])
 
   return <canvas ref={ref} className="pt-heroline-canvas" aria-hidden="true" />
@@ -607,7 +657,11 @@ function drawPhysics(ctx: CanvasRenderingContext2D, w: number, h: number, t: num
   ticks(ctx, w, h)
 }
 
-function DoorArt({ kind, hovered }: { kind: 'anatomy' | 'physics'; hovered: boolean }) {
+/* The plate drawings are no longer mounted on the front door — the two
+   galleries took their place (universal redesign, 19 Aug 2026) — but the
+   work is kept and exported: the synthetic PA chest and the live spectrum
+   remain correct, owner-approved drawings that a later surface can mount. */
+export function DoorArt({ kind, hovered }: { kind: 'anatomy' | 'physics'; hovered: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const hoverRef = useRef(0)
 
@@ -691,8 +745,8 @@ function useReveal<T extends HTMLElement>() {
  * ------------------------------------------------------------------ */
 
 export default function Portal() {
-  const [hover, setHover] = useState<'anatomy' | 'physics' | null>(null)
   const plates = useReveal<HTMLElement>()
+  const physg = useReveal<HTMLElement>()
   const method = useReveal<HTMLElement>()
   const close = useReveal<HTMLElement>()
 
@@ -713,8 +767,7 @@ export default function Portal() {
       <header className="pt-bar">
         <div className="pt-bar-inner">
           <Link to="/" className="pt-wordmark" aria-label="RadioPass home">
-            <span className="brand-mark" aria-hidden="true"><span /><span /><span /></span>
-            RADIOPASS
+            <Logo markHeight={22} />
           </Link>
           <span className="pt-bar-sub">First FRCR · Anatomy &amp; Physics</span>
           <nav className="pt-bar-nav" aria-label="Sections">
@@ -725,6 +778,7 @@ export default function Portal() {
             <Link to="/free-trial">Free trial</Link>
             <Link to="/pricing">Pricing</Link>
           </nav>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -757,116 +811,96 @@ export default function Portal() {
 
         </section>
 
-        {/* ---------------- the two plates ---------------- */}
+        {/* ---------------- the anatomy gallery ---------------- */}
         <section
           ref={plates.ref}
           className={`pt-section pt-reveal${plates.vis ? ' in-view' : ''}`}
-          aria-labelledby="pt-doors-h"
+          aria-labelledby="pt-anat-h"
         >
           <div className="pt-section-head">
             <span className="pt-numeral" aria-hidden="true">I</span>
-            <h2 id="pt-doors-h">Two modules, prepared the same way.</h2>
+            <h2 id="pt-anat-h">Name the structure.</h2>
+          </div>
+          <p className="pt-gallery-lede">
+            Radiographs, CT, MRI, ultrasound, fluoroscopy and angiography, each with
+            its structures marked where the examiner marks them. You type the name;
+            it is graded on what you actually wrote, laterality included.
+          </p>
+
+          {/* Sculptural objects, not cards: each render is the door to its
+              region. The composition is deliberately unequal — a gallery
+              wall, not a grid of tiles. */}
+          <div className="pt-gallery pt-gallery-anatomy">
+            {SCULPTURES.map((o) => (
+              <Link key={o.key} className={`pt-obj pt-obj-${o.key}`} to={o.to}>
+                <span className="rp-sculpt"><img src={o.img} alt="" loading="lazy" /></span>
+                <span className="pt-obj-cap">
+                  <b>{o.name}</b>
+                  <i>{o.region}</i>
+                  <span className="pt-obj-go">Explore <span aria-hidden="true">&rarr;</span></span>
+                </span>
+              </Link>
+            ))}
           </div>
 
-          <div className="pt-plates">
-            <Link
-              className="pt-plate pt-door-anatomy"
-              to={anatomy()}
-              onMouseEnter={() => setHover('anatomy')}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover('anatomy')}
-              onBlur={() => setHover(null)}
-            >
-              <figure className="pt-plate-fig">
-                <span className="pt-viewport">
-                  <DoorArt kind="anatomy" hovered={hover === 'anatomy'} />
-                  <span className="pt-vp-tl">RADIOPASS / ANATOMY</span>
-                  <span className="pt-vp-tr">SYNTHETIC</span>
-                  <span className="pt-vp-bl">{COUNTS.anatomyRegions} REGIONS</span>
-                  <span className="pt-vp-br">ERECT · PA</span>
-                </span>
-                <figcaption className="pt-plate-cap">
-                  <i>Plate I</i>PA chest — drawn, not photographed
-                </figcaption>
-              </figure>
-              <span className="pt-plate-body">
-                <span className="pt-door-tag">Anatomy module</span>
-                <strong>Name the structure.</strong>
-                <span className="pt-door-text">
-                  Radiographs, CT, MRI, ultrasound, fluoroscopy and angiography, each with
-                  its structures marked where the examiner marks them. You type the name;
-                  it is graded on what you actually wrote, laterality included.
-                </span>
-                <span className="pt-chips">
-                  <i className="pt-chip pt-chip-xray">Radiograph</i>
-                  <i className="pt-chip pt-chip-mri">MRI</i>
-                  <i className="pt-chip pt-chip-us">Ultrasound</i>
-                  <i className="pt-chip">CT</i>
-                  <i className="pt-chip">Angiography</i>
-                  <i className="pt-chip">Fluoroscopy</i>
-                </span>
-                <span className="pt-figures">
-                  <span><b>{COUNTS.anatomyCases}</b>labelled cases</span>
-                  <span><b>{COUNTS.anatomyStructures.toLocaleString('en-GB')}</b>structures to name</span>
-                  <span><b>{COUNTS.anatomyRegions}</b>regions</span>
-                </span>
-                <span className="pt-door-go">Enter anatomy <i aria-hidden="true">→</i></span>
-              </span>
-            </Link>
+          <div className="pt-gallery-foot">
+            <span className="pt-figures">
+              <span><b>{COUNTS.anatomyCases}</b>labelled cases</span>
+              <span><b>{COUNTS.anatomyStructures.toLocaleString('en-GB')}</b>structures to name</span>
+              <span><b>{COUNTS.anatomyRegions}</b>regions</span>
+            </span>
+            <Link className="pt-btn pt-btn-solid" to={anatomy()}>Enter anatomy</Link>
+          </div>
+        </section>
 
-            <Link
-              className="pt-plate pt-plate-flip pt-door-physics"
-              to="/physics"
-              onMouseEnter={() => setHover('physics')}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover('physics')}
-              onBlur={() => setHover(null)}
-            >
-              <figure className="pt-plate-fig">
-                <span className="pt-viewport">
-                  <DoorArt kind="physics" hovered={hover === 'physics'} />
-                  <span className="pt-vp-tl">RADIOPASS / PHYSICS</span>
-                  <span className="pt-vp-tr">SYNTHETIC</span>
-                  <span className="pt-vp-bl">{COUNTS.physicsLabs} LABORATORIES</span>
-                  <span className="pt-vp-br">80 kVp · 2.5 mm Al</span>
+        {/* ---------------- the physics gallery ---------------- */}
+        <section
+          ref={physg.ref}
+          className={`pt-section pt-reveal${physg.vis ? ' in-view' : ''}`}
+          aria-labelledby="pt-phys-h"
+        >
+          <div className="pt-section-head">
+            <span className="pt-numeral" aria-hidden="true">II</span>
+            <h2 id="pt-phys-h">See what the equation means.</h2>
+          </div>
+          <p className="pt-gallery-lede">
+            Five laboratories where you move the variable and watch the physics
+            answer &mdash; then the question bank and three timed mock papers in the
+            real true-or-false format, each stem explained.
+          </p>
+
+          {/* The physics visual family: the five signals, drawn live &mdash; the
+              same composition as the anatomy wall, so the two halves read as
+              one universe. */}
+          <div className="pt-gallery pt-gallery-physics">
+            {SIGNAL_GLYPHS.map((g) => (
+              <Link key={g.key} className={`pt-glyph pt-obj-${g.key}`} to="/physics">
+                <span className="pt-glyph-stage">{g.svg}</span>
+                <span className="pt-obj-cap">
+                  <b>{g.name}</b>
+                  <i>{g.desc}</i>
+                  <span className="pt-obj-go">Explore <span aria-hidden="true">&rarr;</span></span>
                 </span>
-                <figcaption className="pt-plate-cap">
-                  <i>Plate II</i>Beam spectrum — the physics, live
-                </figcaption>
-              </figure>
-              <span className="pt-plate-body">
-                <span className="pt-door-tag">Physics module</span>
-                <strong>See what the equation means.</strong>
-                <span className="pt-door-text">
-                  Five laboratories where you move the variable and watch the physics
-                  answer — then the question bank and three timed mock papers in the real
-                  true-or-false format, each stem explained.
-                </span>
-                <span className="pt-chips">
-                  <i className="pt-chip pt-chip-xray">X-ray</i>
-                  <i className="pt-chip">CT</i>
-                  <i className="pt-chip pt-chip-mri">MRI</i>
-                  <i className="pt-chip pt-chip-us">Ultrasound</i>
-                  <i className="pt-chip">Nuclear medicine</i>
-                </span>
-                <span className="pt-figures">
-                  <span><b>{COUNTS.physicsQuestions}</b>questions</span>
-                  <span><b>{COUNTS.physicsStems.toLocaleString('en-GB')}</b>true-or-false stems</span>
-                  <span><b>{COUNTS.physicsMocks}</b>mock papers</span>
-                </span>
-                <span className="pt-door-go">Enter physics <i aria-hidden="true">→</i></span>
-              </span>
-            </Link>
+              </Link>
+            ))}
           </div>
 
-          {/* The trial sits UNDER the two plates and looks nothing like them:
-              one line of type and a link, no figure, no viewport, no numerals.
-              The question the plates ask is "which subject?"; this asks a
-              different one — "do you want to try first?" — and the hierarchy
-              has to say so without a third door. */}
+          <div className="pt-gallery-foot">
+            <span className="pt-figures">
+              <span><b>{COUNTS.physicsQuestions}</b>questions</span>
+              <span><b>{COUNTS.physicsStems.toLocaleString('en-GB')}</b>true-or-false stems</span>
+              <span><b>{COUNTS.physicsMocks}</b>mock papers</span>
+            </span>
+            <Link className="pt-btn pt-btn-solid" to="/physics">Enter physics</Link>
+          </div>
+
+          {/* The trial sits UNDER the two galleries and looks nothing like
+              them: one line of type and a link. The galleries ask "which
+              subject?"; this asks a different question &mdash; "do you want to
+              try first?" &mdash; and the hierarchy has to say so. */}
           <aside className="pt-trial">
             <p className="pt-trial-copy">
-              <strong>Not ready to choose?</strong> Try RadioPass first — a sample of both
+              <strong>Not ready to choose?</strong> Try RadioPass first &mdash; a sample of both
               anatomy and physics.
             </p>
             <Link className="pt-trial-go" to="/free-trial">
@@ -883,7 +917,7 @@ export default function Portal() {
           aria-labelledby="pt-method-h"
         >
           <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">II</span>
+            <span className="pt-numeral" aria-hidden="true">III</span>
             <h2 id="pt-method-h">How it is built.</h2>
           </div>
           <div className="pt-method-grid">
@@ -955,7 +989,7 @@ export default function Portal() {
       <footer className="pt-foot">
         <div className="pt-foot-grid">
           <div className="pt-foot-brand">
-            <span className="pt-wordmark">RADIOPASS</span>
+            <span className="pt-wordmark"><Logo markHeight={20} /></span>
             <p>Anatomy and physics for the First FRCR Examination, in one place.</p>
           </div>
           {/* Two branches, not two feature lists. Everything that lives inside a

@@ -1,0 +1,71 @@
+/* The physics signal glyphs, coloured from the master tokens.
+   Geometry and timing match the tour's vignettes (home/home.css); the
+   colours resolve from tokens so the glyphs read on dark AND light, and
+   the animations run whenever the glyph is on screen — no .in-view gate,
+   because these are ambient sculpture, not a reveal. Warm --core appears
+   only where the drawing genuinely has an energetic focal element (the CT
+   source, the NM protons and photon head); everything structural is cool. */
+
+.rp-sig { display: block; width: 100%; height: auto; overflow: visible; }
+
+.rp-sig-axis { stroke: var(--hairline-lit); stroke-dasharray: 2 4; }
+.rp-sig-axishead { fill: none; stroke: var(--hairline-lit); stroke-width: 1.2; }
+.rp-sig-label {
+  font-family: var(--font-body); font-size: 7.5px; font-weight: 600;
+  fill: var(--text-dim); letter-spacing: 0.06em;
+}
+
+/* X-ray: E solid over dashed fainter B; seamless one-wavelength drift. */
+/* No drop-shadow here: at monumental scale the filter rasterises as a
+   visible rectangle around the clip region. The wave carries its own light. */
+.rp-sig-e { fill: none; stroke: var(--rim); stroke-width: 1.5; }
+.rp-sig-b { fill: none; stroke: var(--structure); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.7; }
+.rp-sig-drift-x { animation: rp-sig-driftx 3.6s linear infinite; }
+@keyframes rp-sig-driftx { to { transform: translateX(28px); } }
+
+/* Ultrasound: the compression field advances one wavelength per loop. */
+.rp-sig-us { stroke: var(--hue-us); stroke-width: 1.6; }
+.rp-sig-drift-us { animation: rp-sig-driftus 7s linear infinite; }
+@keyframes rp-sig-driftus { to { transform: translateX(56px); } }
+
+/* MRI: precession about B₀. */
+.rp-sig-cone { fill: none; stroke: var(--structure); stroke-dasharray: 3 4; opacity: 0.7; }
+.rp-sig-cone-inner { opacity: 0.35; }
+.rp-sig-mri { stroke: var(--hue-mri); stroke-width: 1.8; }
+.rp-sig-mri-dot { fill: var(--hue-mri); }
+.rp-sig-ghost { stroke: var(--hue-mri); opacity: 0.2; stroke-width: 4.5; stroke-linecap: round; }
+.rp-sig-tip-halo { fill: var(--hue-mri); opacity: 0.16; }
+.rp-sig-spin { transform-origin: 60px 48px; animation: rp-sig-precess 5.5s ease-in-out infinite; }
+@keyframes rp-sig-precess {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  25% { transform: rotate(-9deg) scaleX(0.45); }
+  50% { transform: rotate(0deg) scaleX(-1); }
+  75% { transform: rotate(9deg) scaleX(0.45); }
+}
+
+/* CT: the rotation is the idea — one direction, never reversing. */
+.rp-sig-ct-bore { stroke-dasharray: 2 5; }
+.rp-sig-ct-patient { fill: rgba(164, 209, 236, 0.08); stroke: var(--hairline-lit); stroke-width: 1; }
+.rp-sig-ct-source { fill: var(--core); }
+.rp-sig-ct-fan { stroke: var(--rim); stroke-width: 0.9; opacity: 0.5; fill: none; }
+.rp-sig-ct-detector { fill: none; stroke: var(--rim); stroke-width: 2.4; opacity: 0.8; stroke-linecap: round; }
+.rp-sig-ct-gantry { transform-origin: 60px 28px; animation: rp-sig-ct-rotate 7s linear infinite; }
+@keyframes rp-sig-ct-rotate { to { transform: rotate(360deg); } }
+
+/* NM: unstable halo breathing, gamma wiggle, warm emitting core. */
+.rp-sig-halo {
+  fill: none; stroke: var(--core); opacity: 0.4; stroke-width: 0.9;
+  stroke-dasharray: 2.5 3.5;
+  animation: rp-sig-breathe 4.2s ease-in-out infinite;
+}
+@keyframes rp-sig-breathe { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.7; } }
+.rp-sig-proton { fill: var(--core); stroke: var(--hairline-lit); stroke-width: 0.6; }
+.rp-sig-neutron { fill: var(--structure); stroke: var(--hairline); stroke-width: 0.6; opacity: 0.8; }
+.rp-sig-gamma { fill: none; stroke: var(--core); stroke-width: 1.4; opacity: 0.85; }
+.rp-sig-gamma-head { fill: none; stroke: var(--core); stroke-width: 1.6; opacity: 0.9; }
+.rp-sig-label-gamma { fill: var(--core); font-style: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-sig-drift-x, .rp-sig-drift-us, .rp-sig-spin,
+  .rp-sig-ct-gantry, .rp-sig-halo { animation: none; }
+}

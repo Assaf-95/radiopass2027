@@ -6,6 +6,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Breadcrumb, CRUMB_PHYSICS, CRUMB_ROOT } from '../design/breadcrumb'
+import { Logo } from '../design/logo'
+import { ThemeToggle } from '../design/theme'
 import { record } from '../lib/learner'
 
 import { useAuth } from '../lib/auth'
@@ -59,8 +61,10 @@ export function QbShell({ title, children }: { title?: string; children: ReactNo
               branch they were in and the only way out went to the master
               homepage rather than back to Physics. */}
           <div className="qb-nav-id">
+            {/* The shared lockup, not a local wordmark. No branch word here:
+                the breadcrumb underneath already says where you are. */}
             <Link to="/" className="qb-nav-brand" aria-label="RadioPass home">
-              RADIOPASS
+              <Logo markHeight={22} />
             </Link>
             <Breadcrumb trail={[CRUMB_ROOT, CRUMB_PHYSICS, { label: title ?? 'Question bank' }]} />
           </div>
@@ -110,6 +114,7 @@ export function QbShell({ title, children }: { title?: string; children: ReactNo
           <Link to="/visual-lab" className="qb-nav-cta">
             Open the labs
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

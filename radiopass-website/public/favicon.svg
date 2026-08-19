@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- RadioPass brand mark: the precessing moment. One vector tipped in a
-       field, its cone hinted above — the image every module on both sites
-       begins with. Amber on the chassis black; drawn, not photographed. -->
-  <rect width="64" height="64" rx="14" fill="#0B0D10"/>
-  <ellipse cx="32" cy="22" rx="14" ry="5" fill="none" stroke="#A8CBEA" stroke-opacity="0.45" stroke-width="2"/>
-  <line x1="32" y1="46" x2="45" y2="20.5" stroke="#D9A84E" stroke-width="4.5" stroke-linecap="round"/>
-  <circle cx="45" cy="20.5" r="4.5" fill="#F2EEE6"/>
+  <!-- RadioPass mark: the radiographic chain — focal spot, diverging beam,
+       detector, and the one warm band where the image was formed. The body in
+       the beam is dropped at this size (it closes up below ~22px). -->
+  <rect width="64" height="64" rx="14" fill="#030A18"/>
+  <path d="M14 32 L44 17 L44 47 Z" fill="#A4D1EC" opacity="0.14"/>
+  <path d="M14 32 L44 17 M14 32 L44 47" stroke="#A4D1EC" stroke-width="2" opacity="0.6" fill="none"/>
+  <line x1="47" y1="17" x2="47" y2="47" stroke="#A4D1EC" stroke-width="4" stroke-linecap="round"/>
+  <line x1="47" y1="26" x2="47" y2="38" stroke="#D8A874" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="14" cy="32" r="4.2" fill="#F5FCFF"/>
 </svg>

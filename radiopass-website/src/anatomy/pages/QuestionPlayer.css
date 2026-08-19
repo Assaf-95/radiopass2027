@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0B0D10;
+  background: var(--dicom-bg, #000);
   color: var(--text-faint);
   border-radius: var(--radius-lg);
   font-size: 13px;

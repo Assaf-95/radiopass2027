@@ -5,38 +5,9 @@ import { contentState, loadContent, subscribeContent } from '../lib/content/stor
 import { currentStreak, getActivity, storageWorks } from '../lib/account';
 import { progressSyncFailing, subscribeProgress } from '../lib/progress';
 import { useAuth } from '../../lib/auth';
+import { useTheme, ThemeToggle } from '../../design/theme';
+import { Logo } from '../../design/logo';
 import './Layout.css';
-
-/* Deliberately a new key. The previous one was written on every mount, so
-   every browser that ever loaded the old dark-by-default build has "dark"
-   stored whether or not anyone chose it — reading that back would keep the
-   house style from ever appearing. Under this key only an actual toggle
-   writes, so a stored value now means a real preference. */
-const THEME_KEY = 'radiopass-theme-v2';
-
-
-function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    const stored = localStorage.getItem(THEME_KEY);
-    if (stored === 'light' || stored === 'dark') return stored;
-    // The RadioPass house style is the charcoal reading room, as on Physics.
-    return 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  return {
-    theme,
-    toggle: () =>
-      setTheme((t) => {
-        const next = t === 'dark' ? 'light' : 'dark';
-        localStorage.setItem(THEME_KEY, next);
-        return next;
-      }),
-  };
-}
 
 /* A new page starts at the top.
  *
@@ -61,7 +32,11 @@ function useScrollToTopOnNavigate(pathname: string) {
 }
 
 export default function Layout() {
-  const { theme, toggle } = useTheme();
+  /* The shared hook (same key, same attribute as the local one it replaced).
+     Called here — not only inside <ThemeToggle/> — because the header does
+     not render on question routes, and the attribute must still be stamped
+     on <html> when a learner lands directly on a question. */
+  useTheme();
   const location = useLocation();
   const isQuestionRoute = /\/q\//.test(location.pathname);
   useScrollToTopOnNavigate(location.pathname);
@@ -150,17 +125,11 @@ export default function Layout() {
       {!isQuestionRoute && (
         <header className={scrolled ? "app-header is-scrolled" : "app-header"}>
           <div className="app-header-inner">
-            {/* The wordmark only. The sub-label used to read "Anatomy" beside
-                it, which since the nav gained real branch links said the same
-                word twice AND physically overlapped the "Anatomy" link 34px to
-                its right. Which branch you are in is the nav's job now, and it
-                marks it as current. */}
+            {/* The one lockup every header renders: convergence mark,
+                RADIOPASS, and the branch word saying which half you are
+                standing in — the same component the physics header mounts. */}
             <Link to="/anatomy" className="rpa-brand">
-              <span className="rpa-brand-mark">RadioPass</span>
-              {/* The matching half of the physics header's wordmark, in the
-                  same place and the same type. Which half you are in is now
-                  said by the brand itself on both sides. */}
-              <span className="rpa-brand-branch">Anatomy</span>
+              <Logo branch="Anatomy" markHeight={22} />
             </Link>
 
             {/* ONE NAVIGATION LANGUAGE ACROSS BOTH BRANCHES.
@@ -199,9 +168,9 @@ export default function Layout() {
                 </span>
               )}
 
-              <button type="button" className="theme-toggle" onClick={toggle} title="Toggle theme">
-                {theme === 'dark' ? '☾' : '☀'}
-              </button>
+              {/* The shared control, keeping this header's own sizing class
+                  (Layout.css styles .theme-toggle). */}
+              <ThemeToggle className="theme-toggle" />
 
               {/* The same words and the same destination as the physics
                   header. Two different primary buttons — "Start Learning"

@@ -3,6 +3,8 @@ import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from
 import { LEGACY_PHYSICS_ROOT, PHYSICS_HREF, PHYSICS_ROOT } from './physics/routes'
 import { RequireAccess } from './portal/Gate'
 import { MoreDetail } from './design/primitives'
+import { Logo } from './design/logo'
+import { ThemeToggle } from './design/theme'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
 import { hasUnsyncedWork } from './lib/syncedStore'
@@ -424,14 +426,12 @@ function Header() {
   return <header className="site-header">
     <div className="container nav-wrap">
       <Link to="/" className="brand" aria-label="RadioPass home">
-        <span className="brand-mark"><span></span><span></span><span></span></span>
-        <span>radio<span>pass</span></span>
         {/* The half you are standing in, said by the wordmark itself.
-            Anatomy's header says "RadioPass Anatomy" in the same place and
+            Anatomy's header says "RADIOPASS Anatomy" in the same place and
             the same type, so the two read as two sections of one product
             rather than two products that happen to share a name. Absent on
             the portal, which belongs to neither. */}
-        {branch && <span className="brand-branch">{branch}</span>}
+        <Logo branch={branch || undefined} markHeight={24} />
       </Link>
       <nav className={open ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
         {/* The two branches. Anatomy is a plain <a> because it leaves this
@@ -464,6 +464,7 @@ function Header() {
             <Link to="/free-trial" className="button button-small">Start free trial <Icon name="arrow" size={16}/></Link>
           </>
         )}
+        <ThemeToggle />
         <button className="menu-button" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}>
           <Icon name={open ? 'close' : 'menu'} />
         </button>
@@ -483,8 +484,7 @@ function Footer() {
     <div className="container footer-grid">
       <div>
         <Link to="/" className="brand brand-footer">
-          <span className="brand-mark"><span></span><span></span><span></span></span>
-          <span>radio<span>pass</span></span>
+          <Logo markHeight={22} />
         </Link>
         <p>Visual, exam-focused physics revision for FRCR Part 1 candidates.</p>
       </div>
@@ -751,7 +751,7 @@ function LoginPage() {
       </div>
     </div>
     <div className="login-panel">
-      <Link to="/" className="brand"><span className="brand-mark"><span></span><span></span><span></span></span><span>radio<span>pass</span></span></Link>
+      <Link to="/" className="brand"><Logo markHeight={22} /></Link>
       <form className="login-form" onSubmit={submit}>
         <h2>{mode === 'signup' ? 'Create your account' : 'Log in'}</h2>
         <p>{mode === 'signup' ? 'Free — no card required.' : 'Enter your details to access your dashboard.'}</p>
@@ -798,7 +798,7 @@ function ResetPasswordPage() {
       <div><Eyebrow>Account</Eyebrow><h1>Choose a new<br/><span>password.</span></h1><p>You followed a password reset link — set a new password to finish.</p></div>
     </div>
     <div className="login-panel">
-      <Link to="/" className="brand"><span className="brand-mark"><span></span><span></span><span></span></span><span>radio<span>pass</span></span></Link>
+      <Link to="/" className="brand"><Logo markHeight={22} /></Link>
       <form className="login-form" onSubmit={submit}>
         <h2>New password</h2>
         <p>At least 6 characters.</p>

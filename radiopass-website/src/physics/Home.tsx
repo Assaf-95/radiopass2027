@@ -525,20 +525,26 @@ export default function PhysicsHome() {
  * ------------------------------------------------------------------ */
 
 function PartMark({ id }: { id: string }) {
+  /* Every emblem colour is a CSS variable so the marks recolour with the
+     theme: the modality hues where the part IS a modality, the cool rim for
+     the rest. The one warm element an emblem may carry is its genuinely focal
+     point — the tube's focal spot, the atom the photon arrives at — painted
+     var(--core), the same warm the Continue control spends. */
   const common = {
     className: 'ph-mark',
     viewBox: '0 0 48 48',
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: 1.3,
+    strokeWidth: 1.1,
     'aria-hidden': true,
   } as const
+  const focal = { fill: 'var(--core)' } as const
   switch (id) {
     case 'matter': // a photon arriving at an atom
       return (
-        <svg {...common} style={{ color: '#A8CBEA' }}>
+        <svg {...common} style={{ color: 'var(--hue-xray)' }}>
           <path d="M4 24 q3 -5 6 0 t6 0 t6 0" opacity=".85" />
-          <circle cx="33" cy="24" r="3" fill="currentColor" stroke="none" opacity=".9" />
+          <circle cx="33" cy="24" r="3" style={focal} stroke="none" opacity=".9" />
           <ellipse cx="33" cy="24" rx="11" ry="4.5" opacity=".45" />
           <ellipse cx="33" cy="24" rx="11" ry="4.5" transform="rotate(60 33 24)" opacity=".45" />
           <ellipse cx="33" cy="24" rx="11" ry="4.5" transform="rotate(-60 33 24)" opacity=".45" />
@@ -546,8 +552,8 @@ function PartMark({ id }: { id: string }) {
       )
     case 'xray': // tube, diverging beam, detector
       return (
-        <svg {...common} style={{ color: '#A8CBEA' }}>
-          <circle cx="24" cy="8" r="3" fill="currentColor" stroke="none" opacity=".9" />
+        <svg {...common} style={{ color: 'var(--hue-xray)' }}>
+          <circle cx="24" cy="8" r="3" style={focal} stroke="none" opacity=".9" />
           <path d="M24 11 L12 36 M24 11 L36 36" opacity=".5" />
           <path d="M24 11 L24 36" opacity=".25" />
           <ellipse cx="24" cy="26" rx="7" ry="4.5" opacity=".45" />
@@ -556,16 +562,16 @@ function PartMark({ id }: { id: string }) {
       )
     case 'ct': // the gantry: ring, patient, tube on the ring
       return (
-        <svg {...common} style={{ color: '#D9A84E' }}>
+        <svg {...common} style={{ color: 'var(--hue-ct)' }}>
           <circle cx="24" cy="26" r="16" opacity=".55" />
           <ellipse cx="24" cy="26" rx="8" ry="5.5" opacity=".45" />
-          <circle cx="24" cy="10" r="2.6" fill="currentColor" stroke="none" opacity=".9" />
+          <circle cx="24" cy="10" r="2.6" style={focal} stroke="none" opacity=".9" />
           <path d="M24 12.5 L17 22 M24 12.5 L31 22" opacity=".35" />
         </svg>
       )
     case 'nm': // the gamma camera's dot image — counts, some missing
       return (
-        <svg {...common} style={{ color: '#A8CBEA' }}>
+        <svg {...common} style={{ color: 'var(--rim)' }}>
           {[0, 1, 2, 3].flatMap((r) =>
             [0, 1, 2, 3].map((c) => (
               <circle
@@ -583,7 +589,7 @@ function PartMark({ id }: { id: string }) {
       )
     case 'mri': // B₀ and the precessing vector
       return (
-        <svg {...common} style={{ color: '#A99EDB' }}>
+        <svg {...common} style={{ color: 'var(--hue-mri)' }}>
           <path d="M24 42 L24 8" strokeDasharray="2 4" opacity=".5" />
           <path d="M21 11 L24 6 L27 11" opacity=".6" />
           <ellipse cx="24" cy="18" rx="11" ry="3.5" opacity=".45" />
@@ -593,7 +599,7 @@ function PartMark({ id }: { id: string }) {
       )
     case 'us': // the wave, deepening
       return (
-        <svg {...common} style={{ color: '#7BCBC4' }}>
+        <svg {...common} style={{ color: 'var(--hue-us)' }}>
           {[10, 16, 22, 28, 34, 40].map((x, i) => (
             <path
               key={x}
@@ -606,7 +612,7 @@ function PartMark({ id }: { id: string }) {
       )
     case 'safety': // the trefoil, thin-stroke
       return (
-        <svg {...common} style={{ color: '#D9A84E' }}>
+        <svg {...common} style={{ color: 'var(--rim)' }}>
           <circle cx="24" cy="24" r="3.4" opacity=".85" />
           {[90, 210, 330].map((a) => (
             <path

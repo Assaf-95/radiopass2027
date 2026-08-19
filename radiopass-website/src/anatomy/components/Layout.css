@@ -11,14 +11,13 @@
   background: var(--bg);
 }
 /* --- Header --------------------------------------------------------------
-   The Physics nav, verbatim: a single 68px row inside min(1280px, 100%-48px),
-   translucent charcoal with a 16px blur and a hairline under it. The wordmark
-   is Inter at 13px with 0.42em tracking — that extreme letterspacing is the
-   signature of the RadioPass mark and is what makes the two sites read as
-   one. Links are 13px, muted, and go ivory on hover. */
+   The system header: one row at var(--header-h) (the global 64px — this
+   scope no longer declares its own), ground-glass with a 16px blur and a
+   hairline under it, the shared <Logo/> lockup on the left. Links are
+   muted and go ink on hover. */
 /* The mock-ups float the nav over the hero with no bar behind it at all, so
    the header is transparent at the top of the page and only takes its
-   translucent charcoal once the page has scrolled under it. */
+   glass once the page has scrolled under it. */
 .rp-anatomy .app-header {
   position: fixed;
   top: 0;
@@ -30,14 +29,23 @@
   transition: background 0.35s, border-color 0.35s, backdrop-filter 0.35s;
 }
 .rp-anatomy .app-header.is-scrolled {
-  background: rgba(11, 13, 16, 0.72);
+  background: color-mix(in srgb, var(--ground) 78%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom-color: rgba(242, 238, 230, 0.07);
+  border-bottom-color: var(--hairline);
 }
-[data-theme='light'] .app-header .rp-anatomy {
-  background: rgba(246, 244, 239, 0.82);
-  border-bottom-color: var(--line);
+/* In light mode the header carries its glass from the very top. Two reasons:
+   the anatomy home opens on a deliberately dark hero band (films and heroes
+   are read on dark) where floating pearl-ground nav text would be unreadable,
+   and a pearl glass strip over that band is the explicit statement that the
+   chrome is themed while the film is not. (This selector's ancestor order was
+   inverted here for months — '[data-theme] .app-header .rp-anatomy' — so the
+   light header never painted at all.) */
+[data-theme='light'] .rp-anatomy .app-header {
+  background: color-mix(in srgb, var(--ground) 78%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: var(--hairline);
 }
 .rp-anatomy .app-header-inner {
   width: min(1440px, calc(100% - 72px));
@@ -51,29 +59,14 @@
   /* Never let a crowded nav crush the wordmark to zero width. */
   flex: none;
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
   min-width: 0;
   flex: 1;
 }
-.rp-anatomy .rpa-brand-mark {
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: #F7F4ED;
-  white-space: nowrap;
-}
-.rp-anatomy .rpa-brand-sub {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--amber-accent);
-  white-space: nowrap;
-}
+/* The lockup itself is the shared <Logo/>; .rp-logo/.rp-logo-word/
+   .rp-logo-branch are styled once in styles.css and inherit this scope's
+   canonical stacks, so nothing brand-shaped is declared here any more. */
 /* The links are centred in the bar, not pushed against the actions. The gap
    gives way before the words do: at 38px the row outgrew a 1280px laptop once
    the Atlas link joined it, and the nav slid under the wordmark. */
@@ -85,41 +78,44 @@
 .rp-anatomy .app-nav a {
   font-size: 15px;
   font-weight: 400;
-  color: #C9CDD3;
+  color: var(--text-dim);
   white-space: nowrap;
   transition: color 0.2s;
 }
-.rp-anatomy .app-nav a:hover { color: #ffffff; }
+.rp-anatomy .app-nav a:hover { color: var(--text); }
 .rp-anatomy .app-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex: 1; }
-/* The cream call-to-action from the mock-ups. */
+/* The call-to-action: the standard primary inversion — ink on ground. */
 .rp-anatomy .app-cta {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 14px 24px;
   border-radius: var(--radius-sm);
-  background: #F3F0E9;
-  color: #0B0D10;
+  background: var(--ink);
+  color: var(--bg-base);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
   transition: background 0.25s, transform 0.25s;
 }
-.rp-anatomy .app-cta:hover { background: #ffffff; transform: translateY(-1px); }
+.rp-anatomy .app-cta:hover { background: var(--beam); transform: translateY(-1px); }
 .rp-anatomy .theme-toggle {
   width: 40px;
   height: 40px;
   flex: none;
+  display: inline-grid;
+  place-items: center;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(242, 238, 230, 0.2);
+  border: 1px solid var(--hairline);
   background: transparent;
   color: var(--text-dim);
   font-size: 14px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-[data-theme='light'] .theme-toggle .rp-anatomy { border-color: var(--line-strong); }
-.rp-anatomy .theme-toggle:hover { color: var(--text); border-color: rgba(242, 238, 230, 0.5); }
+/* (This selector, too, used to be written inside-out and never matched.) */
+[data-theme='light'] .rp-anatomy .theme-toggle { border-color: var(--hairline-lit); }
+.rp-anatomy .theme-toggle:hover { color: var(--text); border-color: var(--hairline-lit); }
 .rp-anatomy .app-main { flex: 1; min-height: 0; }
 @media (max-width: 1180px) {
   .rp-anatomy .app-nav { display: none; }
@@ -128,8 +124,8 @@
 }
 @media (max-width: 640px) {
   .rp-anatomy .app-header-inner { width: calc(100% - 32px); gap: 10px; }
-  .rp-anatomy .rpa-brand-sub { display: none; }
-  .rp-anatomy .rpa-brand-mark { font-size: 12px; letter-spacing: 0.3em; }
+  .rp-anatomy .rpa-brand .rp-logo { gap: 8px; }
+  .rp-anatomy .rpa-brand .rp-logo-word { font-size: 12px; letter-spacing: 0.22em; }
   .rp-anatomy .theme-toggle { width: 34px; height: 34px; }
   .rp-anatomy .app-cta { padding: 10px 14px; font-size: 13px; }
   .rp-anatomy .app-streak { display: none; }
@@ -154,13 +150,13 @@
   align-items: center;
   gap: 10px;
   padding: 5px 12px 5px 5px;
-  border: 1px solid rgba(242, 238, 230, 0.2);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-sm);
   background: transparent;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
-.rp-anatomy .rpa-account-chip:hover { border-color: rgba(242, 238, 230, 0.5); }
+.rp-anatomy .rpa-account-chip:hover { border-color: var(--hairline-lit); }
 .rp-anatomy .account-avatar {
   display: grid;
   place-items: center;
@@ -228,7 +224,7 @@
 .rp-anatomy .app-nav-divider {
   width: 1px;
   height: 14px;
-  background: var(--rule);
+  background: var(--hairline);
   flex: none;
 }
 .rp-anatomy .app-nav-trial { color: var(--text); }
@@ -236,21 +232,19 @@
   .rp-anatomy .app-nav-divider { display: none; }
 }
 
-/* The branch word — the exact counterpart of .brand-branch in the physics
-   header. Same relationship to the wordmark on both sides: the serif face,
-   untracked and dimmed, so "RadioPass" stays the name and "Anatomy" reads
-   as which half of it you are in rather than part of the name. */
-.rp-anatomy .rpa-brand-branch {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--text-dim);
-  white-space: nowrap;
-}
 @media (max-width: 900px) {
   /* The nav is tight here; the branch links already say which half you are
-     in, so the qualifier goes rather than crushing the wordmark. */
-  .rp-anatomy .rpa-brand-branch { display: none; }
+     in, so the lockup's branch word goes rather than crushing the wordmark. */
+  .rp-anatomy .rpa-brand .rp-logo-branch { display: none; }
+}
+
+/* PHONES. The nav is already hidden below 1180px, but the brand lockup plus
+   the theme toggle, the trial CTA and the account chip still measured 425px
+   inside a 390px screen — the account chip sat off the right edge, out of
+   reach. The wordmark is the part doing least work on a phone (the mark
+   still says RadioPass), so it stands down and the CTA tightens. */
+@media (max-width: 560px) {
+  .rp-anatomy .app-header .rp-logo-word { display: none; }
+  .rp-anatomy .app-header-actions { gap: 8px; }
+  .rp-anatomy .app-cta { padding: 8px 12px; font-size: var(--fs-meta); }
 }
