@@ -1,7 +1,7 @@
 {
-  "broken": 6,
+  "broken": 0,
   "counts": {
-    "echo": 6,
+    "echo": 0,
     "answer-leak": 0,
     "commentary": 0
   }

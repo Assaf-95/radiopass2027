@@ -54,7 +54,6 @@ export const QUESTION_MAP: QuestionMapEntry[] = [
   { q: 'b129', topic: 'xray', section: 'interactions', concept: 'attenuation', by: 'tag' },
   { q: 'b136', topic: 'xray', section: 'geometry', concept: 'focal-spot', by: 'kw' },
   { q: 'b138', topic: 'xray', section: 'geometry', by: 'kw' },
-  { q: 'b142', topic: 'xray', section: 'quality', by: 'kw', note: 'BOOTSTRAP FALLBACK — nothing matched; needs a human' },
   { q: 'b165', topic: 'xray', section: 'geometry', concept: 'focal-spot', by: 'tag' },
   { q: 'b167', topic: 'xray', section: 'interactions', by: 'kw' },
   { q: 'b169', topic: 'xray', section: 'quality', by: 'kw', note: 'BOOTSTRAP FALLBACK — nothing matched; needs a human' },

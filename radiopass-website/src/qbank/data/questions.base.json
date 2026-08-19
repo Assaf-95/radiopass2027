@@ -1203,15 +1203,39 @@
   },
   {
     "id": "b48",
-    "title": "Regarding Compton effect happens when energy is lower than electron binding energy",
+    "title": "Regarding the interaction of X-ray and gamma photons with matter:",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "Compton effect happens when energy is lower than electron binding energy.",
+        "text": "At 140 keV, photons interact with soft tissue predominantly by the photoelectric effect.",
         "answer": false,
-        "explanation": "Compton scatter involves a loosely bound outer-shell electron and is the dominant interaction in soft tissue at diagnostic energies."
+        "explanation": "Compton scatter, not photoelectric. Soft tissue is low-Z, so the binding energies it offers are far too small for photoelectric capture to compete at 140 keV, and Compton dominates. That is why Tc-99m photons have a half-value layer of only about 5 cm in soft tissue, so activity 10 cm deep is attenuated by roughly 75% — the attenuation problem SPECT has to correct. Hold this against the same 140 keV photons entering the gamma-camera crystal, where high-Z iodine makes photoelectric absorption the dominant interaction. Same photon energy, opposite answer: the discriminator is Z, and the exam asks it in both directions."
+      },
+      {
+        "label": "B",
+        "text": "The probability of a photoelectric interaction is proportional to Z³/E³.",
+        "answer": true,
+        "explanation": "Both cube laws matter. The Z³ term is why bone, iodine and barium stand out against soft tissue; the 1/E³ term is why the photoelectric fraction collapses as the mean photon energy rises. It is the single relationship behind most kV-and-contrast questions."
+      },
+      {
+        "label": "C",
+        "text": "At the effective photon energies used in CT, Compton scatter is the dominant interaction in soft tissue.",
+        "answer": true,
+        "explanation": "At roughly 60–70 keV effective energy, Compton dominates in soft tissue, and Compton tracks electron and therefore physical density — which is why CT contrast largely follows tissue density. Photoelectric still contributes to bone and iodine contrast throughout, and becomes prominent at low kV and around iodine's K-edge."
+      },
+      {
+        "label": "D",
+        "text": "At 140 keV, gamma rays interact with the sodium iodide gamma-camera crystal mainly by the photoelectric effect.",
+        "answer": true,
+        "explanation": "The crystal is doped with high-Z iodine, so at 140 keV photoelectric absorption dominates (with some Compton) — which is what deposits the full photon energy and produces a clean photopeak. Contrast this with the same 140 keV photons in soft tissue, where the interaction is predominantly Compton scatter. Both facts are examined, in opposite directions."
+      },
+      {
+        "label": "E",
+        "text": "Increasing the tube kilovoltage increases subject contrast.",
+        "answer": false,
+        "explanation": "Subject contrast is made by photoelectric events, and their relative number collapses as the mean photon energy rises. At the same time more scatter is produced, it carries more energy and it is more forward-directed, so a greater proportion of it reaches the receptor. Contrast falls on both counts. The pay-off for high kV is dose, not contrast: a more penetrating beam needs far less mAs for the same receptor dose, so entrance surface dose falls."
       }
     ]
   },
@@ -1597,15 +1621,39 @@
   },
   {
     "id": "b73",
-    "title": "Regarding mr safety expert is usually a medical physicist",
+    "title": "Regarding MR safety roles, zones and terminology:",
     "topic": "MRI",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "MR safety expert is usually a medical physicist.",
+        "text": "The MR Safety Expert is typically, though not by statute, a medical physicist.",
         "answer": true,
-        "explanation": "The MR Safety Expert is usually a medical physicist providing technical MR safety advice."
+        "explanation": "The MR Safety Expert provides the technical physics advice on MR safety, and in UK practice is typically a medical physicist — but 'typically' is doing real work here, because there is no statutory requirement that it be so. Keep this role separate from the MR Responsible Person."
+      },
+      {
+        "label": "B",
+        "text": "The MR safety responsible person must be a medical physicist.",
+        "answer": false,
+        "explanation": "This conflates two distinct roles, which is the whole point of the question. The MR Responsible Person is a locally designated role covering day-to-day safety and access control, and is often a senior radiographer. The MR Safety Expert is the one typically (but not statutorily) a medical physicist. Swap the role names and the answer flips."
+      },
+      {
+        "label": "C",
+        "text": "The static magnetic field is the greatest hazard in MRI.",
+        "answer": true,
+        "explanation": "B₀ is always on — including during a power failure — and it drives both the projectile hazard and the torque and force on implants. That permanence is why all patients and staff are verbally screened before entering the controlled access area and fully (written) screened before entering the MR environment."
+      },
+      {
+        "label": "D",
+        "text": "'MR Safe' means an item with demonstrated safety in the MR environment within defined conditions.",
+        "answer": false,
+        "explanation": "That is the definition of MR Conditional. MR Safe means no known hazard in ANY MR environment — electrically non-conductive, non-metallic, non-magnetic. MR Unsafe poses an unacceptable risk, and MR Unlabelled carries no safety information and needs a risk assessment. Four terms, and the exam routinely swaps the first two."
+      },
+      {
+        "label": "E",
+        "text": "The MR controlled access area boundary is taken as the 0.5 mT (5 gauss) fringe-field contour.",
+        "answer": true,
+        "explanation": "0.5 mT = 5 gauss is the contour that matters, and this is the conventional exam answer — so '50 mT' is False, and public access is permissible only where the field is below 0.5 mT. UK guidance also gives an inner controlled area at 3 mT, the projectile zone. Precision point worth holding: strictly the MHRA defines the MR Environment by the 0.5 mT contour, and the MR Controlled Access Area is the area that must contain it, so a pedantic examiner could mark the wording False. Know both terms."
       }
     ]
   },
@@ -2219,15 +2267,39 @@
   },
   {
     "id": "b107",
-    "title": "Regarding SAR is proptional to square of larmor frequency",
+    "title": "Regarding the hazards of the switched gradient and radiofrequency fields in MRI:",
     "topic": "MRI",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "SAR is proptional to square of larmor frequency.",
+        "text": "SAR increases with flip angle and is proportional to the square of the Larmor frequency.",
         "answer": true,
-        "explanation": "SAR ∝ (Larmor frequency)² and (flip angle)². True: Larmor frequency is proportional to B0, and SAR rises strongly with field strength."
+        "explanation": "SAR rises approximately with the square of the flip angle and with B₀². Since the Larmor frequency is proportional to B₀, that is the same as saying it goes with the square of the Larmor frequency. This is why 3 T scanning is more SAR-limited than 1.5 T, and why a fast spin echo with a long train of large refocusing pulses is a high-SAR sequence."
+      },
+      {
+        "label": "B",
+        "text": "Localised heating and burns are a recognised hazard of RF energy deposition, particularly with implants and with inappropriate peripheral equipment.",
+        "answer": true,
+        "explanation": "SAR is a whole-body average in watts per kilogram, but the injuries that actually happen are local. RF power absorbed in a conductive implant, or in a cable or lead left in contact with the skin, concentrates heat at one point — so a scan sitting comfortably inside the whole-body limit can still burn. Keep the three fields and their hazards separate: RF (B1) heats, measured as SAR; the switched gradients cause peripheral nerve stimulation and acoustic noise; the static field B₀ causes projectiles and torque on implants."
+      },
+      {
+        "label": "C",
+        "text": "SAR falls as the TR is increased.",
+        "answer": true,
+        "explanation": "A longer TR means fewer RF pulses per unit time — a lower duty cycle, so lower time-averaged RF power deposited per kilogram. Note what does NOT reduce SAR: increasing slice thickness, increasing the field of view, or adding phase-encoding steps. None of those changes the RF power deposited per kilogram."
+      },
+      {
+        "label": "D",
+        "text": "Rapid gradient switching can induce cardiac arrhythmias.",
+        "answer": false,
+        "explanation": "The recognised effects of fast switching are peripheral nerve stimulation, muscular contraction and acoustic noise — more likely with the rapid switching used in cardiac and diffusion imaging. Cardiac stimulation requires a dB/dt far higher than clinical limits allow; the limits exist precisely to keep well below that threshold. Gradients are characterised by slew rate = peak gradient amplitude ÷ rise time."
+      },
+      {
+        "label": "E",
+        "text": "In normal operating mode the whole-body SAR limit restricts the core temperature rise to about 1 °C.",
+        "answer": false,
+        "explanation": "Read the mode. Normal mode is 2 W/kg, restricting the core temperature rise to about 0.5 °C. It is first level (controlled) mode that permits 4 W/kg and about 1.0 °C, with research operation above that. Routine scanning runs in normal mode, so where a stem names the mode you must answer to that mode's figure — an unqualified statement that whole-body SAR limits hold the rise to about 1 °C is the conventional exam True, but tied to normal mode it is False."
       }
     ]
   },
@@ -2842,30 +2914,40 @@
     ]
   },
   {
-    "id": "b142",
-    "title": "Regarding increasing radius of conductive area increases current",
-    "topic": "Other",
-    "source": "recall",
-    "stems": [
-      {
-        "label": "A",
-        "text": "Increasing radius of conductive area increases current.",
-        "answer": true,
-        "explanation": "For a conductor of fixed length and resistivity, resistance falls as cross sectional area increases, so current rises for a fixed voltage."
-      }
-    ]
-  },
-  {
     "id": "b144",
-    "title": "Regarding 1 cgy*cm2 = 1 µGy*m2",
+    "title": "Regarding dose–area product and the dose quantities used in diagnostic radiology:",
     "topic": "Other",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "1 cGy*cm2 = 1 µGy*m2.",
+        "text": "1 cGy·cm² is equal to 1 µGy·m².",
         "answer": true,
-        "explanation": "Because 1 cGy equals 10,000 µGy and 1 m squared equals 10,000 cm squared, 1 cGy cm squared equals 1 µGy m squared."
+        "explanation": "Work it through in the two units separately. 1 cGy = 10⁻² Gy = 10⁴ µGy, and 1 cm² = 10⁻⁴ m². Multiply: 10⁴ × 10⁻⁴ = 1, so 1 cGy·cm² = 1 µGy·m² exactly. The two factors of 10⁴ cancel, which is the only reason this awkward-looking identity holds — it is arithmetic, not a convention, and DAP meters are legitimately calibrated in either."
+      },
+      {
+        "label": "B",
+        "text": "A dose–area product meter mounted at the tube exit measures the dose rate arriving at the image receptor.",
+        "answer": false,
+        "explanation": "It measures patient dose, not what reaches the detector. The DAP chamber sits at the tube exit and integrates dose across the whole beam area, in Gy·cm². Because the beam diverges, the product of dose and area stays essentially constant with distance, so one chamber characterises the whole exposure. To know the input dose rate arriving at the detector you need a dosemeter at the detector face — a different measurement answering a different question."
+      },
+      {
+        "label": "C",
+        "text": "Effective dose can be estimated from the dose–area product by applying a conversion factor.",
+        "answer": true,
+        "explanation": "DAP in Gy·cm² multiplied by a projection-specific conversion factor gives effective dose in mSv — exactly as DLP does for CT. The factor depends on the projection: AP has a higher conversion factor than PA for a chest radiograph, because more dose reaches the anterior radiosensitive organs, which is why chest radiographs are taken PA."
+      },
+      {
+        "label": "D",
+        "text": "Absorbed dose is the energy deposited per unit volume.",
+        "answer": false,
+        "explanation": "Per unit MASS. 1 Gy = 1 J/kg. 'Per unit volume' is the classic distractor and it is wrong, because the same energy deposited in a dense tissue and in lung would then give the same dose despite very different amounts of matter absorbing it."
+      },
+      {
+        "label": "E",
+        "text": "In diagnostic radiology, equivalent dose is numerically equal to absorbed dose.",
+        "answer": true,
+        "explanation": "Equivalent dose = absorbed dose × the radiation weighting factor wR, and wR = 1 for X-rays, gamma rays and electrons — every radiation used in diagnostic imaging. So the numbers match, even though the units change from gray to sievert. Gamma rays do not carry a higher weighting factor than X-rays; both are 1. Only outside diagnostic radiology does this break down, alpha particles carrying wR = 20."
       }
     ]
   },
@@ -3017,15 +3099,39 @@
   },
   {
     "id": "b152",
-    "title": "Regarding if used I123 with iodine CT contrast will affect the count",
+    "title": "Regarding I-123 and the effect of iodinated contrast media on radionuclide studies:",
     "topic": "CT",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "if used I123 with iodine CT contrast will affect the count.",
+        "text": "Iodinated CT contrast given beforehand can affect the count obtained in a subsequent I-123 thyroid study.",
         "answer": true,
-        "explanation": "Iodinated CT contrast can saturate thyroid iodine handling and reduce subsequent I-123 uptake/counts, so timing matters for thyroid nuclear medicine studies."
+        "explanation": "The iodine load from CT contrast floods the thyroid's iodine handling and blocks the uptake of radioiodine for weeks. Less tracer is taken up, so the counts recorded from the gland fall and the study can be uninterpretable or falsely suggest poor function. This is a scheduling problem, not an imaging one: do the radioiodine study first, or wait."
+      },
+      {
+        "label": "B",
+        "text": "Iodinated CT contrast can produce spurious apparent uptake on attenuation-corrected PET images.",
+        "answer": true,
+        "explanation": "A separate mechanism worth holding alongside the thyroid one. The CT is used to build the attenuation map; iodinated contrast inflates the CT numbers in contrast-dense voxels, so the correction over-compensates and the reconstructed PET overestimates activity along those voxels — apparent 'uptake' that is an artefact of the correction, not tracer."
+      },
+      {
+        "label": "C",
+        "text": "I-123 decays by electron capture and emits a 159 keV gamma ray with no beta emission.",
+        "answer": true,
+        "explanation": "Electron capture pulls in an inner-shell electron, converting a proton to a neutron so Z falls by one; characteristic X-rays follow and the daughter nucleus emits its gamma. The 159 keV photon sits nicely in the gamma camera's working range. No betas means no particle dose for nothing — one reason I-123 is the imaging iodine."
+      },
+      {
+        "label": "D",
+        "text": "I-123 has a physical half-life of 6 hours.",
+        "answer": false,
+        "explanation": "13 hours. The 6-hour figure belongs to Tc-99m, and swapping the two is a standard trap. The iodine family is worth holding as a set, because they are the same element with utterly different physics: I-123 13 h, I-131 8 days, I-125 60 days."
+      },
+      {
+        "label": "E",
+        "text": "I-123 is obtained by elution from an on-site generator.",
+        "answer": false,
+        "explanation": "I-123 is cyclotron-produced and delivered — proton bombardment makes the proton-rich, electron-capture nuclides such as F-18 and I-123, and its 13-hour half-life is what makes off-site production workable. Generator supply is the Mo-99 → Tc-99m route, eluted with saline from the alumina column each morning."
       }
     ]
   },

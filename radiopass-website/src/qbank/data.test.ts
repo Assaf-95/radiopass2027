@@ -17,7 +17,7 @@ const VALID_TOPICS = new Set(
 
 describe('question bank data', () => {
   it('holds the full merged bank', () => {
-    expect(QB_TOTALS.questions).toBeGreaterThanOrEqual(386)
+    expect(QB_TOTALS.questions).toBeGreaterThanOrEqual(385)
     expect(QB_TOTALS.stems).toBeGreaterThanOrEqual(1495)
   })
 
@@ -103,9 +103,9 @@ describe('recovered recall provenance', () => {
        statements split off one original exam question — b38 to b42 were five
        chemical-shift fragments — and were re-joined into the questions they
        came from. Fewer question SHELLS, more content: statements went from
-       1,425 to 1,606. Nothing was deleted that carried a statement of its
+       1,425 to 1,625. Nothing was deleted that carried a statement of its
        own. */
-    expect(base.length).toBe(372)
+    expect(base.length).toBe(371)
   })
 
   it('keeps the recovered year distribution exactly', () => {
@@ -118,7 +118,7 @@ describe('recovered recall provenance', () => {
       '2020': 27,
       '2022': 24,
       '2023': 14,
-      '2024': 54,
+      '2024': 53,
       '2025': 35,
       Collection: 160,
     })
@@ -139,7 +139,7 @@ describe('recovered recall provenance', () => {
     const flagged = base.filter((q) => q.completeFive)
     const fiveStem = base.filter((q) => q.stems.length === 5)
     expect(flagged.length).toBe(201)
-    expect(fiveStem.length).toBe(266)
+    expect(fiveStem.length).toBe(271)
     const shortened = flagged.filter((q) => q.stems.length !== 5).map((q) => q.id)
     expect(shortened).toEqual([])
   })
