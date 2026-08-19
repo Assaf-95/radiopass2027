@@ -204,6 +204,40 @@ re-propose any of it:
   stays deleted). **Rebuild it after any change that should ship** — it is not rebuilt
   automatically, and a stale bundle once carried an abandoned experiment.
 
+### Authoring surfaces — built 19 Aug 2026, do not rebuild or duplicate
+
+The owner edits his own content. Five surfaces exist; extend them, never author a
+replacement.
+
+| Route | What |
+|---|---|
+| `/admin` | Author console — links to everything below (`src/portal/Admin.tsx`) |
+| `/admin/questions` | Physics wording: search 467 by id/heading/statement, edit stem, explanation, key point |
+| `/anatomy/admin/structures` | Structure folders + "Scan the question bank" (finds 417 groupings) |
+| `/anatomy/section/:id/images` | Every film in a section: remove, bring back, rename, replace |
+| `/anatomy/section/:id/q/:qid/wording` | Stem, official answer, accepted variants, laterality |
+
+`/anatomy/admin` is the anatomy hub and also links all of it.
+
+**Two content backends, deliberately.** Anatomy questions go through the Node API
+(`src/anatomy/lib/content/api.ts` → `patchQuestion`, resolved by `applyOverlay`);
+structure folders and physics wording go through Supabase
+(`src/lib/contentStore.ts`, admin-gated by the `admin` grant in `entitlements`).
+Both are overlays: the bundled JSON is never mutated and every edit is revertible.
+
+**Rules the editors encode — do not weaken:**
+- The wording editor MERGES into the existing edit document. Writing a fresh one
+  erases the marker geometry the annotation editor saved.
+- Image removal is SOFT (`removedAt`). The question, answers and labels survive.
+- Physics wording cannot change a true/false value — there is nowhere in the
+  document to put one. Flipping one would re-mark work already submitted.
+  Pinned by `src/qbank/overlay.test.ts`.
+- `structureKey` must never fold left/right, proximal/distal, or toe/finger.
+  Pinned by `src/anatomy/lib/structureScan.test.ts`.
+
+Still to do: nothing yet lets folders drive what the Atlas displays — a folder
+records the grouping but the Atlas has not been pointed at it.
+
 ### 3D models (owner-made, in ~/Downloads) — the standing rule
 
 `sodium-atom.glb` opens X-ray §1.1 and `gamma-detector-head.glb` sits in NM §6.2, built up layer
