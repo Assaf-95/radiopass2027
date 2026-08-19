@@ -167,6 +167,65 @@ export function setEditingConfigured(value: boolean) {
 }
 
 /**
+ * Resolves to `fallback` if the promise has not settled in time.
+ *
+ * THE BOOT PATH MUST NOT BE ABLE TO HANG. AnatomyRoutes renders nothing until
+ * loadContent() resolves — deliberately, so a replaced film never flashes as
+ * the old one — which means anything awaited in here can hold the entire
+ * anatomy site on a loading screen.
+ *
+ * That became real the moment the Supabase backend was added: probing it calls
+ * supabase.auth.getSession(), which may refresh the token over the network and
+ * takes a cross-tab Web Lock to do it. A lock held by a BACKGROUNDED tab is
+ * released on that tab's throttled timers — about once a minute in Chrome and
+ * Brave — so a second tab could sit on the loading screen for a minute for a
+ * document it does not need in order to render anything at all.
+ *
+ * The overlay is an enhancement, not a prerequisite. If it is slow, the site
+ * opens on the bundled questions and the overlay is folded in when it lands —
+ * every consumer subscribes, so a late arrival simply repaints.
+ */
+function withTimeout<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) { done = true; resolve(fallback); }
+    }, ms);
+    work.then(
+      (value) => { if (!done) { done = true; clearTimeout(timer); resolve(value); } },
+      () => { if (!done) { done = true; clearTimeout(timer); resolve(fallback); } },
+    );
+  });
+}
+
+/** How long the first paint will wait for a content backend. */
+const BOOT_BUDGET_MS = 2500;
+
+/**
+ * Applies a probe that came back after the boot had already given up on it.
+ *
+ * Without this, a slow connection would open the site on the bundled
+ * questions and STAY there for the whole session — an author would not see
+ * their own edits and would reasonably conclude the save had failed.
+ */
+function applyLate(probe: ReturnType<typeof readSupabaseOverlay>) {
+  void probe.then((sb) => {
+    if (!sb.state.reachable || !sb.overlay) return;
+    /* Never move backwards: a save made while the probe was in flight has
+       already installed a newer document. */
+    if (sb.overlay.rev < state.overlay.rev) return;
+    backend = 'supabase';
+    backendWritable = sb.state.writable;
+    backendWhy = sb.state.why;
+    state = { ...state, overlay: sb.overlay, editingConfigured: sb.state.writable, online: true };
+    writeCache(sb.overlay);
+    notify();
+  }).catch(() => {
+    /* Already reported as unreachable; nothing further to say. */
+  });
+}
+
+/**
  * Loads the overlay. Called once at start-up and again after any save.
  *
  * A cached copy is applied first so the first paint is not delayed by a
@@ -183,7 +242,32 @@ export function loadContent(force = false): Promise<ContentState> {
     notify();
   }
 
-  inflight = fetchContent()
+  /* BOTH probes start now, not one after the other.
+     Asking the Node API first and only then asking Supabase put two waits in
+     front of the first paint of the whole anatomy site, when the answers are
+     independent. Started together, a healthy boot costs the slower of the
+     two rather than their sum. */
+  const nodeProbe = withTimeout(fetchContent(), BOOT_BUDGET_MS, {
+    overlay: null,
+    editingConfigured: false,
+    online: false,
+    error: 'The content service did not answer in time.',
+  });
+  const supabaseRaw = readSupabaseOverlay();
+  let supabaseTimedOut = true;
+  const supabaseProbe = withTimeout(
+    supabaseRaw.then((value) => {
+      supabaseTimedOut = false;
+      return value;
+    }),
+    BOOT_BUDGET_MS,
+    {
+      overlay: null,
+      state: { reachable: false, writable: false, why: 'The content service did not answer in time.' },
+    },
+  );
+
+  inflight = nodeProbe
     .then(async (result) => {
       /* The Node API is authoritative wherever it is actually set up to
          accept writes. Where it is not — no server, or a server with no
@@ -202,7 +286,13 @@ export function loadContent(force = false): Promise<ContentState> {
         };
       }
 
-      const sb = await readSupabaseOverlay();
+      /* Already in flight. If it missed the boot budget the site opens
+         without it and applyLate installs whatever it eventually answers —
+         every consumer subscribes, so the page repaints with the author's
+         edits a moment later rather than never showing them. */
+      const sb = await supabaseProbe;
+      if (supabaseTimedOut) applyLate(supabaseRaw);
+
       if (sb.state.reachable) {
         backend = 'supabase';
         backendWritable = sb.state.writable;

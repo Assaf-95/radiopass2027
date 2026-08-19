@@ -79,13 +79,20 @@ export async function readSupabaseOverlay(): Promise<{
   overlay: ContentOverlay | null
   state: BackendState
 }> {
-  const status = await contentStoreStatus()
+  /* Started together. "Is this account an admin" and "what is the current
+     document" are independent questions, and asking them one after the other
+     put two avoidable round trips in front of the first paint of the whole
+     anatomy site. */
+  const [status, result] = await Promise.all([
+    contentStoreStatus(),
+    getJSONResult<ContentOverlay>(CONTENT_KEYS.anatomyOverlay),
+  ])
+
   if (!status.ready && status.reason === 'no-backend') {
     return { overlay: null, state: { reachable: false, writable: false, why: whyNot('no-backend') } }
   }
 
   supabaseAdmin = status.ready
-  const result = await getJSONResult<ContentOverlay>(CONTENT_KEYS.anatomyOverlay)
   const writable = status.ready
   const why = status.ready ? '' : whyNot(status.reason)
 

@@ -119,8 +119,23 @@ function useContentBoot(): boolean {
   useEffect(() => {
     if (ready) return
     const stop = subscribeContent(() => setReady(true))
+    /* A second, independent deadline. loadContent already budgets each
+       backend probe, but this gate decides whether the anatomy site renders
+       AT ALL, and it must not depend on another module continuing to keep
+       its promises. Whatever happens upstream, the site opens.
+
+       This exists because it did not: adding a Supabase probe to loadContent
+       put a token refresh — which takes a cross-tab lock, released on a
+       backgrounded tab's throttled timers — in front of the first paint, and
+       the anatomy home sat on a loading screen for about a minute. No amount
+       of reviewing the overlay logic would have found that, because nothing
+       about it was logically wrong. */
+    const deadline = setTimeout(() => setReady(true), 3000)
     void loadContent()
-    return stop
+    return () => {
+      clearTimeout(deadline)
+      stop()
+    }
   }, [ready])
   return ready
 }
