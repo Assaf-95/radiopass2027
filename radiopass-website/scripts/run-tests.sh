@@ -30,6 +30,12 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # a release-blocking state, and this is the harness every release runs.
 (cd "$PROJECT_DIR" && node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts --errors-only)
 
+# The physics bank's SHAPE gates the run too. A "statement" a candidate cannot
+# mark true or false is not a question, and 172 of them reached learners before
+# anyone noticed. This is a ratchet, not a pass/fail: the known count is checked
+# in, and the run fails only when it RISES. See scripts/physics-shape-validate.mjs.
+(cd "$PROJECT_DIR" && node scripts/physics-shape-validate.mjs)
+
 case "$PROJECT_DIR" in
   *:*)
     ;;

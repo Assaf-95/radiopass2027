@@ -1067,13 +1067,13 @@
   },
   {
     "id": "b39",
-    "title": "Regarding chemical shift uses phase encoding -f",
+    "title": "Regarding chemical shift uses phase encoding",
     "topic": "MRI",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "Chemical shift uses phase encoding -F.",
+        "text": "Chemical shift uses phase encoding.",
         "answer": false,
         "explanation": "Classic chemical shift displacement occurs in the frequency-encoding direction, not the phase-encoding direction."
       }
@@ -1095,13 +1095,13 @@
   },
   {
     "id": "b41",
-    "title": "Regarding chemical shift reduced by increasing bandwidth -t",
+    "title": "Regarding chemical shift reduced by increasing bandwidth",
     "topic": "MRI",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "Chemical shift reduced by increasing bandwidth -T.",
+        "text": "Chemical shift reduced by increasing bandwidth.",
         "answer": true,
         "explanation": "Increasing receiver bandwidth reduces the pixel displacement caused by the fat-water frequency difference, although it may reduce SNR."
       }
@@ -1165,13 +1165,13 @@
   },
   {
     "id": "b46",
-    "title": "Regarding compton effect is less likely at 120kv than 80kv -t",
+    "title": "Regarding compton effect is less likely at 120kv than 80kv",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "Compton effect is less likely at 120kv than 80kv -T.",
+        "text": "Compton effect is less likely at 120kv than 80kv.",
         "answer": true,
         "explanation": "The absolute probability of Compton interaction falls gradually as photon energy increases, although Compton becomes more dominant relative to photoelectric absorption at higher kVp."
       }
@@ -1291,13 +1291,13 @@
   },
   {
     "id": "b55",
-    "title": "Regarding dose distribution is more uniform in CT than x-ray -t",
+    "title": "Regarding dose distribution is more uniform in CT than x-ray",
     "topic": "CT",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "Dose distribution is more uniform in CT than x ray -T.",
+        "text": "Dose distribution is more uniform in CT than x ray.",
         "answer": true,
         "explanation": "CT irradiates the patient from many angles, so the dose is distributed more circumferentially than in a single projection radiograph."
       }
