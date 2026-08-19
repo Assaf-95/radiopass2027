@@ -89,6 +89,27 @@ export const XRAY: V2Topic = {
             caption: 'Transmitted photons draw the image. Absorbed photons vanish inside — they buy contrast and pay in dose. Scattered photons change direction and survive to fog the image. Every property of a radiograph traces back to this three-way split.',
           },
         },
+        /* The single most-swapped pair in this part of the syllabus, and the
+           exam asks it by name. Put where the atom itself is taught, because
+           the whole distinction is just "which number stayed the same". */
+        {
+          kind: 'compare',
+          title: 'Isotopes against isobars',
+          a: 'Isotopes',
+          b: 'Isobars',
+          rows: [
+            ['Proton number Z', 'the same', 'different'],
+            ['Mass number A (protons + neutrons)', 'different', 'the same'],
+            ['Which element', 'the same element', 'different elements'],
+            ['Chemical behaviour', 'identical — same electron structure', 'different'],
+            ['Place on the periodic table', 'the same place', 'different places'],
+            ['Example', 'I-123, I-125, I-131 — all iodine', 'Mo-99 and Tc-99 — both A = 99'],
+          ],
+        },
+        {
+          kind: 'trap',
+          text: 'Remember which number the name protects. **Iso-tope** holds the PROTON number, so the element is unchanged and only the neutrons differ. **Iso-bar** holds the MASS number, so the element changes. Beta decay makes an isobar: a neutron becomes a proton, A is untouched and Z rises by one — which is exactly Mo-99 decaying to Tc-99. And **isomers** are neither: Tc-99m and Tc-99 have the same Z AND the same A, differing only in nuclear energy state, which is why the m is metastable and not a different substance.',
+        },
       ],
     },
     {

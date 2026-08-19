@@ -45,7 +45,7 @@ export type QuestionMapEntry = {
 export const QUESTION_MAP: QuestionMapEntry[] = [
   { q: 'b1', topic: 'xray', section: 'interactions', concept: 'pe-vs-compton', by: 'tag' },
   { q: 'b2', topic: 'xray', section: 'spectrum', concept: 'characteristic', by: 'kw' },
-  { q: 'b3', topic: 'xray', section: 'quality', by: 'kw', note: 'BOOTSTRAP FALLBACK — nothing matched; needs a human' },
+  { q: 'b3', topic: 'xray', section: 'foundations', concept: 'isotopes-isobars', by: 'manual', note: 'A bootstrap fallback that landed in quality because nothing matched. It is about atomic structure — proton number, mass number, half-life — which is what foundations teaches.' },
   { q: 'b4', topic: 'xray', section: 'spectrum', concept: 'kvp-vs-mas', by: 'tag' },
   { q: 'b46', topic: 'xray', section: 'interactions', concept: 'pe-vs-compton', by: 'tag' },
   { q: 'b47', topic: 'xray', section: 'interactions', concept: 'pe-vs-compton', by: 'tag' },

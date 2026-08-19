@@ -25,6 +25,14 @@ export type ConceptMeta = {
 }
 
 const XRAY: ConceptMeta[] = [
+  {
+    id: 'isotopes-isobars',
+    title: 'Isotopes, isobars and isomers',
+    rule: 'Isotopes share the proton number and differ in mass number; isobars share the mass number and differ in proton number; isomers share both and differ only in nuclear energy state.',
+    why: 'The proton number is what makes an element that element, so isotopes are chemically identical — which is precisely why radioactive iodine is taken up by the thyroid exactly like stable iodine. Changing only the neutron count changes mass number, nuclear stability, binding energy and half-life while leaving the chemistry alone.',
+    confusion: 'Isotopes and isobars are swapped constantly. The name tells you which number is held: iso-TOPE keeps the proton number (same place on the periodic table), iso-BAR keeps the mass number. Beta decay produces an isobar — a neutron becomes a proton, so A is unchanged and Z rises by one, which is Mo-99 becoming Tc-99. Tc-99m and Tc-99 are neither: same Z, same A, different energy state, so they are isomers.',
+    match: /isotope|isobar|isomer|isotone|same (atomic|proton|mass) number/i,
+  },
     {
       id: 'kvp-vs-mas',
       title: 'kVp versus mAs',
