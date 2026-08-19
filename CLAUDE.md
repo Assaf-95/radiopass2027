@@ -219,11 +219,27 @@ replacement.
 
 `/anatomy/admin` is the anatomy hub and also links all of it.
 
-**Two content backends, deliberately.** Anatomy questions go through the Node API
-(`src/anatomy/lib/content/api.ts` → `patchQuestion`, resolved by `applyOverlay`);
-structure folders and physics wording go through Supabase
-(`src/lib/contentStore.ts`, admin-gated by the `admin` grant in `entitlements`).
-Both are overlays: the bundled JSON is never mutated and every edit is revertible.
+**Two content backends, and ONE is chosen per load — never composed.**
+`loadContent()` picks the Node API (`src/anatomy/lib/content/api.ts`) wherever it is
+configured, i.e. `ATLAS_ADMIN_PASSWORD` is set; otherwise Supabase
+(`src/anatomy/lib/content/supabaseBackend.ts`, key `anatomy-overlay`). Physics wording
+and structure folders are Supabase-only. Read `contentBackend()` for what is active;
+save through `saveQuestionPatch()` / `uploadQuestionAsset()` — never call
+`patchQuestion` from a page again.
+
+**Do not "improve" this by merging the two overlays per question.** That design was
+built and rejected: no editor page sends a whole patch (the film manager sends only
+`image`, the wording editor only `edit`), so any per-question precedence rule erases
+marker geometry on something as innocent as a rename.
+
+`src/anatomy/lib/content/merge.ts` is a line-for-line port of `server/lib/overlay.mjs`,
+and `merge.test.ts` runs BOTH over the same fixtures. If you change one, change the
+other or that test fails — two implementations of a merge that decides marking is how
+one edit comes to mean different things on two deployments.
+
+Both backends are overlays: the bundled JSON is never mutated and every edit is
+revertible. Sign-in is the owner's Supabase account (`admin` grant in `entitlements`);
+`isAdmin()` accepts it, so no localStorage passcode is needed.
 
 **Rules the editors encode — do not weaken:**
 - The wording editor MERGES into the existing edit document. Writing a fresh one
