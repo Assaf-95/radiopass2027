@@ -197,7 +197,16 @@ export function applyOverlay(question: Question): Question {
      Only ever reached through the editor's explicit answer field. Keyed by
      letter, so editing C cannot disturb A, B, D or E. */
   if (patch.answers) {
-    const answers = { ...question.answers };
+    /* Built on `next`, not on the bundled `question`.
+       Sourced from the original, this silently reverted every answer the
+       annotation editor had rewritten: that editor writes wording into
+       `patch.edit.answers`, which applyEdit has already put onto `next` by
+       the time we get here, and re-spreading the shipped record threw it
+       away. Only questions carrying BOTH documents were affected, which is
+       exactly what happens once a question is edited on two different
+       pages — so it would have started biting as soon as the wording editor
+       was used on anything already annotated. */
+    const answers = { ...next.answers };
     let touched = false;
     for (const [letter, value] of Object.entries(patch.answers)) {
       if (!answers[letter] || !value?.officialAnswer) continue;

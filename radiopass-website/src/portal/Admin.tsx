@@ -48,6 +48,13 @@ const PASSCODE_CONFIGURED = PASSCODE.length > 0
 type Tool = { name: string; blurb: string; href: string; external?: boolean }
 
 const ANATOMY_TOOLS: Tool[] = [
+  { name: 'Structure folders', blurb: 'Join the structures the dataset records twice. Merging keeps every name a correct answer.', href: `${ANATOMY}/#/admin/structures`, external: true },
+  { name: 'Films — Upper limb', blurb: 'Every film in the section: remove, bring back, rename, replace.', href: `${ANATOMY}/#/section/upper-limb/images`, external: true },
+  { name: 'Films — Lower limb', blurb: 'Same contact sheet, lower limb section.', href: `${ANATOMY}/#/section/lower-limb/images`, external: true },
+  { name: 'Films — Head & neck', blurb: 'Same contact sheet, head and neck section.', href: `${ANATOMY}/#/section/head-neck/images`, external: true },
+  { name: 'Films — Thorax', blurb: 'Same contact sheet, thorax section.', href: `${ANATOMY}/#/section/thorax/images`, external: true },
+  { name: 'Films — Abdomen & pelvis', blurb: 'Same contact sheet, abdomen and pelvis section.', href: `${ANATOMY}/#/section/abdo-pelvis/images`, external: true },
+  { name: 'Films — Spine', blurb: 'Same contact sheet, spine section.', href: `${ANATOMY}/#/section/spine/images`, external: true },
   { name: 'Custom case builder — Upper limb', blurb: 'Upload an image, place and shape arrows, write the answers.', href: `${ANATOMY}/#/section/upper-limb/custom`, external: true },
   { name: 'Custom case builder — Lower limb', blurb: 'Same builder, lower limb section.', href: `${ANATOMY}/#/section/lower-limb/custom`, external: true },
   { name: 'Custom case builder — Head & neck', blurb: 'Same builder, head and neck section.', href: `${ANATOMY}/#/section/head-neck/custom`, external: true },
@@ -59,6 +66,7 @@ const ANATOMY_TOOLS: Tool[] = [
 ]
 
 const PHYSICS_TOOLS: Tool[] = [
+  { name: 'Question wording', blurb: 'Search the bank and fix a sentence. Wording only — a true/false value cannot be changed, so no answered question is ever re-marked.', href: '/admin/questions' },
   // The old demo archive was pulled from the shipped build; the 132 prototypes
   // now live in `reference/library/` and are opened from disk. See its README.
   { name: 'MRI module', blurb: 'Chapter 5 end to end — 21 sections, one concept per screen, each with its own simulations.', href: '/mri' },

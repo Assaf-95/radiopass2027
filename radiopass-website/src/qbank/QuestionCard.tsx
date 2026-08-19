@@ -17,7 +17,9 @@
  * the fact bank. Explanations stay strictly about the stem they sit under.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+
+import { applyQbOverlay, loadQbOverlay, qbOverlayRev, subscribeQbOverlay } from './overlay'
 import { Link } from 'react-router-dom'
 
 import { HighYield } from '../design/primitives'
@@ -44,7 +46,7 @@ export function scoreQuestion(question: QbQuestion, choices: StemChoice) {
 }
 
 export function QuestionCard({
-  question,
+  question: bundledQuestion,
   number,
   total,
   onScored,
@@ -94,6 +96,24 @@ export function QuestionCard({
    */
   revealMarking?: boolean
 }) {
+
+  /* The bundled record, with any wording the author has since edited on top.
+     Resolved here because this is the ONE component every surface renders a
+     question through — the bank, review and both mock views — so a single
+     line keeps all four consistent and none of them has to remember.
+
+     The overlay never carries a true/false value, so `scoreQuestion` below
+     grades against exactly the answer that shipped and no stored attempt can
+     be retrospectively re-marked. See qbank/overlay.ts. */
+  /* Subscribed, so a card already on screen picks the wording up the moment
+     the document arrives instead of showing the shipped text until the next
+     navigation. The fetch is fire-and-forget and fails silently — see
+     loadQbOverlay — because nothing here is needed to answer a question. */
+  useSyncExternalStore(subscribeQbOverlay, qbOverlayRev, qbOverlayRev)
+  useEffect(() => {
+    void loadQbOverlay()
+  }, [])
+  const question = applyQbOverlay(bundledQuestion)
   // A previously submitted question comes back exactly as it was left: the
   // candidate's own ticks, already marked. Submission is final, so this is a
   // read-only replay rather than a fresh sheet — a mark you have taken should

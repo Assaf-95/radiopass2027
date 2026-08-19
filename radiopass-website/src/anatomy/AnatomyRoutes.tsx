@@ -30,6 +30,8 @@ import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import RequireAdmin from './components/RequireAdmin'
 import StructureFolders from './pages/StructureFolders'
+import QuestionWording from './pages/QuestionWording'
+import ImageManager from './pages/ImageManager'
 import { contentLoaded, loadContent, subscribeContent } from './lib/content/store'
 import Home from './pages/Home'
 import SectionHub from './pages/SectionHub'
@@ -171,6 +173,26 @@ export default function AnatomyRoutes() {
             element={
               <RequireAdmin>
                 <ReplaceImageEditor />
+              </RequireAdmin>
+            }
+          />
+          {/* Words only. Geometry is edited on the image page above; these two
+              write through the same merged document so neither undoes the
+              other. */}
+          <Route
+            path="section/:sectionId/q/:questionId/wording"
+            element={
+              <RequireAdmin>
+                <QuestionWording />
+              </RequireAdmin>
+            }
+          />
+          {/* Every film in the section at once — remove, bring back, rename. */}
+          <Route
+            path="section/:sectionId/images"
+            element={
+              <RequireAdmin>
+                <ImageManager />
               </RequireAdmin>
             }
           />

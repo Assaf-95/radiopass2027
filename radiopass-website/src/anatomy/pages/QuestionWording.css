@@ -1,0 +1,214 @@
+/* Wording editor. A form, deliberately plain — the interesting thing on the
+   page is the words, not the chrome around them. */
+
+.qw {
+  max-width: 780px;
+  margin: 0 auto;
+  /* Clears the fixed header, which otherwise sits over the first heading. */
+  padding: calc(var(--header-h) + 24px) 1.25rem 5rem;
+}
+
+.qw-head h1 {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 1.9rem;
+}
+
+.qw-eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.qw-lede {
+  margin: 0 0 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.qw-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.qw-nav a {
+  color: var(--teal-bright);
+  text-decoration: none;
+}
+
+.qw-nav a:hover {
+  text-decoration: underline;
+}
+
+.qw-note,
+.qw-error {
+  margin: 1.25rem 0 0;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.qw-note {
+  border: 1px solid var(--line);
+  background: var(--amber-bg);
+  color: var(--text);
+}
+
+.qw-note a {
+  color: var(--amber-accent);
+}
+
+.qw-error {
+  border: 1px solid var(--red);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.qw-block {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.qw-block h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.qw-hint {
+  margin: 0 0 1.25rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.qw-field {
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.qw-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.qw-field input,
+.qw-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.qw-field input:focus,
+.qw-field textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--halo);
+}
+
+.qw-was {
+  margin: -0.5rem 0 0.85rem;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+.qw-answers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.qw-answer {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.qw-answer:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.qw-letter {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--panel-2);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.qw-answer-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.qw-check {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.qw-check input {
+  margin-top: 0.2rem;
+}
+
+.qw-check small {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-faint);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.qw-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.qw-saved {
+  font-size: 0.9rem;
+  color: var(--green);
+}
+
+@media (max-width: 560px) {
+  .qw {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .qw-answer {
+    gap: 0.6rem;
+  }
+}

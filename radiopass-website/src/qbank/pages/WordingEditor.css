@@ -1,0 +1,305 @@
+/* Physics wording editor. Search, then a plain form. */
+
+.qwe {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 6rem 1.25rem 5rem;
+  color: var(--ink, #e8eaed);
+}
+
+.qwe-head h1 {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 1.9rem;
+}
+
+.qwe-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.qwe-lede {
+  margin: 0 0 0.9rem;
+  max-width: 62ch;
+  opacity: 0.75;
+  line-height: 1.55;
+}
+
+.qwe-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.qwe-nav a {
+  color: #7cc4d8;
+  text-decoration: none;
+}
+
+.qwe-nav a:hover {
+  text-decoration: underline;
+}
+
+.qwe-blocked,
+.qwe-error {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  line-height: 1.55;
+}
+
+.qwe-blocked strong {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.qwe-blocked p,
+.qwe-error {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.qwe-blocked-note {
+  font-size: 0.82rem !important;
+  opacity: 0.6 !important;
+}
+
+.qwe-error {
+  border-color: rgba(255, 120, 120, 0.5);
+}
+
+.qwe-search {
+  display: block;
+  margin: 2rem 0 1rem;
+}
+
+.qwe-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.qwe-search input,
+.qwe-field input,
+.qwe-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.qwe-search input:focus,
+.qwe-field textarea:focus {
+  outline: none;
+  border-color: #7cc4d8;
+}
+
+.qwe-search small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  opacity: 0.55;
+}
+
+.qwe-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.qwe-results li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.qwe-results button {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  gap: 0.6rem;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.7rem 0.2rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.qwe-results button:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.qwe-none {
+  padding: 1rem 0.2rem;
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+.qwe-rid {
+  font-size: 0.78rem;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+}
+
+.qwe-rtitle {
+  line-height: 1.4;
+}
+
+.qwe-rtopic {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+.qwe-badge {
+  grid-column: 3;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e0b25a;
+}
+
+.qwe-editor {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.qwe-editor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.qwe-editor h2 {
+  margin: 1.75rem 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.qwe-hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  opacity: 0.75;
+}
+
+.qwe-field {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+.qwe-stems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.qwe-stem {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.qwe-stem:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.qwe-truth {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  border: 1px solid currentColor;
+}
+
+.qwe-truth.is-true {
+  color: #6fce9f;
+}
+
+.qwe-truth.is-false {
+  color: #e08a8a;
+}
+
+.qwe-truth.is-unknown {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.qwe-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(to top, #0b0d10 72%, transparent);
+}
+
+.qwe-btn {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.qwe-btn:hover:not(:disabled) {
+  border-color: #7cc4d8;
+}
+
+.qwe-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.qwe-btn.is-primary {
+  border-color: #7cc4d8;
+  background: rgba(124, 196, 216, 0.16);
+}
+
+.qwe-btn.is-quiet {
+  opacity: 0.7;
+}
+
+.qwe-saved {
+  font-size: 0.9rem;
+  color: #6fce9f;
+}
+
+@media (max-width: 560px) {
+  .qwe {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .qwe-results button {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}

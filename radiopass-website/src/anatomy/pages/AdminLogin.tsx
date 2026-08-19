@@ -133,6 +133,30 @@ export default function AdminLogin() {
           ))}
         </div>
 
+        <h2>Manage the films</h2>
+        <p className="admin-hint">
+          Every film in a section on one page — <strong>remove</strong> one that cannot be
+          used, <strong>bring it back</strong>, <strong>rename</strong> it, or jump straight
+          to replacing it. Removing is always reversible: the question, its answers and its
+          labels stay exactly as they are and only the picture stops being shown.
+        </p>
+        <div className="admin-links">
+          {SECTION_META.map((s) => (
+            <Link key={s.id} className="btn" to={`/anatomy/section/${s.id}/images`}>{s.title}</Link>
+          ))}
+        </div>
+
+        <h2>One structure recorded twice</h2>
+        <p className="admin-hint">
+          Where the bank separates the same bone written two ways — a phalanx of the little
+          toe and the same phalanx of the fifth — this joins them. A merge keeps
+          <strong> every name a correct answer</strong>, so nothing a candidate might
+          reasonably write starts being marked wrong.
+        </p>
+        <div className="admin-links">
+          <Link className="btn" to="/anatomy/admin/structures">Structure folders</Link>
+        </div>
+
         <h2>Add your own cases</h2>
         <div className="admin-links">
           {SECTION_META.map((s) => (

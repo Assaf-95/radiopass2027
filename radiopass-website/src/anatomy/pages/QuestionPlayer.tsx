@@ -335,6 +335,15 @@ export default function QuestionPlayer() {
             Edit image &amp; labels
           </Link>
           )}
+          {isAdmin() && (
+          <Link
+            className="qp-nav-toggle"
+            to={`/anatomy/section/${section}/q/${question.id}/wording`}
+            title="Reword the question, the official answers and the variants that also score full marks"
+          >
+            Edit wording
+          </Link>
+          )}
           <button className="qp-nav-toggle" onClick={() => setShowIndex((s) => !s)}>Navigator</button>
         </div>
       </div>
