@@ -282,7 +282,13 @@
    on focus rather than a colour change. */
 .rp-anatomy input[type='text'], .rp-anatomy input[type='search'], .rp-anatomy input[type='email'], .rp-anatomy input[type='password'], .rp-anatomy select, .rp-anatomy textarea {
   font-family: var(--font-sans);
-  font-size: 15px;
+  /* EVERY typed answer in the anatomy bank comes through this rule. At 15px
+     it silently beat the per-page rules that tried to set a readable size —
+     identical specificity, later in the file — so raising the answer box on
+     the question player did nothing until this moved. A candidate types an
+     answer here on all 501 questions: it is reading text, not chrome. 16px
+     is also the threshold below which iOS zooms the page on focus. */
+  font-size: var(--fs-support);
   color: var(--text);
   background: var(--panel-2);
   border: 1px solid var(--line);

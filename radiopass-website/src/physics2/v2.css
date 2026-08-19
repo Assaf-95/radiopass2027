@@ -189,7 +189,7 @@
   font-family: var(--v2-serif);
   font-weight: 415;
   font-variation-settings: 'opsz' 12;
-  font-size: 17px;
+  font-size: var(--fs-body);
   line-height: 1.68;
   color: var(--v2-ink);
   max-width: 66ch;
@@ -273,7 +273,7 @@
   margin: 0;
   color: var(--v2-ink);
 }
-.v2-topicrow p { margin: 3px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--v2-ink-2); max-width: 56ch; }
+.v2-topicrow p { margin: 3px 0 0; font-size: 15px; line-height: 1.5; color: var(--v2-ink-2); max-width: 56ch; }
 .v2-topicrow .st { justify-self: end; text-align: right; min-width: 130px; }
 .v2-topicrow .st b { font-family: var(--v2-mono); font-weight: 500; font-size: 12.5px; color: var(--v2-ink-2); }
 .v2-topicrow .st small { display: block; font-size: 11.5px; color: var(--v2-ink-3); margin-top: 2px; }
@@ -314,7 +314,7 @@
 .v2-outcomes li {
   position: relative;
   padding: 3px 0 3px 22px;
-  font-size: 14.5px;
+  font-size: var(--fs-support);
   line-height: 1.55;
   color: var(--v2-ink-2);
 }
@@ -330,7 +330,7 @@
 .v2-section-head { display: flex; align-items: baseline; gap: 13px; }
 .v2-section-head i { font-style: normal; font-family: var(--v2-mono); font-size: 13.5px; color: var(--v2-bronze); }
 .v2-section-head h2 { font-family: var(--v2-serif); font-weight: 500; font-size: clamp(21px, 2.6vw, 25px); margin: 0; }
-.v2-section-blurb { margin: 6px 0 0 37px; font-size: 14px; color: var(--v2-ink-3); }
+.v2-section-blurb { margin: 6px 0 0 37px; font-size: var(--fs-support); color: var(--v2-ink-3); }
 .v2-section-body { margin-top: 18px; display: grid; gap: 18px; }
 
 /* Primer blocks */
@@ -358,7 +358,7 @@
   max-width: 640px;
 }
 .v2-equation b { font-family: var(--v2-mono); font-weight: 680; font-size: clamp(19px, 2.4vw, 23px); letter-spacing: 0.01em; }
-.v2-equation span { font-size: 14px; color: var(--v2-ink-2); }
+.v2-equation span { font-size: var(--fs-support); color: var(--v2-ink-2); }
 
 .v2-rel { max-width: 640px; }
 .v2-rel table { width: 100%; border-collapse: collapse; }
@@ -375,7 +375,7 @@
 .v2-rel td, .v2-rel th {
   border-top: 1px solid var(--v2-line);
   padding: 8px 14px 8px 0;
-  font-size: 14px;
+  font-size: var(--fs-support);
   line-height: 1.5;
   text-align: left;
   vertical-align: top;
@@ -385,9 +385,41 @@
 .v2-rel td:last-child { color: var(--v2-ink-2); }
 .v2-rel th { font-size: 12.5px; font-weight: 600; color: var(--v2-ink-2); border-top: none; padding-top: 0; }
 
+.v2-table { max-width: none; }
+/* Wider than the reading measure on purpose — the whole value is seeing four
+   families against three numbers at once — so it scrolls in its own box on a
+   narrow screen instead of stretching the page. */
+.v2-table-scroll { overflow-x: auto; }
+.v2-table table { min-width: 520px; }
+.v2-table td { white-space: nowrap; }
+.v2-table td:first-child { color: var(--v2-ink); }
+.v2-table-note {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--v2-ink-2);
+  white-space: normal;
+}
+
+/* The course paper keeps wide page margins, so the grid has less room here
+   than it does in a question card. Tighten until five columns fit a phone
+   outright — a summary you have to drag sideways is not a summary. */
+@media (max-width: 640px) {
+  .v2-table table { min-width: 0; }
+  .v2-table td, .v2-table th {
+    white-space: normal;
+    font-size: var(--fs-support);
+    padding: 7px 6px 7px 0;
+    line-height: 1.4;
+  }
+  .v2-table td:first-child { padding-right: 8px; }
+  .v2-table td:last-child, .v2-table th:last-child { padding-right: 0; }
+}
+
 .v2-numbers { max-width: 640px; }
 .v2-numbers dl { margin: 0; display: grid; grid-template-columns: 1fr auto; }
-.v2-numbers dt, .v2-numbers dd { border-top: 1px dotted var(--v2-line-strong); padding: 7px 0; margin: 0; font-size: 14px; }
+.v2-numbers dt, .v2-numbers dd { border-top: 1px dotted var(--v2-line-strong); padding: 7px 0; margin: 0; font-size: var(--fs-support); }
 .v2-numbers dt { color: var(--v2-ink-2); padding-right: 26px; }
 .v2-numbers dd { font-family: var(--v2-mono); font-size: 14px; color: var(--v2-ink); text-align: right; white-space: nowrap; }
 
@@ -421,7 +453,7 @@
 .v2-detail summary::before { content: '+'; font-family: var(--v2-mono); color: var(--v2-bronze); width: 12px; }
 .v2-detail[open] summary::before { content: '−'; }
 .v2-detail summary:hover { color: var(--v2-bronze); }
-.v2-detail .v2-prose { margin-top: 8px; padding-left: 20px; border-left: 1px solid var(--v2-line-strong); font-size: 15.5px; color: var(--v2-ink-2); }
+.v2-detail .v2-prose { margin-top: 8px; padding-left: 20px; border-left: 1px solid var(--v2-line-strong); font-size: var(--fs-support); color: var(--v2-ink-2); }
 
 /* Film plate */
 

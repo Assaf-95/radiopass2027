@@ -163,11 +163,11 @@
 }
 .rp-anatomy .answer-label {
   font-weight: 700;
-  font-size: 13.5px;
+  font-size: var(--fs-support);
 }
 .rp-anatomy .answer-row-prompt {
   margin: 0 0 6px;
-  font-size: 12.5px;
+  font-size: var(--fs-support);
   color: var(--text-muted, #8b93a1);
 }
 .rp-anatomy .answer-row input {
@@ -177,7 +177,7 @@
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--fs-body);
 }
 .rp-anatomy .answer-row input:disabled {
   opacity: 0.85;
@@ -189,22 +189,25 @@
   border-top: 1px dashed var(--border-soft);
 }
 .rp-anatomy .feedback-line {
-  font-size: 13px;
+  font-size: var(--fs-support);
   margin: 0 0 4px;
 }
 .rp-anatomy .feedback-reason {
-  font-size: 12.5px;
+  font-size: var(--fs-support);
   color: var(--text-dim);
   margin: 0 0 6px;
 }
 /* The recognition cue. Set off with a rule rather than a box: it appears on
    every label, including the ones scored full marks, so it has to sit quietly
    next to a correct answer without reading as a correction. */
+/* The explanation is the product. The owner's standing rule is that
+   exam-critical teaching must not occupy less visual space than metadata,
+   and at 12.5px this sat BELOW the navigation and the buttons. */
 .rp-anatomy .feedback-teaching {
   margin: 0 0 8px;
   padding-left: 10px;
   border-left: 2px solid var(--teal);
-  font-size: 12.5px;
+  font-size: var(--fs-body);
   line-height: 1.55;
   color: var(--text-dim);
 }
@@ -229,7 +232,7 @@
 .rp-anatomy .qp-submit {
   width: 100%;
   padding: 12px;
-  font-size: 14.5px;
+  font-size: var(--fs-support);
 }
 .rp-anatomy .qp-total {
   display: flex;
@@ -246,16 +249,16 @@
   gap: 8px;
 }
 .rp-anatomy .teaching-panel h3 {
-  font-size: 14px;
+  font-size: var(--fs-card);
   color: var(--accent);
 }
 .rp-anatomy .teaching-projection {
   font-style: italic;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: var(--fs-support);
 }
 .rp-anatomy .teaching-text {
-  font-size: 13.5px;
+  font-size: var(--fs-body);
   line-height: 1.6;
   white-space: pre-line;
 }
@@ -268,7 +271,7 @@
 .rp-anatomy .source-explanation ul {
   margin: 8px 0 0;
   padding-left: 18px;
-  font-size: 12px;
+  font-size: var(--fs-support);
   color: var(--text-faint);
 }
 .rp-anatomy .teaching-source {
