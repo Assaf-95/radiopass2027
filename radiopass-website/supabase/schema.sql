@@ -154,3 +154,87 @@ grant select, insert, update on public.anatomy_progress to authenticated;
 grant select, insert, update on public.anatomy_disputes to authenticated;
 grant select, insert, update on public.anatomy_bookmarks to authenticated;
 grant select, insert, update on public.learner_events to authenticated;
+
+-- ===========================================================================
+-- Authoring — the editable copy of the content, and the images behind it.
+--
+-- The anatomy dataset (501 questions) and the physics bank (467) ship inside
+-- the JavaScript bundle and are NEVER written to. Everything an author changes
+-- is recorded here as an overlay on top of that base, and every surface reads
+-- base-through-overlay. That is what makes an edit revertible and what stops a
+-- bad edit destroying the source material.
+--
+-- This mirrors the document store the Node content API already speaks
+-- (getJSON/setJSON over a handful of keys), so the same overlay shape works
+-- whether it is served from a filesystem in development or from here in the
+-- browser. Keys in use: 'anatomy-overlay', 'anatomy-audit', 'physics-overlay',
+-- 'physics-audit', 'structure-folders'.
+--
+-- SECURITY. Reading is open to any signed-in candidate, because the overlay is
+-- simply the current content and they are going to be shown it anyway. WRITING
+-- requires the 'admin' grant in public.entitlements, which only the service
+-- role can hand out — so an author cannot promote themselves from the browser,
+-- and the localStorage passcode that gates the admin INTERFACE cannot grant
+-- any actual write.
+-- ===========================================================================
+
+create table if not exists public.content_documents (
+  key text primary key,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now(),
+  updated_by uuid references auth.users (id)
+);
+
+alter table public.content_documents enable row level security;
+
+-- True when the caller holds the admin grant. Security definer so it can read
+-- entitlements rows other than the caller's own row-level view.
+create or replace function public.is_content_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.entitlements e
+    where e.user_id = auth.uid()
+      and 'admin' = any (e.grants)
+      and (e.expires_at is null or e.expires_at > now())
+  );
+$$;
+
+drop policy if exists "anyone signed in may read content" on public.content_documents;
+create policy "anyone signed in may read content" on public.content_documents
+  for select using (auth.uid() is not null);
+
+drop policy if exists "only admins may write content" on public.content_documents;
+create policy "only admins may write content" on public.content_documents
+  for all using (public.is_content_admin()) with check (public.is_content_admin());
+
+grant select on public.content_documents to authenticated;
+grant insert, update on public.content_documents to authenticated;
+
+-- Every write, kept separately from the document so a bad edit can be traced
+-- to a person and a time even after the document has moved on.
+create table if not exists public.content_audit (
+  id bigserial primary key,
+  at timestamptz not null default now(),
+  actor uuid references auth.users (id),
+  key text not null,
+  action text not null,
+  detail jsonb
+);
+
+alter table public.content_audit enable row level security;
+
+drop policy if exists "admins read the audit" on public.content_audit;
+create policy "admins read the audit" on public.content_audit
+  for select using (public.is_content_admin());
+
+drop policy if exists "admins append to the audit" on public.content_audit;
+create policy "admins append to the audit" on public.content_audit
+  for insert with check (public.is_content_admin());
+
+grant select, insert on public.content_audit to authenticated;
+grant usage, select on sequence public.content_audit_id_seq to authenticated;
