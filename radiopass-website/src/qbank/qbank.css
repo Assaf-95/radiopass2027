@@ -665,3 +665,38 @@
   color: var(--text-tertiary);
   opacity: 0.9;
 }
+
+/* --- After marking: the candidate's own answer stays legible -------------
+   The pair is disabled but must NOT read as switched-off furniture — it is
+   the record of what they said, and it is the most useful thing on the card
+   when the stem was wrong. So the pick keeps full contrast, and the true
+   answer is outlined in green beside it. Seeing "I said True, the answer is
+   False" side by side is the whole point of reviewing a paper. */
+.qb-tf.is-marked button {
+  cursor: default;
+  opacity: 1;
+}
+.qb-tf.is-marked button:not(.is-picked):not(.is-answer) {
+  color: var(--qb-mut);
+  border-color: var(--qb-line);
+  opacity: 0.5;
+}
+/* What the candidate said. Kept solid, so it reads first. */
+.qb-tf.is-marked button.is-picked {
+  color: var(--bg-base);
+  background: var(--qb-ink);
+  border-color: var(--qb-ink);
+  opacity: 1;
+}
+/* What was actually true. Outlined rather than filled, so it never competes
+   with the answer given when the two are the same button. */
+.qb-tf.is-marked button.is-answer {
+  border-color: var(--qb-green);
+  color: var(--qb-green);
+  opacity: 1;
+}
+.qb-tf.is-marked button.is-answer.is-picked {
+  background: var(--qb-green);
+  border-color: var(--qb-green);
+  color: var(--bg-base);
+}

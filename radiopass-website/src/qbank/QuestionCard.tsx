@@ -232,27 +232,42 @@ export function QuestionCard({
               </span>
               <p className="qb-stem-text">{stem.text}</p>
 
-              {!marked ? (
-                <div className="qb-tf" role="group" aria-label={`Statement ${stem.label}: true or false`}>
-                  <button
-                    type="button"
-                    className={picked === true ? 'is-picked' : ''}
-                    aria-pressed={picked === true}
-                    autoFocus={autoFocus && stem.label === 'A'}
-                    onClick={() => pick(stem.label, true)}
-                  >
-                    True
-                  </button>
-                  <button
-                    type="button"
-                    className={picked === false ? 'is-picked' : ''}
-                    aria-pressed={picked === false}
-                    onClick={() => pick(stem.label, false)}
-                  >
-                    False
-                  </button>
-                </div>
-              ) : (
+              {/* THE ANSWER STAYS ON SCREEN AFTER MARKING.
+                  These two buttons used to be REPLACED by the verdict, so the
+                  moment a candidate submitted, the thing they had actually
+                  said vanished and all that remained was "correct" or
+                  "incorrect". Reviewing a paper you cannot see your own
+                  answers on is close to useless: the whole value of a wrong
+                  stem is seeing that you said True where the answer was
+                  False. They now stay, disabled, with the pick still marked
+                  and the true answer marked beside it. */}
+              <div
+                className={`qb-tf${marked ? ' is-marked' : ''}`}
+                role="group"
+                aria-label={`Statement ${stem.label}: true or false`}
+              >
+                <button
+                  type="button"
+                  className={`${picked === true ? 'is-picked' : ''}${marked && stem.answer === true ? ' is-answer' : ''}`}
+                  aria-pressed={picked === true}
+                  disabled={marked}
+                  autoFocus={autoFocus && !marked && stem.label === 'A'}
+                  onClick={() => pick(stem.label, true)}
+                >
+                  True
+                </button>
+                <button
+                  type="button"
+                  className={`${picked === false ? 'is-picked' : ''}${marked && stem.answer === false ? ' is-answer' : ''}`}
+                  aria-pressed={picked === false}
+                  disabled={marked}
+                  onClick={() => pick(stem.label, false)}
+                >
+                  False
+                </button>
+              </div>
+
+              {marked && (
                 <span className={`qb-verdict ${right ? 'is-right' : wrong ? 'is-wrong' : unanswered ? 'is-blank' : ''}`}>
                   {stem.answer === null ? (
                     <>
