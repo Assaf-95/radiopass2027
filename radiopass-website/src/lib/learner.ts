@@ -154,6 +154,18 @@ function readAll(): LearnerEvent[] {
   return sanitize(store.read())
 }
 
+/**
+ * Repaint when the timeline changes — including when a sign-in pull lands.
+ *
+ * The dashboard reads lessons finished, mock history and Continue from here,
+ * but could only subscribe to the question store, so a candidate whose record
+ * is lessons and mock papers (and no bank questions) was shown "Nothing
+ * recorded yet" until they navigated away and back.
+ */
+export function subscribeEvents(listener: () => void): () => void {
+  return store.subscribe(listener)
+}
+
 /** Everything recorded, oldest first. */
 export function readEvents(): LearnerEvent[] {
   return readAll()

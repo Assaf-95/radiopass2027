@@ -14,15 +14,13 @@
  * offers a first step, rather than showing a plausible-looking zero state
  * dressed as progress.
  *
- * Two things are deliberately NOT shown:
- *   - mock performance. Finished papers ARE recorded — Mock.tsx emits
- *     mock.completed and learner.ts keeps the history — but the papers write
- *     nothing back to the question record, so a candidate who sat three of
- *     them still reads "0 answered" here. Surfacing the history before that is
- *     fixed would put two contradictory accounts of the same work on one
- *     screen. Both halves land together in the progress pass;
- *   - any single "exam readiness" percentage, which would need a defensible
- *     methodology and currently has none.
+ * Mock papers ARE shown now: they write to the question record as well as to
+ * the timeline, so the history line and the answered count describe the same
+ * work rather than contradicting each other.
+ *
+ * One thing is still deliberately NOT shown: any single "exam readiness"
+ * percentage, which would need a defensible methodology and currently has
+ * none.
  *
  * THE COURSE SECTION IS THE MERGE. This page used to list nine modules linking
  * to nine laboratories, while a second dashboard at /physics-v2 listed the same
@@ -31,10 +29,8 @@
  * learner has finished, and how its slice of the question bank is going.
  */
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-import { useEffect, useState } from 'react'
 
 import { QB_QUESTIONS, QB_TOTALS } from '../qbank/data'
 import {
@@ -43,10 +39,10 @@ import {
   standingOf,
   subscribeQbProgress,
 } from '../qbank/Shell'
-import { readProgress as readUsProgress } from '../us/components/progress'
+import { readProgress as readUsProgress, subscribeProgress as subscribeUsProgress } from '../us/components/progress'
 import { US_STAGES } from '../us/components/Layout'
 import { SECTIONS as MRI_SECTIONS } from '../mri5/sections'
-import { completedModules, lastOfType, mockHistory } from '../lib/learner'
+import { completedModules, lastOfType, mockHistory, subscribeEvents } from '../lib/learner'
 import { V2_TOPICS } from '../physics2/topics'
 import { topicStanding } from '../physics2/lib/derive'
 import { COURSE_PARTS } from './course'
@@ -181,7 +177,13 @@ function useSnapshot(): Snapshot {
     const refresh = () => setSnap(readSnapshot())
     // A sync can land between the first render and this effect.
     refresh()
-    return subscribeQbProgress(refresh)
+    /* All THREE stores the snapshot reads, not just the question one. Lessons,
+       mock history and Continue come from the event log, and the ultrasound
+       count from its own store; subscribing to one of the three meant a
+       candidate whose record was lessons and mocks saw the empty state until
+       they navigated away and back. */
+    const unsubs = [subscribeQbProgress(refresh), subscribeEvents(refresh), subscribeUsProgress(refresh)]
+    return () => unsubs.forEach((off) => off())
   }, [])
   return snap
 }

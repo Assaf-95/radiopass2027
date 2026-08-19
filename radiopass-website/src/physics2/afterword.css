@@ -139,3 +139,16 @@
     justify-content: center;
   }
 }
+
+/* The section link when the course is behind an account. It says so, and looks
+   it, rather than dropping the visitor onto a sign-in wall unannounced. */
+.v2-aw-actions .is-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.85;
+}
+.v2-aw-lock {
+  flex: none;
+  transform: translateY(0.5px);
+}

@@ -34,12 +34,23 @@
 import { Suspense, lazy, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { isAllowed } from '../../lib/access'
+import { useEntitlement } from '../../lib/entitlement'
 import { teachingFor } from '../mapping/lookup'
 import '../afterword.css'
 
 /* Lazy so that the question bank's chunk contains none of it — and, through
    it, none of the course content or three.js — until a candidate asks. */
 const Instrument = lazy(() => import('./Instrument'))
+
+function LockGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" className="v2-aw-lock">
+      <rect x="3" y="7" width="10" height="7" rx="1.5" fill="currentColor" opacity="0.85" />
+      <path d="M5 7 V5 a3 3 0 0 1 6 0 V7" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  )
+}
 
 export function QuestionAfterword({
   questionId,
@@ -51,7 +62,24 @@ export function QuestionAfterword({
 }) {
   const [open, setOpen] = useState(false)
   const [empty, setEmpty] = useState(false)
+  /* Same reason as Instrument's reset: the pagers do not key the card, so this
+     component is re-rendered rather than remounted when the question changes.
+     Without this, an instrument opened on one question stayed open under the
+     next, and an "empty" verdict from one section suppressed the button on a
+     section that does have one. */
+  const [shownFor, setShownFor] = useState(questionId)
+  if (shownFor !== questionId) {
+    setShownFor(questionId)
+    setOpen(false)
+    setEmpty(false)
+  }
   const teaching = teachingFor(questionId)
+  /* The course is behind an account, and /free-trial is the one question
+     surface an anonymous visitor can reach. Sending them to "Read §1.2 in
+     full" and landing them on a sign-in wall — with no hint that is where the
+     link goes — is the dead end the free sample's own padlocks were added to
+     avoid. Ask the same question the destination route asks. */
+  const canOpenCourse = isAllowed({ branch: 'physics', kind: 'module' }, useEntitlement())
 
   if (!teaching) return null
   const { concept } = teaching
@@ -99,9 +127,16 @@ export function QuestionAfterword({
               {open ? 'Hide the instrument' : 'Show me it working'}
             </button>
           )}
-          <Link className="v2-btn v2-btn-quiet" to={teaching.href}>
-            Read §{teaching.topicNum}.{teaching.sectionIndex} in full &rarr;
-          </Link>
+          {canOpenCourse ? (
+            <Link className="v2-btn v2-btn-quiet" to={teaching.href}>
+              Read §{teaching.topicNum}.{teaching.sectionIndex} in full &rarr;
+            </Link>
+          ) : (
+            <Link className="v2-btn v2-btn-quiet is-locked" to="/login?mode=signup">
+              <LockGlyph />
+              §{teaching.topicNum}.{teaching.sectionIndex} in full — free with an account
+            </Link>
+          )}
         </div>
       </div>
 

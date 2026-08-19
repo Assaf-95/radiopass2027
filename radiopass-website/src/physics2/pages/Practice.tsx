@@ -17,7 +17,7 @@ import { readQbMarks, readQbProgress } from '../../qbank/Shell'
 import type { QbQuestion } from '../../qbank/types'
 import { PHYSICS_HREF, practiceHref, topicHref } from '../../physics/routes'
 
-/** 'again' = the whole pool as a fresh re-test (permanent record untouched). */
+/** 'again' = the whole pool as a fresh re-test. Recorded like any attempt. */
 type Filter = 'unseen' | 'wrong' | 'flagged' | 'all' | 'again'
 
 type SessionResult = { question: QbQuestion; correct: number; outOf: number }
@@ -135,7 +135,7 @@ export default function V2Practice() {
             </b>
             <span>
               statements correct across {attempted.length} question{attempted.length === 1 ? '' : 's'}
-              {mode === 'retest' && ' — re-test, your permanent record is unchanged'}
+              {mode === 'retest' && ' — re-test: this attempt updates where you stand now'}
             </span>
           </div>
 

@@ -79,7 +79,7 @@ export const US: V2Topic = {
             title: 'The wave, and what owns its speed',
             annotation: 'drag the frequency · four media',
             caption:
-              'Sound is a mechanical wave, so it needs matter and the matter sets the speed — 1540 m/s in soft tissue, four times that in bone, a fifth of it in air. Change the medium and watch the wavelength change with it while the frequency stays exactly where you put it. The scanner assumes 1540 m/s no matter what, which is why fat measures slightly deep and why air stops the examination.',
+              'Sound is a mechanical wave, so it needs matter and the matter sets the speed — 1540 m/s in soft tissue, about two and a half times that in bone, a fifth of it in air. Change the medium and watch the wavelength change with it while the frequency stays exactly where you put it. The scanner assumes 1540 m/s no matter what, which is why fat measures slightly deep and why air stops the examination.',
             flush: true,
           },
         },

@@ -195,7 +195,13 @@ export function QuestionCard({
         {question.stems.map((stem) => {
           const picked = choices[stem.label]
           const right = marked && stem.answer !== null && picked === stem.answer
-          const wrong = marked && stem.answer !== null && picked !== stem.answer
+          /* A statement left blank is not a wrong answer. Marking it "incorrect"
+             tells a candidate who ran out of time that they got things wrong
+             they never saw — and it is indistinguishable from a genuine error
+             when they come to work out what to study. */
+          const blank = picked === undefined
+          const wrong = marked && stem.answer !== null && !blank && picked !== stem.answer
+          const unanswered = marked && stem.answer !== null && blank
           return (
             <li
               key={stem.label}
@@ -227,7 +233,7 @@ export function QuestionCard({
                   </button>
                 </div>
               ) : (
-                <span className={`qb-verdict ${right ? 'is-right' : wrong ? 'is-wrong' : ''}`}>
+                <span className={`qb-verdict ${right ? 'is-right' : wrong ? 'is-wrong' : unanswered ? 'is-blank' : ''}`}>
                   {stem.answer === null ? (
                     <>
                       Unscored
@@ -236,6 +242,11 @@ export function QuestionCard({
                   ) : right ? (
                     <>
                       Your answer is correct
+                      <small>the statement is {stem.answer ? 'true' : 'false'}</small>
+                    </>
+                  ) : unanswered ? (
+                    <>
+                      Not answered
                       <small>the statement is {stem.answer ? 'true' : 'false'}</small>
                     </>
                   ) : (

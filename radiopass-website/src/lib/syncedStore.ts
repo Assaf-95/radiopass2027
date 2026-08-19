@@ -42,6 +42,27 @@ export function clearLocalCaches() {
   localCaches.forEach((clear) => clear())
 }
 
+/**
+ * Every store's "is my copy behind the server's" flag.
+ *
+ * Sign-out deliberately deletes this device's copy, and that is right: it is
+ * what stops one candidate's record reaching the next person to use the
+ * browser. The assumption underneath it — "the record was pushed on every
+ * write, so nothing is destroyed" — is false whenever those pushes have been
+ * failing. Offline, an expired session, an RLS regression: the work then exists
+ * ONLY on the device that is about to be wiped.
+ *
+ * So the fact is made available rather than assumed, and the sign-out control
+ * asks before destroying it.
+ */
+const syncErrorFlags = new Set<() => boolean>()
+
+/** True when any synced store currently has work it has failed to push. */
+export function hasUnsyncedWork(): boolean {
+  for (const failing of syncErrorFlags) if (failing()) return true
+  return false
+}
+
 export function createSyncedStore<T>(opts: {
   /** localStorage key — keep the existing key so nobody's history resets. */
   localKey: string
@@ -137,6 +158,7 @@ export function createSyncedStore<T>(opts: {
   }
 
   localCaches.add(clearLocal)
+  syncErrorFlags.add(() => lastSyncError !== null)
 
   /* Another tab of the same site wrote this store: drop the cache so this one
      re-reads rather than serving a stale copy and, worse, writing that stale

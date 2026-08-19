@@ -39,6 +39,13 @@ export default function Instrument({
 
   useEffect(() => {
     let live = true
+    /* Clear FIRST. The question pagers render <QuestionCard> without a key, so
+       moving to the next question re-renders this same instance rather than
+       remounting it — and without this the candidate saw the previous
+       section's simulation, at the previous pager position, sitting under the
+       new question's "this question comes from §N.M". */
+    setSims(null)
+    setIndex(0)
     void simsFor(topicId, sectionId).then((found) => {
       if (!live) return
       setSims(found)

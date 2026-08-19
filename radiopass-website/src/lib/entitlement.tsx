@@ -29,19 +29,38 @@ const KNOWN_GRANTS: readonly string[] = ['account', 'trial', 'anatomy', 'physics
  * A missing row is not a failure. During early access nobody has one, and the
  * caller falls back to EARLY_ACCESS_GRANTS.
  */
+/**
+ * How long to wait for the entitlements row before giving up on it.
+ *
+ * A request that never settles is different from one that fails: the catch
+ * below never runs, `server` stays undefined, the entitlement stays UNKNOWN,
+ * and every gated route renders its loading state for ever — the whole
+ * question bank, all nine topics and the mocks, blank, with no error anywhere.
+ * A stalled connection must degrade to "no row", which the caller already
+ * treats as early access, not to a locked product.
+ */
+const GRANTS_TIMEOUT_MS = 8000
+
 async function readServerGrants(userId: string): Promise<ServerGrants> {
   if (!supabase) return null
   try {
-    const { data, error } = await supabase
+    const query = supabase
       .from('entitlements')
       .select('grants, expires_at')
       .eq('user_id', userId)
       .maybeSingle()
+    const { data, error } = (await Promise.race([
+      query,
+      new Promise<{ data: null; error: unknown }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: 'timeout' }), GRANTS_TIMEOUT_MS),
+      ),
+    ])) as { data: unknown; error: unknown }
     if (error || !data) return null
-    const grants = (Array.isArray(data.grants) ? data.grants : []).filter((g): g is Grant =>
-      KNOWN_GRANTS.includes(g)
+    const row = data as { grants?: unknown; expires_at?: string | null }
+    const grants = (Array.isArray(row.grants) ? row.grants : []).filter((g): g is Grant =>
+      KNOWN_GRANTS.includes(g as string),
     )
-    return { grants, expiresAt: (data.expires_at as string | null) ?? null }
+    return { grants, expiresAt: row.expires_at ?? null }
   } catch {
     /* Offline, or the table has not been created on this deployment. Treated
        as "no row", never as "no access": a paying learner must not be locked

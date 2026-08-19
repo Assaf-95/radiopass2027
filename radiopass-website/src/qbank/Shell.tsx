@@ -9,7 +9,7 @@ import { Breadcrumb, CRUMB_PHYSICS, CRUMB_ROOT } from '../design/breadcrumb'
 import { record } from '../lib/learner'
 
 import { useAuth } from '../lib/auth'
-import { createSyncedStore } from '../lib/syncedStore'
+import { createSyncedStore, hasUnsyncedWork } from '../lib/syncedStore'
 import { QB_SUBJECTS } from './types'
 import './qbank.css'
 
@@ -31,6 +31,11 @@ function useQbSyncError(): boolean {
   }, [])
   return hasError
 }
+
+/** What the candidate is told before sign-out throws away unpushed work. */
+const UNSYNCED_WARNING =
+  'Some of your recent work has not reached your account yet — it is saved on this device only. ' +
+  'Signing out clears this device, so that work would be lost. Sign out anyway?'
 
 export function QbShell({ title, children }: { title?: string; children: ReactNode }) {
   const { user, signOut } = useAuth()
@@ -82,10 +87,17 @@ export function QbShell({ title, children }: { title?: string; children: ReactNo
               className="qb-nav-account"
               title={
                 syncError
-                  ? 'Signed in, but your progress is not syncing right now — it is still saved on this device.'
+                  ? 'Signed in, but your progress is not reaching your account — it is on this device only, and logging out clears this device.'
                   : `Signed in as ${user.email} — your progress syncs across devices`
               }
-              onClick={async () => { await signOut(); navigate('/') }}
+              onClick={async () => {
+                /* The tooltip on this very button used to say the work was
+                   "still saved on this device" — on the control that deletes
+                   the device copy. Ask before destroying it. */
+                if (hasUnsyncedWork() && !window.confirm(UNSYNCED_WARNING)) return
+                await signOut()
+                navigate('/')
+              }}
             >
               {syncError && <span className="qb-sync-warn" aria-hidden="true">●</span>}
               {user.email} · Log out

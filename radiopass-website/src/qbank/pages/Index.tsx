@@ -8,6 +8,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
 import { QB_TOTALS, questionsForSection, subjectCounts } from '../data'
+import { QB_QUESTIONS } from '../data'
 import { QbShell, readQbMarks, readQbProgress } from '../Shell'
 import { QB_SUBJECTS } from '../types'
 
@@ -23,9 +24,16 @@ export default function QuestionBankIndex() {
   const counts = useMemo(subjectCounts, [])
   const progress = useMemo(readQbProgress, [])
   const marks = useMemo(readQbMarks, [])
-  const attempted = Object.keys(progress).length
-  const score = Object.values(progress).reduce(
-    (acc, p) => ({ correct: acc.correct + p.correct, outOf: acc.outOf + p.outOf }),
+  /* Counted against the BANK, not against the store. The store is keyed by
+     question id and the three fixed mock papers write their own 120 ids into
+     it, none of which are bank questions — so the raw store size reported work
+     the bank does not contain and could print more attempted than exist. */
+  const attempted = QB_QUESTIONS.filter((q) => progress[q.id]).length
+  const score = QB_QUESTIONS.reduce(
+    (acc, q) => {
+      const a = progress[q.id]
+      return a ? { correct: acc.correct + a.correct, outOf: acc.outOf + a.outOf } : acc
+    },
     { correct: 0, outOf: 0 },
   )
 

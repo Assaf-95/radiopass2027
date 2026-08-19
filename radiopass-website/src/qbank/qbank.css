@@ -658,3 +658,10 @@
     gap: var(--sp-4);
   }
 }
+
+/* A statement left blank in a timed paper. Neutral, not an error: the
+   candidate did not get it wrong, they never reached it. */
+.qb-verdict.is-blank {
+  color: var(--text-tertiary);
+  opacity: 0.9;
+}

@@ -66,7 +66,7 @@ export default function V2Review() {
           ) : (
             <p className="v2-lede">
               Nothing answered yet. Once you practise, your wrong answers and flagged questions
-              gather here for re-testing — re-tests never change your permanent record.
+              gather here for re-testing — your first, cold score is never overwritten.
             </p>
           )}
         </div>

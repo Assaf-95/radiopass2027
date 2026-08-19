@@ -1118,3 +1118,56 @@
     min-height: 260px;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * Narrow screens: nothing may push the page wider than the phone.
+ *
+ * Several primer blocks — equations, the numbers and compare tables, the
+ * relationship rows — size themselves to their content, and a long unbroken
+ * token (a formula, a units string, a URL-like id) made the whole document
+ * 126-196px wider than a 390px screen. The symptom is the worst kind: it is
+ * the TEACHING TEXT that runs off the edge, and every line of prose on the
+ * page is then clipped with it.
+ * ------------------------------------------------------------------ */
+
+.v2-root {
+  overflow-x: hidden;
+}
+
+.v2-section,
+.v2-section-body,
+.v2-section-body > * {
+  min-width: 0;
+}
+
+.v2-prose,
+.v2-principle,
+.v2-trap,
+.v2-section-blurb,
+.v2-equation,
+.v2-numbers,
+.v2-compare,
+.v2-relationship {
+  overflow-wrap: break-word;
+}
+
+/* Tables and equations scroll inside their own box rather than widening the
+   document — the rule the artifact guidance states and the same one the
+   dashboard already follows. */
+.v2-numbers,
+.v2-compare,
+.v2-relationship {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.v2-equation {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 560px) {
+  .v2-section-blurb {
+    margin-left: 0;
+  }
+}

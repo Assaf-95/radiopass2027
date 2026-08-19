@@ -5,6 +5,7 @@ import { RequireAccess } from './portal/Gate'
 import { MoreDetail } from './design/primitives'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
+import { hasUnsyncedWork } from './lib/syncedStore'
 
 import './mri/mri.css'
 import './us/us.css'
@@ -371,7 +372,16 @@ function Header() {
     setOpen(false)
   }, [location.pathname])
 
-  const logOut = async () => { await signOut(); navigate('/') }
+  const logOut = async () => {
+    /* Signing out clears this device. If anything has failed to reach the
+       account it exists here and nowhere else, so ask rather than assume. */
+    if (hasUnsyncedWork() && !window.confirm(
+      'Some of your recent work has not reached your account yet — it is saved on this device ' +
+      'only. Signing out clears this device, so that work would be lost. Sign out anyway?'
+    )) return
+    await signOut()
+    navigate('/')
+  }
 
   if (hasOwnChrome(location.pathname)) return null
 
