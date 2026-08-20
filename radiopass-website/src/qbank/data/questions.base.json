@@ -167,7 +167,7 @@
   },
   {
     "id": "b6",
-    "title": "Regarding focal spot size affects the",
+    "title": "Focal spot size affects the",
     "topic": "Digital Imaging",
     "source": "recall",
     "stems": [
@@ -321,7 +321,7 @@
   },
   {
     "id": "b11",
-    "title": "Regarding dose in CT is affected by",
+    "title": "Dose in CT is affected by",
     "topic": "CT",
     "source": "recall",
     "stems": [
@@ -341,7 +341,7 @@
   },
   {
     "id": "b12",
-    "title": "Regarding SNR is reduced in CT by",
+    "title": "SNR is reduced in CT by",
     "topic": "CT",
     "source": "recall",
     "stems": [
@@ -573,7 +573,7 @@
   },
   {
     "id": "b20",
-    "title": "Regarding dose in radionuclide imaging increases with",
+    "title": "Dose in radionuclide imaging increases with",
     "topic": "Nuclear Medicine",
     "source": "recall",
     "stems": [
@@ -877,7 +877,7 @@
   },
   {
     "id": "b31",
-    "title": "Regarding acoustic impedance is affected by",
+    "title": "Acoustic impedance is affected by",
     "topic": "Ultrasound",
     "source": "recall",
     "stems": [
@@ -935,7 +935,7 @@
   },
   {
     "id": "b33",
-    "title": "Regarding velocity of ultrasound is",
+    "title": "Velocity of ultrasound is",
     "topic": "Ultrasound",
     "source": "recall",
     "stems": [
@@ -3213,7 +3213,7 @@
   },
   {
     "id": "b164",
-    "title": "Regarding SNR increase in MRI with",
+    "title": "SNR increase in MRI with",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -3347,7 +3347,7 @@
   },
   {
     "id": "b168",
-    "title": "Regarding l123 is better> i 125 in imaging because",
+    "title": "I-123 is better than I-125 for imaging because",
     "topic": "Basic Physics",
     "source": "recall",
     "stems": [
@@ -3499,7 +3499,7 @@
   },
   {
     "id": "b179",
-    "title": "Regarding beam filtration increases",
+    "title": "Beam filtration increases",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -3997,7 +3997,7 @@
   },
   {
     "id": "b198",
-    "title": "Regarding MRI SNR increases with",
+    "title": "MRI SNR increases with",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -4175,7 +4175,7 @@
   },
   {
     "id": "b206",
-    "title": "Regarding USS heating at the particular point will depend on",
+    "title": "USS heating at the particular point will depend on",
     "topic": "Other",
     "source": "recall",
     "stems": [
@@ -4379,7 +4379,7 @@
   },
   {
     "id": "b215",
-    "title": "Regarding size of effective focal spot is affected by",
+    "title": "Size of effective focal spot is affected by",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -4419,7 +4419,7 @@
   },
   {
     "id": "b217",
-    "title": "Regarding MRI signal to noise ratio is improved by",
+    "title": "MRI signal to noise ratio is improved by",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -4471,7 +4471,7 @@
   },
   {
     "id": "b219",
-    "title": "Regarding spatial resolution in USS is affected by",
+    "title": "Spatial resolution in USS is affected by",
     "topic": "Digital Imaging",
     "source": "recall",
     "stems": [
@@ -4547,7 +4547,7 @@
       },
       {
         "label": "C",
-        "text": "Molybdenum 68 is the parent of Tc99m. False. Parent is Mo99.",
+        "text": "Molybdenum 68 is the parent of Tc99m.",
         "answer": false,
         "explanation": "Mo-99, not Mo-68, is the parent radionuclide in a Mo-99/Tc-99m generator."
       }
@@ -4555,13 +4555,13 @@
   },
   {
     "id": "b222",
-    "title": "Regarding desirable characteristics of radionuclide are",
+    "title": "Desirable characteristics of a radionuclide are",
     "topic": "Nuclear Medicine",
     "source": "recall",
     "stems": [
       {
         "label": "A",
-        "text": "More than 500keV. False. Would prefer 150keV to 400keV.",
+        "text": "More than 500keV.",
         "answer": false,
         "explanation": "Diagnostic gamma photons above 500 keV are too penetrating and cause septal penetration; useful energies are typically much lower, around 100-250 keV."
       },
@@ -4573,7 +4573,7 @@
       },
       {
         "label": "C",
-        "text": "Half life more than 12 hours. False. Most used radionuclide is Tc99m which half life is 6 hours.",
+        "text": "Half life more than 12 hours.",
         "answer": false,
         "explanation": "For an ideal general diagnostic radionuclide: the half-life should be long enough for imaging but short enough to minimise dose; Tc-99m is about 6 hours."
       },
@@ -4585,7 +4585,7 @@
       },
       {
         "label": "E",
-        "text": "Produces Beta radiation. False. Gamma radiation is desired.",
+        "text": "Produces Beta radiation.",
         "answer": false,
         "explanation": "Diagnostic nuclear medicine generally wants gamma emission for external detection; beta particles mainly increase local absorbed dose."
       }
@@ -4853,7 +4853,7 @@
   },
   {
     "id": "b233",
-    "title": "Regarding SNR in MRI is directly proportional to",
+    "title": "SNR in MRI is directly proportional to",
     "topic": "MRI",
     "source": "recall",
     "stems": [
@@ -5339,7 +5339,7 @@
   },
   {
     "id": "b250",
-    "title": "Regarding the effect of increasing kVp when receptor dose is held constant (as under AEC)",
+    "title": "The effect of increasing kVp when receptor dose is held constant (as under AEC)",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -5403,7 +5403,7 @@
   },
   {
     "id": "b253",
-    "title": "Regarding the effect of increasing kVp when mAs is held constant",
+    "title": "The effect of increasing kVp when mAs is held constant",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -6255,7 +6255,7 @@
   },
   {
     "id": "b282",
-    "title": "Regarding effective focal spot is affected by",
+    "title": "Effective focal spot is affected by",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -6281,7 +6281,7 @@
   },
   {
     "id": "b283",
-    "title": "Regarding focal spot size increases by",
+    "title": "Focal spot size increases by",
     "topic": "Radiography & X-ray Physics",
     "source": "recall",
     "stems": [
@@ -6467,7 +6467,7 @@
   },
   {
     "id": "b289",
-    "title": "Regarding 21 operator can control - in US",
+    "title": "The operator can control the following in ultrasound",
     "topic": "Ultrasound",
     "source": "recall",
     "stems": [
@@ -7323,7 +7323,7 @@
   },
   {
     "id": "b312",
-    "title": "Regarding the noise recorded in a CT study is increased",
+    "title": "The noise recorded in a CT study is increased",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -10173,7 +10173,7 @@
   },
   {
     "id": "b387",
-    "title": "Regarding Scattered radiation in abdominal radiography can be reduced",
+    "title": "Scattered radiation in abdominal radiography can be reduced",
     "topic": "Radiography & X-ray Physics",
     "source": "tutorials",
     "stems": [
@@ -10743,7 +10743,7 @@
   },
   {
     "id": "b402",
-    "title": "Regarding the following actions will increase the noise in a CT slice",
+    "title": "The following actions will increase the noise in a CT slice",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -11427,7 +11427,7 @@
   },
   {
     "id": "b420",
-    "title": "Regarding When X-rays interact with matter, the following statements are true",
+    "title": "When X-rays interact with matter, the following statements are true",
     "topic": "CT",
     "source": "tutorials",
     "stems": [
@@ -11465,7 +11465,7 @@
   },
   {
     "id": "b421",
-    "title": "Regarding the following dosimetric quantities are approximately correct",
+    "title": "The following dosimetric quantities are approximately correct",
     "topic": "Nuclear Medicine",
     "source": "tutorials",
     "stems": [
@@ -12035,7 +12035,7 @@
   },
   {
     "id": "b436",
-    "title": "Regarding the following are true of electromagnetic radiation",
+    "title": "The following are true of electromagnetic radiation",
     "topic": "Basic Physics",
     "source": "tutorials",
     "stems": [
@@ -12643,7 +12643,7 @@
   },
   {
     "id": "b452",
-    "title": "Regarding the effective dose to a patient from a single radiograph under Automatic exposure control is as follows:",
+    "title": "The effective dose to a patient from a single radiograph under Automatic exposure control is as follows:",
     "topic": "Radiation Biology & Dosimetry",
     "source": "tutorials",
     "stems": [

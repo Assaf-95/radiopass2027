@@ -14,7 +14,7 @@
    served to learners, and the first anyone knew of it was the owner meeting
    one mid-revision.
 
-   WHAT IT CHECKS. Three defects, all of them structural and none of them a
+   WHAT IT CHECKS. Five defects, all of them structural and none of them a
    judgement about physics:
 
      echo        the statement is its own title again, so it asserts nothing
@@ -24,6 +24,14 @@
                  which prints the answer on the question
      commentary  the recaller's own notes shipped as exam text ("said something
                  about…", "(part 2)")
+     self-marked the statement carries its own verdict, so the candidate is
+                 shown the answer inside the thing they must judge ("More than
+                 500keV. False. Would prefer 150keV to 400keV.")
+     mis-prefixed
+                 a sentence the options finish, given the "Regarding" prefix
+                 anyway ("Regarding focal spot size affects the"). The prefix
+                 belongs on a stem that names its topic; on a stem the options
+                 complete it produces something that is not English.
 
    WHAT IT DELIBERATELY DOES NOT CHECK is whether an answer is CORRECT, or
    whether a question ought to carry five statements rather than one. The first
@@ -45,7 +53,14 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const DATA = join(ROOT, 'src', 'qbank', 'data', 'questions.base.json')
+/* BOTH FILES, because the loader serves both. extracted.json is de-duplicated
+   against the base and whatever survives goes to candidates exactly as base
+   questions do, so checking only the base would have declared the bank clean
+   while a defect sat in the other half of it. */
+const DATA = [
+  join(ROOT, 'src', 'qbank', 'data', 'questions.base.json'),
+  join(ROOT, 'src', 'qbank', 'data', 'extracted.json'),
+]
 const BASELINE = join(ROOT, 'scripts', 'physics-shape.baseline.json')
 
 const args = process.argv.slice(2)
@@ -63,6 +78,14 @@ const words = (s) =>
     .trim()
 
 const COMMENTARY = /said something|something about|can'?t remember|not sure|\?\?|\(part \d\)/i
+/** A verdict word standing as its own sentence inside the statement. Anchored
+    to a sentence boundary so "false positive" and "a true FISP sequence" are
+    left alone — it is the full stop before it that makes it a mark, not a word. */
+const SELF_MARKED = /[.)]\s+(True|False)\b\s*[.,]/i
+/** The finite verb that shows the title is a sentence rather than a topic.
+    "Regarding dose in CT" is a topic; "Regarding dose in CT is affected by" is
+    half a sentence with a prefix bolted on. */
+const FINITE = /\b(is|are|was|were|has|have|can|will|would|does|do|increases?|decreases?|causes?|results?|occurs?|requires?|reduces?|improves?|affects?|depends?)\b/i
 /** Trailing -T / -F: the transcriber's answer key, left in the sentence. */
 const LEAK = /[-–]\s*[tf]\.?\s*$/i
 
@@ -78,17 +101,26 @@ export function defectsOf(question) {
   if (COMMENTARY.test(`${question.title || ''} ${stems.map((s) => s.text).join(' ')}`)) {
     found.push('commentary')
   }
+  if (stems.some((s) => SELF_MARKED.test(s.text || ''))) {
+    found.push('self-marked')
+  }
+  const title = (question.title || '').trim()
+  if (title.startsWith('Regarding ') && FINITE.test(title.slice('Regarding '.length))) {
+    found.push('mis-prefixed')
+  }
   return found
 }
 
-const bank = JSON.parse(readFileSync(DATA, 'utf8'))
+const bank = DATA.flatMap((file, f) =>
+  JSON.parse(readFileSync(file, 'utf8')).map((q, i) => ({ ...q, id: q.id || `${f ? 'x' : 'b'}${i}` })),
+)
 const broken = []
 for (const question of bank) {
   const defects = defectsOf(question)
   if (defects.length) broken.push({ id: question.id, defects, title: question.title })
 }
 
-const counts = { echo: 0, 'answer-leak': 0, commentary: 0 }
+const counts = { echo: 0, 'answer-leak': 0, commentary: 0, 'self-marked': 0, 'mis-prefixed': 0 }
 for (const b of broken) for (const d of b.defects) counts[d] += 1
 
 console.log('\nRadioPass Physics — question shape')
