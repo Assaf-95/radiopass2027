@@ -145,9 +145,32 @@ uncluttered.
 
 ## Decisions already made — don't reopen
 
-- **Netlify was deliberately deleted** (9 Aug 2026). Local build is the source of truth.
-  Deployment target is a copyable folder to drop onto a host.
-- **Domain:** `passradiology.co.uk` (GoDaddy). `radiopass.co.uk` also discussed.
+- **Netlify was deliberately deleted** (9 Aug 2026) and the local build is still the
+  source of truth — but the owner has since bought hosting again and the app is going
+  back onto Netlify (20 Aug 2026). This is not a reversal of the earlier decision: the
+  distribution is still `npm run package` → a plain folder, and Netlify receives that
+  folder by drag-and-drop rather than building from a repo. No CI, no build hooks, no
+  `netlify.toml`. Deploy by dragging onto the SITE's Deploys tab; dragging onto the
+  Sites page creates a second site instead of updating the first.
+- **The bundle carries config for both kinds of host, and they must stay in step.**
+  `public/.htaccess` for Apache (GoDaddy and other cPanel hosts) and
+  `public/_redirects` + `public/_headers` for Netlify. Each states the same two
+  intents — deep links fall back to the shell, hashed assets cache forever and the
+  shell never does. Change one without the other and the same build behaves
+  differently depending on where it landed.
+- **Domains** (checked against live DNS, 20 Aug 2026):
+  - `radiopass.co.uk` — the live brand. Registered, DNS at GoDaddy
+    (`ns23/ns24.domaincontrol.com`). **`www` already serves a separate marketing
+    landing page** published through ChatGPT's custom-domain feature
+    (`custom-domains.chatgpt.site`, behind Cloudflare) — it is NOT this React
+    app, and it is not to be taken down without the owner saying so.
+  - `app.radiopass.co.uk` — **where this app goes** (owner's decision, 20 Aug
+    2026). A CNAME added at GoDaddy alongside the existing records, so the
+    landing page is untouched and the move is reversible. Do NOT switch the
+    domain's nameservers to a host's own DNS: that moves control of every
+    record and would take the landing page with it.
+  - `passradiology.co.uk` — registered, but no nameservers and no records at
+    all. Parked, pointing nowhere, currently unused.
 - **Copyright on anatomy images: set aside by explicit decision.** The owner will manage image
   replacement himself once online. Do not re-raise it or block on it.
 - **Supabase** backs physics only (auth + progress). RLS is the entire security boundary; the
