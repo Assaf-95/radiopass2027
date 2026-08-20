@@ -159,16 +159,22 @@ uncluttered.
   shell never does. Change one without the other and the same build behaves
   differently depending on where it landed.
 - **Domains** (checked against live DNS, 20 Aug 2026):
-  - `radiopass.co.uk` — the live brand. Registered, DNS at GoDaddy
-    (`ns23/ns24.domaincontrol.com`). **`www` already serves a separate marketing
-    landing page** published through ChatGPT's custom-domain feature
-    (`custom-domains.chatgpt.site`, behind Cloudflare) — it is NOT this React
-    app, and it is not to be taken down without the owner saying so.
-  - `app.radiopass.co.uk` — **where this app goes** (owner's decision, 20 Aug
-    2026). A CNAME added at GoDaddy alongside the existing records, so the
-    landing page is untouched and the move is reversible. Do NOT switch the
-    domain's nameservers to a host's own DNS: that moves control of every
-    record and would take the landing page with it.
+  - `radiopass.co.uk` — the brand, and **where this app goes**: the bare domain
+    and `www`, as the front door. DNS at GoDaddy
+    (`ns23/ns24.domaincontrol.com`).
+  - Until 20 Aug 2026 `www` served a **different** marketing landing page,
+    published through ChatGPT's custom-domain feature
+    (`custom-domains.chatgpt.site`, behind Cloudflare). The owner decided that
+    day he does not want it: *"i do not want the old website that is live"*.
+    It is replaced, not preserved. Do not treat it as a second front door and
+    do not rebuild it — this app already has a home page, and that home page is
+    finished (see the standing rule above).
+  - Removing it takes TWO steps, and doing only the first leaves the domain
+    half-claimed: repoint DNS at GoDaddy, **and** remove the custom domain on
+    the ChatGPT side so it stops publishing there and stops being billed.
+  - No MX records and no mail: nothing on this domain sends or receives email,
+    so DNS changes cannot break an inbox. The only other record is GoDaddy's
+    default `_dmarc`. The professional email address is still outstanding.
   - `passradiology.co.uk` — registered, but no nameservers and no records at
     all. Parked, pointing nowhere, currently unused.
 - **Copyright on anatomy images: set aside by explicit decision.** The owner will manage image
