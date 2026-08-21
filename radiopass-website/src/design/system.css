@@ -1,0 +1,202 @@
+/**
+ * The RadioPass visual system — extracted from the approved design canvas.
+ *
+ * SOURCE OF TRUTH. Every value here is lifted from the artboards in the
+ * approved canvas (Main, Anatomy, Physics, QuestionBank, DesignSystem and the
+ * two mobile boards), not invented. Where the canvas uses a value 348 times
+ * and a near-neighbour twice, the frequent one is the token and the rare one
+ * is a one-off that stays a one-off.
+ *
+ * WHAT THIS FILE IS FOR. The site has a second, older token set in
+ * tokens.css — near-black grounds, a gold accent, Fraunces. That set is what
+ * every existing surface is currently painted with. This file does not
+ * overwrite it: flipping several hundred rules to new values in one edit is
+ * how contrast breaks in places nobody thinks to look. It is introduced as
+ * its own layer so surfaces can be moved onto it deliberately, one archetype
+ * at a time, each verified as it lands.
+ *
+ * THE SEPARATION THAT MATTERS. Colour, type and rules live here. What a page
+ * IS — its context and its archetype — lives in archetypes.ts. A gateway and
+ * a question paper share every token in this file and share almost nothing
+ * about their composition, and that is the system working, not failing.
+ *
+ * ANATOMY AND PHYSICS ARE SIBLINGS. There is no anatomy hue and no physics
+ * hue. Cyan is STRUCTURAL — it marks rules, active state, focus and the
+ * interactive, in both subjects equally. Giving each subject its own colour
+ * would make every shared surface take a side, and the two are peers.
+ */
+
+:root {
+  /* ---------------------------------------------------------- ground
+     Dark navy, not black. The canvas uses two depths and no more: the page
+     itself, and anything raised off it. A third depth was never needed and
+     inventing one here would licence a fourth. */
+  --rp-ground: #070d14;
+  --rp-raised: #0d131c;
+  /* The faintest possible wash, for a large area that would otherwise read
+     as dead flat — a table stripe, an inset well. Deliberately near-invisible:
+     the canvas uses 1.4% and the moment it is stronger it becomes a box. */
+  --rp-wash: rgba(150, 175, 196, 0.014);
+
+  /* ------------------------------------------------------------ ink
+     Four steps, warm-neutral against the navy. Body copy sits at --rp-ink-2
+     rather than the faint end: the canvas's own reading passages do, and a
+     learner reads this for hours. */
+  --rp-ink: #ecf1f5;
+  --rp-ink-2: #a2aeb8;
+  --rp-ink-3: #707e89;
+  --rp-ink-4: #505c68;
+
+  /* ---------------------------------------------------------- accent
+     One structural cyan, three depths. Never decorative, never a subject's
+     property: it means "this is a rule, a focus, or a thing you can act on". */
+  --rp-cyan: #5dcfdf;
+  --rp-cyan-dim: #3c94a1;
+  --rp-cyan-deep: #135d68;
+  --rp-cyan-tint: rgba(93, 207, 223, 0.075);
+  --rp-cyan-edge: rgba(93, 207, 223, 0.42);
+  --rp-cyan-line: rgba(93, 207, 223, 0.2);
+
+  /* The one warm note in the system, and it is rationed — the canvas spends
+     it twice. Reserved for the exam trap and nothing else, so that when it
+     appears a reader already knows what it means. */
+  --rp-warn: #eaae71;
+
+  /* ----------------------------------------------------------- lines
+     Thin, and only two weights. The hairline carries almost every division
+     in the design; the stronger one is for a border that has to hold an
+     edge on its own. */
+  --rp-line: rgba(150, 175, 196, 0.13);
+  --rp-line-2: rgba(150, 175, 196, 0.24);
+
+  /* ------------------------------------------------------------ type
+     Three voices, one job each — and the mono is not an afterthought here:
+     the canvas uses it more than either of the others, because every label,
+     count, timer and piece of metadata is set in it. That is what makes the
+     system read as an instrument rather than a brochure. */
+  --rp-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --rp-sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --rp-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  /* --------------------------------------------------------- motion
+     Slow, ambient, and never in the way of reading. The canvas's own
+     durations: nothing here calls attention to itself. */
+  --rp-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --rp-t-fast: 0.3s;
+  --rp-t: 0.35s;
+  --rp-t-slow: 0.45s;
+  --rp-t-amb: 0.6s;
+}
+
+/* ------------------------------------------------------------------ *
+ * Primitives — the shapes the canvas actually uses.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The tile. One card style for the whole product: a hairline that lifts to
+ * cyan, a rule that draws itself across on hover, a title that brightens.
+ * Nothing scales, nothing casts a shadow — the canvas has no shadows at all,
+ * and adding one here would be the first crack in the system.
+ */
+.rp-tile {
+  background: transparent;
+  border: 1px solid var(--rp-line);
+  transition:
+    border-color var(--rp-t-slow) var(--rp-ease),
+    transform var(--rp-t-slow) var(--rp-ease),
+    background var(--rp-t-slow) ease;
+}
+.rp-tile:hover {
+  border-color: var(--rp-cyan-edge);
+  transform: translateY(-3px);
+  background: rgba(93, 207, 223, 0.03);
+}
+.rp-tile .rp-rule {
+  width: 34px;
+  height: 1px;
+  background: var(--rp-line-2);
+  transition: width 0.55s var(--rp-ease), background var(--rp-t-slow) ease;
+}
+.rp-tile:hover .rp-rule { width: 100%; background: var(--rp-cyan); }
+.rp-tile .rp-tt { transition: color var(--rp-t) ease; }
+.rp-tile:hover .rp-tt { color: #fff; }
+
+/**
+ * The equal split — the system's answer to "are these two the same rank?".
+ *
+ * Hovering illuminates ONE half and THE DIVIDER NEVER MOVES. That is the
+ * whole idea: anatomy and physics are offered at identical weight, and the
+ * interface refuses to lean toward either until the visitor does. Any change
+ * that lets one half grow, brighten by default, or sit first-among-equals
+ * breaks the one rule the product cannot break.
+ */
+.rp-half {
+  position: relative;
+  transition: background var(--rp-t-amb) ease;
+}
+.rp-half:hover {
+  background: radial-gradient(
+    120% 90% at 50% 100%,
+    rgba(93, 207, 223, 0.075) 0%,
+    rgba(93, 207, 223, 0) 62%
+  );
+}
+.rp-half .rp-glow { opacity: 0; transition: opacity var(--rp-t-amb) ease; }
+.rp-half:hover .rp-glow { opacity: 1; }
+.rp-half .rp-enter {
+  opacity: 0.42;
+  transition: opacity 0.4s ease, transform 0.5s var(--rp-ease);
+}
+.rp-half:hover .rp-enter { opacity: 1; transform: translateX(5px); }
+
+/** A row in a dense list: the index archetype's basic unit. */
+.rp-row {
+  transition: background var(--rp-t) ease, padding-left var(--rp-t) var(--rp-ease);
+}
+.rp-row:hover {
+  background: rgba(150, 175, 196, 0.035);
+  padding-left: 12px;
+}
+
+/** A label: uppercase mono, tracked. Every count, timer and eyebrow. */
+.rp-label {
+  font-family: var(--rp-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rp-ink-3);
+}
+
+/** Digits that line up in a column — timers, scores, question counts. */
+.rp-num { font-family: var(--rp-mono); font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------ *
+ * Ambient motion. Slow enough to be atmosphere rather than event, and
+ * switched off entirely for anyone who has asked for less.
+ * ------------------------------------------------------------------ */
+
+@keyframes rp-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -11px, 0); }
+}
+@keyframes rp-spin { to { transform: rotate(360deg); } }
+@keyframes rp-breathe { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.58; } }
+
+.rp-drift { animation: rp-drift 26s ease-in-out infinite; }
+.rp-spin { animation: rp-spin 110s linear infinite; transform-origin: center; }
+.rp-breathe { animation: rp-breathe 11s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-drift, .rp-spin, .rp-breathe { animation: none; }
+  .rp-tile, .rp-tile .rp-rule, .rp-half, .rp-row { transition: none; }
+  .rp-tile:hover { transform: none; }
+}
+
+/* Focus is part of the system, not an afterthought the browser supplies. */
+.rp-tile:focus-visible,
+.rp-half:focus-visible,
+.rp-row:focus-visible {
+  outline: 2px solid var(--rp-cyan);
+  outline-offset: 2px;
+}
