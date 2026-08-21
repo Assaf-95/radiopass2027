@@ -249,3 +249,30 @@ export function trailFor(pathname: string): { label: string; to: string }[] {
   if (ctx === 'physics') return [root, { label: 'Physics', to: '/physics' }]
   return [root]
 }
+
+/* ------------------------------------------------------------------ *
+ * Migration state
+ * ------------------------------------------------------------------ */
+
+/**
+ * Routes already rendering inside the new <Shell>.
+ *
+ * During the migration two chromes exist: App.tsx's original Header/Footer,
+ * and the shell. A page must never show both, so this list is what App's
+ * `hasOwnChrome` consults — one explicit register rather than a predicate
+ * that has to be kept in step by hand in two files.
+ *
+ * It grows as archetypes are migrated and is DELETED once it covers
+ * everything: at that point the old Header comes out and every route is
+ * simply inside the shell. A route in here is a promise that the page
+ * renders <Shell> itself.
+ */
+export const MIGRATED: string[] = [
+  '/_shell',
+]
+
+/** True when this pathname already brings the new shell with it. */
+export function isMigrated(pathname: string): boolean {
+  const clean = pathname.replace(/\/+$/, '') || '/'
+  return MIGRATED.some((p) => matches(p, clean))
+}

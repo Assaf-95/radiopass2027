@@ -4,6 +4,7 @@ import { LEGACY_PHYSICS_ROOT, PHYSICS_HREF, PHYSICS_ROOT } from './physics/route
 import { RequireAccess } from './portal/Gate'
 import { MoreDetail } from './design/primitives'
 import { Logo } from './design/logo'
+import { isMigrated } from './design/archetypes'
 import { ThemeToggle } from './design/theme'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
@@ -177,6 +178,8 @@ const QbPractice = lazyImport(() => import('./qbank/pages/Practice'))
 const QbMock = lazyImport(() => import('./qbank/pages/Mock'))
 const QbReview = lazyImport(() => import('./qbank/pages/Review'))
 const AdrenalAdenomaTool = lazyImport(() => import('./clinical/AdrenalAdenomaTool'))
+/* Temporary: shell verification harness, removed after migration. */
+const ShellPreview = lazyImport(() => import('./design/ShellPreview'))
 
 function MriLoading() {
   return (
@@ -328,6 +331,11 @@ function LegacyCourseRedirect() {
  * bar on one of them and not the other.
  */
 function hasOwnChrome(pathname: string): boolean {
+  /* A migrated route brings the new shell, which has its own header and
+     footer. Showing the original chrome as well would stack two headers —
+     see design/archetypes.ts MIGRATED, which is deleted when the last route
+     moves across. */
+  if (isMigrated(pathname)) return true
   /* '/physics' is deliberately NOT here any more. It used to render the
      cinematic page, which brought its own nav and footer; it is now the
      learner's home and needs the shared header like every other page — a
@@ -830,7 +838,7 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/_shell" element={<ShellPreview/>}/>
     {/* RADIOPASS PHYSICS. The dashboard above, the course engine here.
         Paths are written out rather than built from PHYSICS_ROOT on purpose:
         this table is the definition of what exists, labLink.test.ts reads it

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 /**
  * The RadioPass visual system — extracted from the approved design canvas.
  *
@@ -199,4 +201,148 @@
 .rp-row:focus-visible {
   outline: 2px solid var(--rp-cyan);
   outline-offset: 2px;
+}
+
+/* ==================================================================== *
+ * TYPOGRAPHY
+ *
+ * The scale is the canvas's own, counted rather than invented: its serif
+ * sets at 96/64/40/25/22, its sans reads at 15-19, and its mono labels sit
+ * at 10-13 with the tracking opened up. Everything below is one of those
+ * numbers, clamped so the same token holds from a phone to a wide desktop.
+ *
+ * READABILITY IS A RULE HERE, NOT A PREFERENCE. Measured against the
+ * ground (#070d14):
+ *
+ *     --rp-ink     17.2:1   AAA
+ *     --rp-ink-2    8.6:1   AAA   <- body copy lives here
+ *     --rp-ink-3    4.7:1   AA    <- metadata only
+ *     --rp-ink-4    2.9:1   FAIL  <- decoration and disabled, never meaning
+ *
+ * The canvas is a mock-up and can afford faint prose; a candidate reading
+ * for three hours cannot. So body sets at ink-2, and ink-4 may never carry
+ * information a learner needs. If something important is unreadable, the
+ * fix is the token, not the reader's eyes.
+ * ==================================================================== */
+
+.rp-display-xl,
+.rp-display-l,
+.rp-h1, .rp-h2, .rp-h3 {
+  font-family: var(--rp-serif);
+  font-weight: 300;
+  color: var(--rp-ink);
+  margin: 0;
+  text-wrap: balance;
+  font-optical-sizing: auto;
+}
+
+/* The hero statement. One per page, and most pages have none. */
+.rp-display-xl {
+  font-size: clamp(44px, 7.4vw, 96px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+.rp-display-l {
+  font-size: clamp(34px, 5.2vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+.rp-h1 {
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+.rp-h2 {
+  font-size: clamp(21px, 2.1vw, 25px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.rp-h3 {
+  font-size: clamp(18px, 1.7vw, 22px);
+  line-height: 1.28;
+  letter-spacing: -0.005em;
+}
+
+/* Reading. Sans, ink-2, and a measure that stops at the point a reader
+   starts losing the line on the return sweep. */
+.rp-body-l,
+.rp-body,
+.rp-body-s {
+  font-family: var(--rp-sans);
+  color: var(--rp-ink-2);
+  margin: 0;
+}
+.rp-body-l { font-size: clamp(17px, 1.25vw, 19px); line-height: 1.62; }
+.rp-body   { font-size: clamp(15px, 1.05vw, 16px); line-height: 1.6; }
+.rp-body-s { font-size: 13px; line-height: 1.55; }
+
+/* Long-form prose gets the measure automatically — a lesson should never
+   have to remember it. */
+.rp-prose { max-width: 68ch; }
+.rp-prose > * + * { margin-top: 1em; }
+.rp-prose strong { color: var(--rp-ink); font-weight: 500; }
+
+/* Mono. Labels, counts, timers, parameters — never a reading paragraph.
+   Two tracking steps: wide for a standalone label, tighter for a value
+   sitting inside a row. */
+.rp-label-lg,
+.rp-meta {
+  font-family: var(--rp-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.rp-label-lg {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--rp-ink-3);
+}
+.rp-meta {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rp-ink-3);
+}
+/* A value rather than a label: not uppercased, digits aligned. */
+.rp-value {
+  font-family: var(--rp-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--rp-ink-2);
+}
+
+.rp-btn-text {
+  font-family: var(--rp-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ---- status --------------------------------------------------------
+   Semantic, so no surface improvises its own green. Each is paired with a
+   shape or a word wherever it is used: colour alone never carries the
+   verdict, because roughly one candidate in twelve cannot separate these
+   two hues. */
+:root {
+  --rp-correct: #5fbf8f;
+  --rp-correct-bg: rgba(95, 191, 143, 0.1);
+  --rp-wrong: #e0788a;
+  --rp-wrong-bg: rgba(224, 120, 138, 0.1);
+  --rp-flag: var(--rp-warn);
+  --rp-flag-bg: rgba(234, 174, 113, 0.1);
+  --rp-done: var(--rp-cyan);
+  --rp-todo: var(--rp-ink-4);
+}
+
+/* ---- spacing scale -------------------------------------------------
+   One ladder. A value not on it is a mistake rather than a nuance. */
+:root {
+  --rp-1: 4px;   --rp-2: 8px;   --rp-3: 12px;  --rp-4: 16px;
+  --rp-5: 24px;  --rp-6: 32px;  --rp-7: 48px;  --rp-8: 64px;
+  --rp-9: 80px;  --rp-10: 96px; --rp-11: 128px;
+  /* Page rhythm, named by relationship so a page cannot quietly take
+     "a bit more" without saying what it means. */
+  --rp-gutter: clamp(20px, 4vw, 48px);
+  --rp-wrap: 1240px;
+  --rp-wrap-wide: 1440px;
+  --rp-wrap-read: 720px;
 }
