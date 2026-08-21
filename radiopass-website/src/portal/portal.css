@@ -409,15 +409,22 @@
   margin-bottom: var(--gap-header-content);
 }
 
-/* Level 5, and the clearest case of it on the site: a roman numeral in the
-   margin says where you are and nothing else. */
+/* Level 5: says which half of the site you are looking at, and nothing else.
+   It used to be a roman numeral set out in the margin — I for anatomy, II for
+   physics — which read as an ORDER between two things that are peers. A
+   trainee arrives needing one subject or the other, not a ranked list. So it
+   names the half instead of numbering it.
+   A word does not fit the 64px margin a numeral did (see the note on the old
+   1400px breakpoint below), and chasing that with an ever-wider gutter would
+   be fragile for no gain: as an eyebrow directly above the heading it always
+   fits, at every width, and reads as the label it now is. */
 .pt-numeral {
-  position: absolute;
-  left: -64px;
-  top: var(--sp-2);
+  display: block;
+  margin-bottom: var(--sp-3);
   font-family: var(--pt-mono);
   font-size: var(--fs-meta);
   letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--pt-faint);
 }
 
@@ -919,9 +926,8 @@
    numerals were being drawn past the left edge of the window — present in the
    markup, invisible on screen, and not counted as overflow because nothing
    scrolls leftwards. */
-@media (max-width: 1400px) {
-  .pt-numeral { position: static; display: block; margin-bottom: var(--sp-3); }
-}
+/* (The numeral override that lived here is gone: the label is an eyebrow at
+   every width now, so there is nothing left for a breakpoint to correct.) */
 
 /* --pt-wrap no longer needs stepping down per breakpoint: --gutter is itself
    a clamp, so the measure narrows continuously instead of in three jumps. */

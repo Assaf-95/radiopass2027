@@ -783,24 +783,34 @@ export default function Portal() {
       </header>
 
       <main id="pt-main">
-        {/* ---------------- hero: one line, both papers ---------------- */}
+        {/* ---------------- hero ----------------
+            The headline names the exam this prepares you for. It used to lead
+            with "Both papers. One preparation." — an elegant line about the
+            product's shape, which is not what a trainee arrives looking for.
+            "Both papers, one preparation" is still true and still said; it is
+            simply the SECOND thing said, in the description, where a claim
+            about how the course is built belongs. */}
         <section className="pt-hero" aria-labelledby="pt-hero-h">
           <div className="pt-hero-copy">
             <p className="pt-kicker">The First FRCR Examination</p>
             <h1 id="pt-hero-h">
-              Both papers.
+              FRCR Part 1,
               <br />
-              One <em>preparation</em>.
+              <em>prepared properly</em>.
             </h1>
             <p className="pt-lede">
-              The First FRCR asks two things of a radiology trainee: name the structure,
-              and explain the physics that made the image. RadioPass prepares both, the
-              same way — every mechanism drawn and driveable, every answer explained
-              against its source.
+              Both papers, one preparation. The First FRCR asks two things of a radiology
+              trainee: name the structure, and explain the physics that made the image.
+              RadioPass prepares both, the same way — every mechanism drawn and driveable,
+              every answer explained against its source.
             </p>
+            {/* Two doors, not a recommendation and its runner-up. Anatomy used
+                to be the solid button and physics the ghost, which is a ranking
+                the product does not mean: the halves are equal and the visitor
+                is only choosing which one they are here for today. */}
             <div className="pt-hero-actions">
               <Link className="pt-btn pt-btn-solid" to={anatomy()}>Enter anatomy</Link>
-              <Link className="pt-btn pt-btn-ghost" to="/physics">Enter physics</Link>
+              <Link className="pt-btn pt-btn-solid" to="/physics">Enter physics</Link>
             </div>
           </div>
 
@@ -817,8 +827,13 @@ export default function Portal() {
           className={`pt-section pt-reveal${plates.vis ? ' in-view' : ''}`}
           aria-labelledby="pt-anat-h"
         >
+          {/* The margin mark NAMES the half rather than numbering it. Roman
+              I and II read as an order — first subject, second subject — and
+              the two are peers. It also tells a reader which half they are
+              looking at, which the headings ("Name the structure.") never
+              actually said. */}
           <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">I</span>
+            <span className="pt-numeral" aria-hidden="true">Anatomy</span>
             <h2 id="pt-anat-h">Name the structure.</h2>
           </div>
           <p className="pt-gallery-lede">
@@ -860,7 +875,7 @@ export default function Portal() {
           aria-labelledby="pt-phys-h"
         >
           <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">II</span>
+            <span className="pt-numeral" aria-hidden="true">Physics</span>
             <h2 id="pt-phys-h">See what the equation means.</h2>
           </div>
           <p className="pt-gallery-lede">
@@ -917,7 +932,7 @@ export default function Portal() {
           aria-labelledby="pt-method-h"
         >
           <div className="pt-section-head">
-            <span className="pt-numeral" aria-hidden="true">III</span>
+            <span className="pt-numeral" aria-hidden="true">Method</span>
             <h2 id="pt-method-h">How it is built.</h2>
           </div>
           <div className="pt-method-grid">
@@ -975,9 +990,12 @@ export default function Portal() {
           <h2 id="pt-close-h">
             One exam. <em>Both halves.</em> One place.
           </h2>
+          {/* Equal weight here too — the closing pair asks the same question
+              as the hero's, and gave the same wrong answer by making anatomy
+              the recommendation and physics the alternative. */}
           <div className="pt-hero-actions">
             <Link className="pt-btn pt-btn-solid" to={anatomy()}>Start with anatomy</Link>
-            <Link className="pt-btn pt-btn-ghost" to="/physics">Start with physics</Link>
+            <Link className="pt-btn pt-btn-solid" to="/physics">Start with physics</Link>
           </div>
           <p className="pt-close-note">
             Free while RadioPass is in early access — the Ultrasound Physics Lab stays
