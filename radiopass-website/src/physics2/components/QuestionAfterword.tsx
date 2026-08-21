@@ -91,6 +91,35 @@ export function QuestionAfterword({
         <div className="v2-aw-principle">
           <small>The governing principle</small>
           <strong>{concept.rule}</strong>
+          {/* Where the principle is a set of definitions, the grid IS the
+              teaching and goes first — a candidate who has just mixed up two
+              iso- words reads four rows and stops, and the prose below is
+              there for the one who wants the reason. */}
+          {concept.table && (
+            <div className="v2-aw-table">
+              <table>
+                <thead>
+                  <tr>
+                    {concept.table.head.map((h, i) => (
+                      <th key={i}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {concept.table.rows.map((row, i) => (
+                    <tr key={i}>
+                      {row.map((cell, j) => (
+                        <td key={j}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {/* Outside the scroller: the note is prose and must wrap and stay
+              put, not slide sideways with the grid on a narrow card. */}
+          {concept.table?.note && <p className="v2-aw-tablenote">{concept.table.note}</p>}
           {concept.why && (
             <p>
               <b>Why · </b>

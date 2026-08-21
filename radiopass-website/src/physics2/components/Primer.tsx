@@ -184,6 +184,36 @@ export function PrimerBlocks({ blocks }: { blocks: PrimerBlock[] }) {
                 </table>
               </div>
             )
+          case 'table':
+            /* Wider than the text measure by design, so it scrolls sideways
+               inside its own box rather than pushing the page around on a
+               phone. The row label stays legible: it is the mnemonic. */
+            return (
+              <div key={i} className="v2-rel v2-table">
+                {block.title && <p className="v2-tablecap">{block.title}</p>}
+                <div className="v2-table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        {block.head.map((h, j) => (
+                          <th key={j}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {block.rows.map((row, j) => (
+                        <tr key={j}>
+                          {row.map((cell, k) => (
+                            <td key={k}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {block.note && <p className="v2-table-note">{block.note}</p>}
+              </div>
+            )
           case 'sim':
             return <FilmPlate key={i} sim={block.sim} />
           case 'detail':

@@ -21,16 +21,45 @@ export type ConceptMeta = {
   rule: string
   why?: string
   confusion?: string
+  /**
+   * A summary table, for the principles that are a set of definitions rather
+   * than an argument. Prose is the wrong shape for "which number stays the
+   * same" — four families against three numbers is read in seconds as a grid
+   * and not at all as a paragraph. head[0] labels the row column.
+   */
+  table?: { head: string[]; rows: string[][]; note?: string }
+  /**
+   * True when nothing in the course simulates this, so the afterword must not
+   * offer "show me it working". The instrument shows the SECTION's simulations,
+   * and a section can teach a principle it has no animation for — the atom
+   * model under §1.1 draws shells and binding energies, which is not what a
+   * candidate who has just confused an isotope with an isobar needs to see.
+   */
+  noInstrument?: true
   match: RegExp
 }
 
 const XRAY: ConceptMeta[] = [
   {
     id: 'isotopes-isobars',
-    title: 'Isotopes, isobars and isomers',
-    rule: 'Isotopes share the proton number and differ in mass number; isobars share the mass number and differ in proton number; isomers share both and differ only in nuclear energy state.',
-    why: 'The proton number is what makes an element that element, so isotopes are chemically identical — which is precisely why radioactive iodine is taken up by the thyroid exactly like stable iodine. Changing only the neutron count changes mass number, nuclear stability, binding energy and half-life while leaving the chemistry alone.',
-    confusion: 'Isotopes and isobars are swapped constantly. The name tells you which number is held: iso-TOPE keeps the proton number (same place on the periodic table), iso-BAR keeps the mass number. Beta decay produces an isobar — a neutron becomes a proton, so A is unchanged and Z rises by one, which is Mo-99 becoming Tc-99. Tc-99m and Tc-99 are neither: same Z, same A, different energy state, so they are isomers.',
+    title: 'Isotopes, isobars, isotones and isomers',
+    rule: 'The name tells you which number is held constant: isotoPes = same Protons, isotoNes = same Neutrons, isobArs = same A.',
+    table: {
+      head: ['', 'Protons Z', 'Neutrons N', 'Mass number A', 'Example'],
+      rows: [
+        ['IsotoPes — same P', 'same', 'differ', 'differs', 'I-123 · I-131'],
+        ['IsotoNes — same N', 'differ', 'same', 'differs', 'C-14 · N-15'],
+        ['IsobArs — same A', 'differ', 'differ', 'same', 'Mo-99 · Tc-99'],
+        ['Isomers — same both', 'same', 'same', 'same', 'Tc-99m · Tc-99'],
+      ],
+      note: 'Atomic number Z = the number of protons, and it alone decides which element it is. Mass number A = protons + neutrons. Neutron number N = A − Z. Isomers share both numbers and differ only in nuclear energy state — that is what the m in Tc-99m means.',
+    },
+    why: 'Z fixes the element and therefore the electron structure, so isotopes are chemically identical — which is why radioiodine goes to the thyroid exactly as stable iodine does. Changing only N changes mass number, nuclear stability, binding energy and half-life, and leaves the chemistry alone.',
+    confusion: 'Beta decay makes an isobar: a neutron becomes a proton, so A is unchanged and Z rises by one — Mo-99 to Tc-99.',
+    /* §1.1 simulates the atom, not the nuclide families. Offering it here
+       loads a sodium shell model under a question about which number stayed
+       the same, which teaches nothing about the answer. */
+    noInstrument: true,
     match: /isotope|isobar|isomer|isotone|same (atomic|proton|mass) number/i,
   },
     {

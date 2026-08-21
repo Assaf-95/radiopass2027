@@ -93,22 +93,22 @@ export const XRAY: V2Topic = {
            exam asks it by name. Put where the atom itself is taught, because
            the whole distinction is just "which number stayed the same". */
         {
-          kind: 'compare',
-          title: 'Isotopes against isobars',
-          a: 'Isotopes',
-          b: 'Isobars',
+          kind: 'table',
+          title: 'The iso- family — which number stays the same',
+          /* No "element" column: it would repeat the proton column exactly,
+             and a sixth column is what pushes this off the side of a phone. */
+          head: ['', 'Protons Z', 'Neutrons N', 'Mass number A', 'Example'],
           rows: [
-            ['Proton number Z', 'the same', 'different'],
-            ['Mass number A (protons + neutrons)', 'different', 'the same'],
-            ['Which element', 'the same element', 'different elements'],
-            ['Chemical behaviour', 'identical — same electron structure', 'different'],
-            ['Place on the periodic table', 'the same place', 'different places'],
-            ['Example', 'I-123, I-125, I-131 — all iodine', 'Mo-99 and Tc-99 — both A = 99'],
+            ['IsotoPes — same P', 'same', 'differ', 'differs', 'I-123 · I-131'],
+            ['IsotoNes — same N', 'differ', 'same', 'differs', 'C-14 · N-15'],
+            ['IsobArs — same A', 'differ', 'differ', 'same', 'Mo-99 · Tc-99'],
+            ['Isomers — same both', 'same', 'same', 'same', 'Tc-99m · Tc-99'],
           ],
+          note: 'Atomic number Z = the number of protons. Mass number A = protons + neutrons. Neutron number N = A − Z. Z alone decides which element it is, so isotopes are the same element and isobars are not. Isomers share both numbers and differ only in nuclear energy state — that is what the m in Tc-99m means, and it is why Tc-99m is not a different substance from Tc-99.',
         },
         {
           kind: 'trap',
-          text: 'Remember which number the name protects. **Iso-tope** holds the PROTON number, so the element is unchanged and only the neutrons differ. **Iso-bar** holds the MASS number, so the element changes. Beta decay makes an isobar: a neutron becomes a proton, A is untouched and Z rises by one — which is exactly Mo-99 decaying to Tc-99. And **isomers** are neither: Tc-99m and Tc-99 have the same Z AND the same A, differing only in nuclear energy state, which is why the m is metastable and not a different substance.',
+          text: 'Beta decay makes an isobar, not an isotope: a neutron becomes a proton, so A is untouched and Z rises by one — which is Mo-99 decaying to Tc-99.',
         },
       ],
     },

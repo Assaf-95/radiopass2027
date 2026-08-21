@@ -39,7 +39,10 @@ export type Teaching = {
   sectionIndex: number
   /** The governing principle, when the map names one. 106 rows do not. */
   concept: ConceptMeta | null
-  /** False for the six sections that teach with prose alone. */
+  /**
+   * False for the six sections that teach with prose alone, and for any
+   * question whose concept declares that nothing in the course simulates it.
+   */
   hasSim: boolean
   /** Anchor into the course: '/physics/xray#tube'. */
   href: string
@@ -66,6 +69,10 @@ export function teachingFor(questionId: string): Teaching | null {
   const topic = TOPIC_META[row.topic]
   if (!section || !topic) return null
 
+  const concept = row.concept
+    ? (CONCEPTS[row.topic] ?? []).find((c) => c.id === row.concept) ?? null
+    : null
+
   return {
     topicId: row.topic,
     topicNum: topic.num,
@@ -74,10 +81,12 @@ export function teachingFor(questionId: string): Teaching | null {
     sectionTitle: section.title,
     sectionBlurb: section.blurb,
     sectionIndex: index + 1,
-    concept: row.concept
-      ? (CONCEPTS[row.topic] ?? []).find((c) => c.id === row.concept) ?? null
-      : null,
-    hasSim: !SECTIONS_WITHOUT_SIM.includes(`${row.topic}/${row.section}`),
+    concept,
+    /* A section having a simulation is not the same as this question having
+       one. Where the concept says its principle is simulated nowhere, the
+       button goes rather than opening something unrelated to the mark just
+       dropped. */
+    hasSim: !SECTIONS_WITHOUT_SIM.includes(`${row.topic}/${row.section}`) && !concept?.noInstrument,
     href: `/physics/${row.topic}#${section.id}`,
   }
 }

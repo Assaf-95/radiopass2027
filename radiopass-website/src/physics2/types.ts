@@ -53,6 +53,13 @@ export type PrimerBlock =
   | { kind: 'numbers'; title?: string; rows: { label: string; value: string }[] }
   | { kind: 'trap'; text: string }
   | { kind: 'compare'; title?: string; a: string; b: string; rows: [string, string, string][] }
+  /**
+   * An n-column summary. `compare` holds exactly two things against each
+   * other; this is for the families that need three or four columns before
+   * the contrast is visible at all — isotope / isotone / isobar / isomer
+   * against proton, neutron and mass number. head[0] labels the row column.
+   */
+  | { kind: 'table'; title?: string; head: string[]; rows: string[][]; note?: string }
   | { kind: 'sim'; sim: V2Sim }
   | { kind: 'detail'; summary: string; text: string }
 

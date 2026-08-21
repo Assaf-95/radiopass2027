@@ -43,3 +43,7 @@ archive-historical/
 
 # A staging area the author uses before deleting things. Not source.
 ANATOMY CLAUDE/POTENTIAL DELETE/
+
+# Deployment bundle — rebuilt by `npm run package`, never committed (38 MB).
+radiopass-website/radiopass-godaddy.zip
+radiopass-website/deploy/

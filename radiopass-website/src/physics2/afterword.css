@@ -66,6 +66,81 @@
   font-weight: 600;
 }
 
+/* The summary grid. A principle that is a set of definitions is read as a
+   grid in seconds and as a paragraph not at all — so it gets real table rules,
+   inherited from whichever surface it landed on, and scrolls sideways inside
+   its own box rather than widening the card on a phone. */
+
+.v2-aw-table {
+  margin: 12px 0 0;
+  overflow-x: auto;
+}
+
+.v2-aw-table table {
+  width: 100%;
+  min-width: 440px;
+  border-collapse: collapse;
+}
+
+.v2-aw-table th,
+.v2-aw-table td {
+  text-align: left;
+  padding: 7px 16px 7px 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.v2-aw-table th {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--aw-accent);
+  border-bottom: 1px solid var(--aw-faint);
+}
+
+.v2-aw-table td {
+  border-top: 1px solid var(--aw-faint);
+  color: var(--aw-quiet);
+}
+
+.v2-aw-table tbody tr:first-child td {
+  border-top: none;
+}
+
+.v2-aw-table td:first-child {
+  font-weight: 600;
+  color: var(--aw-ink);
+  padding-right: 24px;
+}
+
+/* On a phone the grid must still be a grid. Sideways scrolling to find out
+   whether a column says "same" or "differ" defeats the whole point, so below
+   the card's comfortable width the cells wrap and shrink instead. */
+@media (max-width: 640px) {
+  .v2-aw-table table {
+    min-width: 0;
+  }
+  .v2-aw-table th,
+  .v2-aw-table td {
+    white-space: normal;
+    font-size: 12px;
+    padding: 6px 9px 6px 0;
+  }
+  .v2-aw-table td:first-child {
+    padding-right: 12px;
+  }
+}
+
+.v2-aw-principle .v2-aw-tablenote {
+  margin: 11px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: normal;
+  max-width: 62ch;
+}
+
 /* --- where it comes from -------------------------------------------- */
 
 .v2-aw-eyebrow {
