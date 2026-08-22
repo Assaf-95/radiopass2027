@@ -20,6 +20,17 @@ has no Supabase token to send. That endpoint is authenticated by the Stripe
 signature over the raw body instead, which is stronger — it proves the request
 came from Stripe AND that nobody altered it in transit.
 
+## The webhook endpoint
+
+Stripe must be pointed at exactly this, in **Developers → Webhooks → Add endpoint**:
+
+```
+https://zrjhdpgkwiotkforjiin.supabase.co/functions/v1/stripe-webhook
+```
+
+Events to send: `checkout.session.completed`, `charge.refunded`,
+`charge.dispute.created`, `payment_intent.payment_failed`.
+
 ## Secrets
 
 ```bash

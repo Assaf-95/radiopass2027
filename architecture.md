@@ -243,7 +243,8 @@ In order:
 1. **Have them reload the account page.** Access appears when the webhook lands,
    usually within seconds.
 2. **Stripe → Developers → Webhooks.** Is the event delivered? A red entry means
-   Stripe could not reach Supabase.
+   Stripe could not reach Supabase. The endpoint should read
+   `https://zrjhdpgkwiotkforjiin.supabase.co/functions/v1/stripe-webhook`.
 3. **Supabase → `stripe_events`.** Find the event id. If it has an `error`, that
    is the reason.
 4. **Check `payments`.** A row means the money arrived; no row means the webhook
