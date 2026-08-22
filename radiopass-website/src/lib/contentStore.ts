@@ -163,7 +163,27 @@ export async function putBinary(file: File): Promise<{ assetId: string; bytes: n
     contentType: file.type || 'image/png',
     upsert: false,
   })
-  if (error) throw new Error(error.message)
+  if (error) {
+    /* The bucket not existing is a setup problem, not a save problem, and it
+       reached the author as the bare words "Bucket not found" — which reads
+       like a bug in the page and tells them nothing to do about it. The
+       overlay table and the image store are provisioned separately, so one
+       can be present while the other never was: every wording edit saves and
+       every image replacement fails, which is exactly as confusing as it
+       sounds. Named here because contentStoreStatus() deliberately does NOT
+       probe for it — a probe that failed on a storage policy would report a
+       missing store that is really there and disable a Save that works. */
+    if (/bucket not found|nosuchbucket/i.test(error.message)) {
+      throw new Error(
+        `No usable image store: Supabase does not serve a public bucket named "${BUCKET}". ` +
+          `It either does not exist or is not marked public — the same error covers both, and ` +
+          `films need it to be both. Create it under Storage and set it public, then replace ` +
+          `the image again. Wording edits are unaffected: those go to the database table, ` +
+          `which is already there.`,
+      )
+    }
+    throw new Error(error.message)
+  }
   return { assetId, bytes: file.size }
 }
 
