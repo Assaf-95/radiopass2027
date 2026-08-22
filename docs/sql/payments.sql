@@ -49,12 +49,21 @@ create table if not exists public.plans (
 comment on table public.plans is
   'What can be held. Prices change through set_plan_price(); access logic never moves.';
 
+-- THE PRICES THAT ALREADY EXISTED, carried over rather than invented.
+-- The site showed £0, £29 and £49; those are the numbers seeded here. The
+-- twelve-month slot has no price because the old pricing had no third paid
+-- figure, and guessing one would be inventing a business decision.
+--
+-- Nothing can be sold at a seeded number anyway: create-checkout-session
+-- refuses a plan whose stripe_price_id is null, and only Pricing Management
+-- sets that. So these are display values until the owner confirms each price,
+-- and no customer can be charged an amount nobody chose.
 insert into public.plans (id, name, months, amount_pence, purchasable, sort_order)
 values
-  ('free',        'Free',      null, 0,     false, 0),
-  ('premium_3m',  '3 months',  3,    4000,  true,  1),
-  ('premium_6m',  '6 months',  6,    7000,  true,  2),
-  ('premium_12m', '12 months', 12,   12000, true,  3)
+  ('free',        'Free',      null, 0,    false, 0),
+  ('premium_3m',  '3 months',  3,    2900, true,  1),
+  ('premium_6m',  '6 months',  6,    4900, true,  2),
+  ('premium_12m', '12 months', 12,   0,    true,  3)
 on conflict (id) do nothing;
 
 -- Every price this plan has ever had. Kept because a refund, a receipt or a
@@ -735,3 +744,33 @@ end;
 $$;
 
 grant execute on function public.owner_revenue() to authenticated;
+
+-- =====================================================================
+-- 11. Where premium content actually lives.
+--
+-- The point of this table is what it does NOT have: any policy at all.
+-- RLS is enabled and no policy grants anybody anything, so an
+-- authenticated browser querying it directly gets an empty result, every
+-- time, no matter what it claims about itself. The ONLY reader is the
+-- premium-content Edge Function, using the service role, and only after
+-- has_paid_access() has answered true.
+--
+-- This is the fix for premium material being compiled into the bundle:
+-- what is sold is not shipped.
+-- =====================================================================
+create table if not exists public.premium_content (
+  content_id  text not null,
+  kind        text not null check (kind in ('question','case','lesson')),
+  body        jsonb not null,
+  updated_at  timestamptz not null default now(),
+  primary key (kind, content_id)
+);
+
+alter table public.premium_content enable row level security;
+
+-- Deliberately no policy. Enabling RLS with none is a locked door, not an
+-- oversight, and the verify script asserts it stays that way.
+revoke all on table public.premium_content from anon, authenticated;
+
+comment on table public.premium_content is
+  'Premium items, unreachable from any browser. Read only by the premium-content function after an entitlement check.';

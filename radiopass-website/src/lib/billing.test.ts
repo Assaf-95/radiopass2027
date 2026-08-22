@@ -33,10 +33,14 @@ describe('the three durations produce the durations they promise', () => {
     expect(planById('nonsense')).toBeUndefined()
   })
 
-  it('carries the launch prices', () => {
-    expect(planById('premium_3m')?.amountPence).toBe(4000)
-    expect(planById('premium_6m')?.amountPence).toBe(7000)
-    expect(planById('premium_12m')?.amountPence).toBe(12000)
+  it('carries the prices the site already showed, not invented ones', () => {
+    /* £29 and £49 existed on the pricing page before payments were added and
+       are preserved. The twelve-month slot is deliberately unpriced — there
+       was no third paid figure to carry over, and a plan with no Stripe price
+       cannot start a checkout, so nobody can be charged a guess. */
+    expect(planById('premium_3m')?.amountPence).toBe(2900)
+    expect(planById('premium_6m')?.amountPence).toBe(4900)
+    expect(planById('premium_12m')?.amountPence).toBe(0)
   })
 })
 

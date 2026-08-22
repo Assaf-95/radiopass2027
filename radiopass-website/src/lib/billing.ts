@@ -42,9 +42,13 @@ export type Plan = {
  */
 export const PLANS: readonly Plan[] = [
   { id: 'free', name: 'Free', months: null, amountPence: 0, currency: 'gbp', purchasable: false },
-  { id: 'premium_3m', name: '3 months', months: 3, amountPence: 4000, currency: 'gbp', purchasable: true },
-  { id: 'premium_6m', name: '6 months', months: 6, amountPence: 7000, currency: 'gbp', purchasable: true },
-  { id: 'premium_12m', name: '12 months', months: 12, amountPence: 12000, currency: 'gbp', purchasable: true },
+  /* The prices the site already showed — £29 and £49 — carried over rather
+     than replaced. The twelve-month slot has no price because the old pricing
+     had no third paid figure; the owner sets it in Pricing Management, and
+     until then no checkout can start for it. */
+  { id: 'premium_3m', name: '3 months', months: 3, amountPence: 2900, currency: 'gbp', purchasable: true },
+  { id: 'premium_6m', name: '6 months', months: 6, amountPence: 4900, currency: 'gbp', purchasable: true },
+  { id: 'premium_12m', name: '12 months', months: 12, amountPence: 0, currency: 'gbp', purchasable: true },
 ]
 
 export function planById(id: string): Plan | undefined {

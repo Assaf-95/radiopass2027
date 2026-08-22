@@ -95,6 +95,20 @@ begin
   end if;
   raise notice 'PASS  free cannot be bought, and a stripe grant for it is refused';
 
+  -- 8. Premium content must be unreachable from a browser entirely.
+  --    Not "hidden by a policy" — no policy at all, so there is nothing to
+  --    get wrong. If anybody ever adds one, this fails.
+  select count(*) into n from pg_policies
+  where schemaname='public' and tablename='premium_content';
+  if n > 0 then
+    raise exception 'FAIL: premium_content has % policies. It must have NONE — the Edge Function is the only reader.', n;
+  end if;
+  if not exists (select 1 from pg_class c join pg_namespace ns on ns.oid=c.relnamespace
+                 where ns.nspname='public' and c.relname='premium_content' and c.relrowsecurity) then
+    raise exception 'FAIL: premium_content does not have RLS enabled.';
+  end if;
+  raise notice 'PASS  premium content is unreachable from any browser';
+
   raise notice '--- all checks passed ---';
 end $$;
 
