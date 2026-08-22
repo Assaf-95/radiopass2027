@@ -30,7 +30,12 @@
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: #8FBEE4;
+  /* The themed blue, not the literal #8FBEE4 it used to be. That literal
+     measured 1.69:1 against the lab's pearl ground in light mode — on the
+     open "Your turn" tag, which this file's own comment calls the one thing
+     the learner should be reading. The done state was already themed
+     (var(--success) below); this is its opposite number. */
+  color: var(--hue-xray);
 }
 
 .rp-task-copy { flex: 1 1 240px; min-width: 0; }

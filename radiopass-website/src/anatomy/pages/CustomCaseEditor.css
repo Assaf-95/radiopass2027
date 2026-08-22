@@ -282,7 +282,10 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #9aa4b2;
+  /* The token its own siblings use. As the literal #9aa4b2 it measured
+     2.16:1 on --panel-2, which light mode re-values to #E9EEF5 — failing
+     even the large-text bar, at 11px. */
+  color: var(--text-dim);
 }
 .rp-anatomy .cce-swatches { display: flex; gap: 6px; }
 .rp-anatomy .cce-swatch {

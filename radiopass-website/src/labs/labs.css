@@ -600,7 +600,11 @@
   padding: var(--sp-1) var(--sp-2);
   white-space: nowrap;
 }
-.mrp-entry.is-instrument .mrp-kind { color: #9aa1aa; border-color: rgba(242, 238, 230, 0.2); }
+/* No colour of its own: the base rule above already sets var(--text-tertiary),
+   which is themed. This override used to hard-code #9aa1aa — within a shade of
+   the token in dark, and 2.37:1 on the pearl ground in light, because .lx-root
+   paints var(--bg-base) and nothing between restores a dark surface. */
+.mrp-entry.is-instrument .mrp-kind { border-color: rgba(242, 238, 230, 0.2); }
 .mrp-entry.is-lesson .mrp-kind { color: var(--lx-accent); border-color: rgba(169, 158, 219, 0.35); }
 
 .mrp-foot {
