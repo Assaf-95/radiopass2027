@@ -1143,3 +1143,25 @@
   color: var(--text);
   border-bottom-color: var(--structure);
 }
+
+/* ---- the page head -------------------------------------------------
+   What replaced the decorative hero. The skull occupied a whole viewport
+   before the page said anything, so the reader met a picture of a skull
+   and then had to scroll to find out where they were. This is the same
+   h1 and the same single action, given the room a heading needs and no
+   more — the page opens on what it is.
+
+   The hero-title / hero-eq / hero-sub rules above still apply; only the
+   container around them changed, so the type does not move. */
+.rp-anatomy .home-head {
+  position: relative;
+  z-index: 1;
+  /* The horizontal gutter matches the region gallery below it (48px on a
+     wide screen). The old hero carried its own inset inside .skull-copy, so
+     without this the h1 sat flush against the window edge while everything
+     under it was indented. */
+  padding: clamp(48px, 9vw, 104px) clamp(24px, 4vw, 48px) clamp(32px, 5vw, 56px);
+  max-width: calc(34ch + clamp(24px, 4vw, 48px));
+}
+.rp-anatomy .home-head .hero-meta { margin-top: 18px; }
+.rp-anatomy .home-head .rpa-hero-actions { margin-top: 28px; }

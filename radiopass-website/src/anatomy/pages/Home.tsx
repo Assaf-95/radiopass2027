@@ -5,9 +5,6 @@ import { flaggedQuestions } from '../lib/stats';
 import { lastOfType } from '../../lib/learner';
 import { computeSectionStats } from '../lib/stats';
 import { getLastQuestion } from '../lib/progress';
-import AnatomyJourney from '../components/AnatomyJourney';
-import SkullHero from '../components/SkullHero';
-import { HERO_FRAMES } from '../data/heroFrames';
 import type { SectionId } from '../types';
 /* The owner's sculpture renders (src/assets/sculpture, 1400px JPEGs),
    presented with the shared .rp-sculpt treatment from styles.css. */
@@ -16,18 +13,6 @@ import chestRender from '../../assets/sculpture/chest.jpg';
 import giRender from '../../assets/sculpture/gi.jpg';
 import mskRender from '../../assets/sculpture/msk.jpg';
 import './Home.css';
-
-/* A compile-time constant: whether the skull hero exists at all is decided
-   before the first paint, so the page height never changes after images load.
-   ?goto=modules and ?region= below both read offsetTop out of live layout and
-   stay correct only because of that. Never make this async.
-
-   With nothing on disk this is false, SkullHero never mounts — no DOM, no
-   observer, no rAF, no network — and the rendered tree is exactly what it was
-   before the hero existed. */
-const MIN_FRAMES = 6;
-const HAS_SKULL =
-  HERO_FRAMES.ladders.some((l) => l.frames.length >= MIN_FRAMES) && !!HERO_FRAMES.poster;
 
 /* Region codes, as a radiologist abbreviates them, for the worklist chips. */
 const CODES: Record<SectionId, string> = {
@@ -139,7 +124,6 @@ export default function Home() {
   /* ?skull=off forces the pre-hero page, so both branches can be smoke-checked
      in one session — the "exactly one h1" invariant is enforced by this one
      expression and by nothing else. */
-  const showSkull = HAS_SKULL && params.get('skull') !== 'off';
 
   const resumable = rows.find((r) => r.last);
   const firstLoaded = rows.find((r) => r.stats.total > 0);
@@ -224,7 +208,32 @@ export default function Home() {
           when no skull frames exist, so that branch keeps its h1. ?region=
           deep links guard on the journey's presence and degrade to the top
           of the page. */}
-      {showSkull ? <SkullHero {...heroProps} /> : <AnatomyJourney {...heroProps} showCopy />}
+      {/* THE DECORATIVE HERO IS GONE, on the owner's instruction: "remove this
+          ugly skull... it just obscures the view". What replaced it is a plain
+          page head — the same h1, the same one action — so the page opens on
+          what it is rather than on a picture of a skull.
+
+          Both former branches are retired here, not just the skull: the
+          fallback drew AnatomyJourney, whose body-full.webp is 1.2 MB — over
+          a megabyte of decoration to replace decoration the owner had just
+          asked to remove. Neither component is deleted; they are simply no
+          longer this page's opening, and the skull frames stay on disk. */}
+      <header className="home-head">
+        <h1 className="hero-title">
+          Radiology Anatomy,
+          <br />
+          <em>Made Visible.</em>
+        </h1>
+        <p className="hero-eq">See what the structure means.</p>
+        <p className="hero-sub">Interactive visual learning for FRCR anatomy.</p>
+        {heroProps.metaLine && <p className="hero-meta mono">{heroProps.metaLine}</p>}
+        <div className="rpa-hero-actions">
+          <button type="button" className="btn btn-primary" onClick={heroProps.onQuestionBank}>
+            {heroProps.startTo ? 'Resume the question bank' : 'Start the question bank'}
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </header>
 
       {/* The chest is not a destination any more — it is the page's ground.
           A fixed, faint layer the content scrolls OVER, so it is felt as
@@ -234,16 +243,14 @@ export default function Home() {
           z-index 0 keeps it under the hero's opaque ground and under every
           section's translucent ground. The source is the owner's chest
           render, screen-blended so its black rectangle melts into the navy. */}
-      {showSkull && (
-        <img
-          className="home-chest-bg"
-          src={chestRender}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          loading="lazy"
-        />
-      )}
+      <img
+        className="home-chest-bg"
+        src={chestRender}
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        loading="lazy"
+      />
 
       {/* THE SIX REGIONS AS A GALLERY. Chapter entries at varied scale —
           the renders large, labels outside the object, negative space doing
