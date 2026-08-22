@@ -464,6 +464,7 @@ function Header() {
             account group beside this nav is already that entry, and having
             both put the same destination in the bar twice. */}
         {user ? (
+          <Link to="/account" className="mobile-login">Your account</Link>
           <button type="button" className="mobile-login" onClick={logOut}>Log out ({user.email})</button>
         ) : (
           <>
@@ -475,7 +476,10 @@ function Header() {
       <div className="nav-actions">
         {user ? (
           <>
-            <span className="account-chip" title={user.email}><Icon name="user" size={14}/>{user.email}</span>
+            {/* The email was a label; it is now the door. /account was
+                reachable only by typing the URL, and an account page nobody
+                can find is an account page nobody has. */}
+            <Link to="/account" className="account-chip" title={`${user.email} — your plan and access`}><Icon name="user" size={14}/>{user.email}</Link>
             <button type="button" className="button button-small button-outline" onClick={logOut}>Log out</button>
           </>
         ) : (

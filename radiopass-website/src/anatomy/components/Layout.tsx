@@ -235,6 +235,9 @@ export default function Layout() {
                         <dd>{activity.submissions}</dd>
                       </div>
                     </dl>
+                    <Link to="/account" className="account-link" onClick={() => setMenuOpen(false)}>
+                      Your plan and access
+                    </Link>
                     <Link to="/anatomy/dashboard" className="account-link" onClick={() => setMenuOpen(false)}>
                       Your progress
                     </Link>
