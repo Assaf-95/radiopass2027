@@ -423,7 +423,16 @@
 .qb-stem.is-right .qb-stem-label { border-color: color-mix(in srgb, var(--success) 60%, transparent); color: var(--qb-green); }
 .qb-stem.is-wrong .qb-stem-label { border-color: color-mix(in srgb, var(--error) 60%, transparent); color: var(--qb-red); }
 
-.qb-verdict { font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.02em; flex: none; text-align: right; }
+/* PLACED, not auto-flowed. .qb-stem is a three-column grid — 34px, the
+   statement, then the True/False pair — and row one fills all three. The
+   verdict appears only after marking, so with no placement of its own it
+   auto-flowed into the next free cell: row two, column ONE, the 34px label
+   column. "Your answer is correct" then rendered one word per line down a
+   34px gutter. The rule below the tablet breakpoint already said
+   grid-column: 2, so this had been found and fixed for phones only; above
+   860px it was still landing in the gutter. 2 / -1 spans the statement and
+   the buttons, which is what text-align: right was written against. */
+.qb-verdict { grid-column: 2 / -1; font-size: var(--fs-support); font-weight: 600; letter-spacing: 0.02em; flex: none; text-align: right; }
 .qb-verdict.is-right { color: var(--qb-green); }
 .qb-verdict.is-wrong { color: var(--qb-red); }
 .qb-verdict small { display: block; font-size: var(--fs-support); font-weight: 500; color: var(--qb-mut); letter-spacing: 0; }
