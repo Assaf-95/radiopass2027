@@ -68,6 +68,14 @@ flowchart TB
         H -->|"asks: do I have access?"| I
     end
 
+    subgraph prot["Premium content — never in the download"]
+        G -.->|"bundle carries questions WITHOUT answers"| H
+        H -->|"asks for answers by id"| PC["Edge Function<br/>premium-content"]
+        PC -->|"has_paid_access?"| I
+        PC -->|"only if yes"| H
+        PC --> PT[("premium_content<br/>no policy — no browser reads it")]
+    end
+
     E -.->|"red build warns you"| C
 
     style B fill:#2d5a3d,color:#fff
@@ -77,6 +85,8 @@ flowchart TB
     style S fill:#4a3a6a,color:#fff
     style P fill:#2d4a4a,color:#fff
     style W fill:#2d4a4a,color:#fff
+    style PC fill:#2d4a4a,color:#fff
+    style PT fill:#4a2d2d,color:#fff
 ```
 
 Read it as three separate loops. The top one is you, editing. The middle is code
@@ -193,6 +203,67 @@ weeks they were away.
 A repeated webhook cannot extend you twice: the Stripe event's id is a primary
 key in the database, so a replay collides and is ignored.
 
+### How premium content is actually protected
+
+This is the part that took two attempts, and the first one was wrong in a way
+worth understanding.
+
+**Hiding a page is not protecting it.** The app used to compile every question
+into the JavaScript it sends to visitors — all 429 physics questions and 2,340
+anatomy answers, roughly 1.7 MB of answer key. A route guard stopped the page
+*rendering*, but the data had already been downloaded. Anyone who opened their
+browser's developer tools could read the lot without an account.
+
+Three things now stand between a stranger and the answers:
+
+**The bundle no longer contains them.** As the site is built, a plugin
+(`scripts/vite-strip-paid.mjs`) removes the answers, accepted variants and
+teaching text from every paid item. What ships is the question, the film and
+the labels — enough to see what you would be buying, and nothing to mark
+against.
+
+**The answers live in a table no browser can reach.** `premium_content` in
+Supabase has row-level security switched on and **no policy at all**. That is
+not an oversight — a locked door with no key cut. Any query from a browser
+returns nothing, whatever it claims about itself.
+
+**One function is the only way in.** `premium-content` asks the database
+"does this person have paid access?" and returns the answers only if the answer
+is yes. The request it receives carries a list of question ids and nothing
+else — no identity, no claim of entitlement — so there is nothing in it to
+forge. Editing your own browser changes what is *asked for*, never what is
+*answered*.
+
+Every build re-checks this: `npm run package` scans the finished bundle and
+**fails** if a single answer survives. That check stands between the build and
+every deploy, so paid content cannot be republished by accident.
+
+### Staging and production return URLs
+
+After paying, Stripe sends the customer back to RadioPass. Which RadioPass
+depends on where they started.
+
+This used to be one setting, `SITE_URL`, and that was a trap: pointing it at
+the preview so a staging test would land correctly would have sent **every
+real customer** to the preview after paying. Charged, granted access on the
+live site, and dropped on a URL that means nothing to them.
+
+So the return address is now taken from where the request came from, checked
+against a list of addresses that are allowed:
+
+```
+ALLOWED_ORIGINS = radiopass.co.uk, www.radiopass.co.uk,
+                  radiopass-preview.pages.dev, localhost:3000
+```
+
+A payment started on the preview returns to the preview; one started on the
+live site returns to the live site; and an address not on that list is
+refused rather than honoured — otherwise the return URL would be something a
+stranger could choose.
+
+`SITE_URL` still exists as the fallback and points at production, which is the
+safe direction to fail in.
+
 ### Free versus premium
 
 Every item carries **Who can see this** — Anyone / Signed-in / Subscribers only.
@@ -259,7 +330,7 @@ In order:
 | Where | What | Why |
 |---|---|---|
 | **Cloudflare Pages** | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SANITY_PROJECT_ID`, `VITE_SANITY_DATASET` | Public by design — already in the JavaScript every visitor downloads |
-| **Supabase Edge Functions** | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL` | Server-side only |
+| **Supabase Edge Functions** | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL`, `ALLOWED_ORIGINS` | Server-side only |
 | **Sanity** | nothing extra | The dataset is public for reading |
 
 **Never** put a Stripe secret key, a webhook signing secret, or the Supabase
@@ -322,6 +393,15 @@ Half in the Studio, half in code, and the split is deliberate:
 3. If a step needs a simulation, a developer registers it in code and gives you
    its key. You can rewrite every word around it; you can't break it.
 4. **Publish.**
+
+### Deploying
+
+```bash
+npm run deploy:cf
+```
+
+Builds, checks the bundle carries no paid content, and uploads straight to
+Cloudflare. Nothing is published if the content check fails.
 
 ### Roll back a bad deploy
 
