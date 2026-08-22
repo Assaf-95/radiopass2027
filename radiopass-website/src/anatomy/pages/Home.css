@@ -178,13 +178,19 @@
   border-bottom-color: rgba(164, 209, 236, 0.7);
 }
 /* The primary action on the dark band: pinned to the dark palette's ink in
-   light mode too, so the button does not become near-black on near-black. */
-[data-theme='light'] .rp-anatomy .skull-copy .btn-primary {
+   light mode too, so the button does not become near-black on near-black.
+   .btn-primary is background: var(--text) / color: var(--bg), which in light
+   mode is a near-black button — correct on a pearl page, invisible on this
+   band. .home-head is listed beside .skull-copy because it inherited the
+   band when it replaced that hero. */
+[data-theme='light'] .rp-anatomy .skull-copy .btn-primary,
+[data-theme='light'] .rp-anatomy .home-head .btn-primary {
   background: #E8ECF1;
   border-color: #E8ECF1;
   color: #030A18;
 }
-[data-theme='light'] .rp-anatomy .skull-copy .btn-primary:hover:not(:disabled) {
+[data-theme='light'] .rp-anatomy .skull-copy .btn-primary:hover:not(:disabled),
+[data-theme='light'] .rp-anatomy .home-head .btn-primary:hover:not(:disabled) {
   background: #F5FCFF;
   border-color: #F5FCFF;
 }
@@ -1156,12 +1162,96 @@
 .rp-anatomy .home-head {
   position: relative;
   z-index: 1;
-  /* The horizontal gutter matches the region gallery below it (48px on a
-     wide screen). The old hero carried its own inset inside .skull-copy, so
-     without this the h1 sat flush against the window edge while everything
-     under it was indented. */
-  padding: clamp(48px, 9vw, 104px) clamp(24px, 4vw, 48px) clamp(32px, 5vw, 56px);
-  max-width: calc(34ch + clamp(24px, 4vw, 48px));
+  /* THE BAND, restored.
+
+     The hero type at the top of this file is the dark palette's literals —
+     #E8ECF1 on the title, #8FA3BC on the sub — written under a comment that
+     declares "THE HERO BAND IS DARK IN BOTH THEMES". The skull hero made
+     that true by painting #000 behind them. Replacing that hero kept the
+     type rules and dropped the band, so in the light theme the copy landed
+     on the pearl page ground (#F2F4F8) and the title measured 1.08:1
+     against it: present in the DOM, invisible on the screen. The subline
+     measured 2.34:1.
+
+     The band comes back rather than the literals being re-themed. A film is
+     read on dark, the sculpture renders are lit for dark, and re-theming
+     would mean maintaining two palettes for one hero. It also makes true
+     again the assumption the fixed chest layer below already documents —
+     that it sits "under the hero's opaque ground".
+
+     A literal, not var(--ground): that token lightens to #F2F4F8 in light
+     mode, which is the very thing this band must not do. #030A18 is the
+     dark theme's value, and the same one the button override above pins. */
+  background: #030A18;
+}
+.rp-anatomy .home-head-in {
+  /* The measure of .region-gallery below, so the headline begins on the
+     same line as the region cards.
+
+     What stood here was max-width: calc(34ch + clamp(24px, 4vw, 48px)).
+     'ch' resolves against THIS element's font size — 16px — and not the
+     h1's, which is 81px at desktop. So it produced a 391px column to hold
+     display type: 27% of a 1440px window, with everything below it at
+     1200px. The headline wrapped to four lines and the hero hugged the
+     left edge, which is the squeeze. */
+  width: var(--container);
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 96px) 0 clamp(44px, 6vw, 80px);
+  display: grid;
+  /* Not an even split. The h1 carries a hard <br/> — "Radiology Anatomy," /
+     "Made Visible." — so the column has to hold the longer of those two
+     lines or the break the markup declares is not the break the reader
+     sees. At the clamp's 82px ceiling that line measures 706px, so an even
+     split (600px) wrapped it to three lines and undid the <br/>. This ratio
+     gives the copy ~750px at every width the clamp tops out at, and the
+     plate keeps enough room to read as an image rather than a thumbnail. */
+  grid-template-columns: minmax(0, 1.32fr) minmax(0, 0.68fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+.rp-anatomy .home-head-copy { min-width: 0; }
+/* The anatomy plate. A PLACEHOLDER: the owner asked for something standing
+   for anatomy until his own image replaces it, so this is the chest render
+   the page already imports for the region gallery and the scenery layer —
+   no new asset, no added bytes.
+
+   Screen-blended for the reason the scenery layer is: the render's own
+   ground is near-black, and screen dissolves it into the band rather than
+   leaving a visible rectangle sitting on top of it. */
+.rp-anatomy .home-head-art {
+  min-width: 0;
+  justify-self: center;
+}
+.rp-anatomy .home-head-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  /* Screen alone does not dissolve this render's edge, because the render's
+     own ground (a lit navy) is LIGHTER than the band it sits on — screening
+     a lighter ground onto a darker one leaves it visible, so the plate read
+     as a rectangle pasted into the hero. The mask feathers the border away
+     so the anatomy glows out of the band instead of sitting in a box. The
+     gallery below keeps its hard frames on purpose: those are cards you can
+     click, and this is not. */
+  -webkit-mask-image: radial-gradient(ellipse 64% 66% at 50% 50%, #000 42%, transparent 100%);
+  mask-image: radial-gradient(ellipse 64% 66% at 50% 50%, #000 42%, transparent 100%);
+}
+/* Stacked, with the plate BELOW the copy and never above it. The skull was
+   removed precisely because a picture arrived before the page had said what
+   it was; a decorative image that reclaims the top of a phone screen would
+   repeat that. */
+@media (max-width: 860px) {
+  .rp-anatomy .home-head-in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(24px, 6vw, 40px);
+  }
+  /* Scaled to the screen, not fixed. At a flat 240px the band came to 788px
+     of an 844px phone — the copy still read first, but the hero owned the
+     whole screen, which is most of what was wrong with the skull. */
+  .rp-anatomy .home-head-art img { max-height: clamp(170px, 34vw, 240px); }
 }
 .rp-anatomy .home-head .hero-meta { margin-top: 18px; }
 .rp-anatomy .home-head .rpa-hero-actions { margin-top: 28px; }

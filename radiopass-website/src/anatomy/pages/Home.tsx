@@ -220,19 +220,36 @@ export default function Home() {
           asked to remove. Neither component is deleted; they are simply no
           longer this page's opening, and the skull frames stay on disk. */}
       <header className="home-head">
-        <h1 className="hero-title">
-          Radiology Anatomy,
-          <br />
-          <em>Made Visible.</em>
-        </h1>
-        <p className="hero-eq">See what the structure means.</p>
-        <p className="hero-sub">Interactive visual learning for FRCR anatomy.</p>
-        {heroProps.metaLine && <p className="hero-meta mono">{heroProps.metaLine}</p>}
-        <div className="rpa-hero-actions">
-          <button type="button" className="btn btn-primary" onClick={heroProps.onQuestionBank}>
-            {heroProps.startTo ? 'Resume the question bank' : 'Start the question bank'}
-            <span aria-hidden="true">→</span>
-          </button>
+        <div className="home-head-in">
+          <div className="home-head-copy">
+            <h1 className="hero-title">
+              Radiology Anatomy,
+              <br />
+              <em>Made Visible.</em>
+            </h1>
+            <p className="hero-eq">See what the structure means.</p>
+            <p className="hero-sub">Interactive visual learning for FRCR anatomy.</p>
+            {heroProps.metaLine && <p className="hero-meta mono">{heroProps.metaLine}</p>}
+            <div className="rpa-hero-actions">
+              <button type="button" className="btn btn-primary" onClick={heroProps.onQuestionBank}>
+                {heroProps.startTo ? 'Resume the question bank' : 'Start the question bank'}
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+          {/* A PLACEHOLDER PLATE, to be swapped for the owner's own image.
+
+              Deliberately the render this page already imports, rather than a
+              new asset: it is bundled twice over already (the region gallery
+              and the scenery layer), so putting it here adds no bytes and
+              nothing new to replace later.
+
+              Decorative, so alt="" and aria-hidden — the hero already says
+              what the page is in text, and a screen reader announcing a
+              second description of the artwork would only repeat it. */}
+          <div className="home-head-art">
+            <img src={chestRender} alt="" aria-hidden="true" decoding="async" />
+          </div>
         </div>
       </header>
 
