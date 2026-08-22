@@ -1052,7 +1052,9 @@ begin
   where id = p_plan_id;
 
   insert into public.access_audit (user_id, actor_id, action, detail, note)
-  values (coalesce(p_actor, '00000000-0000-0000-0000-000000000000'::uuid), p_actor,
+  -- user_id NULL: a price change is a change to the CATALOGUE, not to
+  -- anybody's access. A placeholder uuid here violated the foreign key.
+  values (null, p_actor,
           'price_change',
           jsonb_build_object('plan', p_plan_id, 'from_price', v_old,
                              'to_price', p_price_id, 'amount_pence', p_amount),
