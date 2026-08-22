@@ -32,6 +32,12 @@ jobs:
       # silently resolves a different tree is testing something else.
       - run: npm ci
 
+      # The .public.json files are generated, not committed — committing them
+      # would put a second copy of the bank in the repository and invite the
+      # two to drift. Everything downstream imports them, so this runs first.
+      - name: Generate the public content partition
+        run: node scripts/partition-content.mjs --write
+
       - name: Typecheck
         run: npx tsc -b --noEmit
 
