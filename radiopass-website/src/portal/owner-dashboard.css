@@ -1,0 +1,94 @@
+/* The owner dashboard.
+
+   Chart colour is ONE hue, and it is not the brand cyan. #5dcfdf sits at
+   L 0.795, outside the 0.48–0.67 band a mark wants against a dark surface —
+   fine as an accent on text, glaring as a filled area. #2fa4bb is the same
+   family, passes both the lightness band and 3:1 contrast against the panel
+   (checked with the palette validator, not by eye), and keeps the brighter
+   cyan for the line and the endpoint where a thin mark can carry it. */
+
+.od {
+  --od-mark: #2fa4bb;
+  --od-mark-bright: #5dcfdf;
+  --od-area: rgba(47, 164, 187, 0.16);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 32px) 64px;
+  font-family: var(--rp-sans, system-ui, sans-serif);
+  color: var(--rp-ink, #e8ecf1);
+}
+[data-theme='light'] .od {
+  /* Re-stepped, not reused: the same hue on a pearl surface needs to go
+     darker to keep contrast, and flipping the dark value would fail it. */
+  --od-mark: #1c7d92;
+  --od-mark-bright: #14657a;
+  --od-area: rgba(28, 125, 146, 0.12);
+  color: var(--rp-ink, #101720);
+}
+
+.od-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.od h1 { font-family: var(--rp-serif, Georgia, serif); font-weight: 300; font-size: clamp(28px, 3.4vw, 40px); margin: 0 0 4px; }
+.od h2 { font-family: var(--rp-serif, Georgia, serif); font-weight: 400; font-size: 18px; margin: 0 0 12px; }
+.od-muted { color: var(--rp-ink-3, #8fa3bc); font-size: 14px; line-height: 1.6; }
+.od-error { color: var(--amber, #e0a33f); font-size: 15px; line-height: 1.6; }
+.od-stamp { color: var(--rp-ink-4, #6b7c92); font-size: 12px; margin-top: 28px; }
+.od-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.od-refresh, .od-toggle {
+  font-family: var(--rp-sans, system-ui, sans-serif); font-size: 13px;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  background: transparent; color: inherit;
+  border: 1px solid var(--rp-line-2, rgba(255,255,255,0.18));
+  min-height: 34px;
+}
+.od-refresh:hover, .od-toggle:hover { border-color: var(--od-mark-bright); }
+
+/* Headline figures. Numbers, not one-bar charts. */
+.od-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 24px 0; }
+.od-tile { padding: 18px; border: 1px solid var(--rp-line, rgba(255,255,255,0.10)); border-radius: 12px; background: var(--rp-raised, rgba(255,255,255,0.02)); }
+.od-tile-label { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rp-ink-3, #8fa3bc); margin: 0 0 8px; }
+.od-tile-value { font-size: 34px; font-weight: 300; line-height: 1; margin: 0; font-variant-numeric: tabular-nums; }
+.od-tile-note { font-size: 12px; color: var(--rp-ink-3, #8fa3bc); margin: 8px 0 0; }
+
+.od-flag { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin: 0 0 24px;
+  background: rgba(224, 163, 63, 0.12); border: 1px solid rgba(224, 163, 63, 0.4); }
+
+.od-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .od-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.od-panel { padding: 20px; border: 1px solid var(--rp-line, rgba(255,255,255,0.10)); border-radius: 12px; background: var(--rp-raised, rgba(255,255,255,0.02)); margin-bottom: 16px; }
+.od-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.od-lede { font-size: 14px; color: var(--rp-ink-2, #c8d3e0); margin: 0 0 14px; }
+.od-lede strong { font-variant-numeric: tabular-nums; }
+
+/* Chart. Thin marks, recessive axis, no gridlines competing with 90 points. */
+.od-chartwrap { position: relative; }
+.od-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.od-axis { stroke: var(--rp-line-2, rgba(255,255,255,0.18)); stroke-width: 1; }
+.od-area { fill: var(--od-area); stroke: none; }
+.od-line { fill: none; stroke: var(--od-mark-bright); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.od-cross { stroke: var(--rp-line-2, rgba(255,255,255,0.28)); stroke-width: 1; stroke-dasharray: 3 3; }
+.od-dot { fill: var(--od-mark-bright); stroke: var(--rp-raised, #0d131c); stroke-width: 2; }
+.od-hint { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 12px; color: var(--rp-ink-3, #8fa3bc); margin: 10px 0 0; min-height: 1.4em; }
+
+/* Bars. Identity is the label, so the fill carries no second meaning. */
+.od-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.od-bars li { display: grid; grid-template-columns: 110px minmax(0, 1fr) 48px; gap: 10px; align-items: center; font-size: 13px; }
+.od-bar-label { color: var(--rp-ink-2, #c8d3e0); }
+.od-bar-track { height: 10px; border-radius: 5px; background: var(--rp-line, rgba(255,255,255,0.08)); overflow: hidden; }
+.od-bar-fill { display: block; height: 100%; border-radius: 5px; background: var(--od-mark); min-width: 2px; }
+.od-bar-value { text-align: right; font-variant-numeric: tabular-nums; color: var(--rp-ink-2, #c8d3e0); }
+
+.od-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0 0 20px; }
+.od-fact { padding: 12px 14px; border: 1px solid var(--rp-line, rgba(255,255,255,0.08)); border-radius: 10px; }
+.od-fact dt { font-size: 12px; color: var(--rp-ink-3, #8fa3bc); text-transform: capitalize; }
+.od-fact dd { margin: 4px 0 0; font-size: 22px; font-weight: 300; font-variant-numeric: tabular-nums; }
+
+.od-tablewrap { overflow-x: auto; }
+.od-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.od-table th, .od-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rp-line, rgba(255,255,255,0.08)); }
+.od-table th { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rp-ink-3, #8fa3bc); }
+
+.od-link { display: inline-block; margin-top: 10px; font-size: 14px; color: var(--od-mark-bright); }
+
+@media (prefers-reduced-motion: reduce) { .od * { transition: none !important; } }
