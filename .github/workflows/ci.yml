@@ -19,9 +19,13 @@ jobs:
       run:
         working-directory: radiopass-website
     steps:
-      - uses: actions/checkout@v4
+      # v5, not v4. GitHub runners defaulted to Node24 on 16 June 2026 and
+      # Node20 is removed entirely in the autumn; the v4 actions are Node20
+      # JavaScript actions. Bumping now means the gate does not start failing
+      # on a date nobody is watching for.
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           # Same file Cloudflare Pages reads, so the two builds cannot drift.
           node-version-file: radiopass-website/.nvmrc
