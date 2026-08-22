@@ -111,3 +111,76 @@ export function RequireAccess({
     </main>
   )
 }
+
+/* ------------------------------------------------------------------ *
+ * The inline form, for content that arrives (or does not) after the page
+ * has already rendered.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Why the answers are not here.
+ *
+ * RequireAccess takes over a whole route, which is right when the route
+ * itself is closed. It is wrong for a premium question: the film, the
+ * labels and the stem are the shop window and should still be seen. What is
+ * withheld is the ability to ANSWER, so the notice replaces the answer form
+ * and nothing else.
+ *
+ * This exists because withholding the data silently was worse than
+ * withholding it loudly. The player fetched the answers, was refused, and
+ * rendered an empty question — which reads as broken software rather than
+ * as a paywall, and a learner who thinks the site is broken does not
+ * subscribe, they leave.
+ */
+export function PremiumNotice({
+  reason,
+  branch = 'anatomy',
+}: {
+  reason: 'sign-in' | 'upgrade' | 'unavailable'
+  branch?: 'anatomy' | 'physics'
+}) {
+  const next = encodeURIComponent(
+    typeof window === 'undefined' ? '/' : window.location.pathname + window.location.search,
+  )
+
+  if (reason === 'unavailable') {
+    /* Deliberately NOT phrased as a paywall. A failed request is not a
+       refusal, and telling a paying learner to upgrade because the network
+       hiccuped is the worst thing this component could do. */
+    return (
+      <div className="gate-inline" role="status">
+        <p className="gate-inline-head">This did not load</p>
+        <p className="gate-inline-body">
+          Your connection dropped, or the server is briefly busy. Your access is
+          unaffected — reload the page and it should come back.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="gate-inline" role="status">
+      <p className="gate-inline-head">
+        {reason === 'sign-in' ? 'Sign in to answer this' : 'This case is part of a plan'}
+      </p>
+      <p className="gate-inline-body">
+        {reason === 'sign-in'
+          ? 'The film and its labels are open to everyone. Answering and marking need an account.'
+          : `The film is open to everyone. Marked answers and the teaching behind them are part of ${branch === 'anatomy' ? 'the anatomy' : 'the physics'} plan.`}
+      </p>
+      <div className="gate-inline-actions">
+        {reason === 'sign-in' ? (
+          <>
+            <Link className="gate-cta" to={`/login?mode=signup&next=${next}`}>Create a free account</Link>
+            <Link className="gate-alt-link" to={`/login?next=${next}`}>I have an account</Link>
+          </>
+        ) : (
+          <>
+            <Link className="gate-cta" to="/pricing">See the plans</Link>
+            <Link className="gate-alt-link" to="/account">Your account</Link>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

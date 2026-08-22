@@ -105,3 +105,26 @@
 .gate-alt a:hover {
   color: var(--text-primary);
 }
+
+/* The inline refusal, shown where the answer form would be. Same language as
+   the full-page gate, a quieter shape — it sits inside a page the learner is
+   already reading rather than replacing it. */
+.gate-inline {
+  padding: 20px;
+  border: 1px solid var(--rp-cyan-line, rgba(93,207,223,0.35));
+  border-radius: 12px;
+  background: var(--rp-cyan-tint, rgba(93,207,223,0.06));
+  margin: 16px 0;
+}
+.gate-inline-head {
+  font-family: var(--rp-serif, Georgia, serif);
+  font-size: 17px; font-weight: 400; margin: 0 0 6px;
+  color: var(--rp-ink, #e8ecf1);
+}
+.gate-inline-body {
+  font-size: 14px; line-height: 1.6; margin: 0 0 14px;
+  color: var(--rp-ink-2, #c8d3e0); max-width: 54ch;
+}
+.gate-inline-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.gate-alt-link { font-size: 13px; color: var(--rp-ink-3, #8fa3bc); }
+.gate-alt-link:hover { color: var(--rp-cyan, #5dcfdf); }

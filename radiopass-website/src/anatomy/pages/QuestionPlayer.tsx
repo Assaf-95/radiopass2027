@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { SectionId, GradedQuestion, QuestionProgress } from '../types';
 import { getSectionMeta, getSectionQuestions } from '../data/sections';
 import { usePremiumOne } from '../../lib/usePremium';
+import { PremiumNotice } from '../../portal/Gate';
 import { isAdmin } from '../lib/admin';
 import { assetUrl } from '../lib/assetUrl';
 import { gradeAnswer, overallResult } from '../lib/grading';
@@ -28,7 +29,7 @@ export default function QuestionPlayer() {
      do not arrive, and the marking below has nothing to mark against, which is
      the correct outcome rather than a lenient one. */
   const bundledQuestion = questions[index];
-  const { item: question } = usePremiumOne('case', bundledQuestion);
+  const { item: question, loading: premiumLoading, refused } = usePremiumOne('case', bundledQuestion);
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<GradedQuestion | null>(null);
@@ -239,6 +240,11 @@ export default function QuestionPlayer() {
   }
 
   function handleSubmit() {
+    /* The keyboard shortcut reaches this directly, so the check lives here
+       rather than only on the button. Marking with no answer key would score
+       every response zero and record that as the candidate's attempt —
+       destroying a real result because the content had not arrived. */
+    if (refused || premiumLoading) return;
     const graded: Record<string, ReturnType<typeof gradeAnswer>> = {};
     let totalScore = 0;
     let maxScore = 0;
@@ -449,7 +455,18 @@ export default function QuestionPlayer() {
             })}
           </div>
 
-          {!submitted ? (
+          {/* Refused, still arriving, or ready — in that order, because a
+              refusal must never be shown as a working Submit button the
+              learner presses and gets nothing from. The film and the labels
+              above stay visible either way: that is the part worth seeing
+              before you pay for the rest. */}
+          {refused ? (
+            <PremiumNotice reason={refused} branch="anatomy" />
+          ) : premiumLoading ? (
+            <button className="btn btn-primary qp-submit" disabled aria-busy="true">
+              Loading this case…
+            </button>
+          ) : !submitted ? (
             <button className="btn btn-primary qp-submit" onClick={handleSubmit}>Submit answers (⌘/Ctrl + Enter)</button>
           ) : (
             <div className="qp-total card">
