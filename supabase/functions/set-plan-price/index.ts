@@ -19,15 +19,31 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.47.10'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, { apiVersion: '2024-12-18.acacia' })
 
-const CORS = {
-  'Access-Control-Allow-Origin': Deno.env.get('SITE_URL') ?? '*',
-  'Access-Control-Allow-Headers': 'authorization, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+/* CORS that can serve more than one environment.
+ *
+ * Access-Control-Allow-Origin takes a single value, so hard-coding SITE_URL
+ * meant the browser refused every call from anywhere else — staging got
+ * "Failed to send a request to the Edge Function" before the request left the
+ * page. Echoing the caller's origin, but ONLY when it is on the allowlist, is
+ * what lets production and staging both work without making the header a
+ * wildcard that any site could use. */
+function corsFor(req: Request): Record<string, string> {
+  const allowed = (Deno.env.get('ALLOWED_ORIGINS') ?? '')
+    .split(',').map((o) => o.trim()).filter(Boolean)
+  const origin = req.headers.get('origin') ?? ''
+  return {
+    'Access-Control-Allow-Origin': allowed.includes(origin) ? origin : (Deno.env.get('SITE_URL') ?? ''),
+    'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Vary': 'Origin',
+  }
 }
+let CORS: Record<string, string> = {}
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } })
 
 Deno.serve(async (req) => {
+  CORS = corsFor(req)
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 

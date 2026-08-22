@@ -18,7 +18,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 
 import { useAuth } from '../lib/auth'
 import { usePaidAccess, useAwaitPaidAccess } from '../lib/paidAccess'
-import { PLANS, formatDate, formatPrice, purchasablePlans, remainingLabel } from '../lib/billing'
+import { formatDate, formatPrice, purchasablePlans, remainingLabel } from '../lib/billing'
+import { usePlans } from '../lib/usePlans'
 import { supabase } from '../lib/supabase'
 import './account.css'
 
@@ -28,6 +29,9 @@ export default function Account() {
   const [params, setParams] = useSearchParams()
   const checkout = params.get('checkout')
   const [busy, setBusy] = useState<string | null>(null)
+  /* From the database, so a price changed in Pricing Management shows here
+     without a deploy — and £0 placeholders never reach a customer. */
+  const { plans } = usePlans()
   const [buyError, setBuyError] = useState<string | null>(null)
 
   /* Poll only after a successful return from Stripe. The webhook usually
@@ -161,7 +165,7 @@ export default function Account() {
         <h2>{access.paid ? 'Extend your access' : expired ? 'Renew access' : 'Go premium'}</h2>
         {buyError && <p className="acct-warn" role="alert">{buyError}</p>}
         <ul className="acct-plans">
-          {purchasablePlans(PLANS).map((p) => (
+          {purchasablePlans(plans).map((p) => (
             <li key={p.id}>
               <span className="acct-plan-name">{p.name}</span>
               <span className="acct-plan-price">{formatPrice(p.amountPence, p.currency)}</span>
