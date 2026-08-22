@@ -255,9 +255,19 @@ $$;
 grant execute on function public.paid_access_until(uuid) to authenticated;
 grant execute on function public.has_paid_access(uuid) to authenticated;
 
--- What the app reads on sign-in: grants, and when they lapse.
--- SECURITY DEFINER so it can see the ledger, but it only ever answers
--- about auth.uid() unless the caller may manage users.
+-- my_access() must honour BOTH sources of access, not only the new ledger.
+--
+-- Written against access_grants alone, it silently dropped every grant held
+-- directly on the entitlements row — including the owner's own 'admin' and
+-- 'full'. The effect was that the person who owns the product was refused his
+-- own product and locked out of the admin pages, which is exactly the failure
+-- the ledger was supposed to prevent rather than cause.
+--
+-- So: grants on the entitlements row (staff seats, admin, anything granted
+-- before the ledger existed) are merged with the branch grant the ledger
+-- gives for live PAID access. 'account' is always present for a signed-in
+-- user, which is what makes a free account a real state rather than an
+-- absence.
 create or replace function public.my_access()
 returns jsonb
 language plpgsql
@@ -267,6 +277,7 @@ set search_path = public, pg_temp
 as $$
 declare
   until timestamptz;
+  base  jsonb;
   g     jsonb;
   row_  record;
 begin
@@ -283,11 +294,17 @@ begin
   order by coalesce(ag.expires_at, 'infinity'::timestamptz) desc
   limit 1;
 
-  -- 'account' always; the paid branch only while a grant is live. This is
-  -- the whole of "expired falls back to free" — nothing is deleted, the
-  -- row simply stops matching.
-  g := case when until is null then '["account"]'::jsonb
-            else jsonb_build_array('account', coalesce(row_.branch, 'full')) end;
+  -- to_jsonb() so this works whether grants is text[] or jsonb.
+  select coalesce(to_jsonb(e.grants), '[]'::jsonb) into base
+  from public.entitlements e
+  where e.user_id = auth.uid()
+    and (e.expires_at is null or e.expires_at > now());
+
+  g := coalesce(base, '[]'::jsonb);
+  if not (g ? 'account') then g := g || '["account"]'::jsonb; end if;
+  if until is not null then
+    g := g || jsonb_build_array(coalesce(row_.branch, 'full'));
+  end if;
 
   return jsonb_build_object(
     'grants',      g,

@@ -25,6 +25,7 @@
 
 import { lazy, useEffect, useState } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { RequireAccess } from '../portal/Gate'
 
 import Layout from './components/Layout'
 import RequireAdmin from './components/RequireAdmin'
@@ -165,15 +166,20 @@ export default function AnatomyRoutes() {
       <div className="rp-anatomy">
       <Routes>
         <Route element={<Layout />}>
+          {/* Home and dashboard stay open on purpose: 'home' and 'progress' are
+              PUBLIC_KINDS, a shop window needs a shop window, and a learner
+              must always be able to reach their own record — including after
+              a plan lapses, when their scores are still theirs. Everything
+              below that teaches or tests is gated. */}
           <Route index element={<Home />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="disputes" element={<Disputes />} />
-          <Route path="mri/:studyId" element={<MriViewer />} />
-          <Route path="cxr" element={<ChestXrayAtlas />} />
-          <Route path="atlas" element={<AtlasHome />} />
-          <Route path="atlas/:chapterId" element={<AtlasChapter />} />
-          <Route path="atlas/:chapterId/:structureId" element={<AtlasStructure />} />
-          <Route path="section/:sectionId" element={<SectionHub />} />
+          <Route path="mri/:studyId" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'module' }}><MriViewer /></RequireAccess>} />
+          <Route path="cxr" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'module' }}><ChestXrayAtlas /></RequireAccess>} />
+          <Route path="atlas" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'atlas' }}><AtlasHome /></RequireAccess>} />
+          <Route path="atlas/:chapterId" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'atlas' }}><AtlasChapter /></RequireAccess>} />
+          <Route path="atlas/:chapterId/:structureId" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'atlas' }}><AtlasStructure /></RequireAccess>} />
+          <Route path="section/:sectionId" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'questions' }}><SectionHub /></RequireAccess>} />
           <Route path="admin" element={<AdminLogin />} />
           {/* Authoring: joining the structures the dataset records twice. */}
           <Route
@@ -192,7 +198,7 @@ export default function AnatomyRoutes() {
               </RequireAdmin>
             }
           />
-          <Route path="section/:sectionId/q/:questionId" element={<QuestionPlayer />} />
+          <Route path="section/:sectionId/q/:questionId" element={<RequireAccess resource={{ branch: 'anatomy', kind: 'questions' }}><QuestionPlayer /></RequireAccess>} />
           <Route
             path="section/:sectionId/q/:questionId/replace-image"
             element={

@@ -14,7 +14,15 @@ import { supabase } from './supabase'
 import { ANONYMOUS, UNKNOWN, entitlementOf, type Entitlement, type Grant } from './access'
 
 /** Grants as the server records them, or null while nothing has been read. */
-type ServerGrants = { grants: Grant[]; expiresAt: string | null } | null
+type ServerGrants = {
+  grants: Grant[]
+  /** When paid access lapses. null = no paid access, or one that never ends. */
+  expiresAt: string | null
+  paid: boolean
+  planName?: string | null
+  source?: string | null
+  startsAt?: string | null
+} | null
 
 const KNOWN_GRANTS: readonly string[] = ['account', 'trial', 'anatomy', 'physics', 'full', 'admin']
 
@@ -41,14 +49,18 @@ const KNOWN_GRANTS: readonly string[] = ['account', 'trial', 'anatomy', 'physics
  */
 const GRANTS_TIMEOUT_MS = 8000
 
-async function readServerGrants(userId: string): Promise<ServerGrants> {
+/* No userId parameter, deliberately. my_access() reads auth.uid() from the
+   verified session, so the caller cannot ask about somebody else — there is
+   no argument to tamper with. */
+async function readServerGrants(): Promise<ServerGrants> {
   if (!supabase) return null
   try {
-    const query = supabase
-      .from('entitlements')
-      .select('grants, expires_at')
-      .eq('user_id', userId)
-      .maybeSingle()
+    /* my_access() rather than a table read. The ledger decides, in UTC, on the
+       server: it walks access_grants, ignores anything revoked or refunded,
+       drops anything whose expiry has passed, and answers with the grants that
+       remain. Selecting expires_at and comparing it here would put that
+       judgement in a browser with a clock the user controls. */
+    const query = supabase.rpc('my_access')
     const { data, error } = (await Promise.race([
       query,
       new Promise<{ data: null; error: unknown }>((resolve) =>
@@ -56,11 +68,21 @@ async function readServerGrants(userId: string): Promise<ServerGrants> {
       ),
     ])) as { data: unknown; error: unknown }
     if (error || !data) return null
-    const row = data as { grants?: unknown; expires_at?: string | null }
+    const row = data as {
+      grants?: unknown; expires_at?: string | null; paid?: boolean
+      plan_name?: string | null; source?: string | null; starts_at?: string | null
+    }
     const grants = (Array.isArray(row.grants) ? row.grants : []).filter((g): g is Grant =>
       KNOWN_GRANTS.includes(g as string),
     )
-    return { grants, expiresAt: row.expires_at ?? null }
+    return {
+      grants,
+      expiresAt: row.expires_at ?? null,
+      paid: row.paid === true,
+      planName: row.plan_name ?? null,
+      source: row.source ?? null,
+      startsAt: row.starts_at ?? null,
+    }
   } catch {
     /* Offline, or the table has not been created on this deployment. Treated
        as "no row", never as "no access": a paying learner must not be locked
@@ -83,6 +105,23 @@ async function readServerGrants(userId: string): Promise<ServerGrants> {
  * cover the anatomy-only, physics-only and trial cases for when they do.
  */
 const EARLY_ACCESS_GRANTS: readonly Grant[] = ['account', 'full']
+
+/**
+ * What a signed-in account is worth when the server did not answer.
+ *
+ * NOT the same as EARLY_ACCESS_GRANTS above, and the difference is the whole
+ * security posture. A build with no Supabase at all is a developer's laptop:
+ * there is nothing to protect, the content is in the bundle either way, and
+ * locking it would only make local work impossible.
+ *
+ * A build that HAS a backend which then failed to answer is a different
+ * situation entirely. Falling back to 'full' there means any request that
+ * times out hands out the paid product — a failure mode somebody would find
+ * on purpose once they noticed. So this falls back to the free account: they
+ * keep their history, their scores and everything marked free, and premium
+ * stays shut until the server says otherwise.
+ */
+const OFFLINE_GRANTS: readonly Grant[] = ['account']
 
 /** True when the author passcode has been entered in this browser. */
 function hasAuthorFlag(): boolean {
@@ -110,7 +149,7 @@ export function EntitlementProvider({ children }: { children: ReactNode }) {
     }
     let cancelled = false
     setServer(undefined)
-    void readServerGrants(user.id).then((g) => {
+    void readServerGrants().then((g) => {
       if (!cancelled) setServer(g)
     })
     return () => {
@@ -139,13 +178,18 @@ export function EntitlementProvider({ children }: { children: ReactNode }) {
        nothing beyond the account itself — that is what makes a trial end. */
     let grants: Grant[]
     if (server && server.grants.length) {
-      const expired = server.expiresAt !== null && Date.parse(server.expiresAt) <= Date.now()
-      grants = expired ? ['account'] : [...server.grants]
+      /* Taken as given. my_access() has already removed anything expired,
+         revoked or refunded, so re-testing the date here could only ever
+         DISAGREE with the server — and a browser clock an hour fast would
+         lock a paying learner out of what they bought. */
+      grants = [...server.grants]
     } else {
-      /* No row. Early access: an account is worth everything, and says so on
-         the pricing page. When payments arrive, accounts get rows and this
-         fallback becomes ['account']. */
-      grants = [...EARLY_ACCESS_GRANTS]
+      /* my_access() did not answer — offline, or the function is unavailable.
+         Free, never full: a timeout must not be a way to obtain the product.
+         Note this is no longer the "no row" case at all; my_access() returns
+         ["account"] for an account that has never bought anything, so a free
+         user arrives through the branch above with the right answer. */
+      grants = [...OFFLINE_GRANTS]
     }
 
     /* Authoring is a separate grant and never implies content access on its

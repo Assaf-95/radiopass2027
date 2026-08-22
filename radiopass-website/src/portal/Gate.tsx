@@ -53,25 +53,33 @@ export function RequireAccess({
   return (
     <main className="gate">
       <div className="gate-card">
+        {/* The branch word follows the page you were refused, not a literal.
+            Hard-coded "Physics" told an anatomy visitor they had hit the wrong
+            half of the product, which is a confusing thing to read at the exact
+            moment you are being asked to sign up. */}
         <Link to="/" className="gate-brand" aria-label="RadioPass home">
           <b>RADIOPASS</b>
-          <span>Physics</span>
+          <span>{decision.branch === 'anatomy' ? 'Anatomy' : 'Physics'}</span>
         </Link>
 
         {decision.reason === 'sign-in' ? (
           <>
+            {/* This used to say "the course is free with an account", which was
+                true during early access and became a lie the moment plans went
+                live. A gate that promises something the next screen refuses is
+                worse than one that simply says no. */}
             <h1>
               This page is inside the course.
               <br />
-              <span>The course is free with an account.</span>
+              <span>Sign in to open it.</span>
             </h1>
             <p>
-              Create a free account and this page — with the rest of the nine topics, the full
-              question bank and the mock papers — opens now. No card. Anything you answered in the
-              free sample is already saved and comes with you.
+              A free account saves your progress, scores and flagged questions, and opens
+              the free sample. The rest of the course comes with a plan. Anything you have
+              already answered is saved and comes with you either way.
             </p>
             <Link className="gate-cta" to={`/login?mode=signup&next=${next}`}>
-              Create your free account &rarr;
+              Create a free account &rarr;
             </Link>
             <p className="gate-alt">
               <Link to={`/login?next=${next}`}>I have an account — log in</Link>
