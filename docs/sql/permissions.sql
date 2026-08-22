@@ -1,4 +1,17 @@
 -- =====================================================================
+-- RUN AFTER radiopass-website/supabase/schema.sql, which creates
+-- entitlements, content_documents, content_audit and the progress
+-- tables. Everything here builds on those.
+--
+-- A NOTE ON to_jsonb(grants). The base schema declares grants as
+-- text[], but a live row exports as ["account","full","admin"], which is
+-- jsonb — the two disagree, and `grants ? 'admin'` is a jsonb-only
+-- operator that errors on an array. to_jsonb() is the identity on jsonb
+-- and converts text[] to a JSON array, so wrapping the column makes the
+-- membership test correct whichever the column actually is. Cheap
+-- insurance against a file that runs on one deployment and fails on the
+-- next.
+--
 -- RadioPass permissions.
 --
 -- Run this in the Supabase SQL Editor, on BOTH the production and the
@@ -113,7 +126,7 @@ as $$
       or exists (
         select 1 from public.entitlements e
         where e.user_id = auth.uid()
-          and e.grants ? 'admin'
+          and to_jsonb(e.grants) ? 'admin'
           and (e.expires_at is null or e.expires_at > now())
       )
 $$;
@@ -123,7 +136,7 @@ $$;
 -- ---------------------------------------------------------------------
 update public.entitlements e
 set role = 'administrator'
-where e.role is null and e.grants ? 'admin';
+where e.role is null and to_jsonb(e.grants) ? 'admin';
 
 -- The owner. Change the address if it is ever not this one.
 update public.entitlements e

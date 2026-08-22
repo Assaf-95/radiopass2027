@@ -47,14 +47,14 @@ begin
     -- physics or the reverse.
     'plans', (
       select jsonb_build_object(
-        'full',        count(*) filter (where grants ? 'full'),
-        'anatomy_only',count(*) filter (where grants ? 'anatomy' and not grants ? 'full'),
-        'physics_only',count(*) filter (where grants ? 'physics' and not grants ? 'full'),
-        'trial',       count(*) filter (where grants ? 'trial'),
-        'free',        count(*) filter (where grants ? 'account'
-                                        and not grants ? 'full'
-                                        and not grants ? 'anatomy'
-                                        and not grants ? 'physics'),
+        'full',        count(*) filter (where to_jsonb(grants) ? 'full'),
+        'anatomy_only',count(*) filter (where to_jsonb(grants) ? 'anatomy' and not to_jsonb(grants) ? 'full'),
+        'physics_only',count(*) filter (where to_jsonb(grants) ? 'physics' and not to_jsonb(grants) ? 'full'),
+        'trial',       count(*) filter (where to_jsonb(grants) ? 'trial'),
+        'free',        count(*) filter (where to_jsonb(grants) ? 'account'
+                                        and not to_jsonb(grants) ? 'full'
+                                        and not to_jsonb(grants) ? 'anatomy'
+                                        and not to_jsonb(grants) ? 'physics'),
         'expiring_30', count(*) filter (where expires_at is not null
                                         and expires_at between now() and now() + interval '30 days')
       ) from public.entitlements
