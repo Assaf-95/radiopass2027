@@ -52,6 +52,39 @@ describe('A — anonymous visitor', () => {
       expect(isAllowed(r, ANONYMOUS), `${r.branch}/${r.kind}`).toBe(false)
     }
   })
+
+  /* THE SAMPLE IS THE SHOP WINDOW. It used to require an account — every page
+     in it refused a stranger with reason 'sign-in' — which made it a paywall
+     with a friendlier name. These two tests are the pair: everything named in
+     TRIAL opens for a visitor with no account, and nothing else does. */
+  it('reads the whole free sample without an account', () => {
+    const sample = [
+      { branch: 'physics', kind: 'module', id: 'xray/foundations' },
+      { branch: 'physics', kind: 'module', id: 'xray/tube' },
+      { branch: 'physics', kind: 'module', id: 'xray/spectrum' },
+      { branch: 'physics', kind: 'module', id: 'mri/signal' },
+      { branch: 'physics', kind: 'module', id: 'mri/relaxation' },
+      { branch: 'physics', kind: 'lab', id: 'ultrasound-lab/attenuation' },
+      { branch: 'physics', kind: 'questions', id: 'x57' },
+    ] as const
+    for (const r of sample) {
+      expect(isAllowed(r, ANONYMOUS), `${r.kind}/${r.id ?? ''}`).toBe(true)
+    }
+  })
+
+  it('is still refused everything the sample does not name', () => {
+    const paid = [
+      { branch: 'physics', kind: 'module', id: 'mri/encoding' },
+      { branch: 'physics', kind: 'lab', id: 'ultrasound-lab/doppler' },
+      /* A lab route that forgets to pass its id must NOT fall open just
+         because some lab is free — the id is what the sample names. */
+      { branch: 'physics', kind: 'lab' },
+      { branch: 'anatomy', kind: 'questions', id: 'thorax' },
+    ] as const
+    for (const r of paid) {
+      expect(isAllowed(r, ANONYMOUS), `${r.kind}/${'id' in r ? r.id : '-'}`).toBe(false)
+    }
+  })
 })
 
 describe('B — trial user', () => {
@@ -179,7 +212,11 @@ describe('the trial configuration, as chosen', () => {
       'xray/tube',
       'xray/spectrum',
       'mri/signal',
+      'mri/relaxation',
     ])
+    /* One interactive, because a sample with no simulator in it misrepresents
+       what this product does that a textbook cannot. */
+    expect(byKind.get('lab')).toEqual(['ultrasound-lab/attenuation'])
     expect(byKind.get('questions')).toEqual(['x57', 'b417', 'b415', 'x53', 'b385'])
     // Named ids, never `true` — the free page renders this list, and a whole
     // kind cannot fit on one page.
@@ -192,6 +229,8 @@ describe('the trial configuration, as chosen', () => {
     expect(isAllowed({ branch: 'physics', kind: 'questions', id: 'x57' }, trial)).toBe(true)
     // Everything unnamed stays shut: other modules, mocks, anatomy.
     expect(isAllowed({ branch: 'physics', kind: 'module', id: 'ct/dose' }, trial)).toBe(false)
+    // A different lab is not freed just because one lab is.
+    expect(isAllowed({ branch: 'physics', kind: 'lab', id: 'ultrasound-lab/doppler' }, trial)).toBe(false)
     for (const r of [atlas, anatomyQuestions, physicsLab, physicsMock]) {
       expect(isAllowed(r, trial), `${r.branch}/${r.kind}`).toBe(false)
     }

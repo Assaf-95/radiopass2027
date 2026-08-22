@@ -119,8 +119,29 @@ export const TRIAL: TrialConfig = {
      topic/section pairs from src/physics2/mapping/sections.ts and bank
      question ids; /free-trial renders exactly this list and gates
      progression past it behind a free account. */
+  /* Three X-ray pages: where the beam is made, the machine that makes it, and
+     the curve that describes it. Together they are a complete idea rather
+     than three fragments — a visitor who reads only these has still learned
+     something whole. */
   module: {
-    physics: ['xray/foundations', 'xray/tube', 'xray/spectrum', 'mri/signal'],
+    physics: [
+      'xray/foundations',
+      'xray/tube',
+      'xray/spectrum',
+      /* Two MRI pages, deliberately consecutive: where the signal comes from,
+         and what happens to it afterwards. One alone states a fact; the pair
+         demonstrates that the course explains mechanisms. */
+      'mri/signal',
+      'mri/relaxation',
+    ],
+  },
+  /* One simulator, because the thing this product does that a textbook cannot
+     is let you move the variable and watch the physics answer. A sample with
+     no interactive in it misrepresents what is being sold. Attenuation is the
+     choice: it needs no prior sequence knowledge, and the relationship it
+     shows — more depth, less signal — is legible in about five seconds. */
+  lab: {
+    physics: ['ultrasound-lab/attenuation'],
   },
   questions: {
     physics: ['x57', 'b417', 'b415', 'x53', 'b385'],
@@ -170,19 +191,37 @@ export type Decision =
  * Order matters and is the policy:
  *   1. admin sees everything, because an author must be able to check any page;
  *   2. public kinds are open;
- *   3. a branch grant (or `full`) opens that branch outright;
- *   4. otherwise the trial configuration is consulted;
+ *   3. THE FREE SAMPLE IS OPEN TO EVERYONE, including a visitor with no
+ *      account at all — see below;
+ *   4. a branch grant (or `full`) opens that branch outright;
  *   5. otherwise it is a paid resource — and the reason distinguishes "you are
  *      not signed in" from "your plan does not include this", because those
  *      need different words and different buttons.
+ *
+ * WHY THE SAMPLE MOVED AHEAD OF THE GRANT CHECK. This used to read
+ * `grants.has('trial') && trialAllows(resource)`, which meant the free sample
+ * required an account: an anonymous visitor was refused every page in it with
+ * reason 'sign-in'. A sample nobody can see without signing up is not a
+ * sample — it is the paywall with a friendlier name, and it asks the one
+ * question a stranger is least willing to answer before they have seen
+ * anything.
+ *
+ * The sample is now the product's shop window: whatever TRIAL names renders
+ * for anyone, and the invitation to subscribe sits ON those pages, where the
+ * visitor has already had something worth paying for. The 'trial' grant is
+ * kept because it still means something different — a signed-in learner whose
+ * plan is the sample — but it is no longer what makes the sample visible.
+ *
+ * The blast radius is exactly the TRIAL object: anything not named there is
+ * refused as before, which the tests pin item by item.
  */
 export function canAccess(resource: Resource, entitlement: Entitlement): Decision {
   const { grants } = entitlement
 
   if (grants.has('admin')) return { allowed: true }
   if (PUBLIC_KINDS.has(resource.kind)) return { allowed: true }
+  if (trialAllows(resource)) return { allowed: true }
   if (grants.has('full') || grants.has(resource.branch)) return { allowed: true }
-  if (grants.has('trial') && trialAllows(resource)) return { allowed: true }
 
   return {
     allowed: false,

@@ -1,0 +1,161 @@
+/* The free-sample invitation, and the locked-module preview.
+   Both draw on the approved system tokens; neither invents a colour. */
+
+@import '../design/system.css';
+
+/* ---- the invitation ------------------------------------------------
+   A quiet band at the foot of a sample page. Bordered, not filled: a
+   solid panel here would read as an advertisement dropped into the
+   course rather than as part of it. */
+.rp-sample {
+  margin: var(--rp-9) auto 0;
+  max-width: 720px;
+  padding: var(--rp-6);
+  border: 1px solid var(--rp-line);
+  border-top: 1px solid var(--rp-cyan-line);
+  background: var(--rp-cyan-tint);
+}
+.rp-sample-tag {
+  font-family: var(--rp-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rp-cyan);
+  margin: 0 0 var(--rp-3);
+}
+.rp-sample h2 {
+  font-family: var(--rp-serif);
+  font-weight: 300;
+  font-size: clamp(21px, 2.2vw, 27px);
+  line-height: 1.18;
+  color: var(--rp-ink);
+  margin: 0 0 var(--rp-3);
+  text-wrap: balance;
+}
+.rp-sample-body {
+  font-family: var(--rp-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--rp-ink-2);
+  margin: 0 0 var(--rp-5);
+  max-width: 58ch;
+}
+.rp-sample-actions { display: flex; flex-wrap: wrap; gap: var(--rp-3); }
+.rp-sample-cta,
+.rp-sample-alt {
+  font-family: var(--rp-sans);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: var(--rp-3) var(--rp-5);
+  border: 1px solid transparent;
+  transition: background var(--rp-t) ease, border-color var(--rp-t) ease, color var(--rp-t) ease;
+}
+.rp-sample-cta {
+  background: var(--rp-cyan);
+  color: var(--rp-ground);
+}
+.rp-sample-cta:hover { background: #7ad9e7; }
+.rp-sample-alt {
+  border-color: var(--rp-line-2);
+  color: var(--rp-ink-2);
+}
+.rp-sample-alt:hover { border-color: var(--rp-cyan); color: var(--rp-ink); }
+
+/* ---- locked modules ------------------------------------------------
+   Visible, legible, and obviously not open. The point is that a visitor
+   can SEE what exists beyond the sample: a locked row that hides its own
+   title tells them nothing and sells nothing.
+
+   Contrast is deliberately not crushed. Dimming a locked title to the
+   point of illegibility would make the catalogue unreadable, which is the
+   opposite of the job — so the title stays at ink-2 and the "locked"
+   signal is carried by the shape: a key mark, a rule that does not
+   animate, and a preview held behind a veil. */
+.rp-locked {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  gap: var(--rp-4);
+  align-items: center;
+  padding: var(--rp-4);
+  border: 1px solid var(--rp-line);
+  text-decoration: none;
+  transition: border-color var(--rp-t) ease;
+}
+.rp-locked:hover { border-color: var(--rp-line-2); }
+
+/* The preview thumbnail: real, then veiled. Greyscale plus a low opacity
+   says "there is something here" without pretending to give it away. */
+.rp-locked-thumb {
+  position: relative;
+  width: 96px;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--rp-line);
+  background: var(--rp-raised);
+}
+.rp-locked-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(0.85);
+  opacity: 0.4;
+}
+.rp-locked-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 13, 20, 0.1), rgba(7, 13, 20, 0.6));
+}
+
+.rp-locked-name {
+  font-family: var(--rp-serif);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--rp-ink-2);
+  margin: 0 0 4px;
+}
+.rp-locked-blurb {
+  font-family: var(--rp-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--rp-ink-3);
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* The lock mark. A shape, not only a colour — the state has to survive
+   both a greyscale print and a reader who cannot separate the hues. */
+.rp-locked-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--rp-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rp-ink-3);
+  white-space: nowrap;
+}
+.rp-locked-mark svg { flex: none; stroke: currentColor; fill: none; }
+
+/* A row that IS in the sample, listed beside the locked ones so the
+   difference is visible at a glance. */
+.rp-locked.is-free { border-color: var(--rp-cyan-line); }
+.rp-locked.is-free .rp-locked-name { color: var(--rp-ink); }
+.rp-locked.is-free .rp-locked-thumb img { filter: none; opacity: 1; }
+.rp-locked.is-free .rp-locked-thumb::after { background: none; }
+.rp-locked.is-free .rp-locked-mark { color: var(--rp-cyan); }
+
+@media (max-width: 640px) {
+  .rp-locked { grid-template-columns: 64px minmax(0, 1fr); }
+  .rp-locked-thumb { width: 64px; }
+  .rp-locked-mark { grid-column: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-sample-cta, .rp-sample-alt, .rp-locked { transition: none; }
+}

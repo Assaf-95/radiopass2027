@@ -889,7 +889,7 @@ function App() {
     <Route path="/ultrasound-lab/impedance" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsImpedance/></RequireAccess>}/>
     <Route path="/ultrasound-lab/reflection" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsReflection/></RequireAccess>}/>
     <Route path="/ultrasound-lab/refraction" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsRefraction/></RequireAccess>}/>
-    <Route path="/ultrasound-lab/attenuation" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsAttenuation/></RequireAccess>}/>
+    <Route path="/ultrasound-lab/attenuation" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab', id: 'ultrasound-lab/attenuation' }}><UsAttenuation/></RequireAccess>}/>
     <Route path="/ultrasound-lab/pulse-echo" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsPulseEcho/></RequireAccess>}/>
     <Route path="/ultrasound-lab/transducer" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsTransducer/></RequireAccess>}/>
     <Route path="/ultrasound-lab/beam" element={<RequireAccess resource={{ branch: 'physics', kind: 'lab' }}><UsBeam/></RequireAccess>}/>
