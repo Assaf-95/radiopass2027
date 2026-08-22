@@ -599,3 +599,139 @@ as $$
 $$;
 
 grant execute on function public.public_plans() to anon, authenticated;
+
+-- =====================================================================
+-- 10. Owner-facing lookups.
+--
+-- Search returns a SUMMARY per person, never a dump of the user table:
+-- an admin screen needs enough to act on, and every extra field is one
+-- more thing to leak. The query is required — an empty search must not
+-- page through every candidate you have.
+-- =====================================================================
+create or replace function public.admin_find_users(p_query text, p_limit integer default 25)
+returns table (
+  user_id      uuid,
+  email        text,
+  created_at   timestamptz,
+  role         text,
+  paid         boolean,
+  expires_at   timestamptz,
+  source       text,
+  plan_id      text,
+  plan_name    text,
+  lifetime_pence bigint
+)
+language plpgsql
+stable
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  if not public.has_capability('users:manage') then
+    raise exception 'Not permitted' using errcode = '42501';
+  end if;
+  if coalesce(trim(p_query),'') = '' then
+    raise exception 'Type at least part of an email address';
+  end if;
+
+  return query
+  select
+    u.id,
+    u.email::text,
+    u.created_at,
+    e.role,
+    public.has_paid_access(u.id),
+    public.paid_access_until(u.id),
+    live.source,
+    live.plan_id,
+    pl.name,
+    -- Only PAID payments count toward what somebody has spent. A refunded
+    -- charge in this total would misreport both the customer and revenue.
+    coalesce((select sum(p.amount_pence) from public.payments p
+              where p.user_id = u.id and p.status = 'paid'), 0)::bigint
+  from auth.users u
+  left join public.entitlements e on e.user_id = u.id
+  left join lateral (
+    select ag.source, ag.plan_id
+    from public.access_grants ag
+    where ag.user_id = u.id and ag.status = 'active'
+      and (ag.expires_at is null or ag.expires_at > now())
+    order by coalesce(ag.expires_at, 'infinity'::timestamptz) desc
+    limit 1
+  ) live on true
+  left join public.plans pl on pl.id = live.plan_id
+  where u.email ilike '%' || p_query || '%'
+  order by u.created_at desc
+  limit least(coalesce(p_limit, 25), 100);
+end;
+$$;
+
+grant execute on function public.admin_find_users(text,integer) to authenticated;
+
+-- Everything that has been done to one person's access, newest first.
+create or replace function public.admin_user_history(p_user_id uuid)
+returns table (created_at timestamptz, action text, note text, detail jsonb, actor_email text)
+language plpgsql
+stable
+security definer
+set search_path = public, auth, pg_temp
+as $$
+begin
+  if not public.has_capability('users:manage') then
+    raise exception 'Not permitted' using errcode = '42501';
+  end if;
+  return query
+  select a.created_at, a.action, a.note, a.detail, au.email::text
+  from public.access_audit a
+  left join auth.users au on au.id = a.actor_id
+  where a.user_id = p_user_id
+  order by a.created_at desc
+  limit 100;
+end;
+$$;
+
+grant execute on function public.admin_user_history(uuid) to authenticated;
+
+-- Revenue, kept honest. Complimentary, beta and staff grants are counted
+-- SEPARATELY and never as income — mixing goodwill into revenue is how a
+-- business talks itself into believing a launch went better than it did.
+create or replace function public.owner_revenue()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if not public.has_capability('users:manage') then
+    raise exception 'Not permitted' using errcode = '42501';
+  end if;
+  return (
+    select jsonb_build_object(
+      'by_plan', coalesce((
+        select jsonb_object_agg(plan_id, jsonb_build_object('count', n, 'pence', pence))
+        from (select p.plan_id, count(*) n, sum(p.amount_pence) pence
+              from public.payments p where p.status = 'paid'
+              group by p.plan_id) t), '{}'::jsonb),
+      'total_pence', coalesce((select sum(amount_pence) from public.payments where status='paid'),0),
+      'refunded_pence', coalesce((select sum(amount_pence) from public.payments where status='refunded'),0),
+      'paying_now', (select count(distinct g.user_id) from public.access_grants g
+                      where g.source='stripe' and g.status='active'
+                        and (g.expires_at is null or g.expires_at > now())),
+      'expired_paid', (select count(distinct g.user_id) from public.access_grants g
+                        where g.source='stripe'
+                          and g.user_id not in (
+                            select user_id from public.access_grants
+                            where status='active' and (expires_at is null or expires_at > now()))),
+      'complimentary_now', (select count(distinct g.user_id) from public.access_grants g
+                             where g.source in ('complimentary','beta','staff') and g.status='active'
+                               and (g.expires_at is null or g.expires_at > now())),
+      'renewals', (select count(*) from public.payments p where p.status='paid'
+                    and exists (select 1 from public.payments q
+                                where q.user_id=p.user_id and q.created_at < p.created_at))
+    )
+  );
+end;
+$$;
+
+grant execute on function public.owner_revenue() to authenticated;

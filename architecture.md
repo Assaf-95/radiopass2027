@@ -21,6 +21,7 @@ Publish somewhere.
 | **Cloudflare Pages** | Takes the code from GitHub, builds the site, and serves it to visitors worldwide. | The site is offline. |
 | **Sanity** | Where you log in to edit text and images. Also stores and optimises the images. | The site still loads, but shows the last content it was built with. |
 | **Supabase** | Accounts, logins, and every candidate's progress, scores, flags and favourites. | Visitors can read, but can't log in or save progress. |
+| **Stripe** | Takes the money. Holds card details so RadioPass never does. | Nobody can buy or renew; everybody's existing access is unaffected. |
 
 Two things worth understanding about that table:
 
@@ -57,12 +58,25 @@ flowchart TB
         H -->|"logs in, saves progress"| I[("Supabase<br/>accounts + progress")]
     end
 
+    subgraph pay["Paying — the browser never grants access"]
+        H -->|"chooses 3, 6 or 12 months"| P["Edge Function<br/>create-checkout-session"]
+        P -->|"opens a session"| S["Stripe Checkout"]
+        S -->|"customer pays"| S
+        S -->|"signed webhook"| W["Edge Function<br/>stripe-webhook"]
+        W -->|"writes the entitlement"| I
+        S -.->|"redirect only — NOT proof"| H
+        H -->|"asks: do I have access?"| I
+    end
+
     E -.->|"red build warns you"| C
 
     style B fill:#2d5a3d,color:#fff
     style I fill:#2d4a6a,color:#fff
     style G fill:#5a4a2d,color:#fff
     style D fill:#3d3d3d,color:#fff
+    style S fill:#4a3a6a,color:#fff
+    style P fill:#2d4a4a,color:#fff
+    style W fill:#2d4a4a,color:#fff
 ```
 
 Read it as three separate loops. The top one is you, editing. The middle is code
@@ -82,9 +96,11 @@ the diagram above doesn't mislead you:
 | CI gate — tests on every push | Live |
 | Sanity client + image optimisation | Built |
 | Sanity schemas (what you can edit) | Built |
-| Content actually moved into Sanity | **Not yet** — needs your Sanity project ID |
+| Sanity project connected (`sj57xhl7` / `production`, public) | Done |
+| Content actually moved into Sanity | **Not yet** — migration scripts still to run |
 | Pages reading from Sanity | **Not yet** |
 | Lesson prose separated from simulation code | **Not yet** — the largest remaining piece |
+| Payments, timed access, owner controls | Built; needs Stripe keys and one end-to-end test |
 
 Until the last three are done, content edits still go through the **existing
 admin pages** backed by Supabase (`/admin`, `/anatomy/admin`), which work today.
@@ -130,6 +146,140 @@ Two things will never move into Sanity, and this is deliberate:
 | `assets/` | Images compiled into the app itself, rather than served from a CDN. |
 
 ---
+
+## Payments and Access
+
+### What each part does
+
+**Stripe** takes the money and holds the card details, so RadioPass never sees
+a card number. **Supabase** holds who you are and what you have. They meet at
+exactly one point: a signed message from Stripe saying a payment succeeded.
+
+### How a payment becomes access
+
+1. You pick 3, 6 or 12 months on the pricing page.
+2. If you are not signed in, you are asked to sign in **first**. A purchase has
+   to be attached to an account at the moment it is made — matching payments to
+   people afterwards by email address is how money goes missing.
+3. A function on Supabase opens a Stripe Checkout session. It looks the price up
+   in the database; the browser cannot name its own price.
+4. Stripe takes the payment.
+5. **Stripe sends a signed webhook.** This is the only thing in RadioPass that
+   can grant paid access.
+6. The entitlement is written, and the site unlocks.
+
+**Coming back from Stripe is not proof of payment.** Anybody can type the
+success address. That is why the account page waits for the webhook and says
+"confirming your payment" rather than congratulating you immediately.
+
+### Where the expiry date lives
+
+In Supabase, in `access_grants`, in UTC. Every grant of access is a row saying
+where it came from, when it started and when it ends.
+
+**Nothing turns access off at midnight.** There is no scheduled job to fail. A
+row whose expiry has passed simply stops matching, so access ends the moment it
+should, whether or not anything is running.
+
+### How renewal works
+
+Buying more time while you still have some **adds to what you have**. Access to
+1 December, buying 3 months on 1 November, ends on 1 March — not 1 February.
+You never lose days you have already paid for.
+
+If your access lapsed first, the new period starts today. Nobody gets back the
+weeks they were away.
+
+A repeated webhook cannot extend you twice: the Stripe event's id is a primary
+key in the database, so a replay collides and is ignored.
+
+### Free versus premium
+
+Every item carries **Who can see this** — Anyone / Signed-in / Subscribers only.
+Change it in the Studio and press Publish. See CONTENT-ACCESS.md.
+
+### Changing a price
+
+Owner Dashboard → **Pricing** → type the new price → confirm.
+
+A new Stripe price is created for you. **You never copy an ID from Stripe.**
+Stripe prices cannot be edited, so every change is a new price and the old one
+is kept — an old receipt still resolves to what was actually charged.
+
+### Giving somebody complimentary access
+
+Owner Dashboard → **Customers** → search their email → **+3 / +6 / +12 months
+free**, or **Never expires**. A reason is required and is recorded against the
+account with your name.
+
+This is real access recorded as complimentary — never a fake payment. That is
+what keeps revenue figures honest: comped users are counted separately and never
+as income.
+
+### Revoking access
+
+Same screen → **Revoke**, with a reason. Their account, progress and history all
+survive; only the paid access stops.
+
+### Finding somebody's payment status
+
+Owner Dashboard → **Customers** → search their email. You see whether they are
+free or paid, which plan, when it started and expires, what they have spent, and
+the full history of every manual change.
+
+### What happens when access expires
+
+Nothing is deleted. Their account, scores, flagged questions, favourites,
+completed lessons and streak all remain exactly as they were. Paid content
+locks; free and sample content stays open. The account page shows the date access
+ended and a Renew button — and says plainly that their work is still there,
+because the fear that renewing means starting again is what stops people
+renewing.
+
+### "They paid but the site still says Free"
+
+In order:
+
+1. **Have them reload the account page.** Access appears when the webhook lands,
+   usually within seconds.
+2. **Stripe → Developers → Webhooks.** Is the event delivered? A red entry means
+   Stripe could not reach Supabase.
+3. **Supabase → `stripe_events`.** Find the event id. If it has an `error`, that
+   is the reason.
+4. **Check `payments`.** A row means the money arrived; no row means the webhook
+   never ran.
+5. If the payment is real and the webhook failed, resend it from Stripe. It is
+   safe: a replay that already succeeded is ignored, so you cannot double-grant.
+6. As a last resort, grant complimentary access for the period they bought, with
+   a note saying why. Never invent a payment record.
+
+### Which secrets live where
+
+| Where | What | Why |
+|---|---|---|
+| **Cloudflare Pages** | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SANITY_PROJECT_ID`, `VITE_SANITY_DATASET` | Public by design — already in the JavaScript every visitor downloads |
+| **Supabase Edge Functions** | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL` | Server-side only |
+| **Sanity** | nothing extra | The dataset is public for reading |
+
+**Never** put a Stripe secret key, a webhook signing secret, or the Supabase
+service-role key in a `VITE_` variable or in GitHub. `VITE_` means "compile into
+the JavaScript every visitor downloads" — a secret key there is published, not
+configured.
+
+### Testing payments safely
+
+Stripe test mode uses separate keys and takes no real money.
+
+1. Stripe → toggle **Test mode**.
+2. Use the test keys in Supabase secrets.
+3. Buy a plan with card `4242 4242 4242 4242`, any future expiry, any CVC.
+4. Check the account page shows the right expiry date.
+5. Try again — confirm the second purchase **adds to** the first.
+6. To test expiry, shorten a date directly:
+   `update access_grants set expires_at = now() - interval '1 day' where user_id = '…';`
+   Reload: paid content locks, and every score and flag is still there.
+
+Switch to live keys only when all of that behaves.
 
 ## Maintenance guide
 

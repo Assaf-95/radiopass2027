@@ -155,6 +155,8 @@ const PhysicsWordingEditor = lazyImport(() => import('./qbank/pages/WordingEdito
    must not sit in the bundle every candidate downloads. */
 const OwnerDashboard = lazyImport(() => import('./portal/OwnerDashboard'))
 const AccountPage = lazyImport(() => import('./portal/Account'))
+const OwnerUsers = lazyImport(() => import('./portal/OwnerUsers'))
+const OwnerPricing = lazyImport(() => import('./portal/OwnerPricing'))
 // Mounts only where the /anatomy folder is absent (dev, split hosting): the
 // combined host serves the real folder and this route is never reached. It
 // forwards the whole address — subpath, query, hash — to the live anatomy
@@ -900,7 +902,7 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/admin/dashboard" element={<OwnerDashboard/>}/><Route path="/account" element={<AccountPage/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/_shell" element={<ShellPreview/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/admin/dashboard" element={<OwnerDashboard/>}/><Route path="/account" element={<AccountPage/>}/><Route path="/admin/customers" element={<OwnerUsers/>}/><Route path="/admin/pricing" element={<OwnerPricing/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/_shell" element={<ShellPreview/>}/>
     {/* RADIOPASS PHYSICS. The dashboard above, the course engine here.
         Paths are written out rather than built from PHYSICS_ROOT on purpose:
         this table is the definition of what exists, labLink.test.ts reads it

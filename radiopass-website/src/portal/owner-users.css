@@ -1,0 +1,44 @@
+/* Customer search. Same tokens as the dashboard so the admin area reads as
+   one place rather than a pile of separate tools. */
+.ou { max-width: 860px; margin: 0 auto; padding: clamp(24px,4vw,48px) clamp(16px,4vw,32px) 64px;
+      font-family: var(--rp-sans, system-ui, sans-serif); color: var(--rp-ink, #e8ecf1); }
+.ou h1 { font-family: var(--rp-serif, Georgia, serif); font-weight: 300; font-size: clamp(28px,3.4vw,38px); margin: 0 0 6px; }
+.ou h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--rp-mono, ui-monospace, monospace); color: var(--rp-ink-3,#8fa3bc); margin: 0 0 10px; }
+.ou-muted { color: var(--rp-ink-3,#8fa3bc); font-size: 14px; line-height: 1.6; }
+.ou-warn { color: var(--amber,#e0a33f); font-size: 14px; padding: 10px 14px; border: 1px solid rgba(224,163,63,0.4); border-radius: 8px; }
+.ou-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.ou-search { display: flex; gap: 10px; margin: 20px 0 24px; flex-wrap: wrap; }
+.ou-search input { flex: 1 1 240px; min-height: 44px; padding: 0 14px; border-radius: 8px; font: inherit;
+  background: var(--rp-raised, rgba(255,255,255,0.03)); color: inherit;
+  border: 1px solid var(--rp-line-2, rgba(255,255,255,0.18)); }
+.ou button { min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px;
+  background: transparent; color: inherit; border: 1px solid var(--rp-line-2, rgba(255,255,255,0.18)); }
+.ou button:hover:not(:disabled) { border-color: var(--rp-cyan,#5dcfdf); }
+.ou button:disabled { opacity: 0.5; cursor: default; }
+.ou-search button { background: var(--rp-cyan,#5dcfdf); color: #030A18; border-color: transparent; font-weight: 500; }
+.ou-danger { color: var(--red,#e06a78); border-color: rgba(224,106,120,0.4) !important; }
+
+.ou-card { padding: 18px; border: 1px solid var(--rp-line, rgba(255,255,255,0.10)); border-radius: 12px;
+  background: var(--rp-raised, rgba(255,255,255,0.02)); margin-bottom: 14px; }
+.ou-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.ou-email { font-size: 16px; margin: 0; }
+.ou-since { font-size: 12px; color: var(--rp-ink-3,#8fa3bc); margin: 4px 0 0; }
+.ou-badge { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 5px 10px; border-radius: 999px;
+  border: 1px solid var(--rp-line-2, rgba(255,255,255,0.18)); color: var(--rp-ink-3,#8fa3bc); }
+.ou-badge-on { color: var(--rp-cyan,#5dcfdf); border-color: rgba(93,207,223,0.45); }
+
+.ou-facts { display: grid; grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 10px; margin: 16px 0; }
+.ou-facts dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--rp-ink-3,#8fa3bc); font-family: var(--rp-mono, ui-monospace, monospace); }
+.ou-facts dd { margin: 3px 0 0; font-size: 14px; }
+
+.ou-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.ou-history { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rp-line, rgba(255,255,255,0.08)); }
+.ou-history ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ou-history li { display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; align-items: baseline; }
+.ou-h-when { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 11px; color: var(--rp-ink-3,#8fa3bc); }
+.ou-h-what { text-transform: capitalize; }
+.ou-h-note { color: var(--rp-ink-2,#c8d3e0); font-style: italic; }
+.ou-h-who { font-size: 11px; color: var(--rp-ink-3,#8fa3bc); }
