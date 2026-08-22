@@ -10,7 +10,7 @@
     "preview": "./node_modules/.bin/vite preview",
     "test": "bash scripts/run-tests.sh run",
     "test:watch": "bash scripts/run-tests.sh",
-    "package": "node scripts/partition-content.mjs --write && node scripts/package.mjs && node scripts/assert-no-premium-in-bundle.mjs",
+    "package": "node scripts/package.mjs && node scripts/assert-no-premium-in-bundle.mjs",
     "anatomy:verify": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts",
     "anatomy:baseline": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts --write",
     "physics:shape": "node scripts/physics-shape-validate.mjs",
@@ -20,7 +20,6 @@
     "physics:map": "node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts",
     "anatomy:summary": "node scripts/anatomy-summary.mjs",
     "deploy:cf": "npm run package && node scripts/deploy-cloudflare.mjs",
-    "prepare": "node scripts/partition-content.mjs --write",
     "partition": "node scripts/partition-content.mjs --write"
   },
   "dependencies": {

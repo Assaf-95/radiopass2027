@@ -1,5 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
+// @ts-expect-error — plain ESM helper, no types, and none worth authoring.
+import { stripPaidContent } from './scripts/vite-strip-paid.mjs'
 // @ts-expect-error — plain ESM helper, no types, and none worth authoring.
 import { contentApi } from './scripts/vite-content-api.mjs'
 
@@ -28,7 +31,14 @@ import { contentApi } from './scripts/vite-content-api.mjs'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), contentApi()],
+  plugins: [
+    react(),
+    contentApi(),
+    /* Redacts paid answers from the shipped bundle. Build only — see
+       scripts/vite-strip-paid.mjs for why this is a plugin and not a
+       pre-generated file. */
+    stripPaidContent({ freeSamplePath: fileURLToPath(new URL('./scripts/free-sample.json', import.meta.url)) }),
+  ],
   server: {
     // Vite does not read PORT on its own, so an assigned port would be ignored
     // and the server would quietly come up on 5173 instead. Honouring it here

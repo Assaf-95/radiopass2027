@@ -114,18 +114,29 @@ describe('the public partition, against the full bank', () => {
     }
   })
 
-  it('withholds the answers of paid questions', () => {
-    /* The security property, asserted rather than assumed: what the app
-       imports must NOT contain the marked answers. */
-    let withheld = 0
+  it('is the SOURCE, so it still carries the answers — the build strips them', () => {
+    /* This changed shape deliberately, and the reason matters more than the
+       assertion. Answers used to be removed from generated *.public.json files
+       that the app imported, which meant the repository did not typecheck
+       until a script had been run — CI failed on nine TS2307s from a fresh
+       clone, and "run the generator earlier" only moved that rule rather than
+       removing it.
+
+       Stripping now happens in the BUILD (scripts/vite-strip-paid.mjs), so the
+       source stays whole and every tool that reads it — tsc, editors, this
+       suite — sees the authored data. The security property therefore cannot
+       be asserted here: it is a property of the ARTEFACT, and
+       scripts/assert-no-premium-in-bundle.mjs checks the artefact on every
+       `npm run package`, failing the build if a single answer survives.
+
+       What is worth asserting here is that the marking data is intact, because
+       a stripping bug that reached the source would silently destroy it. */
+    let withAnswers = 0
     for (const meta of SECTION_META) {
       for (const q of getSectionQuestions(meta.id as SectionId)) {
-        if ((q as { premium?: boolean }).premium) {
-          expect(Object.keys(q.answers ?? {}), `${q.id} still ships its answers`).toHaveLength(0)
-          withheld++
-        }
+        if (Object.keys(q.answers ?? {}).length > 0) withAnswers++
       }
     }
-    expect(withheld, 'nothing was withheld — the partition did not run').toBeGreaterThan(400)
+    expect(withAnswers, 'the source lost its answers — marking would break').toBeGreaterThan(400)
   })
 })

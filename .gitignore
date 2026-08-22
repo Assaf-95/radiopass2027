@@ -58,3 +58,4 @@ studio/.env
 supabase/.temp
 supabase/.branches
 .env.local
+.wrangler/
