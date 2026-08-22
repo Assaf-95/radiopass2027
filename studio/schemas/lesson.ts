@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { accessLevelField } from './accessLevel'
 
 /* A physics lesson — the PROSE of one, not the lesson itself.
  *
@@ -22,6 +23,7 @@ export const lesson = defineType({
   title: 'Physics lesson',
   type: 'document',
   fields: [
+    accessLevelField,
     defineField({
       name: 'lessonId',
       title: 'Lesson ID',

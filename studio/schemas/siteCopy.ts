@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { accessLevelField } from './accessLevel'
 
 /* Everything a visitor reads that is not a question or a lesson.
  *
@@ -19,6 +20,7 @@ export const page = defineType({
   title: 'Page',
   type: 'document',
   fields: [
+    accessLevelField,
     defineField({
       name: 'slug',
       title: 'Which page',
@@ -82,6 +84,7 @@ export const faq = defineType({
   title: 'FAQ',
   type: 'document',
   fields: [
+    accessLevelField,
     defineField({ name: 'question', title: 'Question', type: 'string', validation: (r) => r.required() }),
     defineField({
       name: 'answer',

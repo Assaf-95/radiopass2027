@@ -41,7 +41,41 @@ export type Resource = {
   kind: 'home' | 'atlas' | 'questions' | 'mock' | 'module' | 'lab' | 'facts' | 'progress'
   /** e.g. 'ct', 'thorax', 'mri-lab/motion'. Omitted when the whole kind is meant. */
   id?: string
+  /**
+   * The level set on this item in the CMS, when it has one.
+   *
+   * Present, it decides — and it overrides TRIAL, because an author who marks
+   * a page `guest` has said something more specific than a list written
+   * months earlier. Absent, nothing changes: the trial list and the branch
+   * grants decide exactly as before, which is what lets this be added without
+   * re-authoring 429 questions first.
+   */
+  accessLevel?: AccessLevel
 }
+
+/**
+ * What a person must be in order to open an item.
+ *
+ * Three levels rather than a boolean because "free" is genuinely a different
+ * answer from "guest": one asks for an email address and one does not, and
+ * the whole reason to have accounts on a free page is to know who came back.
+ *
+ * A WARNING WORTH READING BEFORE RELYING ON THIS. Setting an item to
+ * `subscriber` hides it. It does not, today, make it unreadable: the question
+ * banks are compiled into the JavaScript every visitor downloads, so anyone
+ * who opens developer tools can read paid content whatever this field says.
+ * Making the level a real boundary means serving premium content from the
+ * network at read time, authenticated, instead of shipping it in the bundle.
+ * See docs/CONTENT-ACCESS.md — this field is the front half of that job and
+ * is honest about being so.
+ */
+export type AccessLevel =
+  /** Anyone at all, signed in or not. */
+  | 'guest'
+  /** Any signed-in account, paid or not. */
+  | 'free'
+  /** A paid plan covering this branch. */
+  | 'subscriber'
 
 /* ------------------------------------------------------------------ *
  * Entitlement — what the current user holds
@@ -220,6 +254,11 @@ export function canAccess(resource: Resource, entitlement: Entitlement): Decisio
 
   if (grants.has('admin')) return { allowed: true }
   if (PUBLIC_KINDS.has(resource.kind)) return { allowed: true }
+  /* An explicit level is the author's decision about THIS item, so it beats
+     the trial list, which is a decision about a set. Checked before the branch
+     grant too: that is what makes `guest` and `free` able to open a page
+     inside a branch somebody has not bought. */
+  if (resource.accessLevel) return decideByLevel(resource.accessLevel, resource.branch, entitlement)
   if (trialAllows(resource)) return { allowed: true }
   if (grants.has('full') || grants.has(resource.branch)) return { allowed: true }
 
@@ -228,6 +267,25 @@ export function canAccess(resource: Resource, entitlement: Entitlement): Decisio
     reason: grants.has('account') ? 'upgrade' : 'sign-in',
     branch: resource.branch,
   }
+}
+
+/**
+ * The decision for an item that carries an explicit level.
+ *
+ * Split out so the reason is right in each case. "Sign in" and "your plan
+ * does not include this" need different words and different buttons, and a
+ * signed-out visitor meeting a subscriber page needs the first one — asking a
+ * stranger to upgrade before they have an account is a dead end.
+ */
+function decideByLevel(level: AccessLevel, branch: Branch, entitlement: Entitlement): Decision {
+  const { grants } = entitlement
+  if (level === 'guest') return { allowed: true }
+  if (level === 'free') {
+    if (grants.has('account')) return { allowed: true }
+    return { allowed: false, reason: 'sign-in', branch }
+  }
+  if (grants.has('full') || grants.has(branch)) return { allowed: true }
+  return { allowed: false, reason: grants.has('account') ? 'upgrade' : 'sign-in', branch }
 }
 
 /** Whether the trial configuration frees this exact resource. */

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { accessLevelField } from './accessLevel'
 
 /* An anatomy case: one film, and the structures a candidate must name on it.
  *
@@ -23,6 +24,7 @@ export const anatomyCase = defineType({
   title: 'Anatomy case',
   type: 'document',
   fields: [
+    accessLevelField,
     defineField({
       name: 'caseId',
       title: 'Case ID',

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { accessLevelField } from './accessLevel'
 
 /* A physics question.
  *
@@ -22,6 +23,7 @@ export const physicsQuestion = defineType({
   title: 'Physics question',
   type: 'document',
   fields: [
+    accessLevelField,
     defineField({
       name: 'questionId',
       title: 'Question ID',
