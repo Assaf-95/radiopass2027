@@ -8,6 +8,7 @@ import { isMigrated } from './design/archetypes'
 import { ThemeToggle } from './design/theme'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
+import { functionErrorMessage } from './lib/functionError'
 import { PLANS, type Plan } from './lib/billing'
 import { hasUnsyncedWork } from './lib/syncedStore'
 
@@ -726,7 +727,7 @@ function PricingContent() {
     setBusy(plan.id); setErr(null)
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout-session', { body: { planId: plan.id } })
-      if (error) throw new Error(error.message)
+      if (error) throw new Error(await functionErrorMessage(error, 'Could not start checkout.'))
       const url = (data as { url?: string })?.url
       if (!url) throw new Error('Checkout did not start.')
       window.location.href = url

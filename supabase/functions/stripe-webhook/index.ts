@@ -56,13 +56,22 @@ Deno.serve(async (req) => {
 
   try {
     switch (event.type) {
+      /* async_payment_succeeded shares this branch deliberately. A session
+         completed with a delayed method (bank debit) is unpaid at completion
+         and pays later; without this the money arrives and access never does,
+         and the event id from the earlier 'completed' has already been burned
+         so no replay can rescue it. */
+      case 'checkout.session.async_payment_succeeded':
       case 'checkout.session.completed': {
         const s = event.data.object as Stripe.Checkout.Session
         /* Only a session that is actually PAID. Sessions complete unpaid for
            delayed methods, and treating completion as payment would hand out
            access for money that never arrives. */
         if (s.payment_status !== 'paid') {
-          await note(event.id, event.type, `ignored: payment_status=${s.payment_status}`)
+          /* Recorded, not consumed. The matching async_payment_succeeded
+             carries its own event id, so this row is a breadcrumb rather than
+             a decision. */
+          await note(event.id, event.type, `awaiting payment: payment_status=${s.payment_status}`)
           break
         }
         const userId = s.metadata?.supabase_user_id ?? s.client_reference_id

@@ -24,9 +24,14 @@ type Row = {
   purchasable: boolean
 }
 
-export function usePlans(): { plans: readonly Plan[]; loading: boolean } {
+export function usePlans(): { plans: readonly Plan[]; loading: boolean; stale: boolean } {
   const [plans, setPlans] = useState<readonly Plan[]>(PLANS)
   const [loading, setLoading] = useState(true)
+  /* True while the compiled fallback is on screen. A price nobody has
+     confirmed must never sit under a button that charges — the twelve-month
+     fallback is £0 and the real price is £99, so rendering it would show a
+     free plan and take a hundred pounds. */
+  const [stale, setStale] = useState(true)
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
@@ -35,6 +40,7 @@ export function usePlans(): { plans: readonly Plan[]; loading: boolean } {
       if (cancelled) return
       setLoading(false)
       if (error || !Array.isArray(data) || data.length === 0) return
+      setStale(false)
       setPlans(
         (data as Row[]).map((r) => ({
           id: r.id as PlanId,
@@ -49,5 +55,5 @@ export function usePlans(): { plans: readonly Plan[]; loading: boolean } {
     return () => { cancelled = true }
   }, [])
 
-  return { plans, loading }
+  return { plans, loading, stale }
 }

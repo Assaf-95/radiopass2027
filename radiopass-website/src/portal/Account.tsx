@@ -20,6 +20,7 @@ import { useAuth } from '../lib/auth'
 import { usePaidAccess, useAwaitPaidAccess } from '../lib/paidAccess'
 import { formatDate, formatPrice, purchasablePlans, remainingLabel } from '../lib/billing'
 import { usePlans } from '../lib/usePlans'
+import { functionErrorMessage } from '../lib/functionError'
 import { supabase } from '../lib/supabase'
 import './account.css'
 
@@ -31,7 +32,7 @@ export default function Account() {
   const [busy, setBusy] = useState<string | null>(null)
   /* From the database, so a price changed in Pricing Management shows here
      without a deploy — and £0 placeholders never reach a customer. */
-  const { plans } = usePlans()
+  const { plans, stale: pricesUnconfirmed } = usePlans()
   const [buyError, setBuyError] = useState<string | null>(null)
 
   /* Poll only after a successful return from Stripe. The webhook usually
@@ -56,7 +57,7 @@ export default function Account() {
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: { planId },
       })
-      if (error) throw new Error(error.message)
+      if (error) throw new Error(await functionErrorMessage(error, 'Could not start checkout.'))
       const url = (data as { url?: string })?.url
       if (!url) throw new Error('Checkout did not start.')
       window.location.href = url
@@ -164,6 +165,12 @@ export default function Account() {
       <section className="acct-card">
         <h2>{access.paid ? 'Extend your access' : expired ? 'Renew access' : 'Go premium'}</h2>
         {buyError && <p className="acct-warn" role="alert">{buyError}</p>}
+        {pricesUnconfirmed ? (
+          /* The compiled fallback is on screen. It is a placeholder, and one of
+             its entries is £0 against a real price of £99 — so no buy button
+             is offered until the database has confirmed what things cost. */
+          <p className="acct-muted">Checking today’s prices…</p>
+        ) : (
         <ul className="acct-plans">
           {purchasablePlans(plans).map((p) => (
             <li key={p.id}>
@@ -180,6 +187,7 @@ export default function Account() {
             </li>
           ))}
         </ul>
+        )}
         <p className="acct-fineprint">
           Payment is handled by Stripe. RadioPass never sees your card details.
         </p>
