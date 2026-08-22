@@ -14,14 +14,6 @@
       "url": "http://localhost:5182"
     },
     {
-      "name": "frcr-anatomy",
-      "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": [
-        "/Users/User1/Desktop/Claude/radiopass-main/ANATOMY CLAUDE/frcr-anatomy/scripts/dev-server.mjs"
-      ],
-      "autoPort": true
-    },
-    {
       "name": "radiopass-2027-bundle",
       "runtimeExecutable": "/usr/local/bin/node",
       "runtimeArgs": [

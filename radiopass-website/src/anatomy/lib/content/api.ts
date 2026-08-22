@@ -1,10 +1,21 @@
 /* ===========================================================================
    Talking to the content API.
 
-   The base path is relative ("api/…") for the same reason every image path
+   The base path is derived from BASE_URL for the same reason every image path
    goes through assetUrl(): one build has to work at a domain root, on a
-   subdomain and inside a subfolder. Routing is hash-based, so the document's
-   own directory is always the site root and a relative call lands correctly.
+   subdomain and inside a subfolder.
+
+   It used to be the relative string "api", which was correct while anatomy was
+   a separate build routing by URL hash — the document's own directory was
+   always the site root, so the browser resolved it there whatever the route.
+   Since the merge, anatomy is ordinary BrowserRouter paths, and a relative
+   base resolves against the CURRENT route instead: on
+   /anatomy/section/thorax/q/thorax-p0072 the call went to
+   /anatomy/section/thorax/q/api/content and 404'd. The overlay — every online
+   edit reaching the Question Bank and the Structure Atlas — therefore never
+   loaded on any route deeper than one segment. Root-absolute is the fix, and
+   BASE_URL keeps the subfolder deployment that assetUrl already honours: the
+   API is mounted at <base>/api by every adapter in server/.
 
    VITE_CONTENT_API overrides it, for the case where the site is served as
    static files from one place and the API runs somewhere else.
@@ -12,7 +23,11 @@
 
 import type { AuditEntry, ContentOverlay } from './types';
 
-const BASE = ((import.meta.env.VITE_CONTENT_API as string | undefined) ?? 'api').replace(/\/+$/, '');
+/** Trailing slash off, so `${BASE}${path}` never doubles it. */
+const deployBase = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+const BASE = (
+  (import.meta.env.VITE_CONTENT_API as string | undefined) ?? `${deployBase}/api`
+).replace(/\/+$/, '');
 
 const TOKEN_KEY = 'radiopass-editor-session-v1';
 
