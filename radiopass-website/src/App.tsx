@@ -408,7 +408,12 @@ function Header() {
      the tools of the branch you are actually in, then the trial. The anatomy
      app's header carries the same first group and the same trial entry, so
      moving between the two builds does not feel like changing website. */
-  const { pathname } = useLocation()
+  /* Read from the location taken at the top, NOT a second useLocation(). The
+     early return above means a hook called here runs on some routes and not
+     others, which is the hook-order violation React reports as
+     "17. undefined -> useContext". Footer gets this right: hook first, then
+     the return. */
+  const { pathname } = location
   const branchLinks: [string, string][] = [
     ['Anatomy', ANATOMY_HREF],
     ['Physics', '/physics'],
