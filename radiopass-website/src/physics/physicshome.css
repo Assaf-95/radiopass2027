@@ -2,13 +2,38 @@
    Design-system tokens only. Structure and space carry the hierarchy; there is
    deliberately no card-inside-card-inside-panel. */
 
+@import '../design/system.css';
+
 .ph {
-  /* Clears the fixed site header (var(--header-h)), the same way .page-hero
-     does. The 64rem measure is the page's reading width; min() keeps it from
-     ever forcing horizontal scroll on a narrow screen. */
-  max-width: min(64rem, 100%);
+  /* THE BRIDGE ONTO THE APPROVED SYSTEM.
+     This page's several hundred existing rules are written against the older
+     token names. Rather than rewrite every one of them — which is how a
+     migration breaks contrast somewhere nobody looks — the old names are
+     re-pointed at the approved values here, at the page's own scope. The
+     page is now painted entirely from system.css: navy ground, structural
+     cyan, Newsreader and IBM Plex. Nothing outside .ph is affected, so the
+     unmigrated pages keep their current palette until their turn. */
+  --font-display: var(--rp-serif);
+  --font-mono: var(--rp-mono);
+  --text-primary: var(--rp-ink);
+  --text-secondary: var(--rp-ink-2);
+  --text-tertiary: var(--rp-ink-3);
+  --text-dim: var(--rp-ink-3);
+  --hairline: var(--rp-line);
+  --structure: var(--rp-cyan);
+  --accent: var(--rp-cyan);
+  --accent-soft: var(--rp-cyan-tint);
+  --bg-base: var(--rp-ground);
+  --success: var(--rp-correct);
+
+  font-family: var(--rp-sans);
+  color: var(--rp-ink-2);
+  background: var(--rp-ground);
+
+  /* The shell supplies the header now, so the page no longer clears one. */
+  max-width: var(--rp-wrap);
   margin: 0 auto;
-  padding: calc(var(--header-h) + var(--gap-section)) var(--gutter) var(--gap-page);
+  padding: var(--rp-7) var(--rp-gutter) var(--rp-10);
 }
 
 .ph-sr {
@@ -92,40 +117,12 @@
   color: var(--text-tertiary);
 }
 
-/* Continue — the single most important control on the page when there is
-   activity, so it is the only accented surface here. */
-.ph-continue {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
-  margin-top: var(--sp-5);
-  padding: var(--sp-4) var(--sp-5);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background var(--dur) var(--ease);
-}
-
-.ph-continue:hover {
-  background: var(--accent-soft);
-}
-
-.ph-continue-label {
-  font-size: var(--fs-meta);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.ph-continue-name {
-  flex: 1;
-  font-size: var(--fs-card);
-  color: var(--text-primary);
-}
-
-.ph-continue-go {
-  color: var(--accent);
-}
+/* The old Continue LINK rules lived here. They are gone: the new composition
+   uses a <section class="ph-continue"> containing a .ph-continue-card, and
+   the two selectors collided — the section inherited a flex row, a border and
+   a radius meant for a link, which is why the empty state laid itself out
+   sideways. Their replacements are in the composition block at the foot of
+   this file. */
 
 /* Mock history. One quiet line above Continue, not a tile: a paper sat weeks
    ago is context for today's work, not today's work. */
@@ -398,4 +395,287 @@
 }
 @media (max-width: 1100px) {
   .ph-atom { width: 130vw; height: 70vh; opacity: 0.09; }
+}
+
+/* ==================================================================== *
+ * THE APPROVED COMPOSITION
+ *
+ * Hero, four routes, topics grouped by how the signal is made, and the
+ * sibling branch. Replaces the parts-list the page carried before, which
+ * showed the course spine — a maintainer's view of the syllabus, not a
+ * learner's way in.
+ * ==================================================================== */
+
+/* ---- hero ---- */
+.ph-hero { padding: var(--sp-7) 0 var(--gap-section); }
+.ph-hero-h {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(46px, 8vw, 104px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0 0 var(--sp-4);
+}
+.ph-hero-lede {
+  font-size: var(--fs-teach);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  max-width: 48ch;
+  margin: 0 0 var(--sp-4);
+}
+.ph-hero-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ---- section furniture, shared by every band below ---- */
+.ph-sec-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--sp-3);
+}
+.ph-sec-h {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.14;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  margin: 0 0 var(--sp-3);
+}
+.ph-sec-lede {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-tertiary);
+  max-width: 64ch;
+  margin: 0 0 var(--gap-desc-main);
+}
+
+/* ---- continue ---- */
+.ph-continue { padding: var(--gap-section) 0; border-top: 1px solid var(--hairline); }
+.ph-continue-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: var(--sp-6);
+  align-items: start;
+}
+.ph-continue-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px solid var(--hairline);
+  text-decoration: none;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.ph-continue-card:hover {
+  border-color: var(--structure, rgba(164, 209, 236, 0.45));
+  background: rgba(164, 209, 236, 0.04);
+}
+.ph-continue-kind {
+  grid-column: 1;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.ph-continue-name {
+  grid-column: 1;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.ph-continue-go { grid-row: 1 / span 2; grid-column: 2; color: var(--text-tertiary); }
+
+/* Figures, not a dashboard: a definition list, because that is what it is. */
+.ph-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-5);
+  margin: 0;
+}
+.ph-figures dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: var(--sp-2);
+}
+.ph-figures dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-section);
+  font-weight: 400;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.ph-figures dd span {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+}
+.ph-empty-line {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+  max-width: 56ch;
+  margin: 0 0 var(--sp-5);
+}
+.ph-cta {
+  display: inline-block;
+  padding: var(--sp-3) var(--sp-5);
+  border: 1px solid var(--structure, rgba(164, 209, 236, 0.45));
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: var(--fs-support);
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+.ph-cta:hover { background: rgba(164, 209, 236, 0.08); }
+
+/* ---- four routes. Equal by construction: one grid, one cell size. ---- */
+.ph-routes { padding: var(--gap-section) 0; border-top: 1px solid var(--hairline); }
+.ph-route-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+}
+.ph-route {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-5);
+  background: var(--bg-base, #05080f);
+  text-decoration: none;
+  transition: background 0.35s ease;
+}
+.ph-route:hover { background: rgba(164, 209, 236, 0.045); }
+.ph-route-n {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.14em;
+  color: var(--text-tertiary);
+}
+.ph-route-rule {
+  display: block; width: 26px; height: 1px;
+  background: var(--text-tertiary);
+  transition: width 0.5s cubic-bezier(0.2, 0.7, 0.3, 1), background 0.35s ease;
+}
+.ph-route:hover .ph-route-rule { width: 100%; background: var(--structure, #a4d1ec); }
+.ph-route-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+.ph-route-blurb {
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-tertiary);
+  flex: 1;
+}
+.ph-route-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ---- topics ---- */
+.ph-topics { padding: var(--gap-section) 0; border-top: 1px solid var(--hairline); }
+.ph-group { margin-bottom: var(--gap-section); }
+.ph-group-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--structure, #a4d1ec);
+  margin: 0 0 var(--sp-3);
+}
+.ph-topic-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hairline); }
+.ph-topic-list li { border-bottom: 1px solid var(--hairline); }
+.ph-topic-list a {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  align-items: center;
+  padding: var(--sp-4) var(--sp-2);
+  text-decoration: none;
+  transition: background 0.3s ease, padding-left 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.ph-topic-list a:hover { background: rgba(164, 209, 236, 0.04); padding-left: var(--sp-4); }
+.ph-topic-mark { width: 52px; height: 52px; opacity: 0.85; }
+.ph-topic-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.ph-topic-blurb {
+  display: block;
+  font-size: var(--fs-support);
+  line-height: var(--lh-body);
+  color: var(--text-tertiary);
+  max-width: 62ch;
+}
+.ph-topic-pct {
+  font-family: var(--font-mono);
+  font-size: var(--fs-support);
+  font-variant-numeric: tabular-nums;
+  color: var(--structure, #a4d1ec);
+}
+
+/* ---- the sibling branch ---- */
+.ph-sibling { padding: var(--gap-section) 0 var(--gap-page); border-top: 1px solid var(--hairline); }
+.ph-sibling a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2) var(--sp-4);
+  align-items: center;
+  padding: var(--sp-5);
+  border: 1px solid var(--hairline);
+  text-decoration: none;
+  transition: border-color 0.3s ease;
+}
+.ph-sibling a:hover { border-color: var(--structure, rgba(164, 209, 236, 0.45)); }
+.ph-sibling-label {
+  font-family: var(--font-display);
+  font-size: var(--fs-card);
+  color: var(--text-primary);
+}
+.ph-sibling-blurb {
+  grid-column: 1;
+  font-size: var(--fs-support);
+  color: var(--text-tertiary);
+  max-width: 60ch;
+}
+.ph-sibling a > span:last-child { grid-row: 1 / span 2; grid-column: 2; color: var(--text-tertiary); }
+
+@media (max-width: 860px) {
+  .ph-continue-row { grid-template-columns: minmax(0, 1fr); }
+  .ph-topic-list a { grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--sp-3); }
+  .ph-topic-mark { width: 40px; height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-route, .ph-route-rule, .ph-topic-list a, .ph-continue-card, .ph-sibling a { transition: none; }
 }

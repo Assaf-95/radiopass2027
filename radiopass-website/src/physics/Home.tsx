@@ -45,8 +45,8 @@ import { SECTIONS as MRI_SECTIONS } from '../mri5/sections'
 import { completedModules, lastOfType, mockHistory, subscribeEvents } from '../lib/learner'
 import { V2_TOPICS } from '../physics2/topics'
 import { topicStanding } from '../physics2/lib/derive'
-import { COURSE_PARTS } from './course'
-import { PHYSICS_HREF, topicHref } from './routes'
+import { topicHref } from './routes'
+import { Shell } from '../design/Shell'
 import './physicshome.css'
 
 /* The sodium atom turning behind the page — the owner's model, driven by
@@ -224,336 +224,210 @@ function useSnapshot(): Snapshot {
  * ------------------------------------------------------------------ */
 
 /**
- * A module's standing in the learner's own record: which of its lessons have
- * been completed. completedModules() carries pathnames, and the spine knows
- * which pathnames belong to each module, so this is a set intersection —
- * no new store, no second definition of "done".
- *
- * The two deep modules (MRI, ultrasound) list one lesson — their home — and
- * track their own internal progress on their own surfaces; here they honestly
- * report opened-or-not rather than pretending 21 sections are one tick.
+ * The four ways in. Equal by construction: one array, one component, no
+ * "recommended" and no larger tile. Counts are computed from the live data —
+ * the approved board carried `[N] modules` placeholders, and a number that
+ * cannot be computed is omitted rather than invented.
  */
-function moduleState(done: Set<string>, lessonPaths: string[]): { done: number; total: number } {
-  return {
-    done: lessonPaths.filter((p) => done.has(p)).length,
-    total: lessonPaths.length,
-  }
-}
-
-/**
- * The three practice doors, absorbed from the second dashboard.
- *
- * They pointed at /question-bank/* — the older surfaces, which do the same
- * three jobs against the same shared record but outside the course. One
- * product means one door each, and the course's own Review knows which topic
- * a wrong answer belongs to, which the generic review list does not.
- *
- * `count` is a real number or nothing: the door never claims work exists that
- * the learner's record does not contain.
- */
-function practiceDestinations(wrong: number): { name: string; to: string; blurb: string }[] {
+function routeTiles(lessonsTotal: number, questions: number, labs: number, papers: number) {
   return [
-    {
-      name: 'Question bank',
-      to: PHYSICS_HREF.questions,
-      blurb:
-        'True-or-false stems in the real format, each one corrected and explained where you answered it.',
-    },
-    {
-      name: 'Mock exams',
-      to: PHYSICS_HREF.mock,
-      blurb:
-        'Three fixed papers and papers you build yourself, sat against the clock and marked at the end.',
-    },
-    {
-      name: 'Review',
-      to: PHYSICS_HREF.review,
-      blurb:
-        wrong > 0
-          ? `${wrong} question${wrong === 1 ? '' : 's'} answered wrong and ready to re-test, with the topics worth another pass.`
-          : 'Everything you answer wrong gathers here for re-testing, topic by topic.',
-    },
+    { n: '01', name: 'Modules', to: '/physics/course',
+      blurb: 'Structured lessons from first principles to examination depth.',
+      meta: `${lessonsTotal} lessons` },
+    { n: '02', name: 'Simulator Labs', to: '/visual-lab',
+      blurb: 'Move the parameters — kVp, mAs, TR, TE, frequency — and watch them act.',
+      meta: `${labs} experiments` },
+    { n: '03', name: 'Question Bank', to: '/question-bank/xray',
+      blurb: 'Concept and calculation questions with fully worked answers.',
+      meta: `${questions} questions` },
+    { n: '04', name: 'Mock Tests', to: '/question-bank/mock',
+      blurb: 'Timed papers in examination format, marked against the real standard.',
+      meta: `${papers} papers` },
   ]
 }
 
-/* ------------------------------------------------------------------ *
- * Page
- * ------------------------------------------------------------------ */
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="ph-stat">
-      <strong>{value}</strong>
-      <span>{label}</span>
-    </div>
-  )
-}
+/**
+ * The topics, grouped by how the signal is made.
+ *
+ * The approved board groups ionising / non-ionising / across-all, and that
+ * grouping is kept exactly. It names six topics; the course teaches NINE,
+ * because digital radiography, fluoroscopy and mammography each carry their
+ * own primer, question pool and essentials. Showing six would orphan three
+ * working topics, so every topic appears, in the board's own three families.
+ */
+const TOPIC_GROUPS: { label: string; ids: string[] }[] = [
+  { label: 'Ionising', ids: ['xray', 'digital', 'fluoro', 'mammo', 'ct', 'nm'] },
+  { label: 'Non-ionising', ids: ['mri', 'us'] },
+  { label: 'Across all', ids: ['safety'] },
+]
 
 export default function PhysicsHome() {
   const s = useSnapshot()
   const pct = (c: number, o: number) => (o > 0 ? Math.round((c / o) * 100) : null)
-  const firstAccuracy = pct(s.firstCorrect, s.firstOutOf)
   const latestAccuracy = pct(s.latestCorrect, s.latestOutOf)
 
   /* The nine topics with their standing. Each topic's pool is resolved from
      the shared question record, so these are the same numbers the topic page
-     and Review show — not a second reckoning of the same work. Recomputed
-     whenever the snapshot changes, so a sync landing after mount repaints the
-     rows as well as the headline. */
+     and Review show — not a second reckoning of the same work. */
   const topics = useMemo(
     () => V2_TOPICS.map((topic) => ({ topic, standing: topicStanding(topic) })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [s],
   )
+  const byId = useMemo(() => new Map(topics.map((t) => [t.topic.id, t])), [topics])
   const wrong = topics.reduce((n, t) => n + t.standing.wrong, 0)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const done = useMemo(() => new Set(completedModules('physics')), [s])
+
+  const tiles = routeTiles(s.lessonsTotal, QB_TOTALS.questions, US_STAGES.length, 3)
 
   return (
+    <Shell>
     <main className="ph">
       <AtomBackdrop />
-      <header className="ph-head">
-        <p className="ph-eyebrow">RadioPass · Physics</p>
-        <h1>
-          {s.hasActivity ? (
-            <>Pick up where you left off.</>
-          ) : (
-            <>
-              Understand the mechanism,
-              <br />
-              <span>then the rule follows.</span>
-            </>
-          )}
-        </h1>
+
+      {/* ---- hero ---- */}
+      <header className="ph-hero">
+        <p className="ph-eyebrow">Subject</p>
+        <h1 className="ph-hero-h">Physics</h1>
+        <p className="ph-hero-lede">
+          The physical basis of image formation, from photon production to reconstruction.
+        </p>
+        <p className="ph-hero-meta">
+          {V2_TOPICS.length} topics · {US_STAGES.length} simulations ·{' '}
+          {QB_TOTALS.questions} questions
+        </p>
       </header>
 
-      {/* --- The learner's own record, or an honest absence --------------- */}
-      <section id="progress" className="ph-state" aria-labelledby="ph-state-h">
-        <h2 id="ph-state-h" className="ph-sr">
-          Your progress
-        </h2>
-
-        {s.hasActivity ? (
-          <>
-            {/* Every label here says exactly which quantity it is. Four of
-                these used to be mislabelled rather than wrong — the numbers
-                were real, they simply did not measure what they claimed. */}
-            <div className="ph-stats">
-              <Stat value={`${s.answered}`} label={`of ${QB_TOTALS.questions} questions answered`} />
-              {latestAccuracy !== null && (
-                <Stat
-                  value={`${latestAccuracy}%`}
-                  label={`${s.latestCorrect} of ${s.latestOutOf} statements right, latest attempt`}
-                />
-              )}
-              {/* The exam predictor. Only worth its own tile once re-testing
-                  has moved the two apart; identical numbers side by side just
-                  look like a bug. */}
-              {firstAccuracy !== null && firstAccuracy !== latestAccuracy && (
-                <Stat value={`${firstAccuracy}%`} label="first time, cold" />
-              )}
-              {s.lessonsDone > 0 && (
-                <Stat value={`${s.lessonsDone}`} label={`of ${s.lessonsTotal} lessons finished`} />
-              )}
-              {s.usStagesVisited > 0 && (
-                <Stat
-                  value={`${s.usStagesVisited}`}
-                  label={`of ${US_STAGES.length} ultrasound experiments opened`}
-                />
-              )}
-              {s.mriSectionsVisited > 0 && (
-                <Stat
-                  value={`${s.mriSectionsVisited}`}
-                  label={`of ${MRI_SECTIONS.length} MRI sections read`}
-                />
-              )}
-              {s.flagged > 0 && <Stat value={`${s.flagged}`} label="flagged for review" />}
-            </div>
-
-            {/* Mock papers. These WERE recorded all along — Mock.tsx has
-                emitted mock.completed since the log existed — and the
-                dashboard simply never asked. Showing the most recent, with the
-                count, because one score with no history is a fact and a
-                history is a trend. */}
-            {s.mocks.length > 0 && (
-              <p className="ph-mocks">
-                {s.mocks.length} mock paper{s.mocks.length === 1 ? '' : 's'} sat · latest{' '}
-                <strong>
-                  {s.mocks[0].correct}/{s.mocks[0].outOf}
-                </strong>{' '}
-                ({Math.round((s.mocks[0].correct / Math.max(1, s.mocks[0].outOf)) * 100)}%) on{' '}
-                {s.mocks[0].paper}
-              </p>
-            )}
-
-            {/* ONE Continue, with one author.
-                There used to be two candidates arbitrated on a timestamp — the
-                last lesson, and the last question-bank subject — because the
-                course engine recorded nothing to the shared timeline and had
-                to be inferred from question activity. It records
-                module.started now, so the timeline knows about primers,
-                lessons and sections alike, and the arbitration is gone with
-                the ambiguity that needed it. */}
+      {/* ---- continue: real record only, never a manufactured percentage ---- */}
+      {s.hasActivity ? (
+        <section className="ph-continue" aria-labelledby="ph-cont-h">
+          <h2 id="ph-cont-h" className="ph-sec-label">Continue</h2>
+          <div className="ph-continue-row">
             {s.lastModule && (
-              <Link className="ph-continue" to={s.lastModule.path}>
-                <span className="ph-continue-label">Continue</span>
-                <span className="ph-continue-name">
-                  {s.lastModule.topic ?? 'Where you left off'}
-                </span>
-                <span className="ph-continue-go" aria-hidden="true">&rarr;</span>
+              <Link className="ph-continue-card" to={s.lastModule.path}>
+                <span className="ph-continue-kind">{s.lastModule.topic ?? 'Last opened'}</span>
+                <span className="ph-continue-name">Pick up where you left off</span>
+                <span className="ph-continue-go" aria-hidden="true">→</span>
               </Link>
             )}
-          </>
-        ) : (
-          /* No activity. Say that, and give one obvious first step — never a
-             fabricated "Week 3 · MRI" or a 0% ring pretending to be a record. */
-          <div className="ph-empty">
-            <p>
-              Nothing recorded yet. RadioPass tracks what you answer and where you have been, and
-              this is where it will appear.
-            </p>
-            {/* The free sample, not a laboratory. The laboratories now ask
-                for an account, so pointing a first-time visitor at one would
-                make their very first click a wall — and the sample is the
-                thing built to be their first click. */}
-            <Link className="button button-primary" to="/free-trial">
-              Start with the free sample <span aria-hidden="true">&rarr;</span>
-            </Link>
+            <dl className="ph-figures">
+              <div>
+                <dt>Questions answered</dt>
+                <dd>{s.answered} <span>of {QB_TOTALS.questions}</span></dd>
+              </div>
+              {latestAccuracy !== null && (
+                <div>
+                  <dt>Accuracy, latest attempt</dt>
+                  <dd>{latestAccuracy}%</dd>
+                </div>
+              )}
+              <div>
+                <dt>Lessons finished</dt>
+                <dd>{s.lessonsDone} <span>of {s.lessonsTotal}</span></dd>
+              </div>
+              {wrong > 0 && (
+                <div>
+                  <dt>To re-test</dt>
+                  <dd>{wrong}</dd>
+                </div>
+              )}
+            </dl>
           </div>
-        )}
+        </section>
+      ) : (
+        <section className="ph-continue">
+          <h2 className="ph-sec-label">Start here</h2>
+          <p className="ph-empty-line">
+            Nothing recorded yet. RadioPass tracks what you answer and where you have
+            been, and this is where it will appear.
+          </p>
+          <Link className="ph-cta" to="/free-trial">Start with the free sample →</Link>
+        </section>
+      )}
+
+      {/* ---- four ways in ---- */}
+      <section className="ph-routes" aria-labelledby="ph-routes-h">
+        <p className="ph-sec-label">Routes</p>
+        <h2 id="ph-routes-h" className="ph-sec-h">Four ways in.</h2>
+        <div className="ph-route-grid">
+          {tiles.map((t) => (
+            <Link key={t.to} className="ph-route" to={t.to}>
+              <span className="ph-route-n">{t.n}</span>
+              <span className="ph-route-rule" aria-hidden="true" />
+              <span className="ph-route-name">{t.name}</span>
+              <span className="ph-route-blurb">{t.blurb}</span>
+              <span className="ph-route-meta">{t.meta}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
-      {/* --- The course ----------------------------------------------------
-          The syllabus itself, parts in order, each topic carrying the
-          learner's own record. This replaced a flat list of equal
-          "destinations": a course home that cannot show the course was the
-          clearest symptom of the pages-not-a-course problem.
+      {/* ---- topics, grouped by how the signal is made ---- */}
+      <section className="ph-topics" aria-labelledby="ph-topics-h">
+        <p className="ph-sec-label">Topics</p>
+        <h2 id="ph-topics-h" className="ph-sec-h">
+          {V2_TOPICS.length} topics, ordered by the physics.
+        </h2>
+        <p className="ph-sec-lede">
+          Grouped by how the signal is made — ionising, non-ionising, and the safety
+          principles that govern both — rather than by the equipment it comes out of.
+        </p>
 
-          A row is a TOPIC now, not a laboratory. The distinction matters: the
-          topic is where the primer, the simulations and that subject's slice
-          of the question bank all meet, so it is the one address that can
-          honestly answer "how am I doing on nuclear medicine". The
-          laboratories are still there, at the same URLs they always had, but
-          they are reached through the topic that teaches them rather than
-          competing with it for the same row.
-
-          Each part carries its modality's instrument mark — the same drawn
-          vocabulary as the laboratory cards, compressed to an emblem. The
-          mark is the only coloured element in the header; everything else
-          stays in the ink. */}
-      <section className="ph-course" aria-labelledby="ph-course-h">
-        <h2 id="ph-course-h">The course</h2>
-        {COURSE_PARTS.map((part, pi) => {
-          const inPart = topics.filter((t) => t.topic.part === pi)
-          if (inPart.length === 0) return null
-          return (
-            <div className="ph-part" key={part.id}>
-              <div className="ph-part-head">
-                <PartMark id={part.id} />
-                <div>
-                  <h3>
-                    <span className="ph-part-no">Part {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][pi]}</span>
-                    {part.title}
-                  </h3>
-                  <p className="ph-part-blurb">{part.blurb}</p>
-                </div>
-              </div>
-              <ul>
-                {inPart.map(({ topic, standing }) => {
-                  /* Two independent records, and the row shows whichever the
-                     learner has actually made. The tick is lesson completion,
-                     keyed by pathname on the shared timeline; the meta column
-                     is the question pool. A learner who has read everything
-                     and answered nothing sees a tick and no numbers, which is
-                     the truth about where they are. */
-                  const state = moduleState(done, topic.lessons.map((l) => l.path))
-                  const finished = state.total > 0 && state.done === state.total
-                  return (
-                    <li key={topic.id}>
-                      <Link to={topicHref(topic.id)}>
-                        <span className={finished ? 'ph-mod-state is-done' : 'ph-mod-state'}>
-                          {finished ? '✓' : state.done > 0 ? `${state.done}/${state.total}` : ''}
-                        </span>
-                        <strong>{topic.title}</strong>
-                        <span className="ph-mod-blurb">{topic.tagline}</span>
-                        <span className="ph-mod-meta">
-                          {standing.answered > 0
-                            ? `${standing.answered}/${standing.total} answered${
-                                standing.latestAccuracy !== null
-                                  ? ` · ${Math.round(standing.latestAccuracy * 100)}% now`
-                                  : ''
-                              }${standing.wrong > 0 ? ` · ${standing.wrong} to fix` : ''}`
-                            : `${standing.total} questions`}
-                        </span>
-                      </Link>
-                    </li>
-                  )
-                })}
-                {/* The last part closes into the exam itself. */}
-                {part.id === 'safety' && (
-                  <li>
-                    <Link to={PHYSICS_HREF.mock}>
-                      <span className="ph-mod-state" />
-                      <strong>Mock papers</strong>
-                      <span className="ph-mod-blurb">
-                        Three fixed papers and papers you build yourself, against the clock.
+        {TOPIC_GROUPS.map((group) => (
+          <div className="ph-group" key={group.label}>
+            <p className="ph-group-label">{group.label}</p>
+            <ul className="ph-topic-list">
+              {group.ids.map((id) => {
+                const entry = byId.get(id)
+                if (!entry) return null
+                const { topic, standing } = entry
+                const seen = standing.total > 0
+                  ? Math.round((standing.answered / standing.total) * 100)
+                  : 0
+                return (
+                  <li key={id}>
+                    <Link to={topicHref(topic.id)}>
+                      <span className="ph-topic-mark" aria-hidden="true">
+                        <PartMark id={topic.id} />
                       </span>
-                      <span className="ph-mod-meta" />
+                      <span className="ph-topic-body">
+                        <span className="ph-topic-name">{topic.title}</span>
+                        <span className="ph-topic-blurb">{topic.tagline}</span>
+                      </span>
+                      {/* Progress only where there is some — a 0% bar on every
+                          row is noise pretending to be information. */}
+                      <span className="ph-topic-state">
+                        {standing.answered > 0 && (
+                          <span className="ph-topic-pct">{seen}%</span>
+                        )}
+                      </span>
                     </Link>
                   </li>
-                )}
-              </ul>
-            </div>
-          )
-        })}
+                )
+              })}
+            </ul>
+          </div>
+        ))}
       </section>
 
-      {/* --- Practise ------------------------------------------------------ */}
-      <section className="ph-destinations" aria-labelledby="ph-dest-h">
-        <h2 id="ph-dest-h">Practise</h2>
-        <ul>
-          {practiceDestinations(wrong).map((d) => (
-            <li key={d.to}>
-              <Link to={d.to}>
-                <strong>{d.name}</strong>
-                <span>{d.blurb}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      {/* ---- the sibling branch. Restrained, and named plainly: the approved
+              board said "The other wing", which is a marketing callout for
+              something that is simply the other half of the product. ---- */}
+      <section className="ph-sibling">
+        <Link to="/anatomy">
+          <span className="ph-sibling-label">Explore Anatomy</span>
+          <span className="ph-sibling-blurb">
+            Cross-sectional and projectional anatomy, learned by region and by modality.
+          </span>
+          <span aria-hidden="true">→</span>
+        </Link>
       </section>
-
-      {/* Secondary. The fact bank and the cinematic tour are worth reaching
-          and are not peers of the three destinations above — putting them
-          there would say the branch has ten equal parts when it has three. */}
-      <section className="ph-secondary" aria-label="Also in Physics">
-        <Link to="/fact-bank">Fact bank</Link>
-        <Link to="/ultrasound-lab/facts">Ultrasound facts</Link>
-        <Link to="/mri-lab/motion">MRI in motion</Link>
-        <Link to="/ultrasound-lab/motion">Ultrasound in motion</Link>
-        <Link to="/study-plan">Six-week plan</Link>
-        <Link to="/adrenal-adenoma">Adrenal adenoma tool</Link>
-      </section>
-
-      <footer className="ph-foot">
-        <p>
-          The physics of the First FRCR in {QB_TOTALS.questions} questions and{' '}
-          {QB_TOTALS.stems.toLocaleString('en-GB')} stems.
-        </p>
-        <Link to="/physics/tour">See what RadioPass Physics does &rarr;</Link>
-      </footer>
     </main>
+    </Shell>
   )
 }
 
 /* ------------------------------------------------------------------ *
- * The instrument marks
- *
- * One emblem per course part, drawn in the modality's own colour and in the
- * same thin-stroke vocabulary as the laboratory card art: a wiggle for the
- * photon, the tube–patient–detector triangle, the gantry ring, the gamma
- * dot grid, the precession cone, the wave, the trefoil. The mark is the
- * physics, compressed — not decoration.
+ * The topic marks — one line drawing per topic.
  * ------------------------------------------------------------------ */
 
 function PartMark({ id }: { id: string }) {
@@ -590,6 +464,37 @@ function PartMark({ id }: { id: string }) {
           <path d="M24 11 L24 36" opacity=".25" />
           <ellipse cx="24" cy="26" rx="7" ry="4.5" opacity=".45" />
           <path d="M10 40 L38 40" strokeWidth="2.2" opacity=".8" />
+        </svg>
+      )
+    case 'digital': // the panel: photons landing on a pixel matrix
+      return (
+        <svg {...common} style={{ color: 'var(--hue-xray)' }}>
+          <path d="M14 6 L14 15 M24 6 L24 15 M34 6 L34 15" opacity=".45" />
+          <rect x="8" y="18" width="32" height="22" opacity=".8" />
+          <path d="M18 18 L18 40 M28 18 L28 40 M8 26 L40 26 M8 33 L40 33" opacity=".3" />
+          <circle cx="24" cy="22" r="1.6" style={focal} stroke="none" opacity=".9" />
+        </svg>
+      )
+    case 'fluoro': // the live chain: tube, patient, intensifier, screen
+      return (
+        <svg {...common} style={{ color: 'var(--hue-xray)' }}>
+          <circle cx="9" cy="24" r="3" style={focal} stroke="none" opacity=".9" />
+          <path d="M12 24 L22 18 M12 24 L22 30" opacity=".5" />
+          <ellipse cx="26" cy="24" rx="4" ry="7" opacity=".45" />
+          {/* the intensifier: wide in, narrow out — the minification that
+              buys its brightness */}
+          <path d="M31 15 L31 33 L41 28 L41 20 Z" opacity=".8" />
+        </svg>
+      )
+    case 'mammo': // compression: two plates, the tissue spread between them
+      return (
+        <svg {...common} style={{ color: 'var(--hue-xray)' }}>
+          <circle cx="24" cy="7" r="2.6" style={focal} stroke="none" opacity=".9" />
+          <path d="M24 10 L14 19 M24 10 L34 19" opacity=".45" />
+          <path d="M10 21 L38 21" strokeWidth="2" opacity=".8" />
+          <path d="M10 31 L38 31" strokeWidth="2" opacity=".8" />
+          {/* flattened, not round — the whole point of the machine */}
+          <ellipse cx="24" cy="26" rx="11" ry="3.6" opacity=".5" />
         </svg>
       )
     case 'ct': // the gantry: ring, patient, tube on the ring

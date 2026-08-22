@@ -269,6 +269,7 @@ export function trailFor(pathname: string): { label: string; to: string }[] {
  */
 export const MIGRATED: string[] = [
   '/_shell',
+  '/physics',
 ]
 
 /** True when this pathname already brings the new shell with it. */
