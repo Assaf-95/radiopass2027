@@ -34,7 +34,12 @@ const APP = join(fileURLToPath(new URL('.', import.meta.url)), '..')
 const DEPLOY = join(APP, 'deploy')
 
 const argv = process.argv.slice(2)
-const project = argv[argv.indexOf('--project') + 1] || 'radiopass-preview'
+/* radiopass-staging, not radiopass-preview. The old project's edge cache
+   still holds an asset from before the content partition — 1 MB of marked
+   answers, pinned by our own `immutable, max-age=31536000` header, on a
+   pages.dev hostname whose zone we do not own and therefore cannot purge.
+   Retiring the hostname is the only way to retract it. */
+const project = argv[argv.indexOf('--project') + 1] || 'radiopass-staging'
 
 if (!existsSync(DEPLOY)) {
   console.error('✗ deploy/ does not exist. Run `npm run package` first.')
