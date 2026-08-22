@@ -20,6 +20,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { applyQbOverlay, loadQbOverlay, qbOverlayRev, subscribeQbOverlay } from './overlay'
+import { usePremiumOne } from '../lib/usePremium'
 import { Link } from 'react-router-dom'
 
 import { HighYield } from '../design/primitives'
@@ -113,7 +114,11 @@ export function QuestionCard({
   useEffect(() => {
     void loadQbOverlay()
   }, [])
-  const question = applyQbOverlay(bundledQuestion)
+  /* Paid questions ship without their five statements; an entitled learner
+     gets them back from the server here. The overlay (the owner's wording
+     edits) is applied AFTER, so an edit still wins over what was fetched. */
+  const { item: hydrated } = usePremiumOne('question', bundledQuestion as never)
+  const question = applyQbOverlay((hydrated ?? bundledQuestion) as never)
   // A previously submitted question comes back exactly as it was left: the
   // candidate's own ticks, already marked. Submission is final, so this is a
   // read-only replay rather than a fresh sheet — a mark you have taken should

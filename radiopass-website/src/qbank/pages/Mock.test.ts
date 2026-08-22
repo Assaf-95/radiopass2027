@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { markPaper } from './Mock'
-import { QB_QUESTIONS } from '../data'
+import { QB_QUESTIONS_FULL as QB_QUESTIONS } from '../data/full'
 import { MOCK_PAPERS } from '../data/mocks'
 import type { QbQuestion } from '../types'
 

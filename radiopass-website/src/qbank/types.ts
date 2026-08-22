@@ -29,6 +29,13 @@ export type QbTopic =
 
 export type QbQuestion = {
   id: string
+  /** True when the statements are withheld from the bundle and must be fetched
+   *  through the premium-content function after an entitlement check. */
+  premium?: boolean
+  /** How many statements this question has, even while they are withheld. A
+   *  count is not content, and without it the bank advertises itself as
+   *  empty to the visitor being asked to buy it. */
+  stemCount?: number
   title: string
   topic: QbTopic
   /**

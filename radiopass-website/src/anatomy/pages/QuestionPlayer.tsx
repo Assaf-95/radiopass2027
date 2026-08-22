@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { SectionId, GradedQuestion, QuestionProgress } from '../types';
 import { getSectionMeta, getSectionQuestions } from '../data/sections';
+import { usePremiumOne } from '../../lib/usePremium';
 import { isAdmin } from '../lib/admin';
 import { assetUrl } from '../lib/assetUrl';
 import { gradeAnswer, overallResult } from '../lib/grading';
@@ -20,7 +21,14 @@ export default function QuestionPlayer() {
   const questions = useMemo(() => getSectionQuestions(section), [section]);
   const meta = getSectionMeta(section);
   const index = questions.findIndex((q) => q.id === questionId);
-  const question = questions[index];
+  /* The bundle carries this question's stem and film but, if it is paid, none
+     of its answers — that is what keeps the bank off a CDN. For a learner who
+     is entitled, the answers come back from the server here and the rest of
+     this component never knows the difference. For one who is not, they simply
+     do not arrive, and the marking below has nothing to mark against, which is
+     the correct outcome rather than a lenient one. */
+  const bundledQuestion = questions[index];
+  const { item: question } = usePremiumOne('case', bundledQuestion);
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<GradedQuestion | null>(null);

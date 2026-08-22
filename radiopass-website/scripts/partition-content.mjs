@@ -69,11 +69,57 @@ for (const name of ANATOMY) {
   if (WRITE) writeFileSync(path.replace('.json', '.public.json'), JSON.stringify(out))
 }
 
+/* ---- physics -------------------------------------------------------------
+   A physics question is a stem plus five statements, and the statements carry
+   the true/false value and the explanation — which is the whole of what is
+   being sold. The question keeps its id, heading and stem in the bundle so a
+   locked card can still be rendered with its title; the statements leave. */
+/* recall.json is NOT questions — it is per-question metadata (year,
+   visualTags, sourceQuestionId) recovered from an archive and not derivable
+   from anything else. Partitioning it produced a file with a bogus `questions`
+   key and broke five test files. It stays whole. */
+const PHYS = ['questions.base.json', 'extracted.json']
+const freePhys = new Set(FREE.physics ?? [])
+let physFree = 0, physPaid = 0
+
+for (const file of PHYS) {
+  const path = join(APP, 'src/qbank/data', file)
+  if (!existsSync(path)) continue
+  const raw = JSON.parse(readFileSync(path, 'utf8'))
+  const list = Array.isArray(raw) ? raw : raw.questions ?? []
+  const out = list.map((q) => {
+    if (freePhys.has(q.id)) { physFree++; return q }
+    const stripped = { ...q }
+    const paid = {}
+    if (stripped.stems) {
+      paid.stems = stripped.stems
+      /* The COUNT stays, because a count is not content. Without it the site
+         advertises "25 statements" instead of 1,495 — the bank looks empty to
+         the very visitor being asked to buy it. */
+      stripped.stemCount = stripped.stems.length
+      delete stripped.stems
+    }
+    if (stripped.keyPoint) { paid.keyPoint = stripped.keyPoint; delete stripped.keyPoint }
+    if (Object.keys(paid).length) {
+      premium.push({ content_id: q.id, kind: 'question', body: paid })
+      physPaid++
+    }
+    stripped.premium = true
+    return stripped
+  })
+  if (WRITE) {
+    const shaped = Array.isArray(raw) ? out : { ...raw, questions: out }
+    writeFileSync(path.replace('.json', '.public.json'), JSON.stringify(shaped))
+  }
+}
+
 console.log('\nContent partition')
 console.log('─'.repeat(52))
 console.log(`  free, bundled whole      ${freeKept}`)
 console.log(`  paid, answers withheld   ${withheld}`)
 console.log(`  paid, shell still bundled ${bundled}`)
+console.log(`  physics free             ${physFree}`)
+console.log(`  physics paid, withheld   ${physPaid}`)
 console.log(`  rows for premium_content ${premium.length}`)
 
 if (WRITE) {

@@ -10,7 +10,7 @@
     "preview": "./node_modules/.bin/vite preview",
     "test": "bash scripts/run-tests.sh run",
     "test:watch": "bash scripts/run-tests.sh",
-    "package": "node scripts/package.mjs",
+    "package": "node scripts/partition-content.mjs --write && node scripts/package.mjs && node scripts/assert-no-premium-in-bundle.mjs",
     "anatomy:verify": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts",
     "anatomy:baseline": "node --import ./scripts/ts-register.mjs scripts/anatomy-mapping.ts --write",
     "physics:shape": "node scripts/physics-shape-validate.mjs",

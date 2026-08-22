@@ -8,7 +8,9 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { QB_QUESTIONS, QB_TOTALS, subjectCounts } from './data'
+import { QB_TOTALS, subjectCounts } from './data'
+/* The authored bank: these assert what was WRITTEN, not what ships. */
+import { QB_QUESTIONS_FULL as QB_QUESTIONS } from './data/full'
 import { labLinkFor, QB_SUBJECTS } from './types'
 
 const VALID_TOPICS = new Set(

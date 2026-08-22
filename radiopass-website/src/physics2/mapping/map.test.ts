@@ -14,7 +14,7 @@ import '../../mri/test/setup'
 
 import { describe, expect, it } from 'vitest'
 
-import { QB_QUESTIONS } from '../../qbank/data'
+import { QB_QUESTIONS_FULL as QB_QUESTIONS } from '../../qbank/data/full'
 import { V2_TOPICS } from '../topics'
 import { SECTIONS, TOPIC_POOLS, sectionList } from './sections'
 import { CONCEPTS } from './concepts'

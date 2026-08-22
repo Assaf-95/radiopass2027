@@ -85,7 +85,23 @@ Deno.serve(async (req) => {
       await admin.from('stripe_customers').insert({ user_id: user.id, stripe_customer_id: customerId })
     }
 
-    const site = Deno.env.get('SITE_URL') ?? ''
+    /* WHERE THE CUSTOMER COMES BACK TO.
+     *
+     * Derived from the request's Origin, checked against an allowlist — NOT
+     * from a single SITE_URL. A shared SITE_URL is one setting for two
+     * environments: pointing it at the preview so a staging test lands
+     * correctly silently sends every PRODUCTION customer to the preview after
+     * paying. They are charged, the webhook grants access on the real site,
+     * and they are dropped on a URL that means nothing to them.
+     *
+     * The allowlist is what stops the Origin header being a redirect the
+     * caller chooses. An unrecognised origin falls back to the configured
+     * site rather than being honoured. */
+    const ALLOWED = (Deno.env.get('ALLOWED_ORIGINS') ?? '')
+      .split(',').map((o) => o.trim()).filter(Boolean)
+    const origin = req.headers.get('origin') ?? ''
+    const site = ALLOWED.includes(origin) ? origin : (Deno.env.get('SITE_URL') ?? '')
+    if (!site) return json({ error: 'No return URL is configured.' }, 500)
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer: customerId,
