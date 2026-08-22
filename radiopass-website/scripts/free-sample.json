@@ -1,0 +1,12 @@
+{
+  "_comment": "Ids that stay in the bundle and are readable without an account. Everything not listed here is paid and has its answers withheld. Physics ids come from TRIAL in src/lib/access.ts.",
+  "physics": ["x57", "b417", "b415", "x53", "b385"],
+  "anatomy": {
+    "spine": [],
+    "upperLimb": [],
+    "lowerLimb": [],
+    "thorax": [],
+    "headNeck": [],
+    "abdoPelvis": []
+  }
+}
