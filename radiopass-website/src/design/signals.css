@@ -11,7 +11,7 @@
 .rp-sig-axis { stroke: var(--hairline-lit); stroke-dasharray: 2 4; }
 .rp-sig-axishead { fill: none; stroke: var(--hairline-lit); stroke-width: 1.2; }
 .rp-sig-label {
-  font-family: var(--font-body); font-size: 7.5px; font-weight: 600;
+  font-family: var(--font-body); font-size: 10px; font-weight: 600;
   fill: var(--text-dim); letter-spacing: 0.06em;
 }
 

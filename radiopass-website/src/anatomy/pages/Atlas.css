@@ -177,8 +177,8 @@
   line-height: 1.15;
 }
 .rp-anatomy .chapter-blurb { color: var(--text-dim); font-size: 13.5px; line-height: 1.55; }
-.rp-anatomy .chapter-figures { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; }
-.rp-anatomy .chapter-cover-note { font-size: 10.5px; color: var(--text-faint); opacity: 0.65; }
+.rp-anatomy .chapter-figures { font-size: 12.5px; color: var(--text-faint); margin-top: 4px; }
+.rp-anatomy .chapter-cover-note { font-size: 12.5px; color: var(--text-faint); opacity: 0.65; }
 /* --- Controls ------------------------------------------------------------ */
 .rp-anatomy .atlas-controls {
   display: flex;
@@ -270,7 +270,7 @@
 .rp-anatomy .sc-name { font-size: 15px; line-height: 1.3; }
 .rp-anatomy .sc-count { font-size: 11px; color: var(--text-faint); }
 .rp-anatomy .sc-mods { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.rp-anatomy .sc-mods .pill { font-size: 9.5px; padding: 2px 6px; }
+.rp-anatomy .sc-mods .pill { font-size: 12px; padding: 2px 6px; }
 .rp-anatomy .atlas-empty {
   grid-column: 1 / -1;
   color: var(--text-dim);
@@ -373,7 +373,7 @@
   padding-top: 12px;
   border-top: 1px solid var(--line);
 }
-.rp-anatomy .film-legend-head { font-size: 9.5px; letter-spacing: 0.24em; }
+.rp-anatomy .film-legend-head { font-size: 11px; letter-spacing: 0.24em; }
 .rp-anatomy .film-legend-head::before { width: 14px; margin-right: 8px; }
 .rp-anatomy .film-legend-list { list-style: none; margin: 9px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
 .rp-anatomy .film-legend-list li {
@@ -389,7 +389,7 @@
 .rp-anatomy .film-legend-list li.is-current .legend-name { color: var(--text); }
 .rp-anatomy .legend-tag {
   margin-left: 8px;
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--amber-accent);

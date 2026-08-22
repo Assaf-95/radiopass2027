@@ -36,7 +36,7 @@
 .rp-anatomy .far-rule {
   position: absolute;
   right: 3vw;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.3em;
   color: rgba(139, 146, 155, 0.22);
 }
@@ -63,7 +63,7 @@
   position: absolute;
   top: 6px;
   right: 8px;
-  font-size: 8.5px;
+  font-size: 10px;
   letter-spacing: 0.18em;
   color: rgba(214, 230, 242, 0.6);
 }
@@ -186,7 +186,7 @@
   opacity: 0;
 }
 .rp-anatomy .journey-name .mono {
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(217, 168, 78, 0.9);
 }
 /* Legibility wash on the copy side only. */
@@ -232,7 +232,7 @@
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .rp-anatomy .journey-chip:hover { border-color: var(--amber-accent); color: #ffffff; background: rgba(217, 168, 78, 0.08); }
-.rp-anatomy .journey-chip .mono { font-size: 10px; color: rgba(217, 168, 78, 0.9); }
+.rp-anatomy .journey-chip .mono { font-size: 11px; color: rgba(217, 168, 78, 0.9); }
 .rp-anatomy .journey-skip {
   display: inline-block;
   margin-top: 22px;

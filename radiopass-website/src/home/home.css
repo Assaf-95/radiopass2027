@@ -372,7 +372,7 @@
 /* SVG user units, not CSS pixels: this text is inside a scaled viewBox, so the
    number is diagram geometry — changing it would move the label off its axis
    rather than make it bigger. Same for every fill-based label below. */
-.hm-svg-note { fill: var(--hm-mut); font-size: 10px; font-family: var(--hm-sans); }
+.hm-svg-note { fill: var(--hm-mut); font-size: 11px; font-family: var(--hm-sans); }
 .hm-svg-note.amber { fill: var(--hm-amber); }
 .hm-svg-ray { stroke: rgba(168, 203, 234, 0.4); stroke-width: 1; }
 .hm-svg-penumbra { fill: rgba(217, 168, 78, 0.22); stroke: none; }
@@ -737,7 +737,7 @@
    roughly 9px on screen; it is part of the diagram's geometry and moves with
    it, which is why it is not a token. */
 .hm-sig2-label {
-  font-family: var(--hm-sans); font-size: 7.5px; font-weight: 600;
+  font-family: var(--hm-sans); font-size: 10px; font-weight: 600;
   fill: rgba(242, 238, 230, 0.5); letter-spacing: 0.06em;
 }
 
@@ -765,7 +765,7 @@
 .in-view .hm-sig2-photon { animation: hm-fadein 0.4s ease forwards 1.7s; }
 /* Also SVG user units — the γ symbol on the emitted photon. */
 .hm-sig2-label-gamma {
-  font-family: var(--hm-serif); font-style: italic; font-size: 10px;
+  font-family: var(--hm-serif); font-style: italic; font-size: 11px;
   fill: var(--hm-amber); opacity: 0;
 }
 .in-view .hm-sig2-label-gamma { animation: hm-fadein 0.4s ease forwards 1.9s; }

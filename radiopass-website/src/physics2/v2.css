@@ -225,7 +225,7 @@
 .v2-resume small {
   display: block;
   font-family: var(--v2-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--v2-ink-3);
@@ -276,7 +276,7 @@
 .v2-topicrow p { margin: 3px 0 0; font-size: 15px; line-height: 1.5; color: var(--v2-ink-2); max-width: 56ch; }
 .v2-topicrow .st { justify-self: end; text-align: right; min-width: 130px; }
 .v2-topicrow .st b { font-family: var(--v2-mono); font-weight: 500; font-size: 12.5px; color: var(--v2-ink-2); }
-.v2-topicrow .st small { display: block; font-size: 11.5px; color: var(--v2-ink-3); margin-top: 2px; }
+.v2-topicrow .st small { display: block; font-size: 12px; color: var(--v2-ink-3); margin-top: 2px; }
 
 .v2-meter {
   height: 3px;
@@ -473,7 +473,7 @@
   border-bottom: 1px solid var(--v2-film-line);
 }
 .v2-plate-bar strong { font-size: 13px; font-weight: 550; letter-spacing: 0.01em; color: var(--v2-film-text); }
-.v2-plate-bar span { font-family: var(--v2-mono); font-size: 11.5px; color: var(--v2-bronze-bright); white-space: nowrap; }
+.v2-plate-bar span { font-family: var(--v2-mono); font-size: 12.5px; color: var(--v2-bronze-bright); white-space: nowrap; }
 .v2-plate-stage { position: relative; }
 .v2-plate-stage iframe { display: block; width: 100%; border: 0; background: var(--v2-film); }
 .v2-plate-stage .v2-plate-mount { padding: 6px 10px 10px; }
@@ -665,7 +665,7 @@
 
 .v2-verdict { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 1px; text-align: right; }
 .v2-verdict b { font-size: 13px; font-weight: 600; }
-.v2-verdict small { font-size: 11.5px; color: var(--v2-ink-3); }
+.v2-verdict small { font-size: 12px; color: var(--v2-ink-3); }
 .v2-verdict.ok b { color: var(--v2-green); }
 .v2-verdict.no b { color: var(--v2-red); }
 
@@ -720,7 +720,7 @@
 .v2-concept small {
   display: block;
   font-family: var(--v2-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--v2-bronze);
@@ -862,7 +862,7 @@
   background: transparent;
   color: var(--v2-film-dim);
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 500;
   padding: 5px 11px;
   min-height: 30px;

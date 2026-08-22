@@ -40,7 +40,7 @@
 
 .v2-aw-principle small {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--aw-accent);
@@ -92,7 +92,7 @@
 }
 
 .v2-aw-table th {
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 600;

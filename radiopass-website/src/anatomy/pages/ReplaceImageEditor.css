@@ -48,7 +48,7 @@
 .rp-anatomy .rie-field textarea { width: 100%; resize: vertical; }
 .rp-anatomy .rie-answers h2 { font-size: 15px; display: flex; align-items: center; gap: 10px; }
 .rp-anatomy .rie-lock {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--amber); border: 1px solid var(--amber);
   border-radius: 4px; padding: 2px 6px; font-weight: 500;
 }
@@ -66,7 +66,7 @@
 .rp-anatomy .rie-pick { flex: 1 1 60%; min-width: 0; display: flex; align-items: flex-start; gap: 10px; background: none; border: 0; text-align: left; cursor: pointer; color: var(--text); padding: 4px; }
 .rp-anatomy .rie-letter { font-family: var(--font-mono); font-weight: 700; color: var(--teal-bright); min-width: 16px; }
 .rp-anatomy .rie-text { font-size: 13px; }
-.rp-anatomy .rie-flag { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; color: var(--amber); }
+.rp-anatomy .rie-flag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--amber); }
 .rp-anatomy .rie-remove { background: none; border: 1px solid var(--line-strong); color: var(--text-dim); border-radius: 4px; font-size: 11px; padding: 4px 8px; cursor: pointer; }
 .rp-anatomy .rie-remove:hover { border-color: var(--red); color: var(--red); }
 .rp-anatomy .rie-preserved { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; }
@@ -279,7 +279,7 @@
 .rp-anatomy .rie-dial { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-faint); }
 .rp-anatomy .rie-dial span { font-size:13px; }
 .rp-anatomy .rie-dial input[type=range] { width:82px; }
-.rp-anatomy .rie-dial b { font-family:var(--font-mono); font-size:10.5px; min-width:34px; color:var(--text-dim); }
+.rp-anatomy .rie-dial b { font-family:var(--font-mono); font-size:11px; min-width:34px; color:var(--text-dim); }
 .rp-anatomy .rie-colours { display:flex; gap:4px; }
 .rp-anatomy .rie-colour { width:16px; height:16px; border-radius:999px; border:1px solid rgba(242,238,230,.35); cursor:pointer; padding:0; }
 .rp-anatomy .rie-colour-white {background:#fff}
@@ -403,7 +403,7 @@
   display: block;
   margin-bottom: 4px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-faint);

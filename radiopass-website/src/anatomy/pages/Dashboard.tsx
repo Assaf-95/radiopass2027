@@ -79,6 +79,11 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Ten columns cannot fit a phone. The table keeps its shape and
+          scrolls inside its own box, so the PAGE never scrolls sideways —
+          previously the document was 779px wide in a 390px viewport, which
+          moves the whole layout under the reader's thumb. */}
+      <div className="dash-table-scroll">
       <table className="dash-table">
         <thead>
           <tr>
@@ -102,6 +107,7 @@ export default function Dashboard() {
           ))}
         </tbody>
       </table>
+      </div>
 
       <div className="dash-danger">
         {!confirmReset ? (

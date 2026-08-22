@@ -57,7 +57,7 @@
   letter-spacing: -0.02em;
 }
 .rp-anatomy .stat-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-faint);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -166,7 +166,7 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--red);
 }
 .rp-anatomy .empty-state {

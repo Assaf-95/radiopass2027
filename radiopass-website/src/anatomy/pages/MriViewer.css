@@ -37,7 +37,7 @@
 }
 .rp-anatomy .mri-ident { display: flex; flex-direction: column; gap: 1px; margin-right: auto; }
 .rp-anatomy .mri-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
-.rp-anatomy .mri-sub { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6d7d90; }
+.rp-anatomy .mri-sub { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6d7d90; }
 .rp-anatomy .mri-modes { display: flex; align-items: center; gap: 8px; position: relative; }
 .rp-anatomy .rpa-mri-select, .rp-anatomy .mri-input, .rp-anatomy .mri-search {
   background: #151c26;
@@ -99,7 +99,7 @@
 .rp-anatomy .mri-side { border-left: 1px solid rgba(140, 175, 200, 0.12); }
 .rp-anatomy .mri-h {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -187,14 +187,14 @@
 .rp-anatomy .mri-label-left { text-align: right; }
 .rp-anatomy .mri-label:hover, .rp-anatomy .mri-label.is-on { color: #fff; border-color: var(--teal); background: rgba(17, 183, 178, 0.16); }
 .rp-anatomy .mri-label:focus-visible { outline: 2px solid var(--teal-bright); outline-offset: 2px; }
-.rp-anatomy .mri-conf { margin-left: 4px; color: #ffb84d; font-size: 10px; vertical-align: super; }
+.rp-anatomy .mri-conf { margin-left: 4px; color: #ffb84d; font-size: 11px; vertical-align: super; }
 /* --- Corner readouts ------------------------------------------------------ */
 .rp-anatomy .mri-hud {
   position: absolute;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(160, 180, 200, 0.6);
@@ -206,7 +206,7 @@
 .rp-anatomy .mri-card { position: relative; }
 .rp-anatomy .mri-card h2 { font-family: var(--font-display); font-size: 20px; letter-spacing: -0.03em; margin: 4px 0 14px; }
 .rp-anatomy .mri-card p { font-size: 13px; line-height: 1.6; color: #a8b6c6; margin: 0 0 14px; }
-.rp-anatomy .mri-cat { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal-bright); }
+.rp-anatomy .mri-cat { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal-bright); }
 .rp-anatomy .mri-close {
   position: absolute;
   top: -4px;
@@ -222,7 +222,7 @@
 }
 .rp-anatomy .mri-close:hover { color: #e9eef4; background: #1d2734; }
 .rp-anatomy .mri-facts { margin: 0 0 16px; display: flex; flex-direction: column; gap: 10px; }
-.rp-anatomy .mri-facts dt { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d7d90; }
+.rp-anatomy .mri-facts dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d7d90; }
 .rp-anatomy .mri-facts dd { margin: 3px 0 0; font-size: 12.5px; line-height: 1.5; color: #cfdcea; }
 .rp-anatomy .rpa-mri-legend ul, .rp-anatomy .mri-missed ul { list-style: none; margin: 0; padding: 0; }
 .rp-anatomy .rpa-mri-legend li button {
@@ -240,9 +240,9 @@
   cursor: pointer;
 }
 .rp-anatomy .rpa-mri-legend li button:hover { background: #1a222d; color: #fff; }
-.rp-anatomy .rpa-mri-legend li button .mono { color: #61708190; font-size: 10px; }
+.rp-anatomy .rpa-mri-legend li button .mono { color: #61708190; font-size: 11px; }
 .rp-anatomy .rpa-mri-note { font-size: 11.5px; line-height: 1.6; color: #8496a8; }
-.rp-anatomy .mri-provenance { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(140,175,200,0.12); font-size: 10.5px; line-height: 1.6; color: #61707f; }
+.rp-anatomy .mri-provenance { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(140,175,200,0.12); font-size: 11px; line-height: 1.6; color: #61707f; }
 /* --- Quiz ----------------------------------------------------------------- */
 .rp-anatomy .mri-quiz-q { font-size: 13.5px; margin: 14px 0 10px; color: #cfdcea; }
 .rp-anatomy .mri-choices { display: flex; flex-direction: column; gap: 6px; }
@@ -254,13 +254,13 @@
 .rp-anatomy .mri-verdict p { margin: 6px 0 0; color: #cfdcea; }
 .rp-anatomy .mri-tip { font-size: 12px !important; line-height: 1.55; color: #a8b6c6 !important; }
 .rp-anatomy .mri-score { display: flex; gap: 18px; margin: 16px 0 0; }
-.rp-anatomy .mri-score dt { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d7d90; }
+.rp-anatomy .mri-score dt { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d7d90; }
 .rp-anatomy .mri-score dd { margin: 2px 0 0; font-size: 17px; }
 .rp-anatomy .mri-missed { margin-top: 18px; }
 .rp-anatomy .mri-missed li { font-size: 12px; color: #e0a33f; padding: 3px 0; }
 /* --- Editor --------------------------------------------------------------- */
 .rp-anatomy .mri-edit-fields { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; }
-.rp-anatomy .mri-coords { font-size: 10.5px; color: #6d7d90; margin: 12px 0 8px; }
+.rp-anatomy .mri-coords { font-size: 11px; color: #6d7d90; margin: 12px 0 8px; }
 .rp-anatomy .mri-io { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(140,175,200,0.12); }
 .rp-anatomy .mri-io .btn { cursor: pointer; }
 /* --- Scrubber ------------------------------------------------------------- */
@@ -293,7 +293,7 @@
   .rp-anatomy .rpa-mri-controls, .rp-anatomy .mri-side { border: 0; border-top: 1px solid rgba(140,175,200,0.12); }
   .rp-anatomy .mri-stage { height: 62svh; }
   .rp-anatomy .rpa-mri-canvas { inset: 8px 108px; }
-  .rp-anatomy .mri-label { max-width: 98px; font-size: 10.5px; }
+  .rp-anatomy .mri-label { max-width: 98px; font-size: 11px; }
   .rp-anatomy .mri-search { width: 140px; }
   .rp-anatomy .mri-results { right: 0; }
 }
