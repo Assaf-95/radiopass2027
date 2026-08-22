@@ -464,8 +464,10 @@ function Header() {
             account group beside this nav is already that entry, and having
             both put the same destination in the bar twice. */}
         {user ? (
-          <Link to="/account" className="mobile-login">Your account</Link>
-          <button type="button" className="mobile-login" onClick={logOut}>Log out ({user.email})</button>
+          <>
+            <Link to="/account" className="mobile-login">Your account</Link>
+            <button type="button" className="mobile-login" onClick={logOut}>Log out ({user.email})</button>
+          </>
         ) : (
           <>
             <Link to="/login" className="mobile-login">Log in</Link>
