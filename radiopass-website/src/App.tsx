@@ -8,6 +8,7 @@ import { isMigrated } from './design/archetypes'
 import { ThemeToggle } from './design/theme'
 import { useAuth } from './lib/auth'
 import { supabase } from './lib/supabase'
+import { PLANS, type Plan } from './lib/billing'
 import { hasUnsyncedWork } from './lib/syncedStore'
 
 import './mri/mri.css'
@@ -153,6 +154,7 @@ const PhysicsWordingEditor = lazyImport(() => import('./qbank/pages/WordingEdito
 /* Lazy, like every other admin page: a dashboard nobody but the owner opens
    must not sit in the bundle every candidate downloads. */
 const OwnerDashboard = lazyImport(() => import('./portal/OwnerDashboard'))
+const AccountPage = lazyImport(() => import('./portal/Account'))
 // Mounts only where the /anatomy folder is absent (dev, split hosting): the
 // combined host serves the real folder and this route is never reached. It
 // forwards the whole address — subpath, query, hash — to the live anatomy
@@ -675,14 +677,66 @@ function StudyPlanPage() {
 }
 
 function PricingContent() {
-  const [annual, setAnnual] = useState(true)
-  const plans = [
-    {name:'Starter',desc:'Create a free account — everything on the site today.',monthly:0,annual:0,cta:'Start free',popular:false,comingSoon:false,features:['Every visual lab','The full question bank','All three mock papers','Progress synced to your account']},
-    {name:'Complete',desc:'Full preparation for your FRCR Part 1 Physics sitting.',monthly:29,annual:19,cta:'Coming soon',popular:true,comingSoon:true,features:['Everything in Starter','Six-week adaptive study plan','Weak-area review','Detailed performance dashboard']},
-    {name:'Intensive',desc:'A focused final-month revision sprint.',monthly:49,annual:39,cta:'Coming soon',popular:false,comingSoon:true,features:['Everything in Complete','30-day crash plan','Daily mixed-paper sessions','High-yield trap library','Priority support']},
-  ]
-  return <main><PageHero eyebrow="Simple pricing" title={<>Invest in understanding.<br/><span>Carry it into the exam.</span></>} text="Every lab, the full question bank and every mock paper are free while RadioPass is in early access — create an account and everything here is already yours."><div className="billing-toggle"><button className={!annual?'active':''} onClick={()=>setAnnual(false)}>Monthly</button><button className={annual?'active':''} onClick={()=>setAnnual(true)}>Annual <span>Save 34%</span></button></div></PageHero>
-  <section className="section pricing-section"><div className="container pricing-grid">{plans.map(plan=><article key={plan.name} className={plan.popular?'popular':''}>{plan.popular&&<div className="popular-label">MOST POPULAR</div>}<div className="pricing-head"><h3>{plan.name}</h3><p>{plan.desc}</p><div className="price"><span>£</span><strong>{annual?plan.annual:plan.monthly}</strong><small>{plan.monthly===0?'forever':'/ month'}</small></div>{annual&&plan.monthly>0&&<em>Billed annually</em>}</div>{plan.comingSoon ? <span className="button button-outline is-disabled" aria-disabled="true" title="Not open yet — everything is free for now">{plan.cta}</span> : <Link to="/login" className="button button-dark">{plan.cta}<Icon name="arrow" size={16}/></Link>}<ul>{plan.features.map(f=><li key={f}><Icon name="check" size={17}/>{f}</li>)}</ul></article>)}</div><p className="pricing-note">RadioPass is in early access. Prices above are what Complete and Intensive will cost at launch — nothing is charged today, and creating a free account already unlocks everything on the site.</p></section>
+  /* The cards, their classes and the page around them are unchanged — this is
+     the same design, now selling something. What changed is the axis: three
+     durations instead of a monthly/annual toggle, because RadioPass sells a
+     block of access rather than a subscription that renews itself.
+
+     Prices come from the DATABASE (public_plans), so a change made in Pricing
+     Management shows here without a deploy. PLANS is the fallback for the
+     moment before that answers, and for a build with no backend. */
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [plans, setPlans] = useState<Plan[]>([...PLANS])
+  const [busy, setBusy] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!supabase) return
+    void supabase.rpc('public_plans').then(({ data }) => {
+      if (!Array.isArray(data) || !data.length) return
+      setPlans(
+        (data as Array<Record<string, unknown>>).map((r) => ({
+          id: r.id as Plan['id'],
+          name: r.name as string,
+          months: (r.months as number) ?? null,
+          amountPence: (r.amount_pence as number) ?? 0,
+          currency: 'gbp' as const,
+          purchasable: r.purchasable === true,
+        })),
+      )
+    })
+  }, [])
+
+  async function choose(plan: Plan) {
+    if (!plan.purchasable) { navigate('/login?next=/account'); return }
+    /* Signed out, we send them to sign in FIRST and come back. A purchase has
+       to be attached to an account at the moment it is made — reconciling a
+       payment to a person afterwards, by email, is how money goes missing. */
+    if (!user) { navigate(`/login?next=${encodeURIComponent('/account')}`); return }
+    if (!supabase) return
+    setBusy(plan.id); setErr(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', { body: { planId: plan.id } })
+      if (error) throw new Error(error.message)
+      const url = (data as { url?: string })?.url
+      if (!url) throw new Error('Checkout did not start.')
+      window.location.href = url
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Could not start checkout.')
+      setBusy(null)
+    }
+  }
+
+  const FEATURES: Record<string, string[]> = {
+    free: ['Every free sample lesson', 'Your progress saved for ever', 'Scores, flags and favourites', 'Never expires'],
+    premium_3m: ['Everything in Free', 'The full question bank', 'All three mock papers', 'Every visual lab'],
+    premium_6m: ['Everything in Free', 'The full question bank', 'All three mock papers', 'Every visual lab'],
+    premium_12m: ['Everything in Free', 'The full question bank', 'All three mock papers', 'Every visual lab'],
+  }
+
+  return <main><PageHero eyebrow="Simple pricing" title={<>Invest in understanding.<br/><span>Carry it into the exam.</span></>} text="A free account keeps your progress for ever. Premium opens the full question bank, every mock paper and every lab — for three, six or twelve months."/>
+  <section className="section pricing-section"><div className="container pricing-grid">{plans.map(plan=>{const popular=plan.id==='premium_6m';return <article key={plan.id} className={popular?'popular':''}>{popular&&<div className="popular-label">MOST POPULAR</div>}<div className="pricing-head"><h3>{plan.name}</h3><p>{plan.purchasable?`${plan.months} months of full access.`:'Create an account — yours permanently.'}</p><div className="price"><span>£</span><strong>{Math.round(plan.amountPence/100)}</strong><small>{plan.purchasable?'one payment':'forever'}</small></div>{plan.purchasable&&<em>Access for {plan.months} months</em>}</div><button type="button" className={plan.purchasable?'button button-dark':'button button-outline'} disabled={busy!==null} onClick={()=>void choose(plan)}>{busy===plan.id?'Opening…':plan.purchasable?'Choose':'Start free'}<Icon name="arrow" size={16}/></button><ul>{(FEATURES[plan.id]??[]).map(f=><li key={f}><Icon name="check" size={17}/>{f}</li>)}</ul></article>})}</div>{err&&<p className="pricing-note" role="alert">{err}</p>}<p className="pricing-note">Payment is handled by Stripe; RadioPass never sees your card details. Buying more time while you still have some adds to it — you never lose days you have paid for.</p></section>
   <section className="section surface-section"><div className="container"><SectionHeading centre eyebrow="Common questions" title={<>Everything you need to <span>decide.</span></>}/><FAQ/></div></section><CTA/></main>
 }
 
@@ -846,7 +900,7 @@ function InfoPage({ type }: { type: 'about'|'privacy'|'terms' }) {
 function NotFound() { return <main><PageHero eyebrow="404" title={<>That page is outside<br/><span>the scan range.</span></>} text="The page you requested could not be found."><Link to="/" className="button button-primary">Return home <Icon name="arrow" size={17}/></Link></PageHero></main> }
 
 function App() {
-  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/admin/dashboard" element={<OwnerDashboard/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/_shell" element={<ShellPreview/>}/>
+  return <><ScrollToTop/><Header/><RouteErrorBoundary><Suspense fallback={<MriLoading/>}><Routes><Route path="/" element={<Portal/>}/><Route path="/physics" element={<PhysicsHome/>}/><Route path="/physics/tour" element={<HomePage/>}/><Route path="/admin" element={<AdminConsole/>}/><Route path="/admin/questions" element={<PhysicsWordingEditor/>}/><Route path="/admin/dashboard" element={<OwnerDashboard/>}/><Route path="/account" element={<AccountPage/>}/><Route path="/anatomy/*" element={<AnatomyRoutes/>}/><Route path="/adrenal-adenoma" element={<AdrenalAdenomaTool/>}/><Route path="/_shell" element={<ShellPreview/>}/>
     {/* RADIOPASS PHYSICS. The dashboard above, the course engine here.
         Paths are written out rather than built from PHYSICS_ROOT on purpose:
         this table is the definition of what exists, labLink.test.ts reads it

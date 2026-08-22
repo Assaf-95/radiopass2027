@@ -11,33 +11,49 @@
    comment points here. Nothing in this file grants anything.
    =========================================================================== */
 
-export type PlanId = 'premium_3m' | 'premium_6m' | 'premium_12m'
+export type PlanId = 'free' | 'premium_3m' | 'premium_6m' | 'premium_12m'
 
 export type Plan = {
   id: PlanId
   name: string
-  months: number
+  /** NULL means it does not expire. That is what `free` is. */
+  months: number | null
   amountPence: number
   currency: 'gbp'
-  /** Filled from the database; null until the price exists in Stripe. */
-  stripePriceId?: string | null
+  /** Free is a state, not a purchase, and must never reach checkout. */
+  purchasable: boolean
 }
 
 /**
- * The catalogue, as the interface knows it.
+ * The catalogue as a FALLBACK, not as the truth.
  *
- * Mirrors public.plans. The database is authoritative — a checkout session is
- * priced from the Stripe price id stored THERE, never from this file, so a
- * stale copy here can misdescribe a price but can never charge a wrong one.
+ * The live list comes from public_plans() so a price changed in Pricing
+ * Management shows immediately, with no deploy. These values are what renders
+ * before that answers, and on a build with no backend at all.
+ *
+ * A stale copy here can misdescribe a price; it can never charge one. The
+ * checkout session is priced from the Stripe price id stored in the database,
+ * so the worst case is a card that says the wrong number, not a card that
+ * takes the wrong money.
+ *
+ * `free` is in the list deliberately. It is a plan somebody permanently
+ * holds — it saves progress, keeps history, and is where a lapsed subscriber
+ * returns to — not the absence of one.
  */
 export const PLANS: readonly Plan[] = [
-  { id: 'premium_3m', name: '3 months', months: 3, amountPence: 4900, currency: 'gbp' },
-  { id: 'premium_6m', name: '6 months', months: 6, amountPence: 8900, currency: 'gbp' },
-  { id: 'premium_12m', name: '12 months', months: 12, amountPence: 14900, currency: 'gbp' },
+  { id: 'free', name: 'Free', months: null, amountPence: 0, currency: 'gbp', purchasable: false },
+  { id: 'premium_3m', name: '3 months', months: 3, amountPence: 4000, currency: 'gbp', purchasable: true },
+  { id: 'premium_6m', name: '6 months', months: 6, amountPence: 7000, currency: 'gbp', purchasable: true },
+  { id: 'premium_12m', name: '12 months', months: 12, amountPence: 12000, currency: 'gbp', purchasable: true },
 ]
 
 export function planById(id: string): Plan | undefined {
   return PLANS.find((p) => p.id === id)
+}
+
+/** The plans somebody can actually buy. */
+export function purchasablePlans(plans: readonly Plan[] = PLANS): readonly Plan[] {
+  return plans.filter((p) => p.purchasable)
 }
 
 /**

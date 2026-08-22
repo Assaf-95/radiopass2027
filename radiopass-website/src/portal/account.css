@@ -1,0 +1,51 @@
+/* The account page. Uses the shared tokens so it reads as part of the site
+   rather than a bolted-on billing screen. */
+
+.acct {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 32px) 72px;
+  font-family: var(--rp-sans, system-ui, sans-serif);
+  color: var(--rp-ink, #e8ecf1);
+}
+.acct h1 { font-family: var(--rp-serif, Georgia, serif); font-weight: 300; font-size: clamp(28px, 3.4vw, 38px); margin: 0 0 4px; }
+.acct h2 { font-family: var(--rp-serif, Georgia, serif); font-weight: 400; font-size: 18px; margin: 0 0 12px; }
+.acct-email { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 13px; color: var(--rp-ink-3, #8fa3bc); margin: 0 0 28px; }
+.acct-muted { color: var(--rp-ink-2, #c8d3e0); font-size: 14px; line-height: 1.65; margin: 12px 0 0; }
+.acct-fineprint { color: var(--rp-ink-3, #8fa3bc); font-size: 12px; line-height: 1.6; margin-top: 14px; }
+
+.acct-card { padding: 20px; border: 1px solid var(--rp-line, rgba(255,255,255,0.10)); border-radius: 12px; background: var(--rp-raised, rgba(255,255,255,0.02)); margin-bottom: 16px; }
+
+.acct-state { font-size: 22px; font-weight: 300; margin: 0; }
+.acct-state-on { color: var(--rp-cyan, #5dcfdf); }
+
+.acct-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0 0; }
+.acct-facts dt { font-family: var(--rp-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rp-ink-3, #8fa3bc); }
+.acct-facts dd { margin: 4px 0 0; font-size: 15px; }
+
+.acct-note, .acct-warn { padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; margin: 0 0 18px; }
+.acct-note { background: rgba(93, 207, 223, 0.10); border: 1px solid rgba(93, 207, 223, 0.35); }
+.acct-warn { background: rgba(224, 163, 63, 0.12); border: 1px solid rgba(224, 163, 63, 0.42); }
+
+.acct-plans { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.acct-plans li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--rp-line, rgba(255,255,255,0.10)); border-radius: 10px; }
+.acct-plan-name { font-size: 15px; }
+.acct-plan-price { font-size: 15px; font-variant-numeric: tabular-nums; color: var(--rp-ink-2, #c8d3e0); }
+
+/* 44px minimum so a thumb can hit it. */
+.acct-buy {
+  min-height: 44px; padding: 0 18px; border-radius: 8px; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 500;
+  background: var(--rp-cyan, #5dcfdf); color: #030A18; border: 1px solid transparent;
+}
+.acct-buy:hover:not(:disabled) { background: #7ad9e7; }
+.acct-buy:disabled { opacity: 0.55; cursor: default; }
+[data-theme='light'] .acct-buy { background: #14657a; color: #fff; }
+
+.acct-link { background: none; border: 0; padding: 0 4px; color: var(--rp-cyan, #5dcfdf); cursor: pointer; font: inherit; text-decoration: underline; }
+
+@media (max-width: 520px) {
+  .acct-plans li { grid-template-columns: 1fr auto; }
+  .acct-buy { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { .acct * { transition: none !important; } }

@@ -24,14 +24,22 @@
 -- without a single line of access logic moving.
 -- ---------------------------------------------------------------------
 create table if not exists public.plans (
-  id                text primary key,           -- 'premium_3m'
-  name              text not null,              -- '3 months'
-  months            integer not null check (months > 0),
-  amount_pence      integer not null check (amount_pence >= 0),
+  id                text primary key,           -- 'free', 'premium_3m'
+  name              text not null,
+  -- NULL months means "does not expire". That is what makes `free` a real
+  -- plan rather than the absence of one: a free account is a state somebody
+  -- is permanently in, not a gap between purchases.
+  months            integer check (months is null or months > 0),
+  amount_pence      integer not null default 0 check (amount_pence >= 0),
   currency          text not null default 'gbp',
-  stripe_price_id   text unique,                -- null until created in Stripe
+  -- The CURRENT Stripe price. History lives in plan_prices, because a price
+  -- that has ever been charged must remain resolvable for old transactions.
+  stripe_price_id   text unique,
   branch            text not null default 'full'
                     check (branch in ('full','anatomy','physics')),
+  -- Free is a real plan and is shown on the pricing page, but it is not
+  -- bought, so it never needs a Stripe price and must never reach checkout.
+  purchasable       boolean not null default true,
   active            boolean not null default true,
   sort_order        integer not null default 0,
   created_at        timestamptz not null default now(),
@@ -39,14 +47,36 @@ create table if not exists public.plans (
 );
 
 comment on table public.plans is
-  'What can be bought. Prices change here; access logic never moves.';
+  'What can be held. Prices change through set_plan_price(); access logic never moves.';
 
-insert into public.plans (id, name, months, amount_pence, stripe_price_id, sort_order)
+insert into public.plans (id, name, months, amount_pence, purchasable, sort_order)
 values
-  ('premium_3m',  '3 months',  3,  4900, null, 1),
-  ('premium_6m',  '6 months',  6,  8900, null, 2),
-  ('premium_12m', '12 months', 12, 14900, null, 3)
+  ('free',        'Free',      null, 0,     false, 0),
+  ('premium_3m',  '3 months',  3,    4000,  true,  1),
+  ('premium_6m',  '6 months',  6,    7000,  true,  2),
+  ('premium_12m', '12 months', 12,   12000, true,  3)
 on conflict (id) do nothing;
+
+-- Every price this plan has ever had. Kept because a refund, a receipt or a
+-- question about an old charge has to resolve the price that was actually
+-- charged — which is not necessarily the one on sale today.
+create table if not exists public.plan_prices (
+  id               uuid primary key default gen_random_uuid(),
+  plan_id          text not null references public.plans(id) on delete cascade,
+  stripe_price_id  text not null unique,
+  amount_pence     integer not null check (amount_pence >= 0),
+  currency         text not null default 'gbp',
+  active           boolean not null default true,
+  created_by       uuid references auth.users(id),
+  created_at       timestamptz not null default now()
+);
+
+create index if not exists plan_prices_plan on public.plan_prices(plan_id, active);
+
+alter table public.plan_prices enable row level security;
+drop policy if exists "managers read plan prices" on public.plan_prices;
+create policy "managers read plan prices" on public.plan_prices
+  for select to authenticated using (public.has_capability('users:manage'));
 
 -- Anyone may read the plan list — it is the pricing page.
 alter table public.plans enable row level security;
@@ -486,3 +516,86 @@ end;
 $$;
 
 grant execute on function public.revoke_access(uuid,text) to authenticated;
+
+-- =====================================================================
+-- 9. Changing a price, without anybody copying an id.
+--
+-- The Edge Function creates the Stripe Price (that needs the secret key,
+-- so it cannot happen here) and then calls this to make it the live one.
+-- Stripe prices are immutable by design, so a change is always a NEW
+-- price; the old row stays, inactive, because an old charge has to stay
+-- resolvable.
+-- =====================================================================
+create or replace function public.record_plan_price(
+  p_plan_id     text,
+  p_price_id    text,
+  p_amount      integer,
+  p_currency    text default 'gbp',
+  p_actor       uuid default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare v_old text;
+begin
+  select stripe_price_id into v_old from public.plans where id = p_plan_id;
+  if not found then raise exception 'Unknown plan %', p_plan_id; end if;
+
+  update public.plan_prices set active = false where plan_id = p_plan_id and active;
+
+  insert into public.plan_prices (plan_id, stripe_price_id, amount_pence, currency, created_by)
+  values (p_plan_id, p_price_id, p_amount, p_currency, p_actor);
+
+  update public.plans
+  set stripe_price_id = p_price_id, amount_pence = p_amount,
+      currency = p_currency, updated_at = now()
+  where id = p_plan_id;
+
+  insert into public.access_audit (user_id, actor_id, action, detail, note)
+  values (coalesce(p_actor, '00000000-0000-0000-0000-000000000000'::uuid), p_actor,
+          'price_change',
+          jsonb_build_object('plan', p_plan_id, 'from_price', v_old,
+                             'to_price', p_price_id, 'amount_pence', p_amount),
+          'Price changed via Pricing Management');
+
+  return jsonb_build_object('status','ok','plan',p_plan_id,'price',p_price_id,'amount_pence',p_amount);
+end;
+$$;
+
+revoke all on function public.record_plan_price(text,text,integer,text,uuid) from public, anon, authenticated;
+
+-- A plan that is not purchasable must never produce a grant. `free` is a
+-- state somebody is in, not something a webhook can award, and a bug that
+-- let it through would hand out access for a payment of nothing.
+create or replace function public.assert_purchasable() returns trigger
+language plpgsql as $$
+begin
+  if new.source = 'stripe' and new.plan_id is not null then
+    if not exists (select 1 from public.plans where id = new.plan_id and purchasable) then
+      raise exception 'Plan % is not purchasable', new.plan_id;
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists access_grants_purchasable on public.access_grants;
+create trigger access_grants_purchasable
+  before insert on public.access_grants
+  for each row execute function public.assert_purchasable();
+
+-- What the pricing page reads. Public, and deliberately narrow: the price
+-- list is not a place to learn anything about Stripe.
+create or replace function public.public_plans()
+returns table (id text, name text, months integer, amount_pence integer,
+               currency text, purchasable boolean, sort_order integer)
+language sql stable
+set search_path = public, pg_temp
+as $$
+  select id, name, months, amount_pence, currency, purchasable, sort_order
+  from public.plans where active order by sort_order
+$$;
+
+grant execute on function public.public_plans() to anon, authenticated;

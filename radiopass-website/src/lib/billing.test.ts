@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { PLANS, formatPrice, isActive, nextExpiry, planById, remainingLabel } from './billing'
+import { PLANS, formatPrice, isActive, nextExpiry, planById, purchasablePlans, remainingLabel } from './billing'
 
 const at = (iso: string) => new Date(iso)
 
@@ -27,10 +27,16 @@ describe('the three durations produce the durations they promise', () => {
     expect(nextExpiry(null, 12, bought).toISOString()).toBe('2027-08-22T10:00:00.000Z')
   })
 
-  it('offers exactly the three plans, with the months they are named for', () => {
-    expect(PLANS.map((p) => p.months)).toEqual([3, 6, 12])
+  it('offers exactly three purchasable plans, with the months they are named for', () => {
+    expect(purchasablePlans().map((p) => p.months)).toEqual([3, 6, 12])
     expect(planById('premium_6m')?.months).toBe(6)
     expect(planById('nonsense')).toBeUndefined()
+  })
+
+  it('carries the launch prices', () => {
+    expect(planById('premium_3m')?.amountPence).toBe(4000)
+    expect(planById('premium_6m')?.amountPence).toBe(7000)
+    expect(planById('premium_12m')?.amountPence).toBe(12000)
   })
 })
 
@@ -107,5 +113,28 @@ describe('what the learner is told', () => {
   it('prices without stray pence', () => {
     expect(formatPrice(4900)).toBe('£49')
     expect(formatPrice(14950)).toBe('£149.50')
+  })
+})
+
+describe('free is a plan, not the absence of one', () => {
+  it('is in the catalogue, costs nothing, and never expires', () => {
+    const free = planById('free')
+    expect(free).toBeDefined()
+    expect(free!.amountPence).toBe(0)
+    /* null months is what "does not expire" means. A free account is a state
+       somebody is permanently in — it is where a lapsed subscriber returns
+       to, with every score and flag still theirs. */
+    expect(free!.months).toBeNull()
+  })
+
+  it('can never be bought', () => {
+    /* Guarded in the database by a trigger too. A webhook that granted `free`
+       would be handing out access for a payment of nothing. */
+    expect(planById('free')!.purchasable).toBe(false)
+    expect(purchasablePlans().some((p) => p.id === 'free')).toBe(false)
+  })
+
+  it('is listed before the paid plans', () => {
+    expect(PLANS[0].id).toBe('free')
   })
 })
