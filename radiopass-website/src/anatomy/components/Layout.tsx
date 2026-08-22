@@ -128,7 +128,14 @@ export default function Layout() {
             {/* The one lockup every header renders: convergence mark,
                 RADIOPASS, and the branch word saying which half you are
                 standing in — the same component the physics header mounts. */}
-            <Link to="/anatomy" className="rpa-brand">
+            {/* To '/', like every other header in the app — Shell.tsx:173,
+                App.tsx:441, 767, 814 all send the wordmark to the front door.
+                This one alone sent it to /anatomy, so pressing RADIOPASS from
+                inside anatomy landed you back on the anatomy home: the branch
+                you were already in, which reads as the button doing something
+                arbitrary. The branch word beside the mark still says where you
+                are standing; the mark is how you leave. */}
+            <Link to="/" className="rpa-brand">
               <Logo branch="Anatomy" markHeight={22} />
             </Link>
 
@@ -192,7 +199,17 @@ export default function Layout() {
                   <span className="account-avatar" aria-hidden="true">
                     {streak > 0 ? streak : '·'}
                   </span>
-                  <span className="account-plan mono">Progress</span>
+                  {/* This chip is the ONLY way to reach the email address and
+                      Log out, and it was labelled "Progress" over a streak
+                      number — which reads as a statistic, not a control. The
+                      account was therefore unreachable in practice: reported
+                      as "there is no sign out button", and it is a fair
+                      reading of what was on screen. The menu still carries the
+                      streak facts; the label now names the thing you cannot
+                      find any other way. */}
+                  <span className="account-plan mono">
+                    {user ? 'Account' : configured ? 'Sign in' : 'Progress'}
+                  </span>
                 </button>
                 {menuOpen && (
                   <div className="account-menu" role="menu">
