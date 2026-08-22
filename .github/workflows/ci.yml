@@ -1,0 +1,51 @@
+# The gate, run on every push and pull request.
+#
+# Cloudflare Pages builds from this repository on push. It will happily publish
+# a build whose tests never ran, so the gate lives here instead: if this job is
+# red, the commit that broke it is named before anyone goes looking at the live
+# site. It runs the SAME checks as scripts/run-tests.sh plus the typecheck, so
+# CI and a local `npm test` cannot disagree about what passing means.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: radiopass-website
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Same file Cloudflare Pages reads, so the two builds cannot drift.
+          node-version-file: radiopass-website/.nvmrc
+          cache: npm
+          cache-dependency-path: radiopass-website/package-lock.json
+
+      # ci, not install: the lockfile is the contract, and a CI run that
+      # silently resolves a different tree is testing something else.
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -b --noEmit
+
+      - name: Question-to-section map (E1-E6)
+        run: node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts --errors-only
+
+      - name: Physics question shape
+        run: node scripts/physics-shape-validate.mjs
+
+      - name: Tests
+        run: npx vitest run
+
+      # Proves the thing Cloudflare will actually publish still assembles,
+      # including the checks package.mjs makes about anatomy media and the
+      # host-config files reaching dist.
+      - name: Build the distribution
+        run: npm run package
