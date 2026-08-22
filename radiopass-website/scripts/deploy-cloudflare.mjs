@@ -2,7 +2,7 @@
 /* ===========================================================================
    Publish deploy/ to Cloudflare Pages.
 
-       node scripts/deploy-cloudflare.mjs [--project radiopass-preview]
+       node scripts/deploy-cloudflare.mjs [--project radiopass-staging]
 
    WHY THIS EXISTS RATHER THAN `wrangler pages deploy deploy`.
 
@@ -34,7 +34,7 @@ const APP = join(fileURLToPath(new URL('.', import.meta.url)), '..')
 const DEPLOY = join(APP, 'deploy')
 
 const argv = process.argv.slice(2)
-/* radiopass-staging, not radiopass-preview. The old project's edge cache
+/* radiopass-staging, not radiopass-staging. The old project's edge cache
    still holds an asset from before the content partition — 1 MB of marked
    answers, pinned by our own `immutable, max-age=31536000` header, on a
    pages.dev hostname whose zone we do not own and therefore cannot purge.

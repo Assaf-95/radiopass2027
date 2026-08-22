@@ -253,7 +253,7 @@ against a list of addresses that are allowed:
 
 ```
 ALLOWED_ORIGINS = radiopass.co.uk, www.radiopass.co.uk,
-                  radiopass-preview.pages.dev, localhost:3000
+                  radiopass-staging.pages.dev, localhost:3000
 ```
 
 A payment started on the preview returns to the preview; one started on the
