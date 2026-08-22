@@ -74,6 +74,11 @@
 .rp-anatomy .rie-preserved ul { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-dim); line-height: 1.7; }
 .rp-anatomy .rie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .rp-anatomy .rie-unreviewed { font-size: 12px; color: var(--amber); }
+/* Said beside the Save button. The banners at the head of the page carry the
+   full outcome and the Done action; this is the short version, for an author
+   looking at the control rather than at the top of a long page. */
+.rp-anatomy .rie-actions-note { font-size: 12px; line-height: 1.5; color: var(--text-dim); margin: 8px 0 0; }
+.rp-anatomy .rie-actions-note.is-bad { color: var(--amber); }
 .rp-anatomy .rie-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: grid; place-items: center; z-index: 60; padding: 24px; }
 .rp-anatomy .rie-modal-inner { background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 22px; max-width: 720px; width: 100%; max-height: 88vh; overflow: auto; }
 .rp-anatomy .rie-confirm { max-width: 460px; }

@@ -161,6 +161,28 @@ function Editor() {
   const [cropRect, setCropRect] = useState<{x:number;y:number;w:number;h:number} | null>(seededCrop);
   const [savedOnce, setSavedOnce] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  /* The outcome of a save is announced at the TOP of the page; the Save
+     button lives in the sidebar, well below the fold on any real question.
+     So both answers — "Saved." with its Done button, and "Not saved." with
+     the reason — were being rendered somewhere the author could not see
+     while looking at the button they had just pressed. The click read as
+     doing nothing at all, which is exactly how it was reported.
+
+     Scrolling the banner into view is what makes the refusal legible: the
+     guard in save() below rejects a label with no answer text, and until
+     now it rejected it silently as far as anyone could tell. Only fires on
+     a real outcome — both values start empty, so this never runs on mount,
+     which is the failure mode that once pushed a lab's header out of its
+     own scroll pane. */
+  const outcomeRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!savedOnce && !saveError) return;
+    outcomeRef.current?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  }, [savedOnce, saveError]);
   /* Magnification of the working stage. 1 is "fits the stage"; above that the
      plate scrolls. Cropping to a tall strip makes the film NARROWER, not
      bigger, so without this the answer to "I cropped it, why is it not zoomed
@@ -662,7 +684,7 @@ function Editor() {
       </header>
 
       {savedOnce && (
-        <div className="rie-saved" role="status">
+        <div className="rie-saved" role="status" ref={outcomeRef}>
           <strong>Saved.</strong> The image is committed. Labels are often the part that
           still needs work — carry on placing them, or view it as a student.
           <span className="rie-saved-actions">
@@ -703,7 +725,7 @@ function Editor() {
       )}
 
       {saveError && (
-        <div className="rie-warn" role="alert">
+        <div className="rie-warn" role="alert" ref={outcomeRef}>
           <strong>Not saved.</strong> {saveError}
         </div>
       )}
@@ -1290,6 +1312,20 @@ function Editor() {
               </button>
             )}
           </div>
+
+          {/* Said at the button, because these two states produce no banner to
+              scroll to. A disabled control announces nothing at all when it is
+              pressed, so the reason it is disabled has to be written next to
+              it; and the refusal is echoed here so the author knows the click
+              registered even before the page moves to the full message. */}
+          {answers.length === 0 && !publishing && (
+            <p className="rie-actions-note">
+              Saving is off until this image has at least one label.
+            </p>
+          )}
+          {saveError && !publishing && (
+            <p className="rie-actions-note is-bad">Not saved — {saveError}</p>
+          )}
 
           {unreviewed > 0 && (
             <p className="rie-unreviewed">
