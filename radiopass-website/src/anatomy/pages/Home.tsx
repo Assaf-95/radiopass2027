@@ -1,9 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { SECTION_META, getSectionQuestions } from '../data/sections';
-import { flaggedQuestions } from '../lib/stats';
+import { SECTION_META } from '../data/sectionMeta';
+import { computeHomeStats, randomQuestionId, sectionModalities } from '../lib/summaryStats';
 import { lastOfType } from '../../lib/learner';
-import { computeSectionStats } from '../lib/stats';
 import { getLastQuestion } from '../lib/progress';
 import type { SectionId } from '../types';
 /* The owner's sculpture renders (src/assets/sculpture, 1400px JPEGs),
@@ -64,9 +63,11 @@ export default function Home() {
   const rows = useMemo(
     () =>
       SECTION_META.map((s) => {
-        const stats = computeSectionStats(s.id);
-        const questions = getSectionQuestions(s.id);
-        const modalities = Array.from(new Set(questions.map((q) => q.imagingModality)));
+        /* Both read the generated summary, not the bank — see
+           lib/summaryStats.ts. This page used to import the whole question
+           dataset (a 1 MB chunk) to render six cards. */
+        const stats = computeHomeStats(s.id);
+        const modalities = sectionModalities(s.id);
         return { meta: s, stats, modalities, last: getLastQuestion(s.id) };
       }),
     []
@@ -91,11 +92,11 @@ export default function Home() {
   }, []);
 
   /* Flagged across every region. Real count or nothing — never a zero chip
-     pretending to be a feature the learner has not used. */
-  const flaggedCount = useMemo(
-    () => SECTION_META.reduce((n, m) => n + flaggedQuestions(m.id).length, 0),
-    []
-  );
+     pretending to be a feature the learner has not used.
+     Summed from the rows already computed above rather than calling into
+     lib/stats: that module imports the question bank, and reaching it for a
+     COUNT was the last thing pulling a 1 MB chunk onto this page. */
+  const flaggedCount = useMemo(() => rows.reduce((n, r) => n + r.stats.flagged, 0), [rows]);
 
   /* Two different numbers, and the difference matters.
      `structures` and `questions` describe the bank; `attempted`, `rawScore`
@@ -133,9 +134,9 @@ export default function Home() {
     const pool = rows.filter((r) => r.stats.total > 0);
     if (!pool.length) return;
     const r = pool[Math.floor(Math.random() * pool.length)];
-    const qs = getSectionQuestions(r.meta.id);
-    const q = qs[Math.floor(Math.random() * qs.length)];
-    navigate(`/anatomy/section/${r.meta.id}/q/${q.id}`);
+    const id = randomQuestionId(r.meta.id);
+    if (!id) return;
+    navigate(`/anatomy/section/${r.meta.id}/q/${id}`);
   }
 
   /* Honour ?goto=modules from the header: land on the syllabus, no film.

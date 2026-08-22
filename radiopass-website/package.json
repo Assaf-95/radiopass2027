@@ -17,7 +17,8 @@
     "questions:validate": "node --import ./scripts/ts-register.mjs scripts/questions-validate.ts",
     "atlas:validate": "node --import ./scripts/ts-register.mjs scripts/atlas-validate.ts",
     "atlas:report": "node --import ./scripts/ts-register.mjs scripts/atlas-report.ts",
-    "physics:map": "node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts"
+    "physics:map": "node --import ./scripts/ts-register.mjs scripts/physics-map-validate.ts",
+    "anatomy:summary": "node scripts/anatomy-summary.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.7.0",

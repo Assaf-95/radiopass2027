@@ -28,18 +28,34 @@ import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import Layout from './components/Layout'
 import RequireAdmin from './components/RequireAdmin'
-import StructureFolders from './pages/StructureFolders'
-import QuestionWording from './pages/QuestionWording'
-import ImageManager from './pages/ImageManager'
 import { contentLoaded, loadContent, subscribeContent } from './lib/content/store'
 import Home from './pages/Home'
-import SectionHub from './pages/SectionHub'
-import QuestionPlayer from './pages/QuestionPlayer'
 import './anatomy.css'
 
 /* The Structure Atlas is a browsing tool rather than a step on the path to
    answering a question, so it loads on demand. Its three pages share one
    chunk: a learner who opens the Atlas will use all three. */
+/* The learner path — front page, a region, a question.
+   These were EAGER, on the reasoning that they are the walk from the home
+   page to answering something. The cost of that was paid by everyone on
+   arrival: SectionHub and QuestionPlayer both import the question bank, so
+   simply opening /anatomy downloaded and parsed all 521 questions with every
+   label, marker, variant and teaching paragraph — a 192 KB chunk (1 MB raw)
+   before the six region cards could paint.
+
+   The first load now buys only the front page. Clicking a region fetches its
+   chunk, which is the right place to spend it: that click is a deliberate act
+   with an obvious cause, where arriving at a slow home page is neither. */
+const SectionHub = lazy(() => import('./pages/SectionHub'))
+const QuestionPlayer = lazy(() => import('./pages/QuestionPlayer'))
+
+/* Authoring. These were eager despite this file's own rule that the authoring
+   suite must not be in the application's first download — QuestionWording and
+   ImageManager both pull the bank too. */
+const StructureFolders = lazy(() => import('./pages/StructureFolders'))
+const QuestionWording = lazy(() => import('./pages/QuestionWording'))
+const ImageManager = lazy(() => import('./pages/ImageManager'))
+
 const AtlasHome = lazy(() => import('./pages/AtlasHome'))
 const AtlasChapter = lazy(() => import('./pages/AtlasChapter'))
 const AtlasStructure = lazy(() => import('./pages/AtlasStructure'))

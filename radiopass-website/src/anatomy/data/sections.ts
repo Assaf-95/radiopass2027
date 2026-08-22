@@ -1,4 +1,5 @@
 import type { Question, SectionId, SectionMeta } from '../types';
+import { SECTION_META } from './sectionMeta';
 import { getCustomQuestions } from '../lib/customQuestions';
 import { applyEdit, getEdit } from '../lib/questionEdits';
 import { applyOverlay } from '../lib/content/store';
@@ -10,45 +11,7 @@ import thoraxData from './thorax.json';
 import headNeckData from './headNeck.json';
 import abdoPelvisData from './abdoPelvis.json';
 
-export const SECTION_META: SectionMeta[] = [
-  {
-    id: 'upper-limb',
-    title: 'Upper Limb',
-    description: 'Shoulder girdle, humerus, elbow, forearm, wrist and hand.',
-    modalities: [],
-  },
-  {
-    id: 'lower-limb',
-    title: 'Lower Limb',
-    description: 'Hip, femur, knee, tibia/fibula, ankle and foot.',
-    modalities: ['Plain Film', 'Angiography', 'Ultrasound', 'Cross-sectional imaging', 'Hip', 'Knee', 'Ankle and Foot'],
-  },
-  {
-    id: 'head-neck',
-    heroImage: '/images/section-hero/head-neck.jpg',
-    title: 'Head and Neck',
-    description: 'Skull base, facial bones, orbits, sinuses, temporal bones, neck.',
-    modalities: [],
-  },
-  {
-    id: 'spine',
-    title: 'Spine',
-    description: 'Cervical, thoracic, lumbar spine, sacrum and coccyx.',
-    modalities: ['Plain Film', 'Ultrasound', 'Cross-sectional imaging'],
-  },
-  {
-    id: 'thorax',
-    title: 'Thorax',
-    description: 'Chest wall, lungs, mediastinum, heart and great vessels.',
-    modalities: ['Plain Film', 'Fluoroscopy', 'Angiography', 'Ultrasound', 'Cross-sectional imaging'],
-  },
-  {
-    id: 'abdo-pelvis',
-    title: 'Abdomen and Pelvis',
-    description: 'GI tract, liver, biliary tree, urinary tract, male and female pelvis.',
-    modalities: ['Plain Film', 'Ultrasound', 'Fluoroscopy', 'Angiography', 'Biliary imaging', 'Cross-sectional imaging', 'MRI Pelvis'],
-  },
-];
+export { SECTION_META } from './sectionMeta';
 
 const DATA: Record<SectionId, Question[]> = {
   spine: spineData as unknown as Question[],
