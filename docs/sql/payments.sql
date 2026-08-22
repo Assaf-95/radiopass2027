@@ -772,5 +772,18 @@ alter table public.premium_content enable row level security;
 -- oversight, and the verify script asserts it stays that way.
 revoke all on table public.premium_content from anon, authenticated;
 
+-- Table privileges. A policy decides WHICH ROWS a role may see; a grant
+-- decides whether the role may touch the table at all, and both are needed.
+-- Omitting these once left the pricing page empty with correct-looking
+-- policies in place.
+grant select on public.plans            to anon, authenticated;
+grant select on public.plan_prices      to authenticated;
+grant select on public.payments         to authenticated;
+grant select on public.access_grants    to authenticated;
+grant select on public.stripe_customers to authenticated;
+grant select on public.stripe_events    to authenticated;
+grant select on public.access_audit     to authenticated;
+-- premium_content gets none, deliberately.
+
 comment on table public.premium_content is
   'Premium items, unreachable from any browser. Read only by the premium-content function after an entitlement check.';
